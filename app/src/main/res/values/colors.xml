@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+  <!-- deep blue -->
+  <!--<color name="blue_deep_light_6">#ffdf00</color>-->
+  <!--<color name="blue_deep_light_5">#ffdf00</color>-->
+  <!--<color name="blue_deep_light_4">#ffdf00</color>-->
+  <!--<color name="blue_deep_light_3">#F1B200</color>-->
+  <!--<color name="blue_deep_light_2">#F1B200</color>-->
+  <!--<color name="blue_deep_light_1">#F1B200</color>-->
+  <!--<color name="blue_deep">#F1B200</color>-->
+  <!--<color name="blue_deep_dark_1">#F1B200</color>-->
+  <!--<color name="blue_deep_dark_2">#F1B200</color>-->
+
+  <color name="blue_deep_light_6">#B8E4FF</color>
+  <color name="blue_deep_light_5">#8ECFFF</color>
+  <color name="blue_deep_light_4">#57AFF3</color>
+  <color name="blue_deep_light_3">#138FE0</color>
+  <color name="blue_deep_light_2">#0073BF</color>
+  <color name="blue_deep_light_1">#0063A6</color>
+  <color name="blue_deep">#00548B</color>
+  <color name="blue_deep_dark_1">#004774</color>
+  <color name="blue_deep_dark_2">#003759</color>
+
+  <color name="orange_light_2">#FFD500</color>
+  <color name="orange_light_1">#FFBF13</color>
+  <color name="orange">#F1B200</color>
+  <color name="orange_dark_1">#EE9700</color>
+  <color name="orange_dark_2">#DB8300</color>
+  <color name="orange_dark_3">#D65E00</color>
+
+  <!-- basic -->
+  <color name="yellow">#F1AF00</color>
+  <color name="green">#09BB74</color>
+  <color name="red">#CA4747</color>
+
+  <!-- basic -->
+  <color name="transparent">#00000000</color>
+  <color name="dark">#212529</color>
+  <color name="black">#000000</color>
+  <color name="grey">#888888</color>
+  <color name="grey_light_1">#BABABA</color>
+  <color name="grey_light_2">#D4D4D4</color>
+  <color name="grey_light_3">#EDEDED</color>
+  <color name="white">#FFFFFF</color>
+  <color name="white_high_op">#CCFFFFFF</color>
+  <color name="white_mid_op">#88FFFFFF</color>
+  <color name="white_low_op">#33FFFFFF</color>
+</resources>

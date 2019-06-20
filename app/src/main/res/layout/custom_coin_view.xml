@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+      android:id="@+id/amount"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintHorizontal_chainStyle="packed"
+      app:layout_constraintEnd_toStartOf="@id/unit"
+      android:fontFamily="sans-serif-light"
+      android:text="0.00"
+      android:textSize="46sp" />
+
+    <TextView
+      android:id="@+id/unit"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_xxs"
+      app:layout_constraintBaseline_toBaselineOf="@id/amount"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/amount"
+      android:fontFamily="sans-serif-light"
+      android:text="mBTC" />
+
+    <!--<TextView-->
+    <!--android:id="@+id/amount"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginStart="@dimen/space_xxxs"-->
+    <!--android:layout_marginEnd="@dimen/space_xxxs"-->
+    <!--android:ellipsize="none"-->
+    <!--android:fontFamily="sans-serif-light"-->
+    <!--android:singleLine="true"-->
+    <!--android:text="0,00"-->
+    <!--android:textColor="@color/dark"-->
+    <!--android:textSize="30sp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintEnd_toStartOf="@id/unit"-->
+    <!--app:layout_constraintHorizontal_chainStyle="packed"-->
+    <!--app:layout_constraintStart_toEndOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/unit"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginStart="@dimen/space_xxxs"-->
+    <!--android:fontFamily="sans-serif-light"-->
+    <!--android:maxLines="1"-->
+    <!--android:text="mBTC"-->
+    <!--app:layout_constraintBaseline_toBaselineOf="@id/amount"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintHorizontal_chainStyle="packed"-->
+    <!--app:layout_constraintStart_toEndOf="@id/amount" />-->
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

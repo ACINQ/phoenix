@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.eclair.phoenix.AppKitModel.StartupState" />
+
+    <variable
+      name="appKitModel"
+      type="fr.acinq.eclair.phoenix.AppKitModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/space_lg"
+    tools:context=".startup.StartupFragment">
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      android:id="@+id/starting"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      android:visibility="@{appKitModel.state == StartupState.IN_PROGRESS}"
+      app:text="@string/startup_wait" />
+
+    <TextView
+      android:id="@+id/error"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      android:drawableStart="@drawable/ic_alert_triangle_white_24dp"
+      android:text="@{appKitModel.errorMessage}"
+      android:visibility="@{appKitModel.state == StartupState.ERROR}" />
+
+    <!--<Button-->
+    <!--android:id="@+id/start_button"-->
+    <!--style="@style/default_buttonStyle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginTop="@dimen/space_md"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/state"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--android:backgroundTint="@color/green"-->
+    <!--android:text="Start node" />-->
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

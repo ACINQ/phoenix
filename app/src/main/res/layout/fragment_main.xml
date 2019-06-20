@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".main.MainFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toTopOf="@id/list_top_guideline"
+      android:elevation="16dp">
+
+      <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+        android:id="@+id/balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:amount_size="48sp"
+        app:unit_size="20sp"
+        app:amount_color="@color/white"
+        app:unit_color="@color/white" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+      android:id="@+id/list_top_guideline"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintGuide_percent="0.6"
+      android:orientation="horizontal" />
+
+    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+    <!--android:id="@+id/swipe_refresh"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/list_top_guideline"-->
+    <!--app:layout_constrainedHeight="true"-->
+    <!--android:scrollIndicators="none">-->
+
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/payment_list"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/list_top_guideline"
+      app:layout_constrainedHeight="true"
+      android:clipToPadding="false"
+      android:overScrollMode="never"
+      android:paddingBottom="88dp" />
+
+    <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/buttons_layout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:background="@drawable/rounded_top_white"
+      android:elevation="44dp">
+
+      <Button
+        android:id="@+id/receive_button"
+        style="@style/ClassicButtonStyle"
+        android:layout_width="0dp"
+        android:layout_marginBottom="@dimen/space_md"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintEnd_toStartOf="@id/send_button"
+        android:text="Receive" />
+
+      <Button
+        android:id="@+id/send_button"
+        style="@style/ClassicButtonStyle"
+        android:layout_width="0dp"
+        android:layout_marginBottom="@dimen/space_md"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/receive_button"
+        android:text="Send" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,118 @@
+/*
+ * Copyright 2019 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
+android {
+  compileSdkVersion 28
+  defaultConfig {
+    applicationId "fr.acinq.eclair.phoenix"
+    minSdkVersion 26
+    targetSdkVersion 28
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+  buildTypes {
+    debug {
+      resValue "string", "CHAIN", CHAIN_TESTNET
+      buildConfigField "String", "CHAIN", CHAIN_TESTNET
+      debuggable true
+    }
+    release {
+      resValue "string", "CHAIN", CHAIN_TESTNET
+      buildConfigField "String", "CHAIN", CHAIN_TESTNET
+      minifyEnabled false
+      debuggable false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  packagingOptions {
+    exclude 'META-INF/LICENSE*'
+    exclude 'META-INF/NOTICE.txt'
+    merge 'reference.conf'
+  }
+  dataBinding {
+    enabled = true
+  }
+  splits {
+    abi {
+      enable true
+      reset()
+      include 'x86', 'armeabi-v7a'
+      universalApk true
+    }
+  }
+}
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+  // base dependencies
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "androidx.appcompat:appcompat:1.0.2"
+  implementation 'androidx.core:core-ktx:1.0.2'
+
+  // ANDROIDX - navigation
+  def nav_version = "2.1.0-alpha05"
+  implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+  implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+  // ANDROIDX - constraint layout
+  def constraint_version = "2.0.0-beta2"
+  implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+
+  // ANDROIDX - viewmodel + livedata
+  def lifecycle_version = "2.2.0-alpha01"
+  implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+  implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+  // logging
+  implementation 'org.slf4j:slf4j-api:1.7.25'
+  implementation 'com.github.tony19:logback-android:2.0.0'
+
+  // eclair core
+  def libsecp256k1_version = "1.2-SNAPSHOT"
+  def eclair_version = "0.3.2-android-phoenix-SNAPSHOT"
+  implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
+  implementation ("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
+    exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'
+  }
+
+  // eventbus
+  def eventbus_version = "3.1.1"
+  implementation "org.greenrobot:eventbus:$eventbus_version"
+
+  // zxing
+  def zxing_version = "3.6.0"
+  implementation "com.journeyapps:zxing-android-embedded:$zxing_version"
+
+  // tests
+  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+  testImplementation 'junit:junit:4.12'
+  androidTestImplementation 'androidx.test:runner:1.2.0'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}

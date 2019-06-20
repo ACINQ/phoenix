@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".receive.ReceiveWithOpenDialogFragment">
+
+    <FrameLayout
+      android:id="@+id/illustration"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/blue_deep_light_2"
+      android:padding="@dimen/space_lg"
+      app:layout_constraintTop_toTopOf="parent">
+
+      <ImageView
+        android:layout_width="100dp"
+        android:layout_gravity="center"
+        android:layout_height="100dp"
+        android:src="@drawable/cloudy"
+        android:contentDescription="@string/utils_unknown" />
+
+    </FrameLayout>
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:layout_marginTop="@dimen/space_lg"
+      app:layout_constraintTop_toBottomOf="@id/illustration"
+      android:text="@string/receive_with_open_title" />
+
+    <androidx.constraintlayout.widget.Guideline
+      android:id="@+id/label_guideline"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintGuide_percent="0.4"
+      android:orientation="vertical" />
+
+    <TextView
+      android:id="@+id/funding_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_lg"
+      app:layout_constraintBaseline_toBaselineOf="@id/funding_value"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/label_guideline"
+      app:layout_constrainedWidth="true"
+      android:text="@string/receive_with_open_funding_label" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+      android:id="@+id/funding_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_lg"
+      android:layout_marginStart="@dimen/space_xs"
+      android:layout_marginEnd="@dimen/space_lg"
+      app:layout_constraintTop_toBottomOf="@id/title"
+      app:layout_constraintStart_toEndOf="@id/label_guideline"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constrainedWidth="true"
+      app:amount_size="@dimen/text_md"
+      app:thin="false"
+      app:unit_size="@dimen/text_xs" />
+
+    <TextView
+      android:id="@+id/fee_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_lg"
+      app:layout_constraintBaseline_toBaselineOf="@id/fee_value"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/label_guideline"
+      app:layout_constrainedWidth="true"
+      android:text="@string/receive_with_open_fee_label" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+      android:id="@+id/fee_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_lg"
+      android:layout_marginStart="@dimen/space_xs"
+      app:layout_constraintTop_toBottomOf="@id/funding_label"
+      app:layout_constraintStart_toEndOf="@id/label_guideline"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constrainedWidth="true"
+      app:amount_size="@dimen/text_md"
+      app:thin="false"
+      app:unit_size="@dimen/text_xs" />
+
+    <TextView
+      android:id="@+id/push_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_lg"
+      app:layout_constraintBaseline_toBaselineOf="@id/push_value"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/label_guideline"
+      app:layout_constrainedWidth="true"
+      android:text="@string/receive_with_open_push_label" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+      android:id="@+id/push_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/space_xs"
+      android:layout_marginEnd="@dimen/space_lg"
+      app:layout_constraintTop_toBottomOf="@id/fee_label"
+      app:layout_constraintStart_toEndOf="@id/label_guideline"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constrainedWidth="true"
+      app:amount_size="@dimen/text_md"
+      app:thin="false"
+      app:unit_size="@dimen/text_xs" />
+
+    <Button
+      android:id="@+id/decline_button"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_lg"
+      app:layout_constraintBaseline_toBaselineOf="@+id/accept_button"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintHorizontal_chainStyle="spread"
+      app:layout_constraintEnd_toStartOf="@id/accept_button"
+      android:text="@string/receive_with_open_fee_decline" />
+
+    <Button
+      android:id="@+id/accept_button"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_lg"
+      app:layout_constraintTop_toBottomOf="@id/push_label"
+      app:layout_constraintStart_toEndOf="@id/decline_button"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:text="@string/receive_with_open_fee_accept" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

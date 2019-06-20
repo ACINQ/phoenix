@@ -1,0 +1,81 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+  <string name="app_name">Phoenix</string>
+
+  <!-- //////////////// initwallet / create seed //////////////// -->
+
+  <string name="newseed_instructions">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus.\nPlease save this list somewhere safe (not on this phone).</string>
+  <string name="newseed_words_td"><![CDATA[<td><font color="#B8E4FF"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="newseed_generating_seed">Generating seed…</string>
+  <string name="newseed_seed_saved_checkbox">I have saved this list of words.</string>
+  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the only way to access my funds.</string>
+  <string name="newseed_next">Next</string>
+
+
+  <!-- //////////////// Pin dialogs //////////////////// -->
+
+  <string name="pindialog_title_default">Please enter your PIN</string>
+  <string name="pindialog_pwd_placeholder">●●●●●●</string>
+  <string name="pindialog_error">PIN code must be a 6 digits number.</string>
+  <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
+
+  <!-- //////////////// placeholders ////////////////-->
+  <string name="lipsum_short">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+  <string name="lipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+  <string name="lipsum_long">
+    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
+    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
+    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
+    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
+  </string>
+
+  <!-- //////////////// Startup //////////////////// -->
+
+  <string name="startup_wait">Starting node…</string>
+  <string name="startup_error">Could not start!</string>
+  <string name="startup_error_wrong_pwd">PIN is incorrect</string>
+  <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
+  <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
+  <string name="startup_error_generic">The application could not start, please try later</string>
+
+  <!-- //////////////// payment holder //////////////// -->
+
+  <string name="paymentholder_desc_waiting">Payment is processing</string>
+  <string name="paymentholder_desc_successful">Payment is successful</string>
+
+  <!-- //////////////// receive with open channel //////////////// -->
+
+  <string name="receive_with_open_title">Lorem ipsum dolor sit amet</string>
+  <string name="receive_with_open_funding_label">Funding</string>
+  <string name="receive_with_open_push_label">Someone wants to send you</string>
+  <string name="receive_with_open_fee_label">It will cost </string>
+  <string name="receive_with_open_fee_accept">Accept</string>
+  <string name="receive_with_open_fee_decline">Decline</string>
+
+  <!-- //////////////// send //////////////// -->
+
+  <string name="send_init_paste">Paste payment request</string>
+
+  <string name="send_go">Pay</string>
+  <string name="send_cancel">Cancel</string>
+
+  <!-- //////////////// utilities strings //////////////// -->
+
+  <string name="utils_pretty_amount"><![CDATA[%1$s<small>%2$s<small>]]></string>
+  <string name="utils_unknown">N/A</string>
+</resources>
