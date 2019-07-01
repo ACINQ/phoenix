@@ -57,6 +57,15 @@ object Wallet {
     return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
 
+  fun cleanPaymentRequest(input: String): String {
+    val trimmed = input.replace("\\u00A0", "").trim()
+    return when {
+      trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
+      trimmed.startsWith("lightning:", true) -> trimmed.drop(10)
+      else -> trimmed
+    }
+  }
+
   // ------------------------ NODES & API URLS
 
   const val PRICE_RATE_API = "https://blockchain.info/fr/ticker"

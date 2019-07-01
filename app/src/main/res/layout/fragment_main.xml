@@ -22,100 +22,119 @@
 
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <androidx.constraintlayout.motion.widget.MotionLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layoutDescription="@xml/scene_motion_main"
     tools:context=".main.MainFragment">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      app:layout_constrainedHeight="true"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintBottom_toTopOf="@id/list_top_guideline"
-      android:elevation="16dp">
-
-      <fr.acinq.eclair.phoenix.utils.customviews.CoinView
-        android:id="@+id/balance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:amount_size="48sp"
-        app:unit_size="20sp"
-        app:amount_color="@color/white"
-        app:unit_color="@color/white" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-    <androidx.constraintlayout.widget.Guideline
-      android:id="@+id/list_top_guideline"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:layout_constraintGuide_percent="0.6"
-      android:orientation="horizontal" />
-
-    <!--<androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
-    <!--android:id="@+id/swipe_refresh"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@id/list_top_guideline"-->
-    <!--app:layout_constrainedHeight="true"-->
-    <!--android:scrollIndicators="none">-->
 
     <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/payment_list"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      app:layout_behavior="@string/appbar_scrolling_view_behavior"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/list_top_guideline"
-      app:layout_constrainedHeight="true"
+      android:layout_height="0dp"
       android:clipToPadding="false"
       android:overScrollMode="never"
-      android:paddingBottom="88dp" />
+      android:paddingBottom="88dp"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/top_section" />
 
-    <!--</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+    <View
+      android:id="@+id/top_section"
+      android:layout_width="0dp"
+      android:layout_height="@dimen/balance_default_height"
+      android:contentDescription="@null"
+      android:fitsSystemWindows="true"
+      android:scaleType="center" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+      android:id="@+id/balance"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:amount_size="48sp"
+      app:unit_color="@color/primary_muted"
+      app:layout_constrainedWidth="true"
+      app:unit_size="20sp" />
+
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="200dp"
+      android:background="@drawable/main_bg_bottom_gradient"
+      app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/buttons_layout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_md"
-      android:layout_marginEnd="@dimen/space_md"
+      android:background="@color/white"
+      android:elevation="16dp"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      android:background="@drawable/rounded_top_white"
-      android:elevation="44dp">
+      app:layout_constraintStart_toStartOf="parent">
 
-      <Button
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/settings_button"
+        style="@style/ClassicButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        app:icon="@drawable/ic_settings_24dp"
+        app:text=""
+        app:layoutDescription="@string/menu_settings"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintEnd_toStartOf="@id/receive_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_sm"
+        android:layout_marginBottom="@dimen/space_sm"
+        android:background="@color/grey_light_3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/receive_button"
+        app:layout_constraintStart_toEndOf="@id/settings_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/receive_button"
         style="@style/ClassicButtonStyle"
         android:layout_width="0dp"
-        android:layout_marginBottom="@dimen/space_md"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
+        app:text="@string/menu_receive"
+        app:text_color="@color/dark"
+        app:text_size="@dimen/text_lg"
+        app:icon="@drawable/ic_receive_black_20dp"
         app:layout_constraintEnd_toStartOf="@id/send_button"
-        android:text="Receive" />
+        app:layout_constraintStart_toEndOf="@id/settings_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
-      <Button
+      <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_sm"
+        android:layout_marginBottom="@dimen/space_sm"
+        android:background="@color/grey_light_3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/send_button"
+        app:layout_constraintStart_toEndOf="@id/receive_button"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/send_button"
         style="@style/ClassicButtonStyle"
         android:layout_width="0dp"
-        android:layout_marginBottom="@dimen/space_md"
-        app:layout_constraintTop_toTopOf="parent"
+        app:text="@string/menu_send"
+        app:text_color="@color/dark"
+        app:text_size="@dimen/text_lg"
+        app:icon="@drawable/ic_send_black_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/receive_button"
-        android:text="Send" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

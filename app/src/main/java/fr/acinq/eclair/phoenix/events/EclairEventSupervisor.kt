@@ -16,16 +16,20 @@
 
 package fr.acinq.eclair.phoenix.events
 
+import akka.actor.ActorRef
 import akka.actor.Terminated
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.`BackupCompleted$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import fr.acinq.eclair.payment.PaymentLifecycle
+import fr.acinq.eclair.payment.PaymentReceived
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
-
+import org.spongycastle.crypto.Commitment
 
 class PendingPayToOpenRequestEvent(val preimage: ByteVector32, var event: PayToOpenRequestEvent?)
 
@@ -39,34 +43,61 @@ class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 class NodeSupervisor : UntypedActor() {
   private val log = LoggerFactory.getLogger(NodeSupervisor::class.java)
 
-  //  lateinit var preimage: ByteVector32
-
   // key is payment hash
   private val payToOpenMap = HashMap<ByteVector32, PendingPayToOpenRequestEvent>()
+
+  private val channelsMap = HashMap<ActorRef, Commitments>()
+
+  private fun postBalance() {
+    val balance = MilliSatoshi(channelsMap.map { c -> c.value.availableBalanceForSendMsat() }.sum())
+    log.info("posting balance=${balance.amount()}")
+    EventBus.getDefault().post(BalanceEvent(balance))
+  }
+
+  private fun postPayment() {
+    log.info("posting payment event")
+    EventBus.getDefault().post(PaymentEvent())
+  }
 
   override fun onReceive(event: Any?) {
     log.debug("received event $event")
     when (event) {
       is ChannelCreated -> {
         log.info("channel $event has been created")
+        postPayment()
       }
       is ChannelRestored -> {
         log.info("channel $event has been restored")
+        channelsMap[event.channel()] = event.currentData().commitments()
+        postBalance()
+        postPayment()
       }
       is ChannelIdAssigned -> {
         log.info("channel has been assigned id=${event.channelId()}")
       }
+      is ChannelStateChanged -> {
+        val data = event.currentData()
+        if (data is HasCommitments) {
+          channelsMap[event.channel()] = data.commitments()
+          postBalance()
+
+        }
+      }
       is ChannelSignatureSent -> {
         log.info("signature sent on ${event.commitments().channelId()}")
+        postPayment()
       }
       is ChannelSignatureReceived -> {
         log.info("signature $event has been sent")
+        channelsMap[event.channel()] = event.commitments()
+        postBalance()
       }
       is `BackupCompleted$` -> {
         log.info("channels have been backed up by core")
       }
       is Terminated -> {
         log.info("channel $event has been terminated")
+        channelsMap.remove(event.actor)
       }
       is ByteVector32 -> {
         val paymentHash = Crypto.sha256().apply(event.bytes())
@@ -121,9 +152,23 @@ class NodeSupervisor : UntypedActor() {
           event.paymentPreimage().tryFailure(RuntimeException("unknown payment hash"))
         }
       }
+      is PaymentLifecycle.PaymentSucceeded -> {
+        postPayment()
+      }
+      is PaymentLifecycle.PaymentFailed -> {
+        postPayment()
+      }
+      is PaymentReceived -> {
+        postPayment()
+      }
       else -> {
         log.warn("unhandled event $event")
       }
     }
+  }
+
+  override fun aroundPostStop() {
+    super.aroundPostStop()
+    log.info("eclair events supervisor stopped")
   }
 }

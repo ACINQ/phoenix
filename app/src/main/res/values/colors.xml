@@ -17,41 +17,45 @@
 
 <resources>
   <!-- deep blue -->
-  <!--<color name="blue_deep_light_6">#ffdf00</color>-->
-  <!--<color name="blue_deep_light_5">#ffdf00</color>-->
-  <!--<color name="blue_deep_light_4">#ffdf00</color>-->
-  <!--<color name="blue_deep_light_3">#F1B200</color>-->
-  <!--<color name="blue_deep_light_2">#F1B200</color>-->
-  <!--<color name="blue_deep_light_1">#F1B200</color>-->
-  <!--<color name="blue_deep">#F1B200</color>-->
-  <!--<color name="blue_deep_dark_1">#F1B200</color>-->
-  <!--<color name="blue_deep_dark_2">#F1B200</color>-->
+  <!--<color name="primary_light_3">#FFE4A5</color>-->
+  <!--<color name="primary_light_2">#FFD96B</color>-->
+  <!--<color name="primary_light_1">#FFCD49</color>-->
+  <!--<color name="primary">#FFC800</color>-->
+  <!--<color name="primary_dark_1">#E69900</color>-->
+  <!--<color name="primary_dark_2">#CC8100</color>-->
 
-  <color name="blue_deep_light_6">#B8E4FF</color>
-  <color name="blue_deep_light_5">#8ECFFF</color>
-  <color name="blue_deep_light_4">#57AFF3</color>
-  <color name="blue_deep_light_3">#138FE0</color>
-  <color name="blue_deep_light_2">#0073BF</color>
-  <color name="blue_deep_light_1">#0063A6</color>
-  <color name="blue_deep">#00548B</color>
-  <color name="blue_deep_dark_1">#004774</color>
-  <color name="blue_deep_dark_2">#003759</color>
 
-  <color name="orange_light_2">#FFD500</color>
-  <color name="orange_light_1">#FFBF13</color>
-  <color name="orange">#F1B200</color>
-  <color name="orange_dark_1">#EE9700</color>
-  <color name="orange_dark_2">#DB8300</color>
-  <color name="orange_dark_3">#D65E00</color>
+
+  <color name="main_gradient_bottom">#49489CFF</color>
+  <color name="gradient_complement">#33FF0000</color>
+  <color name="primary_light_1_mid_op">#88FFDE88</color>
+  <color name="primary_light_1">#FFDE88</color>
+  <color name="primary">#FCB937</color>
+  <color name="primary_muted">#DB8F1E</color>
+
+  <color name="payment_holder_bg">#21FFFFFF</color>
+  <color name="payment_holder_received">#30AF3D</color>
+  <color name="payment_holder_sent">#A63D3D</color>
+
+
+  <!--<color name="primary_light_3">#138FE0</color>-->
+  <!--<color name="primary_light_2">#0073BF</color>-->
+  <!--<color name="primary_light_1">#0063A6</color>-->
+  <!--<color name="primary">#00548B</color>-->
+  <!--<color name="primary_dark_1">#004774</color>-->
+  <!--<color name="primary_dark_2">#003759</color>-->
+
 
   <!-- basic -->
   <color name="yellow">#F1AF00</color>
+  <color name="orange">#F19100</color>
   <color name="green">#09BB74</color>
   <color name="red">#CA4747</color>
 
   <!-- basic -->
   <color name="transparent">#00000000</color>
-  <color name="dark">#212529</color>
+  <color name="dark">#463800</color>
+  <color name="dark2">#212529</color>
   <color name="black">#000000</color>
   <color name="grey">#888888</color>
   <color name="grey_light_1">#BABABA</color>
@@ -61,4 +65,5 @@
   <color name="white_high_op">#CCFFFFFF</color>
   <color name="white_mid_op">#88FFFFFF</color>
   <color name="white_low_op">#33FFFFFF</color>
+
 </resources>

@@ -13,23 +13,31 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-  android:shape="rectangle">
-  <gradient
-    android:angle="0"
-    android:centerX="80%"
-    android:centerY="100%"
-    android:endColor="@color/blue_deep_light_2"
-    android:gradientRadius="180%"
-    android:startColor="@color/blue_deep_dark_2"
-    android:type="radial" />
-  <!--<gradient-->
-    <!--android:angle="0"-->
-    <!--android:centerX="80%"-->
-    <!--android:centerY="100%"-->
-    <!--android:endColor="@color/orange_light_1"-->
-    <!--android:gradientRadius="180%"-->
-    <!--android:startColor="@color/orange_dark_3"-->
-    <!--android:type="radial" />-->
-</shape>
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="@color/primary" />
+    </shape>
+  </item>
+  <item>
+    <shape android:shape="rectangle">
+
+      <!--<gradient-->
+      <!--android:angle="0"-->
+      <!--android:centerX="80%"-->
+      <!--android:centerY="100%"-->
+      <!--android:endColor="@color/primary_light_1"-->
+      <!--android:gradientRadius="180%"-->
+      <!--android:startColor="@color/gradient_complement"-->
+      <!--android:type="radial" />-->
+
+      <gradient
+        android:angle="90"
+        android:endColor="@color/primary_light_1_mid_op"
+        android:startColor="@color/gradient_complement"
+        android:type="linear" />
+    </shape>
+  </item>
+
+</layer-list>

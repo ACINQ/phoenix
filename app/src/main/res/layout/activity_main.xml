@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,11 +32,11 @@
       android:name="androidx.navigation.fragment.NavHostFragment"
       android:layout_width="0dp"
       android:layout_height="0dp"
+      app:defaultNavHost="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      app:defaultNavHost="true"
       app:navGraph="@navigation/nav_graph_main" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>

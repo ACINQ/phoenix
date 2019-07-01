@@ -41,7 +41,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       android:visibility="@{model.state == SeedEncryptionState.ENCRYPTING}"
-      app:progress_tint="@color/white"
+      app:progress_tint="@color/dark"
       app:text="@string/newseed_generating_seed" />
 
     <TextView

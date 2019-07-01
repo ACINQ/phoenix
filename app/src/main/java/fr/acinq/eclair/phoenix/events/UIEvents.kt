@@ -18,10 +18,9 @@ package fr.acinq.eclair.phoenix.events
 
 import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.io.PayToOpenRequestEvent
-import fr.acinq.eclair.phoenix.main.Payment
 
-class PaymentEvent(payment: Payment)
+class PaymentEvent()
 
-class BalanceEvent(amount: MilliSatoshi)
+class BalanceEvent(val amount: MilliSatoshi)
 
-class ReceiveWithOpen(request: PayToOpenRequestEvent)
+class ReceiveWithOpen(val request: PayToOpenRequestEvent)

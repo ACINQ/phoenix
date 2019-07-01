@@ -14,13 +14,12 @@
   ~ limitations under the License.
   -->
 
-<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">--><!--<item android:state_pressed="true">--><!--<shape android:shape="rectangle">--><!--<solid android:color="@color/yellow" />--><!--<corners android:radius="50dp" />--><!--</shape>--><!--</item>--><!--<item>--><!--<shape android:shape="rectangle">--><!--<solid android:color="@color/blue_deep_light_2" />--><!--<corners android:radius="50dp" />--><!--</shape>--><!--</item>--><!--</selector>-->
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
   android:color="#77222529">
 
   <item android:id="@android:id/background">
     <shape android:shape="rectangle">
-      <solid android:color="@color/blue_deep_light_2" />
+      <solid android:color="@color/primary_light_1" />
     </shape>
   </item>
 </ripple>

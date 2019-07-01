@@ -44,6 +44,12 @@ android {
       debuggable false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
+    applicationVariants.all { variant ->
+      variant.outputs.all { output ->
+        final String chain = variant.buildType.resValues.get("CHAIN").value // careful, contains " characters...
+        outputFileName = "${defaultConfig.versionCode}-v${defaultConfig.versionName}-${chain.substring(1, chain.length() - 1)}-${variant.buildType.name}.apk"
+      }
+    }
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8

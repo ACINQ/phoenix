@@ -46,7 +46,7 @@
 
   <!-- //////////////// Startup //////////////////// -->
 
-  <string name="startup_wait">Starting node…</string>
+  <string name="startup_wait">Loading…</string>
   <string name="startup_error">Could not start!</string>
   <string name="startup_error_wrong_pwd">PIN is incorrect</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
@@ -55,8 +55,21 @@
 
   <!-- //////////////// payment holder //////////////// -->
 
-  <string name="paymentholder_desc_waiting">Payment is processing</string>
-  <string name="paymentholder_desc_successful">Payment is successful</string>
+  <string name="paymentholder_sending">Sending…</string>
+  <string name="paymentholder_processing">Processing…</string>
+  <string name="paymentholder_failed">Failed</string>
+
+  <string name="paymentholder_sent_prefix">-</string>
+  <string name="paymentholder_received_prefix">+</string>
+
+  <!-- //////////////// receive //////////////// -->
+
+  <string name="receive_loading_message">Please hold…</string>
+  <string name="receive_no_amount_requested_hint">Unspecified</string>
+  <string name="receive_amount_label">Requested\namount</string>
+  <string name="receive_share_subject">Please pay this payment</string>
+  <string name="receive_share_title">Share this payment request with…</string>
+  <string name="receive_share_button">Share…</string>
 
   <!-- //////////////// receive with open channel //////////////// -->
 
@@ -71,11 +84,45 @@
 
   <string name="send_init_paste">Paste payment request</string>
 
+  <string name="send_loading">Please wait…</string>
+  <string name="send_invalid_pr_generic">This payment is not valid.</string>
+  <string name="send_description_label">Description</string>
+  <string name="send_destination_label">Recipient</string>
   <string name="send_go">Pay</string>
   <string name="send_cancel">Cancel</string>
 
+  <!-- //////////////// scan //////////////// -->
+
+  <string name="scan_request_camera_access">Grant camera permission</string>
+  <string name="scan_instructions">Place a payment request barcode\ninside the rectangle to scan it</string>
+  <string name="scan_state_reading">Reading payment request</string>
+  <string name="scan_state_error">This QR code is not a valid payment.\nPlease try again.</string>
+
   <!-- //////////////// utilities strings //////////////// -->
 
-  <string name="utils_pretty_amount"><![CDATA[%1$s<small>%2$s<small>]]></string>
+  <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_unknown">N/A</string>
+  <string name="utils_default_coin_view_hint">Enter amount in</string>
+  <string name="btn_ok">OK</string>
+  <string name="btn_confirm">Confirm</string>
+  <string name="btn_cancel">Cancel</string>
+
+  <!-- //////////////// settings //////////////// -->
+
+  <string name="settings_close_all_channels">Close channels</string>
+  <string name="settings_list_channels">(Debug) List my channels</string>
+
+  <!-- //////////////// close all channels //////////////// -->
+
+  <string name="closeall_message_ready">Do you want to empty your wallet and send all your funds to a Bitcoin address?\n\nNote that fees depending on the current state of the Bitcoin network will apply.</string>
+  <string name="closeall_message_error">There was a problem. Please try again later.</string>
+  <string name="closeall_message_done">Your funds were sent.</string>
+  <string name="closeall_message_in_progress">Please wait…</string>
+
+  <!-- //////////////// menu //////////////// -->
+
+  <string name="menu_settings">settings</string>
+  <string name="menu_send">Send</string>
+  <string name="menu_receive">Receive</string>
+
 </resources>

@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.AppKitModel
+import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
@@ -43,13 +44,14 @@ class StartupFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     mBinding.appKitModel = appKit
-    appKit.state.observe(viewLifecycleOwner, Observer {
+    appKit.startupState.observe(viewLifecycleOwner, Observer {
+      log.info("startup is now $it")
       startNodeIfNeeded()
     })
   }
 
   private fun startNodeIfNeeded() {
-    if (appKit.state.value == AppKitModel.StartupState.OFF && !appKit.isKitReady()) {
+    if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady()) {
       mPinDialog?.show()
     }
   }

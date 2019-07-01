@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
@@ -31,6 +30,11 @@ import fr.acinq.eclair.phoenix.initwallet.InitWalletActivity
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.eclair.phoenix.utils.Wallet
 import org.slf4j.LoggerFactory
+import android.app.Activity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import fr.acinq.eclair.phoenix.send.SendFragmentDirections
+import fr.acinq.eclair.phoenix.utils.IntentCodes
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,6 +44,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
     val appKitModel = ViewModelProviders.of(this).get(AppKitModel::class.java)
     appKitModel.navigationEvent.observe(this, Observer {
       when(it) {
@@ -55,33 +60,27 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    log.info("MainActivity.onStart")
     if (!Wallet.getSeedFile(applicationContext).exists()) {
       log.info("wallet has not been initialized yet...")
       startActivity(Intent(this, InitWalletActivity::class.java))
       finish()
     } else {
-//      if (!EventBus.getDefault().isRegistered(this)) {
-//        EventBus.getDefault().register(this)
-//      }
     }
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    log.info("MainActivity.onDestroy")
-//    EventBus.getDefault().unregister(this)
   }
 
   fun getActivityThis(): Context {
     return this@MainActivity
   }
 
-//  @Subscribe(threadMode = ThreadMode.MAIN)
-//  fun handleEvent(event: PayToOpenRequestEvent) {
-//    log.info("handling PayToOpenRequestEvent -> modal")
-//    val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(event.payToOpenRequest().fundingSatoshis(),
-//      event.payToOpenRequest().pushMsat(), event.payToOpenRequest().feeSatoshis(), event.payToOpenRequest().paymentHash().toString())
-//    findNavController(R.id.nav_host_main).navigate(action)
-//  }
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    if (requestCode == IntentCodes.SCAN_PAYMENT_REQUEST_RESULT) {
+      if (resultCode == Activity.RESULT_OK) {
+        val invoice = data!!.getStringExtra(IntentCodes.SEND_PAYMENT_INVOICE_EXTRA)
+        val action = SendFragmentDirections.globalActionAnyToSend(invoice)
+        findNavController(R.id.nav_host_main).navigate(action)
+      }
+    }
+  }
 }

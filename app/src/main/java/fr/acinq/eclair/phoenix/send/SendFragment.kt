@@ -20,11 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseDialogFragment
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
+import fr.acinq.eclair.phoenix.utils.customviews.CoinView
 
 class SendFragment : BaseDialogFragment() {
 
@@ -41,23 +45,41 @@ class SendFragment : BaseDialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    log.info("hello send fragment")
     model = ViewModelProviders.of(this).get(SendViewModel::class.java)
     mBinding.model = model
-    val paymentRequest = PaymentRequest.read(args.paymentRequest)
-    model.paymentRequest.value = paymentRequest
-    if (paymentRequest.amount().isDefined) {
-      mBinding.amount.setAmount(paymentRequest.amount().get())
-    }
+
+    model.paymentRequest.observe(this, Observer {
+      if (it != null && it.amount().isDefined) {
+        mBinding.amount.setAmount(it.amount().get())
+      }
+    })
+
+    model.checkAndSetPaymentRequest(args.paymentRequest)
+
+    mBinding.amount.setAmountWatcher(object : CoinView.CoinViewWatcher() {
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        mBinding.amount.checkAmountEmpty()
+      }
+    })
   }
 
   override fun onStart() {
     super.onStart()
     mBinding.sendButton.setOnClickListener {
-      val pr: PaymentRequest? = model.paymentRequest.value
-      pr?.let {
-        appKit.sendPaymentRequest(pr)
+      model.paymentRequest.value?.let {
+        val amount_opt = mBinding.amount.getAmount()
+        if (amount_opt.isDefined) {
+          appKit.sendPaymentRequest(mBinding.amount.getAmount().get(), it)
+          findNavController().navigate(R.id.action_send_to_main)
+        } else {
+          log.info("empty amount!")
+          // TODO handle amount error
+        }
       }
+    }
+
+    mBinding.cancelButton.setOnClickListener {
+      findNavController().navigate(R.id.action_send_to_main)
     }
   }
 }

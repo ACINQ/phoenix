@@ -50,6 +50,14 @@
       android:name=".initwallet.InitWalletActivity"
       android:launchMode="singleTask" />
 
+    <!-- scan qr codes -->
+    <activity
+      android:name=".scan.ScanActivity"
+      android:noHistory="true"
+      android:screenOrientation="portrait"
+      android:stateNotNeeded="true"
+      android:windowSoftInputMode="stateAlwaysHidden" />
+
   </application>
 
 </manifest>

@@ -19,6 +19,7 @@ package fr.acinq.eclair.phoenix.receive
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,16 +28,18 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
-import fr.acinq.eclair.phoenix.utils.Wallet
-import fr.acinq.eclair.wire.`PayToOpenRequest$`
+import fr.acinq.eclair.phoenix.utils.Converter
+import fr.acinq.eclair.phoenix.utils.customviews.CoinView
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
+import scala.Option
+import java.util.*
+
 
 class ReceiveFragment : BaseFragment() {
 
@@ -53,22 +56,47 @@ class ReceiveFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProviders.of(this).get(ReceiveViewModel::class.java)
-    generatePaymentRequest()
     mBinding.model = model
+
+    mBinding.amountValue.setAmountWatcher(object : CoinView.CoinViewWatcher() {
+      private var throttle = Timer()
+      private val DELAY: Long = 350
+
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        mBinding.amountValue.checkAmountEmpty()
+        model.amountInputState.value = AmountTypingState.TYPING
+        throttle.cancel()
+        throttle = Timer()
+        throttle.schedule(object : TimerTask() {
+          override fun run() {
+            context?.let {
+              try {
+                generatePaymentRequest(Converter.string2Msat_opt(s.toString(), it))
+              } catch (e: Exception) {
+                log.error("amount could not be converted to msat: ${e.message}")
+              } finally {
+                model.amountInputState.postValue(AmountTypingState.DONE)
+              }
+            }
+          }
+        }, DELAY)
+      }
+    })
+
     model.paymentRequest.observe(viewLifecycleOwner, Observer {
-      log.info("a new payment_request=$it has been generated")
       if (it != null) {
-        model.generateQrCode()
-        log.info("fired and forgot QR bitmap update")
+        model.state.value = PaymentGenerationState.BUILDING_BITMAP
+        model.generateQrCodeBitmap()
       }
     })
     model.bitmap.observe(viewLifecycleOwner, Observer { bitmap ->
       if (bitmap != null) {
         mBinding.qrImage.setImageBitmap(bitmap)
-//        val payToOpen = `PayToOpenRequest$`.`MODULE$`.apply(Wallet.getChainHash(), 2000, 1500, 500, ByteVector32.Zeroes())
-//        EventBus.getDefault().post(payToOpen)
+        model.state.value = PaymentGenerationState.DONE
       }
     })
+
+    generatePaymentRequest(Option.apply(null))
   }
 
   override fun onStart() {
@@ -82,14 +110,25 @@ class ReceiveFragment : BaseFragment() {
         log.error("failed to copy: ${e.localizedMessage}")
       }
     }
+    mBinding.shareButton.setOnClickListener {
+      model.paymentRequest.value?.let {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.receive_share_subject))
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "lightning:${PaymentRequest.write(it)}")
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
+      }
+    }
   }
 
-  private fun generatePaymentRequest() {
-    lifecycleScope.launch(CoroutineExceptionHandler{ _, exception ->
-      log.error("error when generating payment request: $exception")
+  // payment request is generated in appkit view model and updates the receive view model
+  private fun generatePaymentRequest(amount_opt: Option<MilliSatoshi>) {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when generating payment request: ", exception)
+      model.state.value = PaymentGenerationState.ERROR
     }) {
-      log.info("thread ${Thread.currentThread().name}")
-      model.paymentRequest.value = appKit.generatePaymentRequest("toto", MilliSatoshi(110000 * 1000))
+      model.state.value = PaymentGenerationState.IN_PROGRESS
+      model.paymentRequest.value = appKit.generatePaymentRequest("Phoenix payment", amount_opt)
     }
   }
 

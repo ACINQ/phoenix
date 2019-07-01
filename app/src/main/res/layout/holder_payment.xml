@@ -18,48 +18,72 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:padding="@dimen/space_md">
-
-  <ImageView
-    android:id="@+id/icon"
-    android:layout_width="20dp"
-    android:layout_height="20dp"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="@id/label"
-    android:src="@drawable/ic_check_white_24dp"
-    android:tint="@color/green"
-    app:layout_constraintBottom_toBottomOf="@id/label"
-    android:contentDescription="@string/paymentholder_desc_waiting" />
+  android:layout_marginLeft="@dimen/space_sm"
+  android:layout_marginTop="@dimen/space_xs"
+  android:layout_marginRight="@dimen/space_sm"
+  android:background="@drawable/rounded_white"
+  android:backgroundTint="@color/payment_holder_bg"
+  android:paddingLeft="@dimen/space_md"
+  android:paddingTop="@dimen/space_sm"
+  android:paddingRight="@dimen/space_md"
+  android:paddingBottom="@dimen/space_sm">
 
   <TextView
+    android:id="@+id/description"
     style="@style/default_textAppearance"
-    android:id="@+id/label"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/space_md"
-    android:layout_marginStart="@dimen/space_sm"
-    app:layout_constrainedWidth="true"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintEnd_toStartOf="@id/amount"
-    app:layout_constraintHorizontal_chainStyle="packed"
-    app:layout_constraintStart_toEndOf="@id/icon"
-    app:layout_constraintHorizontal_bias="0"
-    android:textSize="@dimen/text_lg"
+    android:layout_marginEnd="@dimen/space_lg"
     android:ellipsize="end"
-    android:lines="1" />
+    android:fontFamily="sans-serif-medium"
+    android:lines="1"
+    android:textSize="@dimen/text_lg"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintEnd_toStartOf="@id/amount"
+    app:layout_constraintHorizontal_bias="0"
+    app:layout_constraintHorizontal_chainStyle="packed"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <TextView
-    style="@style/default_textAppearance"
     android:id="@+id/amount"
+    style="@style/default_textAppearance"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:layout_constraintStart_toEndOf="@id/label"
-    app:layout_constraintBaseline_toBaselineOf="@id/label"
+    android:ellipsize="start"
+    android:maxWidth="200dp"
+    android:singleLine="true"
+    android:textAlignment="viewEnd"
+    android:textSize="@dimen/text_md"
+    app:layout_constraintBaseline_toBaselineOf="@id/description"
+    app:layout_constraintEnd_toStartOf="@id/unit"
+    app:layout_constraintHorizontal_bias="1"
+    app:layout_constraintStart_toEndOf="@id/description" />
+
+  <TextView
+    android:id="@+id/unit"
+    style="@style/default_textAppearance"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:singleLine="true"
+    android:alpha="0.7"
+    android:textAlignment="viewEnd"
+    android:textSize="@dimen/text_xs"
+    app:layout_constraintBaseline_toBaselineOf="@id/amount"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="1"
-    android:ellipsize="start"
-    android:maxWidth="300dp"
-    android:singleLine="true"
-    android:textAlignment="viewEnd" />
+    app:layout_constraintStart_toEndOf="@id/amount" />
+
+  <TextView
+    android:id="@+id/timestamp"
+    style="@style/default_textAppearance"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="@color/primary_muted"
+    android:textSize="@dimen/text_xs"
+    app:layout_constraintEnd_toStartOf="@id/amount"
+    app:layout_constraintHorizontal_bias="0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/description" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,15 +18,16 @@
 
   <style name="default_theme" parent="Theme.AppCompat.NoActionBar">
     <!-- colors -->
-    <item name="colorPrimary">@color/blue_deep</item>
+    <item name="colorPrimary">@color/primary</item>
     <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="colorAccent">@color/yellow</item>
+    <item name="colorAccent">@color/red</item>
 
     <!-- background -->
-    <item name="android:colorBackground">@color/blue_deep</item>
+    <item name="android:colorBackground">@color/primary</item>
     <item name="android:windowBackground">@drawable/app_bg_default</item>
 
     <!-- text -->
+    <item name="android:textColor">@color/dark</item>
 
     <!-- widget overrides -->
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
@@ -36,19 +37,19 @@
 
   <style name="default_textAppearance" parent="TextAppearance.AppCompat.Body1">
     <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:textColor">@color/white</item>
+    <item name="android:textColor">@color/dark</item>
     <item name="android:textStyle">normal</item>
     <item name="android:fontFamily">sans-serif</item>
     <item name="android:letterSpacing">0.05</item>
-    <item name="android:gravity">start|center</item>
-    <item name="android:drawablePadding">@dimen/space_xs</item>
   </style>
 
-  <style name="default_textAppearance_alt" parent="TextAppearance.AppCompat.Body1">
+  <style name="default_textAppearance_alt" parent="default_textAppearance">
     <item name="android:textColor">@color/dark</item>
   </style>
 
   <style name="paragraph_textViewStyle" parent="default_textAppearance">
+    <item name="android:drawablePadding">@dimen/space_xs</item>
+    <item name="android:gravity">start|center</item>
     <item name="android:lineSpacingMultiplier">1.4</item>
   </style>
 
@@ -60,6 +61,8 @@
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:minHeight">0dp</item>
+    <item name="android:drawablePadding">@dimen/space_xs</item>
+    <item name="android:gravity">start|center</item>
     <item name="android:paddingTop">@dimen/space_sm</item>
     <item name="android:paddingBottom">@dimen/space_sm</item>
     <item name="android:paddingLeft">@dimen/space_md</item>
@@ -81,11 +84,22 @@
 
   <!-- ///////////// special styles ///////////// -->
 
+  <style name="HLineSeparator">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">1dp</item>
+    <item name="android:background">@color/grey_light_3</item>
+  </style>
+
+  <style name="HSeparator" parent="HLineSeparator">
+    <item name="android:layout_width">50dp</item>
+  </style>
+
   <style name="ClassicButtonStyle" parent="default_buttonStyle">
     <item name="android:background">@drawable/button_bg_square</item>
     <item name="android:padding">@dimen/space_md_p</item>
     <item name="android:textColor">@color/dark</item>
     <item name="android:textSize">@dimen/text_lg</item>
+    <item name="android:gravity">center</item>
     <item name="android:backgroundTint">@color/transparent</item>
   </style>
 
@@ -96,7 +110,7 @@
     <item name="android:gravity">center</item>
     <item name="android:layout_margin">@dimen/space_xs</item>
     <item name="android:hapticFeedbackEnabled">true</item>
-    <item name="android:textColor">@color/white</item>
+    <item name="android:textColor">@color/dark</item>
     <item name="android:textSize">20sp</item>
     <item name="android:background">@drawable/button_pin</item>
   </style>

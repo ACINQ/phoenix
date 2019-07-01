@@ -19,6 +19,7 @@ package fr.acinq.eclair.phoenix
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
+import akka.dispatch.Futures
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.content.Context
@@ -36,17 +37,16 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.Channel
 import fr.acinq.eclair.channel.ChannelEvent
+import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.BackupEvent
+import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.PaymentEvent
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.phoenix.events.AcceptPayToOpen
-import fr.acinq.eclair.phoenix.events.NodeSupervisor
-import fr.acinq.eclair.phoenix.events.PayToOpenResponse
-import fr.acinq.eclair.phoenix.events.RejectPayToOpen
+import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.NetworkException
 import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -62,30 +62,46 @@ import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.collection.JavaConverters
-import scala.collection.immutable.List
 import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.math.BigDecimal
+import scala.util.Left
 import scodec.bits.`ByteVector$`
 import java.io.IOException
 import java.net.UnknownHostException
 import java.security.GeneralSecurityException
 import java.util.concurrent.TimeUnit
+import scala.collection.immutable.List as ScalaList
 
+data class NodeData(var balance: MilliSatoshi, var activeChannelsCount: Int)
 class AppKit(val kit: Kit, val api: Eclair)
+enum class StartupState {
+  OFF, IN_PROGRESS, DONE, ERROR
+}
 
 class AppKitModel : ViewModel() {
   private val log = LoggerFactory.getLogger(AppKitModel::class.java)
+
   private val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
+  private var system: ActorSystem = ActorSystem.apply("system")
 
   val navigationEvent = SingleLiveEvent<Any>()
 
-  enum class StartupState {
-    OFF, IN_PROGRESS, DONE, ERROR
-  }
+  val startupState = MutableLiveData<StartupState>()
+  val startupErrorMessage = MutableLiveData<String>()
+
+  val nodeData = MutableLiveData<NodeData>()
+  val payments = MutableLiveData<List<Payment>>()
+
+  private val _kit = MutableLiveData<AppKit>()
+  val kit: LiveData<AppKit> get() = _kit
 
   init {
+    _kit.value = null
+    startupState.value = StartupState.OFF
+    nodeData.value = NodeData(MilliSatoshi(0), 0)
     log.info("init appkit model")
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
@@ -98,84 +114,78 @@ class AppKitModel : ViewModel() {
     log.info("appkit model has been destroyed")
   }
 
-  private var system: ActorSystem = ActorSystem.apply("system")
-
-  val state = MutableLiveData<StartupState>()
-  val errorMessage = MutableLiveData<String>()
-
-  private val _kit = MutableLiveData<AppKit>()
-  val kit: LiveData<AppKit> get() = _kit
-
-  init {
-    state.value = StartupState.OFF
-    _kit.value = null
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PayToOpenRequestEvent) {
+    navigationEvent.value = event
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PayToOpenRequestEvent) {
-    log.info("handling PayToOpenRequestEvent -> cal event -> modal")
-    navigationEvent.value = event //MutableLiveData(event)
+  fun handleEvent(event: BalanceEvent) {
+    nodeData.value = nodeData.value?.copy(balance = event.amount)
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PaymentEvent) {
+    log.info("received PaymentEvent")
+    refreshPaymentList()
   }
 
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
-  //  fun generate(description: String, amount: MilliSatoshi): PaymentRequest {
-  //    return generatePaymentRequest(description, amount)
-  //  }
+  fun refreshPaymentList() {
+    viewModelScope.launch {
+      withContext(Dispatchers.Default) {
+        _kit.value?.let {
+          payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+        } ?: log.warn("tried to retrieve payment list but appkit is not initialized!!")
+      }
+    }
+  }
 
   @UiThread
-  suspend fun generatePaymentRequest(description: String, amount: MilliSatoshi?): PaymentRequest {
+  suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest {
     return coroutineScope {
       async(Dispatchers.Default) {
-        val hop = PaymentRequest.ExtraHop(
-          Wallet.ACINQ.nodeId(),
-          ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
-        val routes = List.empty<List<PaymentRequest.ExtraHop>>().`$colon$colon`(List.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
+        val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
+        val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
 
         val preimage = fr.acinq.eclair.`package$`.`MODULE$`.randomBytes32()
 
         // push preimage to nodesupervisor actor
         system.eventStream().publish(preimage)
 
-        val f = Patterns.ask(_kit.value?.kit?.paymentHandler(),
-          PaymentLifecycle.ReceivePayment(Option.apply(amount), description, Option.apply(null), routes, Option.empty(), Option.apply(preimage)), timeout)
+        val f = Patterns.ask(_kit.value?.kit?.paymentHandler(), PaymentLifecycle.ReceivePayment(amount_opt, description, Option.apply(null), routes, Option.empty(), Option.apply(preimage)), timeout)
         Await.result(f, awaitDuration) as PaymentRequest
       }
     }.await()
   }
 
   @UiThread
-  fun sendPaymentRequest(paymentRequest: PaymentRequest, checkFees: Boolean = false) {
+  fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, checkFees: Boolean = false) {
     log.info("sending payment request $paymentRequest")
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
-
         _kit.value?.let {
+          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
+          else Channel.MIN_CLTV_EXPIRY()
 
-          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long)
-            paymentRequest.minFinalCltvExpiry().get() as Long
-          else
-            Channel.MIN_CLTV_EXPIRY()
+          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
+          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
+            false, // never randomize on mobile
+            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
+            1.0, // at most 100%
+            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
-          val routeParams: Option<RouteParams> = if (checkFees)
-            Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-          else
-            Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-              false, // never randomize on mobile
-              `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-              1.0, // at most 100%
-              4,
-              Router.DEFAULT_ROUTE_MAX_CLTV(),
-              Option.empty()))
-
-          _kit.value!!.kit.paymentInitiator().tell(PaymentLifecycle.SendPayment(
-            paymentRequest.amount().get().amount(), paymentRequest.paymentHash(), paymentRequest.nodeId(), paymentRequest.routingInfo(),
-            finalCltvExpiry + 1, 10, routeParams), ActorRef.noSender())
-
-        } ?: log.info("appkit is not initialized!!!!!!!!")
-
-
+          it.kit.paymentInitiator().tell(PaymentLifecycle.SendPayment(amount.amount(),
+            paymentRequest.paymentHash(),
+            paymentRequest.nodeId(),
+            paymentRequest.routingInfo(),
+            finalCltvExpiry + 1,
+            10,
+            routeParams,
+            Option.apply(paymentRequest)), ActorRef.noSender())
+        } ?: log.warn("tried to send a payment but app kit is not initialized!!")
       }
     }
   }
@@ -190,6 +200,24 @@ class AppKitModel : ViewModel() {
     system.eventStream().publish(RejectPayToOpen(paymentHash))
   }
 
+  @UiThread
+  fun closeAllChannels(address: String) {
+    viewModelScope.launch {
+      withContext(Dispatchers.Default) {
+        val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+        val channels = Await.result(kit.value?.api?.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
+        val closingFutures = ArrayList<Future<String>>()
+        channels.foreach {
+          val channelId = it.channelId()
+          log.info("init closing of channel=$channelId")
+          kit.value?.api?.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
+        }
+        val r = Await.result(Futures.sequence(closingFutures, system.dispatcher()), awaitDuration)
+        log.info("closing channels returns: $r")
+      }
+    }
+  }
+
   /**
    * This method launches the node startup process.
    */
@@ -199,32 +227,36 @@ class AppKitModel : ViewModel() {
       log.warn("tried to startup node but kit is already available")
     } else {
       viewModelScope.launch {
-        state.value = StartupState.IN_PROGRESS
+        startupState.value = StartupState.IN_PROGRESS
         withContext(Dispatchers.Default) {
           try {
             _kit.postValue(startNode(context, pin))
-            state.postValue(StartupState.DONE)
+            startupState.postValue(StartupState.DONE)
             _kit.value?.kit?.switchboard()?.tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
           } catch (t: Throwable) {
             log.info("aborted node startup")
-            state.postValue(StartupState.ERROR)
-            _kit.value = null
+            startupState.postValue(StartupState.ERROR)
+            _kit.postValue(null)
             when (t) {
               is GeneralSecurityException -> {
                 log.info("user entered wrong PIN")
-                errorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
+                startupState.postValue(StartupState.ERROR)
+                startupErrorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
               }
               is NetworkException, is UnknownHostException -> {
                 log.info("network error: ", t)
-                state.postValue(StartupState.ERROR)
+                startupState.postValue(StartupState.ERROR)
+                startupErrorMessage.postValue(context.getString(R.string.startup_error_network))
               }
               is IOException, is IllegalAccessException -> {
-                log.info("seed file not readable: ", t)
-                state.postValue(StartupState.ERROR)
+                log.error("seed file not readable: ", t)
+                startupState.postValue(StartupState.ERROR)
+                startupErrorMessage.postValue(context.getString(R.string.startup_error_unreadable))
               }
               else -> {
                 log.error("error when starting node: ", t)
-                errorMessage.postValue(context.getString(R.string.startup_error_generic))
+                startupState.postValue(StartupState.ERROR)
+                startupErrorMessage.postValue(context.getString(R.string.startup_error_generic))
               }
             }
           }

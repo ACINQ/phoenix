@@ -27,7 +27,7 @@
       android:id="@+id/illustration"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:background="@color/blue_deep_light_2"
+      android:background="@color/primary_light_1"
       android:padding="@dimen/space_lg"
       app:layout_constraintTop_toTopOf="parent">
 

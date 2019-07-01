@@ -19,6 +19,7 @@ package fr.acinq.eclair.phoenix.utils.customviews
 import android.content.Context
 import android.graphics.PorterDuff
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -32,7 +33,13 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
     attrs?.let {
       val arr = context.obtainStyledAttributes(it, R.styleable.ProgressTextView, 0, 0)
       mBinding.label.text = arr.getString(R.styleable.ProgressTextView_text)
-      mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, ContextCompat.getColor(context, R.color.white)))
+      mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, ContextCompat.getColor(context, R.color.dark)))
+
+      if (arr.hasValue(R.styleable.ProgressTextView_text_size)) {
+        mBinding.label.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+          arr.getDimensionPixelSize(R.styleable.ProgressTextView_text_size, R.dimen.text_lg).toFloat())
+      }
+
       mBinding.progressBar.indeterminateDrawable.setColorFilter(arr.getColor(R.styleable.ProgressTextView_progress_tint, ContextCompat.getColor(context, R.color.green)), PorterDuff.Mode.SRC_IN)
       arr.recycle()
     }

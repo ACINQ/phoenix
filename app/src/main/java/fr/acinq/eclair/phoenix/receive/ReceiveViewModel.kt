@@ -28,19 +28,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
+enum class AmountTypingState {
+  TYPING, DONE
+}
+
+enum class PaymentGenerationState {
+  IN_PROGRESS, BUILDING_BITMAP, ERROR, DONE
+}
+
 class ReceiveViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveViewModel::class.java)
 
   val paymentRequest = MutableLiveData<PaymentRequest>()
   val bitmap = MutableLiveData<Bitmap>()
+  val amountInputState = MutableLiveData<AmountTypingState>()
+  val state = MutableLiveData<PaymentGenerationState>()
 
   init {
     paymentRequest.value = null
     bitmap.value = null
+    amountInputState.value = AmountTypingState.DONE
+    state.value = PaymentGenerationState.DONE
   }
 
   @UiThread
-  fun generateQrCode() {
+  fun generateQrCodeBitmap() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         bitmap.postValue(QRCode.generateBitmap(PaymentRequest.write(paymentRequest.value)))

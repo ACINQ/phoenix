@@ -19,7 +19,7 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.AppKitModel.StartupState" />
+    <import type="fr.acinq.eclair.phoenix.StartupState" />
 
     <variable
       name="appKitModel"
@@ -40,7 +40,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      android:visibility="@{appKitModel.state == StartupState.IN_PROGRESS}"
+      android:visibility="@{appKitModel.startupState == StartupState.IN_PROGRESS}"
       app:text="@string/startup_wait" />
 
     <TextView
@@ -52,19 +52,7 @@
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintBottom_toBottomOf="parent"
       android:drawableStart="@drawable/ic_alert_triangle_white_24dp"
-      android:text="@{appKitModel.errorMessage}"
-      android:visibility="@{appKitModel.state == StartupState.ERROR}" />
-
-    <!--<Button-->
-    <!--android:id="@+id/start_button"-->
-    <!--style="@style/default_buttonStyle"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="@dimen/space_md"-->
-    <!--app:layout_constraintTop_toBottomOf="@id/state"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--android:backgroundTint="@color/green"-->
-    <!--android:text="Start node" />-->
+      android:text="@{appKitModel.startupErrorMessage}"
+      android:visibility="@{appKitModel.startupState == StartupState.ERROR}" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

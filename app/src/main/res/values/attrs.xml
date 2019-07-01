@@ -15,9 +15,14 @@
   -->
 
 <resources>
+  <attr name="text" format="string" />
+  <attr name="text_color" format="color" />
+  <attr name="text_size" format="dimension" />
+
   <declare-styleable name="ProgressTextView">
-    <attr name="text" format="string" />
-    <attr name="text_color" format="color" />
+    <attr name="text" />
+    <attr name="text_color" />
+    <attr name="text_size" />
     <attr name="progress_tint" format="color" />
   </declare-styleable>
   <declare-styleable name="CoinView">
@@ -28,5 +33,17 @@
     <attr name="unit" format="string" />
     <attr name="unit_size" format="dimension" />
     <attr name="unit_color" format="color" />
+    <attr name="editable" format="boolean" />
+    <attr name="hint" format="reference" />
+  </declare-styleable>
+  <declare-styleable name="ButtonView">
+    <attr name="text" />
+    <attr name="text_color" />
+    <attr name="text_size" />
+    <attr name="icon" format="reference" />
+    <attr name="icon_tint" format="color" />
+    <attr name="icon_size" format="dimension" />
+    <attr name="icon_gravity" format="integer" />
+    <attr name="background" format="reference" />
   </declare-styleable>
 </resources>

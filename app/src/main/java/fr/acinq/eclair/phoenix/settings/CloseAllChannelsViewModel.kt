@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package fr.acinq.eclair.phoenix.main
+package fr.acinq.eclair.phoenix.settings
 
-import fr.acinq.bitcoin.MilliSatoshi
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import org.slf4j.LoggerFactory
 
-class Payment(val amount: MilliSatoshi, val id: String)
+enum class ClosingChannelsState {
+  READY, IN_PROGRESS, DONE, ERROR
+}
+
+class CloseAllChannelsViewModel : ViewModel() {
+  private val log = LoggerFactory.getLogger(CloseAllChannelsViewModel::class.java)
+
+  val state = MutableLiveData<ClosingChannelsState>(ClosingChannelsState.READY)
+
+}

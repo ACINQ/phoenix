@@ -21,6 +21,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.CoinUtils
+import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.R
 
 class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerView.Adapter<PaymentHolder>() {

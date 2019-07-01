@@ -20,52 +20,133 @@
 
   <data>
 
+    <import type="fr.acinq.eclair.phoenix.receive.AmountTypingState" />
+
+    <import type="fr.acinq.eclair.phoenix.receive.PaymentGenerationState" />
+
     <variable
       name="model"
       type="fr.acinq.eclair.phoenix.receive.ReceiveViewModel" />
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/space_lg"
+    android:fillViewport="true"
     tools:context=".receive.ReceiveFragment">
 
-    <FrameLayout
-      android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:background="@drawable/rounded_white"
       android:padding="@dimen/space_lg">
 
-      <ImageView
-        android:id="@+id/qr_image"
-        android:layout_width="200dp"
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/qr_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_white"
+        android:elevation="2dp"
+        android:paddingTop="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg_p"
         app:layout_constrainedWidth="true"
-        android:adjustViewBounds="true"
-        android:clickable="true"
-        android:contentDescription="@string/utils_unknown"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/qrcode_placeholder" />
-    </FrameLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:background="@drawable/rounded_white"
-      android:elevation="16dp"
-      android:padding="@dimen/space_sm"
-      android:visibility="@{model.bitmap == null}"
-      app:text="generating qr" />
+        <ImageView
+          android:id="@+id/qr_image"
+          android:layout_width="200dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:adjustViewBounds="true"
+          android:alpha="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null ? 1f : 0.15f}"
+          android:clickable="true"
+          android:contentDescription="@string/utils_unknown"
+          android:focusable="true"
+          android:scaleType="fitCenter"
+          android:src="@drawable/qrcode_placeholder"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
 
-  </androidx.constraintlayout.widget.ConstraintLayout>
+        <ProgressBar
+          android:id="@+id/progress_bar"
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:indeterminateTint="@color/green"
+          android:visibility="@{!(model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null)}"
+          app:layout_constraintBottom_toBottomOf="@id/qr_image"
+          app:layout_constraintEnd_toEndOf="@id/qr_image"
+          app:layout_constraintStart_toStartOf="@id/qr_image"
+          app:layout_constraintTop_toTopOf="@id/qr_image" />
+
+        <androidx.constraintlayout.widget.Guideline
+          android:id="@+id/label_guideline"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          app:layout_constraintGuide_percent="0.45" />
+
+        <TextView
+          style="@style/default_textAppearance_alt"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_xxs"
+          android:text="@string/receive_amount_label"
+          android:textAlignment="viewEnd"
+          android:textColor="@color/dark"
+          android:textSize="@dimen/text_sm"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="@id/amount_value"
+          app:layout_constraintEnd_toStartOf="@id/label_guideline"
+          app:layout_constraintHorizontal_bias="1"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="@id/amount_value" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+          android:id="@+id/amount_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xxs"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_md"
+          android:background="@drawable/editable_bg_dotted"
+          app:amount_color="@color/dark"
+          app:amount_size="22sp"
+          app:editable="true"
+          app:hint="@string/receive_no_amount_requested_hint"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0.0"
+          app:layout_constraintStart_toEndOf="@id/label_guideline"
+          app:layout_constraintTop_toBottomOf="@id/qr_image"
+          app:unit_color="@color/dark"
+          app:unit_size="@dimen/text_md" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <Button
+        android:id="@+id/share_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:drawableStart="@drawable/ic_share_white_24dp"
+        android:drawableTint="@color/dark"
+        android:elevation="4dp"
+        android:enabled="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
+        android:text="@string/receive_share_button"
+        android:textAppearance="@style/default_textAppearance_alt"
+        android:textColor="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null ? @color/dark : @color/grey_light_1}"
+        android:textSize="@dimen/text_md"
+        android:translationY="-24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/qr_layout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
 </layout>

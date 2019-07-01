@@ -15,7 +15,8 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto">
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
 
   <data>
 
@@ -25,59 +26,62 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <TextView
+    <EditText
       android:id="@+id/amount"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:background="@color/transparent"
+      android:fontFamily="sans-serif-light"
+      android:importantForAutofill="no"
+      android:inputType="none"
+      android:maxLines="1"
+      android:minWidth="16dp"
+      android:overScrollMode="always"
+      android:text=""
+      android:textColorHint="@color/grey_light_1"
+      android:textSize="46sp"
+      app:layout_constrainedWidth="true"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintEnd_toStartOf="@id/unit"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintHorizontal_chainStyle="packed"
-      app:layout_constraintEnd_toStartOf="@id/unit"
-      android:fontFamily="sans-serif-light"
-      android:text="0.00"
-      android:textSize="46sp" />
+      tools:ignore="LabelFor" />
 
     <TextView
       android:id="@+id/unit"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="@dimen/space_xxs"
+      android:fontFamily="sans-serif-light"
+      android:maxLines="1"
+      android:text=""
+      android:textSize="@dimen/text_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constrainedHeight="true"
       app:layout_constraintBaseline_toBaselineOf="@id/amount"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toEndOf="@id/amount"
-      android:fontFamily="sans-serif-light"
-      android:text="mBTC" />
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintStart_toEndOf="@id/amount" />
 
-    <!--<TextView-->
-    <!--android:id="@+id/amount"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginStart="@dimen/space_xxxs"-->
-    <!--android:layout_marginEnd="@dimen/space_xxxs"-->
-    <!--android:ellipsize="none"-->
-    <!--android:fontFamily="sans-serif-light"-->
-    <!--android:singleLine="true"-->
-    <!--android:text="0,00"-->
-    <!--android:textColor="@color/dark"-->
-    <!--android:textSize="30sp"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toStartOf="@id/unit"-->
-    <!--app:layout_constraintHorizontal_chainStyle="packed"-->
-    <!--app:layout_constraintStart_toEndOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/unit"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginStart="@dimen/space_xxxs"-->
-    <!--android:fontFamily="sans-serif-light"-->
-    <!--android:maxLines="1"-->
-    <!--android:text="mBTC"-->
-    <!--app:layout_constraintBaseline_toBaselineOf="@id/amount"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintHorizontal_chainStyle="packed"-->
-    <!--app:layout_constraintStart_toEndOf="@id/amount" />-->
+    <TextView
+      android:id="@+id/hint"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:text=""
+      android:textAlignment="textStart"
+      android:textColor="@color/grey_light_1"
+      android:textSize="@dimen/text_md"
+      android:visibility="gone"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

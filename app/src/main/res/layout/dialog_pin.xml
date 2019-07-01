@@ -131,7 +131,7 @@
           android:alpha=".5"
           android:background="@color/transparent"
           android:src="@drawable/ic_trash_white_24dp"
-          android:tint="@color/blue_deep_light_3" />
+          android:tint="@color/dark" />
 
         <Button
           android:id="@+id/pin_num_0"
@@ -144,7 +144,7 @@
           android:alpha=".5"
           android:background="@color/transparent"
           android:src="@drawable/ic_backspace_white_24dp"
-          android:tint="@color/blue_deep_light_3" />
+          android:tint="@color/dark" />
 
       </GridLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

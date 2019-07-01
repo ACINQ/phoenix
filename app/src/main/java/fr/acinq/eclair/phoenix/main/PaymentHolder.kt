@@ -17,12 +17,21 @@
 package fr.acinq.eclair.phoenix.main
 
 import android.annotation.SuppressLint
+import android.text.format.DateUtils
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.CoinUnit
+import fr.acinq.eclair.db.OutgoingPaymentStatus
+import fr.acinq.eclair.db.Payment
+import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
+import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
+import kotlinx.android.synthetic.main.holder_payment.view.*
+import scala.Option
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
@@ -36,7 +45,61 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
 
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
-    itemView.findViewById<TextView>(R.id.amount).text = Converter.formatAmount(payment.amount, itemView.context, true)
-    itemView.findViewById<TextView>(R.id.label).text = payment.id
+
+    val isPaymentOutgoing = payment.direction() == `PaymentDirection$`.`MODULE$`.OUTGOING()
+    val amountView = itemView.findViewById<TextView>(R.id.amount)
+    val unitView = itemView.findViewById<TextView>(R.id.unit)
+
+    // payment status ====> amount/colors
+    when (payment.status()) {
+      `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
+        // amount
+        if (payment.finalAmount().isDefined) {
+          amountView.text = Converter.formatAmount(payment.finalAmount().get(), itemView.context, true, isPaymentOutgoing)
+        } else {
+          amountView.text = itemView.context.getString(R.string.utils_unknown)
+        }
+        // color
+        if (isPaymentOutgoing) {
+          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.payment_holder_sent))
+        } else {
+          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.payment_holder_received))
+        }
+        // unit
+        unitView.text = coinUnit.shortLabel().toUpperCase()
+        unitView.visibility = View.VISIBLE
+      }
+      `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
+        amountView.text = itemView.context.getString(R.string.paymentholder_processing)
+        unitView.visibility = View.GONE
+      }
+      `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
+        amountView.text = itemView.context.getString(R.string.paymentholder_failed)
+        unitView.visibility = View.GONE
+      }
+    }
+
+    // description
+    if (payment.description().isDefined) {
+      itemView.findViewById<TextView>(R.id.description).text = payment.description().get()
+    } else {
+      itemView.findViewById<TextView>(R.id.description).text = itemView.context.getString(R.string.utils_unknown)
+    }
+
+    // timestamp
+    if (payment.completedAt().isDefined) {
+      val l: Long = payment.completedAt().get() as Long
+      val delaySincePayment: Long = l - System.currentTimeMillis()
+      itemView.findViewById<TextView>(R.id.timestamp).text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
+    } else {
+      itemView.findViewById<TextView>(R.id.timestamp).text = "pending!!!"
+    }
+
+
+    //    itemView.findViewById<ImageView>(R.id.icon).setImageResource(when (payment.status()) {
+    //      `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> R.drawable.ic_cross_white_24dp
+    //      `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> R.drawable.ic_check_white_24dp
+    //      else -> R.drawable.ic_clock_white_24dp
+    //    })
   }
 }

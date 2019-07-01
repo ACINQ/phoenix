@@ -21,6 +21,7 @@ import android.preference.PreferenceManager
 import androidx.core.content.edit
 import fr.acinq.eclair.BtcUnit
 import fr.acinq.eclair.CoinUnit
+import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
 
 object Prefs {
@@ -36,6 +37,7 @@ object Prefs {
   }
 
   fun prefCoin(context: Context): CoinUnit {
-    return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_COIN_UNIT, BtcUnit.code()))
+    return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context)
+      .getString(PREFS_COIN_UNIT, SatUnit.code()))
   }
 }

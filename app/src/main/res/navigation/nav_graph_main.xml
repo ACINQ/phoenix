@@ -31,6 +31,10 @@
     app:destination="@id/receive_with_open_dialog"
     app:launchSingleTop="true" />
   <action
+    android:id="@+id/global_action_any_to_send"
+    app:destination="@id/send"
+    app:launchSingleTop="true" />
+  <action
     android:id="@+id/global_action_any_to_testdialog"
     app:destination="@id/test_dialog"
     app:launchSingleTop="true" />
@@ -50,7 +54,7 @@
       app:destination="@id/receive_fragment" />
     <action
       android:id="@+id/action_main_to_init_send"
-      app:destination="@id/init_send"
+      app:destination="@id/initSendFragment"
       app:launchSingleTop="true" />
   </fragment>
 
@@ -115,20 +119,6 @@
     android:name="fr.acinq.eclair.phoenix.receive.TestDialog" />
 
   <dialog
-    android:id="@+id/init_send"
-    android:name="fr.acinq.eclair.phoenix.send.InitSendFragment"
-    android:label="InitSendFragment">
-    <action
-      android:id="@+id/action_init_send_to_main"
-      app:destination="@id/main_fragment"
-      app:popUpTo="@+id/main_fragment"
-      app:popUpToInclusive="true" />
-    <action
-      android:id="@+id/action_init_send_to_send"
-      app:destination="@id/send"
-      app:popUpTo="@+id/init_send" />
-  </dialog>
-  <dialog
     android:id="@+id/send"
     android:name="fr.acinq.eclair.phoenix.send.SendFragment"
     android:label="SendFragment">
@@ -141,5 +131,9 @@
       android:name="payment_request"
       app:argType="string" />
   </dialog>
+  <fragment
+    android:id="@+id/initSendFragment"
+    android:name="fr.acinq.eclair.phoenix.send.InitSendFragment"
+    android:label="InitSendFragment" />
 
 </navigation>

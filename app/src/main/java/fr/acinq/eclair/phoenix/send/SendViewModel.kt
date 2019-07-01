@@ -16,18 +16,70 @@
 
 package fr.acinq.eclair.phoenix.send
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.annotation.UiThread
+import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.phoenix.scan.ReadingState
+import fr.acinq.eclair.phoenix.utils.Wallet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+
+enum class SendState {
+  VERIFYING_PR, INVALID_PR, VALID_PR, ERROR_IN_AMOUNT, SENDING
+}
 
 class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
+
+  val state = MutableLiveData<SendState>()
   val paymentRequest = MutableLiveData<PaymentRequest>(null)
+
+  // ---- computed values from payment request
+
   val paymentHash: LiveData<String> = Transformations.map(paymentRequest) { pr ->
     "${pr?.paymentHash() ?: ""}"
+  }
+
+  val description: LiveData<String> = Transformations.map(paymentRequest) { pr ->
+    pr?.let {
+      when {
+        it.description().isLeft -> it.description().left().get()
+        it.description().isRight -> it.description().right().get().toString()
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val destination: LiveData<String> = Transformations.map(paymentRequest) { pr ->
+    pr?.let { it.nodeId().toString() } ?: ""
+  }
+
+  val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
+    state == SendState.VALID_PR || state == SendState.ERROR_IN_AMOUNT || state == SendState.SENDING
+  }
+
+  // ---- end of computed values
+
+  init {
+    state.value = SendState.VERIFYING_PR
+  }
+
+  @UiThread
+  fun checkAndSetPaymentRequest(input: String) {
+    viewModelScope.launch {
+      withContext(Dispatchers.Default) {
+        try {
+          paymentRequest.postValue(PaymentRequest.read(Wallet.cleanPaymentRequest(input)))
+          state.postValue(SendState.VALID_PR)
+        } catch (e: Exception) {
+          log.info("invalid payment request $input: ${e.message}")
+          paymentRequest.postValue(null)
+          state.postValue(SendState.INVALID_PR)
+        }
+      }
+    }
   }
 
 }

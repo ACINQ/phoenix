@@ -16,13 +16,51 @@
 
 package fr.acinq.eclair.phoenix.send
 
+import androidx.annotation.UiThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.phoenix.utils.Wallet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+
+enum class ReadingState {
+  SCANNING, READING, DONE, ERROR
+}
 
 class InitSendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(InitSendViewModel::class.java)
 
-  val paymentRequest = MutableLiveData("")
+  val hasCameraAccess = MutableLiveData(false)
+  val paymentRequest = MutableLiveData<String>(null)
+  val readingState = MutableLiveData<ReadingState>()
+
+  init {
+    readingState.value = ReadingState.SCANNING
+  }
+
+  @UiThread
+  fun checkAndSetPaymentRequest(input: String) {
+    if (readingState.value == ReadingState.SCANNING) {
+      readingState.value = ReadingState.READING
+      viewModelScope.launch {
+        withContext(Dispatchers.Default) {
+          try {
+            val cleanPR = Wallet.cleanPaymentRequest(input)
+            PaymentRequest.read(cleanPR)
+            paymentRequest.postValue(cleanPR)
+            readingState.postValue(ReadingState.DONE)
+          } catch (e: Exception) {
+            log.info("invalid payment request $input: ${e.message}")
+            paymentRequest.postValue(null)
+            readingState.postValue(ReadingState.ERROR)
+          }
+        }
+      }
+    }
+  }
 
 }

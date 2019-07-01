@@ -47,9 +47,7 @@ abstract class BaseFragment : Fragment() {
    * If there is no kit, go to startup by default.
    */
   open fun handleKit() {
-    if (appKit.isKitReady()) {
-      Toast.makeText(context, "App kit ready", Toast.LENGTH_SHORT).show()
-    } else {
+    if (!appKit.isKitReady()) {
       findNavController().navigate(R.id.global_action_any_to_startup)
     }
   }

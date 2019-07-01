@@ -17,7 +17,12 @@
 package fr.acinq.eclair.phoenix
 
 import android.app.Application
+import fr.acinq.eclair.CoinUtils
+import fr.acinq.eclair.MBtcUnit
+import fr.acinq.eclair.`MBtcUnit$`
+import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.phoenix.utils.Logging
+import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
 
 class App : Application() {
@@ -27,6 +32,15 @@ class App : Application() {
   override fun onCreate() {
     super.onCreate()
     Logging.setupLogger()
+    init()
     log.info("app created")
+  }
+
+  private fun init() {
+    when (Prefs.prefCoin(applicationContext)) {
+      `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
+      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
+      else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
+    }
   }
 }

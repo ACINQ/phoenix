@@ -16,19 +16,22 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
+import fr.acinq.eclair.phoenix.scan.ScanActivity
+import fr.acinq.eclair.phoenix.utils.IntentCodes
 import fr.acinq.eclair.phoenix.utils.Prefs
 
 class MainFragment : BaseFragment() {
@@ -54,27 +57,31 @@ class MainFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+    appKit.nodeData.observe(viewLifecycleOwner, Observer {
+      mBinding.balance.setAmount(it.balance)
+    })
+    appKit.payments.observe(viewLifecycleOwner, Observer {
+      paymentsAdapter.update(it, "usd", Prefs.prefCoin(context!!), displayAmountAsFiat = false)
+    })
   }
 
   override fun onStart() {
     super.onStart()
-    mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
-    mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
+    appKit.refreshPaymentList()
+//    mBinding.bottomNav.menu.findItem(R.id.menu_receive).setOnMenuItemClickListener {
+//      findNavController().navigate(R.id.action_main_to_receive)
+//      true
+//    }
+//
+//    mBinding.bottomNav.menu.findItem(R.id.menu_send).setOnMenuItemClickListener {
+//      findNavController().navigate(R.id.action_main_to_init_send)
+//      true
+//    }
 
-    mBinding.balance.setAmount(MilliSatoshi(14354357))
-    val payments = ArrayList<Payment>()
-    payments.add(Payment(MilliSatoshi(321), "Lorem ipsum dolor sit amet"))
-    payments.add(Payment(MilliSatoshi(65431321), "efficitur nulla a, placera"))
-    payments.add(Payment(MilliSatoshi(9852), "Orci varius natoque penatibus"))
-    payments.add(Payment(MilliSatoshi(54357), "Mauris eget arcu vel mi imperdiet"))
-    payments.add(Payment(MilliSatoshi(9852), "Phasellus et nisl quis ligula"))
-    payments.add(Payment(MilliSatoshi(132168735437), "Mauris arcu lorem"))
-    payments.add(Payment(MilliSatoshi(2131), "Nunc nec ex vel orci"))
-    payments.add(Payment(MilliSatoshi(68354357), "Suspendisse potenti"))
-    payments.add(Payment(MilliSatoshi(357315321), "Proin pulvinar malesuada efficitur"))
-    payments.add(Payment(MilliSatoshi(6873541), "Donec id ante mauris"))
-    context?.let {
-      paymentsAdapter.update(payments, "usd", Prefs.prefCoin(context!!), displayAmountAsFiat = false)
+
+    mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
+    mBinding.sendButton.setOnClickListener {
+       findNavController().navigate(R.id.action_main_to_init_send)
     }
   }
 

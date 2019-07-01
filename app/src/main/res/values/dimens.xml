@@ -40,4 +40,11 @@
   <!-- pin -->
   <dimen name="pin_button_size">64dp</dimen>
 
+  <!-- scanner -->
+  <dimen name="scanner_size">250dp</dimen>
+
+  <!-- main fragment coordinator height -->
+  <dimen name="balance_default_height">200dp</dimen>
+  <dimen name="balance_min_height">160dp</dimen>
+
 </resources>
