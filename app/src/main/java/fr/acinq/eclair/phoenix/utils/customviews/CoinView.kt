@@ -17,6 +17,8 @@
 package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.InputType
@@ -77,11 +79,14 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
       mBinding.unit.text = Prefs.prefCoin(context).code()
       mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
       mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
+
+      mBinding.root.backgroundTintList = ContextCompat.getColorStateList(context, R.color.red)
+
       arr.recycle()
     }
   }
 
-  public fun setAmountSize(size: Float) {
+  fun setAmountSize(size: Float) {
     mBinding.amount.textSize = size
     postInvalidate()
   }

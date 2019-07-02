@@ -17,12 +17,20 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
-  <merge>
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:background="@drawable/button_bg_square"
+    android:padding="@dimen/space_md"
+    android:layout_height="wrap_content">
 
     <ImageView
       android:id="@+id/image"
-      android:layout_width="16dp"
-      android:layout_height="16dp"
+      android:layout_width="@dimen/button_height"
+      android:layout_height="@dimen/button_height"
+      android:scaleType="fitCenter"
+      android:paddingTop="@dimen/space_xxxs"
+      android:paddingBottom="@dimen/space_xxxs"
+      android:adjustViewBounds="true"
       android:layout_marginEnd="@dimen/space_xs"
       app:layout_constraintBottom_toBottomOf="@id/text"
       app:layout_constraintEnd_toStartOf="@id/text"
@@ -35,13 +43,12 @@
       android:id="@+id/text"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:fontFamily="sans-serif-medium"
-      android:textSize="@dimen/text_lg"
-      android:lineSpacingMultiplier="1"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toEndOf="@id/image"
-      app:layout_constraintTop_toTopOf="parent" />
-  </merge>
+      app:layout_constraintTop_toTopOf="parent"
+      android:lineSpacingMultiplier="1"
+      android:textSize="@dimen/text_lg" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

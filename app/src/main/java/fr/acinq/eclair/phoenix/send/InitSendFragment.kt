@@ -72,7 +72,7 @@ class InitSendFragment : BaseFragment() {
     })
     model.readingState.observe(this, Observer {
       if (it == ReadingState.ERROR) {
-        Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 850)
+        Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1250)
       }
     })
   }

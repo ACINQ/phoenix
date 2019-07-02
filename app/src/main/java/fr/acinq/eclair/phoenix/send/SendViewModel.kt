@@ -19,7 +19,6 @@ package fr.acinq.eclair.phoenix.send
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.phoenix.scan.ReadingState
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

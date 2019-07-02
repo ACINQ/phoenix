@@ -34,8 +34,8 @@
 
       <gradient
         android:angle="90"
-        android:endColor="@color/primary_light_1_mid_op"
-        android:startColor="@color/gradient_complement"
+        android:endColor="@color/app_gradient_top"
+        android:startColor="@color/app_gradient_complement"
         android:type="linear" />
     </shape>
   </item>

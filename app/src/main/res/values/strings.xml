@@ -96,32 +96,37 @@
   <string name="scan_request_camera_access">Grant camera permission</string>
   <string name="scan_instructions">Place a payment request barcode\ninside the rectangle to scan it</string>
   <string name="scan_state_reading">Reading payment request</string>
-  <string name="scan_state_error">This QR code is not a valid payment.\nPlease try again.</string>
+  <string name="scan_state_error">This is not a valid payment.\nPlease try again.</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_default_coin_view_hint">Enter amount in</string>
+  <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_close_all_channels">Close channels</string>
+  <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_list_channels">(Debug) List my channels</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closeall_message_ready">Do you want to empty your wallet and send all your funds to a Bitcoin address?\n\nNote that fees depending on the current state of the Bitcoin network will apply.</string>
+  <string name="closeall_title">Empty Wallet</string>
+  <string name="closeall_instructions">Do you want to empty your wallet and send all your funds to a Bitcoin address?\n\nNote that fees depending on the current state of the Bitcoin network will apply.</string>
+  <string name="closeall_hint">Enter Bitcoin address</string>
+  <string name="closeall_checking_channels">Checking funds, please hold…</string>
+  <string name="closeall_no_channels">You don\'t have any funds that can be withdrawn yet.</string>
   <string name="closeall_message_error">There was a problem. Please try again later.</string>
-  <string name="closeall_message_done">Your funds were sent.</string>
+  <string name="closeall_message_done">Funds sent.</string>
   <string name="closeall_message_in_progress">Please wait…</string>
 
   <!-- //////////////// menu //////////////// -->
 
-  <string name="menu_settings">settings</string>
+  <string name="menu_settings">Settings</string>
   <string name="menu_send">Send</string>
   <string name="menu_receive">Receive</string>
 

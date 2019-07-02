@@ -15,11 +15,11 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="#77222529">
+  android:color="#FFFFFF">
 
   <item android:id="@android:id/background">
     <shape android:shape="rectangle">
-      <solid android:color="@color/primary_light_1" />
+      <solid android:color="?android:attr/colorAccent" />
       <corners android:radius="50dp" />
     </shape>
   </item>

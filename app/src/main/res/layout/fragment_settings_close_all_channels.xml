@@ -20,39 +20,170 @@
 
   <data>
 
+    <import type="fr.acinq.eclair.phoenix.settings.ClosingChannelsState" />
+
     <variable
       name="model"
       type="fr.acinq.eclair.phoenix.settings.CloseAllChannelsViewModel" />
   </data>
 
-  <ScrollView
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true"
-    tools:context=".receive.SettingsFragment">
+    android:animateLayoutChanges="true"
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ImageButton
+      android:id="@+id/back_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:backgroundTint="@color/transparent"
+      android:contentDescription="@string/btn_back"
+      android:padding="@dimen/space_md"
+      android:src="@drawable/ic_arrow_back_24dp" />
+
+    <TextView
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_lg"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintTop_toTopOf="@id/back_button"
+      app:layout_constraintBottom_toBottomOf="@id/back_button"
+      app:layout_constraintStart_toEndOf="@id/back_button"
+      android:ellipsize="end"
+      android:singleLine="true"
+      android:text="@string/closeall_title" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/back_button"
+      android:background="@color/white"
+      android:padding="@dimen/space_lg"
+      android:visibility="@{model.state == ClosingChannelsState.CHECKING_CHANNELS}"
+      app:text="@string/closeall_checking_channels" />
 
-      <TextView
-        android:id="@+id/message"
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/back_button"
+      android:background="@color/white"
+      android:padding="@dimen/space_lg"
+      android:text="@string/closeall_no_channels"
+      android:visibility="@{model.state == ClosingChannelsState.NO_CHANNELS}" />
+
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constraintTop_toBottomOf="@id/back_button"
+      android:fillViewport="true"
+      android:visibility="@{model.state != ClosingChannelsState.NO_CHANNELS &amp;&amp; model.state != ClosingChannelsState.CHECKING_CHANNELS}"
+      android:paddingBottom="@dimen/space_lg"
+      tools:context=".receive.SettingsFragment">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-        android:id="@+id/confirm_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/ic_circle_check_24dp"
-        app:icon_tint="@color/green"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/message"
-        app:text="@string/btn_confirm" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/main_layout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toTopOf="parent"
+          android:background="@color/white"
+          android:elevation="2dp"
+          android:paddingStart="@dimen/space_lg"
+          android:paddingTop="@dimen/space_md_p"
+          android:paddingEnd="@dimen/space_lg"
+          android:paddingBottom="@dimen/space_lg_p">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-  </ScrollView>
+          <TextView
+            android:id="@+id/instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/closeall_instructions" />
+
+          <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/address_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md_p"
+            app:layout_constraintTop_toBottomOf="@id/instructions"
+            android:alpha="@{model.state == ClosingChannelsState.READY ? 1f : 0.4f}"
+            android:hint="@string/closeall_hint"
+            android:textColorHint="@color/primary">
+
+            <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/address_input"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              app:layout_constraintTop_toBottomOf="@id/message"
+              android:backgroundTint="@color/primary"
+              android:enabled="@{model.state == ClosingChannelsState.READY}"
+              android:inputType="textVisiblePassword|textNoSuggestions"
+              android:textColor="@color/dark" />
+          </com.google.android.material.textfield.TextInputLayout>
+
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/space_lg"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/address_layout"
+            android:drawableStart="@drawable/ic_alert_triangle_24dp"
+            android:text="@string/closeall_message_error"
+            android:visibility="@{model.state == ClosingChannelsState.ERROR}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="@dimen/space_lg"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/main_layout"
+          android:background="@drawable/super_rounded"
+          android:backgroundTint="@color/green"
+          android:drawableStart="@drawable/ic_check"
+          android:elevation="4dp"
+          android:padding="@dimen/space_md"
+          android:text="@string/closeall_message_done"
+          android:translationY="-28dp"
+          android:visibility="@{model.state == ClosingChannelsState.DONE}" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="@dimen/space_lg"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/main_layout"
+          android:background="@drawable/super_rounded"
+          android:elevation="4dp"
+          android:padding="@dimen/space_md"
+          android:translationY="-28dp"
+          android:visibility="@{model.state == ClosingChannelsState.IN_PROGRESS}"
+          app:text="@string/closeall_message_in_progress"
+          app:text_color="@color/dark" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/confirm_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginEnd="@dimen/space_lg"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/main_layout"
+          android:elevation="4dp"
+          android:translationY="-28dp"
+          android:visibility="@{model.state == ClosingChannelsState.READY}"
+          app:background="@drawable/button_bg"
+          app:icon="@drawable/ic_check_circle"
+          app:icon_tint="@color/white"
+          app:text="@string/btn_confirm"
+          app:text_color="@color/white" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

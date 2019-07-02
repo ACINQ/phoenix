@@ -16,10 +16,8 @@
 
 package fr.acinq.eclair.phoenix.main
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
@@ -30,8 +28,6 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
-import fr.acinq.eclair.phoenix.scan.ScanActivity
-import fr.acinq.eclair.phoenix.utils.IntentCodes
 import fr.acinq.eclair.phoenix.utils.Prefs
 
 class MainFragment : BaseFragment() {
@@ -68,17 +64,8 @@ class MainFragment : BaseFragment() {
   override fun onStart() {
     super.onStart()
     appKit.refreshPaymentList()
-//    mBinding.bottomNav.menu.findItem(R.id.menu_receive).setOnMenuItemClickListener {
-//      findNavController().navigate(R.id.action_main_to_receive)
-//      true
-//    }
-//
-//    mBinding.bottomNav.menu.findItem(R.id.menu_send).setOnMenuItemClickListener {
-//      findNavController().navigate(R.id.action_main_to_init_send)
-//      true
-//    }
 
-
+    mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener {
        findNavController().navigate(R.id.action_main_to_init_send)

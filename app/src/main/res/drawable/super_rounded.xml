@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,11 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="#44222529">
-
-  <item android:id="@android:id/background">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
     <shape android:shape="rectangle">
       <solid android:color="@color/white" />
+      <corners android:radius="100dp" />
     </shape>
   </item>
-</ripple>
+</selector>

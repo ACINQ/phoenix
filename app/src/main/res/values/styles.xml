@@ -20,7 +20,7 @@
     <!-- colors -->
     <item name="colorPrimary">@color/primary</item>
     <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="colorAccent">@color/red</item>
+    <item name="colorAccent">@color/blue_light_1</item>
 
     <!-- background -->
     <item name="android:colorBackground">@color/primary</item>
@@ -28,6 +28,7 @@
 
     <!-- text -->
     <item name="android:textColor">@color/dark</item>
+    <item name="primaryTextColor">@color/dark</item>
 
     <!-- widget overrides -->
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
@@ -40,7 +41,7 @@
     <item name="android:textColor">@color/dark</item>
     <item name="android:textStyle">normal</item>
     <item name="android:fontFamily">sans-serif</item>
-    <item name="android:letterSpacing">0.05</item>
+    <item name="android:letterSpacing">0.035</item>
   </style>
 
   <style name="default_textAppearance_alt" parent="default_textAppearance">
@@ -48,9 +49,9 @@
   </style>
 
   <style name="paragraph_textViewStyle" parent="default_textAppearance">
-    <item name="android:drawablePadding">@dimen/space_xs</item>
+    <item name="android:drawablePadding">@dimen/space_md</item>
     <item name="android:gravity">start|center</item>
-    <item name="android:lineSpacingMultiplier">1.4</item>
+    <item name="android:lineSpacingMultiplier">1.1</item>
   </style>
 
   <style name="paragraph_textViewStyle_alt" parent="paragraph_textViewStyle">
@@ -61,7 +62,7 @@
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:minHeight">0dp</item>
-    <item name="android:drawablePadding">@dimen/space_xs</item>
+    <item name="android:drawablePadding">@dimen/space_md</item>
     <item name="android:gravity">start|center</item>
     <item name="android:paddingTop">@dimen/space_sm</item>
     <item name="android:paddingBottom">@dimen/space_sm</item>
@@ -75,11 +76,11 @@
   <style name="default_dialogTheme" parent="@style/Theme.MaterialComponents.Light.Dialog">
     <item name="android:windowIsFloating">true</item>
     <item name="android:windowFrame">@null</item>
-    <item name="android:windowBackground">@drawable/rounded_white</item>
+    <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="android:textViewStyle">@style/default_textAppearance_alt</item>
-    <item name="buttonStyle">@style/ClassicButtonStyle</item>
+    <item name="buttonStyle">@style/default_buttonStyle</item>
   </style>
 
   <!-- ///////////// special styles ///////////// -->
@@ -87,20 +88,11 @@
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">@color/grey_light_3</item>
+    <item name="android:background">@color/grey_light_4</item>
   </style>
 
   <style name="HSeparator" parent="HLineSeparator">
     <item name="android:layout_width">50dp</item>
-  </style>
-
-  <style name="ClassicButtonStyle" parent="default_buttonStyle">
-    <item name="android:background">@drawable/button_bg_square</item>
-    <item name="android:padding">@dimen/space_md_p</item>
-    <item name="android:textColor">@color/dark</item>
-    <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:gravity">center</item>
-    <item name="android:backgroundTint">@color/transparent</item>
   </style>
 
   <style name="PinButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless.Colored">

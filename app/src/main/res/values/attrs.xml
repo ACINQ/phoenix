@@ -15,8 +15,10 @@
   -->
 
 <resources>
+
+  <attr name="primaryTextColor" format="reference" />
   <attr name="text" format="string" />
-  <attr name="text_color" format="color" />
+  <attr name="text_color" format="color">@col</attr>
   <attr name="text_size" format="dimension" />
 
   <declare-styleable name="ProgressTextView">
@@ -45,5 +47,6 @@
     <attr name="icon_size" format="dimension" />
     <attr name="icon_gravity" format="integer" />
     <attr name="background" format="reference" />
+    <attr name="background_tint" format="color" />
   </declare-styleable>
 </resources>

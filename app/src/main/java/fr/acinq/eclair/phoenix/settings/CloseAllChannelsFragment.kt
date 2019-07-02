@@ -17,14 +17,14 @@
 package fr.acinq.eclair.phoenix.settings
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
-import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsCloseAllChannelsBinding
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -46,29 +46,35 @@ class CloseAllChannelsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProviders.of(this).get(CloseAllChannelsViewModel::class.java)
     mBinding.model = model
-
-    model.state.observe(this, Observer {
-      when (it) {
-        ClosingChannelsState.READY -> mBinding.message.text = getString(R.string.closeall_message_ready)
-        ClosingChannelsState.IN_PROGRESS -> mBinding.message.text = getString(R.string.closeall_message_in_progress)
-        ClosingChannelsState.ERROR -> mBinding.message.text = getString(R.string.closeall_message_error)
-        ClosingChannelsState.DONE -> mBinding.message.text = getString(R.string.closeall_message_done)
-      }
-    })
   }
 
   override fun onStart() {
     super.onStart()
-    mBinding.confirmButton.setOnClickListener { }
+    getChannels()
+    mBinding.confirmButton.setOnClickListener { closeAllChannels() }
+  }
+
+  private fun getChannels() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when retrieving list of channels: ", exception)
+      model.state.value = ClosingChannelsState.NO_CHANNELS
+    }) {
+      model.state.value = ClosingChannelsState.CHECKING_CHANNELS
+      when (appKit.getChannels(`NORMAL$`.`MODULE$`).count()) {
+        0 -> model.state.value = ClosingChannelsState.READY
+        else -> model.state.value = ClosingChannelsState.READY
+      }
+    }
   }
 
   private fun closeAllChannels() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when closing all channels: ", exception)
       model.state.value = ClosingChannelsState.ERROR
+      Handler().postDelayed({ model.state.value = ClosingChannelsState.READY }, 2000)
     }) {
       model.state.value = ClosingChannelsState.IN_PROGRESS
-      appKit.closeAllChannels("whatever")
+      appKit.closeAllChannels(mBinding.addressInput.text.toString())
       model.state.value = ClosingChannelsState.DONE
     }
   }

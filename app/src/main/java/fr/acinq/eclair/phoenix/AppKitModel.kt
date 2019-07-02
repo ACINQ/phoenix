@@ -38,6 +38,7 @@ import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.Channel
 import fr.acinq.eclair.channel.ChannelEvent
 import fr.acinq.eclair.channel.RES_GETINFO
+import fr.acinq.eclair.channel.State
 import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.BackupEvent
 import fr.acinq.eclair.db.Payment
@@ -125,8 +126,7 @@ class AppKitModel : ViewModel() {
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PaymentEvent) {
-    log.info("received PaymentEvent")
+  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
     refreshPaymentList()
   }
 
@@ -200,14 +200,34 @@ class AppKitModel : ViewModel() {
     system.eventStream().publish(RejectPayToOpen(paymentHash))
   }
 
+  /**
+   * Retrieves the list of channels from the router. Can filter by state.
+   */
   @UiThread
-  fun closeAllChannels(address: String) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
+  suspend fun getChannels(state: State?): Iterable<RES_GETINFO> {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        delay(500)
+        kit.value?.api?.let {
+          val res = Await.result(it.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
+          val channels = JavaConverters.asJavaIterableConverter(res).asJava()
+          state?.let {
+            channels.filter { c -> c.state() == state }
+          } ?: channels
+        } ?: ArrayList()
+      }
+    }.await()
+  }
+
+  @UiThread
+  suspend fun closeAllChannels(address: String) {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        delay(500)
         val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
         val channels = Await.result(kit.value?.api?.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
         val closingFutures = ArrayList<Future<String>>()
-        channels.foreach {
+        JavaConverters.asJavaIterableConverter(channels).asJava().map {
           val channelId = it.channelId()
           log.info("init closing of channel=$channelId")
           kit.value?.api?.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
@@ -215,7 +235,7 @@ class AppKitModel : ViewModel() {
         val r = Await.result(Futures.sequence(closingFutures, system.dispatcher()), awaitDuration)
         log.info("closing channels returns: $r")
       }
-    }
+    }.await()
   }
 
   /**

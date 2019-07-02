@@ -21,11 +21,6 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
 
 object BindingHelpers {
-  @BindingAdapter("app:isVisible")
-  @JvmStatic
-  fun isVisible(view: View, show: Boolean) {
-    view.visibility = if (show) View.VISIBLE else View.GONE
-  }
 
   @BindingAdapter("app:hideIfZero")
   @JvmStatic
@@ -37,7 +32,7 @@ object BindingHelpers {
   @JvmStatic
   fun enableOrFade(view: View, enabled: Boolean) {
     view.isEnabled = enabled
-    view.alpha = if (enabled) 1f else .4f
+    view.alpha = if (enabled) 1f else .5f
   }
 
   @BindingConversion

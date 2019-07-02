@@ -19,7 +19,7 @@
       <gradient
         android:angle="90"
         android:endColor="@color/transparent"
-        android:startColor="@color/main_gradient_bottom"
+        android:startColor="@color/app_shade"
         android:type="linear" />
     </shape>
   </item>

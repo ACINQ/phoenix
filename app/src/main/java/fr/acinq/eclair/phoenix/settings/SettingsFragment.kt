@@ -16,29 +16,15 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
-import fr.acinq.bitcoin.MilliSatoshi
-import fr.acinq.eclair.payment.PaymentRequest
+import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsBinding
-import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.customviews.CoinView
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
-import scala.Option
-import java.util.*
 
 
 class SettingsFragment : BaseFragment() {
@@ -61,6 +47,6 @@ class SettingsFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
-    mBinding.closeChannelsButton.setOnClickListener {  }
+    mBinding.closeChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_closeAllChannels) }
   }
 }

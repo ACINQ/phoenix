@@ -50,7 +50,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     val amountView = itemView.findViewById<TextView>(R.id.amount)
     val unitView = itemView.findViewById<TextView>(R.id.unit)
 
-    // payment status ====> amount/colors
+    // payment status ====> amount/colors/unit
     when (payment.status()) {
       `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
         // amount
@@ -94,12 +94,5 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     } else {
       itemView.findViewById<TextView>(R.id.timestamp).text = "pending!!!"
     }
-
-
-    //    itemView.findViewById<ImageView>(R.id.icon).setImageResource(when (payment.status()) {
-    //      `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> R.drawable.ic_cross_white_24dp
-    //      `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> R.drawable.ic_check_white_24dp
-    //      else -> R.drawable.ic_clock_white_24dp
-    //    })
   }
 }

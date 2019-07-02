@@ -51,7 +51,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintBottom_toBottomOf="parent"
-      android:drawableStart="@drawable/ic_alert_triangle_white_24dp"
+      android:drawableStart="@drawable/ic_alert_triangle_24dp"
       android:text="@{appKitModel.startupErrorMessage}"
       android:visibility="@{appKitModel.startupState == StartupState.ERROR}" />
   </androidx.constraintlayout.widget.ConstraintLayout>

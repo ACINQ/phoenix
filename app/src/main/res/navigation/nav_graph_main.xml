@@ -45,30 +45,15 @@
     android:name="fr.acinq.eclair.phoenix.main.MainFragment"
     android:label="MainFragment">
     <action
-      android:id="@+id/action_mainFragment_to_testFragment"
-      app:destination="@id/test_fragment"
-      app:enterAnim="@anim/slide_in_left"
-      app:exitAnim="@anim/slide_out_right" />
-    <action
       android:id="@+id/action_main_to_receive"
       app:destination="@id/receive_fragment" />
     <action
       android:id="@+id/action_main_to_init_send"
-      app:destination="@id/initSendFragment"
+      app:destination="@id/send_init"
       app:launchSingleTop="true" />
-  </fragment>
-
-  <fragment
-    android:id="@+id/test_fragment"
-    android:name="fr.acinq.eclair.phoenix.main.TestFragment"
-    android:label="fragment_test">
     <action
-      android:id="@+id/action_testFragment_to_mainFragment"
-      app:destination="@id/main_fragment"
-      app:enterAnim="@anim/fade_in"
-      app:exitAnim="@anim/fade_out"
-      app:popUpTo="@id/main_fragment"
-      app:popUpToInclusive="true" />
+      android:id="@+id/action_main_to_settings"
+      app:destination="@id/settings" />
   </fragment>
 
   <fragment
@@ -131,9 +116,22 @@
       android:name="payment_request"
       app:argType="string" />
   </dialog>
+
   <fragment
-    android:id="@+id/initSendFragment"
+    android:id="@+id/send_init"
     android:name="fr.acinq.eclair.phoenix.send.InitSendFragment"
     android:label="InitSendFragment" />
+  <fragment
+    android:id="@+id/settings"
+    android:name="fr.acinq.eclair.phoenix.settings.SettingsFragment"
+    android:label="SettingsFragment" >
+    <action
+      android:id="@+id/action_settings_to_closeAllChannels"
+      app:destination="@id/close_all_channels" />
+  </fragment>
+  <fragment
+    android:id="@+id/close_all_channels"
+    android:name="fr.acinq.eclair.phoenix.settings.CloseAllChannelsFragment"
+    android:label="CloseAllChannelsFragment" />
 
 </navigation>

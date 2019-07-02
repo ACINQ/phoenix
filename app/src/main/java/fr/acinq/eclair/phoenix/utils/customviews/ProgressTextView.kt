@@ -31,16 +31,20 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
   init {
     val mBinding = DataBindingUtil.inflate<CustomProgressTextViewBinding>(LayoutInflater.from(getContext()), R.layout.custom_progress_text_view, this, true)
     attrs?.let {
-      val arr = context.obtainStyledAttributes(it, R.styleable.ProgressTextView, 0, 0)
+      val arr = context.obtainStyledAttributes(it, R.styleable.ProgressTextView, 0, defStyle)
       mBinding.label.text = arr.getString(R.styleable.ProgressTextView_text)
-      mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, ContextCompat.getColor(context, R.color.dark)))
+      if (arr.hasValue(R.styleable.ProgressTextView_text_color)) {
+        mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, R.attr.primaryTextColor))
+      }
 
       if (arr.hasValue(R.styleable.ProgressTextView_text_size)) {
         mBinding.label.setTextSize(TypedValue.COMPLEX_UNIT_PX,
           arr.getDimensionPixelSize(R.styleable.ProgressTextView_text_size, R.dimen.text_lg).toFloat())
       }
 
-      mBinding.progressBar.indeterminateDrawable.setColorFilter(arr.getColor(R.styleable.ProgressTextView_progress_tint, ContextCompat.getColor(context, R.color.green)), PorterDuff.Mode.SRC_IN)
+      if (arr.hasValue(R.styleable.ProgressTextView_progress_tint)) {
+        mBinding.progressBar.indeterminateDrawable.setColorFilter(arr.getColor(R.styleable.ProgressTextView_progress_tint, R.attr.primaryTextColor), PorterDuff.Mode.SRC_IN)
+      }
       arr.recycle()
     }
   }

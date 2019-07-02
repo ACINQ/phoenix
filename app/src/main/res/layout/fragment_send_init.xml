@@ -19,7 +19,9 @@
   xmlns:tools="http://schemas.android.com/tools">
 
   <data>
+
     <import type="fr.acinq.eclair.phoenix.send.ReadingState" />
+
     <variable
       name="model"
       type="fr.acinq.eclair.phoenix.send.InitSendViewModel" />
@@ -28,6 +30,39 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/actions_layout"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:background="@color/white">
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/paste_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:icon="@drawable/ic_clipboard_24dp"
+        app:text="@string/send_init_paste" />
+
+      <View
+        android:id="@+id/sep"
+        style="@style/HLineSeparator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/paste_button" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/cancel_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sep"
+        app:text="@string/btn_cancel" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.journeyapps.barcodescanner.DecoratedBarcodeView
       android:id="@+id/scan_view"
@@ -45,106 +80,69 @@
       android:id="@+id/scan_crosshairs"
       android:layout_width="@dimen/scanner_size"
       android:layout_height="@dimen/scanner_size"
-      android:background="@drawable/rounded_white_low_op"
-      android:visibility="@{model.hasCameraAccess}"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintEnd_toEndOf="@id/scan_view"
       app:layout_constraintStart_toStartOf="@id/scan_view"
-      app:layout_constraintTop_toTopOf="@id/scan_view" />
+      app:layout_constraintTop_toTopOf="@id/scan_view"
+      android:background="@drawable/rounded_white_low_op"
+      android:visibility="@{model.hasCameraAccess}" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_xs"
-      android:visibility="@{model.readingState == ReadingState.READING}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/scan_crosshairs"
       app:layout_constraintEnd_toEndOf="@id/scan_crosshairs"
       app:layout_constraintStart_toStartOf="@id/scan_crosshairs"
       app:layout_constraintTop_toTopOf="@id/scan_crosshairs"
+      android:padding="@dimen/space_xs"
+      android:visibility="@{model.readingState == ReadingState.READING}"
       app:text_color="@color/dark"
       app:text_size="@dimen/text_md" />
 
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:background="@drawable/rounded_white"
+      android:layout_margin="@dimen/space_lg"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@id/scan_view"
+      android:background="@drawable/rounded"
+      android:drawableStart="@drawable/ic_alert_triangle_24dp"
+      android:drawablePadding="@dimen/space_md"
+      android:drawableTint="@color/red"
       android:padding="@dimen/space_md_p"
       android:text="@string/scan_state_error"
       android:textColor="@color/dark"
-      android:layout_marginStart="@dimen/space_lg"
-      android:layout_marginEnd="@dimen/space_lg"
-      android:drawableStart="@drawable/ic_alert_triangle_white_24dp"
-      android:drawablePadding="@dimen/space_md"
-      android:drawableTint="@color/red"
-      android:visibility="@{model.readingState == ReadingState.ERROR}"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="@id/scan_crosshairs"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/scan_crosshairs" />
+      android:visibility="@{model.readingState == ReadingState.ERROR}" />
 
     <TextView
       android:id="@+id/instructions"
       style="@style/default_textAppearance"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
       android:padding="@dimen/space_sm"
       android:text="@string/scan_instructions"
       android:textAlignment="center"
       android:textColor="@color/grey_light_1"
       android:textSize="@dimen/text_sm"
-      android:visibility="@{model.hasCameraAccess}"
-      app:layout_constraintBottom_toBottomOf="@id/scan_view" />
+      android:visibility="@{model.hasCameraAccess}" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
       android:id="@+id/camera_access_button"
-      style="@style/ClassicButtonStyle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:visibility="@{!model.hasCameraAccess}"
-      app:icon="@drawable/ic_photo_camera_black_24dp"
-      app:icon_tint="@color/white"
+      android:layout_margin="@dimen/space_lg"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintTop_toTopOf="@id/scan_view"
+      android:visibility="@{!model.hasCameraAccess}"
+      app:icon="@drawable/ic_photo_camera_black_24dp"
+      app:background="@drawable/rounded"
       app:text="@string/scan_request_camera_access"
-      app:text_color="@color/white" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:id="@+id/actions_layout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="@color/white"
-      app:layout_constrainedHeight="true"
-      app:layout_constraintBottom_toBottomOf="parent">
-
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-        android:id="@+id/paste_button"
-        style="@style/ClassicButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/ic_clipboard_white_24dp"
-        app:icon_tint="@color/dark"
-        app:layout_constraintTop_toTopOf="parent"
-        app:text="@string/send_init_paste"
-        app:text_color="@color/dark" />
-
-      <View
-        android:id="@+id/sep"
-        style="@style/HLineSeparator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/paste_button" />
-
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-        android:id="@+id/cancel_button"
-        style="@style/ClassicButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sep"
-        app:text="@string/btn_cancel"
-        app:text_color="@color/dark" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+      app:text_size="@dimen/text_lg" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -16,19 +16,17 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import org.slf4j.LoggerFactory
 
 enum class ClosingChannelsState {
-  READY, IN_PROGRESS, DONE, ERROR
+  CHECKING_CHANNELS, NO_CHANNELS, READY, IN_PROGRESS, DONE, ERROR
 }
 
 class CloseAllChannelsViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(CloseAllChannelsViewModel::class.java)
 
-  val state = MutableLiveData<ClosingChannelsState>(ClosingChannelsState.READY)
+  val state = MutableLiveData(ClosingChannelsState.CHECKING_CHANNELS)
 
 }

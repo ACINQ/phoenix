@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
@@ -118,6 +119,9 @@ class ReceiveFragment : BaseFragment() {
         shareIntent.putExtra(Intent.EXTRA_TEXT, "lightning:${PaymentRequest.write(it)}")
         startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
       }
+    }
+    mBinding.backButton.setOnClickListener {
+      findNavController().popBackStack()
     }
   }
 

@@ -44,15 +44,15 @@
         android:id="@+id/qr_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_white"
-        android:elevation="2dp"
-        android:paddingTop="@dimen/space_lg"
-        android:paddingBottom="@dimen/space_lg_p"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/rounded"
+        android:elevation="2dp"
+        android:paddingTop="@dimen/space_lg"
+        android:paddingBottom="@dimen/space_lg_p">
 
         <ImageView
           android:id="@+id/qr_image"
@@ -60,35 +60,35 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_lg"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
           android:adjustViewBounds="true"
           android:alpha="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null ? 1f : 0.15f}"
           android:clickable="true"
           android:contentDescription="@string/utils_unknown"
           android:focusable="true"
           android:scaleType="fitCenter"
-          android:src="@drawable/qrcode_placeholder"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent" />
+          android:src="@drawable/qrcode_placeholder" />
 
         <ProgressBar
           android:id="@+id/progress_bar"
           android:layout_width="20dp"
           android:layout_height="20dp"
-          android:indeterminateTint="@color/green"
-          android:visibility="@{!(model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null)}"
           app:layout_constraintBottom_toBottomOf="@id/qr_image"
           app:layout_constraintEnd_toEndOf="@id/qr_image"
           app:layout_constraintStart_toStartOf="@id/qr_image"
-          app:layout_constraintTop_toTopOf="@id/qr_image" />
+          app:layout_constraintTop_toTopOf="@id/qr_image"
+          android:indeterminateTint="@color/green"
+          android:visibility="@{!(model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null)}" />
 
         <androidx.constraintlayout.widget.Guideline
           android:id="@+id/label_guideline"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
-          app:layout_constraintGuide_percent="0.45" />
+          app:layout_constraintGuide_percent="0.45"
+          android:orientation="vertical" />
 
         <TextView
           style="@style/default_textAppearance_alt"
@@ -96,16 +96,16 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_xxs"
-          android:text="@string/receive_amount_label"
-          android:textAlignment="viewEnd"
-          android:textColor="@color/dark"
-          android:textSize="@dimen/text_sm"
           app:layout_constrainedWidth="true"
           app:layout_constraintBottom_toBottomOf="@id/amount_value"
           app:layout_constraintEnd_toStartOf="@id/label_guideline"
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="@id/amount_value" />
+          app:layout_constraintTop_toTopOf="@id/amount_value"
+          android:text="@string/receive_amount_label"
+          android:textAlignment="viewEnd"
+          android:textColor="@color/dark"
+          android:textSize="@dimen/text_sm" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.CoinView
           android:id="@+id/amount_value"
@@ -114,25 +114,39 @@
           android:layout_marginStart="@dimen/space_xxs"
           android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginEnd="@dimen/space_md"
-          android:background="@drawable/editable_bg_dotted"
-          app:amount_color="@color/dark"
-          app:amount_size="22sp"
-          app:editable="true"
-          app:hint="@string/receive_no_amount_requested_hint"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0.0"
           app:layout_constraintStart_toEndOf="@id/label_guideline"
           app:layout_constraintTop_toBottomOf="@id/qr_image"
+          android:background="@drawable/editable_bg_dotted"
+          app:amount_color="@color/dark"
+          app:amount_size="22sp"
+          app:editable="true"
+          app:hint="@string/receive_no_amount_requested_hint"
           app:unit_color="@color/dark"
           app:unit_size="@dimen/text_md" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
+      <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintEnd_toEndOf="@id/qr_layout"
+        app:layout_constraintBottom_toTopOf="@id/qr_layout"
+        android:background="@drawable/rounded"
+        android:elevation="3dp"
+        android:src="@drawable/ic_cross_24dp"
+        android:translationY="@dimen/corner" />
+
       <Button
         android:id="@+id/share_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/qr_layout"
         android:backgroundTint="@color/white"
         android:drawableStart="@drawable/ic_share_white_24dp"
         android:drawableTint="@color/dark"
@@ -142,10 +156,7 @@
         android:textAppearance="@style/default_textAppearance_alt"
         android:textColor="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null ? @color/dark : @color/grey_light_1}"
         android:textSize="@dimen/text_md"
-        android:translationY="-24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/qr_layout" />
+        android:translationY="-24dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

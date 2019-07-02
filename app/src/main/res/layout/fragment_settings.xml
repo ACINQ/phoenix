@@ -25,53 +25,79 @@
       type="fr.acinq.eclair.phoenix.settings.SettingsViewModel" />
   </data>
 
-  <ScrollView
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true"
-    tools:context=".receive.SettingsFragment">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ImageButton
+      android:id="@+id/back_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:backgroundTint="@color/transparent"
+      android:contentDescription="@string/btn_back"
+      android:padding="@dimen/space_md"
+      android:src="@drawable/ic_arrow_back_24dp" />
+
+    <TextView
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_lg"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintTop_toTopOf="@id/back_button"
+      app:layout_constraintBottom_toBottomOf="@id/back_button"
+      app:layout_constraintStart_toEndOf="@id/back_button"
+      android:ellipsize="end"
+      android:singleLine="true"
+      android:text="@string/menu_settings" />
+
+    <ScrollView
       android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+      android:layout_height="0dp"
+      app:layout_constraintTop_toBottomOf="@+id/back_button"
+      android:background="@color/white"
+      android:fillViewport="true"
+      tools:context=".receive.SettingsFragment">
 
-      <androidx.constraintlayout.helper.widget.Flow
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:constraint_referenced_ids="close_channels_button, sep1, list_all_channels"
-        app:flow_verticalStyle="packed"
-        app:flow_wrapMode="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0" />
-
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-        android:id="@+id/close_channels_button"
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
-        app:text="@string/settings_close_all_channels"
-        app:text_size="@dimen/text_lg"
-        tools:ignore="MissingConstraints" />
+        android:layout_height="wrap_content">
 
-      <View
-        android:id="@+id/sep1"
-        style="@style/HLineSeparator"
-        tools:ignore="MissingConstraints" />
+        <androidx.constraintlayout.helper.widget.Flow
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintVertical_bias="0"
+          android:orientation="vertical"
+          app:constraint_referenced_ids="close_channels_button, sep1, list_all_channels"
+          app:flow_verticalStyle="packed"
+          app:flow_wrapMode="none" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-        android:id="@+id/list_all_channels"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
-        app:text="@string/settings_list_channels"
-        app:text_size="@dimen/text_lg"
-        tools:ignore="MissingConstraints" />
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/close_channels_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:text="@string/settings_close_all_channels"
+          tools:ignore="MissingConstraints" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-  </ScrollView>
+        <View
+          android:id="@+id/sep1"
+          style="@style/HLineSeparator"
+          tools:ignore="MissingConstraints" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/list_all_channels"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:text="@string/settings_list_channels"
+          tools:ignore="MissingConstraints" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
