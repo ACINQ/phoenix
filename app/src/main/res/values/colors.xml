@@ -42,13 +42,13 @@
 
 
 
-  <color name="blue_light_2">#138FE0</color>
-  <color name="blue_light_1">#0073BF</color>
-  <color name="blue">#0063A6</color>
-  <color name="blue_dark_1">#00548B</color>
-  <color name="blue_dark_2">#004774</color>
-  <color name="blue_dark_3">#003759</color>
+  <color name="blue">#138FE0</color>
 
+  <color name="deepblue_light_1">#0073BF</color>
+  <color name="deepblue">#0063A6</color>
+  <color name="deepblue_dark_1">#00548B</color>
+  <color name="deepblue_dark_2">#004774</color>
+  <color name="deepblue_dark_3">#003759</color>
 
   <!-- basic -->
   <color name="yellow">#F1AF00</color>

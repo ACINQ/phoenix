@@ -20,7 +20,9 @@
     <!-- colors -->
     <item name="colorPrimary">@color/primary</item>
     <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="colorAccent">@color/blue_light_1</item>
+    <item name="colorAccent">@color/blue</item>
+
+    <item name="buttonViewStyle">@style/default_buttonStyle</item>
 
     <!-- background -->
     <item name="android:colorBackground">@color/primary</item>
@@ -62,7 +64,7 @@
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:minHeight">0dp</item>
-    <item name="android:drawablePadding">@dimen/space_md</item>
+    <item name="android:minWidth">0dp</item>
     <item name="android:gravity">start|center</item>
     <item name="android:paddingTop">@dimen/space_sm</item>
     <item name="android:paddingBottom">@dimen/space_sm</item>

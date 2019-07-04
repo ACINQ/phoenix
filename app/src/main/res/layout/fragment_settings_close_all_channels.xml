@@ -178,7 +178,6 @@
           android:elevation="4dp"
           android:translationY="-28dp"
           android:visibility="@{model.state == ClosingChannelsState.READY}"
-          app:background="@drawable/button_bg"
           app:icon="@drawable/ic_check_circle"
           app:icon_tint="@color/white"
           app:text="@string/btn_confirm"

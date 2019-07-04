@@ -82,6 +82,7 @@
           android:id="@+id/close_channels_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
           app:text="@string/settings_close_all_channels"
           tools:ignore="MissingConstraints" />
 
@@ -94,6 +95,7 @@
           android:id="@+id/list_all_channels"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
           app:text="@string/settings_list_channels"
           tools:ignore="MissingConstraints" />
 

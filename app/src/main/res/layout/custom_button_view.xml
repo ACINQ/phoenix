@@ -17,11 +17,7 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
-  <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:background="@drawable/button_bg_square"
-    android:padding="@dimen/space_md"
-    android:layout_height="wrap_content">
+  <merge>
 
     <ImageView
       android:id="@+id/image"
@@ -50,5 +46,5 @@
       app:layout_constraintTop_toTopOf="parent"
       android:lineSpacingMultiplier="1"
       android:textSize="@dimen/text_lg" />
-  </androidx.constraintlayout.widget.ConstraintLayout>
+  </merge>
 </layout>

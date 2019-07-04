@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsCloseAllChannelsBinding
@@ -52,6 +53,7 @@ class CloseAllChannelsFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.confirmButton.setOnClickListener { closeAllChannels() }
+    mBinding.backButton.setOnClickListener { findNavController().popBackStack() }
   }
 
   private fun getChannels() {

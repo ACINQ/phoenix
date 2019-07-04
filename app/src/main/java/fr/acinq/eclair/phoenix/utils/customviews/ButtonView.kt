@@ -24,19 +24,23 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomButtonViewBinding
 
-class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = R.style.default_buttonStyle) : ConstraintLayout(context, attrs, R.style.default_buttonStyle) {
+
+class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.buttonViewStyle) : ConstraintLayout(context, attrs, R.attr.buttonViewStyle) {
 
   private var mBinding: CustomButtonViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
     R.layout.custom_button_view, this, true)
 
   init {
     attrs?.let {
-      val arr = context.obtainStyledAttributes(attrs, R.styleable.ButtonView, 0, defStyle)
+      val arr = context.obtainStyledAttributes(attrs, R.styleable.ButtonView, defStyleAttr, R.style.default_buttonStyle)
+      setPadding(resources.getDimensionPixelOffset(R.dimen.space_md))
 
+      // optional text
       if (arr.hasValue(R.styleable.ButtonView_text)) {
         mBinding.text.text = arr.getString(R.styleable.ButtonView_text)
         if (arr.hasValue(R.styleable.ButtonView_text_size)) {
@@ -60,12 +64,6 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mBinding.image.visibility = GONE
       }
 
-      arr.getDrawable(R.styleable.ButtonView_background)?.let {
-        mBinding.root.background = it
-      }
-      if (arr.hasValue(R.styleable.ButtonView_background_tint)) {
-        mBinding.root.backgroundTintList = arr.getColorStateList(R.styleable.ButtonView_background_tint)
-      }
       arr.recycle()
     }
   }
