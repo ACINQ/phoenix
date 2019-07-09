@@ -19,13 +19,12 @@
 
   <!-- //////////////// initwallet / create seed //////////////// -->
 
-  <string name="newseed_instructions">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus.\nPlease save this list somewhere safe (not on this phone).</string>
-  <string name="newseed_words_td"><![CDATA[<td><font color="#B8E4FF"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="newseed_instructions">This words list is the key to your wallet. Save it list somewhere safe (not on this phone).</string>
+  <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="newseed_generating_seed">Generating seed…</string>
   <string name="newseed_seed_saved_checkbox">I have saved this list of words.</string>
-  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the only way to access my funds.</string>
+  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds. Only I possess it.</string>
   <string name="newseed_next">Next</string>
-
 
   <!-- //////////////// Pin dialogs //////////////////// -->
 
@@ -129,5 +128,10 @@
   <string name="menu_settings">Settings</string>
   <string name="menu_send">Send</string>
   <string name="menu_receive">Receive</string>
+
+  <!-- //////////////// init wallet //////////////// -->
+
+  <string name="initwallet_create">Create seed</string>
+  <string name="initwallet_restore">Or restore my wallet</string>
 
 </resources>

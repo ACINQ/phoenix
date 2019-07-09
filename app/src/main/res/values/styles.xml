@@ -29,26 +29,30 @@
     <item name="android:windowBackground">@drawable/app_bg_default</item>
 
     <!-- text -->
-    <item name="android:textColor">@color/dark</item>
     <item name="primaryTextColor">@color/dark</item>
+    <item name="altTextColor">@color/white</item>
+    <item name="android:textColor">?primaryTextColor</item>
 
     <!-- widget overrides -->
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
+    <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
   </style>
 
   <style name="default_textAppearance" parent="TextAppearance.AppCompat.Body1">
     <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:textColor">@color/dark</item>
+    <item name="android:textColor">?primaryTextColor</item>
     <item name="android:textStyle">normal</item>
     <item name="android:fontFamily">sans-serif</item>
     <item name="android:letterSpacing">0.035</item>
   </style>
 
   <style name="default_textAppearance_alt" parent="default_textAppearance">
-    <item name="android:textColor">@color/dark</item>
+    <item name="android:textColor">?altTextColor</item>
   </style>
+
+  <!-- Widgets overrides -->
 
   <style name="paragraph_textViewStyle" parent="default_textAppearance">
     <item name="android:drawablePadding">@dimen/space_md</item>
@@ -57,7 +61,7 @@
   </style>
 
   <style name="paragraph_textViewStyle_alt" parent="paragraph_textViewStyle">
-    <item name="android:textColor">@color/dark</item>
+    <item name="android:textColor">?altTextColor</item>
   </style>
 
   <style name="default_buttonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
@@ -83,6 +87,12 @@
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="android:textViewStyle">@style/default_textAppearance_alt</item>
     <item name="buttonStyle">@style/default_buttonStyle</item>
+  </style>
+
+  <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
+    <item name="android:textColor">?primaryTextColor</item>
+    <item name="android:textSize">@dimen/text_lg</item>
+    <item name="android:buttonTint">?primaryTextColor</item>
   </style>
 
   <!-- ///////////// special styles ///////////// -->

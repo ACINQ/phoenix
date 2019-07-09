@@ -22,6 +22,7 @@
   </declare-styleable>
 
   <attr name="primaryTextColor" format="reference" />
+  <attr name="altTextColor" format="reference" />
   <attr name="text" format="string" />
   <attr name="text_color" format="color">@col</attr>
   <attr name="text_size" format="dimension" />
