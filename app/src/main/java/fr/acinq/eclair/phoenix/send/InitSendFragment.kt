@@ -88,6 +88,14 @@ class InitSendFragment : BaseFragment() {
       context?.let { model.checkAndSetPaymentRequest(Clipboard.read(it)) }
     }
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
+    context?.let {
+      if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        model.hasCameraAccess.value = false
+        activity?.let { act ->
+          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), IntentCodes.CAMERA_PERMISSION_REQUEST)
+        }
+      }
+    }
   }
 
   override fun onResume() {
@@ -97,11 +105,6 @@ class InitSendFragment : BaseFragment() {
         model.hasCameraAccess.value = true
         startScanning()
         mBinding.scanView.resume()
-      } else {
-        model.hasCameraAccess.value = false
-        activity?.let { act ->
-          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), IntentCodes.CAMERA_PERMISSION_REQUEST)
-        }
       }
     }
   }

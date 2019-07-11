@@ -46,6 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="@color/transparent"
         app:icon="@drawable/ic_clipboard_24dp"
         app:text="@string/send_init_paste" />
 
@@ -60,6 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sep"
+        android:backgroundTint="@color/transparent"
         app:text="@string/btn_cancel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -101,24 +103,6 @@
       app:text_size="@dimen/text_md" />
 
     <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/space_lg"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="@id/scan_view"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/scan_view"
-      android:background="@drawable/rounded"
-      android:drawableStart="@drawable/ic_alert_triangle_24dp"
-      android:drawablePadding="@dimen/space_md"
-      android:drawableTint="@color/red"
-      android:padding="@dimen/space_md_p"
-      android:text="@string/scan_state_error"
-      android:textColor="@color/dark"
-      android:visibility="@{model.readingState == ReadingState.ERROR}" />
-
-    <TextView
       android:id="@+id/instructions"
       style="@style/default_textAppearance"
       android:layout_width="match_parent"
@@ -138,11 +122,30 @@
       android:layout_margin="@dimen/space_lg"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintTop_toTopOf="@id/scan_view"
+      android:backgroundTint="@color/white"
       android:visibility="@{!model.hasCameraAccess}"
-      app:icon="@drawable/ic_photo_camera_black_24dp"
       app:background="@drawable/rounded"
+      app:icon="@drawable/ic_photo_camera_black_24dp"
       app:text="@string/scan_request_camera_access"
       app:text_size="@dimen/text_lg" />
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="@dimen/space_lg"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@id/scan_view"
+      android:background="@drawable/rounded"
+      android:drawableStart="@drawable/ic_alert_triangle_24dp"
+      android:drawablePadding="@dimen/space_md"
+      android:drawableTint="@color/red"
+      android:padding="@dimen/space_md_p"
+      android:text="@string/scan_state_error"
+      android:textColor="@color/dark"
+      android:visibility="@{model.readingState == ReadingState.ERROR}" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
