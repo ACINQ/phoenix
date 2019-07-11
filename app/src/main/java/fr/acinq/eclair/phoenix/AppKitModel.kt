@@ -86,7 +86,6 @@ class AppKitModel : ViewModel() {
 
   private val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
-  private var system: ActorSystem = ActorSystem.apply("system")
 
   val navigationEvent = SingleLiveEvent<Any>()
 
@@ -103,7 +102,6 @@ class AppKitModel : ViewModel() {
     _kit.value = null
     startupState.value = StartupState.OFF
     nodeData.value = NodeData(MilliSatoshi(0), 0)
-    log.info("init appkit model")
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -111,8 +109,10 @@ class AppKitModel : ViewModel() {
 
   override fun onCleared() {
     EventBus.getDefault().unregister(this)
+    shutdown()
+
     super.onCleared()
-    log.info("appkit model has been destroyed")
+    log.info("appkit has been cleared")
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -147,16 +147,18 @@ class AppKitModel : ViewModel() {
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest {
     return coroutineScope {
       async(Dispatchers.Default) {
-        val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
-        val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
+        _kit.value?.let {
+          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
+          val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
 
-        val preimage = fr.acinq.eclair.`package$`.`MODULE$`.randomBytes32()
+          val preimage = fr.acinq.eclair.`package$`.`MODULE$`.randomBytes32()
 
-        // push preimage to nodesupervisor actor
-        system.eventStream().publish(preimage)
+          // push preimage to node supervisor actor
+          it.kit.system().eventStream().publish(preimage)
 
-        val f = Patterns.ask(_kit.value?.kit?.paymentHandler(), PaymentLifecycle.ReceivePayment(amount_opt, description, Option.apply(null), routes, Option.empty(), Option.apply(preimage)), timeout)
-        Await.result(f, awaitDuration) as PaymentRequest
+          val f = Patterns.ask(_kit.value?.kit?.paymentHandler(), PaymentLifecycle.ReceivePayment(amount_opt, description, Option.apply(null), routes, Option.empty(), Option.apply(preimage)), timeout)
+          Await.result(f, awaitDuration) as PaymentRequest
+        } ?: throw RuntimeException("kit not initialized")
       }
     }.await()
   }
@@ -192,12 +194,12 @@ class AppKitModel : ViewModel() {
 
   @UiThread
   fun acceptPayToOpen(paymentHash: ByteVector32) {
-    system.eventStream().publish(AcceptPayToOpen(paymentHash))
+    _kit.value?.kit?.system()?.eventStream()?.publish(AcceptPayToOpen(paymentHash))
   }
 
   @UiThread
   fun rejectPayToOpen(paymentHash: ByteVector32) {
-    system.eventStream().publish(RejectPayToOpen(paymentHash))
+    _kit.value?.kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
   }
 
   /**
@@ -224,16 +226,19 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         delay(500)
-        val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-        val channels = Await.result(kit.value?.api?.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
-        val closingFutures = ArrayList<Future<String>>()
-        JavaConverters.asJavaIterableConverter(channels).asJava().map {
-          val channelId = it.channelId()
-          log.info("init closing of channel=$channelId")
-          kit.value?.api?.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
-        }
-        val r = Await.result(Futures.sequence(closingFutures, system.dispatcher()), awaitDuration)
-        log.info("closing channels returns: $r")
+        kit.value?.let {
+          val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+          val channels = Await.result(kit.value?.api?.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
+          val closingFutures = ArrayList<Future<String>>()
+          JavaConverters.asJavaIterableConverter(channels).asJava().map { res ->
+            val channelId = res.channelId()
+            log.info("init closing of channel=$channelId")
+            it.api.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
+          }
+
+          val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), awaitDuration)
+          log.info("closing channels returns: $r")
+        } ?: throw RuntimeException("app kit not initialized")
       }
     }.await()
   }
@@ -244,7 +249,7 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun startAppKit(context: Context, pin: String) {
     if (isKitReady()) {
-      log.warn("tried to startup node but kit is already available")
+      log.warn("tried to startup node but kit is already setup")
     } else {
       viewModelScope.launch {
         startupState.value = StartupState.IN_PROGRESS
@@ -285,6 +290,17 @@ class AppKitModel : ViewModel() {
     }
   }
 
+  fun shutdown() {
+    _kit.value?.let {
+      it.kit.system().shutdown()
+      it.kit.nodeParams().db().audit().close()
+      it.kit.nodeParams().db().channels().close()
+      it.kit.nodeParams().db().network().close()
+      it.kit.nodeParams().db().peers().close()
+      it.kit.nodeParams().db().pendingRelay().close()
+    } ?: log.warn("could not close db connection and shutdown system because kit is not initialized!")
+  }
+
   @WorkerThread
   private fun cancelBackgroundJobs() {
     // cancel all the jobs scheduled by the work manager that would lock up the eclair DB
@@ -308,23 +324,22 @@ class AppKitModel : ViewModel() {
     log.info("starting up node...")
     // TODO before startup: migration scripts + check datadir + restore backups
 
+    val system = ActorSystem.create("system")
+    system.registerOnTermination {
+      log.info("system has been shutdown, all actors are terminated")
+      _kit.postValue(null)
+    }
+
     checkConnectivity(context)
     setupApp()
     cancelBackgroundJobs()
 
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8).split(" ")
-    val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(JavaConverters.collectionAsScalaIterableConverter<String>(mnemonics).asScala().toSeq(), "").toArray())
+    val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(JavaConverters.collectionAsScalaIterableConverter(mnemonics).asScala().toSeq(), "").toArray())
     val pk = DeterministicWallet.derivePrivateKey(DeterministicWallet.generate(seed), LocalKeyManager.nodeKeyBasePath(Wallet.getChainHash()))
     val hashOfSeed = pk.privateKey().publicKey().hash160().toHex()
 
-    log.info("seed has been successfully read")
-
-    //      if (!system.isTerminated) {
-    //        log.info("terminating active actor system")
-    //        system.awaitTermination(Duration.Inf())
-    //        log.info("actor system has been terminated")
-    //        system = ActorSystem.apply("system")
-    //      }
+    log.info("seed successfully read")
 
     Class.forName("org.sqlite.JDBC")
     // todo init address
@@ -332,7 +347,7 @@ class AppKitModel : ViewModel() {
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
     log.info("node setup ready")
 
-    val nodeSupervisor = system.actorOf(Props.create(NodeSupervisor::class.java), "NodeSupervisor")
+    val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, BackupEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
@@ -340,9 +355,9 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, PaymentLifecycle.PaymentResult::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
-    log.info("node supervisor ready")
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
+    log.info("bootstrap complete")
     val eclair = EclairImpl(kit)
     return AppKit(kit, eclair)
   }

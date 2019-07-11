@@ -74,7 +74,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="close_channels_button, sep1, list_all_channels"
+          app:constraint_referenced_ids="close_channels_button, sep1, shutdown_button, sep2, list_all_channels"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
 
@@ -88,6 +88,21 @@
 
         <View
           android:id="@+id/sep1"
+          style="@style/HLineSeparator"
+          android:layout_height="64dp"
+          tools:ignore="MissingConstraints" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/shutdown_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:text_color="@color/red"
+          android:background="@drawable/button_bg_square"
+          app:text="@string/settings_shutdown"
+          tools:ignore="MissingConstraints" />
+
+        <View
+          android:id="@+id/sep2"
           style="@style/HLineSeparator"
           tools:ignore="MissingConstraints" />
 

@@ -62,12 +62,7 @@ class InitSendFragment : BaseFragment() {
     model.paymentRequest.observe(this, Observer {
       if (it != null) {
         val action = SendFragmentDirections.globalActionAnyToSend(it)
-        findNavController().popBackStack().also { findNavController().navigate(action) } //  navigate(action)
-        // go to main!!!
-        //        val result = Intent()
-        //        result.putExtra(IntentCodes.SEND_PAYMENT_INVOICE_EXTRA, it)
-        //        setResult(Activity.RESULT_OK, result)
-        //        finish()
+        findNavController().navigate(action)
       }
     })
     model.readingState.observe(this, Observer {

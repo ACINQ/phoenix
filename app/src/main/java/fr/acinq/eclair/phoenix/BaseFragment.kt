@@ -48,6 +48,8 @@ abstract class BaseFragment : Fragment() {
    */
   open fun handleKit() {
     if (!appKit.isKitReady()) {
+      log.info("appkit is not ready, moving to startup")
+      appKit.startupState.postValue(StartupState.OFF)
       findNavController().navigate(R.id.global_action_any_to_startup)
     }
   }

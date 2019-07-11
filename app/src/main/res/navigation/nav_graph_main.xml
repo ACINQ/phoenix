@@ -23,9 +23,9 @@
   <action
     android:id="@+id/global_action_any_to_startup"
     app:destination="@id/startup_fragment"
-    app:launchSingleTop="true"
-    app:popUpTo="@id/main_fragment"
-    app:popUpToInclusive="true" />
+    app:enterAnim="@anim/pop_in"
+    app:exitAnim="@anim/fade_out"
+    app:launchSingleTop="true" />
   <action
     android:id="@+id/global_action_any_to_receive_with_open"
     app:destination="@id/receive_with_open_dialog"
@@ -33,7 +33,8 @@
   <action
     android:id="@+id/global_action_any_to_send"
     app:destination="@id/send"
-    app:launchSingleTop="true" />
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
   <action
     android:id="@+id/global_action_any_to_testdialog"
     app:destination="@id/test_dialog"
@@ -63,11 +64,10 @@
     <action
       android:id="@+id/action_startup_to_main"
       app:destination="@+id/main_fragment"
-      app:enterAnim="@anim/fade_in"
+      app:enterAnim="@anim/pop_in"
       app:exitAnim="@anim/fade_out"
       app:launchSingleTop="true"
-      app:popUpTo="@id/main_fragment"
-      app:popUpToInclusive="true" />
+      app:popUpTo="@id/main_fragment" />
   </fragment>
 
   <fragment

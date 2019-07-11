@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,12 +29,10 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.phoenix.databinding.ActivityMainBinding
 import fr.acinq.eclair.phoenix.initwallet.InitWalletActivity
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
-import fr.acinq.eclair.phoenix.utils.Wallet
-import org.slf4j.LoggerFactory
-import android.app.Activity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import fr.acinq.eclair.phoenix.send.SendFragmentDirections
 import fr.acinq.eclair.phoenix.utils.IntentCodes
+import fr.acinq.eclair.phoenix.utils.Wallet
+import org.slf4j.LoggerFactory
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     val appKitModel = ViewModelProviders.of(this).get(AppKitModel::class.java)
     appKitModel.navigationEvent.observe(this, Observer {
-      when(it) {
+      when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(it.payToOpenRequest().fundingSatoshis(),
             it.payToOpenRequest().pushMsat(), it.payToOpenRequest().feeSatoshis(), it.payToOpenRequest().paymentHash().toString())
@@ -66,6 +65,11 @@ class MainActivity : AppCompatActivity() {
       finish()
     } else {
     }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    log.info("main activity destroyed")
   }
 
   fun getActivityThis(): Context {

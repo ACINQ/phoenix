@@ -18,7 +18,6 @@ package fr.acinq.eclair.phoenix
 
 import android.app.Application
 import fr.acinq.eclair.CoinUtils
-import fr.acinq.eclair.MBtcUnit
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.phoenix.utils.Logging

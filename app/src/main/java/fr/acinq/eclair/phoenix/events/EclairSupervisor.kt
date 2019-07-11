@@ -29,7 +29,6 @@ import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
-import org.spongycastle.crypto.Commitment
 
 class PendingPayToOpenRequestEvent(val preimage: ByteVector32, var event: PayToOpenRequestEvent?)
 
@@ -40,8 +39,8 @@ class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 /**
  * This actor listens to events dispatched by eclair core.
  */
-class NodeSupervisor : UntypedActor() {
-  private val log = LoggerFactory.getLogger(NodeSupervisor::class.java)
+class EclairSupervisor : UntypedActor() {
+  private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
 
   // key is payment hash
   private val payToOpenMap = HashMap<ByteVector32, PendingPayToOpenRequestEvent>()
@@ -169,6 +168,6 @@ class NodeSupervisor : UntypedActor() {
 
   override fun aroundPostStop() {
     super.aroundPostStop()
-    log.info("eclair events supervisor stopped")
+    log.info("eclair supervisor stopped")
   }
 }

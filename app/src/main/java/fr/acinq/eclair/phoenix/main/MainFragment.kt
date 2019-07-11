@@ -67,9 +67,7 @@ class MainFragment : BaseFragment() {
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
-    mBinding.sendButton.setOnClickListener {
-       findNavController().navigate(R.id.action_main_to_init_send)
-    }
+    mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
   }
 
 }

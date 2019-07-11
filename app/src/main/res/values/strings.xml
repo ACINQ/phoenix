@@ -110,6 +110,7 @@
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_close_all_channels">Empty wallet</string>
+  <string name="settings_shutdown">(Debug) Shutdown node</string>
   <string name="settings_list_channels">(Debug) List my channels</string>
 
   <!-- //////////////// close all channels //////////////// -->

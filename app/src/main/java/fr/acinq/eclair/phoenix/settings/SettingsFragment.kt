@@ -48,6 +48,7 @@ class SettingsFragment : BaseFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.closeChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_closeAllChannels) }
+    mBinding.shutdownButton.setOnClickListener { appKit.shutdown() }
     mBinding.backButton.setOnClickListener { findNavController().popBackStack() }
   }
 }
