@@ -16,59 +16,40 @@
   -->
 
 <resources>
-  <!-- deep blue -->
-  <!--<color name="primary_light_3">#FFE4A5</color>-->
-  <!--<color name="primary_light_2">#FFD96B</color>-->
-  <!--<color name="primary_light_1">#FFCD49</color>-->
-  <!--<color name="primary">#FFC800</color>-->
-  <!--<color name="primary_dark_1">#E69900</color>-->
-  <!--<color name="primary_dark_2">#CC8100</color>-->
-
-
-
-  <color name="app_shade">#49489CFF</color>
-  <color name="app_gradient_complement">#33FF0000</color>
-  <color name="app_gradient_top">#88FFDE88</color>
-
-  <color name="primary_light_1">#FFDE88</color>
-  <color name="primary">#FCB937</color>
-  <color name="primary_muted">#BBDB8F1E</color>
-
-  <color name="main_top_limiter">#158d4545</color>
-
-  <color name="payment_holder_bg">#21FFFFFF</color>
-  <color name="payment_holder_received">#30AF3D</color>
-  <color name="payment_holder_sent">#A63D3D</color>
-
-
-
-  <color name="blue">#138FE0</color>
-
   <color name="deepblue_light_1">#0073BF</color>
   <color name="deepblue">#0063A6</color>
   <color name="deepblue_dark_1">#00548B</color>
   <color name="deepblue_dark_2">#004774</color>
   <color name="deepblue_dark_3">#003759</color>
 
-  <!-- basic -->
-  <color name="yellow">#F1AF00</color>
-  <color name="orange">#F19100</color>
+  <!-- tints -->
+  <color name="yellow_light_1">#FFCE7F</color>
+  <color name="yellow">#FDBF55</color>
+  <color name="orange">#FFBF9C</color>
   <color name="green">#09BB74</color>
+  <color name="blue">#138FE0</color>
+
   <color name="red">#CA4747</color>
+  <color name="dawn">#F8EFF1</color>
+  <color name="blossom">#DFBABA</color>
+  <color name="brandy">#C58181</color>
 
   <!-- basic -->
   <color name="transparent">#00000000</color>
-  <color name="dark">#463800</color>
-  <color name="dark2">#212529</color>
+  <color name="dark">#2B313E</color>
   <color name="black">#000000</color>
-  <color name="grey">#888888</color>
-  <color name="grey_light_1">#BABABA</color>
-  <color name="grey_light_2">#D4D4D4</color>
-  <color name="grey_light_3">#EDEDED</color>
-  <color name="grey_light_4">#F2F2F2</color>
   <color name="white">#FFFFFF</color>
   <color name="white_high_op">#CCFFFFFF</color>
   <color name="white_mid_op">#88FFFFFF</color>
   <color name="white_low_op">#33FFFFFF</color>
 
+  <!-- greys -->
+  <color name="grey">#888888</color>
+  <color name="grey_light_1">#BABABA</color>
+  <color name="grey_light_2">#D4D4D4</color>
+  <color name="grey_light_3">#EDEDED</color>
+
+  <color name="casper">#A9C1CC</color>
+  <color name="mystic">#E4ECF0</color>
+  <color name="athens">#F1F7F9</color>
 </resources>

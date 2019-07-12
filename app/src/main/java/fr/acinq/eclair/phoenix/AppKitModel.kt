@@ -255,9 +255,10 @@ class AppKitModel : ViewModel() {
         startupState.value = StartupState.IN_PROGRESS
         withContext(Dispatchers.Default) {
           try {
-            _kit.postValue(startNode(context, pin))
+            val res = startNode(context, pin)
+            res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+            _kit.postValue(res)
             startupState.postValue(StartupState.DONE)
-            _kit.value?.kit?.switchboard()?.tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
           } catch (t: Throwable) {
             log.info("aborted node startup")
             startupState.postValue(StartupState.ERROR)

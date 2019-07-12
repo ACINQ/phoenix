@@ -32,7 +32,7 @@
       android:layout_height="wrap_content"
       tools:context=".initwallet.InitWalletFragment">
 
-      <Button
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/create_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,11 +41,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/white"
-        android:text="@string/initwallet_create"
-        android:textColor="@color/dark" />
+        app:icon="@drawable/ic_fire"
+        android:backgroundTint="@color/orange"
+        app:text="@string/initwallet_create" />
 
-      <Button
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/restore_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,8 +53,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/transparent"
-        android:text="@string/initwallet_restore" />
+        app:text="@string/initwallet_restore" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

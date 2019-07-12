@@ -38,7 +38,6 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
   init {
     attrs?.let {
       val arr = context.obtainStyledAttributes(attrs, R.styleable.ButtonView, defStyleAttr, R.style.default_buttonStyle)
-      setPadding(resources.getDimensionPixelOffset(R.dimen.space_md))
 
       // optional text
       if (arr.hasValue(R.styleable.ButtonView_text)) {

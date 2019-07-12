@@ -24,13 +24,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.phoenix.BaseDialogFragment
+import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.utils.customviews.CoinView
 
-class SendFragment : BaseDialogFragment() {
+class SendFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSendBinding
   private val args: SendFragmentArgs by navArgs()
@@ -65,6 +64,10 @@ class SendFragment : BaseDialogFragment() {
 
   override fun onStart() {
     super.onStart()
+    appKit.nodeData.value?.let {
+      mBinding.balanceValue.setAmount(it.balance)
+    } ?: log.warn("balance is not available yet")
+
     mBinding.sendButton.setOnClickListener {
       model.paymentRequest.value?.let {
         val amount_opt = mBinding.amount.getAmount()
@@ -73,7 +76,7 @@ class SendFragment : BaseDialogFragment() {
           findNavController().navigate(R.id.action_send_to_main)
         } else {
           log.info("empty amount!")
-          // TODO handle amount error
+          model.state.value = SendState.ERROR_IN_AMOUNT
         }
       }
     }

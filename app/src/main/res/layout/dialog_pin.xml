@@ -42,24 +42,24 @@
         app:flow_wrapMode="none" />
 
       <TextView
-        android:textAppearance="@style/default_textAppearance"
         android:id="@+id/pin_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
         android:text="@string/pindialog_title_default"
         android:textAlignment="center"
+        android:textAppearance="@style/default_textAppearance"
         tools:ignore="MissingConstraints" />
 
       <TextView
         android:id="@+id/pin_display_placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:alpha=".3"
         android:letterSpacing="0.2"
+        android:alpha=".3"
         android:text="@string/pindialog_pwd_placeholder"
-        android:textColor="@color/dark"
-        android:textSize="18sp"
+        android:textColor="?attr/defaultMutedTextColor"
+        android:textSize="@dimen/text_xl"
         tools:ignore="MissingConstraints" />
 
       <TextView
@@ -69,8 +69,8 @@
         app:layout_constraintBaseline_toBaselineOf="@id/pin_display_placeholder"
         app:layout_constraintStart_toStartOf="@id/pin_display_placeholder"
         android:letterSpacing="0.2"
-        android:textColor="@color/dark"
-        android:textSize="18sp" />
+        android:textColor="?attr/defaultMutedTextColor"
+        android:textSize="@dimen/text_xl" />
 
       <GridLayout
         android:id="@+id/pin_grid"
@@ -128,10 +128,8 @@
         <ImageButton
           android:id="@+id/pin_num_clear"
           style="@style/PinButtonStyle"
-          android:alpha=".5"
-          android:background="@color/transparent"
-          android:src="@drawable/ic_trash_white_24dp"
-          android:tint="@color/dark" />
+          android:src="@drawable/ic_trash"
+          android:tint="?attr/defaultMutedTextColor" />
 
         <Button
           android:id="@+id/pin_num_0"
@@ -141,10 +139,8 @@
         <ImageButton
           android:id="@+id/pin_backspace"
           style="@style/PinButtonStyle"
-          android:alpha=".5"
-          android:background="@color/transparent"
-          android:src="@drawable/ic_backspace_white_24dp"
-          android:tint="@color/dark" />
+          android:src="@drawable/ic_backspace"
+          android:tint="?attr/defaultMutedTextColor" />
 
       </GridLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,29 +15,29 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="24dp"
-  android:height="24dp"
+  android:width="@dimen/button_height"
+  android:height="@dimen/button_height"
   android:viewportWidth="24"
   android:viewportHeight="24">
   <path
     android:fillColor="#00000000"
-    android:pathData="M12,12m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
-    android:strokeWidth="2"
-    android:strokeColor="@color/white"
+    android:pathData="M21,4H8l-7,8 7,8h13a2,2 0,0 0,2 -2V6a2,2 0,0 0,-2 -2z"
+    android:strokeWidth="1"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
   <path
     android:fillColor="#00000000"
-    android:pathData="M12,5m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
-    android:strokeWidth="2"
-    android:strokeColor="@color/white"
+    android:pathData="M18,9L12,15"
+    android:strokeWidth="1"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
   <path
     android:fillColor="#00000000"
-    android:pathData="M12,19m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"
-    android:strokeWidth="2"
-    android:strokeColor="@color/white"
+    android:pathData="M12,9L18,15"
+    android:strokeWidth="1"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

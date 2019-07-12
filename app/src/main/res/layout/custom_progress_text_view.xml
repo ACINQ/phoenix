@@ -28,7 +28,7 @@
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/label"
-      android:indeterminateTint="?attr/primaryTextColor" />
+      android:indeterminateTint="?attr/defaultTextColor" />
 
     <TextView
       android:id="@+id/label"

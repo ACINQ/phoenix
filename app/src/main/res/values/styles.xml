@@ -16,33 +16,47 @@
 
 <resources>
 
-  <style name="default_theme" parent="Theme.AppCompat.NoActionBar">
-    <!-- colors -->
-    <item name="colorPrimary">@color/primary</item>
+  <style name="default_theme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- colors definition -->
+    <item name="colorPrimary">@color/yellow</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">@color/blue</item>
 
-    <item name="buttonViewStyle">@style/default_buttonStyle</item>
+    <item name="defaultBackgroundColor">@color/white</item>
+    <item name="defaultMutedBackgroundColor">@color/athens</item>
+    <item name="defaultErrorBackgroundColor">@color/blossom</item>
+
+    <item name="defaultButtonColor">@color/mystic</item>
+
+    <item name="defaultTextColor">@color/dark</item>
+    <item name="defaultMutedTextColor">@color/casper</item>
+    <item name="defaultErrorTextColor">@color/brandy</item>
+    <item name="defaultMutedErrorTextColor">@color/blossom</item>
+    <item name="altBackgroundColor">@color/yellow</item>
+    <item name="altTextColor">@color/white</item>
 
     <!-- background -->
-    <item name="android:colorBackground">@color/primary</item>
+    <item name="android:colorBackground">?attr/defaultBackgroundColor</item>
     <item name="android:windowBackground">@drawable/app_bg_default</item>
 
     <!-- text -->
-    <item name="primaryTextColor">@color/dark</item>
-    <item name="altTextColor">@color/white</item>
-    <item name="android:textColor">?primaryTextColor</item>
+    <item name="android:textColor">?attr/defaultTextColor</item>
 
     <!-- widget overrides -->
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
+    <item name="buttonViewStyle">@style/default_buttonStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
+
+    <!-- status bar -->
+    <item name="android:statusBarColor">@color/mystic</item>
+    <item name="android:windowLightStatusBar">true</item>
   </style>
 
   <style name="default_textAppearance" parent="TextAppearance.AppCompat.Body1">
     <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:textColor">?primaryTextColor</item>
+    <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textStyle">normal</item>
     <item name="android:fontFamily">sans-serif</item>
     <item name="android:letterSpacing">0.035</item>
@@ -70,8 +84,8 @@
     <item name="android:minHeight">0dp</item>
     <item name="android:minWidth">0dp</item>
     <item name="android:gravity">start|center</item>
-    <item name="android:paddingTop">@dimen/space_sm</item>
-    <item name="android:paddingBottom">@dimen/space_sm</item>
+    <item name="android:paddingTop">@dimen/space_md</item>
+    <item name="android:paddingBottom">@dimen/space_md</item>
     <item name="android:paddingLeft">@dimen/space_md</item>
     <item name="android:paddingRight">@dimen/space_md</item>
     <item name="android:background">@drawable/button_bg</item>
@@ -90,9 +104,9 @@
   </style>
 
   <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
-    <item name="android:textColor">?primaryTextColor</item>
+    <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:buttonTint">?primaryTextColor</item>
+    <item name="android:buttonTint">?attr/defaultTextColor</item>
   </style>
 
   <!-- ///////////// special styles ///////////// -->
@@ -100,7 +114,12 @@
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">@color/grey_light_4</item>
+    <item name="android:background">@color/mystic</item>
+  </style>
+
+  <style name="VSeparator" parent="HLineSeparator">
+    <item name="android:layout_width">1dp</item>
+    <item name="android:layout_height">0dp</item>
   </style>
 
   <style name="HSeparator" parent="HLineSeparator">
@@ -114,7 +133,7 @@
     <item name="android:gravity">center</item>
     <item name="android:layout_margin">@dimen/space_xs</item>
     <item name="android:hapticFeedbackEnabled">true</item>
-    <item name="android:textColor">@color/dark</item>
+    <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textSize">20sp</item>
     <item name="android:background">@drawable/button_pin</item>
   </style>

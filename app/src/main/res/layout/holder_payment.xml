@@ -18,15 +18,32 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:layout_marginLeft="@dimen/space_sm"
   android:layout_marginTop="@dimen/space_xs"
-  android:layout_marginRight="@dimen/space_sm"
-  android:background="@drawable/rounded"
-  android:backgroundTint="@color/payment_holder_bg"
   android:paddingLeft="@dimen/space_md"
   android:paddingTop="@dimen/space_sm"
   android:paddingRight="@dimen/space_md"
   android:paddingBottom="@dimen/space_sm">
+
+  <ImageView
+    android:id="@+id/avatar_background"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:src="@drawable/payment_holder_avatar_background"
+    android:contentDescription="@null" />
+
+  <ImageView
+    android:id="@+id/avatar"
+    android:layout_width="20dp"
+    android:layout_height="20dp"
+    app:layout_constraintStart_toStartOf="@id/avatar_background"
+    app:layout_constraintTop_toTopOf="@id/avatar_background"
+    app:layout_constraintBottom_toBottomOf="@id/avatar_background"
+    app:layout_constraintEnd_toEndOf="@id/avatar_background"
+    android:src="@drawable/payment_holder_def_success"
+    android:contentDescription="@null" />
 
   <TextView
     android:id="@+id/description"
@@ -34,11 +51,12 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginEnd="@dimen/space_lg"
+    android:layout_marginStart="@dimen/space_md"
     app:layout_constrainedWidth="true"
     app:layout_constraintEnd_toStartOf="@id/amount"
     app:layout_constraintHorizontal_bias="0"
     app:layout_constraintHorizontal_chainStyle="packed"
-    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintStart_toEndOf="@id/avatar_background"
     app:layout_constraintTop_toTopOf="parent"
     android:ellipsize="end"
     android:lines="1"
@@ -71,7 +89,7 @@
     app:layout_constraintStart_toEndOf="@id/amount"
     android:singleLine="true"
     android:textAlignment="viewEnd"
-    android:alpha="0.3"
+    android:textColor="?attr/defaultMutedTextColor"
     android:textSize="@dimen/text_xs" />
 
   <TextView
@@ -81,9 +99,9 @@
     android:layout_height="wrap_content"
     app:layout_constraintEnd_toStartOf="@id/amount"
     app:layout_constraintHorizontal_bias="0"
-    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintStart_toStartOf="@id/description"
     app:layout_constraintTop_toBottomOf="@id/description"
-    android:textColor="@color/primary_muted"
+    android:textColor="?attr/defaultMutedTextColor"
     android:textSize="@dimen/text_xs" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

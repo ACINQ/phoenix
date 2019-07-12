@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +14,10 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+  android:duration="@integer/anim_default_time">
+  <alpha android:fromAlpha="1" android:toAlpha="0" />
   <translate
-    android:duration="700"
     android:fromXDelta="0%"
     android:fromYDelta="0%"
     android:toXDelta="-100%"

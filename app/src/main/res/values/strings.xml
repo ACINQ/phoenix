@@ -19,11 +19,11 @@
 
   <!-- //////////////// initwallet / create seed //////////////// -->
 
-  <string name="newseed_instructions">This words list is the key to your wallet. Save it list somewhere safe (not on this phone).</string>
+  <string name="newseed_instructions">This words list is the key to your wallet. Save it somewhere safe (not on this phone).</string>
   <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="newseed_generating_seed">Generating seed…</string>
   <string name="newseed_seed_saved_checkbox">I have saved this list of words.</string>
-  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds. Only I possess it.</string>
+  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds.\nOnly I possess it.</string>
   <string name="newseed_next">Next</string>
 
   <!-- //////////////// Pin dialogs //////////////////// -->
@@ -65,7 +65,7 @@
 
   <string name="receive_loading_message">Please hold…</string>
   <string name="receive_no_amount_requested_hint">Unspecified</string>
-  <string name="receive_amount_label">Requested\namount</string>
+  <string name="receive_amount_label">Amount</string>
   <string name="receive_share_subject">Please pay this payment</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
@@ -83,10 +83,11 @@
 
   <string name="send_init_paste">Paste payment request</string>
 
-  <string name="send_loading">Please wait…</string>
-  <string name="send_invalid_pr_generic">This payment is not valid.</string>
-  <string name="send_description_label">Description</string>
-  <string name="send_destination_label">Recipient</string>
+  <string name="send_balance_prefix">You have</string>
+  <string name="send_loading">Checking payment…</string>
+  <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
+  <string name="send_destination_label">Send to</string>
+  <string name="send_description_label">for</string>
   <string name="send_go">Pay</string>
   <string name="send_cancel">Cancel</string>
 
@@ -132,7 +133,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">Create seed</string>
+  <string name="initwallet_create">New Wallet</string>
   <string name="initwallet_restore">Or restore my wallet</string>
 
 </resources>

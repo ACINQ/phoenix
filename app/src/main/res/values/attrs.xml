@@ -21,8 +21,20 @@
     <attr name="buttonViewStyle" />
   </declare-styleable>
 
-  <attr name="primaryTextColor" format="reference" />
+  <attr name="defaultBackgroundColor" format="reference" />
+  <attr name="defaultMutedBackgroundColor" format="reference" />
+  <attr name="defaultErrorBackgroundColor" format="reference" />
+
+  <attr name="defaultButtonColor" format="reference" />
+
+  <attr name="defaultTextColor" format="reference" />
+  <attr name="defaultMutedTextColor" format="reference" />
+  <attr name="defaultErrorTextColor" format="reference" />
+  <attr name="defaultMutedErrorTextColor" format="reference" />
+
+  <attr name="altBackgroundColor" format="reference" />
   <attr name="altTextColor" format="reference" />
+
   <attr name="text" format="string" />
   <attr name="text_color" format="color">@col</attr>
   <attr name="text_size" format="dimension" />

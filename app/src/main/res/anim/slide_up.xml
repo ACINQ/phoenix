@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,14 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item>
-    <shape android:shape="rectangle">
-      <solid android:color="@color/white" />
-      <corners android:bottomLeftRadius="@dimen/corner" android:bottomRightRadius="@dimen/corner" />
-    </shape>
-  </item>
-</selector>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+  android:duration="@integer/anim_default_time">
+  <alpha
+    android:fromAlpha="0.0"
+    android:toAlpha="1.0" />
+  <translate
+    android:fromXDelta="0"
+    android:fromYDelta="20%"
+    android:toXDelta="0"
+    android:toYDelta="0" />
+</set>

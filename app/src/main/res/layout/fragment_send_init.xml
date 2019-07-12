@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        android:backgroundTint="@color/transparent"
+        android:padding="@dimen/space_md_p"
         app:icon="@drawable/ic_clipboard_24dp"
         app:text="@string/send_init_paste" />
 
@@ -61,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sep"
-        android:backgroundTint="@color/transparent"
+        android:padding="@dimen/space_md_p"
         app:text="@string/btn_cancel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -125,7 +125,7 @@
       android:backgroundTint="@color/white"
       android:visibility="@{!model.hasCameraAccess}"
       app:background="@drawable/rounded"
-      app:icon="@drawable/ic_photo_camera_black_24dp"
+      app:icon="@drawable/ic_photo_camera"
       app:text="@string/scan_request_camera_access"
       app:text_size="@dimen/text_lg" />
 

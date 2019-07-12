@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,11 @@
   ~ limitations under the License.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
   <item>
     <shape android:shape="rectangle">
-      <solid android:color="@color/white" />
-      <stroke
-        android:width="1dp"
-        android:color="@color/dark"
-        android:dashWidth="1dp"
-        android:dashGap="1dp" />
+      <solid android:color="?attr/defaultBackgroundColor" />
+      <corners android:topLeftRadius="@dimen/corner" android:topRightRadius="@dimen/corner" />
     </shape>
   </item>
-
-  <item android:bottom="1dp">
-    <shape android:shape="rectangle">
-      <solid android:color="@color/white" />
-    </shape>
-  </item>
-
-</layer-list>
+</selector>

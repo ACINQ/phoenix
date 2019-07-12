@@ -37,17 +37,17 @@
       app:layout_constraintTop_toBottomOf="@id/top_section"
       app:layout_behavior="@string/appbar_scrolling_view_behavior"
       app:layout_constrainedHeight="true"
+      android:background="@color/transparent"
       android:clipToPadding="false"
       android:overScrollMode="never"
       android:paddingBottom="88dp" />
 
     <View
       android:id="@+id/top_limiter"
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      app:layout_constraintBottom_toBottomOf="@id/top_section"
-      android:background="@color/main_top_limiter"
-      android:backgroundTintMode="screen" />
+      android:layout_width="60dp"
+      android:layout_height="8dp"
+      android:background="@drawable/rounded"
+      android:backgroundTint="?attr/colorPrimary" />
 
     <View
       android:id="@+id/top_section"
@@ -61,14 +61,8 @@
       android:layout_height="wrap_content"
       app:layout_constrainedWidth="true"
       app:amount_size="48sp"
-      app:unit_color="@color/primary_muted"
+      app:unit_color="?attr/colorPrimary"
       app:unit_size="20sp" />
-
-    <View
-      android:layout_width="match_parent"
-      android:layout_height="200dp"
-      app:layout_constraintBottom_toBottomOf="parent"
-      android:background="@drawable/app_bg_shade" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/buttons_layout"
@@ -76,8 +70,19 @@
       android:layout_height="wrap_content"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      android:background="@color/white"
-      android:elevation="16dp">
+      android:background="@drawable/rounded_top"
+      android:backgroundTint="?attr/defaultBackgroundColor"
+      android:clipChildren="true">
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/rounded_top"
+        android:backgroundTint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constrainedWidth="true"
+        android:layout_marginStart="@dimen/space_md_p"
+        android:layout_marginEnd="@dimen/space_md_p" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/settings_button"
@@ -86,21 +91,23 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintEnd_toStartOf="@id/receive_button"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/button_bg_square"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/button_bg_square"
+        android:paddingStart="@dimen/space_md_p"
+        android:paddingTop="@dimen/space_md_p"
+        android:paddingEnd="@dimen/space_md_p"
+        android:paddingBottom="@dimen/space_md_p"
         app:icon="@drawable/ic_settings_20dp" />
 
       <View
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/space_sm"
-        android:layout_marginBottom="@dimen/space_sm"
+        style="@style/VSeparator"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginBottom="@dimen/space_md"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/receive_button"
         app:layout_constraintStart_toEndOf="@id/settings_button"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/grey_light_3" />
+        app:layout_constraintTop_toTopOf="parent" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/receive_button"
@@ -110,21 +117,22 @@
         app:layout_constraintStart_toEndOf="@id/settings_button"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/button_bg_square"
+        android:paddingStart="@dimen/space_md_p"
+        android:paddingTop="@dimen/space_md_p"
+        android:paddingEnd="@dimen/space_md_p"
+        android:paddingBottom="@dimen/space_md_p"
         app:icon="@drawable/ic_receive_20dp"
         app:text="@string/menu_receive"
-        app:text_color="@color/dark"
         app:text_size="@dimen/text_lg" />
 
       <View
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/space_sm"
-        android:layout_marginBottom="@dimen/space_sm"
+        style="@style/VSeparator"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginBottom="@dimen/space_md"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/send_button"
         app:layout_constraintStart_toEndOf="@id/receive_button"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/grey_light_3" />
+        app:layout_constraintTop_toTopOf="parent" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/send_button"
@@ -133,13 +141,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/receive_button"
         app:layout_constraintTop_toTopOf="parent"
-        app:icon="@drawable/ic_send_20dp"
         android:background="@drawable/button_bg_square"
+        android:paddingStart="@dimen/space_md_p"
+        android:paddingTop="@dimen/space_md_p"
+        android:paddingEnd="@dimen/space_md_p"
+        android:paddingBottom="@dimen/space_md_p"
+        app:icon="@drawable/ic_send_20dp"
         app:text="@string/menu_send"
-        app:text_color="@color/dark"
         app:text_size="@dimen/text_lg" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
   </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

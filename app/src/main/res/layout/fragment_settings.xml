@@ -38,7 +38,7 @@
       android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
       android:padding="@dimen/space_md"
-      android:src="@drawable/ic_arrow_back_24dp" />
+      android:src="@drawable/ic_arrow_back" />
 
     <TextView
       android:layout_width="0dp"
@@ -81,6 +81,7 @@
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/close_channels_button"
           android:layout_width="match_parent"
+          android:padding="@dimen/space_md_p"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
           app:text="@string/settings_close_all_channels"
@@ -89,7 +90,6 @@
         <View
           android:id="@+id/sep1"
           style="@style/HLineSeparator"
-          android:layout_height="64dp"
           tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
@@ -97,6 +97,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:text_color="@color/red"
+          android:padding="@dimen/space_md_p"
           android:background="@drawable/button_bg_square"
           app:text="@string/settings_shutdown"
           tools:ignore="MissingConstraints" />
@@ -111,6 +112,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
+          android:padding="@dimen/space_md_p"
           app:text="@string/settings_list_channels"
           tools:ignore="MissingConstraints" />
 

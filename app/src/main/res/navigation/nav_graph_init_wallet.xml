@@ -33,9 +33,13 @@
     android:label="InitSeedFragment">
     <action
       android:id="@+id/action_initSeed_to_restoreSeed"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
       app:destination="@id/restore_seed_fragment" />
     <action
       android:id="@+id/action_initSeed_to_newSeed"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
       app:destination="@id/create_seed_fragment" />
   </fragment>
 
@@ -46,6 +50,8 @@
     <action
       android:id="@+id/action_restoreSeed_to_setupPin"
       app:popUpTo="@id/init_seed_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
       app:destination="@id/setup_pin_fragment" />
   </fragment>
 
@@ -56,6 +62,8 @@
     <action
       android:id="@+id/action_createSeed_to_setupPin"
       app:popUpTo="@id/init_seed_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
       app:destination="@id/setup_pin_fragment" />
   </fragment>
 
@@ -68,6 +76,8 @@
       app:argType="string[]" />
     <action
       android:id="@+id/action_setupPin_to_main"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
       app:destination="@id/main_fragment" />
   </fragment>
 

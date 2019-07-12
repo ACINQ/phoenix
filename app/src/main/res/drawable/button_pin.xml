@@ -13,14 +13,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+  android:color="@color/mystic"
+  android:exitFadeDuration="@android:integer/config_mediumAnimTime">
 
-<set xmlns:android="http://schemas.android.com/apk/res/android" android:duration="400">
-  <alpha
-    android:fromAlpha="0.0"
-    android:toAlpha="1.0" />
-  <scale
-    android:fromXScale="0.7"
-    android:fromYScale="0.7"
-    android:toXScale="1.0"
-    android:toYScale="1.0" />
-</set>
+  <item android:id="@android:id/mask">
+    <shape android:shape="oval">
+      <solid android:color="?attr/defaultBackgroundColor" />
+    </shape>
+  </item>
+  <item android:id="@android:id/background">
+    <shape android:shape="oval">
+      <solid android:color="@color/transparent" />
+    </shape>
+  </item>
+</ripple>

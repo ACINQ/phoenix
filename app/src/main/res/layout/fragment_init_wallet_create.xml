@@ -101,7 +101,7 @@
         android:checked="@={model.userHasAcknowledgedSoleRecourse}"
         android:text="@string/newseed_words_sole_recourse_checkbox" />
 
-      <Button
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/next_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -110,8 +110,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="@color/white_mid_op"
-        android:text="@string/newseed_next"
+        app:text="@string/newseed_next"
+        app:icon="@drawable/ic_arrow_next"
         app:enableOrFade="@{model.userHasSavedWords &amp;&amp; model.userHasAcknowledgedSoleRecourse}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

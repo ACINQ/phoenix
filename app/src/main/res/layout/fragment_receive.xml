@@ -32,6 +32,7 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/altBackgroundColor"
     android:fillViewport="true"
     tools:context=".receive.ReceiveFragment">
 
@@ -52,7 +53,7 @@
         android:background="@drawable/rounded"
         android:elevation="2dp"
         android:paddingTop="@dimen/space_lg"
-        android:paddingBottom="@dimen/space_lg_p">
+        android:paddingBottom="@dimen/space_lg">
 
         <ImageView
           android:id="@+id/qr_image"
@@ -104,8 +105,7 @@
           app:layout_constraintTop_toTopOf="@id/amount_value"
           android:text="@string/receive_amount_label"
           android:textAlignment="viewEnd"
-          android:textColor="@color/dark"
-          android:textSize="@dimen/text_sm" />
+          android:textColor="@color/dark" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.CoinView
           android:id="@+id/amount_value"
@@ -127,6 +127,26 @@
           app:unit_color="@color/dark"
           app:unit_size="@dimen/text_md" />
 
+        <View
+          style="@style/HSeparator"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintTop_toBottomOf="@id/amount_value"
+          app:layout_constraintBottom_toTopOf="@id/share_button"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/share_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount_value"
+          app:enableOrFade="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
+          app:icon="@drawable/ic_share"
+          app:text="@string/receive_share_button" />
+
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <ImageButton
@@ -139,24 +159,6 @@
         android:elevation="3dp"
         android:src="@drawable/ic_cross_24dp"
         android:translationY="@dimen/corner" />
-
-      <Button
-        android:id="@+id/share_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/qr_layout"
-        android:backgroundTint="@color/white"
-        android:drawableStart="@drawable/ic_share_white_24dp"
-        android:drawableTint="@color/dark"
-        android:elevation="4dp"
-        android:enabled="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
-        android:text="@string/receive_share_button"
-        android:textAppearance="@style/default_textAppearance_alt"
-        android:textColor="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null ? @color/dark : @color/grey_light_1}"
-        android:textSize="@dimen/text_md"
-        android:translationY="-24dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

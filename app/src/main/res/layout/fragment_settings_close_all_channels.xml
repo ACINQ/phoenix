@@ -41,7 +41,7 @@
       android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
       android:padding="@dimen/space_md"
-      android:src="@drawable/ic_arrow_back_24dp" />
+      android:src="@drawable/ic_arrow_back" />
 
     <TextView
       android:layout_width="0dp"
@@ -115,17 +115,16 @@
             app:layout_constraintTop_toBottomOf="@id/instructions"
             android:alpha="@{model.state == ClosingChannelsState.READY ? 1f : 0.4f}"
             android:hint="@string/closeall_hint"
-            android:textColorHint="@color/primary">
+            android:textColorHint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
               android:id="@+id/address_input"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               app:layout_constraintTop_toBottomOf="@id/message"
-              android:backgroundTint="@color/primary"
+              android:backgroundTint="?attr/colorPrimary"
               android:enabled="@{model.state == ClosingChannelsState.READY}"
-              android:inputType="textVisiblePassword|textNoSuggestions"
-              android:textColor="@color/dark" />
+              android:inputType="textVisiblePassword|textNoSuggestions" />
           </com.google.android.material.textfield.TextInputLayout>
 
           <TextView
@@ -165,8 +164,7 @@
           android:padding="@dimen/space_md"
           android:translationY="-28dp"
           android:visibility="@{model.state == ClosingChannelsState.IN_PROGRESS}"
-          app:text="@string/closeall_message_in_progress"
-          app:text_color="@color/dark" />
+          app:text="@string/closeall_message_in_progress" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/confirm_button"
@@ -179,9 +177,7 @@
           android:translationY="-28dp"
           android:visibility="@{model.state == ClosingChannelsState.READY}"
           app:icon="@drawable/ic_check_circle"
-          app:icon_tint="@color/white"
-          app:text="@string/btn_confirm"
-          app:text_color="@color/white" />
+          app:text="@string/btn_confirm" />
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
   </androidx.constraintlayout.widget.ConstraintLayout>

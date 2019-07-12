@@ -17,21 +17,22 @@
 package fr.acinq.eclair.phoenix.main
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.text.format.DateUtils
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
 import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
+import kotlinx.android.synthetic.main.custom_button_view.view.*
 import kotlinx.android.synthetic.main.holder_payment.view.*
-import scala.Option
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
@@ -49,8 +50,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     val isPaymentOutgoing = payment.direction() == `PaymentDirection$`.`MODULE$`.OUTGOING()
     val amountView = itemView.findViewById<TextView>(R.id.amount)
     val unitView = itemView.findViewById<TextView>(R.id.unit)
+    val descriptionView = itemView.findViewById<TextView>(R.id.description)
+    val timestampView = itemView.findViewById<TextView>(R.id.timestamp)
+    val avatarBgView = itemView.findViewById<ImageView>(R.id.avatar_background)
+    val avatarView = itemView.findViewById<ImageView>(R.id.avatar)
 
-    // payment status ====> amount/colors/unit
+    // payment status ====> amount/colors/unit/description/avatar
     when (payment.status()) {
       `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
         // amount
@@ -61,38 +66,53 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
         }
         // color
         if (isPaymentOutgoing) {
-          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.payment_holder_sent))
+          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.dark))
         } else {
-          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.payment_holder_received))
+          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
         }
+        amountView.visibility = View.VISIBLE
         // unit
         unitView.text = coinUnit.shortLabel().toUpperCase()
         unitView.visibility = View.VISIBLE
+        // desc + avatar
+        descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
+        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.athens))
+        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_success))
       }
       `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
+        amountView.visibility = View.VISIBLE
         amountView.text = itemView.context.getString(R.string.paymentholder_processing)
         unitView.visibility = View.GONE
+        // desc + avatar
+        descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
+        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.transparent))
+        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_pending))
       }
       `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
-        amountView.text = itemView.context.getString(R.string.paymentholder_failed)
+        amountView.visibility = View.GONE
         unitView.visibility = View.GONE
+        // desc + avatar
+        descriptionView.setTextColor(itemView.context.getColor(R.color.brandy))
+        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.dawn))
+        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_failed))
       }
     }
 
     // description
     if (payment.description().isDefined) {
-      itemView.findViewById<TextView>(R.id.description).text = payment.description().get()
+      descriptionView.text = payment.description().get()
     } else {
-      itemView.findViewById<TextView>(R.id.description).text = itemView.context.getString(R.string.utils_unknown)
+      descriptionView.text = itemView.context.getString(R.string.utils_unknown)
     }
 
     // timestamp
     if (payment.completedAt().isDefined) {
       val l: Long = payment.completedAt().get() as Long
       val delaySincePayment: Long = l - System.currentTimeMillis()
-      itemView.findViewById<TextView>(R.id.timestamp).text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
+      timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
+      timestampView.visibility = View.VISIBLE
     } else {
-      itemView.findViewById<TextView>(R.id.timestamp).text = "pending!!!"
+      timestampView.visibility = View.GONE
     }
   }
 }
