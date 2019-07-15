@@ -102,7 +102,7 @@
 
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_unknown">N/A</string>
-  <string name="utils_default_coin_view_hint">Enter amount in</string>
+  <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>

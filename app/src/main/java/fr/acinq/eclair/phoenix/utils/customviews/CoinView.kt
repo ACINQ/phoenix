@@ -41,7 +41,7 @@ import scala.Option
 
 class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = R.style.default_theme) : ConstraintLayout(context, attrs, defStyle) {
 
-  protected val log = LoggerFactory.getLogger(CoinView::class.java)
+  private val log = LoggerFactory.getLogger(CoinView::class.java)
 
   val mBinding: CustomCoinViewBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.custom_coin_view, this, true)
   private var isEditable: Boolean = false
@@ -55,9 +55,14 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
         mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
+        val coinUnit = Prefs.prefCoin(context)
         isEditable = arr.getBoolean(R.styleable.CoinView_editable, false)
         if (isEditable) {
-          mBinding.hint.text = context.getString(arr.getResourceId(R.styleable.CoinView_hint, R.string.utils_default_coin_view_hint))
+          if (arr.hasValue(R.styleable.CoinView_hint)) {
+            mBinding.hint.text = context.getString(arr.getResourceId(R.styleable.CoinView_hint, R.string.utils_default_coin_view_hint))
+          } else {
+            mBinding.hint.text = context.getString(R.string.utils_default_coin_view_hint, coinUnit.code())
+          }
           mBinding.amount.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
           mBinding.amount.focusable = View.FOCUSABLE
           mBinding.amount.isClickable = true
@@ -75,7 +80,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
         handleEmptyAmountIfEditable()
 
-        mBinding.unit.text = Prefs.prefCoin(context).code()
+        mBinding.unit.text = coinUnit.code()
         mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
         mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
       } catch (e: Exception) {
