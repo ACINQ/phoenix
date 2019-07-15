@@ -17,8 +17,6 @@
 package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.InputType
@@ -52,37 +50,37 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     attrs?.let {
       val arr = context.obtainStyledAttributes(it, R.styleable.CoinView, 0, 0)
 
-      mBinding.amount.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_amount_size, R.dimen.text_lg).toFloat())
-      mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
-      mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
+      try {
+        mBinding.amount.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_amount_size, R.dimen.text_lg).toFloat())
+        mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
+        mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
-      isEditable = arr.getBoolean(R.styleable.CoinView_editable, false)
-      if (isEditable) {
-        mBinding.hint.text = context.getString(arr.getResourceId(R.styleable.CoinView_hint, R.string.utils_default_coin_view_hint))
-        mBinding.amount.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-        mBinding.amount.focusable = View.FOCUSABLE
-        mBinding.amount.isClickable = true
+        isEditable = arr.getBoolean(R.styleable.CoinView_editable, false)
+        if (isEditable) {
+          mBinding.hint.text = context.getString(arr.getResourceId(R.styleable.CoinView_hint, R.string.utils_default_coin_view_hint))
+          mBinding.amount.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+          mBinding.amount.focusable = View.FOCUSABLE
+          mBinding.amount.isClickable = true
 
-        mBinding.root.setOnClickListener {
-          mBinding.amount.requestFocus()
-          val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-          imm.showSoftInput(mBinding.amount, InputMethodManager.RESULT_UNCHANGED_SHOWN)
+          this.setOnClickListener {
+            mBinding.amount.requestFocus()
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(mBinding.amount, InputMethodManager.RESULT_UNCHANGED_SHOWN)
+          }
+        } else {
+          mBinding.amount.inputType = InputType.TYPE_NULL
+          mBinding.amount.focusable = View.NOT_FOCUSABLE
+          mBinding.amount.isClickable = false
         }
-      } else {
-        mBinding.amount.inputType = InputType.TYPE_NULL
-        mBinding.amount.focusable = View.NOT_FOCUSABLE
-        mBinding.amount.isClickable = false
+
+        handleEmptyAmountIfEditable()
+
+        mBinding.unit.text = Prefs.prefCoin(context).code()
+        mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
+        mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
+      } catch (e: Exception) {
+        arr.recycle()
       }
-
-      checkAmountEmpty()
-
-      mBinding.unit.text = Prefs.prefCoin(context).code()
-      mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
-      mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
-
-      mBinding.root.backgroundTintList = ContextCompat.getColorStateList(context, R.color.red)
-
-      arr.recycle()
     }
   }
 
@@ -104,7 +102,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     mBinding.amount.addTextChangedListener(textWatcher)
   }
 
-  fun checkAmountEmpty() {
+  fun handleEmptyAmountIfEditable() {
     if (isEditable) {
       if (Strings.isNullOrEmpty(mBinding.amount.text.toString())) {
         mBinding.unit.visibility = View.GONE
@@ -127,14 +125,14 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
   fun setAmount(amount: MilliSatoshi) {
     if (isEditable) {
       mBinding.amount.setText(Converter.rawAmountPrint(amount, context))
-      checkAmountEmpty()
+      handleEmptyAmountIfEditable()
     } else {
       mBinding.amount.setText(Converter.formatAmount(amount, context))
     }
     mBinding.unit.text = Prefs.prefCoin(context).code()
   }
 
-  open class CoinViewWatcher() : TextWatcher {
+  open class CoinViewWatcher : TextWatcher {
     override fun afterTextChanged(s: Editable?) {}
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

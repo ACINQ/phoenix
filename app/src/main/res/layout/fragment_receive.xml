@@ -53,7 +53,7 @@
         android:background="@drawable/rounded"
         android:elevation="2dp"
         android:paddingTop="@dimen/space_lg"
-        android:paddingBottom="@dimen/space_lg">
+        android:paddingBottom="@dimen/space_md">
 
         <ImageView
           android:id="@+id/qr_image"
@@ -88,7 +88,7 @@
           android:id="@+id/label_guideline"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:layout_constraintGuide_percent="0.45"
+          app:layout_constraintGuide_percent="0.5"
           android:orientation="vertical" />
 
         <TextView
@@ -98,11 +98,10 @@
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_xxs"
           app:layout_constrainedWidth="true"
-          app:layout_constraintBottom_toBottomOf="@id/amount_value"
+          app:layout_constraintBaseline_toBaselineOf="@id/amount_value"
           app:layout_constraintEnd_toStartOf="@id/label_guideline"
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="@id/amount_value"
           android:text="@string/receive_amount_label"
           android:textAlignment="viewEnd"
           android:textColor="@color/dark" />
@@ -112,9 +111,10 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_xxs"
-          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginTop="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_md"
           app:layout_constrainedWidth="true"
+          android:paddingBottom="@dimen/space_xxs"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0.0"
           app:layout_constraintStart_toEndOf="@id/label_guideline"
@@ -128,10 +128,10 @@
           app:unit_size="@dimen/text_md" />
 
         <View
+          android:id="@+id/share_separator"
           style="@style/HSeparator"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_lg"
           app:layout_constraintTop_toBottomOf="@id/amount_value"
-          app:layout_constraintBottom_toTopOf="@id/share_button"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintEnd_toEndOf="parent" />
 
@@ -139,10 +139,11 @@
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_xs"
+          android:padding="@dimen/space_xs"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/amount_value"
+          app:layout_constraintTop_toBottomOf="@id/share_separator"
           app:enableOrFade="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
           app:icon="@drawable/ic_share"
           app:text="@string/receive_share_button" />

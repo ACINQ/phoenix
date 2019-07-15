@@ -57,7 +57,7 @@ class SendFragment : BaseFragment() {
 
     mBinding.amount.setAmountWatcher(object : CoinView.CoinViewWatcher() {
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        mBinding.amount.checkAmountEmpty()
+        mBinding.amount.handleEmptyAmountIfEditable()
       }
     })
   }

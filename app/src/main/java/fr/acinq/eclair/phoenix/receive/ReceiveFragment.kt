@@ -64,7 +64,7 @@ class ReceiveFragment : BaseFragment() {
       private val DELAY: Long = 350
 
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        mBinding.amountValue.checkAmountEmpty()
+        mBinding.amountValue.handleEmptyAmountIfEditable()
         model.amountInputState.value = AmountTypingState.TYPING
         throttle.cancel()
         throttle = Timer()
