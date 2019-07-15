@@ -114,15 +114,16 @@
           android:layout_marginTop="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_md"
           app:layout_constrainedWidth="true"
-          android:paddingBottom="@dimen/space_xxs"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0.0"
           app:layout_constraintStart_toEndOf="@id/label_guideline"
           app:layout_constraintTop_toBottomOf="@id/qr_image"
-          android:background="@drawable/editable_bg_dotted"
+          android:background="@drawable/line_dots"
           app:amount_color="@color/dark"
           app:amount_size="22sp"
+          android:paddingBottom="@dimen/space_xxs"
           app:editable="true"
+          android:layerType="software"
           app:hint="@string/receive_no_amount_requested_hint"
           app:unit_color="@color/dark"
           app:unit_size="@dimen/text_md" />
@@ -131,11 +132,11 @@
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
-          android:padding="@dimen/space_sm"
+          android:layout_marginTop="@dimen/space_md_p"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/amount_value"
+          android:padding="@dimen/space_sm"
           app:enableOrFade="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
           app:icon="@drawable/ic_share"
           app:text="@string/receive_share_button" />
@@ -149,11 +150,11 @@
         app:layout_constraintEnd_toEndOf="@id/qr_layout"
         app:layout_constraintBottom_toTopOf="@id/qr_layout"
         android:background="@drawable/rounded"
+        android:contentDescription="@string/btn_back"
         android:elevation="3dp"
         android:src="@drawable/ic_cross_24dp"
         android:translationX="14dp"
-        android:translationY="22dp"
-        android:contentDescription="@string/btn_back" />
+        android:translationY="22dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

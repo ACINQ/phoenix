@@ -42,9 +42,9 @@
         android:layout_width="124dp"
         android:layout_height="124dp"
         android:layout_margin="@dimen/space_lg"
-        android:alpha=".6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_separator"
+        android:alpha=".6"
         android:contentDescription="@null"
         android:src="@drawable/ic_send_lg"
         android:tint="@color/mystic"
@@ -62,7 +62,7 @@
         android:id="@+id/balance_value"
         android:layout_width="wrap_content"
         android:layout_marginStart="@dimen/space_xxs"
-        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_md"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -118,6 +118,8 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
+          android:background="@drawable/line_dots"
+          android:layerType="software"
           app:amount_size="48sp"
           app:editable="true"
           app:unit_size="@dimen/text_md" />
@@ -176,7 +178,7 @@
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/cancel_button"
-          android:layout_width="0dp"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:layout_constraintBottom_toBottomOf="@+id/send_button"
           app:layout_constraintEnd_toStartOf="@id/send_button"
@@ -187,13 +189,12 @@
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"
-          android:layout_width="0dp"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_lg_p"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/cancel_button"
           app:layout_constraintTop_toBottomOf="@id/description_value"
-          android:backgroundTint="@color/transparent"
           app:icon="@drawable/ic_check_circle"
           app:icon_tint="@color/green"
           app:text="@string/receive_with_open_fee_accept" />
