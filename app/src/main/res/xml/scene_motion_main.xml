@@ -25,19 +25,6 @@
       app:dragDirection="dragUp"
       app:touchAnchorId="@id/payment_list"
       app:touchAnchorSide="top" />
-
-    <!--<KeyFrameSet>-->
-    <!--<KeyAttribute-->
-    <!--android:scaleX="1.0"-->
-    <!--android:scaleY="1.0"-->
-    <!--app:framePosition="60"-->
-    <!--app:target="@id/balance" />-->
-    <!--<KeyAttribute-->
-    <!--android:scaleX="0.5"-->
-    <!--android:scaleY="0.5"-->
-    <!--app:framePosition="90"-->
-    <!--app:target="@id/balance" />-->
-    <!--</KeyFrameSet>-->
   </Transition>
 
   <ConstraintSet android:id="@+id/expanded">

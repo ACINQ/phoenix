@@ -50,6 +50,7 @@
   <color name="grey_light_3">#EDEDED</color>
 
   <color name="casper">#A9C1CC</color>
+  <color name="ripple">#66AFC0CF</color>
   <color name="mystic">#E4ECF0</color>
   <color name="athens">#F1F7F9</color>
 </resources>

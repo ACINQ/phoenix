@@ -26,6 +26,8 @@
   <attr name="defaultErrorBackgroundColor" format="reference" />
 
   <attr name="defaultButtonColor" format="reference" />
+  <attr name="defaultRippleColor" format="reference" />
+  <attr name="contrastedRippleColor" format="reference" />
 
   <attr name="defaultTextColor" format="reference" />
   <attr name="defaultMutedTextColor" format="reference" />

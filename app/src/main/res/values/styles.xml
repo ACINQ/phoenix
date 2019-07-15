@@ -27,6 +27,7 @@
     <item name="defaultErrorBackgroundColor">@color/blossom</item>
 
     <item name="defaultButtonColor">@color/mystic</item>
+    <item name="defaultRippleColor">@color/ripple</item>
 
     <item name="defaultTextColor">@color/dark</item>
     <item name="defaultMutedTextColor">@color/casper</item>

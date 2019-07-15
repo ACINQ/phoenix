@@ -127,23 +127,15 @@
           app:unit_color="@color/dark"
           app:unit_size="@dimen/text_md" />
 
-        <View
-          android:id="@+id/share_separator"
-          style="@style/HSeparator"
-          android:layout_marginTop="@dimen/space_lg"
-          app:layout_constraintTop_toBottomOf="@id/amount_value"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent" />
-
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_xs"
-          android:padding="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_md"
+          android:padding="@dimen/space_sm"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/share_separator"
+          app:layout_constraintTop_toBottomOf="@id/amount_value"
           app:enableOrFade="@{model.amountInputState == AmountTypingState.DONE &amp;&amp; model.state == PaymentGenerationState.DONE &amp;&amp; model.bitmap != null}"
           app:icon="@drawable/ic_share"
           app:text="@string/receive_share_button" />
@@ -152,14 +144,16 @@
 
       <ImageButton
         android:id="@+id/back_button"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="@id/qr_layout"
         app:layout_constraintBottom_toTopOf="@id/qr_layout"
         android:background="@drawable/rounded"
         android:elevation="3dp"
         android:src="@drawable/ic_cross_24dp"
-        android:translationY="@dimen/corner" />
+        android:translationX="14dp"
+        android:translationY="22dp"
+        android:contentDescription="@string/btn_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

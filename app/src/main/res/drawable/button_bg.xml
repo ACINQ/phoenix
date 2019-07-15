@@ -15,19 +15,14 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:exitFadeDuration="@android:integer/config_mediumAnimTime"
-  android:color="#FFFFFF">
+  android:color="?attr/colorPrimary"
+  android:exitFadeDuration="@android:integer/config_mediumAnimTime">
 
   <item android:id="@android:id/mask">
     <shape android:shape="rectangle">
       <solid android:color="?attr/defaultButtonColor" />
-      <corners android:radius="50dp" />
+      <corners android:radius="@dimen/corner" />
     </shape>
   </item>
-  <item android:id="@android:id/mask">
-    <shape android:shape="rectangle">
-      <solid android:color="?attr/defaultButtonColor" />
-      <corners android:radius="50dp" />
-    </shape>
-  </item>
+  <item android:id="@android:id/background" android:drawable="@drawable/rounded_border" />
 </ripple>

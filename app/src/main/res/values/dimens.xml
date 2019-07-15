@@ -35,7 +35,7 @@
   <dimen name="space_xxs">4dp</dimen>
   <dimen name="space_xxxs">2dp</dimen>
 
-  <dimen name="corner">16dp</dimen>
+  <dimen name="corner">22dp</dimen>
 
   <!-- pin -->
   <dimen name="pin_button_size">64dp</dimen>
