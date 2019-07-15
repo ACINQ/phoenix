@@ -70,6 +70,7 @@
       android:layout_height="wrap_content"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
+      android:elevation="2dp"
       android:background="@drawable/rounded_top"
       android:backgroundTint="?attr/defaultBackgroundColor"
       android:clipChildren="true">
