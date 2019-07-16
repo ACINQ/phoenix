@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.eclair.phoenix.settings.ListChannelsState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.eclair.phoenix.settings.ListChannelsViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      android:background="@color/mystic"
+      app:text="@string/listallchannels_title" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/action_bar"
+      android:padding="@dimen/space_lg"
+      android:visibility="@{model.state == ListChannelsState.IN_PROGRESS}"
+      app:text="@string/listallchannels_in_progress" />
+
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/action_bar"
+      android:padding="@dimen/space_lg"
+      android:text="@string/listallchannels_error"
+      android:visibility="@{model.state == ListChannelsState.ERROR}" />
+
+    <TextView
+      android:id="@+id/channels_found_header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/action_bar"
+      android:padding="@dimen/space_lg"
+      android:text="@string/listallchannels_no_channels"
+      android:visibility="@{model.state == ListChannelsState.DONE}" />
+
+    <View
+      style="@style/HLineSeparator"
+      app:layout_constraintTop_toBottomOf="@id/channels_found_header"
+      android:visibility="@{model.state == ListChannelsState.DONE}"
+      tools:ignore="MissingConstraints" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      android:id="@+id/copy_button"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="@id/share_button"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/share_button"
+      android:background="@drawable/button_bg_square"
+      app:icon="@drawable/ic_clipboard"
+      android:visibility="@{model.state == ListChannelsState.DONE}"
+      app:text="@string/listallchannels_copy" />
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      android:id="@+id/share_button"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/channels_found_header"
+      app:layout_constraintStart_toEndOf="@id/copy_button"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:icon="@drawable/ic_share"
+      android:background="@drawable/button_bg_square"
+      android:visibility="@{model.state == ListChannelsState.DONE}"
+      app:text="@string/listallchannels_share" />
+
+    <TextView
+      android:id="@+id/channels_result_serialized"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constraintTop_toBottomOf="@id/share_button"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constrainedWidth="true"
+      app:layout_constrainedHeight="true"
+      android:background="?attr/defaultMutedBackgroundColor"
+      android:padding="@dimen/space_md"
+      android:scrollHorizontally="true"
+      android:text="@{model.serializedChannels}"
+      android:textIsSelectable="true"
+      android:textSize="@dimen/text_xs"
+      android:visibility="@{model.state == ListChannelsState.DONE}" />
+
+    <!--android:text="@{model.serializedChannels}"-->
+
+    <!--<androidx.recyclerview.widget.RecyclerView-->
+    <!--android:id="@+id/channels_list"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+    <!--app:layout_constrainedHeight="true"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/channels_found_header"-->
+    <!--android:clipToPadding="false"-->
+    <!--android:overScrollMode="never"-->
+    <!--android:visibility="@{model.state == ListChannelsState.DONE}" />-->
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

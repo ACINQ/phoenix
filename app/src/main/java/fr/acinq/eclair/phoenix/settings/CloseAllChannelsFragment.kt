@@ -59,11 +59,11 @@ class CloseAllChannelsFragment : BaseFragment() {
   private fun getChannels() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when retrieving list of channels: ", exception)
-      model.state.value = ClosingChannelsState.NO_CHANNELS
+      model.state.value = ClosingChannelsState.ERROR
     }) {
       model.state.value = ClosingChannelsState.CHECKING_CHANNELS
       when (appKit.getChannels(`NORMAL$`.`MODULE$`).count()) {
-        0 -> model.state.value = ClosingChannelsState.READY
+        0 -> model.state.value = ClosingChannelsState.NO_CHANNELS
         else -> model.state.value = ClosingChannelsState.READY
       }
     }

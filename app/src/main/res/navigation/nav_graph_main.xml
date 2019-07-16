@@ -128,12 +128,19 @@
     android:name="fr.acinq.eclair.phoenix.settings.SettingsFragment"
     android:label="SettingsFragment" >
     <action
-      android:id="@+id/action_settings_to_closeAllChannels"
+      android:id="@+id/action_settings_to_close_all_channels"
       app:destination="@id/close_all_channels" />
+    <action
+      android:id="@+id/action_settings_to_list_channels"
+      app:destination="@id/list_channels" />
   </fragment>
   <fragment
     android:id="@+id/close_all_channels"
     android:name="fr.acinq.eclair.phoenix.settings.CloseAllChannelsFragment"
     android:label="CloseAllChannelsFragment" />
+  <fragment
+    android:id="@+id/list_channels"
+    android:name="fr.acinq.eclair.phoenix.settings.ListChannelsFragment"
+    android:label="ListChannelsFragment" />
 
 </navigation>

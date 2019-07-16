@@ -16,6 +16,7 @@
 
 <resources>
 
+  <attr name="actionBarViewStyle" format="reference" />
   <attr name="buttonViewStyle" format="reference" />
   <declare-styleable name="default_theme">
     <attr name="buttonViewStyle" />
@@ -66,5 +67,8 @@
     <attr name="icon_tint" format="color" />
     <attr name="icon_size" format="dimension" />
     <attr name="icon_gravity" format="integer" />
+  </declare-styleable>
+  <declare-styleable name="ActionBarView">
+    <attr name="text" />
   </declare-styleable>
 </resources>

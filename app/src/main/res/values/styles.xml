@@ -42,10 +42,12 @@
 
     <!-- text -->
     <item name="android:textColor">?attr/defaultTextColor</item>
+    <item name="android:textSize">@dimen/text_lg</item>
 
     <!-- widget overrides -->
-    <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
+    <item name="actionBarViewStyle">@style/paragraph_textViewStyle</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
+    <!--<item name="android:textViewStyle">@style/paragraph_textViewStyle</item>-->
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
@@ -115,7 +117,7 @@
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">@color/mystic</item>
+    <item name="android:background">@color/athens</item>
   </style>
 
   <style name="VSeparator" parent="HLineSeparator">

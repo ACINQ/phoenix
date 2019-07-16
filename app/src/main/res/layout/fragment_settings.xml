@@ -74,16 +74,16 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="close_channels_button, sep1, shutdown_button, sep2, list_all_channels"
+          app:constraint_referenced_ids="close_channels_button, sep1, list_all_channels_button, sep2, shutdown_button"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/close_channels_button"
           android:layout_width="match_parent"
-          android:padding="@dimen/space_md_p"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
+          android:padding="@dimen/space_md_p"
           app:text="@string/settings_close_all_channels"
           tools:ignore="MissingConstraints" />
 
@@ -93,13 +93,12 @@
           tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/shutdown_button"
+          android:id="@+id/list_all_channels_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          app:text_color="@color/red"
-          android:padding="@dimen/space_md_p"
           android:background="@drawable/button_bg_square"
-          app:text="@string/settings_shutdown"
+          android:padding="@dimen/space_md_p"
+          app:text="@string/settings_list_channels"
           tools:ignore="MissingConstraints" />
 
         <View
@@ -108,12 +107,13 @@
           tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/list_all_channels"
+          android:id="@+id/shutdown_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
           android:padding="@dimen/space_md_p"
-          app:text="@string/settings_list_channels"
+          app:text="@string/settings_shutdown"
+          app:text_color="@color/red"
           tools:ignore="MissingConstraints" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

@@ -102,6 +102,7 @@
 
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_unknown">N/A</string>
+  <string name="utils_copied">Copied to clipboard!</string>
   <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
@@ -124,6 +125,18 @@
   <string name="closeall_message_error">There was a problem. Please try again later.</string>
   <string name="closeall_message_done">Funds sent.</string>
   <string name="closeall_message_in_progress">Please wait…</string>
+
+  <!-- //////////////// list all channels //////////////// -->
+
+  <string name="listallchannels_title">Channels List</string>
+  <string name="listallchannels_in_progress">Please hold…</string>
+  <string name="listallchannels_error">There was an error when retrieving the list of channels. Please try again.</string>
+  <string name="listallchannels_no_channels">You don\'t have any channels yet.</string>
+  <string name="listallchannels_channels_header">You have %1$d channel(s).</string>
+  <string name="listallchannels_copy">Copy</string>
+  <string name="listallchannels_share">Share</string>
+  <string name="listallchannels_share_subject">Channels data</string>
+  <string name="listallchannels_share_title">Share channels data</string>
 
   <!-- //////////////// menu //////////////// -->
 

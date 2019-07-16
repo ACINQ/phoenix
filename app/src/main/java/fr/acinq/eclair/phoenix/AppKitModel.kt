@@ -209,7 +209,6 @@ class AppKitModel : ViewModel() {
   suspend fun getChannels(state: State?): Iterable<RES_GETINFO> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        delay(500)
         kit.value?.api?.let {
           val res = Await.result(it.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
           val channels = JavaConverters.asJavaIterableConverter(res).asJava()
@@ -228,9 +227,8 @@ class AppKitModel : ViewModel() {
         delay(500)
         kit.value?.let {
           val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val channels = Await.result(kit.value?.api?.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
           val closingFutures = ArrayList<Future<String>>()
-          JavaConverters.asJavaIterableConverter(channels).asJava().map { res ->
+          getChannels(null).map { res ->
             val channelId = res.channelId()
             log.info("init closing of channel=$channelId")
             it.api.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
