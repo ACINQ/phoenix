@@ -139,9 +139,11 @@
           android:background="@drawable/rounded"
           android:backgroundTint="@color/green"
           android:drawableStart="@drawable/ic_check"
+          android:drawablePadding="@dimen/space_xs"
+          android:drawableTint="?attr/altTextColor"
           android:padding="@dimen/space_md"
           android:text="@string/closeall_message_done"
-          android:textColor="@color/white"
+          android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == ClosingChannelsState.DONE}" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
