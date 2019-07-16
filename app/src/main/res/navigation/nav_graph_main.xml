@@ -47,9 +47,9 @@
     android:label="MainFragment">
     <action
       android:id="@+id/action_main_to_receive"
+      app:destination="@id/receive_fragment"
       app:enterAnim="@anim/slide_in_left"
-      app:exitAnim="@anim/slide_out_right"
-      app:destination="@id/receive_fragment" />
+      app:exitAnim="@anim/slide_out_right" />
     <action
       android:id="@+id/action_main_to_init_send"
       app:destination="@id/send_init"
@@ -78,7 +78,12 @@
     android:label="ReceiveFragment">
     <action
       android:id="@+id/action_receive_to_main"
-      app:destination="@id/main_fragment" />
+      app:destination="@id/main_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_right"
+      app:popExitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/main_fragment" />
   </fragment>
 
   <dialog
@@ -126,7 +131,7 @@
   <fragment
     android:id="@+id/settings"
     android:name="fr.acinq.eclair.phoenix.settings.SettingsFragment"
-    android:label="SettingsFragment" >
+    android:label="SettingsFragment">
     <action
       android:id="@+id/action_settings_to_close_all_channels"
       app:destination="@id/close_all_channels" />

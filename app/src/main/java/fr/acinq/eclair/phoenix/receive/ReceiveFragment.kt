@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +39,9 @@ import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.customviews.CoinView
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import scala.Option
 import java.util.*
 
@@ -47,6 +51,14 @@ class ReceiveFragment : BaseFragment() {
   private lateinit var mBinding: FragmentReceiveBinding
 
   private lateinit var model: ReceiveViewModel
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+      findNavController().navigate(R.id.action_receive_to_main)
+    }
+  }
+
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentReceiveBinding.inflate(inflater, container, false)
@@ -102,6 +114,9 @@ class ReceiveFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    if (!EventBus.getDefault().isRegistered(this)) {
+      EventBus.getDefault().register(this)
+    }
     mBinding.qrImage.setOnClickListener {
       try {
         val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -120,9 +135,12 @@ class ReceiveFragment : BaseFragment() {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
       }
     }
-    mBinding.backButton.setOnClickListener {
-      findNavController().popBackStack()
-    }
+    mBinding.backButton.setOnClickListener { findNavController().navigate(R.id.action_receive_to_main) }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    EventBus.getDefault().unregister(this)
   }
 
   // payment request is generated in appkit view model and updates the receive view model
@@ -136,4 +154,12 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
+    model.paymentRequest.value?.let {
+      if (event.paymentHash == it.paymentHash()) {
+        findNavController().navigate(R.id.action_receive_to_main)
+      }
+    }
+  }
 }

@@ -53,9 +53,8 @@ class EclairSupervisor : UntypedActor() {
     EventBus.getDefault().post(BalanceEvent(balance))
   }
 
-  private fun postPayment() {
-    log.info("posting payment event")
-    EventBus.getDefault().post(PaymentEvent())
+  private fun postPayment(paymentHash: ByteVector32?) {
+    EventBus.getDefault().post(PaymentEvent(paymentHash))
   }
 
   override fun onReceive(event: Any?) {
@@ -63,13 +62,11 @@ class EclairSupervisor : UntypedActor() {
     when (event) {
       is ChannelCreated -> {
         log.info("channel $event has been created")
-        postPayment()
       }
       is ChannelRestored -> {
         log.info("channel $event has been restored")
         channelsMap[event.channel()] = event.currentData().commitments()
         postBalance()
-        postPayment()
       }
       is ChannelIdAssigned -> {
         log.info("channel has been assigned id=${event.channelId()}")
@@ -79,12 +76,11 @@ class EclairSupervisor : UntypedActor() {
         if (data is HasCommitments) {
           channelsMap[event.channel()] = data.commitments()
           postBalance()
-
         }
       }
       is ChannelSignatureSent -> {
         log.info("signature sent on ${event.commitments().channelId()}")
-        postPayment()
+        postPayment(null)
       }
       is ChannelSignatureReceived -> {
         log.info("signature $event has been sent")
@@ -152,13 +148,13 @@ class EclairSupervisor : UntypedActor() {
         }
       }
       is PaymentLifecycle.PaymentSucceeded -> {
-        postPayment()
+        postPayment(event.paymentHash())
       }
       is PaymentLifecycle.PaymentFailed -> {
-        postPayment()
+        postPayment(event.paymentHash())
       }
       is PaymentReceived -> {
-        postPayment()
+        postPayment(event.paymentHash())
       }
       else -> {
         log.warn("unhandled event $event")
