@@ -48,7 +48,7 @@ class EclairSupervisor : UntypedActor() {
   private val channelsMap = HashMap<ActorRef, Commitments>()
 
   private fun postBalance() {
-    val balance = MilliSatoshi(channelsMap.map { c -> c.value.availableBalanceForSendMsat() }.sum())
+    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocalMsat() }.sum())
     log.info("posting balance=${balance.amount()}")
     EventBus.getDefault().post(BalanceEvent(balance))
   }

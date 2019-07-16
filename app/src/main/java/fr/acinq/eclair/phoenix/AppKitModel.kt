@@ -179,14 +179,16 @@ class AppKitModel : ViewModel() {
             1.0, // at most 100%
             4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
-          it.kit.paymentInitiator().tell(PaymentLifecycle.SendPayment(amount.amount(),
-            paymentRequest.paymentHash(),
-            paymentRequest.nodeId(),
-            paymentRequest.routingInfo(),
-            finalCltvExpiry + 1,
-            10,
-            routeParams,
-            Option.apply(paymentRequest)), ActorRef.noSender())
+
+          it.kit.paymentInitiator().tell(PaymentLifecycle.SendPayment(
+            /* amountMsat */ amount.amount(),
+            /* paymentHash = */ paymentRequest.paymentHash(),
+            /* targetNodeId = */ paymentRequest.nodeId(),
+            /* paymentRequest_opt = */ Option.apply(null),
+            /* assistedRoutes = */ paymentRequest.routingInfo(),
+            /* finalCltvExpiry = */finalCltvExpiry + 1,
+            /* maxAttempts = */10,
+            /* routeParams = */ routeParams), ActorRef.noSender())
         } ?: log.warn("tried to send a payment but app kit is not initialized!!")
       }
     }
