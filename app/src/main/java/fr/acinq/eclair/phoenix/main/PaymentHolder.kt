@@ -25,14 +25,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.common.base.Strings
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
 import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
-import kotlinx.android.synthetic.main.custom_button_view.view.*
 import kotlinx.android.synthetic.main.holder_payment.view.*
+
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
@@ -44,8 +45,20 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     // ????????
   }
 
+  private fun getAttrColor(resId: Int): Int {
+    val typedValue = TypedValue()
+    itemView.context.theme.resolveAttribute(resId, typedValue, true)
+    val ta = itemView.context.obtainStyledAttributes(typedValue.resourceId, intArrayOf(resId))
+    val color = ta.getColor(0, 0)
+    ta.recycle()
+    return color
+  }
+
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
+
+    val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
+    val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
 
     val isPaymentOutgoing = payment.direction() == `PaymentDirection$`.`MODULE$`.OUTGOING()
     val amountView = itemView.findViewById<TextView>(R.id.amount)
@@ -99,10 +112,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     }
 
     // description
-    if (payment.description().isDefined) {
+    if (payment.description().isDefined && !Strings.isNullOrEmpty(payment.description().get())) {
       descriptionView.text = payment.description().get()
+      descriptionView.setTextColor(defaultTextColor)
     } else {
-      descriptionView.text = itemView.context.getString(R.string.utils_unknown)
+      descriptionView.text = itemView.context.getString(R.string.paymentholder_no_desc)
+      descriptionView.setTextColor(mutedTextColor)
     }
 
     // timestamp

@@ -57,9 +57,9 @@
   <string name="paymentholder_sending">Sending…</string>
   <string name="paymentholder_processing">Processing…</string>
   <string name="paymentholder_failed">Failed</string>
-
   <string name="paymentholder_sent_prefix">-</string>
   <string name="paymentholder_received_prefix">+</string>
+  <string name="paymentholder_no_desc">No description</string>
 
   <!-- //////////////// receive //////////////// -->
 
