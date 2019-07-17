@@ -89,7 +89,7 @@ class AppKitModel : ViewModel() {
 
   val navigationEvent = SingleLiveEvent<Any>()
 
-  val startupState = MutableLiveData<StartupState>()
+  val startupState = MutableLiveData(StartupState.OFF)
   val startupErrorMessage = MutableLiveData<String>()
 
   val nodeData = MutableLiveData<NodeData>()
@@ -100,7 +100,6 @@ class AppKitModel : ViewModel() {
 
   init {
     _kit.value = null
-    startupState.value = StartupState.OFF
     nodeData.value = NodeData(MilliSatoshi(0), 0)
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
@@ -113,6 +112,10 @@ class AppKitModel : ViewModel() {
 
     super.onCleared()
     log.info("appkit has been cleared")
+  }
+
+  fun isWalletInit(context: Context): Boolean {
+    return Wallet.getSeedFile(context).exists()
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -248,41 +251,47 @@ class AppKitModel : ViewModel() {
    */
   @UiThread
   fun startAppKit(context: Context, pin: String) {
-    if (isKitReady()) {
-      log.warn("tried to startup node but kit is already setup")
-    } else {
-      viewModelScope.launch {
+    when {
+      isKitReady() -> {
+        log.warn("ignoring attempt to start node because kit is already setup")
+      }
+      startupState.value == StartupState.IN_PROGRESS -> {
+        log.info("ignoring attempt to start node because startup is already in progress")
+      }
+      else -> {
         startupState.value = StartupState.IN_PROGRESS
-        withContext(Dispatchers.Default) {
-          try {
-            val res = startNode(context, pin)
-            res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-            _kit.postValue(res)
-            startupState.postValue(StartupState.DONE)
-          } catch (t: Throwable) {
-            log.info("aborted node startup")
-            startupState.postValue(StartupState.ERROR)
-            _kit.postValue(null)
-            when (t) {
-              is GeneralSecurityException -> {
-                log.info("user entered wrong PIN")
-                startupState.postValue(StartupState.ERROR)
-                startupErrorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
-              }
-              is NetworkException, is UnknownHostException -> {
-                log.info("network error: ", t)
-                startupState.postValue(StartupState.ERROR)
-                startupErrorMessage.postValue(context.getString(R.string.startup_error_network))
-              }
-              is IOException, is IllegalAccessException -> {
-                log.error("seed file not readable: ", t)
-                startupState.postValue(StartupState.ERROR)
-                startupErrorMessage.postValue(context.getString(R.string.startup_error_unreadable))
-              }
-              else -> {
-                log.error("error when starting node: ", t)
-                startupState.postValue(StartupState.ERROR)
-                startupErrorMessage.postValue(context.getString(R.string.startup_error_generic))
+        viewModelScope.launch {
+          withContext(Dispatchers.Default) {
+            try {
+              val res = startNode(context, pin)
+              res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+              _kit.postValue(res)
+              startupState.postValue(StartupState.DONE)
+            } catch (t: Throwable) {
+              log.info("aborted node startup")
+              startupState.postValue(StartupState.ERROR)
+              _kit.postValue(null)
+              when (t) {
+                is GeneralSecurityException -> {
+                  log.info("user entered wrong PIN")
+                  startupState.postValue(StartupState.ERROR)
+                  startupErrorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
+                }
+                is NetworkException, is UnknownHostException -> {
+                  log.info("network error: ", t)
+                  startupState.postValue(StartupState.ERROR)
+                  startupErrorMessage.postValue(context.getString(R.string.startup_error_network))
+                }
+                is IOException, is IllegalAccessException -> {
+                  log.error("seed file not readable: ", t)
+                  startupState.postValue(StartupState.ERROR)
+                  startupErrorMessage.postValue(context.getString(R.string.startup_error_unreadable))
+                }
+                else -> {
+                  log.error("error when starting node: ", t)
+                  startupState.postValue(StartupState.ERROR)
+                  startupErrorMessage.postValue(context.getString(R.string.startup_error_generic))
+                }
               }
             }
           }
@@ -290,6 +299,7 @@ class AppKitModel : ViewModel() {
       }
     }
   }
+
 
   fun shutdown() {
     _kit.value?.let {

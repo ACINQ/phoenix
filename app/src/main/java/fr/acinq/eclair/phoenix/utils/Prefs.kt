@@ -25,6 +25,7 @@ import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
 
 object Prefs {
+  private val PREFS_IS_PIN_SET: String = "PREFS_IS_PIN_SET"
   private val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
   private val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
 
@@ -33,11 +34,19 @@ object Prefs {
   }
 
   fun setHasStartedOnce(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(PREFS_IS_FIRST_TIME, false) }
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
   }
 
   fun prefCoin(context: Context): CoinUnit {
     return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context)
       .getString(PREFS_COIN_UNIT, SatUnit.code()))
+  }
+
+  fun isPinSet(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_PIN_SET, false)
+  }
+
+  fun pinIsNowSet(context: Context) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_PIN_SET, true).apply()
   }
 }

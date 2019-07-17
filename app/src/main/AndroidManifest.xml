@@ -32,7 +32,6 @@
     android:supportsRtl="true"
     android:theme="@style/default_theme">
 
-    <!-- main activity, entry point, contains most of the app screens -->
     <activity
       android:name=".MainActivity"
       android:launchMode="singleTask">
@@ -45,11 +44,5 @@
       </intent-filter>
     </activity>
 
-    <!-- init wallet activity, only when user runs the app for the first time -->
-    <activity
-      android:name=".initwallet.InitWalletActivity"
-      android:launchMode="singleTask" />
-
   </application>
-
 </manifest>

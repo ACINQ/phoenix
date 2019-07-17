@@ -17,6 +17,11 @@
 <resources>
   <string name="app_name">Phoenix</string>
 
+  <!-- //////////////// initwallet / automated wallet creation //////////////// -->
+
+  <string name="autocreate_generating">Creating your wallet…</string>
+  <string name="autocreate_error">We could not create your wallet.\nReason: %1$s</string>
+
   <!-- //////////////// initwallet / create seed //////////////// -->
 
   <string name="newseed_instructions">This words list is the key to your wallet. Save it somewhere safe (not on this phone).</string>

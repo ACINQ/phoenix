@@ -20,12 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletBinding
-import org.slf4j.LoggerFactory
 
 
 class InitWalletFragment : InitWalletBaseFragment() {
@@ -40,7 +37,7 @@ class InitWalletFragment : InitWalletBaseFragment() {
   override fun onStart() {
     super.onStart()
     seedModel.reset()
-    mBinding.createSeed.setOnClickListener { findNavController().navigate(R.id.action_initSeed_to_newSeed) }
-    mBinding.restoreSeed.setOnClickListener { findNavController().navigate(R.id.action_initSeed_to_restoreSeed) }
+    mBinding.createSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_auto_create) }
+    mBinding.restoreSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_restore) }
   }
 }

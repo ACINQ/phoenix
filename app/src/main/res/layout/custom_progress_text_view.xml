@@ -38,7 +38,6 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/progress_bar"
       app:layout_constraintTop_toTopOf="parent"
-      android:lineSpacingMultiplier="1"
-      android:textSize="@dimen/text_md" />
+      android:lineSpacingMultiplier="1" />
   </merge>
 </layout>

@@ -85,11 +85,8 @@ class CreateSeedFragment : InitWalletBaseFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.nextButton.setOnClickListener {
-      // val bundle = Bundle().apply {
-      //   putStringArrayList("words", ArrayList(seedModel.words.value!!))
-      // }
       seedModel.words.value = model.words.value
-      findNavController().navigate(R.id.action_createSeed_to_setupPin)
+      findNavController().navigate(R.id.action_create_seed_to_setup_pin)
     }
   }
 

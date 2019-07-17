@@ -126,7 +126,7 @@
           android:layout_marginTop="@dimen/space_lg"
           android:layout_height="wrap_content"
           app:layout_constraintTop_toBottomOf="@id/address_layout"
-          android:drawableStart="@drawable/ic_alert_triangle_24dp"
+          android:drawableStart="@drawable/ic_alert_triangle"
           android:text="@string/closeall_message_error"
           android:visibility="@{model.state == ClosingChannelsState.ERROR}" />
 
@@ -139,8 +139,8 @@
           android:background="@drawable/rounded"
           android:backgroundTint="@color/green"
           android:drawableStart="@drawable/ic_check"
-          android:drawablePadding="@dimen/space_xs"
           android:drawableTint="?attr/altTextColor"
+          android:drawablePadding="@dimen/space_sm"
           android:padding="@dimen/space_md"
           android:text="@string/closeall_message_done"
           android:textColor="?attr/altTextColor"

@@ -22,12 +22,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import fr.acinq.eclair.phoenix.AppKitModel
-import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
+import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
+import fr.acinq.eclair.phoenix.utils.Prefs
 
 class StartupFragment : BaseFragment() {
 
@@ -50,23 +50,6 @@ class StartupFragment : BaseFragment() {
     })
   }
 
-  private fun startNodeIfNeeded() {
-    if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady()) {
-      mPinDialog?.show()
-    }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    mPinDialog?.dismiss()
-  }
-
-  override fun handleKit() {
-    if (appKit.isKitReady()) {
-      findNavController().navigate(R.id.action_startup_to_main)
-    }
-  }
-
   override fun onStart() {
     super.onStart()
     if (mPinDialog == null) {
@@ -82,5 +65,31 @@ class StartupFragment : BaseFragment() {
       })
     }
     startNodeIfNeeded()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    mPinDialog?.dismiss()
+  }
+
+  override fun appCheckup() {
+    if (appKit.isKitReady()) {
+      findNavController().navigate(R.id.action_startup_to_main)
+    } else if (context != null && !appKit.isWalletInit(context!!)) {
+      findNavController().navigate(R.id.global_action_any_to_init_wallet)
+    }
+  }
+
+  private fun startNodeIfNeeded() {
+    context?.let {
+      if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.isWalletInit(it)) {
+        if (Prefs.isPinSet(it)) {
+          // user has defined a pin code encrypting the seed so let's ask for it
+          mPinDialog?.show()
+        } else {
+          appKit.startAppKit(it, "tutu")
+        }
+      }
+    } ?: log.warn("cannot start node with null context")
   }
 }

@@ -47,7 +47,7 @@
     <!-- widget overrides -->
     <item name="actionBarViewStyle">@style/paragraph_textViewStyle</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
-    <!--<item name="android:textViewStyle">@style/paragraph_textViewStyle</item>-->
+    <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>

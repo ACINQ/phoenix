@@ -27,11 +27,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.phoenix.databinding.ActivityMainBinding
-import fr.acinq.eclair.phoenix.initwallet.InitWalletActivity
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.eclair.phoenix.send.SendFragmentDirections
 import fr.acinq.eclair.phoenix.utils.IntentCodes
-import fr.acinq.eclair.phoenix.utils.Wallet
 import org.slf4j.LoggerFactory
 
 
@@ -39,13 +37,14 @@ class MainActivity : AppCompatActivity() {
 
   val log = LoggerFactory.getLogger(MainActivity::class.java)
   private lateinit var mBinding: ActivityMainBinding
+  private lateinit var appKit: AppKitModel
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-    val appKitModel = ViewModelProviders.of(this).get(AppKitModel::class.java)
-    appKitModel.navigationEvent.observe(this, Observer {
+    appKit = ViewModelProviders.of(this).get(AppKitModel::class.java)
+    appKit.navigationEvent.observe(this, Observer {
       when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(it.payToOpenRequest().fundingSatoshis(),
@@ -55,16 +54,6 @@ class MainActivity : AppCompatActivity() {
         else -> log.info("unhandled navigation event $it")
       }
     })
-  }
-
-  override fun onStart() {
-    super.onStart()
-    if (!Wallet.getSeedFile(applicationContext).exists()) {
-      log.info("wallet has not been initialized yet...")
-      startActivity(Intent(this, InitWalletActivity::class.java))
-      finish()
-    } else {
-    }
   }
 
   override fun onDestroy() {

@@ -51,7 +51,7 @@ class SetupPinFragment : InitWalletBaseFragment() {
     seedModel.words.observe(viewLifecycleOwner, Observer { words ->
       if (words.isNullOrEmpty()) {
         log.info("reference to seed lost when setting up PIN")
-        findNavController().popBackStack(R.id.global_action_any_to_initwallet, true)
+        findNavController().popBackStack(R.id.global_action_any_to_init_wallet, true)
       }
     })
 

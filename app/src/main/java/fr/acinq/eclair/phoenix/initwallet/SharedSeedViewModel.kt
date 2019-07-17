@@ -28,7 +28,6 @@ class SharedSeedViewModel : ViewModel() {
 
   @UiThread
   fun reset() {
-    log.info("reset view model")
     words.value = ArrayList()
   }
 

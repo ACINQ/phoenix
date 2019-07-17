@@ -17,7 +17,6 @@
 package fr.acinq.eclair.phoenix
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory
 
 abstract class BaseFragment : Fragment() {
 
-  val log: Logger = LoggerFactory.getLogger(BaseFragment::class.java)
+  open val log: Logger = LoggerFactory.getLogger(BaseFragment::class.java)
   protected lateinit var appKit: AppKitModel
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -39,18 +38,27 @@ abstract class BaseFragment : Fragment() {
     } ?: throw Exception("Invalid Activity")
 
     appKit.kit.observe(viewLifecycleOwner, Observer {
-      handleKit()
+      appCheckup()
     })
   }
 
+  override fun onStart() {
+    super.onStart()
+    appCheckup()
+  }
+
   /**
-   * If there is no kit, go to startup by default.
+   * Checks up the app state (wallet init, app kit is started) and navigate to appropriate page if needed.
    */
-  open fun handleKit() {
+  open fun appCheckup() {
     if (!appKit.isKitReady()) {
-      log.info("appkit is not ready, moving to startup")
-      appKit.startupState.postValue(StartupState.OFF)
-      findNavController().navigate(R.id.global_action_any_to_startup)
+      if (context != null && !appKit.isWalletInit(context!!)) {
+        log.info("wallet has not been initialized, moving to init")
+        findNavController().navigate(R.id.global_action_any_to_init_wallet)
+      } else {
+        log.info("appkit is not ready, moving to startup")
+        findNavController().navigate(R.id.global_action_any_to_startup)
+      }
     }
   }
 
