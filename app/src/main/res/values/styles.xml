@@ -45,6 +45,7 @@
     <item name="android:textSize">@dimen/text_lg</item>
 
     <!-- widget overrides -->
+    <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
     <item name="actionBarViewStyle">@style/paragraph_textViewStyle</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
@@ -94,6 +95,22 @@
     <item name="android:background">@drawable/button_bg</item>
     <item name="android:textAppearance">@style/default_textAppearance</item>
     <item name="android:fontFamily">sans-serif</item>
+  </style>
+
+  <style name="default_notifButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:minHeight">0dp</item>
+    <item name="android:minWidth">0dp</item>
+    <item name="android:gravity">start|center</item>
+    <item name="android:paddingTop">@dimen/space_sm</item>
+    <item name="android:paddingBottom">@dimen/space_sm</item>
+    <item name="android:paddingLeft">@dimen/space_sm</item>
+    <item name="android:paddingRight">@dimen/space_sm</item>
+    <item name="android:background">@drawable/button_bg_square</item>
+    <item name="android:textSize">@dimen/text_sm</item>
+    <item name="android:textAllCaps">true</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
   </style>
 
   <style name="default_dialogTheme" parent="@style/Theme.MaterialComponents.Light.Dialog">

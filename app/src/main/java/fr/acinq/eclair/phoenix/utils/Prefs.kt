@@ -18,14 +18,13 @@ package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
 import android.preference.PreferenceManager
-import androidx.core.content.edit
-import fr.acinq.eclair.BtcUnit
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
 
 object Prefs {
-  private val PREFS_IS_PIN_SET: String = "PREFS_IS_PIN_SET"
+  private val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+  private val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
   private val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
 
@@ -37,16 +36,23 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
   }
 
-  fun prefCoin(context: Context): CoinUnit {
-    return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context)
-      .getString(PREFS_COIN_UNIT, SatUnit.code()))
+  fun getCoin(context: Context): CoinUnit {
+    return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_COIN_UNIT, SatUnit.code()))
   }
 
-  fun isPinSet(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_PIN_SET, false)
+  fun isSeedEncrypted(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
   }
 
-  fun pinIsNowSet(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_PIN_SET, true).apply()
+  fun setIsSeedEncrypted(context: Context) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, true).apply()
+  }
+
+  fun getMnemonicsSeenTimestamp(context: Context): Long {
+    return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, 0)
+  }
+
+  fun setMnemonicsSeenTimestamp(context: Context, timestamp: Long) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, timestamp).apply()
   }
 }

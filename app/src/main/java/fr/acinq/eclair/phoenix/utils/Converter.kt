@@ -18,7 +18,6 @@ package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
 import android.text.Html
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import fr.acinq.bitcoin.BtcAmount
 import fr.acinq.bitcoin.MilliSatoshi
@@ -28,7 +27,6 @@ import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.eclair.phoenix.R
 import org.slf4j.LoggerFactory
 import scala.Option
-import scala.`None$`
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.util.regex.Pattern
@@ -40,13 +38,13 @@ object Converter {
   private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
 
   fun rawAmount(amount: BtcAmount, context: Context): BigDecimal {
-    return CoinUtils.rawAmountInUnit(amount, Prefs.prefCoin(context)).bigDecimal()
+    return CoinUtils.rawAmountInUnit(amount, Prefs.getCoin(context)).bigDecimal()
   }
 
   fun rawAmountPrint(amount: BtcAmount, context: Context): String = rawAmount(amount, context).toPlainString()
 
   fun formatAmount(amount: BtcAmount, context: Context, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
-    val unit = Prefs.prefCoin(context)
+    val unit = Prefs.getCoin(context)
     val formatted = `CoinUtils$`.`MODULE$`.formatAmountInUnit(amount, unit, false)
     val formattedParts = formatted.split(Pattern.quote(DECIMAL_SEPARATOR).toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     val prefix = if (withSign) context.getString(if (isOutgoing) R.string.paymentholder_sent_prefix else R.string.paymentholder_received_prefix) else ""
@@ -58,7 +56,7 @@ object Converter {
     }
   }
 
-  fun string2Msat(input: String, context: Context): MilliSatoshi = CoinUtils.convertStringAmountToMsat(input, Prefs.prefCoin(context).code())
+  fun string2Msat(input: String, context: Context): MilliSatoshi = CoinUtils.convertStringAmountToMsat(input, Prefs.getCoin(context).code())
 
   /**
    * Converts a string to an optional MilliSatoshi. If string is empty, or amount is 0, returns none.

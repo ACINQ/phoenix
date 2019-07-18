@@ -18,6 +18,7 @@
 
   <attr name="actionBarViewStyle" format="reference" />
   <attr name="buttonViewStyle" format="reference" />
+  <attr name="notifButtonStyle" format="reference" />
   <declare-styleable name="default_theme">
     <attr name="buttonViewStyle" />
   </declare-styleable>

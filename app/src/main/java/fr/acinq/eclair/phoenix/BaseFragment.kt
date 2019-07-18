@@ -42,11 +42,6 @@ abstract class BaseFragment : Fragment() {
     })
   }
 
-  override fun onStart() {
-    super.onStart()
-    appCheckup()
-  }
-
   /**
    * Checks up the app state (wallet init, app kit is started) and navigate to appropriate page if needed.
    */

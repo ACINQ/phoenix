@@ -16,8 +16,35 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.Context
+import android.text.format.DateUtils
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import fr.acinq.eclair.phoenix.utils.Prefs
 
 class MainViewModel : ViewModel() {
+
+  private val MNEMONICS_REMINDER_INTERVAL = DateUtils.DAY_IN_MILLIS * 30
+
+  val notifications = MutableLiveData(HashSet<NotificationTypes>())
+
+  fun updateNotifications(context: Context) {
+    checkWalletIsSecure(context)
+    checkMnemonics(context)
+  }
+
+  private fun checkWalletIsSecure(context: Context) {
+    if (!Prefs.isSeedEncrypted(context)) {
+      notifications.value?.add(NotificationTypes.NO_PIN_SET)
+    }
+  }
+
+  private fun checkMnemonics(context: Context) {
+    val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
+    when {
+      timestamp == 0L -> notifications.value?.add(NotificationTypes.MNEMONICS_NEVER_SEEN)
+      System.currentTimeMillis() - timestamp > MNEMONICS_REMINDER_INTERVAL -> notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+    }
+  }
 
 }

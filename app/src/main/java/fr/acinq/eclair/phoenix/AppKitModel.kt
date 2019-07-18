@@ -104,6 +104,7 @@ class AppKitModel : ViewModel() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
+
   }
 
   override fun onCleared() {
@@ -181,7 +182,6 @@ class AppKitModel : ViewModel() {
             `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
             1.0, // at most 100%
             4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
-
 
           it.kit.paymentInitiator().tell(PaymentLifecycle.SendPayment(
             /* amountMsat */ amount.amount(),

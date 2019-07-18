@@ -32,13 +32,19 @@ import fr.acinq.eclair.phoenix.utils.Prefs
 
 class MainFragment : BaseFragment() {
 
-  private lateinit var viewModel: MainViewModel
+  private lateinit var model: MainViewModel
   private lateinit var mBinding: FragmentMainBinding
+
   private lateinit var paymentsAdapter: PaymentsAdapter
   private lateinit var paymentsManager: RecyclerView.LayoutManager
 
+  private lateinit var notificationsAdapter: NotificationsAdapter
+  private lateinit var notificationsManager: RecyclerView.LayoutManager
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentMainBinding.inflate(inflater, container, false)
+
+    // init payment recycler view
     paymentsManager = LinearLayoutManager(context)
     paymentsAdapter = PaymentsAdapter(ArrayList())
     mBinding.paymentList.apply {
@@ -47,23 +53,36 @@ class MainFragment : BaseFragment() {
       adapter = paymentsAdapter
     }
 
+    // init notification recycler view
+    notificationsManager = LinearLayoutManager(context)
+    notificationsAdapter = NotificationsAdapter(HashSet())
+    mBinding.notificationList.apply {
+      setHasFixedSize(true)
+      layoutManager = notificationsManager
+      adapter = notificationsAdapter
+    }
+
     return mBinding.root
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+    model = ViewModelProviders.of(this).get(MainViewModel::class.java)
     appKit.nodeData.observe(viewLifecycleOwner, Observer {
       mBinding.balance.setAmount(it.balance)
     })
     appKit.payments.observe(viewLifecycleOwner, Observer {
-      paymentsAdapter.update(it, "usd", Prefs.prefCoin(context!!), displayAmountAsFiat = false)
+      paymentsAdapter.update(it, "usd", Prefs.getCoin(context!!), displayAmountAsFiat = false)
+    })
+    model.notifications.observe(viewLifecycleOwner, Observer {
+      notificationsAdapter.update(it)
     })
   }
 
   override fun onStart() {
     super.onStart()
     appKit.refreshPaymentList()
+    context?.let { model.updateNotifications(it) }
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }

@@ -55,7 +55,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
         mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
-        val coinUnit = Prefs.prefCoin(context)
+        val coinUnit = Prefs.getCoin(context)
         isEditable = arr.getBoolean(R.styleable.CoinView_editable, false)
         if (isEditable) {
           if (arr.hasValue(R.styleable.CoinView_hint)) {
@@ -134,7 +134,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     } else {
       mBinding.amount.setText(Converter.formatAmount(amount, context))
     }
-    mBinding.unit.text = Prefs.prefCoin(context).code()
+    mBinding.unit.text = Prefs.getCoin(context).code()
   }
 
   open class CoinViewWatcher : TextWatcher {

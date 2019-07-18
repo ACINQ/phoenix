@@ -36,7 +36,7 @@ class App : Application() {
   }
 
   private fun init() {
-    when (Prefs.prefCoin(applicationContext)) {
+    when (Prefs.getCoin(applicationContext)) {
       `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
       `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
       else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")

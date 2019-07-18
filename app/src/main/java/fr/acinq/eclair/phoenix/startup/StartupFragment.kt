@@ -83,7 +83,7 @@ class StartupFragment : BaseFragment() {
   private fun startNodeIfNeeded() {
     context?.let {
       if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.isWalletInit(it)) {
-        if (Prefs.isPinSet(it)) {
+        if (Prefs.isSeedEncrypted(it)) {
           // user has defined a pin code encrypting the seed so let's ask for it
           mPinDialog?.show()
         } else {
