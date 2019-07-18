@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
 
@@ -39,8 +40,8 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       actionButton.text = itemView.resources.getString(notification.actionResId)
       actionButton.setOnClickListener {
         when (notification) {
-          NotificationTypes.NO_PIN_SET -> {}
-          NotificationTypes.MNEMONICS_NEVER_SEEN -> {}
+          NotificationTypes.NO_PIN_SET -> {  }
+          NotificationTypes.MNEMONICS_NEVER_SEEN -> { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
           NotificationTypes.MNEMONICS_REMINDER -> {}
         }
       }

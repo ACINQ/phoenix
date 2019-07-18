@@ -16,9 +16,7 @@
 
 package fr.acinq.eclair.phoenix.initwallet
 
-import android.app.ActivityOptions
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +27,6 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
-import fr.acinq.eclair.phoenix.MainActivity
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletAutoCreateBinding
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
@@ -55,7 +52,7 @@ class AutoCreateFragment : Fragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProviders.of(this).get(AutoCreateViewModel::class.java)
-    model.errorCause.observe(this, Observer {
+    model.errorCause.observe(viewLifecycleOwner, Observer {
       mBinding.error.text = getString(R.string.autocreate_error, it)
     })
     model.state.observe(viewLifecycleOwner, Observer { state ->

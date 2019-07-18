@@ -47,7 +47,7 @@ class SendFragment : BaseFragment() {
     model = ViewModelProviders.of(this).get(SendViewModel::class.java)
     mBinding.model = model
 
-    model.paymentRequest.observe(this, Observer {
+    model.paymentRequest.observe(viewLifecycleOwner, Observer {
       if (it != null && it.amount().isDefined) {
         mBinding.amount.setAmount(it.amount().get())
       }

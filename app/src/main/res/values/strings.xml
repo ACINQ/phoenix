@@ -162,4 +162,17 @@
   <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
 
+  <!-- //////////////// display seed //////////////// -->
+
+  <string name="displayseed_title">My Wallet</string>
+  <string name="displayseed_loading">Unlocking seed…</string>
+  <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
+  <string name="displayseed_instructions"><![CDATA[
+    This words list is the key to your wallet. Only you possess it. Save it somewhere safe (not on this phone)!
+    <br /><br />
+    <b>Should you lose this words list, your funds will be lost.</b>
+  ]]></string>
+  <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+
+
 </resources>

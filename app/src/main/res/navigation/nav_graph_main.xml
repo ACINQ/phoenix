@@ -63,6 +63,9 @@
     <action
       android:id="@+id/action_main_to_settings"
       app:destination="@id/settings" />
+    <action
+      android:id="@+id/action_main_to_display_seed"
+      app:destination="@id/display_seed" />
   </fragment>
 
   <!-- init wallet -->
@@ -228,6 +231,9 @@
     <action
       android:id="@+id/action_settings_to_list_channels"
       app:destination="@id/list_channels" />
+    <action
+      android:id="@+id/action_settings_to_display_seed"
+      app:destination="@id/display_seed" />
   </fragment>
 
   <!-- settings: close all channels and empty wallet  -->
@@ -241,5 +247,9 @@
     android:id="@+id/list_channels"
     android:name="fr.acinq.eclair.phoenix.settings.ListChannelsFragment"
     android:label="ListChannelsFragment" />
+  <fragment
+    android:id="@+id/display_seed"
+    android:name="fr.acinq.eclair.phoenix.settings.DisplaySeedFragment"
+    android:label="DisplaySeedFragment" />
 
 </navigation>

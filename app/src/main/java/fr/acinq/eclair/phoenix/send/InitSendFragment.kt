@@ -59,13 +59,13 @@ class InitSendFragment : BaseFragment() {
     model = ViewModelProviders.of(this).get(InitSendViewModel::class.java)
     mBinding.model = model
 
-    model.paymentRequest.observe(this, Observer {
+    model.paymentRequest.observe(viewLifecycleOwner, Observer {
       if (it != null) {
         val action = SendFragmentDirections.globalActionAnyToSend(it)
         findNavController().navigate(action)
       }
     })
-    model.readingState.observe(this, Observer {
+    model.readingState.observe(viewLifecycleOwner, Observer {
       if (it == ReadingState.ERROR) {
         Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1250)
       }
