@@ -17,12 +17,23 @@
 <resources>
   <string name="app_name">Phoenix</string>
 
-  <!-- //////////////// initwallet / automated wallet creation //////////////// -->
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
   <string name="autocreate_generating">Creating your wallet…</string>
   <string name="autocreate_error">We could not create your wallet.\nReason: %1$s</string>
 
-  <!-- //////////////// initwallet / create seed //////////////// -->
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+
+  <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nThis feature is intended for advanced users who wish to restore a previous installation of this application.</string>
+  <string name="restore_disclaimer_checkbox">I understand.</string>
+  <string name="restore_disclaimer_next">Next</string>
+  <string name="restore_instructions">Use the virtual keyboard below to type in your words list.</string>
+  <string name="restore_mnemonics_label">Use the keyboard below to type the seed:</string>
+  <string name="restore_in_progress">Restoring your wallet…</string>
+  <string name="restore_import_button">Import</string>
+  <string name="restore_error">Error!\nReason: %1$s</string>
+
+  <!-- //////////////// init wallet / create seed //////////////// -->
 
   <string name="newseed_instructions">This words list is the key to your wallet. Save it somewhere safe (not on this phone).</string>
   <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>

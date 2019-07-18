@@ -1,0 +1,397 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/main_keyboard"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:clipToPadding="false"
+      android:paddingStart="@dimen/space_xs"
+      android:paddingTop="@dimen/space_xxs"
+      android:paddingEnd="@dimen/space_xs"
+      android:paddingBottom="@dimen/space_xs"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent">
+
+      <!-- 1st row: Q / W / E / R / T / Y / U / I / O / P -->
+
+      <Button
+        android:id="@+id/key_q"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_q"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_w"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_w"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_w"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_e"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_q"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_e"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_e"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_r"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_w"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_r"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_r"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_t"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_e"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_t"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_t"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_y"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_r"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_y"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_y"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_u"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_t"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_u"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_u"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_i"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_y"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_i"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_i"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_o"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_u"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_o"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_o"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_p"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_i"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_p"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_p"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_o"
+        app:layout_constraintTop_toTopOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <!-- 2nd row: A / S / D / F / G / H / J / K / L -->
+
+      <Button
+        android:id="@+id/key_a"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_a"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_s"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/key_q"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_s"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_s"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_d"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_a"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_d"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_d"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_f"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_s"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_f"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_f"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_g"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_d"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_g"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_g"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_h"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_f"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_h"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_h"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_j"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_g"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_j"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_j"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_k"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_h"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_k"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_k"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_l"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_j"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_l"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_l"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_k"
+        app:layout_constraintTop_toTopOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <!-- 3rd row: Z / X / C / V / B / N / M / delete -->
+
+      <Button
+        android:id="@+id/key_z"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_z"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_x"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/key_a"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_x"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_x"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_c"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_z"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_c"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_c"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_v"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_x"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_v"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_v"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_b"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_c"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_b"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_b"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_n"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_v"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_n"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_n"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_m"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_b"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <Button
+        android:id="@+id/key_m"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:text="@string/key_m"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/key_delete"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_n"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".1" />
+
+      <ImageButton
+        android:id="@+id/key_delete"
+        style="@style/default_virtualKeyboardKeyStyle"
+        android:layout_height="0dp"
+        android:contentDescription="@string/key_delete_desc"
+        android:paddingEnd="@dimen/space_sm"
+        android:paddingBottom="8dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_backspace"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/key_m"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/key_m"
+        app:layout_constraintTop_toTopOf="@id/key_z"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".2"
+        tools:ignore="RtlSymmetry" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 4th row: space bar -->
+
+    <ImageButton
+      android:id="@+id/key_space"
+      style="@style/default_virtualKeyboardKeyStyle"
+      android:background="@drawable/rounded_sm"
+      android:backgroundTint="?attr/defaultMutedTextColor"
+      android:contentDescription="@string/key_space_desc"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/main_keyboard"
+      app:layout_constraintWidth_default="percent"
+      app:layout_constraintWidth_percent=".4" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -20,34 +20,178 @@
 
   <data>
 
+    <import type="fr.acinq.eclair.phoenix.initwallet.RestoreSeedState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.eclair.phoenix.initwallet.RestoreSeedViewModel" />
+
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <ScrollView
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
     tools:context=".initwallet.RestoreSeedFragment">
 
-    <TextView
-      android:id="@+id/message"
-      android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      android:text="Import Seed" />
+      android:padding="@dimen/space_lg">
 
-    <Button
-      android:id="@+id/next_button"
-      style="@style/default_buttonStyle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_md"
-      app:layout_constraintTop_toBottomOf="@id/message"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:backgroundTint="@color/yellow"
-      android:text="Go to next" />
+      <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_disclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="@{model.state == RestoreSeedState.INIT}"
+        app:constraint_referenced_ids="disclaimer_message, disclaimer_checkbox, disclaimer_button" />
 
-  </androidx.constraintlayout.widget.ConstraintLayout>
+      <TextView
+        android:id="@+id/disclaimer_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/restore_disclaimer_message" />
+
+      <CheckBox
+        android:id="@+id/disclaimer_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/disclaimer_message"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        android:text="@string/restore_disclaimer_checkbox" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/disclaimer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:icon="@drawable/ic_arrow_next"
+        app:text="@string/restore_disclaimer_next" />
+
+      <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="@{model.state != RestoreSeedState.INIT}"
+        app:constraint_referenced_ids="instructions, mnemonics_layout, keyboard" />
+
+      <TextView
+        android:id="@+id/instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/restore_instructions" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mnemonics_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/instructions"
+        android:background="@drawable/rounded_sm"
+        android:backgroundTint="?attr/defaultMutedBackgroundColor">
+
+        <TextView
+          android:id="@+id/mnemonics_input_label"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          app:layout_constraintTop_toTopOf="parent"
+          android:paddingStart="@dimen/space_sm"
+          android:paddingEnd="@dimen/space_sm"
+          android:text="@string/restore_mnemonics_label"
+          android:textColor="?attr/defaultMutedTextColor"
+          android:textSize="@dimen/text_sm" />
+
+        <TextView
+          android:id="@+id/mnemonics_input"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintTop_toBottomOf="@id/mnemonics_input_label"
+          android:paddingStart="@dimen/space_sm"
+          android:paddingEnd="@dimen/space_sm" />
+
+        <HorizontalScrollView
+          android:id="@+id/autocomplete_scroll"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/mnemonics_input"
+          android:fadeScrollbars="false"
+          android:fillViewport="true"
+          android:scrollbarAlwaysDrawHorizontalTrack="true"
+          android:scrollbarSize="4dp"
+          android:scrollbars="horizontal">
+
+          <TextView
+            android:id="@+id/autocomplete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_xs"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_sm" />
+        </HorizontalScrollView>
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <fr.acinq.eclair.phoenix.utils.customviews.VirtualKeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/import_button"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/keyboard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:icon="@drawable/ic_check_circle"
+        android:visibility="@{model.state == RestoreSeedState.INPUT_DATA}"
+        app:text="@string/restore_import_button" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/import_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/space_md"
+        android:visibility="@{model.state == RestoreSeedState.IN_PROGRESS}"
+        app:text="@string/restore_in_progress" />
+
+      <TextView
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mnemonics_layout"
+        android:background="@drawable/rounded"
+        android:clickable="true"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:padding="@dimen/space_md"
+        android:text="@string/restore_error"
+        android:visibility="@{model.state == RestoreSeedState.ERROR}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </ScrollView>
+
+
 </layout>
