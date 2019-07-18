@@ -18,6 +18,7 @@ package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -64,7 +65,9 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             mBinding.hint.text = context.getString(R.string.utils_default_coin_view_hint, coinUnit.code())
           }
           mBinding.amount.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-          mBinding.amount.focusable = View.FOCUSABLE
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mBinding.amount.focusable = View.FOCUSABLE
+          }
           mBinding.amount.isClickable = true
 
           this.setOnClickListener {
@@ -74,7 +77,9 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
           }
         } else {
           mBinding.amount.inputType = InputType.TYPE_NULL
-          mBinding.amount.focusable = View.NOT_FOCUSABLE
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mBinding.amount.focusable = View.NOT_FOCUSABLE
+          }
           mBinding.amount.isClickable = false
         }
 
