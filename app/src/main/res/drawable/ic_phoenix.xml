@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,14 @@
   android:viewportWidth="64"
   android:viewportHeight="64">
   <path
-    android:fillColor="@color/yellow"
-    android:pathData="M0,0h108v108h-108z" />
+    android:fillAlpha="1"
+    android:fillColor="#000000"
+    android:pathData="M53.03,21.34C52.68,30.07 45.45,33.98 31.35,33.07L30.51,55.37L20.46,55.06L21.72,11.18C42.94,9.23 53.38,12.61 53.03,21.34Z" />
+  <path
+    android:fillAlpha="0"
+    android:fillColor="#FF000000"
+    android:pathData="M53.03,21.34C52.68,30.07 45.45,33.98 31.35,33.07L30.51,55.37L20.46,55.06L21.72,11.18C42.94,9.23 53.38,12.61 53.03,21.34Z"
+    android:strokeWidth="1"
+    android:strokeAlpha="1"
+    android:strokeColor="#000000" />
 </vector>
