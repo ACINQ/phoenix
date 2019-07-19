@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
@@ -31,25 +30,18 @@ class SettingsFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSettingsBinding
 
-  private lateinit var model: SettingsViewModel
-
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-    mBinding.model = model
-  }
-
   override fun onStart() {
     super.onStart()
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.closeChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_close_all_channels) }
+    mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.shutdownButton.setOnClickListener { appKit.shutdown() }
-    mBinding.backButton.setOnClickListener { findNavController().popBackStack() }
   }
 }
