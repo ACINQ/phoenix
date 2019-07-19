@@ -20,12 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletBinding
+import fr.acinq.eclair.phoenix.utils.Wallet
 
 
-class InitWalletFragment : InitWalletBaseFragment() {
+class InitWalletFragment : Fragment() {
 
   private lateinit var mBinding: FragmentInitWalletBinding
 
@@ -36,8 +39,14 @@ class InitWalletFragment : InitWalletBaseFragment() {
 
   override fun onStart() {
     super.onStart()
-    seedModel.reset()
     mBinding.createSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_auto_create) }
     mBinding.restoreSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_restore) }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (context != null && Wallet.getSeedFile(context!!).exists()) {
+      findNavController().navigate(R.id.global_action_any_to_startup)
+    }
   }
 }

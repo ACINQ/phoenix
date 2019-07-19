@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,17 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="?attr/defaultRippleColor"
-  android:exitFadeDuration="@android:integer/config_shortAnimTime">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+  android:width="45dp"
+  android:height="30dp"
+  android:viewportWidth="30"
+  android:viewportHeight="20">
 
-  <item android:id="@android:id/mask">
-    <shape android:shape="oval">
-      <solid android:color="?attr/defaultBackgroundColor" />
-    </shape>
-  </item>
-  <item android:id="@android:id/background">
-    <shape android:shape="oval">
-      <solid android:color="@color/transparent" />
-    </shape>
-  </item>
-</ripple>
+  <path
+    android:fillColor="#00000000"
+    android:pathData="M28,15v2h-26v-2"
+    android:strokeWidth=".75"
+    android:strokeColor="?attr/defaultTextColor"
+    android:strokeLineCap="round"
+    android:strokeLineJoin="miter" />
+</vector>

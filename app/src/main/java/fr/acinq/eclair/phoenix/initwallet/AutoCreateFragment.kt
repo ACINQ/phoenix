@@ -29,6 +29,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletAutoCreateBinding
+import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -65,11 +66,16 @@ class AutoCreateFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    if (model.state.value == AutoCreateState.START) {
-      context?.let {
-        model.createAndSaveSeed(it.applicationContext)
+    if (context != null && Wallet.getSeedFile(context!!).exists()) {
+      findNavController().navigate(R.id.global_action_any_to_startup)
+    } else {
+      if (model.state.value == AutoCreateState.START) {
+        context?.let {
+          model.createAndSaveSeed(it.applicationContext)
+        }
       }
     }
+
   }
 }
 

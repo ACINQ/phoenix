@@ -37,7 +37,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg">
+      android:paddingTop="@dimen/space_lg"
+      android:paddingBottom="@dimen/space_lg">
 
       <androidx.constraintlayout.widget.Group
         android:id="@+id/group_disclaimer"
@@ -51,6 +52,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="@dimen/space_lg"
+        android:paddingEnd="@dimen/space_lg"
         android:text="@string/restore_disclaimer_message" />
 
       <CheckBox
@@ -58,6 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginStart="@dimen/space_lg"
         app:layout_constraintTop_toBottomOf="@id/disclaimer_message"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,6 +76,7 @@
         app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:enableOrFade="@{model.userHasCheckedDisclaimer}"
         app:icon="@drawable/ic_arrow_next"
         app:text="@string/restore_disclaimer_next" />
 
@@ -86,14 +91,21 @@
         android:id="@+id/instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="@dimen/space_lg"
+        android:paddingEnd="@dimen/space_lg"
         android:text="@string/restore_instructions" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mnemonics_layout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructions"
         android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/defaultMutedBackgroundColor">
@@ -147,6 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
+        app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
@@ -157,8 +170,8 @@
         app:layout_constraintTop_toBottomOf="@id/keyboard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:icon="@drawable/ic_check_circle"
         android:visibility="@{model.state == RestoreSeedState.INPUT_DATA}"
+        app:icon="@drawable/ic_check_circle"
         app:text="@string/restore_import_button" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
@@ -180,10 +193,10 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/mnemonics_layout"
+        app:layout_constraintTop_toBottomOf="@id/mnemonics_layout"
         android:background="@drawable/rounded"
         android:clickable="true"
-        android:elevation="8dp"
+        android:elevation="4dp"
         android:focusable="true"
         android:padding="@dimen/space_md"
         android:text="@string/restore_error"

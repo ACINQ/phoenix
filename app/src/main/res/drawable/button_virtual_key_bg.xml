@@ -14,18 +14,11 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="?attr/defaultRippleColor"
-  android:exitFadeDuration="@android:integer/config_shortAnimTime">
-
-  <item android:id="@android:id/mask">
-    <shape android:shape="oval">
-      <solid android:color="?attr/defaultBackgroundColor" />
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:state_pressed="true">
+    <shape android:shape="rectangle" android:useLevel="false">
+      <solid android:color="@color/mystic" />
+      <corners android:radius="4dp" />
     </shape>
   </item>
-  <item android:id="@android:id/background">
-    <shape android:shape="oval">
-      <solid android:color="@color/transparent" />
-    </shape>
-  </item>
-</ripple>
+</selector>

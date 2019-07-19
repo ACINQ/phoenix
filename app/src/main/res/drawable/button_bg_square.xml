@@ -16,7 +16,7 @@
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
   android:color="?attr/defaultRippleColor"
-  android:exitFadeDuration="@android:integer/config_mediumAnimTime">
+  android:exitFadeDuration="@android:integer/config_shortAnimTime">
 
   <item android:id="@android:id/mask">
     <shape android:shape="rectangle">
