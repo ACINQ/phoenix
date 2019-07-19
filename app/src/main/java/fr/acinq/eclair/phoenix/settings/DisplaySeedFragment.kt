@@ -78,8 +78,20 @@ class DisplaySeedFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    refreshBackupWarning()
+    context?.let {
+      mBinding.backupWarningButton.setOnClickListener { _ ->
+        if (mBinding.backupWarningCheckbox.isChecked) {
+          Prefs.setMnemonicsSeenTimestamp(it, System.currentTimeMillis())
+          refreshBackupWarning()
+        }
+      }
+    }
+
+    mBinding.backupWarningCheckbox.setOnCheckedChangeListener { _, isChecked -> model.userHasSavedSeed.value = isChecked }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
 
+    // -- retrieve seed if adequate
     if (model.state.value == DisplaySeedState.INIT && model.words.value.isNullOrEmpty()) {
       context?.let {
         model.state.value = DisplaySeedState.UNLOCKING
@@ -95,6 +107,12 @@ class DisplaySeedFragment : BaseFragment() {
   override fun onStop() {
     super.onStop()
     mPinDialog?.dismiss()
+  }
+
+  private fun refreshBackupWarning() {
+    context?.let {
+      model.showUserBackupWarning.value = Prefs.getMnemonicsSeenTimestamp(it) == 0L
+    }
   }
 
   private fun getPinDialog(): PinDialog {
@@ -125,9 +143,13 @@ enum class DisplaySeedState {
 
 class DisplaySeedViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(DisplaySeedViewModel::class.java)
+
   val state = MutableLiveData(DisplaySeedState.INIT)
   val errorMessage = MutableLiveData("")
   val words = MutableLiveData<List<String>>()
+
+  val showUserBackupWarning = MutableLiveData(true)
+  val userHasSavedSeed = MutableLiveData(false)
 
   @UiThread
   fun getSeed(context: Context, pin: String) {

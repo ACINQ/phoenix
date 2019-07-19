@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.utils.Prefs
 
-class MainFragment : BaseFragment() {
+class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
   private lateinit var model: MainViewModel
   private lateinit var mBinding: FragmentMainBinding
@@ -87,6 +88,10 @@ class MainFragment : BaseFragment() {
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
+  }
+
+  override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    context?.let { model.updateNotifications(it) }
   }
 
 }

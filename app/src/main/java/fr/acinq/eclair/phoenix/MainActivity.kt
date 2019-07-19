@@ -30,6 +30,7 @@ import fr.acinq.eclair.phoenix.databinding.ActivityMainBinding
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.eclair.phoenix.send.SendFragmentDirections
 import fr.acinq.eclair.phoenix.utils.IntentCodes
+import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
 
 
@@ -42,7 +43,6 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
     appKit = ViewModelProviders.of(this).get(AppKitModel::class.java)
     appKit.navigationEvent.observe(this, Observer {
       when (it) {

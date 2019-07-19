@@ -41,9 +41,16 @@ class MainViewModel : ViewModel() {
 
   private fun checkMnemonics(context: Context) {
     val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
-    when {
-      timestamp == 0L -> notifications.value?.add(NotificationTypes.MNEMONICS_NEVER_SEEN)
-      System.currentTimeMillis() - timestamp > MNEMONICS_REMINDER_INTERVAL -> notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+
+    if (timestamp == 0L) {
+      notifications.value?.add(NotificationTypes.MNEMONICS_NEVER_SEEN)
+    } else {
+      notifications.value?.remove(NotificationTypes.MNEMONICS_NEVER_SEEN)
+      if (System.currentTimeMillis() - timestamp > MNEMONICS_REMINDER_INTERVAL) {
+        notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+      } else {
+        notifications.value?.remove(NotificationTypes.MNEMONICS_REMINDER)
+      }
     }
   }
 

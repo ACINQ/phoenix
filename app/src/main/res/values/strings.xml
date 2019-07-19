@@ -185,6 +185,8 @@
     <b>Should you lose this words list, your funds will be lost.</b>
   ]]></string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
+  <string name="displayseed_has_saved_seed_button">Confirm</string>
 
 
 </resources>

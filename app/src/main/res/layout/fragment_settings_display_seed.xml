@@ -36,9 +36,9 @@
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:text="@string/displayseed_title"
+      app:layout_constraintTop_toTopOf="parent"
       android:background="@color/mystic"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:text="@string/displayseed_title" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:layout_width="match_parent"
@@ -52,10 +52,10 @@
       android:id="@+id/error_view"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
       app:layout_constraintTop_toBottomOf="@id/action_bar"
-      android:visibility="@{model.state == DisplaySeedState.ERROR}"
-      android:text="@string/displayseed_error" />
+      android:padding="@dimen/space_lg"
+      android:text="@string/displayseed_error"
+      android:visibility="@{model.state == DisplaySeedState.ERROR}" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -85,6 +85,42 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
           app:layout_constraintTop_toBottomOf="@id/instructions" />
+
+        <androidx.constraintlayout.widget.Group
+          android:id="@+id/backgrup_warning_group"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:visibility="@{model.showUserBackupWarning}"
+          app:constraint_referenced_ids="backup_warning_separator, backup_warning_checkbox, backup_warning_button" />
+
+        <View
+          android:id="@+id/backup_warning_separator"
+          style="@style/HSeparator"
+          android:layout_marginTop="@dimen/space_lg"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/words_table" />
+
+        <CheckBox
+          android:id="@+id/backup_warning_checkbox"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          app:layout_constraintTop_toBottomOf="@id/backup_warning_separator"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          android:text="@string/displayseed_has_saved_seed_checkbox" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/backup_warning_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintTop_toBottomOf="@id/backup_warning_checkbox"
+          app:layout_constraintStart_toStartOf="@id/backup_warning_checkbox"
+          app:enableOrFade="@{model.userHasSavedSeed}"
+          app:icon="@drawable/ic_check_circle"
+          app:text="@string/displayseed_has_saved_seed_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
