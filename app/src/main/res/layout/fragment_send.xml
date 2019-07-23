@@ -36,6 +36,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:animateLayoutChanges="true"
       android:padding="@dimen/space_md">
 
       <ImageView
@@ -89,7 +90,7 @@
         android:layout_marginTop="@dimen/space_lg"
         app:layout_constraintTop_toBottomOf="@id/balance_separator"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="@{model.state == SendState.VERIFYING_PR}"
+        android:visibility="@{model.state == SendState.VALIDATING_INVOICE}"
         app:text="@string/send_loading"
         app:text_size="@dimen/text_lg" />
 
@@ -100,12 +101,12 @@
         app:layout_constraintTop_toBottomOf="@id/balance_separator"
         app:layout_constraintStart_toStartOf="parent"
         android:text="@string/send_invalid_pr_generic"
-        android:visibility="@{model.state == SendState.INVALID_PR}" />
+        android:visibility="@{model.state == SendState.INVALID_INVOICE}" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_xl"
         app:layout_constraintTop_toBottomOf="@id/balance_separator"
         android:visibility="@{model.isFormVisible()}">
 
@@ -113,7 +114,6 @@
           android:id="@+id/amount"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -185,7 +185,7 @@
           app:layout_constraintHorizontal_chainStyle="spread"
           app:layout_constraintStart_toStartOf="parent"
           android:backgroundTint="@color/transparent"
-          app:text="@string/receive_with_open_fee_decline" />
+          app:text="@string/send_cancel_button" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"
@@ -197,11 +197,66 @@
           app:layout_constraintTop_toBottomOf="@id/description_value"
           app:icon="@drawable/ic_check_circle"
           app:icon_tint="@color/green"
-          app:text="@string/receive_with_open_fee_accept" />
+          app:text="@string/send_pay_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/balance_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/send_swap_in_progress"
+        android:visibility="@{model.state == SendState.SWAPPING}" />
 
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/balance_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/send_swap_error"
+        android:visibility="@{model.state == SendState.SWAPPING_ERROR}" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
+        app:layout_constraintTop_toBottomOf="@id/balance_separator"
+        android:visibility="@{model.state == SendState.SWAP_CONFIRM}">
+
+        <TextView
+          android:id="@+id/swap_instructions"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toTopOf="parent"
+          android:text="@string/send_swap_confirm_instructions" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/swap_cancel_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:layout_constraintBottom_toBottomOf="@+id/swap_confirm_button"
+          app:layout_constraintEnd_toStartOf="@id/swap_confirm_button"
+          app:layout_constraintHorizontal_chainStyle="spread"
+          app:layout_constraintStart_toStartOf="parent"
+          android:background="@drawable/button_bg_square"
+          app:text="@string/send_swap_confirm_cancel_button" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/swap_confirm_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg_p"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/swap_cancel_button"
+          app:layout_constraintTop_toBottomOf="@id/swap_instructions"
+          app:icon="@drawable/ic_check_circle"
+          app:icon_tint="@color/green"
+          app:text="@string/send_swap_confirm_confirm_button" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

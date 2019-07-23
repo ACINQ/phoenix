@@ -73,7 +73,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
       `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
         // amount
         if (payment.finalAmount().isDefined) {
-          amountView.text = Converter.formatAmount(payment.finalAmount().get(), itemView.context, true, isPaymentOutgoing)
+          amountView.text = Converter.formatAmount(payment.finalAmount().get(), itemView.context, false, true, isPaymentOutgoing)
         } else {
           amountView.text = itemView.context.getString(R.string.utils_unknown)
         }

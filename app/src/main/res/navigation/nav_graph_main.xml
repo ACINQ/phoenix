@@ -210,7 +210,7 @@
       app:popUpTo="@+id/main_fragment"
       app:popUpToInclusive="true" />
     <argument
-      android:name="payment_request"
+      android:name="invoice"
       app:argType="string" />
   </fragment>
 

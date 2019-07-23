@@ -104,8 +104,14 @@
   <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">for</string>
-  <string name="send_go">Pay</string>
-  <string name="send_cancel">Cancel</string>
+  <string name="send_pay_button">Pay</string>
+  <string name="send_cancel_button">Decline</string>
+  <string name="send_pay_button_for_swap">Next</string>
+  <string name="send_swap_in_progress">Submarine swap in progress…</string>
+  <string name="send_swap_error">Swapping failed. Please try again.</string>
+  <string name="send_swap_confirm_instructions">Submarine swap placeholder text.\n\nYou\'ll send: %1$s\nPrice is: %2$s</string>
+  <string name="send_swap_confirm_confirm_button">Confirm and send</string>
+  <string name="send_swap_confirm_cancel_button">Cancel</string>
 
   <!-- //////////////// scan //////////////// -->
 
@@ -117,6 +123,7 @@
   <!-- //////////////// utilities strings //////////////// -->
 
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
+  <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>
   <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>

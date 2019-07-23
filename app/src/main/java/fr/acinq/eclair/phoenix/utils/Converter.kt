@@ -43,16 +43,24 @@ object Converter {
 
   fun rawAmountPrint(amount: BtcAmount, context: Context): String = rawAmount(amount, context).toPlainString()
 
-  fun formatAmount(amount: BtcAmount, context: Context, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
+  fun formatAmount(amount: BtcAmount, context: Context, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
     val unit = Prefs.getCoin(context)
     val formatted = `CoinUtils$`.`MODULE$`.formatAmountInUnit(amount, unit, false)
     val formattedParts = formatted.split(Pattern.quote(DECIMAL_SEPARATOR).toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     val prefix = if (withSign) context.getString(if (isOutgoing) R.string.paymentholder_sent_prefix else R.string.paymentholder_received_prefix) else ""
 
     return if (formattedParts.size == 2) {
-      Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1]), Html.FROM_HTML_MODE_COMPACT)
+      if (withUnit) {
+        Html.fromHtml(context.getString(R.string.utils_pretty_amount_with_unit, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1], unit.code()), Html.FROM_HTML_MODE_COMPACT)
+      } else {
+        Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1]), Html.FROM_HTML_MODE_COMPACT)
+      }
     } else {
-      Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, formatted, ""), Html.FROM_HTML_MODE_COMPACT)
+      if (withUnit) {
+        Html.fromHtml(context.getString(R.string.utils_pretty_amount_with_unit, prefix, formatted, "", unit.code()), Html.FROM_HTML_MODE_COMPACT)
+      } else {
+        Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, formatted, ""), Html.FROM_HTML_MODE_COMPACT)
+      }
     }
   }
 
@@ -84,4 +92,5 @@ object Converter {
   }
 
   fun sat2msat(amount: Satoshi) = fr.acinq.bitcoin.`package$`.`MODULE$`.satoshi2millisatoshi(amount)
+  fun msat2sat(amount: MilliSatoshi) = fr.acinq.bitcoin.`package$`.`MODULE$`.millisatoshi2satoshi(amount)
 }

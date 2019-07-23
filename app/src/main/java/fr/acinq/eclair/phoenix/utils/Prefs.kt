@@ -19,14 +19,15 @@ package fr.acinq.eclair.phoenix.utils
 import android.content.Context
 import android.preference.PreferenceManager
 import fr.acinq.eclair.CoinUnit
+import fr.acinq.eclair.MSatUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
 
 object Prefs {
-  private val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
-  private val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
-  private val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
-  private val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
+  private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+  private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
+  private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
+  private const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
 
   fun isFirstTime(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)

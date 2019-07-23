@@ -18,51 +18,94 @@ package fr.acinq.eclair.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.phoenix.utils.Api
+import fr.acinq.eclair.phoenix.utils.BitcoinURI
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
+import scala.util.Either
+import scala.util.Left
+import scala.util.Right
 
 enum class SendState {
-  VERIFYING_PR, INVALID_PR, VALID_PR, ERROR_IN_AMOUNT, SENDING
+  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, ERROR_IN_AMOUNT, SWAPPING, SWAPPING_ERROR, SWAP_CONFIRM, SENDING
 }
 
 class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
   val state = MutableLiveData<SendState>()
-  val paymentRequest = MutableLiveData<PaymentRequest>(null)
+  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request
 
-  val paymentHash: LiveData<String> = Transformations.map(paymentRequest) { pr ->
-    "${pr?.paymentHash() ?: ""}"
-  }
-
-  val description: LiveData<String> = Transformations.map(paymentRequest) { pr ->
-    pr?.let {
+  val description: LiveData<String> = Transformations.map(invoice) {
+    it?.let {
       when {
-        it.description().isLeft -> it.description().left().get()
-        it.description().isRight -> it.description().right().get().toString()
+        it.isLeft -> it.left().get().first.label
+        it.isRight && it.right().get().description().isLeft -> it.right().get().description().left().get()
+        it.isRight && it.right().get().description().isRight -> it.right().get().description().right().get().toString()
         else -> ""
       }
     } ?: ""
   }
 
-  val destination: LiveData<String> = Transformations.map(paymentRequest) { pr ->
-    pr?.let { it.nodeId().toString() } ?: ""
+  val destination: LiveData<String> = Transformations.map(invoice) {
+    it?.let {
+      when {
+        it.isLeft -> it.left().get().first.address
+        it.isRight -> it.right().get().nodeId().toString()
+        else -> ""
+      }
+    } ?: ""
   }
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
-    state == SendState.VALID_PR || state == SendState.ERROR_IN_AMOUNT || state == SendState.SENDING
+    state == SendState.VALID_INVOICE || state == SendState.ERROR_IN_AMOUNT || state == SendState.SENDING
   }
 
   // ---- end of computed values
 
   init {
-    state.value = SendState.VERIFYING_PR
+    state.value = SendState.VALIDATING_INVOICE
+  }
+
+  val httpClient = OkHttpClient()
+
+  @UiThread
+  fun sendSubmarineSwap(amount: Satoshi, bitcoinURI: BitcoinURI, targetBlocks: Int = 6) {
+    viewModelScope.launch {
+      withContext(Dispatchers.Default) {
+        state.postValue(SendState.SWAPPING)
+        try {
+          val json = JSONObject().put("amountSatoshis", amount.amount()).put("address", bitcoinURI.address).put("targetBlocks", targetBlocks)
+          val request = Request.Builder().url(Api.SWAP_API_URL).post(RequestBody.create(Api.JSON, json.toString())).build()
+          delay(500)
+          val response = httpClient.newCall(request).execute()
+          val body = response.body()
+          if (response.isSuccessful && body != null) {
+            val paymentRequest = body.string().removeSurrounding("\"")
+            log.info("swapped $bitcoinURI -> $paymentRequest")
+            invoice.postValue(Left.apply(Pair(bitcoinURI, PaymentRequest.read(paymentRequest))))
+            state.postValue(SendState.SWAP_CONFIRM)
+          } else {
+            throw RuntimeException("swap responds with code ${response.code()}, aborting swap payment")
+          }
+        } catch (e: Exception) {
+          log.error("error in swap http request, aborting swap payment: ", e)
+          state.postValue(SendState.SWAPPING_ERROR)
+        }
+      }
+    }
   }
 
   @UiThread
@@ -70,12 +113,17 @@ class SendViewModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         try {
-          paymentRequest.postValue(PaymentRequest.read(Wallet.cleanPaymentRequest(input)))
-          state.postValue(SendState.VALID_PR)
+          val extract = Wallet.extractInvoice(input)
+          when (extract) {
+            is BitcoinURI -> invoice.postValue(Left.apply(Pair(extract, null)))
+            is PaymentRequest -> invoice.postValue(Right.apply(extract))
+            else -> throw RuntimeException("unhandled invoice type")
+          }
+          state.postValue(SendState.VALID_INVOICE)
         } catch (e: Exception) {
           log.info("invalid payment request $input: ${e.message}")
-          paymentRequest.postValue(null)
-          state.postValue(SendState.INVALID_PR)
+          invoice.postValue(null)
+          state.postValue(SendState.INVALID_INVOICE)
         }
       }
     }

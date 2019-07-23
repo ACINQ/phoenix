@@ -17,7 +17,6 @@
 package fr.acinq.eclair.phoenix.send
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -29,7 +28,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
@@ -37,7 +35,6 @@ import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import fr.acinq.eclair.phoenix.BaseFragment
-import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendInitBinding
 import fr.acinq.eclair.phoenix.utils.Clipboard
 import fr.acinq.eclair.phoenix.utils.IntentCodes
@@ -59,15 +56,24 @@ class InitSendFragment : BaseFragment() {
     model = ViewModelProviders.of(this).get(InitSendViewModel::class.java)
     mBinding.model = model
 
-    model.paymentRequest.observe(viewLifecycleOwner, Observer {
+    model.invoice.observe(viewLifecycleOwner, Observer {
       if (it != null) {
         val action = SendFragmentDirections.globalActionAnyToSend(it)
         findNavController().navigate(action)
       }
     })
     model.readingState.observe(viewLifecycleOwner, Observer {
-      if (it == ReadingState.ERROR) {
-        Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1250)
+      when (it) {
+        ReadingState.ERROR -> {
+          mBinding.scanView.resume()
+          Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1250)
+        }
+        ReadingState.READING -> {
+          mBinding.scanView.pause()
+        }
+        ReadingState.SCANNING -> {
+          mBinding.scanView.resume()
+        }
       }
     })
   }

@@ -17,11 +17,16 @@
 package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.io.NodeURI
+import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BuildConfig
+import fr.acinq.eclair.phoenix.send.ReadingState
 import java.io.File
+import java.lang.RuntimeException
 
 object Wallet {
 
@@ -57,12 +62,56 @@ object Wallet {
     return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
 
-  fun cleanPaymentRequest(input: String): String {
+  fun cleanInvoice(input: String): String {
     val trimmed = input.replace("\\u00A0", "").trim()
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
       trimmed.startsWith("lightning:", true) -> trimmed.drop(10)
+      trimmed.startsWith("bitcoin://", true) -> trimmed.drop(10)
+      trimmed.startsWith("bitcoin:", true) -> trimmed.drop(8)
       else -> trimmed
+    }
+  }
+
+  fun checkInvoice(input: String): String {
+    val cleanInvoice = cleanInvoice(input)
+    return try {
+      PaymentRequest.read(cleanInvoice)
+      cleanInvoice
+    } catch (e1: Exception) {
+      try {
+        BitcoinURI(cleanInvoice)
+        cleanInvoice
+      } catch (e2: Exception) {
+        throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage}")
+      }
+    }
+  }
+
+  fun extractInvoice(input: String): Any {
+    val cleanInvoice = cleanInvoice(input)
+    return try {
+      PaymentRequest.read(cleanInvoice)
+    } catch (e1: Exception) {
+      try {
+        BitcoinURI(cleanInvoice)
+      } catch (e2: Exception) {
+        throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage}")
+      }
+    }
+  }
+
+  fun showKeyboard(context: Context?, view: View) {
+    context?.let {
+      val imm = it.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+      imm.showSoftInput(view, InputMethodManager.RESULT_UNCHANGED_SHOWN)
+    }
+  }
+
+  fun hideKeyboard(context: Context?, view: View) {
+    context?.let {
+      val imm = it.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+      imm.hideSoftInputFromWindow(view.windowToken, 0 )
     }
   }
 

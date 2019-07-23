@@ -18,6 +18,7 @@ package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -65,5 +66,13 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
       arr.recycle()
     }
+  }
+
+  fun setText(text: String) {
+    mBinding.text.text = text
+  }
+
+  fun setIcon(icon: Drawable) {
+    mBinding.image.setImageDrawable(icon)
   }
 }

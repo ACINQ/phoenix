@@ -100,9 +100,8 @@
       app:layout_constraintStart_toStartOf="@id/scan_crosshairs"
       app:layout_constraintTop_toTopOf="@id/scan_crosshairs"
       android:padding="@dimen/space_xs"
-      android:visibility="@{model.readingState == ReadingState.READING}"
-      app:text_color="@color/dark"
-      app:text_size="@dimen/text_md" />
+      app:progress_tint="?attr/colorPrimary"
+      android:visibility="@{model.readingState == ReadingState.READING}" />
 
     <TextView
       android:id="@+id/instructions"

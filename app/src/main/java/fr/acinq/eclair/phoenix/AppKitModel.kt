@@ -48,17 +48,17 @@ import fr.acinq.eclair.payment.PaymentEvent
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
-import fr.acinq.eclair.phoenix.utils.NetworkException
-import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.router.RouteParams
 import fr.acinq.eclair.router.Router
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
+import okhttp3.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
@@ -98,13 +98,14 @@ class AppKitModel : ViewModel() {
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
 
+  val httpClient = OkHttpClient()
+
   init {
     _kit.value = null
     nodeData.value = NodeData(MilliSatoshi(0), 0)
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
-
   }
 
   override fun onCleared() {

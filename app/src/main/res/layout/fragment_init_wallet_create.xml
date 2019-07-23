@@ -31,13 +31,13 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".initwallet.CreateSeedFragment"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
-      tools:context=".initwallet.CreateSeedFragment">
+      android:padding="@dimen/space_lg">
 
       <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
         android:id="@+id/generating_seed_view"
