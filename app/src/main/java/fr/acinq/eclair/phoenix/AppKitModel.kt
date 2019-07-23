@@ -192,7 +192,7 @@ class AppKitModel : ViewModel() {
             /* amountMsat */ amount.amount(),
             /* paymentHash = */ paymentRequest.paymentHash(),
             /* targetNodeId = */ paymentRequest.nodeId(),
-            /* paymentRequest_opt = */ Option.apply(null),
+            /* paymentRequest_opt = */ Option.apply(paymentRequest),
             /* assistedRoutes = */ paymentRequest.routingInfo(),
             /* finalCltvExpiry = */finalCltvExpiry + 1,
             /* maxAttempts = */10,
