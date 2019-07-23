@@ -142,7 +142,11 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
-          payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+          try {
+            payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+          } catch (e: Exception) {
+            log.error("could not retrieve payment list: ", e)
+          }
         } ?: log.warn("tried to retrieve payment list but appkit is not initialized!!")
       }
     }
