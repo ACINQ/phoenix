@@ -20,5 +20,5 @@ import okhttp3.MediaType
 
 object Api {
   val JSON = MediaType.get("application/json; charset=utf-8")
-  const val SWAP_API_URL = "http://endurance.acinq.co:8091/api/paytochain"
+  const val SWAP_API_URL = "https://endurance-p2c.acinq.co/api/paytochain"
 }

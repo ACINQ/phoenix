@@ -44,6 +44,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentMainBinding.inflate(inflater, container, false)
+    mBinding.lifecycleOwner = this
 
     // init payment recycler view
     paymentsManager = LinearLayoutManager(context)
