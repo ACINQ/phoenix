@@ -36,7 +36,7 @@
       app:layout_constraintTop_toBottomOf="@+id/action_bar"
       android:background="@color/white"
       android:fillViewport="true"
-      tools:context=".receive.SettingsFragment">
+      tools:context=".settings.SettingsFragment">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -51,7 +51,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="close_channels_button, display_seed_button, list_all_channels_button, shutdown_button"
+          app:constraint_referenced_ids="close_channels_button, display_seed_button, list_all_channels_button, logs_button, shutdown_button"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
 
@@ -80,6 +80,15 @@
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md_p"
           app:text="@string/settings_list_channels"
+          tools:ignore="MissingConstraints" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/logs_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md_p"
+          app:text="@string/settings_logs"
           tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView

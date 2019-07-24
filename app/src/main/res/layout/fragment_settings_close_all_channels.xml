@@ -80,8 +80,7 @@
       app:layout_constraintTop_toBottomOf="@id/back_button"
       android:fillViewport="true"
       android:paddingBottom="@dimen/space_lg"
-      android:visibility="@{model.state != ClosingChannelsState.NO_CHANNELS &amp;&amp; model.state != ClosingChannelsState.CHECKING_CHANNELS}"
-      tools:context=".receive.SettingsFragment">
+      android:visibility="@{model.state != ClosingChannelsState.NO_CHANNELS &amp;&amp; model.state != ClosingChannelsState.CHECKING_CHANNELS}">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"

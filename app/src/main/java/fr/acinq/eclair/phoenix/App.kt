@@ -30,7 +30,7 @@ class App : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    Logging.setupLogger()
+    Logging.setupLogger(applicationContext)
     init()
     log.info("app created")
   }

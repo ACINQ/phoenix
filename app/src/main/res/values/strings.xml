@@ -138,6 +138,7 @@
   <string name="settings_display_seed">My wallet\'s seed</string>
   <string name="settings_shutdown">(Debug) Shutdown node</string>
   <string name="settings_list_channels">(Debug) List my channels</string>
+  <string name="settings_logs">(Debug) App logs</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -195,5 +196,12 @@
   <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
   <string name="displayseed_has_saved_seed_button">Confirm</string>
 
+  <!-- //////////////// logs settings //////////////// -->
+
+  <string name="logs_title">Application logs</string>
+  <string name="logs_instructions">You can extract and share the application logs.</string>
+  <string name="logs_share_button">Share…</string>
+  <string name="logs_share_subject">Phoenix App logs</string>
+  <string name="logs_share_title">Share Phoenix logs…</string>
 
 </resources>

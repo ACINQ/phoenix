@@ -234,6 +234,9 @@
     <action
       android:id="@+id/action_settings_to_display_seed"
       app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_settings_to_logs"
+      app:destination="@id/logs_fragment" />
   </fragment>
 
   <!-- settings: close all channels and empty wallet  -->
@@ -251,5 +254,9 @@
     android:id="@+id/display_seed"
     android:name="fr.acinq.eclair.phoenix.settings.DisplaySeedFragment"
     android:label="DisplaySeedFragment" />
+  <fragment
+    android:id="@+id/logs_fragment"
+    android:name="fr.acinq.eclair.phoenix.settings.LogsSettingsFragment"
+    android:label="LogsSettingsFragment" />
 
 </navigation>
