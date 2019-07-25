@@ -41,6 +41,8 @@ import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.channel.State
 import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.BackupEvent
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
@@ -48,17 +50,18 @@ import fr.acinq.eclair.payment.PaymentEvent
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
-import fr.acinq.eclair.phoenix.utils.*
+import fr.acinq.eclair.phoenix.utils.NetworkException
+import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
+import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.router.RouteParams
 import fr.acinq.eclair.router.Router
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
-import okhttp3.*
+import okhttp3.OkHttpClient
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
@@ -72,7 +75,10 @@ import scodec.bits.`ByteVector$`
 import java.io.IOException
 import java.net.UnknownHostException
 import java.security.GeneralSecurityException
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
 data class NodeData(var balance: MilliSatoshi, var activeChannelsCount: Int)
@@ -143,13 +149,32 @@ class AppKitModel : ViewModel() {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
           try {
-            payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+            val t = measureTimeMillis {
+              payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+            }
+            log.info("payment list query complete in ${t}ms")
           } catch (e: Exception) {
             log.error("could not retrieve payment list: ", e)
           }
         } ?: log.warn("tried to retrieve payment list but appkit is not initialized!!")
       }
     }
+  }
+
+  suspend fun getSentPayment(id: UUID): Option<OutgoingPayment> {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw RuntimeException("kit not initialized")
+      }
+    }.await()
+  }
+
+  suspend fun getReceivedPayment(paymentHash: ByteVector32): Option<IncomingPayment> {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw RuntimeException("kit not initialized")
+      }
+    }.await()
   }
 
   @UiThread

@@ -204,4 +204,27 @@
   <string name="logs_share_subject">Phoenix App logs</string>
   <string name="logs_share_title">Share Phoenix logs…</string>
 
+  <!-- //////////////// payment details //////////////// -->
+
+  <string name="paymentdetails_title"></string>
+  <string name="paymentdetails_loading">Retrieving payment details…</string>
+  <string name="paymentdetails_error">This payment could not be found…</string>
+
+  <string name="paymentdetails_status_sent_pending"><![CDATA[Payment is <b>pending</b> since %1$s]]></string>
+  <string name="paymentdetails_status_sent_failed"><![CDATA[Payment has <b>failed</b>.<br />No money has been sent.]]></string>
+  <string name="paymentdetails_status_sent_successful"><![CDATA[Payment <b>sent</b> on %1$s!]]></string>
+
+  <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
+  <string name="paymentdetails_status_received_successful"><![CDATA[Payment <b>received</b> on %1$s!]]></string>
+
+  <string name="paymentdetails_amount_sent_pending_label">Sending</string>
+  <string name="paymentdetails_amount_sent_failed_label">Tried to send</string>
+  <string name="paymentdetails_amount_sent_successful_label">Sent</string>
+
+  <string name="paymentdetails_amount_received_pending_label">Receiving</string>
+  <string name="paymentdetails_amount_received_successful_label">Received</string>
+
+  <string name="paymentdetails_desc_label">Desc.</string>
+  <string name="paymentdetails_destination_label">To</string>
+
 </resources>

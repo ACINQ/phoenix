@@ -24,26 +24,20 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
 import fr.acinq.eclair.db.`PaymentDirection$`
+import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.android.synthetic.main.holder_payment.view.*
 
 
-class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-
-  init {
-    itemView.setOnClickListener(this)
-  }
-
-  override fun onClick(v: View) {
-    // ????????
-  }
+class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   private fun getAttrColor(resId: Int): Int {
     val typedValue = TypedValue()
@@ -112,12 +106,13 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
     }
 
     // description
-    if (payment.description().isDefined && !Strings.isNullOrEmpty(payment.description().get())) {
-      descriptionView.text = payment.description().get()
-      descriptionView.setTextColor(defaultTextColor)
-    } else {
+    val desc = if (payment.paymentRequest().isDefined) PaymentRequest.readDescription(payment.paymentRequest().get()) else ""
+    if (desc.isNullOrBlank()) {
       descriptionView.text = itemView.context.getString(R.string.paymentholder_no_desc)
       descriptionView.setTextColor(mutedTextColor)
+    } else {
+      descriptionView.text = desc
+      descriptionView.setTextColor(defaultTextColor)
     }
 
     // timestamp
@@ -128,6 +123,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.On
       timestampView.visibility = View.VISIBLE
     } else {
       timestampView.visibility = View.GONE
+    }
+
+    // clickable action
+    itemView.setOnClickListener {
+      val action = MainFragmentDirections.actionMainToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing) payment.id().get().toString() else payment.paymentHash().toString())
+      itemView.findNavController().navigate(action)
     }
   }
 }

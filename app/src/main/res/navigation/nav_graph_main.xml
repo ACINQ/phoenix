@@ -66,6 +66,9 @@
     <action
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_main_to_payment_details"
+      app:destination="@id/payment_details" />
   </fragment>
 
   <!-- init wallet -->
@@ -258,5 +261,16 @@
     android:id="@+id/logs_fragment"
     android:name="fr.acinq.eclair.phoenix.settings.LogsSettingsFragment"
     android:label="LogsSettingsFragment" />
+  <fragment
+    android:id="@+id/payment_details"
+    android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment"
+    android:label="PaymentDetailsFragment" >
+    <argument
+      android:name="direction"
+      app:argType="string" />
+    <argument
+      android:name="identifier"
+      app:argType="string" />
+  </fragment>
 
 </navigation>
