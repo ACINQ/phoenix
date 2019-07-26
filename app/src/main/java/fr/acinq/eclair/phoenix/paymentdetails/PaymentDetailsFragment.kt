@@ -23,7 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
@@ -46,7 +48,8 @@ import java.util.*
 class PaymentDetailsFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentPaymentDetailsBinding
-  private lateinit var model: PaymentDetailsViewModel
+  // shared view model, living with payment details nested graph
+  private val model: PaymentDetailsViewModel by navGraphViewModels(R.id.nav_graph_payment_details) //{ factory }
   private val args: PaymentDetailsFragmentArgs by navArgs()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -57,7 +60,6 @@ class PaymentDetailsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(PaymentDetailsViewModel::class.java)
 
     model.payment.observe(viewLifecycleOwner, Observer {
       it?.let {
@@ -82,7 +84,7 @@ class PaymentDetailsFragment : BaseFragment() {
               }
               mBinding.amountValue.setAmount(MilliSatoshi(p.amountMsat()))
             }
-            it.isRight-> {
+            it.isRight -> {
               val p = it.right().get()
               if (p.amountMsat_opt().isDefined) {
                 mBinding.amountLabel.text = context!!.getString(R.string.paymentdetails_amount_received_successful_label)
@@ -102,6 +104,12 @@ class PaymentDetailsFragment : BaseFragment() {
 
     getPayment(args.direction == `PaymentDirection$`.`MODULE$`.OUTGOING().toString(), args.identifier)
     mBinding.model = model
+  }
+
+  override fun onStart() {
+    super.onStart()
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.showTechnicalsButton.setOnClickListener { findNavController().navigate(R.id.action_payment_details_to_payment_details_technicals) }
   }
 
   private fun getPayment(isSentPayment: Boolean, identifier: String) {
@@ -160,6 +168,65 @@ class PaymentDetailsViewModel : ViewModel() {
         it.isLeft && it.left().get().targetNodeId().isDefined -> {
           it.left().get().targetNodeId().get().toString()
         }
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val paymentHash: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isLeft -> it.left().get().paymentHash().toString()
+        else -> it.right().get().paymentHash().toString()
+      }
+    } ?: ""
+  }
+
+  val paymentRequest: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isLeft && it.left().get().paymentRequest_opt().isDefined -> it.left().get().paymentRequest_opt().get()
+        it.isRight && it.right().get().paymentRequest_opt().isDefined -> it.right().get().paymentRequest_opt().get()
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val preimage: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isRight && it.right().get().preimage_opt().isDefined -> {
+          it.right().get().preimage_opt().get().toString()
+        }
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val createdAt: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isLeft -> DateFormat.getDateTimeInstance().format(it.left().get().createdAt())
+        it.isRight -> DateFormat.getDateTimeInstance().format(it.right().get().createdAt())
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val completedAt: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isLeft && it.left().get().completedAt().isDefined -> DateFormat.getDateTimeInstance().format(it.left().get().completedAt().get())
+        it.isRight && it.right().get().receivedAt_opt().isDefined -> DateFormat.getDateTimeInstance().format(it.right().get().receivedAt_opt().get())
+        else -> ""
+      }
+    } ?: ""
+  }
+
+  val expiredAt: LiveData<String> = Transformations.map(payment) {
+    it?.let {
+      when {
+        it.isRight && it.right().get().expireAt_opt().isDefined -> DateFormat.getDateTimeInstance().format(it.right().get().expireAt_opt().get())
         else -> ""
       }
     } ?: ""

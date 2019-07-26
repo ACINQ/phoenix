@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsViewModel" />
+
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/athens"
+    tools:context=".paymentdetails.PaymentDetailsTechnicalsFragment">
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:text="@string/paymentdetails_technicals_title" />
+
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      app:layout_constraintTop_toBottomOf="@id/action_bar"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constrainedHeight="true"
+      android:background="?attr/defaultBackgroundColor"
+      android:fillViewport="true"
+      android:overScrollMode="never"
+      android:visibility="@{model.state == PaymentDetailsState.DONE}">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false">
+
+        <GridLayout
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constrainedWidth="true"
+          android:columnCount="2">
+
+          <TextView
+            android:id="@+id/payment_hash_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_payment_hash_label" />
+
+          <TextView
+            android:id="@+id/payment_hash_value"
+            style="@style/TechnicalsValueView"
+            android:text="@{model.paymentHash}" />
+
+          <View
+            style="@style/HLineMutedSeparator"
+            android:layout_columnSpan="2" />
+
+          <TextView
+            android:id="@+id/payment_request_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_payment_request_label" />
+
+          <TextView
+            style="@style/TechnicalsValueView"
+            android:id="@+id/payment_request_value"
+            android:text="@{model.paymentRequest}" />
+
+          <View
+            style="@style/HLineMutedSeparator"
+            android:layout_columnSpan="2" />
+
+          <TextView
+            android:id="@+id/preimage_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_preimage_label" />
+
+          <TextView
+            android:id="@+id/preimage_value"
+            style="@style/TechnicalsValueView"
+            android:text="@{model.preimage}" />
+
+          <View
+            style="@style/HLineMutedSeparator"
+            android:layout_height="24dp"
+            android:layout_columnSpan="2" />
+
+          <TextView
+            android:id="@+id/created_at_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_created_at_label" />
+
+          <TextView
+            android:id="@+id/created_at_value"
+            style="@style/TechnicalsValueView"
+            android:text="@{model.createdAt}" />
+
+          <View
+            style="@style/HLineMutedSeparator"
+            android:layout_columnSpan="2" />
+
+          <TextView
+            android:id="@+id/expired_at_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_expire_at_label"
+            android:visibility="@{!model.isSent()}" />
+
+          <TextView
+            android:id="@+id/expired_at_value"
+            style="@style/TechnicalsValueView"
+            android:text="@{model.expiredAt}"
+            android:visibility="@{!model.isSent()}" />
+
+          <View
+            style="@style/HLineMutedSeparator"
+            android:layout_columnSpan="2"
+            android:visibility="@{!model.isSent()}" />
+
+          <TextView
+            android:id="@+id/completed_at_label"
+            style="@style/TechnicalsLabelView"
+            android:text="@string/paymentdetails_completed_at_label" />
+
+          <TextView
+            android:id="@+id/completed_at_value"
+            style="@style/TechnicalsValueView"
+            android:text="@{model.completedAt}" />
+
+        </GridLayout>
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

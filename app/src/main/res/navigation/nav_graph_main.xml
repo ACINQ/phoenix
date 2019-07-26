@@ -68,7 +68,14 @@
       app:destination="@id/display_seed" />
     <action
       android:id="@+id/action_main_to_payment_details"
-      app:destination="@id/payment_details" />
+      app:destination="@id/nav_graph_payment_details">
+      <argument
+        android:name="direction"
+        app:argType="string" />
+      <argument
+        android:name="identifier"
+        app:argType="string" />
+    </action>
   </fragment>
 
   <!-- init wallet -->
@@ -138,7 +145,7 @@
   <fragment
     android:id="@+id/auto_create_fragment"
     android:name="fr.acinq.eclair.phoenix.initwallet.AutoCreateFragment"
-    android:label="AutoCreateFragment" >
+    android:label="AutoCreateFragment">
     <action
       android:id="@+id/action_auto_create_to_startup"
       app:destination="@+id/main_fragment"
@@ -253,24 +260,49 @@
     android:id="@+id/list_channels"
     android:name="fr.acinq.eclair.phoenix.settings.ListChannelsFragment"
     android:label="ListChannelsFragment" />
+
+  <!-- settings: display wallet seed -->
   <fragment
     android:id="@+id/display_seed"
     android:name="fr.acinq.eclair.phoenix.settings.DisplaySeedFragment"
     android:label="DisplaySeedFragment" />
+
+  <!-- settings: share logs -->
   <fragment
     android:id="@+id/logs_fragment"
     android:name="fr.acinq.eclair.phoenix.settings.LogsSettingsFragment"
     android:label="LogsSettingsFragment" />
-  <fragment
-    android:id="@+id/payment_details"
-    android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment"
-    android:label="PaymentDetailsFragment" >
-    <argument
-      android:name="direction"
-      app:argType="string" />
-    <argument
-      android:name="identifier"
-      app:argType="string" />
-  </fragment>
+
+  <!-- nested graph with shared view model for payment details -->
+  <navigation
+    android:id="@+id/nav_graph_payment_details"
+    app:startDestination="@id/payment_details">
+
+    <!-- payment details overview -->
+    <fragment
+      android:id="@+id/payment_details"
+      android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment"
+      android:label="PaymentDetailsFragment">
+      <argument
+        android:name="direction"
+        app:argType="string" />
+      <argument
+        android:name="identifier"
+        app:argType="string" />
+      <action
+        android:id="@+id/action_payment_details_to_payment_details_technicals"
+        app:destination="@id/payment_details_technicals"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_right"
+        app:popExitAnim="@anim/slide_out_left" />
+    </fragment>
+
+    <!-- payment details technical data -->
+    <fragment
+      android:id="@+id/payment_details_technicals"
+      android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
+      android:label="PaymentDetailsTechnicalsFragment" />
+  </navigation>
 
 </navigation>

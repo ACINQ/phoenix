@@ -149,6 +149,12 @@
 
   <!-- ///////////// special styles ///////////// -->
 
+  <style name="HLineMutedSeparator">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">1dp</item>
+    <item name="android:background">?attr/defaultMutedBackgroundColor</item>
+  </style>
+
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
@@ -162,6 +168,34 @@
 
   <style name="HSeparator" parent="HLineSeparator">
     <item name="android:layout_width">50dp</item>
+  </style>
+
+  <style name="MutedLabelView" parent="default_textAppearance">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textAllCaps">true</item>
+    <item name="android:textColor">?attr/defaultMutedTextColor</item>
+    <item name="android:textSize">@dimen/text_sm</item>
+  </style>
+
+  <style name="TechnicalsBaseView" parent="default_textAppearance">
+    <item name="android:paddingStart">@dimen/space_md</item>
+    <item name="android:paddingTop">@dimen/space_md</item>
+    <item name="android:paddingBottom">@dimen/space_md</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textColor">?attr/defaultTextColor</item>
+  </style>
+
+  <style name="TechnicalsLabelView" parent="TechnicalsBaseView">
+    <item name="android:layout_width">140dp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="TechnicalsValueView" parent="TechnicalsBaseView">
+    <item name="android:paddingEnd">@dimen/space_md</item>
+    <item name="android:layout_width">0dp</item>
+    <item name="android:textIsSelectable">true</item>
+    <item name="android:layout_gravity">fill</item>
   </style>
 
   <style name="PinButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless.Colored">

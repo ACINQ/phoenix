@@ -44,6 +44,7 @@
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toEndOf="@id/image"
       app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
       android:lineSpacingMultiplier="1"
       android:textSize="@dimen/text_lg" />
   </merge>

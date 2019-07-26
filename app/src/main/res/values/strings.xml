@@ -226,5 +226,18 @@
 
   <string name="paymentdetails_desc_label">Desc.</string>
   <string name="paymentdetails_destination_label">To</string>
+  <string name="paymentdetails_fees_label">Fees</string>
+
+  <string name="paymentdetails_technicals_button">Show technical data</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="paymentdetails_technicals_title">Payment data</string>
+  <string name="paymentdetails_payment_hash_label">Payment Hash</string>
+  <string name="paymentdetails_payment_request_label">Payment Request</string>
+  <string name="paymentdetails_preimage_label">Preimage</string>
+  <string name="paymentdetails_created_at_label">Created at</string>
+  <string name="paymentdetails_expire_at_label">Expires at</string>
+  <string name="paymentdetails_completed_at_label">Completed at</string>
 
 </resources>
