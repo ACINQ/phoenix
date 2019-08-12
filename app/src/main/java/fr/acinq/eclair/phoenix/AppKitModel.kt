@@ -193,23 +193,15 @@ class AppKitModel : ViewModel() {
           // push preimage to node supervisor actor
           it.kit.system().eventStream().publish(preimage)
 
-//          amountMsat_opt: Option[MilliSatoshi],
-//          description: String,
-//          expirySeconds_opt: Option[Long] = None,
-//          extraHops: List[List[ExtraHop]] = Nil,
-//          fallbackAddress: Option[String] = None,
-//          paymentPreimage: Option[ByteVector32] = None,
-//          allowMultiPart: Boolean = false
-
           val f = Patterns.ask(it.kit.paymentHandler(),
             PaymentLifecycle.ReceivePayment(
-              amount_opt,
-              description,
-              Option.apply(null),
-              routes,
-              Option.empty(),
-              Option.apply(preimage),
-              true), timeout)
+              /* amount */ amount_opt,
+              /* description */ description,
+              /* expiry seconds */ Option.apply(null),
+              /* extra routing info */ routes,
+              /* fallback onchain address */ Option.empty(),
+              /* payment preimage */ Option.apply(preimage),
+              /* allow multi part payment */ true), timeout)
           Await.result(f, awaitDuration) as PaymentRequest
         } ?: throw RuntimeException("kit not initialized")
       }
@@ -226,11 +218,11 @@ class AppKitModel : ViewModel() {
           else Channel.MIN_CLTV_EXPIRY()
 
           val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-            false, // never randomize on mobile
-            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-            1.0, // at most 100%
-            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
+            else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
+              false, // never randomize on mobile
+              `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
+              1.0, // at most 100%
+              4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
           val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
           val assistedRoutes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>() as Seq<Seq<PaymentRequest.ExtraHop>>
@@ -242,11 +234,11 @@ class AppKitModel : ViewModel() {
             /* max attempts */ 10,
             /* predefined route */ predefRoutes,
             /* payment request */ Option.apply(paymentRequest),
-            /* assisted routes */ assistedRoutes,
+            /* assisted routes */ paymentRequest.routingInfo(), // assistedRoutes,
             /* cltv expiry */ Channel.MIN_CLTV_EXPIRY(),
-            /* route params */ routeParams,
-            /* allow amp */ true,
-            /* amp total amount */ Option.apply(null))
+            /* route params */ Option.apply(null),
+            /* allow amp */ paymentRequest.features().allowMultiPart(),
+            /* amp total amount */ Option.apply(amount.amount()))
 
           it.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
         } ?: log.warn("tried to send a payment but app kit is not initialized!!")
