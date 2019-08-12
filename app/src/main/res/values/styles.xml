@@ -44,6 +44,10 @@
     <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
 
+    <!-- controls -->
+    <item name="colorControlNormal">?attr/defaultMutedTextColor</item>
+    <item name="colorControlActivated">?attr/colorPrimary</item>
+
     <!-- widget overrides -->
     <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
     <item name="actionBarViewStyle">@style/paragraph_textViewStyle</item>
@@ -88,8 +92,8 @@
     <item name="android:minHeight">0dp</item>
     <item name="android:minWidth">0dp</item>
     <item name="android:gravity">start|center</item>
-    <item name="android:paddingTop">@dimen/space_md</item>
-    <item name="android:paddingBottom">@dimen/space_md</item>
+    <item name="android:paddingTop">@dimen/space_sm_p</item>
+    <item name="android:paddingBottom">@dimen/space_sm_p</item>
     <item name="android:paddingLeft">@dimen/space_md</item>
     <item name="android:paddingRight">@dimen/space_md</item>
     <item name="android:background">@drawable/button_bg</item>

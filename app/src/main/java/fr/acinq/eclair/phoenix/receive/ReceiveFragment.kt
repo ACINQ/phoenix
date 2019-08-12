@@ -24,27 +24,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.customviews.CoinView
+import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import scala.Option
-import java.util.*
-
 
 class ReceiveFragment : BaseFragment() {
 
@@ -71,30 +68,12 @@ class ReceiveFragment : BaseFragment() {
     model = ViewModelProviders.of(this).get(ReceiveViewModel::class.java)
     mBinding.model = model
 
-    mBinding.amountValue.setAmountWatcher(object : CoinView.CoinViewWatcher() {
-      private var throttle = Timer()
-      private val DELAY: Long = 350
-
-      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        mBinding.amountValue.handleEmptyAmountIfEditable()
-        model.amountInputState.value = AmountTypingState.TYPING
-        throttle.cancel()
-        throttle = Timer()
-        throttle.schedule(object : TimerTask() {
-          override fun run() {
-            context?.let {
-              try {
-                generatePaymentRequest(Converter.string2Msat_opt(s.toString(), it))
-              } catch (e: Exception) {
-                log.error("amount could not be converted to msat: ${e.message}")
-              } finally {
-                model.amountInputState.postValue(AmountTypingState.DONE)
-              }
-            }
-          }
-        }, DELAY)
+    context?.let {
+      ArrayAdapter.createFromResource(it, R.array.units_array, android.R.layout.simple_spinner_item).also { adapter ->
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        mBinding.amountUnit.adapter = adapter
       }
-    })
+    }
 
     model.paymentRequest.observe(viewLifecycleOwner, Observer {
       if (it != null) {
@@ -108,8 +87,6 @@ class ReceiveFragment : BaseFragment() {
         model.state.value = PaymentGenerationState.DONE
       }
     })
-
-    generatePaymentRequest(Option.apply(null))
   }
 
   override fun onStart() {
@@ -117,14 +94,15 @@ class ReceiveFragment : BaseFragment() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
+
+    mBinding.generateButton.setOnClickListener {
+      generatePaymentRequest()
+    }
+    mBinding.copyButton.setOnClickListener {
+      copyInvoice()
+    }
     mBinding.qrImage.setOnClickListener {
-      try {
-        val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.primaryClip = ClipData.newPlainText("Payment request", PaymentRequest.write(model.paymentRequest.value))
-        Toast.makeText(activity!!.applicationContext, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
-      } catch (e: Exception) {
-        log.error("failed to copy: ${e.localizedMessage}")
-      }
+      copyInvoice()
     }
     mBinding.shareButton.setOnClickListener {
       model.paymentRequest.value?.let {
@@ -135,7 +113,7 @@ class ReceiveFragment : BaseFragment() {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
       }
     }
-    mBinding.backButton.setOnClickListener { findNavController().navigate(R.id.action_receive_to_main) }
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_receive_to_main) })
   }
 
   override fun onStop() {
@@ -143,14 +121,27 @@ class ReceiveFragment : BaseFragment() {
     EventBus.getDefault().unregister(this)
   }
 
+  private fun copyInvoice() {
+    try {
+      val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+      clipboard.primaryClip = ClipData.newPlainText("Payment request", PaymentRequest.write(model.paymentRequest.value))
+      Toast.makeText(activity!!.applicationContext, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+    } catch (e: Exception) {
+      log.error("failed to copy: ${e.localizedMessage}")
+    }
+  }
+
   // payment request is generated in appkit view model and updates the receive view model
-  private fun generatePaymentRequest(amount_opt: Option<MilliSatoshi>) {
+  private fun generatePaymentRequest() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when generating payment request: ", exception)
       model.state.value = PaymentGenerationState.ERROR
     }) {
+      Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
-      model.paymentRequest.value = appKit.generatePaymentRequest("Phoenix payment", amount_opt)
+      val amount_opt = Converter.string2Msat_opt(mBinding.amountValue.text.toString(), context!!)
+      val desc = mBinding.descValue.text.toString()
+      model.paymentRequest.value = appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, amount_opt)
     }
   }
 

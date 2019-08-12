@@ -18,9 +18,7 @@ package fr.acinq.eclair.phoenix.receive
 
 import android.graphics.Bitmap
 import androidx.annotation.UiThread
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.utils.QRCode
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
-enum class AmountTypingState {
-  TYPING, DONE
-}
-
 enum class PaymentGenerationState {
-  IN_PROGRESS, BUILDING_BITMAP, ERROR, DONE
+  INIT, IN_PROGRESS, BUILDING_BITMAP, ERROR, DONE
 }
 
 class ReceiveViewModel : ViewModel() {
@@ -41,14 +35,15 @@ class ReceiveViewModel : ViewModel() {
 
   val paymentRequest = MutableLiveData<PaymentRequest>()
   val bitmap = MutableLiveData<Bitmap>()
-  val amountInputState = MutableLiveData<AmountTypingState>()
   val state = MutableLiveData<PaymentGenerationState>()
+  val paymentRequestString: LiveData<String> = Transformations.map(paymentRequest) {
+    it?.let { PaymentRequest.write(it) } ?: ""
+  }
 
   init {
     paymentRequest.value = null
     bitmap.value = null
-    amountInputState.value = AmountTypingState.DONE
-    state.value = PaymentGenerationState.DONE
+    state.value = PaymentGenerationState.INIT
   }
 
   @UiThread

@@ -79,9 +79,14 @@
 
   <!-- //////////////// receive //////////////// -->
 
+  <string name="receive_title">Create and share invoice</string>
   <string name="receive_loading_message">Please hold…</string>
-  <string name="receive_no_amount_requested_hint">Unspecified</string>
-  <string name="receive_amount_label">Amount:</string>
+  <string name="receive_error_message">There was an error when generating the invoice…\n\nPlease try again.</string>
+  <string name="receive_amount_label">Amount (optional)</string>
+  <string name="receive_desc_label">Description:</string>
+  <string name="receive_desc_hint">Payment description (optional)</string>
+  <string name="receive_default_desc">Phoenix payment</string>
+  <string name="receive_generate_button">Create invoice</string>
   <string name="receive_share_subject">Please pay this payment</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>

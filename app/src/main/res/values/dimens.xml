@@ -30,6 +30,7 @@
   <dimen name="space_lg">32dp</dimen>
   <dimen name="space_md_p">24dp</dimen>
   <dimen name="space_md">16dp</dimen>
+  <dimen name="space_sm_p">14dp</dimen>
   <dimen name="space_sm">12dp</dimen>
   <dimen name="space_xs">8dp</dimen>
   <dimen name="space_xxs">4dp</dimen>
@@ -42,6 +43,7 @@
 
   <!-- button content height -->
   <dimen name="button_height">22dp</dimen>
+  <dimen name="button_corner">30dp</dimen>
 
   <!-- scanner -->
   <dimen name="scanner_size">250dp</dimen>
