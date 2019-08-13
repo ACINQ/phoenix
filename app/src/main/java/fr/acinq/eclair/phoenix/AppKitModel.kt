@@ -51,13 +51,13 @@ import fr.acinq.eclair.payment.PaymentInitiator
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
+import fr.acinq.eclair.phoenix.utils.KitNotInitialized
 import fr.acinq.eclair.phoenix.utils.NetworkException
 import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
 import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.router.RouteParams
 import fr.acinq.eclair.router.Router
-import fr.acinq.eclair.wire.OnionTlv
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -102,7 +102,7 @@ class AppKitModel : ViewModel() {
   val startupErrorMessage = MutableLiveData<String>()
 
   val nodeData = MutableLiveData<NodeData>()
-  val payments = MutableLiveData<List<Payment>>()
+
 
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
@@ -136,38 +136,31 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
-    nodeData.value = nodeData.value?.copy(balance = event.amount)
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
-    refreshPaymentList()
+    nodeData.value = nodeData.value?.copy(balance = event.available)
   }
 
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
-  fun refreshPaymentList() {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
+  suspend fun getPayments(): List<Payment> {
+    return coroutineScope {
+      async(Dispatchers.Default) {
         _kit.value?.let {
-          try {
-            val t = measureTimeMillis {
-              payments.postValue(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
-            }
-            log.info("payment list query complete in ${t}ms")
-          } catch (e: Exception) {
-            log.error("could not retrieve payment list: ", e)
+          val list = mutableListOf<Payment>()
+          val t = measureTimeMillis {
+            list.addAll(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
           }
-        } ?: log.warn("tried to retrieve payment list but appkit is not initialized!!")
+          log.info("payment list query complete in ${t}ms")
+          list
+        } ?: throw KitNotInitialized()
       }
-    }
+    }.await()
   }
 
   suspend fun getSentPayment(id: UUID): Option<OutgoingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw RuntimeException("kit not initialized")
+        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw KitNotInitialized()
       }
     }.await()
   }
@@ -175,7 +168,7 @@ class AppKitModel : ViewModel() {
   suspend fun getReceivedPayment(paymentHash: ByteVector32): Option<IncomingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw RuntimeException("kit not initialized")
+        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw KitNotInitialized()
       }
     }.await()
   }
@@ -203,7 +196,7 @@ class AppKitModel : ViewModel() {
               /* payment preimage */ Option.apply(preimage),
               /* allow multi part payment */ true), timeout)
           Await.result(f, awaitDuration) as PaymentRequest
-        } ?: throw RuntimeException("kit not initialized")
+        } ?: throw KitNotInitialized()
       }
     }.await()
   }
@@ -218,14 +211,13 @@ class AppKitModel : ViewModel() {
           else Channel.MIN_CLTV_EXPIRY()
 
           val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-            else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-              false, // never randomize on mobile
-              `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-              1.0, // at most 100%
-              4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
+          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
+            false, // never randomize on mobile
+            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
+            1.0, // at most 100%
+            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
           val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
-          val assistedRoutes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>() as Seq<Seq<PaymentRequest.ExtraHop>>
 
           val sendRequest = PaymentInitiator.SendPaymentRequest(
             /* amount */ amount.amount(),
@@ -282,15 +274,18 @@ class AppKitModel : ViewModel() {
         kit.value?.let {
           val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
+
+          it.kit.switchboard()
+
           getChannels(null).map { res ->
             val channelId = res.channelId()
             log.info("init closing of channel=$channelId")
-            it.api.close(Left.apply(channelId), closeScriptPubKey, timeout)?.let { it1 -> closingFutures.add(it1) }
+            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, timeout))
           }
 
           val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), awaitDuration)
           log.info("closing channels returns: $r")
-        } ?: throw RuntimeException("app kit not initialized")
+        } ?: throw KitNotInitialized()
       }
     }.await()
   }

@@ -74,7 +74,11 @@ class EclairSupervisor : UntypedActor() {
       is ChannelStateChanged -> {
         val data = event.currentData()
         if (data is HasCommitments) {
-          channelsMap[event.channel()] = data.commitments()
+          if (data is DATA_CLOSING || data is DATA_SHUTDOWN) {
+            channelsMap.remove(event.channel())
+          } else {
+            channelsMap[event.channel()] = data.commitments()
+          }
           postBalance()
         }
       }

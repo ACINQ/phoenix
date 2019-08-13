@@ -20,13 +20,17 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.utils.Prefs
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class MainViewModel : ViewModel() {
 
   private val MNEMONICS_REMINDER_INTERVAL = DateUtils.DAY_IN_MILLIS * 30
 
   val notifications = MutableLiveData(HashSet<NotificationTypes>())
+  val payments = MutableLiveData<List<Payment>>()
 
   fun updateNotifications(context: Context) {
     checkWalletIsSecure(context)

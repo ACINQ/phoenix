@@ -22,6 +22,6 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 
 class PaymentEvent(val paymentHash: ByteVector32?)
 
-class BalanceEvent(val amount: MilliSatoshi)
+class BalanceEvent(val available: MilliSatoshi)
 
 class ReceiveWithOpen(val request: PayToOpenRequestEvent)

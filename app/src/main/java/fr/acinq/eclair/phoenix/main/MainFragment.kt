@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +31,12 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.Wallet
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -73,7 +80,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     appKit.nodeData.observe(viewLifecycleOwner, Observer {
       mBinding.balance.setAmount(it.balance)
     })
-    appKit.payments.observe(viewLifecycleOwner, Observer {
+    model.payments.observe(viewLifecycleOwner, Observer {
       paymentsAdapter.update(it, "usd", Prefs.getCoin(context!!), displayAmountAsFiat = false)
     })
     model.notifications.observe(viewLifecycleOwner, Observer {
@@ -83,7 +90,12 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onStart() {
     super.onStart()
-    appKit.refreshPaymentList()
+    if (!EventBus.getDefault().isRegistered(this)) {
+      EventBus.getDefault().register(this)
+    }
+    Wallet.hideKeyboard(context, mBinding.main)
+
+    refreshPaymentList()
     context?.let { model.updateNotifications(it) }
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
@@ -91,8 +103,26 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
   }
 
+  override fun onStop() {
+    super.onStop()
+    EventBus.getDefault().unregister(this)
+  }
+
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
     context?.let { model.updateNotifications(it) }
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
+    refreshPaymentList()
+  }
+
+  private fun refreshPaymentList() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when fetching payments: ", exception)
+    }) {
+      model.payments.value = appKit.getPayments()
+    }
   }
 
 }
