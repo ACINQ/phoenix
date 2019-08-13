@@ -18,7 +18,7 @@
 
   <style name="default_theme" parent="Theme.AppCompat.Light.NoActionBar">
     <!-- colors definition -->
-    <item name="colorPrimary">@color/yellow</item>
+    <item name="colorPrimary">@color/salmon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">@color/blue</item>
 
