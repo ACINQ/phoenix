@@ -131,7 +131,7 @@ class EclairSupervisor : UntypedActor() {
             log.info("ignored $event because associated event for this payment_hash is unknown")
           } else {
             if (payToOpen.paymentPreimage().tryFailure(RuntimeException("rejected by user"))) {
-              payToOpenMap.remove(event.paymentHash)
+              log.info("payToOpen event has been rejected by user")
             } else {
               log.warn("success promise for $event has failed")
             }

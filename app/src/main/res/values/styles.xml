@@ -141,7 +141,7 @@
     <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
-    <item name="android:textViewStyle">@style/default_textAppearance_alt</item>
+    <item name="android:textViewStyle">@style/default_textAppearance</item>
     <item name="buttonStyle">@style/default_buttonStyle</item>
   </style>
 
@@ -162,7 +162,7 @@
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">@color/mystic</item>
+    <item name="android:background">?attr/defaultButtonColor</item>
   </style>
 
   <style name="VSeparator" parent="HLineSeparator">

@@ -36,9 +36,6 @@ class ReceiveViewModel : ViewModel() {
   val paymentRequest = MutableLiveData<PaymentRequest>()
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<PaymentGenerationState>()
-  val paymentRequestString: LiveData<String> = Transformations.map(paymentRequest) {
-    it?.let { PaymentRequest.write(it) } ?: ""
-  }
 
   init {
     paymentRequest.value = null

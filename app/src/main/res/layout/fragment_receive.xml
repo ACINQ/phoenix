@@ -47,16 +47,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/space_md_p"
-        app:layout_constraintTop_toTopOf="@id/action_bar"
+        app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="@id/invoice_params_layout"
-        android:background="?attr/defaultBackgroundColor" />
-
-      <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="@id/mask"
-        android:background="?attr/defaultButtonColor" />
+        android:background="@drawable/square_border_hz" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
@@ -169,9 +163,7 @@
         android:visibility="@{model.state == PaymentGenerationState.ERROR}"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_error_message"
-        android:drawableTint="?attr/defaultErrorTextColor"
-        android:drawableStart="@drawable/ic_alert_triangle"
-        android:textColor="?attr/defaultErrorTextColor" />
+        android:drawableStart="@drawable/ic_alert_triangle" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -192,7 +184,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
           android:adjustViewBounds="true"
-          android:background="@drawable/rounded"
+          android:background="@drawable/rounded_border_primary"
           android:clickable="true"
           android:contentDescription="@string/utils_unknown"
           android:focusable="true"
@@ -222,17 +214,6 @@
           app:layout_constraintTop_toTopOf="@id/copy_button"
           android:padding="@dimen/space_sm"
           app:icon="@drawable/ic_share" />
-
-        <TextView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          app:layout_constraintTop_toBottomOf="@id/copy_button"
-          android:padding="@dimen/space_lg"
-          android:text="@{model.paymentRequestString}"
-          android:textAlignment="center"
-          android:textColor="?attr/defaultMutedTextColor"
-          android:textIsSelectable="true"
-          android:textSize="@dimen/text_xs" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

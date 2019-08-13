@@ -42,7 +42,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintHorizontal_chainStyle="spread"
       app:layout_constraintEnd_toStartOf="@id/accept_button"
-      android:text="@string/receive_with_open_fee_decline" />
+      android:text="@string/receive_with_open_decline" />
 
     <Button
       android:id="@+id/accept_button"
@@ -52,7 +52,7 @@
       app:layout_constraintTop_toBottomOf="@id/title"
       app:layout_constraintStart_toEndOf="@id/decline_button"
       app:layout_constraintEnd_toEndOf="parent"
-      android:text="@string/receive_with_open_fee_accept" />
+      android:text="@string/receive_with_open_accept" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -18,147 +18,153 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <data>
+
+    <variable
+      name="model"
+      type="fr.acinq.eclair.phoenix.receive.ReceiveWithOpenViewModel" />
+
+  </data>
+
+
+  <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".receive.ReceiveWithOpenDialogFragment">
 
-    <FrameLayout
-      android:id="@+id/illustration"
+    <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="?attr/altBackgroundColor"
-      android:padding="@dimen/space_lg"
-      app:layout_constraintTop_toTopOf="parent">
+      android:layout_height="wrap_content">
 
       <ImageView
+        android:id="@+id/illustration"
         android:layout_width="100dp"
         android:layout_gravity="center"
         android:layout_height="100dp"
-        android:src="@drawable/cloudy"
-        android:contentDescription="@string/utils_unknown" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/utils_unknown"
+        android:src="@drawable/ic_bolt_gradient" />
 
-    </FrameLayout>
+      <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md_p"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/illustration"
+        android:text="@string/receive_with_open_title"
+        android:textAllCaps="true"
+        android:textColor="?attr/defaultMutedTextColor"
+        android:textSize="@dimen/text_sm" />
 
-    <TextView
-      android:id="@+id/title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:layout_marginTop="@dimen/space_lg"
-      app:layout_constraintTop_toBottomOf="@id/illustration"
-      android:text="@string/receive_with_open_title" />
+      <ImageButton
+        android:id="@+id/help_button"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="@dimen/space_xs"
+        app:layout_constraintTop_toTopOf="@id/title"
+        app:layout_constraintBottom_toBottomOf="@id/title"
+        app:layout_constraintStart_toEndOf="@id/title"
+        android:background="@drawable/button_bg_square"
+        android:contentDescription="@string/receive_with_open_desc"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_help_circle"
+        android:tint="?attr/defaultMutedTextColor" />
 
-    <androidx.constraintlayout.widget.Guideline
-      android:id="@+id/label_guideline"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:layout_constraintGuide_percent="0.4"
-      android:orientation="vertical" />
+      <TextView
+        android:id="@+id/help"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:background="@drawable/rounded_sm"
+        android:backgroundTint="?attr/defaultMutedBackgroundColor"
+        android:padding="@dimen/space_sm"
+        android:text="@string/receive_with_open_help"
+        android:textColor="?attr/defaultMutedTextColor"
+        android:textSize="@dimen/text_sm"
+        android:visibility="@{model.showHelp}" />
 
-    <TextView
-      android:id="@+id/funding_label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_lg"
-      app:layout_constraintBaseline_toBaselineOf="@id/funding_value"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/label_guideline"
-      app:layout_constrainedWidth="true"
-      android:text="@string/receive_with_open_funding_label" />
+      <View
+        android:id="@+id/title_sep"
+        style="@style/HSeparator"
+        app:layout_constraintTop_toBottomOf="@id/help"
+        android:layout_marginTop="@dimen/space_md"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
-      android:id="@+id/funding_value"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_lg"
-      android:layout_marginStart="@dimen/space_xs"
-      android:layout_marginEnd="@dimen/space_lg"
-      app:layout_constraintTop_toBottomOf="@id/title"
-      app:layout_constraintStart_toEndOf="@id/label_guideline"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constrainedWidth="true"
-      app:amount_size="@dimen/text_md"
-      app:thin="false"
-      app:unit_size="@dimen/text_xs" />
+      <TextView
+        android:id="@+id/desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        android:lineSpacingMultiplier="1.25"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/title_sep"
+        android:text="@string/receive_with_open_desc"
+        android:textAlignment="center" />
 
-    <TextView
-      android:id="@+id/fee_label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_lg"
-      app:layout_constraintBaseline_toBaselineOf="@id/fee_value"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/label_guideline"
-      app:layout_constrainedWidth="true"
-      android:text="@string/receive_with_open_fee_label" />
+      <TextView
+        android:id="@+id/cost"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/desc"
+        android:text="@string/receive_with_open_cost"
+        android:textAlignment="center" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
-      android:id="@+id/fee_value"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginEnd="@dimen/space_lg"
-      android:layout_marginStart="@dimen/space_xs"
-      app:layout_constraintTop_toBottomOf="@id/funding_label"
-      app:layout_constraintStart_toEndOf="@id/label_guideline"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constrainedWidth="true"
-      app:amount_size="@dimen/text_md"
-      app:thin="false"
-      app:unit_size="@dimen/text_xs" />
+      <View
+        android:id="@+id/accept_separator"
+        style="@style/HLineSeparator"
+        android:layout_marginTop="@dimen/space_lg_p"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cost" />
 
-    <TextView
-      android:id="@+id/push_label"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_lg"
-      app:layout_constraintBaseline_toBaselineOf="@id/push_value"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/label_guideline"
-      app:layout_constrainedWidth="true"
-      android:text="@string/receive_with_open_push_label" />
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/accept_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/accept_separator"
+        android:background="@drawable/button_bg_square"
+        app:icon="@drawable/ic_check_circle"
+        app:icon_tint="@color/green"
+        app:text_color="@color/green"
+        app:text="@string/receive_with_open_accept" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
-      android:id="@+id/push_value"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_xs"
-      android:layout_marginEnd="@dimen/space_lg"
-      app:layout_constraintTop_toBottomOf="@id/fee_label"
-      app:layout_constraintStart_toEndOf="@id/label_guideline"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constrainedWidth="true"
-      app:amount_size="@dimen/text_md"
-      app:thin="false"
-      app:unit_size="@dimen/text_xs" />
+      <View
+        android:id="@+id/decline_separator"
+        style="@style/HLineSeparator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accept_button" />
 
-    <Button
-      android:id="@+id/decline_button"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_lg"
-      app:layout_constraintBaseline_toBaselineOf="@+id/accept_button"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintHorizontal_chainStyle="spread"
-      app:layout_constraintEnd_toStartOf="@id/accept_button"
-      android:text="@string/receive_with_open_fee_decline" />
+      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        android:id="@+id/decline_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/decline_separator"
+        android:background="@drawable/button_bg_square"
+        app:icon="@drawable/ic_cross_circle"
+        app:text="@string/receive_with_open_decline" />
 
-    <Button
-      android:id="@+id/accept_button"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_lg"
-      app:layout_constraintTop_toBottomOf="@id/push_label"
-      app:layout_constraintStart_toEndOf="@id/decline_button"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:text="@string/receive_with_open_fee_accept" />
 
-  </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
 </layout>

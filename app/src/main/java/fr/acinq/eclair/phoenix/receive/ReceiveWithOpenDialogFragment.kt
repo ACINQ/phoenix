@@ -18,17 +18,22 @@ package fr.acinq.eclair.phoenix.receive
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.phoenix.AppKitModel
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveWithOpenBinding
+import fr.acinq.eclair.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,6 +44,7 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   lateinit var mBinding: FragmentReceiveWithOpenBinding
   private lateinit var appKit: AppKitModel
+  private lateinit var model: ReceiveWithOpenViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     mBinding = FragmentReceiveWithOpenBinding.inflate(inflater, container, true)
@@ -52,6 +58,9 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       ViewModelProviders.of(activity!!).get(AppKitModel::class.java)
     } ?: throw Exception("Invalid Activity")
 
+    model = ViewModelProviders.of(this).get(ReceiveWithOpenViewModel::class.java)
+    mBinding.model = model
+
     requireActivity().onBackPressedDispatcher.addCallback(this) {
       log.info("back pressed should be disabled here")
     }
@@ -59,8 +68,10 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    mBinding.fundingValue.setAmount(Satoshi(args.fundingSat))
-    mBinding.feeValue.setAmount(Satoshi(args.feeSat))
+    context?.let {
+      mBinding.desc.text = Html.fromHtml(getString(R.string.receive_with_open_desc, Converter.formatAmount(Satoshi(args.fundingSat), it, withUnit = true)))
+      mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost, Converter.formatAmount(Satoshi(args.feeSat), it, withUnit = true)))
+    }
   }
 
   override fun onStart() {
@@ -75,9 +86,25 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
       dismiss()
     }
+    mBinding.helpButton.setOnClickListener {
+      model.showHelp.value?.let {
+        model.showHelp.value = !it
+      }
+    }
+  }
+
+  override fun onCancel(dialog: DialogInterface) {
+    appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+    super.onCancel(dialog)
   }
 
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
   }
+}
+
+class ReceiveWithOpenViewModel : ViewModel() {
+  private val log = LoggerFactory.getLogger(ReceiveWithOpenViewModel::class.java)
+
+  val showHelp = MutableLiveData(false)
 }
