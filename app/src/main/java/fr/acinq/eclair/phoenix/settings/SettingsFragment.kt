@@ -43,6 +43,5 @@ class SettingsFragment : BaseFragment() {
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
-    mBinding.shutdownButton.setOnClickListener { appKit.shutdown() }
   }
 }

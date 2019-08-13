@@ -20,23 +20,23 @@
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/defaultMutedBackgroundColor"
+    tools:context=".settings.SettingsFragment">
 
     <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      android:background="?attr/defaultMutedBackgroundColor"
       app:text="@string/menu_settings" />
 
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
       app:layout_constraintTop_toBottomOf="@+id/action_bar"
-      android:background="@color/white"
-      android:fillViewport="true"
-      tools:context=".settings.SettingsFragment">
+      android:background="?attr/defaultBackgroundColor"
+      android:fillViewport="true">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -51,9 +51,23 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="close_channels_button, display_seed_button, list_all_channels_button, logs_button, shutdown_button"
+          app:constraint_referenced_ids="general_title, close_channels_button, display_seed_button, advanced_title, list_all_channels_button, logs_button, shutdown_button"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
+
+        <TextView
+          android:id="@+id/general_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="@dimen/space_md_p"
+          android:paddingTop="@dimen/space_md_p"
+          android:paddingEnd="@dimen/space_md_p"
+          android:paddingBottom="@dimen/space_xs"
+          android:text="@string/settings_general_title"
+          android:textColor="?attr/colorPrimary"
+          android:textSize="@dimen/text_sm"
+          android:textStyle="bold"
+          tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/close_channels_button"
@@ -61,6 +75,7 @@
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md_p"
+          app:hz_bias="0"
           app:text="@string/settings_close_all_channels"
           tools:ignore="MissingConstraints" />
 
@@ -70,7 +85,22 @@
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md_p"
+          app:hz_bias="0"
           app:text="@string/settings_display_seed"
+          tools:ignore="MissingConstraints" />
+
+        <TextView
+          android:id="@+id/advanced_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="@dimen/space_md_p"
+          android:paddingTop="@dimen/space_md_p"
+          android:paddingEnd="@dimen/space_md_p"
+          android:paddingBottom="@dimen/space_xs"
+          android:text="@string/settings_advanced_title"
+          android:textColor="?attr/colorPrimary"
+          android:textSize="@dimen/text_sm"
+          android:textStyle="bold"
           tools:ignore="MissingConstraints" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
@@ -79,6 +109,7 @@
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md_p"
+          app:hz_bias="0"
           app:text="@string/settings_list_channels"
           tools:ignore="MissingConstraints" />
 
@@ -86,19 +117,10 @@
           android:id="@+id/logs_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md_p"
-          app:text="@string/settings_logs"
-          tools:ignore="MissingConstraints" />
-
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/shutdown_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
           android:padding="@dimen/space_md_p"
-          app:text="@string/settings_shutdown"
-          app:text_color="@color/red"
+          app:hz_bias="0"
+          app:text="@string/settings_logs"
           tools:ignore="MissingConstraints" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

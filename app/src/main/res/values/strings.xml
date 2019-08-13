@@ -140,11 +140,12 @@
 
   <!-- //////////////// settings //////////////// -->
 
+  <string name="settings_general_title">General</string>
   <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_display_seed">My wallet\'s seed</string>
-  <string name="settings_shutdown">(Debug) Shutdown node</string>
-  <string name="settings_list_channels">(Debug) List my channels</string>
-  <string name="settings_logs">(Debug) App logs</string>
+  <string name="settings_advanced_title">Advanced</string>
+  <string name="settings_list_channels">List my channels</string>
+  <string name="settings_logs">App logs</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
