@@ -51,7 +51,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="general_title, close_channels_button, display_seed_button, advanced_title, list_all_channels_button, logs_button, shutdown_button"
+          app:constraint_referenced_ids="general_title, close_channels_button, display_seed_button, advanced_title, list_all_channels_button, logs_button"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
 
