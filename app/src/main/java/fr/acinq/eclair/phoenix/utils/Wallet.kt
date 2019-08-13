@@ -117,7 +117,7 @@ object Wallet {
 
   // ------------------------ NODES & API URLS
 
-  const val PRICE_RATE_API = "https://blockchain.info/fr/ticker"
+  const val PRICE_RATE_API = "https://blockchain.info/ticker"
   val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735")
   const val WALLET_CONTEXT_SOURCE = "https://acinq.co/mobile/walletcontext.json"
   const val DEFAULT_ONCHAIN_EXPLORER = "https://api.blockcypher.com/v1/btc/test3/txs/"

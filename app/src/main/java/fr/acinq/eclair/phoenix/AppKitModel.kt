@@ -51,19 +51,17 @@ import fr.acinq.eclair.payment.PaymentInitiator
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
-import fr.acinq.eclair.phoenix.utils.KitNotInitialized
-import fr.acinq.eclair.phoenix.utils.NetworkException
-import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.router.RouteParams
 import fr.acinq.eclair.router.Router
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
+import okhttp3.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
@@ -72,6 +70,7 @@ import scala.collection.Seq
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import scala.math.BigDecimal
 import scala.util.Left
 import scodec.bits.`ByteVector$`
@@ -411,9 +410,72 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
 
+    system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
+      Runnable { httpClient.newCall(Request.Builder().url(Wallet.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
+
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
     val eclair = EclairImpl(kit)
     return AppKit(kit, eclair)
+  }
+
+  private fun getExchangeRateHandler(context: Context): Callback {
+    return object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve exchange rates: ${e.localizedMessage}")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        if (!response.isSuccessful) {
+          log.warn("could not retrieve exchange rates, api responds with ${response.code()}")
+        } else {
+          val body = response.body()
+          if (body != null) {
+            try {
+              val json = JSONObject(body.string())
+              getRateFromJson(context, json, "AUD")
+              getRateFromJson(context, json, "BRL")
+              getRateFromJson(context, json, "CAD")
+              getRateFromJson(context, json, "CHF")
+              getRateFromJson(context, json, "CLP")
+              getRateFromJson(context, json, "CNY")
+              getRateFromJson(context, json, "DKK")
+              getRateFromJson(context, json, "EUR")
+              getRateFromJson(context, json, "GBP")
+              getRateFromJson(context, json, "HKD")
+              getRateFromJson(context, json, "INR")
+              getRateFromJson(context, json, "ISK")
+              getRateFromJson(context, json, "JPY")
+              getRateFromJson(context, json, "KRW")
+              getRateFromJson(context, json, "NZD")
+              getRateFromJson(context, json, "PLN")
+              getRateFromJson(context, json, "RUB")
+              getRateFromJson(context, json, "SEK")
+              getRateFromJson(context, json, "SGD")
+              getRateFromJson(context, json, "THB")
+              getRateFromJson(context, json, "TWD")
+              getRateFromJson(context, json, "USD")
+              Prefs.setExchangeRateTimestamp(context, System.currentTimeMillis())
+            } catch (t: Throwable) {
+              log.error("could not read exchange rates response: ", t)
+            } finally {
+              body.close()
+            }
+          } else {
+            log.warn("exchange rate body is null")
+          }
+        }
+      }
+    }
+  }
+
+  fun getRateFromJson(context: Context, json: JSONObject, code: String) {
+    var rate = -1.0f
+    try {
+      rate = json.getJSONObject(code).getDouble("last").toFloat()
+    } catch (e: Exception) {
+      log.debug("could not read {} from price api response", code)
+    }
+    Prefs.setExhangeRate(context, code, rate)
   }
 }

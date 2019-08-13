@@ -28,6 +28,8 @@ object Prefs {
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
   private const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
+  private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
+  private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
 
   fun isFirstTime(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)
@@ -55,5 +57,21 @@ object Prefs {
 
   fun setMnemonicsSeenTimestamp(context: Context, timestamp: Long) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, timestamp).apply()
+  }
+
+  fun getExchangeRate(context: Context, code: String): Float {
+    return PreferenceManager.getDefaultSharedPreferences(context).getFloat(PREFS_EXCHANGE_RATE_PREFIX + code.toUpperCase(), -1.0f)
+  }
+
+  fun setExhangeRate(context: Context, code: String, rate: Float) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat(PREFS_EXCHANGE_RATE_PREFIX + code, rate).apply()
+  }
+
+  fun getExchangeRateTimestamp(context: Context): Long {
+    return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_EXCHANGE_RATE_TIMESTAMP, 0)
+  }
+
+  fun setExchangeRateTimestamp(context: Context, timestamp: Long) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_EXCHANGE_RATE_TIMESTAMP, timestamp).apply()
   }
 }
