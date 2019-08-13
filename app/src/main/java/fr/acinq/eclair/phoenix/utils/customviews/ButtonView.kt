@@ -24,6 +24,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import androidx.databinding.DataBindingUtil
@@ -52,6 +53,11 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         val params = LayoutParams(resources.getDimensionPixelOffset(R.dimen.button_height), resources.getDimensionPixelOffset(R.dimen.button_height))
         params.setMargins(0, 0, 0, 0)
         mBinding.image.layoutParams = params
+      }
+
+      if (arr.hasValue(R.styleable.ButtonView_hz_bias)) {
+        val params = mBinding.image.layoutParams as LayoutParams
+        params.horizontalBias = 0f
       }
 
       // optional image

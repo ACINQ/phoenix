@@ -67,7 +67,7 @@
     <attr name="icon" format="reference" />
     <attr name="icon_tint" format="color" />
     <attr name="icon_size" format="dimension" />
-    <attr name="icon_gravity" format="integer" />
+    <attr name="hz_bias" format="float" />
   </declare-styleable>
   <declare-styleable name="ActionBarView">
     <attr name="text" />
