@@ -20,8 +20,7 @@ import akka.actor.ActorRef
 import akka.actor.Terminated
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.MilliSatoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.`BackupCompleted$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
@@ -29,8 +28,6 @@ import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
-
-class PendingPayToOpenRequestEvent(val preimage: ByteVector32, var event: PayToOpenRequestEvent?)
 
 interface PayToOpenResponse
 class AcceptPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
@@ -43,12 +40,12 @@ class EclairSupervisor : UntypedActor() {
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
 
   // key is payment hash
-  private val payToOpenMap = HashMap<ByteVector32, PendingPayToOpenRequestEvent>()
+  private val payToOpenMap = HashMap<ByteVector32, PayToOpenRequestEvent>()
 
   private val channelsMap = HashMap<ActorRef, Commitments>()
 
   private fun postBalance() {
-    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocalMsat() }.sum())
+    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().amount() }.sum())
     log.info("posting balance=${balance.amount()}")
     EventBus.getDefault().post(BalanceEvent(balance))
   }
@@ -98,58 +95,30 @@ class EclairSupervisor : UntypedActor() {
         log.info("channel $event has been terminated")
         channelsMap.remove(event.actor)
       }
-      is ByteVector32 -> {
-        val paymentHash = Crypto.sha256().apply(event.bytes())
-        if (payToOpenMap.containsKey(paymentHash)) {
-          log.warn("received preimage with hash=$paymentHash but it is already linked with a pending payToOpen request")
-        } else {
-          log.info("adding PendingPayToOpenRequest for payment_hash=$paymentHash")
-          payToOpenMap[paymentHash] = PendingPayToOpenRequestEvent(event, null)
-        }
-      }
       is AcceptPayToOpen -> {
-        if (payToOpenMap.containsKey(event.paymentHash)) {
-          val preimage = payToOpenMap[event.paymentHash]!!.preimage
-          val payToOpen = payToOpenMap[event.paymentHash]!!.event
-          if (payToOpen == null) {
-            log.info("ignored $event because associated event for this payment_hash is unknown")
+        val payToOpen = payToOpenMap[event.paymentHash]
+        payToOpen?.let {
+          if (it.decision().trySuccess(true)) {
+            payToOpenMap.remove(event.paymentHash)
           } else {
-            if (payToOpen.paymentPreimage().trySuccess(preimage)) {
-              payToOpenMap.remove(event.paymentHash)
-            } else {
-              log.warn("success promise for $event has failed")
-            }
+            log.warn("success promise for $event has failed")
           }
-        } else {
-          log.info("ignored $event because payment_hash is unknown")
-        }
+        } ?: log.info("ignored $event because associated event for this payment_hash is unknown")
       }
       is RejectPayToOpen -> {
-        if (payToOpenMap.containsKey(event.paymentHash)) {
-          val payToOpen = payToOpenMap[event.paymentHash]!!.event
-          if (payToOpen == null) {
-            log.info("ignored $event because associated event for this payment_hash is unknown")
+        val payToOpen = payToOpenMap[event.paymentHash]
+        payToOpen?.let {
+          if (it.decision().trySuccess(false)) {
+            log.info("payToOpen event has been rejected by user")
           } else {
-            if (payToOpen.paymentPreimage().tryFailure(RuntimeException("rejected by user"))) {
-              log.info("payToOpen event has been rejected by user")
-            } else {
-              log.warn("success promise for $event has failed")
-            }
+            log.warn("success promise for $event has failed")
           }
-        } else {
-          log.info("ignored $event because payment_hash is unknown")
-        }
+        } ?: log.info("ignored $event because associated event for this payment_hash is unknown")
       }
       is PayToOpenRequestEvent -> {
-        log.info("peer sent an open channel request with payment_hash=${event.payToOpenRequest().paymentHash()}")
-        if (payToOpenMap.containsKey(event.payToOpenRequest().paymentHash())) {
-          log.info("received valid PayToOpen request with payment_hash=${event.payToOpenRequest().paymentHash()}, ask for user permission")
-          payToOpenMap[event.payToOpenRequest().paymentHash()]!!.event = event
-          EventBus.getDefault().post(event)
-        } else {
-          log.info("$event is unknown")
-          event.paymentPreimage().tryFailure(RuntimeException("unknown payment hash"))
-        }
+        log.info("adding PendingPayToOpenRequest for payment_hash=${event.paymentHash()}")
+        payToOpenMap[event.paymentHash()] = event
+        EventBus.getDefault().post(event)
       }
       is PaymentLifecycle.PaymentSucceeded -> {
         postPayment(event.paymentHash())

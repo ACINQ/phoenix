@@ -49,6 +49,7 @@ import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.router.RouteParams
 import fr.acinq.eclair.router.Router
+import fr.acinq.eclair.router.TrampolineHop
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -149,7 +150,7 @@ class AppKitModel : ViewModel() {
                   val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
                   txsOut.forEach { txOut ->
                     list.add(Payment(PaymentDirection.OUTGOING(), Option.apply(null), ByteVector32.Zeroes(), Option.apply(null),
-                      Option.apply(Converter.sat2msat(txOut.amount())), Option.apply(null), `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED(),
+                      Option.apply(Converter.any2Msat(txOut.amount())), Option.apply(null), `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED(),
                       System.currentTimeMillis(), Option.apply(hc.waitingSince() * 1000), Option.apply(null)))
                   }
                 }
@@ -190,19 +191,14 @@ class AppKitModel : ViewModel() {
           val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
           val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
 
-          val preimage = fr.acinq.eclair.`package$`.`MODULE$`.randomBytes32()
-
-          // push preimage to node supervisor actor
-          it.kit.system().eventStream().publish(preimage)
-
           val f = Patterns.ask(it.kit.paymentHandler(),
             PaymentLifecycle.ReceivePayment(
               /* amount */ amount_opt,
               /* description */ description,
-              /* expiry seconds */ Option.apply(null),
+              /* expiry seconds */ Option.empty(),
               /* extra routing info */ routes,
               /* fallback onchain address */ Option.empty(),
-              /* payment preimage */ Option.apply(preimage),
+              /* payment preimage */ Option.empty(),
               /* allow multi part payment */ true), timeout)
           Await.result(f, awaitDuration) as PaymentRequest
         } ?: throw KitNotInitialized()
@@ -216,30 +212,34 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
-          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
-          else Channel.MIN_CLTV_EXPIRY()
+//          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
+//          else Channel.MIN_CLTV_EXPIRY()
 
-          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-            false, // never randomize on mobile
-            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-            1.0, // at most 100%
-            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
+//          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
+//          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
+//            false, // never randomize on mobile
+//            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
+//            1.0, // at most 100%
+//            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
           val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
 
+          val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), 144, MilliSatoshi(100), true)
+          val trampolines = ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(trampoline)
+
           val sendRequest = PaymentInitiator.SendPaymentRequest(
-            /* amount */ amount.amount(),
+            /* amount */ amount,
             /* paymentHash */ paymentRequest.paymentHash(),
             /* target */ paymentRequest.nodeId(),
             /* max attempts */ 10,
             /* predefined route */ predefRoutes,
             /* payment request */ Option.apply(paymentRequest),
             /* assisted routes */ paymentRequest.routingInfo(), // assistedRoutes,
+            /* trampoline hops */ trampolines,
             /* cltv expiry */ Channel.MIN_CLTV_EXPIRY(),
             /* route params */ Option.apply(null),
             /* allow amp */ paymentRequest.features().allowMultiPart(),
-            /* amp total amount */ Option.apply(amount.amount()))
+            /* amp total amount */ Option.apply(amount))
 
           it.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
         } ?: log.warn("tried to send a payment but app kit is not initialized!!")

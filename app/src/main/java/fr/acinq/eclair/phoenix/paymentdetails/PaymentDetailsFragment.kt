@@ -27,7 +27,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.MilliSatoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
@@ -82,15 +82,15 @@ class PaymentDetailsFragment : BaseFragment() {
                   mBinding.statusText.text = Html.fromHtml(context!!.getString(R.string.paymentdetails_status_sent_successful, completedAtDate))
                 }
               }
-              mBinding.amountValue.setAmount(MilliSatoshi(p.amountMsat()))
+              mBinding.amountValue.setAmount(p.amount())
             }
             it.isRight -> {
               val p = it.right().get()
-              if (p.amountMsat_opt().isDefined) {
+              if (p.amount_opt().isDefined) {
                 mBinding.amountLabel.text = context!!.getString(R.string.paymentdetails_amount_received_successful_label)
                 val receivedAt = if (p.receivedAt_opt().isDefined) DateFormat.getDateTimeInstance().format(p.receivedAt_opt().get()) else context!!.getString(R.string.utils_unknown)
                 mBinding.statusText.text = Html.fromHtml(context!!.getString(R.string.paymentdetails_status_received_successful, receivedAt))
-                mBinding.amountValue.setAmount(MilliSatoshi(p.amountMsat_opt().get() as Long))
+                mBinding.amountValue.setAmount(MilliSatoshi(p.amount_opt().get() as Long))
               } else {
                 mBinding.amountLabel.text = context!!.getString(R.string.paymentdetails_amount_received_pending_label)
                 mBinding.statusText.text = Html.fromHtml(context!!.getString(R.string.paymentdetails_status_received_pending))

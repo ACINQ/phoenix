@@ -33,7 +33,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
-import fr.acinq.bitcoin.MilliSatoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomCoinViewBinding
@@ -151,7 +151,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
   }
 
   fun setAmount(amount: Satoshi) {
-    _amount = Option.apply(Converter.sat2msat(amount))
+    _amount = Option.apply(Converter.any2Msat(amount))
     refreshFields()
   }
 

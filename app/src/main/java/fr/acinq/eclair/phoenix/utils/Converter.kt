@@ -19,8 +19,12 @@ package fr.acinq.eclair.phoenix.utils
 import android.content.Context
 import android.text.Html
 import android.text.Spanned
-import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.Btc
+import fr.acinq.bitcoin.BtcAmount
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.`package$`
 import fr.acinq.eclair.CoinUtils
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.eclair.phoenix.R
 import org.slf4j.LoggerFactory
@@ -43,11 +47,14 @@ object Converter {
     FIAT_FORMAT.maximumFractionDigits = 2
   }
 
-  private fun rawAmount(amount: BtcAmount, context: Context): BigDecimal {
-    return CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal()
-  }
+  fun printAmountRaw(amount: BtcAmount, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
+  fun printAmountRaw(amount: MilliSatoshi, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
 
-  fun printAmountRaw(amount: BtcAmount, context: Context): String = rawAmount(amount, context).toPlainString()
+  fun printAmountPretty(amount: MilliSatoshi, context: Context, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
+    val unit = Prefs.getCoinUnit(context)
+    val formatted = `CoinUtils$`.`MODULE$`.formatAmountInUnit(amount, unit, false)
+    return formatAnyAmount(context, formatted, unit.code(), withUnit, withSign, isOutgoing)
+  }
 
   fun printAmountPretty(amount: BtcAmount, context: Context, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
     val unit = Prefs.getCoinUnit(context)
@@ -93,7 +100,8 @@ object Converter {
   fun convertMsatToFiat(context: Context, amount: MilliSatoshi): BigDecimal {
     val fiat = Prefs.getFiatCurrency(context)
     val rate = Prefs.getExchangeRate(context, fiat)
-    return `package$`.`MODULE$`.millisatoshi2btc(amount).amount().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
+
+    return `package$`.`MODULE$`.satoshi2btc(amount.truncateToSatoshi()).amount().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
   }
 
   /**
@@ -106,7 +114,7 @@ object Converter {
   fun convertFiatToMsat(context: Context, amount: String): MilliSatoshi {
     val fiat = Prefs.getFiatCurrency(context)
     val rate = Prefs.getExchangeRate(context, fiat)
-    return `package$`.`MODULE$`.btc2millisatoshi(Btc(`BigDecimal$`.`MODULE$`.apply(amount).`$div`(scala.math.BigDecimal.decimal(rate))))
+    return any2Msat(Btc(`BigDecimal$`.`MODULE$`.apply(amount).`$div`(scala.math.BigDecimal.decimal(rate))))
   }
 
   /**
@@ -147,6 +155,9 @@ object Converter {
     }
   }
 
-  fun sat2msat(amount: Satoshi): MilliSatoshi = fr.acinq.bitcoin.`package$`.`MODULE$`.satoshi2millisatoshi(amount)
-  fun msat2sat(amount: MilliSatoshi): Satoshi = fr.acinq.bitcoin.`package$`.`MODULE$`.millisatoshi2satoshi(amount)
+  fun any2Msat(amount: BtcAmount): MilliSatoshi {
+    return MilliSatoshi.toMilliSatoshi(amount)
+  }
+
+  fun msat2sat(amount: MilliSatoshi): Satoshi = amount.truncateToSatoshi()
 }

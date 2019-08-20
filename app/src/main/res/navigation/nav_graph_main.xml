@@ -192,7 +192,7 @@
       android:name="fundingSat"
       app:argType="long" />
     <argument
-      android:name="pushMsat"
+      android:name="amountMsat"
       app:argType="long" />
     <argument
       android:name="feeSat"

@@ -17,7 +17,7 @@
 package fr.acinq.eclair.phoenix.events
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.MilliSatoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 
 class PaymentEvent(val paymentHash: ByteVector32?)
