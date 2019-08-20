@@ -155,6 +155,7 @@ class EclairSupervisor : UntypedActor() {
         postPayment(event.paymentHash())
       }
       is PaymentLifecycle.PaymentFailed -> {
+        log.info("payment has failed ${event.failures().mkString(", ")}")
         postPayment(event.paymentHash())
       }
       is PaymentReceived -> {

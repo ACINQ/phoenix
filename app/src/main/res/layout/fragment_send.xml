@@ -110,19 +110,76 @@
         app:layout_constraintTop_toBottomOf="@id/balance_separator"
         android:visibility="@{model.isFormVisible()}">
 
-        <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+        <EditText
           android:id="@+id/amount"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constrainedHeight="true"
+          app:layout_constraintEnd_toStartOf="@id/unit"
+          app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          android:background="@drawable/line_dots"
-          android:layerType="software"
-          app:amount_size="48sp"
-          app:editable="true"
-          app:unit_size="@dimen/text_md" />
+          android:background="@null"
+          android:fontFamily="sans-serif-light"
+          android:importantForAutofill="no"
+          android:inputType="numberDecimal"
+          android:minWidth="16dp"
+          android:overScrollMode="always"
+          android:singleLine="true"
+          android:text=""
+          android:textSize="48sp"
+          tools:ignore="LabelFor" />
+
+        <Spinner
+          android:id="@+id/unit"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/space_xxs"
+          android:layout_marginStart="@dimen/space_xs"
+          app:layout_constraintBaseline_toBaselineOf="@+id/amount"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/amount"
+          android:background="@drawable/spinner_bg"
+          android:paddingLeft="@dimen/space_xs"
+          android:paddingTop="@dimen/space_xxs"
+          android:paddingRight="@dimen/space_md_p"
+          android:paddingBottom="@dimen/space_xxs"
+          android:spinnerMode="dialog" />
+
+        <TextView
+          android:id="@+id/amount_converted"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          app:layout_constraintTop_toBottomOf="@id/amount"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constrainedWidth="true"
+          android:textColor="?attr/defaultMutedTextColor"
+          android:textSize="@dimen/text_md" />
+
+        <TextView
+          android:id="@+id/amount_error"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          app:layout_constraintTop_toBottomOf="@id/amount"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constrainedWidth="true"
+          android:text="@string/send_amount_error"
+          android:textAlignment="center"
+          android:textColor="?attr/defaultErrorTextColor"
+          android:textSize="@dimen/text_md"
+          android:visibility="@{model.errorInAmount}" />
+
+        <androidx.constraintlayout.widget.Barrier
+          android:id="@+id/amount_feedback_barrier"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:barrierDirection="bottom"
+          app:constraint_referenced_ids="amount_converted, amount_error" />
 
         <TextView
           android:id="@+id/destination_label"
@@ -140,12 +197,12 @@
           android:id="@+id/destination_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginEnd="@dimen/space_lg"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/destination_label"
-          app:layout_constraintTop_toBottomOf="@id/amount"
+          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
           android:ellipsize="end"
           android:singleLine="true"
           android:text="@{model.destination}"

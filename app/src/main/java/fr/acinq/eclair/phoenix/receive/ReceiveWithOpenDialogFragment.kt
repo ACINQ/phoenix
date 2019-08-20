@@ -29,6 +29,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.MilliSatoshi
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.phoenix.AppKitModel
 import fr.acinq.eclair.phoenix.R
@@ -69,8 +70,8 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     context?.let {
-      mBinding.desc.text = Html.fromHtml(getString(R.string.receive_with_open_desc, Converter.formatAmount(Satoshi(args.fundingSat), it, withUnit = true)))
-      mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost, Converter.formatAmount(Satoshi(args.feeSat), it, withUnit = true)))
+      mBinding.desc.text = Html.fromHtml(getString(R.string.receive_with_open_desc, Converter.printAmountPretty(MilliSatoshi(args.pushMsat), it, withUnit = true)))
+      mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost, Converter.printAmountPretty(Satoshi(args.feeSat), it, withUnit = true)))
     }
   }
 

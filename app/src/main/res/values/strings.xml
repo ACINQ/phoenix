@@ -108,6 +108,7 @@
   <string name="send_balance_prefix">You have</string>
   <string name="send_loading">Checking payment…</string>
   <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
+  <string name="send_amount_error">Please enter a valid amount.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">for</string>
   <string name="send_pay_button">Pay</string>
@@ -128,8 +129,11 @@
 
   <!-- //////////////// utilities strings //////////////// -->
 
+  <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
+  <string name="utils_converted_amount">≈ %1$s</string>
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>
   <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>

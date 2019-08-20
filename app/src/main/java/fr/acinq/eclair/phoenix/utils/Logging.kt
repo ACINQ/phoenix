@@ -51,6 +51,7 @@ object Logging {
 
     // set level
     lc.getLogger("fr.acinq.eclair.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
+    lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
     if (BuildConfig.DEBUG) {
       lc.getLogger("io.netty").level = Level.DEBUG
     } else {

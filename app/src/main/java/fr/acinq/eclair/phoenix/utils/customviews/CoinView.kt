@@ -17,8 +17,10 @@
 package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.os.Build
+import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -45,7 +47,15 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
   private val log = LoggerFactory.getLogger(CoinView::class.java)
 
   val mBinding: CustomCoinViewBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.custom_coin_view, this, true)
+  private var _amount: Option<MilliSatoshi> = Option.apply(null)
   private var isEditable: Boolean = false
+
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+    when (key) {
+      Prefs.PREFS_SHOW_AMOUNT_IN_FIAT -> refreshFields()
+      else -> {}
+    }
+  }
 
   init {
     attrs?.let {
@@ -56,7 +66,10 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
         mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
-        val coinUnit = Prefs.getCoin(context)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs.registerOnSharedPreferenceChangeListener(prefsListener)
+
+        val coinUnit = Prefs.getCoinUnit(context)
         isEditable = arr.getBoolean(R.styleable.CoinView_editable, false)
         if (isEditable) {
           if (arr.hasValue(R.styleable.CoinView_hint)) {
@@ -85,9 +98,18 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
         handleEmptyAmountIfEditable()
 
-        mBinding.unit.text = coinUnit.code()
         mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
         mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
+
+        if (!isEditable) {
+          mBinding.clickable.setOnClickListener {
+            val showAmountInFiat = Prefs.getShowAmountInFiat(context)
+            Prefs.setShowAmountInFiat(context, !showAmountInFiat)
+          }
+        } else {
+          mBinding.clickable.visibility = View.GONE
+        }
+
       } catch (e: Exception) {
         arr.recycle()
       }
@@ -108,9 +130,9 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     return mBinding.amount.baseline
   }
 
-  fun setAmountWatcher(textWatcher: TextWatcher) {
-    mBinding.amount.addTextChangedListener(textWatcher)
-  }
+//  fun setAmountWatcher(textWatcher: TextWatcher) {
+//    mBinding.amount.addTextChangedListener(textWatcher)
+//  }
 
   fun handleEmptyAmountIfEditable() {
     if (isEditable) {
@@ -129,17 +151,43 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
   }
 
   fun setAmount(amount: Satoshi) {
-    setAmount(Converter.sat2msat(amount))
+    _amount = Option.apply(Converter.sat2msat(amount))
+    refreshFields()
   }
 
   fun setAmount(amount: MilliSatoshi) {
-    if (isEditable) {
-      mBinding.amount.setText(Converter.rawAmountPrint(amount, context))
-      handleEmptyAmountIfEditable()
+    _amount = Option.apply(amount)
+    refreshFields()
+  }
+
+  private fun refreshFields() {
+    val showAmountInFiat = Prefs.getShowAmountInFiat(context)
+    val coinUnit = Prefs.getCoinUnit(context)
+    if (_amount.isDefined) {
+      if (showAmountInFiat) {
+        if (isEditable) {
+          mBinding.amount.setText(Converter.printFiatRaw(context, _amount.get()))
+          mBinding.hint.text = context.getString(R.string.utils_default_coin_view_hint, coinUnit.code())
+          handleEmptyAmountIfEditable()
+        } else {
+          mBinding.amount.setText(Converter.printFiatPretty(context, _amount.get()))
+        }
+        mBinding.unit.text = Prefs.getFiatCurrency(context)
+      } else {
+        if (isEditable) {
+          mBinding.amount.setText(Converter.printAmountRaw(_amount.get(), context))
+          mBinding.hint.text = context.getString(R.string.utils_default_coin_view_hint, coinUnit.code())
+          handleEmptyAmountIfEditable()
+        } else {
+          mBinding.amount.setText(Converter.printAmountPretty(_amount.get(), context))
+        }
+        mBinding.unit.text = coinUnit.code()
+      }
     } else {
-      mBinding.amount.setText(Converter.formatAmount(amount, context))
+      mBinding.amount.setText("")
     }
-    mBinding.unit.text = Prefs.getCoin(context).code()
+    invalidate()
+    requestLayout()
   }
 
   open class CoinViewWatcher : TextWatcher {

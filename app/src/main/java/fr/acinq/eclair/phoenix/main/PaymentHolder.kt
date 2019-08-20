@@ -26,7 +26,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.google.common.base.Strings
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
@@ -67,7 +66,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
         // amount
         if (payment.finalAmount().isDefined) {
-          amountView.text = Converter.formatAmount(payment.finalAmount().get(), itemView.context, false, true, isPaymentOutgoing)
+          amountView.text = Converter.printAmountPretty(payment.finalAmount().get(), itemView.context, false, true, isPaymentOutgoing)
         } else {
           amountView.text = itemView.context.getString(R.string.utils_unknown)
         }

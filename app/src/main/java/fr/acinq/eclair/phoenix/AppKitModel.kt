@@ -35,10 +35,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.bitcoin.`package$`
 import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
-import fr.acinq.eclair.channel.Channel
-import fr.acinq.eclair.channel.ChannelEvent
-import fr.acinq.eclair.channel.RES_GETINFO
-import fr.acinq.eclair.channel.State
+import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.BackupEvent
 import fr.acinq.eclair.db.IncomingPayment
@@ -202,7 +199,7 @@ class AppKitModel : ViewModel() {
 
   @UiThread
   fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, checkFees: Boolean = false) {
-    log.info("sending payment request $paymentRequest")
+    log.info("sending $amount for pr $paymentRequest")
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
@@ -276,7 +273,7 @@ class AppKitModel : ViewModel() {
 
           it.kit.switchboard()
 
-          getChannels(null).map { res ->
+          getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("init closing of channel=$channelId")
             closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, timeout))
@@ -476,6 +473,6 @@ class AppKitModel : ViewModel() {
     } catch (e: Exception) {
       log.debug("could not read {} from price api response", code)
     }
-    Prefs.setExhangeRate(context, code, rate)
+    Prefs.setExchangeRate(context, code, rate)
   }
 }

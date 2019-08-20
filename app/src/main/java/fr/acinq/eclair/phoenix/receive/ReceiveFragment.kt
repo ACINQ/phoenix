@@ -21,9 +21,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -31,17 +34,23 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.acinq.bitcoin.MilliSatoshi
+import fr.acinq.eclair.`BtcUnit$`
+import fr.acinq.eclair.`MBtcUnit$`
+import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.eclair.phoenix.utils.Converter
+import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import scala.Option
 
 class ReceiveFragment : BaseFragment() {
 
@@ -69,7 +78,7 @@ class ReceiveFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      ArrayAdapter.createFromResource(it, R.array.units_array, android.R.layout.simple_spinner_item).also { adapter ->
+      ArrayAdapter(it, android.R.layout.simple_spinner_item, listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.amountUnit.adapter = adapter
       }
@@ -81,6 +90,7 @@ class ReceiveFragment : BaseFragment() {
         model.generateQrCodeBitmap()
       }
     })
+
     model.bitmap.observe(viewLifecycleOwner, Observer { bitmap ->
       if (bitmap != null) {
         mBinding.qrImage.setImageBitmap(bitmap)
@@ -95,6 +105,25 @@ class ReceiveFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
+    mBinding.amountValue.addTextChangedListener(object : TextWatcher {
+      override fun afterTextChanged(s: Editable?) {
+      }
+
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+      }
+
+      override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        refreshConversionDisplay()
+      }
+    })
+    mBinding.amountUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      override fun onNothingSelected(parent: AdapterView<*>?) {
+      }
+
+      override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        refreshConversionDisplay()
+      }
+    }
     mBinding.generateButton.setOnClickListener {
       generatePaymentRequest()
     }
@@ -139,9 +168,35 @@ class ReceiveFragment : BaseFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
-      val amount_opt = Converter.string2Msat_opt(mBinding.amountValue.text.toString(), context!!)
       val desc = mBinding.descValue.text.toString()
-      model.paymentRequest.value = appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, amount_opt)
+      model.paymentRequest.value = appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount())
+    }
+  }
+
+  private fun refreshConversionDisplay() {
+    context?.let {
+      try {
+        val amount = extractAmount()
+        val unit = mBinding.amountUnit.selectedItem.toString()
+        if (unit == Prefs.getFiatCurrency(it)) {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), it, withUnit = true))
+        } else {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
+        }
+      } catch (e: Exception) {
+        log.info("could not extract amount: ", e)
+        mBinding.amountConverted.text = ""
+      }
+    }
+  }
+
+  private fun extractAmount(): Option<MilliSatoshi> {
+    val unit = mBinding.amountUnit.selectedItem.toString()
+    val amount = mBinding.amountValue.text.toString()
+    return if (unit == Prefs.getFiatCurrency(context!!)) {
+      Option.apply(Converter.convertFiatToMsat(context!!, amount))
+    } else {
+      Converter.string2Msat_opt(amount, unit)
     }
   }
 

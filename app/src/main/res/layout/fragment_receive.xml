@@ -107,12 +107,25 @@
           android:paddingBottom="@dimen/space_xs"
           android:spinnerMode="dialog" />
 
+        <TextView
+          android:id="@+id/amount_converted"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xxs"
+          app:layout_constraintTop_toBottomOf="@id/amount_value_layout"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintHorizontal_bias="0"
+          android:textColor="?attr/defaultMutedTextColor"
+          android:textSize="@dimen/text_sm" />
+
         <com.google.android.material.textfield.TextInputLayout
           android:id="@+id/desc_value_layout"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_sm"
-          app:layout_constraintTop_toBottomOf="@id/amount_value_layout"
+          app:layout_constraintTop_toBottomOf="@id/amount_converted"
           android:hint="@string/receive_desc_hint"
           android:textColorHint="?attr/defaultMutedTextColor"
           app:hintAnimationEnabled="false">
@@ -130,7 +143,7 @@
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/generate_button"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:layout_constraintTop_toBottomOf="@id/desc_value_layout"
@@ -144,7 +157,7 @@
           android:id="@+id/progress_bar"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           app:layout_constraintTop_toBottomOf="@id/desc_value_layout"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
@@ -160,10 +173,10 @@
         android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/invoice_params_layout"
-        android:visibility="@{model.state == PaymentGenerationState.ERROR}"
+        android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_error_message"
-        android:drawableStart="@drawable/ic_alert_triangle" />
+        android:visibility="@{model.state == PaymentGenerationState.ERROR}" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

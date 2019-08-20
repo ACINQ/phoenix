@@ -64,7 +64,7 @@ class CloseAllChannelsFragment : BaseFragment() {
       model.state.value = ClosingChannelsState.CHECKING_CHANNELS
       val channels = appKit.getChannels(null)
       val normals = channels.filter { c -> c.state() == `NORMAL$`.`MODULE$` }
-      if (normals.isEmpty() || channels.count() > normals.count()) {
+      if (normals.isEmpty()) {
         model.state.value = ClosingChannelsState.NO_CHANNELS
       } else {
         model.state.value = ClosingChannelsState.READY

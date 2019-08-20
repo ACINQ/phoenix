@@ -29,7 +29,7 @@
     <layer-list>
       <item
         android:id="@android:id/background"
-        android:drawable="@drawable/rounded" />
+        android:drawable="@drawable/rounded_border" />
       <item
         android:width="@dimen/text_lg"
         android:height="@dimen/text_lg"

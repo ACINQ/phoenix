@@ -37,13 +37,14 @@ import scala.util.Left
 import scala.util.Right
 
 enum class SendState {
-  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, ERROR_IN_AMOUNT, SWAPPING, SWAPPING_ERROR, SWAP_CONFIRM, SENDING
+  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, SWAPPING, SWAPPING_ERROR, SWAP_CONFIRM, SENDING
 }
 
 class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
   val state = MutableLiveData<SendState>()
+  val errorInAmount = MutableLiveData(false)
   val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request
@@ -70,7 +71,7 @@ class SendViewModel : ViewModel() {
   }
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
-    state == SendState.VALID_INVOICE || state == SendState.ERROR_IN_AMOUNT || state == SendState.SENDING
+    state == SendState.VALID_INVOICE || state == SendState.SENDING
   }
 
   // ---- end of computed values

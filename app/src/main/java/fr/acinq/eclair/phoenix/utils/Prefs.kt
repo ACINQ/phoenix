@@ -27,6 +27,8 @@ object Prefs {
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
+  const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
+  private const val PREFS_FIAT_CURRENCY: String = "PREFS_FIAT_CURRENCY"
   private const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
@@ -39,8 +41,12 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
   }
 
-  fun getCoin(context: Context): CoinUnit {
+  fun getCoinUnit(context: Context): CoinUnit {
     return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_COIN_UNIT, SatUnit.code()))
+  }
+
+  fun setCoinUnit(context: Context, unit: CoinUnit) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_COIN_UNIT, unit.code()).apply()
   }
 
   fun isSeedEncrypted(context: Context): Boolean {
@@ -63,8 +69,8 @@ object Prefs {
     return PreferenceManager.getDefaultSharedPreferences(context).getFloat(PREFS_EXCHANGE_RATE_PREFIX + code.toUpperCase(), -1.0f)
   }
 
-  fun setExhangeRate(context: Context, code: String, rate: Float) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat(PREFS_EXCHANGE_RATE_PREFIX + code, rate).apply()
+  fun setExchangeRate(context: Context, code: String, rate: Float) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putFloat(PREFS_EXCHANGE_RATE_PREFIX + code.toUpperCase(), rate).apply()
   }
 
   fun getExchangeRateTimestamp(context: Context): Long {
@@ -73,5 +79,21 @@ object Prefs {
 
   fun setExchangeRateTimestamp(context: Context, timestamp: Long) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_EXCHANGE_RATE_TIMESTAMP, timestamp).apply()
+  }
+
+  fun getShowAmountInFiat(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
+  }
+
+  fun setShowAmountInFiat(context: Context, amountInFiat: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, amountInFiat).apply()
+  }
+
+  fun getFiatCurrency(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_FIAT_CURRENCY, "USD") ?: "USD"
+  }
+
+  fun setFiatCurrency(context: Context, code: String) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
   }
 }

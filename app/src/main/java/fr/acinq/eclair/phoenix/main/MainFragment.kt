@@ -81,7 +81,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       mBinding.balance.setAmount(it.balance)
     })
     model.payments.observe(viewLifecycleOwner, Observer {
-      paymentsAdapter.update(it, "usd", Prefs.getCoin(context!!), displayAmountAsFiat = false)
+      paymentsAdapter.update(it, "usd", Prefs.getCoinUnit(context!!), displayAmountAsFiat = false)
     })
     model.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
