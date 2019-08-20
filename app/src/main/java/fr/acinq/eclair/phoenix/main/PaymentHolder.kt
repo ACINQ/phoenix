@@ -126,7 +126,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     // clickable action
     itemView.setOnClickListener {
-      val action = MainFragmentDirections.actionMainToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing) payment.id().get().toString() else payment.paymentHash().toString())
+      val action = MainFragmentDirections.actionMainToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString())
       itemView.findNavController().navigate(action)
     }
   }

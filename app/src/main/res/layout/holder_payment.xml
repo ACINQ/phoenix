@@ -102,6 +102,6 @@
     app:layout_constraintStart_toStartOf="@id/description"
     app:layout_constraintTop_toBottomOf="@id/description"
     android:textColor="?attr/defaultMutedTextColor"
-    android:textSize="@dimen/text_xs" />
+    android:textSize="@dimen/text_sm" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

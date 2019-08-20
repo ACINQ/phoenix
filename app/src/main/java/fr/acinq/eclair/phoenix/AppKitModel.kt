@@ -37,10 +37,7 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.crypto.LocalKeyManager
-import fr.acinq.eclair.db.BackupEvent
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.Payment
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.PaymentEvent
@@ -144,6 +141,22 @@ class AppKitModel : ViewModel() {
         _kit.value?.let {
           val list = mutableListOf<Payment>()
           val t = measureTimeMillis {
+            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedChannels()).asJava()
+            closed.forEach { hc ->
+              if (hc is DATA_CLOSING) {
+                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
+                txs.forEach { tx ->
+                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
+                  txsOut.forEach { txOut ->
+                    list.add(Payment(PaymentDirection.OUTGOING(), Option.apply(null), ByteVector32.Zeroes(), Option.apply(null),
+                      Option.apply(Converter.sat2msat(txOut.amount())), Option.apply(null), `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED(),
+                      System.currentTimeMillis(), Option.apply(hc.waitingSince() * 1000), Option.apply(null)))
+                  }
+                }
+              } else {
+                log.info("closed channel is not DATA_CLOSING type")
+              }
+            }
             list.addAll(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
           }
           log.info("payment list query complete in ${t}ms")
