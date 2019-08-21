@@ -32,7 +32,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
-import fr.acinq.bitcoin.`package$`
 import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
@@ -47,8 +46,6 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
-import fr.acinq.eclair.router.RouteParams
-import fr.acinq.eclair.router.Router
 import fr.acinq.eclair.router.TrampolineHop
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
@@ -66,7 +63,6 @@ import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
-import scala.math.BigDecimal
 import scala.util.Left
 import scodec.bits.`ByteVector$`
 import java.io.IOException
@@ -212,20 +208,28 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
-//          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
-//          else Channel.MIN_CLTV_EXPIRY()
+          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
+          else Channel.MIN_CLTV_EXPIRY()
 
-//          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-//          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-//            false, // never randomize on mobile
-//            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-//            1.0, // at most 100%
-//            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
+          //          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
+          //          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
+          //            false, // never randomize on mobile
+          //            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
+          //            1.0, // at most 100%
+          //            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
 
           val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
 
-          val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), 144, MilliSatoshi(100), true)
-          val trampolines = ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(trampoline)
+          val trampolines = if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) {
+            // direct payment to ACINQ: no trampoline
+            ScalaList.empty<TrampolineHop>()
+          } else if (paymentRequest.routingInfo().nonEmpty() && paymentRequest.routingInfo().head().nonEmpty() && paymentRequest.routingInfo().head().head().nodeId() == Wallet.ACINQ.nodeId()) {
+            // payment to another phoenix: no trampoline
+            ScalaList.empty<TrampolineHop>()
+          } else {
+            val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), 200, MilliSatoshi(100), true)
+            ScalaList.empty<TrampolineHop>().`$colon$colon`(trampoline)
+          }
 
           val sendRequest = PaymentInitiator.SendPaymentRequest(
             /* amount */ amount,
@@ -236,9 +240,9 @@ class AppKitModel : ViewModel() {
             /* payment request */ Option.apply(paymentRequest),
             /* assisted routes */ paymentRequest.routingInfo(), // assistedRoutes,
             /* trampoline hops */ trampolines,
-            /* cltv expiry */ Channel.MIN_CLTV_EXPIRY(),
+            /* cltv expiry */ finalCltvExpiry + 1,
             /* route params */ Option.apply(null),
-            /* allow amp */ paymentRequest.features().allowMultiPart(),
+            /* allow amp */ paymentRequest.features().allowMultiPart() && trampolines.isEmpty,
             /* amp total amount */ Option.apply(amount))
 
           it.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
