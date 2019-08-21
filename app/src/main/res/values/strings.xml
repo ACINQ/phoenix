@@ -114,9 +114,9 @@
   <string name="send_pay_button">Pay</string>
   <string name="send_cancel_button">Decline</string>
   <string name="send_pay_button_for_swap">Next</string>
-  <string name="send_swap_in_progress">Submarine swap in progress…</string>
-  <string name="send_swap_error">Swapping failed. Please try again.</string>
-  <string name="send_swap_confirm_instructions">Submarine swap placeholder text.\n\nYou\'ll send: %1$s\nPrice is: %2$s</string>
+  <string name="send_swap_in_progress">Swap in progress…</string>
+  <string name="send_swap_error">Swap failed. Please try again.</string>
+  <string name="send_swap_confirm_instructions">You\'ll send: %1$s\nPrice is: %2$s</string>
   <string name="send_swap_confirm_confirm_button">Confirm and send</string>
   <string name="send_swap_confirm_cancel_button">Cancel</string>
 
@@ -210,7 +210,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Application logs</string>
-  <string name="logs_instructions">You can extract and share the application logs.</string>
+  <string name="logs_instructions">You can extract and share the application logs from this page.</string>
   <string name="logs_share_button">Share…</string>
   <string name="logs_share_subject">Phoenix App logs</string>
   <string name="logs_share_title">Share Phoenix logs…</string>
@@ -221,7 +221,7 @@
   <string name="paymentdetails_loading">Retrieving payment details…</string>
   <string name="paymentdetails_error">This payment could not be found…</string>
 
-  <string name="paymentdetails_status_sent_pending"><![CDATA[Payment is <b>pending</b> since %1$s]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[Payment has been <b>pending</b> since %1$s]]></string>
   <string name="paymentdetails_status_sent_failed"><![CDATA[Payment has <b>failed</b>.<br />No money has been sent.]]></string>
   <string name="paymentdetails_status_sent_successful"><![CDATA[Payment <b>sent</b> on %1$s!]]></string>
 
