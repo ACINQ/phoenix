@@ -52,12 +52,12 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/top_section">
-      <CustomAttribute
-        app:attributeName="amountSize"
-        app:customFloatValue="48" />
-      <CustomAttribute
-        app:attributeName="unitSize"
-        app:customFloatValue="22" />
+      <!--<CustomAttribute-->
+        <!--app:attributeName="amountSize"-->
+        <!--app:customFloatValue="48" />-->
+      <!--<CustomAttribute-->
+        <!--app:attributeName="unitSize"-->
+        <!--app:customFloatValue="22" />-->
     </Constraint>
   </ConstraintSet>
 
@@ -85,12 +85,12 @@
       app:layout_constraintBottom_toBottomOf="@id/top_section"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent">
-      <CustomAttribute
-        app:attributeName="amountSize"
-        app:customFloatValue="38" />
-      <CustomAttribute
-        app:attributeName="unitSize"
-        app:customFloatValue="20" />
+      <!--<CustomAttribute-->
+        <!--app:attributeName="amountSize"-->
+        <!--app:customFloatValue="38" />-->
+      <!--<CustomAttribute-->
+        <!--app:attributeName="unitSize"-->
+        <!--app:customFloatValue="20" />-->
     </Constraint>
 
   </ConstraintSet>
