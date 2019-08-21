@@ -51,7 +51,7 @@ class MainViewModel : ViewModel() {
     } else {
       notifications.value?.remove(NotificationTypes.MNEMONICS_NEVER_SEEN)
       if (System.currentTimeMillis() - timestamp > MNEMONICS_REMINDER_INTERVAL) {
-        notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+        //notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
       } else {
         notifications.value?.remove(NotificationTypes.MNEMONICS_REMINDER)
       }

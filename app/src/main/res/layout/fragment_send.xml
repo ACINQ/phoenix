@@ -124,7 +124,7 @@
           android:fontFamily="sans-serif-light"
           android:importantForAutofill="no"
           android:inputType="numberDecimal"
-          android:minWidth="16dp"
+          android:minWidth="32dp"
           android:overScrollMode="always"
           android:singleLine="true"
           android:text=""

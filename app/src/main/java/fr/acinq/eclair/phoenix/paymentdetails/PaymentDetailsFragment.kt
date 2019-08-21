@@ -90,7 +90,7 @@ class PaymentDetailsFragment : BaseFragment() {
                 mBinding.amountLabel.text = context!!.getString(R.string.paymentdetails_amount_received_successful_label)
                 val receivedAt = if (p.receivedAt_opt().isDefined) DateFormat.getDateTimeInstance().format(p.receivedAt_opt().get()) else context!!.getString(R.string.utils_unknown)
                 mBinding.statusText.text = Html.fromHtml(context!!.getString(R.string.paymentdetails_status_received_successful, receivedAt))
-                mBinding.amountValue.setAmount(MilliSatoshi(p.amount_opt().get() as Long))
+                mBinding.amountValue.setAmount(p.amount_opt().get())
               } else {
                 mBinding.amountLabel.text = context!!.getString(R.string.paymentdetails_amount_received_pending_label)
                 mBinding.statusText.text = Html.fromHtml(context!!.getString(R.string.paymentdetails_status_received_pending))

@@ -93,7 +93,7 @@
 
   <!-- //////////////// receive with open channel //////////////// -->
 
-  <string name="receive_with_open_title">Incoming Swap Payment</string>
+  <string name="receive_with_open_title">Incoming Payment</string>
   <string name="receive_with_open_help_desc">What\'s this?</string>
   <string name="receive_with_open_help">A swap payment converts a classic on-chain transaction into an instant Lightning payment in a trustless fashion. A fee is applied to cover the miners fees.</string>
   <string name="receive_with_open_amount_label">Someone wants to send you</string>

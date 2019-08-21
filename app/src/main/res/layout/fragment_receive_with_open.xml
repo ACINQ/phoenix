@@ -89,7 +89,7 @@
         android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/defaultMutedBackgroundColor"
         android:padding="@dimen/space_sm"
-        android:text="@string/receive_with_open_help"
+        android:text="@string/lipsum_short"
         android:textColor="?attr/defaultMutedTextColor"
         android:textSize="@dimen/text_sm"
         android:visibility="@{model.showHelp}" />
