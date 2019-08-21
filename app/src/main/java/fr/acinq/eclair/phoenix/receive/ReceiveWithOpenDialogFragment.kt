@@ -70,7 +70,8 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     context?.let {
-      mBinding.desc.text = Html.fromHtml(getString(R.string.receive_with_open_desc, Converter.printAmountPretty(MilliSatoshi(args.amountMsat), it, withUnit = true)))
+      mBinding.amountValue.text = Converter.printAmountPretty(MilliSatoshi(args.amountMsat), it, withUnit = true)
+      mBinding.amountFiat.text = Html.fromHtml(getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, MilliSatoshi(args.amountMsat), withUnit = true)))
       mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost, Converter.printAmountPretty(Satoshi(args.feeSat), it, withUnit = true)))
     }
   }

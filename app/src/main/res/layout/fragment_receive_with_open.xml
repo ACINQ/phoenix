@@ -70,7 +70,7 @@
         app:layout_constraintBottom_toBottomOf="@id/title"
         app:layout_constraintStart_toEndOf="@id/title"
         android:background="@drawable/button_bg_square"
-        android:contentDescription="@string/receive_with_open_desc"
+        android:contentDescription="@string/receive_with_open_help_desc"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_help_circle"
         android:tint="?attr/defaultMutedTextColor" />
@@ -103,18 +103,46 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
       <TextView
-        android:id="@+id/desc"
+        android:id="@+id/amount_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginEnd="@dimen/space_lg"
         app:layout_constraintStart_toStartOf="parent"
-        android:lineSpacingMultiplier="1.25"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/title_sep"
-        android:text="@string/receive_with_open_desc"
+        android:text="@string/receive_with_open_amount_label"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/amount_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_xs"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toBottomOf="@id/amount_label"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/amount_fiat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        android:textColor="?attr/defaultMutedTextColor"
+        app:layout_constraintTop_toBottomOf="@id/amount_value"
+        android:textSize="@dimen/text_md"
         android:textAlignment="center" />
 
       <TextView
@@ -127,7 +155,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toBottomOf="@id/desc"
+        app:layout_constraintTop_toBottomOf="@id/amount_fiat"
         android:text="@string/receive_with_open_cost"
         android:textAlignment="center" />
 
