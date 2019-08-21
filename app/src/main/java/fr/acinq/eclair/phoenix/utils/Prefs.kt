@@ -17,6 +17,7 @@
 package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.MSatUnit
@@ -39,6 +40,10 @@ object Prefs {
 
   fun setHasStartedOnce(context: Context) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
+  }
+
+  fun getCoinUnit(prefs: SharedPreferences): CoinUnit {
+    return `CoinUtils$`.`MODULE$`.getUnitFromString(prefs.getString(PREFS_COIN_UNIT, SatUnit.code()))
   }
 
   fun getCoinUnit(context: Context): CoinUnit {
@@ -81,12 +86,20 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_EXCHANGE_RATE_TIMESTAMP, timestamp).apply()
   }
 
+  fun getShowAmountInFiat(prefs: SharedPreferences): Boolean {
+    return prefs.getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
+  }
+
   fun getShowAmountInFiat(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
   }
 
   fun setShowAmountInFiat(context: Context, amountInFiat: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, amountInFiat).apply()
+  }
+
+  fun getFiatCurrency(prefs: SharedPreferences): String {
+    return prefs.getString(PREFS_FIAT_CURRENCY, "USD") ?: "USD"
   }
 
   fun getFiatCurrency(context: Context): String {

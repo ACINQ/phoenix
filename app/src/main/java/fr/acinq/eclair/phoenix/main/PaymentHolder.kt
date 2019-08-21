@@ -50,6 +50,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
 
+    val primaryColor: Int = getAttrColor(R.attr.colorPrimary)
     val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
     val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
 
@@ -66,7 +67,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
         // amount
         if (payment.finalAmount().isDefined) {
-          amountView.text = Converter.printAmountPretty(payment.finalAmount().get(), itemView.context, false, true, isPaymentOutgoing)
+          if (displayAmountAsFiat) {
+            amountView.text = Converter.printFiatPretty(itemView.context, payment.finalAmount().get(), withUnit = false, withSign = true, isOutgoing = isPaymentOutgoing)
+          } else {
+            amountView.text = Converter.printAmountPretty(payment.finalAmount().get(), itemView.context, withUnit = false, withSign = true, isOutgoing = isPaymentOutgoing)
+          }
+
         } else {
           amountView.text = itemView.context.getString(R.string.utils_unknown)
         }
@@ -78,29 +84,52 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
         amountView.visibility = View.VISIBLE
         // unit
-        unitView.text = coinUnit.shortLabel().toUpperCase()
+        unitView.text = if (displayAmountAsFiat) fiatCode else coinUnit.shortLabel()
         unitView.visibility = View.VISIBLE
         // desc + avatar
         descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
-        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.athens))
+        avatarBgView.imageTintList = ColorStateList.valueOf(primaryColor)
         avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_success))
+
+        // timestamp
+        if (payment.completedAt().isDefined) {
+          val l: Long = payment.completedAt().get() as Long
+          val delaySincePayment: Long = l - System.currentTimeMillis()
+          timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
+          timestampView.visibility = View.VISIBLE
+        } else {
+          timestampView.visibility = View.GONE
+        }
       }
       `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
-        amountView.visibility = View.VISIBLE
-        amountView.text = itemView.context.getString(R.string.paymentholder_processing)
+        amountView.visibility = View.GONE
         unitView.visibility = View.GONE
         // desc + avatar
         descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
         avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.transparent))
         avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_pending))
+
+        timestampView.visibility = View.VISIBLE
+        timestampView.text = itemView.context.getString(R.string.paymentholder_processing)
       }
       `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
         amountView.visibility = View.GONE
         unitView.visibility = View.GONE
         // desc + avatar
         descriptionView.setTextColor(itemView.context.getColor(R.color.brandy))
-        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.dawn))
+        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.transparent))
         avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_failed))
+
+        // timestamp
+        if (payment.completedAt().isDefined) {
+          val l: Long = payment.completedAt().get() as Long
+          val delaySincePayment: Long = l - System.currentTimeMillis()
+          timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
+          timestampView.visibility = View.VISIBLE
+        } else {
+          timestampView.visibility = View.GONE
+        }
+
       }
     }
 
@@ -114,15 +143,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       descriptionView.setTextColor(defaultTextColor)
     }
 
-    // timestamp
-    if (payment.completedAt().isDefined) {
-      val l: Long = payment.completedAt().get() as Long
-      val delaySincePayment: Long = l - System.currentTimeMillis()
-      timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
-      timestampView.visibility = View.VISIBLE
-    } else {
-      timestampView.visibility = View.GONE
-    }
+
 
     // clickable action
     itemView.setOnClickListener {

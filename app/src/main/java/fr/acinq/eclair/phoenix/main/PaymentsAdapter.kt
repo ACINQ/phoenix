@@ -16,6 +16,8 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -23,34 +25,46 @@ import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.R
+import fr.acinq.eclair.phoenix.utils.Prefs
 
 class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerView.Adapter<PaymentHolder>() {
-  private var fiatCode = "usd"
-  private var coinUnit = CoinUtils.getUnitFromString("btc")
+
+  private var fiat = "usd"
+  private var coin = CoinUtils.getUnitFromString("btc")
   private var displayAmountAsFiat = false // by default always show amounts in bitcoin
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
+    val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
+    prefs.registerOnSharedPreferenceChangeListener(prefsListener)
+    fiat = Prefs.getFiatCurrency(prefs)
+    coin = Prefs.getCoinUnit(prefs)
+    displayAmountAsFiat = Prefs.getShowAmountInFiat(prefs)
     val view = LayoutInflater.from(parent.context).inflate(R.layout.holder_payment, parent, false)
     return PaymentHolder(view)
   }
 
   override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
     val payment = this.payments!![position]
-    holder.bindPaymentItem(position, payment, fiatCode, coinUnit, displayAmountAsFiat)
+    holder.bindPaymentItem(position, payment, fiat, coin, displayAmountAsFiat)
   }
 
   override fun getItemCount(): Int {
     return if (this.payments == null) 0 else this.payments!!.size
   }
 
-  fun refresh(fiatCode: String, prefUnit: CoinUnit, displayAmountAsFiat: Boolean) {
-    update(this.payments, fiatCode, prefUnit, displayAmountAsFiat)
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs: SharedPreferences, key: String ->
+    when (key) {
+      Prefs.PREFS_SHOW_AMOUNT_IN_FIAT -> {
+        fiat = Prefs.getFiatCurrency(prefs)
+        coin = Prefs.getCoinUnit(prefs)
+        displayAmountAsFiat = Prefs.getShowAmountInFiat(prefs)
+        update(this.payments) //fiat, coin, showAmountInFiat)
+      }
+      else -> {}
+    }
   }
 
-  fun update(payments: List<Payment>?, fiatCode: String, prefUnit: CoinUnit, displayAmountAsFiat: Boolean) {
-    this.fiatCode = fiatCode
-    this.coinUnit = prefUnit
-    this.displayAmountAsFiat = displayAmountAsFiat
+  fun update(payments: List<Payment>?) {
     if (payments == null) {
       this.payments = payments
     } else if (this.payments != payments) {

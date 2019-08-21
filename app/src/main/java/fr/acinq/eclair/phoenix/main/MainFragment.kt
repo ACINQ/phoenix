@@ -44,6 +44,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private lateinit var mBinding: FragmentMainBinding
 
   private lateinit var paymentsAdapter: PaymentsAdapter
+//  private lateinit var paymentsListAdapter: PaymentsListAdapter
   private lateinit var paymentsManager: RecyclerView.LayoutManager
 
   private lateinit var notificationsAdapter: NotificationsAdapter
@@ -61,6 +62,13 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = paymentsManager
       adapter = paymentsAdapter
     }
+//    paymentsListAdapter = PaymentsListAdapter()
+//    mBinding.paymentList.apply {
+//      setHasFixedSize(true)
+//      layoutManager = paymentsManager
+//      adapter = paymentsListAdapter
+//    }
+
 
     // init notification recycler view
     notificationsManager = LinearLayoutManager(context)
@@ -81,7 +89,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       mBinding.balance.setAmount(it.balance)
     })
     model.payments.observe(viewLifecycleOwner, Observer {
-      paymentsAdapter.update(it, "usd", Prefs.getCoinUnit(context!!), displayAmountAsFiat = false)
+//      paymentsListAdapter.submitList(it)
+      paymentsAdapter.update(it)
     })
     model.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)

@@ -17,7 +17,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
   <item>
     <shape android:shape="oval" android:useLevel="false">
-      <solid android:color="?attr/defaultMutedBackgroundColor" />
+      <solid android:color="?attr/colorPrimary" />
     </shape>
   </item>
 </selector>

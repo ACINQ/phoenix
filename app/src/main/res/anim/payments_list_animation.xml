@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2019 ACINQ SAS
   ~
@@ -14,16 +15,7 @@
   ~ limitations under the License.
   -->
 
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="@dimen/button_height"
-  android:height="@dimen/button_height"
-  android:viewportWidth="24"
-  android:viewportHeight="24">
-  <path
-    android:fillColor="#00000000"
-    android:pathData="M19,8l-9,9l-5,-5"
-    android:strokeWidth="3"
-    android:strokeColor="?attr/defaultBackgroundColor"
-    android:strokeLineCap="round"
-    android:strokeLineJoin="round" />
-</vector>
+<layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
+  android:animation="@anim/payment_insertion_animation"
+  android:animationOrder="normal"
+  android:delay="15%" />

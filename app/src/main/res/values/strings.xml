@@ -187,8 +187,8 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="notifications_set_up_pin">Your wallet is not encrypted.</string>
-  <string name="notifications_set_up_pin_action">Set a password</string>
+  <string name="notifications_set_up_pin">Your wallet is not protected.</string>
+  <string name="notifications_set_up_pin_action">Set a PIN</string>
   <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you backed up your wallet?</string>
   <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>

@@ -26,8 +26,8 @@
 
   <ImageView
     android:id="@+id/avatar_background"
-    android:layout_width="36dp"
-    android:layout_height="36dp"
+    android:layout_width="26dp"
+    android:layout_height="26dp"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -36,8 +36,8 @@
 
   <ImageView
     android:id="@+id/avatar"
-    android:layout_width="20dp"
-    android:layout_height="20dp"
+    android:layout_width="16dp"
+    android:layout_height="16dp"
     app:layout_constraintStart_toStartOf="@id/avatar_background"
     app:layout_constraintTop_toTopOf="@id/avatar_background"
     app:layout_constraintBottom_toBottomOf="@id/avatar_background"
@@ -51,7 +51,7 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginEnd="@dimen/space_lg"
-    android:layout_marginStart="@dimen/space_md"
+    android:layout_marginStart="@dimen/space_sm"
     app:layout_constrainedWidth="true"
     app:layout_constraintEnd_toStartOf="@id/amount"
     app:layout_constraintHorizontal_bias="0"
@@ -60,6 +60,7 @@
     app:layout_constraintTop_toTopOf="parent"
     android:ellipsize="end"
     android:lines="1"
+    android:text="@string/lipsum_short"
     android:textSize="@dimen/text_lg" />
 
   <TextView
@@ -75,8 +76,9 @@
     android:ellipsize="start"
     android:maxWidth="200dp"
     android:singleLine="true"
+    android:text="1.23456"
     android:textAlignment="viewEnd"
-    android:textSize="@dimen/text_md" />
+    android:textSize="@dimen/text_lg" />
 
   <TextView
     android:id="@+id/unit"
@@ -88,9 +90,10 @@
     app:layout_constraintHorizontal_bias="1"
     app:layout_constraintStart_toEndOf="@id/amount"
     android:singleLine="true"
+    android:text="sat"
     android:textAlignment="viewEnd"
     android:textColor="?attr/defaultMutedTextColor"
-    android:textSize="@dimen/text_xs" />
+    android:textSize="@dimen/text_sm" />
 
   <TextView
     android:id="@+id/timestamp"
@@ -102,6 +105,7 @@
     app:layout_constraintStart_toStartOf="@id/description"
     app:layout_constraintTop_toBottomOf="@id/description"
     android:textColor="?attr/defaultMutedTextColor"
+    android:text="Yesterday"
     android:textSize="@dimen/text_sm" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

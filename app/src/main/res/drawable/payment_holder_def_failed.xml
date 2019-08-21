@@ -23,14 +23,14 @@
     android:fillColor="#00000000"
     android:pathData="M18,6L6,18"
     android:strokeWidth="3"
-    android:strokeColor="?attr/defaultMutedErrorTextColor"
+    android:strokeColor="?attr/colorPrimary"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
   <path
     android:fillColor="#00000000"
     android:pathData="M6,6L18,18"
     android:strokeWidth="3"
-    android:strokeColor="?attr/defaultMutedErrorTextColor"
+    android:strokeColor="?attr/colorPrimary"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>
