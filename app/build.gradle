@@ -44,12 +44,22 @@ android {
       debuggable false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-//    applicationVariants.all { variant ->
-//      variant.outputs.all { output ->
-//        final String chain = variant.buildType.resValues.get("CHAIN").value // careful, contains " characters...
-//        outputFileName = "${defaultConfig.versionCode}-v${defaultConfig.versionName}-${chain.substring(1, chain.length() - 1)}-${variant.buildType.name}.apk"
-//      }
-//    }
+    applicationVariants.all { variant ->
+      variant.outputs.all { output ->
+        def abi = output.getFilter(com.android.build.OutputFile.ABI)
+        final String architecture = abi == null ? "universal" : abi
+        final String chain = variant.buildType.resValues.get("CHAIN").value // careful, contains " characters...
+        outputFileName = "phoenix-$architecture-${variant.buildType.name}.apk"
+      }
+    }
+  }
+  splits {
+    abi {
+      enable true
+      reset() // reset abi list to none
+      include "x86", "x86_64", "arm64-v8a", "armeabi-v7a"
+      universalApk true
+    }
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -65,14 +75,6 @@ android {
   }
   dataBinding {
     enabled = true
-  }
-  splits {
-    abi {
-      enable true
-      reset()
-      include 'x86', 'armeabi-v7a'
-      universalApk true
-    }
   }
 }
 
