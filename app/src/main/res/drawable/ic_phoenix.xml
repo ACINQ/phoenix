@@ -1,33 +1,11 @@
-<!--
-  ~ Copyright 2019 ACINQ SAS
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="64dp"
-  android:height="64dp"
-  android:viewportWidth="64"
-  android:viewportHeight="64">
+  android:width="108dp"
+  android:height="108dp"
+  android:viewportWidth="108"
+  android:viewportHeight="108">
   <path
-    android:fillAlpha="1"
-    android:fillColor="#000000"
-    android:pathData="M53.03,21.34C52.68,30.07 45.45,33.98 31.35,33.07L30.51,55.37L20.46,55.06L21.72,11.18C42.94,9.23 53.38,12.61 53.03,21.34Z" />
-  <path
-    android:fillAlpha="0"
-    android:fillColor="#FF000000"
-    android:pathData="M53.03,21.34C52.68,30.07 45.45,33.98 31.35,33.07L30.51,55.37L20.46,55.06L21.72,11.18C42.94,9.23 53.38,12.61 53.03,21.34Z"
+    android:fillColor="@color/white"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeWidth="1"
-    android:strokeAlpha="1"
-    android:strokeColor="#000000" />
+    android:pathData="M78,31.37A4,4 0,0 0,71 34a6,6 0,0 1,-12 0v-8a5,5 0,0 0,-4 -4.9V20l-1,-2 -1,2v1.1a5,5 0,0 0,-4 4.9v8a6,6 0,0 1,-12 0,4 4,0 0,0 -7,-2.62A32.89,32.89 0,0 0,21 54v18a6,6 0,0 0,6 -6V52a6,6 0,0 1,6 6v27a6,6 0,0 0,6 -6V63a6,6 0,0 1,6 6v21a6,6 0,0 0,6 -6V72a3,3 0,0 1,6 0v12a6,6 0,0 0,6 6V69a6,6 0,0 1,6 -6v16a6,6 0,0 0,6 6V58a6,6 0,0 1,6 -6v14a6,6 0,0 0,6 6V54a32.89,32.89 0,0 0,-9 -22.63z" />
 </vector>
