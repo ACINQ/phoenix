@@ -50,7 +50,7 @@ class CreateSeedFragment : InitWalletBaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(CreateSeedViewModel::class.java)
+    model = ViewModelProvider(this).get(CreateSeedViewModel::class.java)
     mBinding.model = model
     model.words.observe(viewLifecycleOwner, Observer { words ->
       mBinding.wordsTable.removeAllViews()

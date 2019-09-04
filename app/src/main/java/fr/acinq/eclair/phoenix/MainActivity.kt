@@ -23,6 +23,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import fr.acinq.eclair.io.PayToOpenRequestEvent
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-    appKit = ViewModelProviders.of(this).get(AppKitModel::class.java)
+    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
     appKit.navigationEvent.observe(this, Observer {
       when (it) {
         is PayToOpenRequestEvent -> {

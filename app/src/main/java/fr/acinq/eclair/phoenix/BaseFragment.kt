@@ -19,6 +19,7 @@ package fr.acinq.eclair.phoenix
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.security.PinDialog
@@ -33,9 +34,7 @@ abstract class BaseFragment : Fragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
 
-    appKit = activity?.run {
-      ViewModelProviders.of(activity!!).get(AppKitModel::class.java)
-    } ?: throw Exception("Invalid Activity")
+    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
 
     appKit.kit.observe(viewLifecycleOwner, Observer {
       appCheckup()

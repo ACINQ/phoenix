@@ -52,7 +52,7 @@ class AutoCreateFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(AutoCreateViewModel::class.java)
+    model = ViewModelProvider(this).get(AutoCreateViewModel::class.java)
     model.errorCause.observe(viewLifecycleOwner, Observer {
       mBinding.error.text = getString(R.string.autocreate_error, it)
     })

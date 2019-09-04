@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,7 +35,7 @@ abstract class BaseDialogFragment : DialogFragment() {
     if (activity == null) {
       dismiss()
     } else {
-      appKit = ViewModelProviders.of(activity!!).get(AppKitModel::class.java)
+      appKit = ViewModelProvider(this).get(AppKitModel::class.java)
       appKit.kit.observe(viewLifecycleOwner, Observer {
         handleKit()
       })

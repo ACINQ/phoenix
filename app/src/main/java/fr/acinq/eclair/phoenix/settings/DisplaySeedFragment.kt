@@ -56,7 +56,7 @@ class DisplaySeedFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(DisplaySeedViewModel::class.java)
+    model = ViewModelProvider(this).get(DisplaySeedViewModel::class.java)
     mBinding.model = model
     model.words.observe(viewLifecycleOwner, Observer { words ->
       mBinding.wordsTable.removeAllViews()

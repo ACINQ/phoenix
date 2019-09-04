@@ -26,6 +26,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
@@ -55,11 +56,8 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    appKit = activity?.run {
-      ViewModelProviders.of(activity!!).get(AppKitModel::class.java)
-    } ?: throw Exception("Invalid Activity")
-
-    model = ViewModelProviders.of(this).get(ReceiveWithOpenViewModel::class.java)
+    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
+    model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
     mBinding.model = model
 
     requireActivity().onBackPressedDispatcher.addCallback(this) {

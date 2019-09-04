@@ -21,6 +21,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -45,7 +46,7 @@ class CloseAllChannelsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(CloseAllChannelsViewModel::class.java)
+    model = ViewModelProvider(this).get(CloseAllChannelsViewModel::class.java)
     mBinding.model = model
   }
 

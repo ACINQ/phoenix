@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
@@ -52,9 +53,7 @@ class TestDialog : DialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    appKit = activity?.run {
-      ViewModelProviders.of(this).get(AppKitModel::class.java)
-    } ?: throw Exception("Invalid Activity")
+    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
 
     requireActivity().onBackPressedDispatcher.addCallback(this) {
       log.info("back pressed is disabled here")

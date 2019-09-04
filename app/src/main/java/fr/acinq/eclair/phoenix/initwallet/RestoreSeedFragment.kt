@@ -65,7 +65,7 @@ class RestoreSeedFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(RestoreSeedViewModel::class.java)
+    model = ViewModelProvider(this).get(RestoreSeedViewModel::class.java)
 
     // -- watch state
     model.state.observe(viewLifecycleOwner, Observer {

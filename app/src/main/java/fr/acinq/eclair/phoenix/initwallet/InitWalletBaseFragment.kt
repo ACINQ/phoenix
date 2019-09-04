@@ -18,6 +18,7 @@ package fr.acinq.eclair.phoenix.initwallet
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,9 +31,7 @@ abstract class InitWalletBaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    seedModel = activity?.run {
-      ViewModelProviders.of(this).get(SharedSeedViewModel::class.java)
-    } ?: throw Exception("Invalid Activity")
+    seedModel = ViewModelProvider(this).get(SharedSeedViewModel::class.java)
   }
 
 }

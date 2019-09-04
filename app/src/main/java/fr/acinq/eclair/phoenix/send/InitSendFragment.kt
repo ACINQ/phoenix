@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.zxing.BarcodeFormat
@@ -53,7 +54,7 @@ class InitSendFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(InitSendViewModel::class.java)
+    model = ViewModelProvider(this).get(InitSendViewModel::class.java)
     mBinding.model = model
 
     model.invoice.observe(viewLifecycleOwner, Observer {

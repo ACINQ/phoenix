@@ -56,7 +56,7 @@ class SetupPinFragment : InitWalletBaseFragment() {
     })
 
     // fragment model/binding
-    model = ViewModelProviders.of(this).get(SetupPinViewModel::class.java)
+    model = ViewModelProvider(this).get(SetupPinViewModel::class.java)
     mBinding.model = model
     model.state.observe(viewLifecycleOwner, Observer { state ->
       if (state == SeedEncryptionState.DONE && activity != null) {

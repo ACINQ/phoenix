@@ -53,7 +53,7 @@ class ListChannelsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(ListChannelsViewModel::class.java)
+    model = ViewModelProvider(this).get(ListChannelsViewModel::class.java)
     model.channels.observe(viewLifecycleOwner, Observer {
       when {
         it.count() > 0 -> mBinding.channelsFoundHeader.text = getString(R.string.listallchannels_channels_header, it.count())

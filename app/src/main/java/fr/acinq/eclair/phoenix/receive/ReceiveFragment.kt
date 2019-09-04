@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -74,7 +75,7 @@ class ReceiveFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProviders.of(this).get(ReceiveViewModel::class.java)
+    model = ViewModelProvider(this).get(ReceiveViewModel::class.java)
     mBinding.model = model
 
     context?.let {
