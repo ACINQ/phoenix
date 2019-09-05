@@ -23,6 +23,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.`BackupCompleted$`
+import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
@@ -48,10 +49,6 @@ class EclairSupervisor : UntypedActor() {
     val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().amount() }.sum())
     log.info("posting balance=${balance.amount()}")
     EventBus.getDefault().post(BalanceEvent(balance))
-  }
-
-  private fun postPayment(paymentHash: ByteVector32?) {
-    EventBus.getDefault().post(PaymentEvent(paymentHash))
   }
 
   override fun onReceive(event: Any?) {
@@ -81,7 +78,7 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelSignatureSent -> {
         log.info("signature sent on ${event.commitments().channelId()}")
-        postPayment(null)
+        EventBus.getDefault().post(PaymentPending())
       }
       is ChannelSignatureReceived -> {
         log.info("signature $event has been sent")
@@ -121,14 +118,14 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(event)
       }
       is PaymentLifecycle.PaymentSucceeded -> {
-        postPayment(event.paymentHash())
+        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.OUTGOING(), event.id().toString()))
       }
       is PaymentLifecycle.PaymentFailed -> {
-        log.info("payment has failed ${event.failures().mkString(", ")}")
-        postPayment(event.paymentHash())
+        log.info("payment has failed [ ${event.failures().mkString(", ")} ]")
+        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.OUTGOING(), event.id().toString()))
       }
       is PaymentReceived -> {
-        postPayment(event.paymentHash())
+        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.INCOMING(), event.paymentHash().toString()))
       }
       else -> {
         log.warn("unhandled event $event")

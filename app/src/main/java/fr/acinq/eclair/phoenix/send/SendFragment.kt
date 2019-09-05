@@ -33,15 +33,22 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.db.`PaymentDirection$`
+import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scala.Option
 
 class SendFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSendBinding
   private val args: SendFragmentArgs by navArgs()
@@ -91,7 +98,7 @@ class SendFragment : BaseFragment() {
                 }
                 Unit
               } catch (e: Exception) {
-                log.error("could not extract amount when showing swap instructions: ", e)
+                log.error("could not extract amount after swap:  ${e.message}")
               }
             }
             // invoice is a payment request
@@ -132,10 +139,6 @@ class SendFragment : BaseFragment() {
       mBinding.balanceValue.setAmount(it.balance)
     } ?: log.warn("balance is not available yet")
 
-    mBinding.swapCancelButton.setOnClickListener {
-      findNavController().navigate(R.id.action_send_to_main)
-    }
-
     mBinding.sendButton.setOnClickListener { _ ->
       model.invoice.value?.let {
         Wallet.hideKeyboard(context, mBinding.amount)
@@ -143,21 +146,21 @@ class SendFragment : BaseFragment() {
           val amount_opt = extractAmount()
           if (amount_opt.isDefined) {
             model.errorInAmount.value = false
+            val amount = amount_opt.get()
             when {
               it.isLeft -> {
                 // onchain payment must first be swapped
-                model.sendSubmarineSwap(Converter.msat2sat(amount_opt.get()), it.left().get().first)
+                model.sendSubmarineSwap(Converter.msat2sat(amount), it.left().get().first)
               }
               it.isRight -> {
-                appKit.sendPaymentRequest(amount_opt.get(), it.right().get())
-                findNavController().navigate(R.id.action_send_to_main)
+                sendPaymentFinal(amount, it.right().get())
               }
             }
           } else {
             throw RuntimeException("empty amount")
           }
         } catch (e: Exception) {
-          log.error("could not extract amount: ", e)
+          log.error("could not extract amount: ${e.message}")
           model.errorInAmount.value = true
         }
       }
@@ -165,18 +168,28 @@ class SendFragment : BaseFragment() {
 
     mBinding.swapConfirmButton.setOnClickListener { _ ->
       model.invoice.value?.let {
-        if (it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined) {
-          val pr = it.left().get().second
-          appKit.sendPaymentRequest(amount = pr!!.amount().get(), paymentRequest = pr, checkFees = false)
-          findNavController().navigate(R.id.action_send_to_main)
+        if (it.isLeft) {
+          it.left()?.get()?.second?.let { pr ->
+            if (pr.amount().isDefined) {
+              sendPaymentFinal(pr.amount().get(), pr)
+            }
+          } ?: log.warn("invoice=$it in model is not valid for swap confirmation state")
         }
       }
-
     }
 
     mBinding.cancelButton.setOnClickListener {
       findNavController().navigate(R.id.action_send_to_main)
     }
+
+    mBinding.swapCancelButton.setOnClickListener {
+      findNavController().navigate(R.id.action_send_to_main)
+    }
+  }
+
+  private fun sendPaymentFinal(amount: MilliSatoshi, pr: PaymentRequest) {
+    appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, checkFees = false)
+    findNavController().navigate(R.id.action_send_to_main)
   }
 
   private fun refreshAmountConversionDisplay() {
@@ -191,7 +204,7 @@ class SendFragment : BaseFragment() {
         }
         model.errorInAmount.value = false
       } catch (e: Exception) {
-        log.info("could not extract amount: ", e)
+        log.info("could not extract amount: ${e.message}")
         mBinding.amountConverted.text = ""
         model.errorInAmount.value = true
       }

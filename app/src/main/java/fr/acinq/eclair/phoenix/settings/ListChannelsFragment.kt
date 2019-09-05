@@ -35,10 +35,14 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsListChannelsBinding
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import upickle.`default$`
 
 
 class ListChannelsFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSettingsListChannelsBinding
 

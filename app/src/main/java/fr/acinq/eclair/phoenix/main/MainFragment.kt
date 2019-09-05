@@ -28,24 +28,32 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
-import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.events.PaymentComplete
+import fr.acinq.eclair.phoenix.events.PaymentPending
+import fr.acinq.eclair.phoenix.startup.StartupFragment
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var model: MainViewModel
   private lateinit var mBinding: FragmentMainBinding
 
   private lateinit var paymentsAdapter: PaymentsAdapter
-//  private lateinit var paymentsListAdapter: PaymentsListAdapter
+  //  private lateinit var paymentsListAdapter: PaymentsListAdapter
   private lateinit var paymentsManager: RecyclerView.LayoutManager
 
   private lateinit var notificationsAdapter: NotificationsAdapter
@@ -63,12 +71,12 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = paymentsManager
       adapter = paymentsAdapter
     }
-//    paymentsListAdapter = PaymentsListAdapter()
-//    mBinding.paymentList.apply {
-//      setHasFixedSize(true)
-//      layoutManager = paymentsManager
-//      adapter = paymentsListAdapter
-//    }
+    //    paymentsListAdapter = PaymentsListAdapter()
+    //    mBinding.paymentList.apply {
+    //      setHasFixedSize(true)
+    //      layoutManager = paymentsManager
+    //      adapter = paymentsListAdapter
+    //    }
 
 
     // init notification recycler view
@@ -90,7 +98,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       mBinding.balance.setAmount(it.balance)
     })
     model.payments.observe(viewLifecycleOwner, Observer {
-//      paymentsListAdapter.submitList(it)
+      //      paymentsListAdapter.submitList(it)
       paymentsAdapter.update(it)
     })
     model.notifications.observe(viewLifecycleOwner, Observer {
@@ -124,7 +132,13 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
-    refreshPaymentList()
+    when (event) {
+      is PaymentComplete -> {
+        val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
+        findNavController().navigate(action)
+      }
+      is PaymentPending -> refreshPaymentList()
+    }
   }
 
   private fun refreshPaymentList() {

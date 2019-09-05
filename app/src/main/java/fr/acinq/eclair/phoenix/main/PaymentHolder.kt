@@ -31,10 +31,10 @@ import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
 import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.android.synthetic.main.holder_payment.view.*
-
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -143,12 +143,10 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       descriptionView.setTextColor(defaultTextColor)
     }
 
-
-
     // clickable action
     itemView.setOnClickListener {
-      val action = MainFragmentDirections.actionMainToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString())
-      itemView.findNavController().navigate(action)
+      val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString(), fromEvent = false)
+      it.findNavController().navigate(action)
     }
   }
 }

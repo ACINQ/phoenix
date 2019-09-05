@@ -27,8 +27,12 @@ import androidx.navigation.navGraphViewModels
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsTechnicalsBinding
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class PaymentDetailsTechnicalsFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentPaymentDetailsTechnicalsBinding
   // shared view model, living with payment details nested graph

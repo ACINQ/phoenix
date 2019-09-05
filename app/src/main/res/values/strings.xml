@@ -134,6 +134,7 @@
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
 
+  <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>
   <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>
@@ -221,9 +222,9 @@
   <string name="paymentdetails_loading">Retrieving payment details…</string>
   <string name="paymentdetails_error">This payment could not be found…</string>
 
-  <string name="paymentdetails_status_sent_pending"><![CDATA[Payment has been <b>pending</b> since %1$s]]></string>
-  <string name="paymentdetails_status_sent_failed"><![CDATA[Payment has <b>failed</b>.<br />No money has been sent.]]></string>
-  <string name="paymentdetails_status_sent_successful"><![CDATA[Payment <b>sent</b> on %1$s!]]></string>
+  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Sent</b> %1$s]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pending…</b>]]></string>
+  <string name="paymentdetails_status_sent_failed"><![CDATA[Payment <b>failed</b>.<br />No money has been sent.]]></string>
 
   <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
   <string name="paymentdetails_status_received_successful"><![CDATA[Payment <b>received</b> on %1$s!]]></string>
@@ -236,7 +237,7 @@
   <string name="paymentdetails_amount_received_successful_label">Received</string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
-  <string name="paymentdetails_destination_label">To</string>
+  <string name="paymentdetails_destination_label">Sent to</string>
   <string name="paymentdetails_fees_label">Fees</string>
 
   <string name="paymentdetails_technicals_button">Show technical data</string>

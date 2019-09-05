@@ -56,12 +56,16 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
-    model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
-    mBinding.model = model
+    if (activity == null) {
+      dismiss()
+    } else {
+      appKit = ViewModelProvider(activity!!).get(AppKitModel::class.java)
+      model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
+      mBinding.model = model
 
-    requireActivity().onBackPressedDispatcher.addCallback(this) {
-      log.info("back pressed should be disabled here")
+      activity!!.onBackPressedDispatcher.addCallback(this) {
+        log.info("back pressed should be disabled here")
+      }
     }
   }
 

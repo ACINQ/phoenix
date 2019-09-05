@@ -33,9 +33,7 @@ abstract class BaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-
-    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
-
+    appKit = ViewModelProvider(activity!!).get(AppKitModel::class.java)
     appKit.kit.observe(viewLifecycleOwner, Observer {
       appCheckup()
     })
@@ -46,7 +44,7 @@ abstract class BaseFragment : Fragment() {
    */
   open fun appCheckup() {
     if (!appKit.isKitReady()) {
-      if (context != null && !appKit.isWalletInit(context!!)) {
+      if (context != null && !appKit.hasWalletBeenSetup(context!!)) {
         log.info("wallet has not been initialized, moving to init")
         findNavController().navigate(R.id.global_action_any_to_init_wallet)
       } else {

@@ -39,10 +39,14 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.db.`IncomingPayment$`
+import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
+import fr.acinq.eclair.phoenix.events.PaymentComplete
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -51,9 +55,13 @@ import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scala.Option
 
 class ReceiveFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentReceiveBinding
 
@@ -79,7 +87,9 @@ class ReceiveFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      ArrayAdapter(it, android.R.layout.simple_spinner_item, listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))).also { adapter ->
+      ArrayAdapter(it,
+        android.R.layout.simple_spinner_item,
+        listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.amountUnit.adapter = adapter
       }
@@ -185,7 +195,7 @@ class ReceiveFragment : BaseFragment() {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
         }
       } catch (e: Exception) {
-        log.info("could not extract amount: ", e)
+        log.info("could not extract amount: ${e.message}")
         mBinding.amountConverted.text = ""
       }
     }
@@ -204,8 +214,11 @@ class ReceiveFragment : BaseFragment() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
     model.paymentRequest.value?.let {
-      if (event.paymentHash == it.paymentHash()) {
-        findNavController().navigate(R.id.action_receive_to_main)
+      if (event is PaymentComplete) {
+        if (event.direction == `PaymentDirection$`.`MODULE$`.INCOMING() && event.identifier == it.paymentHash().toString()) {
+          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
+          findNavController().navigate(action)
+        }
       }
     }
   }

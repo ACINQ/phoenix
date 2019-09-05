@@ -28,8 +28,12 @@ import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
 import fr.acinq.eclair.phoenix.utils.Prefs
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class StartupFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentStartupBinding
 
@@ -75,14 +79,14 @@ class StartupFragment : BaseFragment() {
   override fun appCheckup() {
     if (appKit.isKitReady()) {
       findNavController().navigate(R.id.action_startup_to_main)
-    } else if (context != null && !appKit.isWalletInit(context!!)) {
+    } else if (context != null && !appKit.hasWalletBeenSetup(context!!)) {
       findNavController().navigate(R.id.global_action_any_to_init_wallet)
     }
   }
 
   private fun startNodeIfNeeded() {
     context?.let {
-      if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.isWalletInit(it)) {
+      if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.hasWalletBeenSetup(it)) {
         if (Prefs.isSeedEncrypted(it)) {
           // user has defined a pin code encrypting the seed so let's ask for it
           mPinDialog?.show()

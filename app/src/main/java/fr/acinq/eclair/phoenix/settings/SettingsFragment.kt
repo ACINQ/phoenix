@@ -24,9 +24,13 @@ import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsBinding
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 
 class SettingsFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSettingsBinding
 

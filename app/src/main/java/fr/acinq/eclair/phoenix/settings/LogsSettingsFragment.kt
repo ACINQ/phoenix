@@ -28,8 +28,12 @@ import fr.acinq.eclair.phoenix.BuildConfig
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsLogsBinding
 import fr.acinq.eclair.phoenix.utils.Logging
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class LogsSettingsFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSettingsLogsBinding
 

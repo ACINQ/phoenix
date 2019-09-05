@@ -115,7 +115,7 @@ class AppKitModel : ViewModel() {
     log.info("appkit has been cleared")
   }
 
-  fun isWalletInit(context: Context): Boolean {
+  fun hasWalletBeenSetup(context: Context): Boolean {
     return Wallet.getSeedFile(context).exists()
   }
 

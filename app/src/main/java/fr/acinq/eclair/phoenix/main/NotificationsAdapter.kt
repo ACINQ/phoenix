@@ -30,7 +30,7 @@ class NotificationsAdapter(private var notifications: MutableSet<NotificationTyp
 
   override fun onBindViewHolder(holder: NotificationHolder, position: Int) {
     val notif = this.notifications.elementAt(position)
-    holder.bindItem(notif)
+    holder.bindItem(notif, position)
   }
 
   override fun getItemCount(): Int {

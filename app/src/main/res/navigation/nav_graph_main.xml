@@ -19,32 +19,48 @@
   android:id="@+id/nav_graph_main"
   app:startDestination="@id/main_fragment">
 
-  <!-- global actions -->
+  <!-- global to startup -->
   <action
     android:id="@+id/global_action_any_to_startup"
     app:destination="@id/startup_fragment"
     app:enterAnim="@anim/fade_in"
     app:exitAnim="@anim/fade_out"
     app:launchSingleTop="true" />
+  <!-- global to wallet initialization -->
   <action
     android:id="@+id/global_action_any_to_init_wallet"
     app:destination="@id/init_wallet_fragment"
     app:enterAnim="@anim/slide_up"
     app:exitAnim="@anim/fade_out"
     app:launchSingleTop="true" />
+  <!-- global to receive with payToOpen -->
   <action
     android:id="@+id/global_action_any_to_receive_with_open"
     app:destination="@id/receive_with_open_dialog"
     app:launchSingleTop="true" />
+  <!-- global to send -->
   <action
     android:id="@+id/global_action_any_to_send"
     app:destination="@id/send"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
+  <!-- global to payment details page -->
   <action
-    android:id="@+id/global_action_any_to_testdialog"
-    app:destination="@id/test_dialog"
-    app:launchSingleTop="true" />
+    android:id="@+id/global_action_any_to_payment_details"
+    app:destination="@id/nav_graph_payment_details"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment">
+    <argument
+      android:name="direction"
+      app:argType="string" />
+    <argument
+      android:name="identifier"
+      app:argType="string" />
+    <argument
+      android:name="fromEvent"
+      android:defaultValue="false"
+      app:argType="boolean" />
+  </action>
 
   <!-- main fragment -->
   <fragment
@@ -66,16 +82,6 @@
     <action
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
-    <action
-      android:id="@+id/action_main_to_payment_details"
-      app:destination="@id/nav_graph_payment_details">
-      <argument
-        android:name="direction"
-        app:argType="string" />
-      <argument
-        android:name="identifier"
-        app:argType="string" />
-    </action>
   </fragment>
 
   <!-- init wallet -->
@@ -283,12 +289,6 @@
       android:id="@+id/payment_details"
       android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment"
       android:label="PaymentDetailsFragment">
-      <argument
-        android:name="direction"
-        app:argType="string" />
-      <argument
-        android:name="identifier"
-        app:argType="string" />
       <action
         android:id="@+id/action_payment_details_to_payment_details_technicals"
         app:destination="@id/payment_details_technicals"
@@ -296,6 +296,16 @@
         app:exitAnim="@anim/slide_out_left"
         app:popEnterAnim="@anim/slide_in_right"
         app:popExitAnim="@anim/slide_out_left" />
+      <argument
+        android:name="identifier"
+        app:argType="string" />
+      <argument
+        android:name="direction"
+        app:argType="string" />
+      <argument
+        android:name="fromEvent"
+        android:defaultValue="false"
+        app:argType="boolean" />
     </fragment>
 
     <!-- payment details technical data -->

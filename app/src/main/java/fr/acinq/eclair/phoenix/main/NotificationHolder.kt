@@ -20,13 +20,21 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.marginTop
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
 
 class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-  fun bindItem(notification: NotificationTypes) {
+  fun bindItem(notification: NotificationTypes, position: Int) {
+    if (position > 0) {
+      val layoutParams = itemView.layoutParams as ConstraintLayout.LayoutParams
+      val med = itemView.resources.getDimensionPixelOffset(R.dimen.space_md)
+      layoutParams.setMargins(med, itemView.resources.getDimensionPixelOffset(R.dimen.space_xs), med, 0)
+    }
+
     val messageView = itemView.findViewById<TextView>(R.id.notif_message)
     val iconView = itemView.findViewById<ImageView>(R.id.notif_icon)
     val actionButton = itemView.findViewById<Button>(R.id.notif_button)

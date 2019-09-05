@@ -16,11 +16,14 @@
 
 package fr.acinq.eclair.phoenix.events
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import scala.Enumeration
 
-class PaymentEvent(val paymentHash: ByteVector32?)
+interface PaymentEvent
+
+class PaymentPending : PaymentEvent
+class PaymentComplete(val direction: Enumeration.Value, val identifier: String) : PaymentEvent
 
 class BalanceEvent(val available: MilliSatoshi)
 

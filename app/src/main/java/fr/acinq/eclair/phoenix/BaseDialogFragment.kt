@@ -36,7 +36,7 @@ abstract class BaseDialogFragment : DialogFragment() {
       dismiss()
     } else {
       appKit = ViewModelProvider(this).get(AppKitModel::class.java)
-      appKit.kit.observe(viewLifecycleOwner, Observer {
+      appKit.kit.observe(activity!!, Observer {
         handleKit()
       })
       requireActivity().onBackPressedDispatcher.addCallback(this) {

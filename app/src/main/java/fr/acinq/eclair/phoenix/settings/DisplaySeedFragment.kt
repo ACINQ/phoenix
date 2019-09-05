@@ -37,10 +37,13 @@ import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 
 class DisplaySeedFragment : BaseFragment() {
+
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSettingsDisplaySeedBinding
   private lateinit var model: DisplaySeedViewModel
