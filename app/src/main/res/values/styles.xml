@@ -60,6 +60,7 @@
     <!-- status bar -->
     <item name="android:statusBarColor">@color/mystic</item>
     <item name="android:windowLightStatusBar">true</item>
+
   </style>
 
   <style name="default_textAppearance" parent="TextAppearance.AppCompat.Body1">
@@ -143,6 +144,10 @@
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="android:textViewStyle">@style/default_textAppearance</item>
     <item name="buttonStyle">@style/default_buttonStyle</item>
+  </style>
+
+  <style name="dialog_fullScreen" parent="default_dialogTheme">
+    <item name="android:windowFullscreen">true</item>
   </style>
 
   <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">

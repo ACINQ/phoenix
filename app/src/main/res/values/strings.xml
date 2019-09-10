@@ -146,9 +146,11 @@
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_general_title">General</string>
+  <string name="settings_security_title">Security</string>
+  <string name="settings_advanced_title">Advanced</string>
   <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_display_seed">My wallet\'s seed</string>
-  <string name="settings_advanced_title">Advanced</string>
+  <string name="settings_seed_security">Manage access</string>
   <string name="settings_list_channels">List my channels</string>
   <string name="settings_logs">App logs</string>
 
@@ -272,5 +274,24 @@
   <string name="state_sync">Synchronizing with peer</string>
   <string name="state_offline">Peer is offline</string>
   <string name="state_shutdown">Shutdown</string>
+
+  <!-- //////////////// seed security //////////////// -->
+
+  <string name="seedsec_title">Security</string>
+  <string name="seedsec_instructions">Your wallet should always be protected by a 8-digits PIN password, in case your phone is compromised.</string>
+  <string name="seedsec_error_wrong_pin">Invalid password, please try again.</string>
+  <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
+  <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+  <string name="seedsec_wait">Please hold…</string>
+  <string name="seedsec_pin_update_success">PIN successfully updated!</string>
+  <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
+  <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
+  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
+  <string name="seedsec_setup_pin">Protect my wallet…</string>
+  <string name="seedsec_change_pin">Change my wallet PIN</string>
+  <string name="seedsec_fingerprint_enable">Do you want to unlock your wallet with your fingerprint?</string>
+  <string name="seedsec_fingerprint_disable">Disable fingerprint</string>
+  <string name="seedsec_fingerprint_is_enabled">Fingerprint is enabled</string>
+  <string name="seedsec_fingerprint_is_disabled">Fingerprint is disabled</string>
 
 </resources>

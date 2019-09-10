@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="vertical"
-        app:constraint_referenced_ids="pin_title, pin_display_placeholder, pin_grid"
+        app:constraint_referenced_ids="pin_title,pin_display_placeholder,pin_grid"
         app:flow_verticalGap="@dimen/space_lg"
         app:flow_verticalStyle="packed"
         app:flow_wrapMode="none" />
@@ -47,6 +47,7 @@
         android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
         android:text="@string/pindialog_title_default"
+        android:textSize="@dimen/text_xl"
         android:textAlignment="center"
         android:textAppearance="@style/default_textAppearance"
         tools:ignore="MissingConstraints" />

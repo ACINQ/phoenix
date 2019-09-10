@@ -36,7 +36,8 @@ object Wallet {
   private const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
   private const val NETWORK_DB_FILE = "network.sqlite"
-  private val WALLET_DB_FILE = "wallet.sqlite"
+  private const val WALLET_DB_FILE = "wallet.sqlite"
+  internal const val DEFAULT_PIN = "111111"
 
   fun getDatadir(context: Context): File {
     return File(context.filesDir, ECLAIR_BASE_DATADIR)

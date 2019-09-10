@@ -22,8 +22,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.utils.Prefs
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 class MainViewModel : ViewModel() {
 
@@ -38,7 +36,7 @@ class MainViewModel : ViewModel() {
   }
 
   private fun checkWalletIsSecure(context: Context) {
-    if (!Prefs.isSeedEncrypted(context)) {
+    if (!Prefs.getIsSeedEncrypted(context)) {
       notifications.value?.add(NotificationTypes.NO_PIN_SET)
     }
   }

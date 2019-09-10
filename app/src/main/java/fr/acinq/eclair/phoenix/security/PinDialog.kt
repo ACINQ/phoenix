@@ -20,6 +20,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Handler
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -31,16 +32,16 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.DialogPinBinding
 import java.util.*
 
-class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val mPinCallback: PinDialogCallback, title: String = context.getString(R.string.pindialog_title_default)) :
+class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val mPinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default) :
   Dialog(context, themeResId) {
 
-  private val mBinding: DialogPinBinding = DataBindingUtil.inflate<DialogPinBinding>(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
+  private val mBinding: DialogPinBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
   private var mPinValue: String = ""
 
   init {
     setContentView(mBinding.root)
     setOnCancelListener { mPinCallback.onPinCancel(this@PinDialog) }
-    mBinding.pinTitle.text = title
+    mBinding.pinTitle.text = Html.fromHtml(getContext().getString(titleResId), Html.FROM_HTML_MODE_COMPACT)
 
     val mButtonsList = ArrayList<View>()
     mButtonsList.add(mBinding.pinNum1)

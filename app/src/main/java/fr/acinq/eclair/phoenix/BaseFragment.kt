@@ -55,9 +55,14 @@ abstract class BaseFragment : Fragment() {
   }
 
   fun getPinDialog(callback: PinDialog.PinDialogCallback): PinDialog {
-    val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), android.R.style.Theme_NoTitleBar_Fullscreen, callback)
+    val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback)
     pinDialog.setCanceledOnTouchOutside(false)
-    pinDialog.setCancelable(false)
+    return pinDialog
+  }
+
+  fun getPinDialog(titleResId: Int, callback: PinDialog.PinDialogCallback): PinDialog {
+    val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback, titleResId)
+    pinDialog.setCanceledOnTouchOutside(false)
     return pinDialog
   }
 

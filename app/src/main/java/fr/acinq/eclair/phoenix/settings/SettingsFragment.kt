@@ -45,6 +45,7 @@ class SettingsFragment : BaseFragment() {
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.closeChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_close_all_channels) }
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
+    mBinding.seedSecurityButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_seed_security) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
   }

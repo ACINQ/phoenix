@@ -28,6 +28,7 @@ import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.Wallet
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -87,11 +88,11 @@ class StartupFragment : BaseFragment() {
   private fun startNodeIfNeeded() {
     context?.let {
       if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.hasWalletBeenSetup(it)) {
-        if (Prefs.isSeedEncrypted(it)) {
+        if (Prefs.getIsSeedEncrypted(it)) {
           // user has defined a pin code encrypting the seed so let's ask for it
           mPinDialog?.show()
         } else {
-          appKit.startAppKit(it, "tutu")
+          appKit.startAppKit(it, Wallet.DEFAULT_PIN)
         }
       }
     } ?: log.warn("cannot start node with null context")

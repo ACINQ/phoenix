@@ -20,6 +20,7 @@
   android:layout_height="wrap_content"
   android:layout_marginStart="@dimen/space_md"
   android:layout_marginEnd="@dimen/space_md"
+  android:layout_marginBottom="@dimen/space_xs"
   android:background="@drawable/app_notif_bg"
   android:padding="@dimen/space_sm">
 
@@ -28,28 +29,28 @@
     android:layout_width="@dimen/button_height"
     android:layout_height="@dimen/button_height"
     android:layout_marginStart="@dimen/space_xs"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
     android:adjustViewBounds="true"
     android:contentDescription="@null"
-    android:scaleType="fitCenter" />
+    android:scaleType="fitCenter"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <TextView
     android:id="@+id/notif_message"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/space_sm"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toEndOf="@+id/notif_icon"
-    app:layout_constraintEnd_toEndOf="parent"
     android:ellipsize="end"
     android:maxLines="2"
     android:text="@string/lipsum"
-    android:textSize="@dimen/text_md" />
+    android:textSize="@dimen/text_md"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/notif_icon"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <Button
-    style="?attr/notifButtonStyle"
     android:id="@+id/notif_button"
+    style="?attr/notifButtonStyle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:layout_constraintStart_toEndOf="@id/notif_icon"

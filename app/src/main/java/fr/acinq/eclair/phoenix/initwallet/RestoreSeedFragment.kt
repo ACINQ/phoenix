@@ -256,7 +256,7 @@ class RestoreSeedViewModel : ViewModel() {
           MnemonicCode.validate(mnemonics)
           val seed: ByteArray = Hex.encode(mnemonics.toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, "tutu")
+          EncryptedSeed.writeSeedToFile(context, seed, Wallet.DEFAULT_PIN)
           log.info("seed written to file")
           state.postValue(RestoreSeedState.DONE)
         } catch (t: Throwable) {

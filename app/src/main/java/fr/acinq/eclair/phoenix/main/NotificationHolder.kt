@@ -29,11 +29,6 @@ import fr.acinq.eclair.phoenix.R
 class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   fun bindItem(notification: NotificationTypes, position: Int) {
-    if (position > 0) {
-      val layoutParams = itemView.layoutParams as ConstraintLayout.LayoutParams
-      val med = itemView.resources.getDimensionPixelOffset(R.dimen.space_md)
-      layoutParams.setMargins(med, itemView.resources.getDimensionPixelOffset(R.dimen.space_xs), med, 0)
-    }
 
     val messageView = itemView.findViewById<TextView>(R.id.notif_message)
     val iconView = itemView.findViewById<ImageView>(R.id.notif_icon)
@@ -48,7 +43,7 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       actionButton.text = itemView.resources.getString(notification.actionResId)
       actionButton.setOnClickListener {
         when (notification) {
-          NotificationTypes.NO_PIN_SET -> {  }
+          NotificationTypes.NO_PIN_SET -> { itemView.findNavController().navigate(R.id.action_main_to_seed_security) }
           NotificationTypes.MNEMONICS_NEVER_SEEN -> { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
           NotificationTypes.MNEMONICS_REMINDER -> {}
         }

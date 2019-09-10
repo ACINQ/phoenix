@@ -33,6 +33,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsDisplaySeedBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,10 +99,10 @@ class DisplaySeedFragment : BaseFragment() {
     if (model.state.value == DisplaySeedState.INIT && model.words.value.isNullOrEmpty()) {
       context?.let {
         model.state.value = DisplaySeedState.UNLOCKING
-        if (Prefs.isSeedEncrypted(it)) {
+        if (Prefs.getIsSeedEncrypted(it)) {
           getPinDialog().show()
         } else {
-          model.getSeed(it, "tutu")
+          model.getSeed(it, Wallet.DEFAULT_PIN)
         }
       }
     }

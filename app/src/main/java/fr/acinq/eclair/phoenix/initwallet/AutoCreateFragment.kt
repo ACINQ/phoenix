@@ -99,7 +99,7 @@ class AutoCreateViewModel : ViewModel() {
           val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
           val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, "tutu")
+          EncryptedSeed.writeSeedToFile(context, seed, Wallet.DEFAULT_PIN)
           log.info("words written to file")
           state.postValue(AutoCreateState.DONE)
         } catch (t: Throwable) {

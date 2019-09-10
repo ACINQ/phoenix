@@ -82,6 +82,9 @@
     <action
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_main_to_seed_security"
+      app:destination="@id/seed_security" />
   </fragment>
 
   <!-- init wallet -->
@@ -253,6 +256,9 @@
     <action
       android:id="@+id/action_settings_to_logs"
       app:destination="@id/logs_fragment" />
+    <action
+      android:id="@+id/action_settings_to_seed_security"
+      app:destination="@id/seed_security" />
   </fragment>
 
   <!-- settings: close all channels and empty wallet  -->
@@ -328,5 +334,9 @@
       android:name="channel_id"
       app:argType="string" />
   </dialog>
+  <fragment
+    android:id="@+id/seed_security"
+    android:name="fr.acinq.eclair.phoenix.settings.SeedSecurityFragment"
+    android:label="seed_security" />
 
 </navigation>

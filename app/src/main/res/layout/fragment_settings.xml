@@ -51,7 +51,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:layout_constraintVertical_bias="0"
           android:orientation="vertical"
-          app:constraint_referenced_ids="general_title, close_channels_button, display_seed_button, advanced_title, list_all_channels_button, logs_button"
+          app:constraint_referenced_ids="general_title,close_channels_button,security_title,display_seed_button,seed_security_button,advanced_title,list_all_channels_button,logs_button"
           app:flow_verticalStyle="packed"
           app:flow_wrapMode="none" />
 
@@ -79,6 +79,20 @@
           app:text="@string/settings_close_all_channels"
           tools:ignore="MissingConstraints" />
 
+        <TextView
+          android:id="@+id/security_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="@dimen/space_md_p"
+          android:paddingTop="@dimen/space_md_p"
+          android:paddingEnd="@dimen/space_md_p"
+          android:paddingBottom="@dimen/space_xs"
+          android:text="@string/settings_security_title"
+          android:textColor="?attr/colorPrimary"
+          android:textSize="@dimen/text_sm"
+          android:textStyle="bold"
+          tools:ignore="MissingConstraints" />
+
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/display_seed_button"
           android:layout_width="match_parent"
@@ -87,6 +101,16 @@
           android:padding="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_display_seed"
+          tools:ignore="MissingConstraints" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/seed_security_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md_p"
+          app:hz_bias="0"
+          app:text="@string/settings_seed_security"
           tools:ignore="MissingConstraints" />
 
         <TextView

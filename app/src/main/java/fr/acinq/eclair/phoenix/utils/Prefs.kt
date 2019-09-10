@@ -54,7 +54,7 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_COIN_UNIT, unit.code()).apply()
   }
 
-  fun isSeedEncrypted(context: Context): Boolean {
+  fun getIsSeedEncrypted(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
   }
 
