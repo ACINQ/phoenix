@@ -265,7 +265,11 @@
   <fragment
     android:id="@+id/list_channels"
     android:name="fr.acinq.eclair.phoenix.settings.ListChannelsFragment"
-    android:label="ListChannelsFragment" />
+    android:label="ListChannelsFragment">
+    <action
+      android:id="@+id/action_list_channels_to_channel_details"
+      app:destination="@id/channel_details" />
+  </fragment>
 
   <!-- settings: display wallet seed -->
   <fragment
@@ -314,5 +318,15 @@
       android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
       android:label="PaymentDetailsTechnicalsFragment" />
   </navigation>
+
+  <!-- channel details dialog -->
+  <dialog
+    android:id="@+id/channel_details"
+    android:name="fr.acinq.eclair.phoenix.settings.ChannelDetailsDialog"
+    android:label="channel_details">
+    <argument
+      android:name="channel_id"
+      app:argType="string" />
+  </dialog>
 
 </navigation>

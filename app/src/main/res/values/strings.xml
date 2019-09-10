@@ -169,11 +169,22 @@
   <string name="listallchannels_in_progress">Please hold…</string>
   <string name="listallchannels_error">There was an error when retrieving the list of channels. Please try again.</string>
   <string name="listallchannels_no_channels">You don\'t have any channels yet.</string>
-  <string name="listallchannels_channels_header">You have %1$d channel(s).</string>
+  <plurals name="listallchannels_channels_header">
+    <item quantity="one">You have %1$d channel.</item>
+    <item quantity="other">You have %1$d channels.</item>
+  </plurals>
   <string name="listallchannels_copy">Copy</string>
+  <string name="listallchannels_share_all">Share all channels…</string>
   <string name="listallchannels_share">Share</string>
+  <string name="listallchannels_close">Close</string>
   <string name="listallchannels_share_subject">Channels data</string>
-  <string name="listallchannels_share_title">Share channels data</string>
+  <string name="listallchannels_share_title">Share channel data</string>
+  <string name="listallchannels_serialization_error">Could not retrieve channel data</string>
+
+  <!-- //////////////// channel details //////////////// -->
+
+  <string name="channel_loading">Retrieving channel data…</string>
+  <string name="channel_error">Could not retrieve channel data</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -251,5 +262,15 @@
   <string name="paymentdetails_created_at_label">Created at</string>
   <string name="paymentdetails_expire_at_label">Expires at</string>
   <string name="paymentdetails_completed_at_label">Completed at</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="state_wait_confirmed">Funding tx is being confirmed</string>
+  <string name="state_closing">Channel is closing</string>
+  <string name="state_closed">Channel has been closed</string>
+  <string name="state_normal">Up and running</string>
+  <string name="state_sync">Synchronizing with peer</string>
+  <string name="state_offline">Peer is offline</string>
+  <string name="state_shutdown">Shutdown</string>
 
 </resources>

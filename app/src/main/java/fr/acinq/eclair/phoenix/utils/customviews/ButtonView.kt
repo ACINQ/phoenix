@@ -24,9 +24,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
-import androidx.core.view.setPadding
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomButtonViewBinding
@@ -57,7 +55,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
       if (arr.hasValue(R.styleable.ButtonView_hz_bias)) {
         val params = mBinding.image.layoutParams as LayoutParams
-        params.horizontalBias = 0f
+        params.horizontalBias = arr.getFloat(R.styleable.ButtonView_hz_bias, 0f)
       }
 
       // optional image

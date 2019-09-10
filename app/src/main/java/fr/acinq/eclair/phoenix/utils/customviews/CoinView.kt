@@ -100,6 +100,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
         mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
         mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
+        mBinding.unit.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
         if (!isEditable) {
           mBinding.clickable.setOnClickListener {

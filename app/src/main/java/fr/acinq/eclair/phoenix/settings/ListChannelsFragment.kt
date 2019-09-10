@@ -16,20 +16,17 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.RES_GETINFO
-import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsListChannelsBinding
@@ -45,13 +42,23 @@ class ListChannelsFragment : BaseFragment() {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentSettingsListChannelsBinding
-
   private lateinit var model: ListChannelsViewModel
+
+  private lateinit var channelsAdapter: ChannelsAdapter
+  private lateinit var channelsManager: RecyclerView.LayoutManager
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsListChannelsBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
-    mBinding.channelsResultSerialized.setHorizontallyScrolling(true)
+
+    channelsAdapter = ChannelsAdapter(ArrayList())
+    channelsManager = LinearLayoutManager(context)
+    mBinding.channelsList.apply {
+      setHasFixedSize(true)
+      adapter = channelsAdapter
+      layoutManager = channelsManager
+    }
+
     return mBinding.root
   }
 
@@ -59,8 +66,9 @@ class ListChannelsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ListChannelsViewModel::class.java)
     model.channels.observe(viewLifecycleOwner, Observer {
+      val channelsCount = it.count()
       when {
-        it.count() > 0 -> mBinding.channelsFoundHeader.text = getString(R.string.listallchannels_channels_header, it.count())
+        channelsCount > 0 -> mBinding.channelsFoundHeader.text = resources.getQuantityString(R.plurals.listallchannels_channels_header, channelsCount, channelsCount)
         else -> mBinding.channelsFoundHeader.text = getString(R.string.listallchannels_no_channels)
       }
     })
@@ -72,21 +80,13 @@ class ListChannelsFragment : BaseFragment() {
     getChannels()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
 
-    mBinding.copyButton.setOnClickListener {
-      try {
-        val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.primaryClip = ClipData.newPlainText("Channels data", model.serializedChannels.value)
-        Toast.makeText(activity!!.applicationContext, getString(R.string.utils_copied), Toast.LENGTH_SHORT).show()
-      } catch (e: Exception) {
-        log.error("failed to copy raw channel data: ${e.localizedMessage}")
-      }
-    }
     mBinding.shareButton.setOnClickListener {
-      model.serializedChannels.value?.let {
+      model.channels.value?.let {
+        val data = it.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))
-        shareIntent.putExtra(Intent.EXTRA_TEXT, it)
+        shareIntent.putExtra(Intent.EXTRA_TEXT, data)
         startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
       }
     }
@@ -98,9 +98,9 @@ class ListChannelsFragment : BaseFragment() {
       model.state.value = ListChannelsState.ERROR
     }) {
       model.state.value = ListChannelsState.IN_PROGRESS
-      val result = appKit.getChannels(null)
-      model.serializedChannels.value = result.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
-      model.channels.value = result
+      val channels = appKit.getChannels(null).toMutableList()
+      channelsAdapter.update(channels)
+      model.channels.value = channels
       model.state.value = ListChannelsState.DONE
     }
   }
@@ -112,6 +112,5 @@ enum class ListChannelsState {
 
 class ListChannelsViewModel : ViewModel() {
   val state = MutableLiveData(ListChannelsState.IN_PROGRESS)
-  val channels = MutableLiveData<Iterable<RES_GETINFO>>(ArrayList())
-  val serializedChannels = MutableLiveData("")
+  val channels = MutableLiveData<MutableList<RES_GETINFO>>(ArrayList())
 }

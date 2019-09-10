@@ -279,6 +279,21 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
+  /**
+   * Retrieves a channel from the router, using its long channel Id.
+   */
+  @UiThread
+  suspend fun getChannel(channelId: ByteVector32): RES_GETINFO? {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        kit.value?.api?.let {
+          val res = Await.result(it.channelInfo(Left.apply(channelId), timeout), awaitDuration) as RES_GETINFO
+          res
+        }
+      }
+    }.await()
+  }
+
   @UiThread
   suspend fun closeAllChannels(address: String) {
     return coroutineScope {
