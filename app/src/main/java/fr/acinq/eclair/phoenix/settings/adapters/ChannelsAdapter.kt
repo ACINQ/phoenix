@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.eclair.phoenix.settings
+package fr.acinq.eclair.phoenix.settings.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

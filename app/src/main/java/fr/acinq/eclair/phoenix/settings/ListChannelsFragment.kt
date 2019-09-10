@@ -30,6 +30,7 @@ import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsListChannelsBinding
+import fr.acinq.eclair.phoenix.settings.adapters.ChannelsAdapter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger

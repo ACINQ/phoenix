@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.eclair.phoenix.settings
+package fr.acinq.eclair.phoenix.settings.adapters
 
 import android.content.res.ColorStateList
 import android.view.View
@@ -23,15 +23,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.phoenix.R
+import fr.acinq.eclair.phoenix.settings.ListChannelsFragmentDirections
 import fr.acinq.eclair.phoenix.utils.Transcriber
 import fr.acinq.eclair.phoenix.utils.customviews.CoinView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import upickle.`default$`
 
 class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
