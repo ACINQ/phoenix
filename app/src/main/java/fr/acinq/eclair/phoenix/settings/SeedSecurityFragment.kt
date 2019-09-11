@@ -53,11 +53,11 @@ class SeedSecurityFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(SeedSecurityViewModel::class.java)
-    model.state.observe(viewLifecycleOwner, Observer { state ->
+    model.pinUpdateState.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
-        SeedSecurityState.ABORT_PIN_UPDATE -> Handler().postDelayed({ model.state.value = SeedSecurityState.IDLE }, 2500)
-        SeedSecurityState.SUCCESS_PIN_UPDATE -> Handler().postDelayed({ model.state.value = SeedSecurityState.IDLE }, 4500)
-        SeedSecurityState.SET_NEW_PIN -> promptNewPin()
+        SeedSecurityViewModel.PinUpdateState.ABORT_PIN_UPDATE -> Handler().postDelayed({ model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.IDLE }, 2500)
+        SeedSecurityViewModel.PinUpdateState.SUCCESS_PIN_UPDATE -> Handler().postDelayed({ model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.IDLE }, 4500)
+        SeedSecurityViewModel.PinUpdateState.SET_NEW_PIN -> promptNewPin()
         else -> {
         }
       }
@@ -73,7 +73,7 @@ class SeedSecurityFragment : BaseFragment() {
     val isSeedEncrypted = context?.let { ctx -> Prefs.getIsSeedEncrypted(ctx) } ?: true
     model.isSeedEncrypted.value = isSeedEncrypted
     mBinding.setPinButton.setOnClickListener {
-      model.state.value = SeedSecurityState.ENTER_PIN
+      model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.ENTER_PIN
       if (isSeedEncrypted) {
         promptExistingPin()
       } else {
@@ -101,7 +101,7 @@ class SeedSecurityFragment : BaseFragment() {
       }
 
       override fun onPinCancel(dialog: PinDialog) {
-        model.state.value = SeedSecurityState.IDLE
+        model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.IDLE
       }
     }).show()
   }
@@ -112,33 +112,34 @@ class SeedSecurityFragment : BaseFragment() {
         if (pinCode == firstPin) {
           model.encryptSeed(context, pinCode)
         } else {
-          model.state.value = SeedSecurityState.ABORT_PIN_UPDATE
+          model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.ABORT_PIN_UPDATE
           model.errorMessage.value = R.string.seedsec_error_pins_match
         }
         dialog.dismiss()
       }
 
       override fun onPinCancel(dialog: PinDialog) {
-        model.state.value = SeedSecurityState.IDLE
+        model.pinUpdateState.value = SeedSecurityViewModel.PinUpdateState.IDLE
       }
     }).show()
   }
 }
 
-enum class SeedSecurityState {
-  ENTER_PIN, SET_NEW_PIN, ENCRYPTING, ABORT_PIN_UPDATE, SUCCESS_PIN_UPDATE, IDLE
-}
-
 class SeedSecurityViewModel : ViewModel() {
+
+  enum class PinUpdateState {
+    ENTER_PIN, SET_NEW_PIN, ENCRYPTING, ABORT_PIN_UPDATE, SUCCESS_PIN_UPDATE, IDLE
+  }
+
   private val log = LoggerFactory.getLogger(DisplaySeedViewModel::class.java)
 
   private val seed = MutableLiveData<ByteArray>(null)
-  val state = MutableLiveData(SeedSecurityState.IDLE)
+  val pinUpdateState = MutableLiveData(PinUpdateState.IDLE)
   val errorMessage = MutableLiveData<Int>(null)
   val isSeedEncrypted = MutableLiveData(false)
 
-  val newPinInProgress: LiveData<Boolean> = Transformations.map(state) {
-    it == SeedSecurityState.ENTER_PIN || it == SeedSecurityState.SET_NEW_PIN || it == SeedSecurityState.ENCRYPTING
+  val newPinInProgress: LiveData<Boolean> = Transformations.map(pinUpdateState) {
+    it == PinUpdateState.ENTER_PIN || it == PinUpdateState.SET_NEW_PIN || it == PinUpdateState.ENCRYPTING
   }
 
   /**
@@ -146,15 +147,15 @@ class SeedSecurityViewModel : ViewModel() {
    */
   @UiThread
   fun readSeed(context: Context?, pin: String) {
-    if (state.value != SeedSecurityState.IDLE) {
-      log.error("cannot read seed in state ${state.value}")
+    if (pinUpdateState.value != PinUpdateState.IDLE) {
+      log.error("cannot read seed in state ${pinUpdateState.value}")
     }
     if (context != null) {
       viewModelScope.launch {
         withContext(Dispatchers.Default) {
           try {
             seed.postValue(EncryptedSeed.readSeedFile(context, pin))
-            state.postValue(SeedSecurityState.SET_NEW_PIN)
+            pinUpdateState.postValue(PinUpdateState.SET_NEW_PIN)
           } catch (e: Exception) {
             log.error("could not read seed: ", e)
             if (pin == Wallet.DEFAULT_PIN) {
@@ -162,7 +163,7 @@ class SeedSecurityViewModel : ViewModel() {
               Prefs.setIsSeedEncrypted(context)
               isSeedEncrypted.postValue(true)
             }
-            state.postValue(SeedSecurityState.ABORT_PIN_UPDATE)
+            pinUpdateState.postValue(PinUpdateState.ABORT_PIN_UPDATE)
             errorMessage.postValue(R.string.seedsec_error_wrong_pin)
           }
         }
@@ -178,15 +179,15 @@ class SeedSecurityViewModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         try {
-          if (state.value != SeedSecurityState.SET_NEW_PIN) {
-            throw java.lang.RuntimeException("cannot encrypt seed in state ${state.value}")
+          if (pinUpdateState.value != PinUpdateState.SET_NEW_PIN) {
+            throw java.lang.RuntimeException("cannot encrypt seed in state ${pinUpdateState.value}")
           }
-          state.postValue(SeedSecurityState.ENCRYPTING)
+          pinUpdateState.postValue(PinUpdateState.ENCRYPTING)
           EncryptedSeed.writeSeedToFile(context!!, seed.value ?: throw RuntimeException("empty seed"), pin)
-          state.postValue(SeedSecurityState.SUCCESS_PIN_UPDATE)
+          pinUpdateState.postValue(PinUpdateState.SUCCESS_PIN_UPDATE)
         } catch (e: java.lang.Exception) {
           log.error("could not encrypt seed: ", e)
-          state.postValue(SeedSecurityState.ABORT_PIN_UPDATE)
+          pinUpdateState.postValue(PinUpdateState.ABORT_PIN_UPDATE)
           errorMessage.postValue(R.string.seedsec_error_generic)
         }
       }

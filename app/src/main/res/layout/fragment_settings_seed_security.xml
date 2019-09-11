@@ -20,7 +20,7 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.SeedSecurityState" />
+    <import type="fr.acinq.eclair.phoenix.settings.SeedSecurityViewModel.PinUpdateState" />
 
     <variable
       name="model"
@@ -71,7 +71,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:visibility="@{model.state == SeedSecurityState.IDLE}"
+          android:visibility="@{model.pinUpdateState == PinUpdateState.IDLE}"
           app:icon="@drawable/ic_shield"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep"
@@ -83,7 +83,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
           android:drawableStart="@drawable/ic_alert_triangle"
-          android:visibility="@{model.state == SeedSecurityState.ABORT_PIN_UPDATE}"
+          android:visibility="@{model.pinUpdateState == PinUpdateState.ABORT_PIN_UPDATE}"
           app:layout_constraintTop_toBottomOf="@id/sep" />
 
         <TextView
@@ -94,7 +94,7 @@
           android:drawableTint="@color/green"
           android:text="@string/seedsec_pin_update_success"
           android:textColor="@color/green"
-          android:visibility="@{model.state == SeedSecurityState.SUCCESS_PIN_UPDATE}"
+          android:visibility="@{model.pinUpdateState == PinUpdateState.SUCCESS_PIN_UPDATE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep" />
 
