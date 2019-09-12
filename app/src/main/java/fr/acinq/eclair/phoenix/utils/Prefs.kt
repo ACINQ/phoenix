@@ -19,20 +19,27 @@ package fr.acinq.eclair.phoenix.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import android.util.Base64
 import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.MSatUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
 
 object Prefs {
-  private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
+
+  // -- unit, fiat, conversion...
   const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
   private const val PREFS_FIAT_CURRENCY: String = "PREFS_FIAT_CURRENCY"
   private const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
+
+  // -- authentication with PIN/biometrics
+  private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+  private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
+  private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
+  private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
 
   fun isFirstTime(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)
@@ -41,6 +48,45 @@ object Prefs {
   fun setHasStartedOnce(context: Context) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
   }
+
+  // -- ==================================
+  // -- authentication with PIN/biometrics
+  // -- ==================================
+
+  fun getIsSeedEncrypted(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
+  }
+
+  fun setIsSeedEncrypted(context: Context) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, true).apply()
+  }
+
+  fun useBiometrics(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_USE_BIOMETRICS, false)
+  }
+  fun saveUseBiometrics(context: Context, useBiometrics: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_USE_BIOMETRICS, useBiometrics).apply()
+  }
+
+  fun getEncryptedPIN(context: Context): ByteArray? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN, null)?.let { Base64.decode(it, Base64.DEFAULT) }
+  }
+
+  fun saveEncryptedPIN(context: Context, encryptedPIN: ByteArray) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN, Base64.encodeToString(encryptedPIN, Base64.DEFAULT)).apply()
+  }
+
+  fun getEncryptedPINIV(context: Context): ByteArray? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN_IV, null)?.let { Base64.decode(it, Base64.DEFAULT) }
+  }
+
+  fun saveEncryptedPINIV(context: Context, iv: ByteArray) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN_IV, Base64.encodeToString(iv, Base64.DEFAULT)).apply()
+  }
+
+  // -- ==================================
+  // -- unit, fiat, conversion...
+  // -- ==================================
 
   fun getCoinUnit(prefs: SharedPreferences): CoinUnit {
     return `CoinUtils$`.`MODULE$`.getUnitFromString(prefs.getString(PREFS_COIN_UNIT, SatUnit.code()))
@@ -52,14 +98,6 @@ object Prefs {
 
   fun setCoinUnit(context: Context, unit: CoinUnit) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_COIN_UNIT, unit.code()).apply()
-  }
-
-  fun getIsSeedEncrypted(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
-  }
-
-  fun setIsSeedEncrypted(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, true).apply()
   }
 
   fun getMnemonicsSeenTimestamp(context: Context): Long {

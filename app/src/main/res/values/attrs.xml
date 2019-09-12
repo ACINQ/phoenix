@@ -40,8 +40,11 @@
   <attr name="altTextColor" format="reference" />
 
   <attr name="text" format="string" />
-  <attr name="text_color" format="color">@col</attr>
+  <attr name="text_color" format="color" />
   <attr name="text_size" format="dimension" />
+  <attr name="icon" format="reference" />
+  <attr name="icon_tint" format="color" />
+  <attr name="icon_size" format="dimension" />
 
   <declare-styleable name="ProgressTextView">
     <attr name="text" />
@@ -64,10 +67,18 @@
     <attr name="text" />
     <attr name="text_color" />
     <attr name="text_size" />
-    <attr name="icon" format="reference" />
-    <attr name="icon_tint" format="color" />
-    <attr name="icon_size" format="dimension" />
+    <attr name="icon" />
+    <attr name="icon_tint" />
+    <attr name="icon_size" />
     <attr name="hz_bias" format="float" />
+  </declare-styleable>
+  <declare-styleable name="SwitchView">
+    <attr name="text" />
+    <attr name="text_color" />
+    <attr name="text_size" />
+    <attr name="icon" />
+    <attr name="icon_tint" />
+    <attr name="icon_size" />
   </declare-styleable>
   <declare-styleable name="ActionBarView">
     <attr name="text" />

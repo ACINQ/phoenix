@@ -74,7 +74,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md_p"
+          android:paddingStart="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_close_all_channels"
           tools:ignore="MissingConstraints" />
@@ -98,7 +98,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md_p"
+          android:paddingStart="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_display_seed"
           tools:ignore="MissingConstraints" />
@@ -108,7 +108,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md_p"
+          android:paddingStart="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_seed_security"
           tools:ignore="MissingConstraints" />
@@ -132,7 +132,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md_p"
+          android:paddingStart="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_list_channels"
           tools:ignore="MissingConstraints" />
@@ -142,7 +142,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
-          android:padding="@dimen/space_md_p"
+          android:paddingStart="@dimen/space_md_p"
           app:hz_bias="0"
           app:text="@string/settings_logs"
           tools:ignore="MissingConstraints" />

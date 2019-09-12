@@ -42,14 +42,22 @@
   <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds.\nOnly I possess it.</string>
   <string name="newseed_next">Next</string>
 
-  <!-- //////////////// Pin dialogs //////////////////// -->
+  <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Please enter your PIN</string>
   <string name="pindialog_pwd_placeholder">●●●●●●</string>
   <string name="pindialog_error">PIN code must be a 6 digits number.</string>
   <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
 
+  <!-- //////////////// Biometric dialog //////////////////// -->
+
+  <string name="biometricprompt_title">Wallet is locked</string>
+  <string name="biometricprompt_subtitle">Please confirm your identity</string>
+  <string name="biometricprompt_desc">Lorem ipsum description</string>
+  <string name="biometricprompt_negative">Unlock with PIN</string>
+
   <!-- //////////////// placeholders ////////////////-->
+
   <string name="lipsum_short">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
   <string name="lipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
   <string name="lipsum_long">
@@ -150,7 +158,7 @@
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_display_seed">My wallet\'s seed</string>
-  <string name="settings_seed_security">Manage access</string>
+  <string name="settings_seed_security">Wallet security</string>
   <string name="settings_list_channels">List my channels</string>
   <string name="settings_logs">App logs</string>
 
@@ -278,17 +286,32 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Security</string>
-  <string name="seedsec_instructions">Your wallet should always be protected by a 8-digits PIN password, in case your phone is compromised.</string>
+
+  <string name="seedsec_prot_none">Your wallet should always be protected in case your phone is compromised.\n\nPlease consider setting up a PIN code.\n\nNote that biometric locks such as Fingerprint can be used if you device supports it.</string>
+  <string name="seedsec_prot_pin_only">Your wallet is protected by a 8-digits PIN.</string>
+  <string name="seedsec_prot_biometrics_button">Biometric authentication</string>
+  <string name="seedsec_prot_fingerprint_supported">Your device supports Fingerprint lock. Do you want to enable it for this application?</string>
+  <string name="seedsec_prot_pin_and_bio">Your wallet is protected with a PIN and a Fingerprint.</string>
+
   <string name="seedsec_error_wrong_pin">Invalid password, please try again.</string>
   <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
   <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+
+  <string name="seedsec_disable_bio_prompt_title">Are you sure you want to disable biometric authentication?</string>
+  <string name="seedsec_disable_bio_prompt_subtitle">You will have to use your PIN code from now</string>
+  <string name="seedsec_disable_bio_prompt_negative">Cancel</string>
+
+  <string name="seedsec_bio_prompt_title">Enroll biometric authentication</string>
+  <string name="seedsec_bio_prompt_subtitle">You will be able to easily unlock your wallet</string>
+  <string name="seedsec_bio_prompt_negative">Cancel</string>
+
   <string name="seedsec_wait">Please hold…</string>
   <string name="seedsec_pin_update_success">PIN successfully updated!</string>
   <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
   <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
   <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
   <string name="seedsec_setup_pin">Protect my wallet…</string>
-  <string name="seedsec_change_pin">Change my wallet PIN</string>
+  <string name="seedsec_change_pin">Change my PIN</string>
   <string name="seedsec_fingerprint_enable">Do you want to unlock your wallet with your fingerprint?</string>
   <string name="seedsec_fingerprint_disable">Disable fingerprint</string>
   <string name="seedsec_fingerprint_is_enabled">Fingerprint is enabled</string>

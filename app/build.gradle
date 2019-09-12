@@ -101,6 +101,10 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
+  // ANDROIDX - biometric
+  def biometric_version = "1.0.0-beta01"
+  implementation "androidx.biometric:biometric:$biometric_version"
+
   // logging
   implementation 'org.slf4j:slf4j-api:1.7.25'
   implementation 'com.github.tony19:logback-android:2.0.0'

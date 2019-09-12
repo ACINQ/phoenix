@@ -27,6 +27,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
+import fr.acinq.eclair.phoenix.utils.KeystoreHelper
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import org.slf4j.Logger
@@ -86,13 +87,24 @@ class StartupFragment : BaseFragment() {
   }
 
   private fun startNodeIfNeeded() {
-    context?.let {
-      if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.hasWalletBeenSetup(it)) {
-        if (Prefs.getIsSeedEncrypted(it)) {
-          // user has defined a pin code encrypting the seed so let's ask for it
-          mPinDialog?.show()
-        } else {
-          appKit.startAppKit(it, Wallet.DEFAULT_PIN)
+    context?.let { ctx ->
+      if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.hasWalletBeenSetup(ctx)) {
+        when {
+          Prefs.useBiometrics(ctx) ->
+            getBiometricAuth({
+              mPinDialog?.show()
+            }, {
+              try {
+                val pin = KeystoreHelper.decryptPin(ctx)?.toString(Charsets.UTF_8)
+                appKit.startAppKit(ctx, pin!!)
+              } catch (e: Exception) {
+                log.error("could not decrypt pin: ", e)
+              }
+            })
+          Prefs.getIsSeedEncrypted(ctx) ->
+            mPinDialog?.show()
+          else ->
+            appKit.startAppKit(ctx, Wallet.DEFAULT_PIN)
         }
       }
     } ?: log.warn("cannot start node with null context")
