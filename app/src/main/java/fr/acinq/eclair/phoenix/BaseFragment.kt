@@ -16,7 +16,6 @@
 
 package fr.acinq.eclair.phoenix
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -26,9 +25,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.security.PinDialog
-import fr.acinq.eclair.phoenix.settings.SeedSecurityViewModel
-import fr.acinq.eclair.phoenix.utils.KeystoreHelper
-import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -60,27 +56,21 @@ abstract class BaseFragment : Fragment() {
     }
   }
 
-  fun getBiometricAuth(pinCallback: () -> Unit, successCallback: () -> Unit) {
+  fun getBiometricAuth(titleResId: Int = R.string.biometricprompt_title, negativeResId: Int = R.string.biometricprompt_negative, descResId: Int? = null, negativeCallback: () -> Unit, successCallback: () -> Unit): BiometricPrompt {
     val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-      .setTitle(getString(R.string.biometricprompt_title))
-      .setSubtitle(getString(R.string.biometricprompt_subtitle))
-      .setDescription(getString(R.string.biometricprompt_desc))
-      .setNegativeButtonText(getString(R.string.biometricprompt_negative))
-      .build()
+      .setTitle(getString(titleResId))
+      .setDeviceCredentialAllowed(false)
+      .setNegativeButtonText(getString(negativeResId))
+
+    descResId?.let { biometricPromptInfo.setDescription(getString(descResId)) }
 
     val biometricPrompt = BiometricPrompt(this, { runnable -> Handler(Looper.getMainLooper()).post(runnable) }, object : BiometricPrompt.AuthenticationCallback() {
       override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
         super.onAuthenticationError(errorCode, errString)
         log.info("biometric auth error ($errorCode): $errString")
         if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
-          log.info("user wants the PIN dialog!")
-          pinCallback()
+          negativeCallback()
         }
-      }
-
-      override fun onAuthenticationFailed() {
-        super.onAuthenticationFailed()
-        log.info("biometric auth is not recognized")
       }
 
       override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -88,24 +78,29 @@ abstract class BaseFragment : Fragment() {
         try {
           successCallback()
         } catch (e: Exception) {
-          log.error("could not encrypt pin in keystore: ", e)
+          log.error("could not handle successful biometric auth callback: ", e)
         }
       }
     })
 
-    biometricPrompt.authenticate(biometricPromptInfo)
+    biometricPrompt.authenticate(biometricPromptInfo.build())
+    return biometricPrompt
   }
 
-  fun getPinDialog(callback: PinDialog.PinDialogCallback): PinDialog {
-    val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback)
-    pinDialog.setCanceledOnTouchOutside(false)
-    return pinDialog
+  fun getPinDialog(callback: PinDialog.PinDialogCallback): PinDialog? {
+    return context?.let {
+      val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback)
+      pinDialog.setCanceledOnTouchOutside(false)
+      pinDialog
+    }
   }
 
-  fun getPinDialog(titleResId: Int, callback: PinDialog.PinDialogCallback): PinDialog {
-    val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback, titleResId)
-    pinDialog.setCanceledOnTouchOutside(false)
-    return pinDialog
+  fun getPinDialog(titleResId: Int, callback: PinDialog.PinDialogCallback): PinDialog? {
+    return context?.let {
+      val pinDialog = PinDialog(it, R.style.dialog_fullScreen, callback, titleResId)
+      pinDialog.setCanceledOnTouchOutside(false)
+      pinDialog
+    }
   }
 
 }

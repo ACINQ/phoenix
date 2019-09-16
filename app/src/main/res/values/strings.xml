@@ -52,8 +52,6 @@
   <!-- //////////////// Biometric dialog //////////////////// -->
 
   <string name="biometricprompt_title">Wallet is locked</string>
-  <string name="biometricprompt_subtitle">Please confirm your identity</string>
-  <string name="biometricprompt_desc">Lorem ipsum description</string>
   <string name="biometricprompt_negative">Unlock with PIN</string>
 
   <!-- //////////////// placeholders ////////////////-->
@@ -75,6 +73,7 @@
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
   <string name="startup_error_generic">The application could not start, please try later</string>
+  <string name="startup_error_auth">Could not authenticate user.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -287,34 +286,35 @@
 
   <string name="seedsec_title">Security</string>
 
-  <string name="seedsec_prot_none">Your wallet should always be protected in case your phone is compromised.\n\nPlease consider setting up a PIN code.\n\nNote that biometric locks such as Fingerprint can be used if you device supports it.</string>
-  <string name="seedsec_prot_pin_only">Your wallet is protected by a 8-digits PIN.</string>
-  <string name="seedsec_prot_biometrics_button">Biometric authentication</string>
-  <string name="seedsec_prot_fingerprint_supported">Your device supports Fingerprint lock. Do you want to enable it for this application?</string>
-  <string name="seedsec_prot_pin_and_bio">Your wallet is protected with a PIN and a Fingerprint.</string>
-
-  <string name="seedsec_error_wrong_pin">Invalid password, please try again.</string>
-  <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
-  <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Are you sure you want to disable biometric authentication?</string>
-  <string name="seedsec_disable_bio_prompt_subtitle">You will have to use your PIN code from now</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancel</string>
-
-  <string name="seedsec_bio_prompt_title">Enroll biometric authentication</string>
-  <string name="seedsec_bio_prompt_subtitle">You will be able to easily unlock your wallet</string>
-  <string name="seedsec_bio_prompt_negative">Cancel</string>
-
-  <string name="seedsec_wait">Please hold…</string>
-  <string name="seedsec_pin_update_success">PIN successfully updated!</string>
+  <string name="seedsec_instructions">Your wallet should always be protected by a PIN in case your phone is compromised. If your device supports it, you can use biometric authentication.</string>
+  <string name="seedsec_pin_switch">PIN authentication</string>
+  <string name="seedsec_biometrics_switch">Biometric authentication</string>
+  <string name="seedsec_change_pin">Change my PIN…</string>
+  <string name="seedsec_biometric_enrollment_error">Biometric enrollment failed. Please try again.</string>
+  <string name="seedsec_biometric_not_supported">Your device does not support Biometric authentication.</string>
   <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
   <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
   <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
-  <string name="seedsec_setup_pin">Protect my wallet…</string>
-  <string name="seedsec_change_pin">Change my PIN</string>
-  <string name="seedsec_fingerprint_enable">Do you want to unlock your wallet with your fingerprint?</string>
-  <string name="seedsec_fingerprint_disable">Disable fingerprint</string>
-  <string name="seedsec_fingerprint_is_enabled">Fingerprint is enabled</string>
-  <string name="seedsec_fingerprint_is_disabled">Fingerprint is disabled</string>
+
+  <string name="seedsec_pin_update_success">PIN successfully updated!</string>
+  <string name="seedsec_biometric_enabled">Biometric authentication activated</string>
+  <string name="seedsec_biometric_disabled">Biometric authentication disabled</string>
+
+  <string name="seedsec_biometric_support_no_hw">Your device does not support biometric authentication</string>
+  <string name="seedsec_biometric_support_hw_unavailable">Biometric hardware is not available. Try again later.</string>
+  <string name="seedsec_biometric_support_none_enrolled">Please enroll biometric first.</string>
+
+  <string name="seedsec_error_wrong_pin">Invalid PIN</string>
+  <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
+  <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+
+  <string name="seedsec_disable_bio_prompt_title">Disable biometric lock</string>
+  <string name="seedsec_disable_bio_prompt_desc">You will have to use your PIN code from now</string>
+  <string name="seedsec_disable_bio_prompt_negative">Cancel</string>
+
+  <string name="seedsec_bio_prompt_title">Enable biometric lock</string>
+  <string name="seedsec_bio_prompt_negative">Cancel</string>
+
+
 
 </resources>

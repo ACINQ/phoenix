@@ -100,7 +100,7 @@ class DisplaySeedFragment : BaseFragment() {
       context?.let {
         model.state.value = DisplaySeedState.UNLOCKING
         if (Prefs.getIsSeedEncrypted(it)) {
-          getPinDialog().show()
+          getPinDialog()?.show()
         } else {
           model.getSeed(it, Wallet.DEFAULT_PIN)
         }
@@ -119,7 +119,7 @@ class DisplaySeedFragment : BaseFragment() {
     }
   }
 
-  private fun getPinDialog(): PinDialog {
+  private fun getPinDialog(): PinDialog? {
     return mPinDialog ?: getPinDialog(object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
         context?.let { model.getSeed(it, pinCode) }

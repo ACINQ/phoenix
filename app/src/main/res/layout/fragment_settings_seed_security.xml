@@ -54,90 +54,67 @@
         android:layout_height="wrap_content">
 
         <TextView
-          android:id="@+id/prot_none"
+          android:id="@+id/prot_instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_lg"
-          android:text="@string/seedsec_prot_none"
-          android:visibility="@{model.protectionState == ProtectionState.NONE}"
+          android:paddingStart="@dimen/space_md_p"
+          android:paddingEnd="@dimen/space_md_p"
+          android:paddingTop="@dimen/space_md"
+          android:paddingBottom="@dimen/space_md"
+          android:background="@color/athens"
+          android:textSize="@dimen/text_sm"
+          android:textColor="@color/slate"
+          android:text="@string/seedsec_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-          android:id="@+id/prot_pin"
+        <View
+          android:id="@+id/sep_pin_state"
+          style="@style/HLineSeparator"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/prot_instructions" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.SwitchView
+          android:id="@+id/pin_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_lg"
-          android:text="@string/seedsec_prot_pin_only"
-          android:visibility="@{model.protectionState == ProtectionState.PIN_ONLY}"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-          android:id="@+id/prot_pin_and_bio"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:padding="@dimen/space_lg"
-          android:text="@string/seedsec_prot_pin_and_bio"
-          android:visibility="@{model.protectionState == ProtectionState.PIN_AND_BIOMETRICS}"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.Barrier
-          android:id="@+id/head_barrier"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          app:barrierDirection="bottom"
-          app:constraint_referenced_ids="prot_none,prot_pin,prot_pin_and_bio" />
+          app:enableOrFade="@{model.protectionState == ProtectionState.NONE}"
+          app:layout_constraintTop_toBottomOf="@id/sep_pin_state"
+          app:text="@string/seedsec_pin_switch" />
 
         <View
           android:id="@+id/sep_pin_update"
           style="@style/HLineSeparator"
-          app:layout_constraintTop_toBottomOf="@id/head_barrier" />
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/pin_switch" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/set_pin_button"
+          android:id="@+id/update_pin_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
           app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
+          android:visibility="@{model.protectionState != ProtectionState.NONE}"
           app:hz_bias="0"
-          app:icon="@drawable/ic_shield"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_pin_update"
-          app:text="@string/seedsec_setup_pin" />
+          app:text="@string/seedsec_change_pin" />
 
         <View
           android:id="@+id/sep_biometrics"
           style="@style/HLineSeparator"
-          app:layout_constraintTop_toBottomOf="@id/set_pin_button" />
+          android:visibility="@{model.protectionState != ProtectionState.NONE}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/update_pin_button" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.SwitchView
-          android:id="@+id/biometrics_checkbox"
+          android:id="@+id/biometrics_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
+          android:visibility="@{model.protectionState != ProtectionState.NONE}"
           app:icon="@drawable/ic_fingerprint"
           app:layout_constraintTop_toBottomOf="@id/sep_biometrics"
-          app:text="@string/seedsec_prot_biometrics_button" />
-
-        <TextView
-          android:id="@+id/error"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
-          android:drawableStart="@drawable/ic_alert_triangle"
-          android:visibility="@{model.protectionUpdateState == ProtectionUpdateState.ERROR}"
-          app:layout_constraintTop_toBottomOf="@id/sep_pin_update" />
-
-<!--        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView-->
-<!--          android:layout_width="wrap_content"-->
-<!--          android:layout_height="wrap_content"-->
-<!--          android:layout_marginTop="@dimen/space_lg"-->
-<!--          android:visibility="@{model.newPinInProgress}"-->
-<!--          app:layout_constrainedWidth="true"-->
-<!--          app:layout_constraintEnd_toEndOf="parent"-->
-<!--          app:layout_constraintHorizontal_bias="0"-->
-<!--          app:layout_constraintStart_toStartOf="parent"-->
-<!--          app:layout_constraintTop_toBottomOf="@id/sep"-->
-<!--          app:text="@string/seedsec_wait" />-->
+          app:text="@string/seedsec_biometrics_switch" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

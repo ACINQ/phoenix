@@ -64,7 +64,8 @@ object Prefs {
   fun useBiometrics(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_USE_BIOMETRICS, false)
   }
-  fun saveUseBiometrics(context: Context, useBiometrics: Boolean) {
+
+  fun useBiometrics(context: Context, useBiometrics: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_USE_BIOMETRICS, useBiometrics).apply()
   }
 

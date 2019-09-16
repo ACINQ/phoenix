@@ -73,8 +73,8 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
         view.isHapticFeedbackEnabled = true
         view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
         if (mPinValue == "" || mPinValue.length != PIN_LENGTH) {
-          val `val` = (view as Button).text.toString()
-          mPinValue += `val`
+          val digit = (view as Button).text.toString()
+          mPinValue += digit
           mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
         }
       }
@@ -91,6 +91,11 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
         mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
       }
     }
+  }
+
+  fun reset() {
+    mPinValue = ""
+    mBinding.pinDisplay.text = ""
   }
 
   fun animateSuccess() {

@@ -22,8 +22,10 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginStart
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomSwitchViewBinding
@@ -37,9 +39,7 @@ class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet
   init {
     attrs?.let {
       val arr = context.obtainStyledAttributes(attrs, R.styleable.SwitchView, defStyleAttr, R.style.default_buttonStyle)
-
       background = context.getDrawable(R.drawable.button_bg_square)
-
       mBinding.text.text = arr.getString(R.styleable.SwitchView_text)
       if (arr.hasValue(R.styleable.SwitchView_text_size)) {
         mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.SwitchView_text_size, R.dimen.text_lg).toFloat())
@@ -54,6 +54,9 @@ class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
       } else {
         mBinding.icon.visibility = GONE
+        val params = LayoutParams(0, LayoutParams.WRAP_CONTENT)
+        params.setMargins(0, 0, 0, 0)
+        mBinding.text.layoutParams = params
       }
 
       arr.recycle()

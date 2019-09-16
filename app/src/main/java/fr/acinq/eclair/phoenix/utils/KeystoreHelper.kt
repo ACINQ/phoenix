@@ -30,10 +30,9 @@ import javax.crypto.spec.IvParameterSpec
 
 object KeystoreHelper {
 
-  val log: Logger = LoggerFactory.getLogger(this::class.java)
   private const val PIN_KEY_NAME = "PHOENIX_KEY_PIN"
 
-  public fun generateKeyForPin() {
+  fun generateKeyForPin() {
     val keyStore = KeyStore.getInstance("AndroidKeyStore")
     keyStore.load(null)
     val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
@@ -44,12 +43,6 @@ object KeystoreHelper {
       .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
       .build())
     keyGenerator.generateKey()
-  }
-
-  public fun getAllAliases(): ArrayList<String> {
-    val keyStore = KeyStore.getInstance("AndroidKeyStore")
-    keyStore.load(null)
-    return Collections.list(keyStore.aliases())
   }
 
   private fun getKeyForPin(): SecretKey? {
@@ -69,7 +62,6 @@ object KeystoreHelper {
       val cipher = Cipher.getInstance("${KeyProperties.KEY_ALGORITHM_AES}/${KeyProperties.BLOCK_MODE_CBC}/${KeyProperties.ENCRYPTION_PADDING_PKCS7}")
       cipher.init(Cipher.ENCRYPT_MODE, sk)
       val iv = cipher.iv
-      log.info("encrypt pin with iv=$iv")
       Prefs.saveEncryptedPINIV(context, iv)
       val encrypted = cipher.doFinal(pin.toByteArray(Charsets.UTF_8))
       Prefs.saveEncryptedPIN(context, encrypted)
@@ -80,7 +72,6 @@ object KeystoreHelper {
     val sk = getKeyForPin() ?: throw RuntimeException("could not retrieve PIN key from keystore")
     val iv = Prefs.getEncryptedPINIV(context) ?: throw java.lang.RuntimeException("pin initialization vector is missing")
     val pin = Prefs.getEncryptedPIN(context) ?: throw java.lang.RuntimeException("encrypted pin is missing")
-    log.info("decrypt pin with iv=$iv")
     val cipher = Cipher.getInstance("${KeyProperties.KEY_ALGORITHM_AES}/${KeyProperties.BLOCK_MODE_CBC}/${KeyProperties.ENCRYPTION_PADDING_PKCS7}")
     cipher.init(Cipher.DECRYPT_MODE, sk, IvParameterSpec(iv))
     return cipher.doFinal(pin)

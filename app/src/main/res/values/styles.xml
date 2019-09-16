@@ -50,7 +50,7 @@
 
     <!-- widget overrides -->
     <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
-    <item name="actionBarViewStyle">@style/paragraph_textViewStyle</item>
+    <item name="actionBarViewStyle">@style/default_actionBar</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
@@ -69,6 +69,10 @@
     <item name="android:textStyle">normal</item>
     <item name="android:fontFamily">sans-serif</item>
     <item name="android:letterSpacing">0.035</item>
+  </style>
+
+  <style name="default_actionBar" parent="default_textAppearance">
+    <item name="android:background">?attr/defaultMutedBackgroundColor</item>
   </style>
 
   <style name="default_textAppearance_alt" parent="default_textAppearance">

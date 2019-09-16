@@ -33,13 +33,13 @@ class ActionBarView @JvmOverloads constructor(context: Context, attrs: Attribute
 
   init {
     attrs?.let {
-      val arr = context.obtainStyledAttributes(attrs, R.styleable.ActionBarView, defStyleAttr, R.style.default_textAppearance)
+      val arr = context.obtainStyledAttributes(attrs, R.styleable.ActionBarView, defStyleAttr, R.style.default_actionBar)
       mBinding.title.text = arr.getString(R.styleable.ActionBarView_text)
       arr.recycle()
     }
   }
 
-  fun setOnBackAction(l : View.OnClickListener) {
+  fun setOnBackAction(l : OnClickListener) {
     mBinding.backButton.setOnClickListener(l)
   }
 }

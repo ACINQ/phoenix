@@ -18,11 +18,12 @@ package fr.acinq.eclair.phoenix.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.UiThread
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
@@ -32,12 +33,12 @@ import fr.acinq.eclair.phoenix.databinding.FragmentSettingsSeedSecurityBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
 import fr.acinq.eclair.phoenix.utils.KeystoreHelper
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
 import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
 
 class SeedSecurityFragment : BaseFragment() {
 
@@ -45,6 +46,11 @@ class SeedSecurityFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSettingsSeedSecurityBinding
   private lateinit var model: SeedSecurityViewModel
+
+  private var promptPin: PinDialog? = null
+  private var newPin: PinDialog? = null
+  private var confirmPin: PinDialog? = null
+  private var biometricPrompt: BiometricPrompt? = null
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsSeedSecurityBinding.inflate(inflater, container, false)
@@ -58,34 +64,77 @@ class SeedSecurityFragment : BaseFragment() {
     model.protectionState.observe(viewLifecycleOwner, Observer { state ->
       when (state!!) {
         SeedSecurityViewModel.ProtectionState.NONE -> {
-          mBinding.biometricsCheckbox.setChecked(false)
-          mBinding.setPinButton.setText(getString(R.string.seedsec_setup_pin))
+          mBinding.pinSwitch.setChecked(false)
+          mBinding.biometricsSwitch.setChecked(false)
         }
         SeedSecurityViewModel.ProtectionState.PIN_ONLY -> {
-          mBinding.biometricsCheckbox.setChecked(false)
-          mBinding.setPinButton.setText(getString(R.string.seedsec_change_pin))
+          mBinding.pinSwitch.setChecked(true)
+          mBinding.biometricsSwitch.setChecked(false)
         }
         SeedSecurityViewModel.ProtectionState.PIN_AND_BIOMETRICS -> {
-          mBinding.biometricsCheckbox.setChecked(true)
-          mBinding.setPinButton.setText(getString(R.string.seedsec_change_pin))
+          mBinding.pinSwitch.setChecked(true)
+          mBinding.biometricsSwitch.setChecked(true)
         }
       }
     })
     model.protectionUpdateState.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
-        SeedSecurityViewModel.ProtectionUpdateState.ERROR -> Handler().postDelayed({ model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE }, 2500)
         SeedSecurityViewModel.ProtectionUpdateState.SET_NEW_PIN -> promptNewPin()
         else -> Unit
       }
     })
-    model.errorMessage.observe(viewLifecycleOwner, Observer {
-      it?.let { mBinding.error.text = getString(it) }
+    model.messageEvent.observe(viewLifecycleOwner, Observer {
+      it?.let { Toast.makeText(context, getString(it), Toast.LENGTH_SHORT).show() }
     })
     mBinding.model = model
   }
 
   override fun onStart() {
     super.onStart()
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.pinSwitch.setOnClickListener {
+      model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
+      model.readSeed(context, Wallet.DEFAULT_PIN)
+    }
+    mBinding.updatePinButton.setOnClickListener {
+      model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
+      promptExistingPin { pin: String -> model.readSeed(context, pin) }
+    }
+    mBinding.biometricsSwitch.setOnClickListener {
+      context?.let { ctx ->
+        when (BiometricManager.from(ctx).canAuthenticate()) {
+          BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> Toast.makeText(context, R.string.seedsec_biometric_support_no_hw, Toast.LENGTH_SHORT).show()
+          BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> Toast.makeText(context, R.string.seedsec_biometric_support_hw_unavailable, Toast.LENGTH_SHORT).show()
+          BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> Toast.makeText(context, R.string.seedsec_biometric_support_none_enrolled, Toast.LENGTH_SHORT).show()
+          BiometricManager.BIOMETRIC_SUCCESS -> if (mBinding.biometricsSwitch.isChecked()) {
+            disableBiometrics(ctx)
+          } else {
+            enrollBiometrics(ctx)
+          }
+        }
+      }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    checkState()
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    biometricPrompt?.cancelAuthentication()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    promptPin?.dismiss()
+    newPin?.dismiss()
+    confirmPin?.dismiss()
+    model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
+  }
+
+  private fun checkState() {
     val isSeedEncrypted = context?.let { ctx -> Prefs.getIsSeedEncrypted(ctx) } ?: true
     val useBiometrics = context?.let { ctx -> Prefs.useBiometrics(ctx) } ?: false
     model.protectionState.value = if (isSeedEncrypted) {
@@ -97,118 +146,59 @@ class SeedSecurityFragment : BaseFragment() {
     } else {
       SeedSecurityViewModel.ProtectionState.NONE
     }
-
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
-
-    mBinding.setPinButton.setOnClickListener {
-      model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
-      if (isSeedEncrypted) {
-        promptExistingPin { pin: String -> model.readSeed(context, pin) }
-      } else {
-        model.readSeed(context, Wallet.DEFAULT_PIN)
-      }
-    }
-
-    mBinding.biometricsCheckbox.setOnClickListener {
-      context?.let { ctx ->
-        if (mBinding.biometricsCheckbox.isChecked()) {
-          disableBiometrics(ctx)
-        } else {
-          enrollBiometrics(ctx)
-        }
-      }
-    }
   }
 
   private fun disableBiometrics(context: Context) {
-    // we just need biometric confirmation
-    val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-      .setTitle(getString(R.string.seedsec_disable_bio_prompt_title))
-      .setSubtitle(getString(R.string.seedsec_disable_bio_prompt_subtitle))
-      .setNegativeButtonText(getString(R.string.seedsec_disable_bio_prompt_negative))
-      .build()
-
-    val biometricPrompt = BiometricPrompt(this@SeedSecurityFragment, Executors.newSingleThreadExecutor(), object : BiometricPrompt.AuthenticationCallback() {
-      override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-        super.onAuthenticationError(errorCode, errString)
-        log.info("biometric auth error ($errorCode): $errString")
+    biometricPrompt = getBiometricAuth(R.string.seedsec_disable_bio_prompt_title, R.string.seedsec_disable_bio_prompt_negative, R.string.seedsec_disable_bio_prompt_desc, {
+      model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
+    }, {
+      try {
+        Prefs.useBiometrics(context, false)
+        KeystoreHelper.deleteKeyForPin()
         model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
-      }
-
-      override fun onAuthenticationFailed() {
-        super.onAuthenticationFailed()
-        log.info("biometric auth is not recognized")
-      }
-
-      override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-        super.onAuthenticationSucceeded(result)
-        try {
-          Prefs.saveUseBiometrics(context, false)
-          KeystoreHelper.deleteKeyForPin()
-          model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
-          model.protectionState.postValue(SeedSecurityViewModel.ProtectionState.PIN_ONLY)
-        } catch (e: Exception) {
-          log.error("could not disable bio: ", e)
-        }
+        model.protectionState.postValue(SeedSecurityViewModel.ProtectionState.PIN_ONLY)
+        model.messageEvent.postValue(R.string.seedsec_biometric_disabled)
+      } catch (e: Exception) {
+        log.error("could not disable bio: ", e)
       }
     })
-
-    biometricPrompt.authenticate(biometricPromptInfo)
   }
 
   private fun enrollBiometrics(context: Context) {
     promptExistingPin { pin: String ->
       lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
         log.error("error when enrolling biometric: ", exception)
-        model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ERROR
+        model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
+        model.messageEvent.value = R.string.seedsec_biometric_enrollment_error
       }) {
         model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENROLLING_BIOMETRICS
         if (model.checkPIN(context, pin)) {
           // generate new key for pin code encryption (if necessary remove the old one)
           KeystoreHelper.deleteKeyForPin()
           KeystoreHelper.generateKeyForPin()
-
-          val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(getString(R.string.seedsec_bio_prompt_title))
-            .setSubtitle(getString(R.string.seedsec_bio_prompt_subtitle))
-            .setNegativeButtonText(getString(R.string.seedsec_bio_prompt_negative))
-            .build()
-
-          val biometricPrompt = BiometricPrompt(this@SeedSecurityFragment, Executors.newSingleThreadExecutor(), object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-              super.onAuthenticationError(errorCode, errString)
-              log.info("biometric auth error ($errorCode): $errString")
+          biometricPrompt = getBiometricAuth(R.string.seedsec_bio_prompt_title, R.string.seedsec_bio_prompt_negative, null, {
+            model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
+          }, {
+            try {
+              KeystoreHelper.encryptPin(context, pin)
+              Prefs.useBiometrics(context, true)
               model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
-            }
-
-            override fun onAuthenticationFailed() {
-              super.onAuthenticationFailed()
-              log.info("biometric auth is not recognized")
-            }
-
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-              super.onAuthenticationSucceeded(result)
-              try {
-                KeystoreHelper.encryptPin(context, pin)
-                Prefs.saveUseBiometrics(context, true)
-                model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
-                model.protectionState.postValue(SeedSecurityViewModel.ProtectionState.PIN_AND_BIOMETRICS)
-              } catch (e: Exception) {
-                log.error("could not encrypt pin in keystore: ", e)
-              }
+              model.protectionState.postValue(SeedSecurityViewModel.ProtectionState.PIN_AND_BIOMETRICS)
+              model.messageEvent.postValue(R.string.seedsec_biometric_enabled)
+            } catch (e: Exception) {
+              log.error("could not encrypt pin in keystore: ", e)
             }
           })
-
-          biometricPrompt.authenticate(biometricPromptInfo)
         } else {
-          throw java.lang.RuntimeException("invalid PIN")
+          model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
+          model.messageEvent.value = R.string.seedsec_error_wrong_pin
         }
       }
     }
   }
 
   private fun promptExistingPin(callback: (pin: String) -> Unit) {
-    getPinDialog(R.string.seedsec_pindialog_title_unlock, object : PinDialog.PinDialogCallback {
+    promptPin = getPinDialog(R.string.seedsec_pindialog_title_unlock, object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
         callback(pinCode)
         dialog.dismiss()
@@ -217,11 +207,13 @@ class SeedSecurityFragment : BaseFragment() {
       override fun onPinCancel(dialog: PinDialog) {
         model.protectionUpdateState.postValue(SeedSecurityViewModel.ProtectionUpdateState.IDLE)
       }
-    }).show()
+    })
+    promptPin?.reset()
+    promptPin?.show()
   }
 
   private fun promptNewPin() {
-    getPinDialog(R.string.seedsec_pindialog_title_set_new, object : PinDialog.PinDialogCallback {
+    newPin = getPinDialog(R.string.seedsec_pindialog_title_set_new, object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
         confirmNewPin(pinCode)
         dialog.dismiss()
@@ -230,17 +222,19 @@ class SeedSecurityFragment : BaseFragment() {
       override fun onPinCancel(dialog: PinDialog) {
         model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
       }
-    }).show()
+    })
+    newPin?.reset()
+    newPin?.show()
   }
 
   private fun confirmNewPin(firstPin: String) {
-    getPinDialog(R.string.seedsec_pindialog_title_confirm_new, object : PinDialog.PinDialogCallback {
+    confirmPin = getPinDialog(R.string.seedsec_pindialog_title_confirm_new, object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
         if (pinCode == firstPin) {
           model.encryptSeed(context, pinCode)
         } else {
-          model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ERROR
-          model.errorMessage.value = R.string.seedsec_error_pins_match
+          model.messageEvent.value = R.string.seedsec_error_pins_match
+          model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
         }
         dialog.dismiss()
       }
@@ -248,14 +242,16 @@ class SeedSecurityFragment : BaseFragment() {
       override fun onPinCancel(dialog: PinDialog) {
         model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
       }
-    }).show()
+    })
+    confirmPin?.reset()
+    confirmPin?.show()
   }
 }
 
 class SeedSecurityViewModel : ViewModel() {
 
   enum class ProtectionUpdateState {
-    ENTER_PIN, SET_NEW_PIN, ENCRYPTING, ERROR, ENROLLING_BIOMETRICS, IDLE
+    ENTER_PIN, SET_NEW_PIN, ENCRYPTING, ENROLLING_BIOMETRICS, IDLE
   }
 
   enum class ProtectionState {
@@ -267,12 +263,7 @@ class SeedSecurityViewModel : ViewModel() {
   private val seed = MutableLiveData<ByteArray>(null)
   val protectionState = MutableLiveData(ProtectionState.NONE)
   val protectionUpdateState = MutableLiveData(ProtectionUpdateState.IDLE)
-  val errorMessage = MutableLiveData<Int>(null)
-  val biometricsSupport = MutableLiveData(true)
-
-  val newPinInProgress: LiveData<Boolean> = Transformations.map(protectionUpdateState) {
-    it == ProtectionUpdateState.ENTER_PIN || it == ProtectionUpdateState.SET_NEW_PIN || it == ProtectionUpdateState.ENCRYPTING || it == ProtectionUpdateState.ENROLLING_BIOMETRICS
-  }
+  val messageEvent = SingleLiveEvent<Int>()
 
   /**
    * Check if the PIN is correct
@@ -309,8 +300,8 @@ class SeedSecurityViewModel : ViewModel() {
               // preference pin status is probably obsolete
               Prefs.setIsSeedEncrypted(context)
             }
-            protectionUpdateState.postValue(ProtectionUpdateState.ERROR)
-            errorMessage.postValue(R.string.seedsec_error_wrong_pin)
+            messageEvent.postValue(R.string.seedsec_error_wrong_pin)
+            protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
           }
         }
       }
@@ -331,10 +322,14 @@ class SeedSecurityViewModel : ViewModel() {
           protectionUpdateState.postValue(ProtectionUpdateState.ENCRYPTING)
           EncryptedSeed.writeSeedToFile(context!!, seed.value ?: throw RuntimeException("empty seed"), pin)
           protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
+          protectionState.postValue(ProtectionState.PIN_ONLY)
+          KeystoreHelper.deleteKeyForPin()
+          Prefs.useBiometrics(context, false)
+          messageEvent.postValue(R.string.seedsec_pin_update_success)
         } catch (e: java.lang.Exception) {
           log.error("could not encrypt seed: ", e)
-          protectionUpdateState.postValue(ProtectionUpdateState.ERROR)
-          errorMessage.postValue(R.string.seedsec_error_generic)
+          messageEvent.postValue(R.string.seedsec_error_generic)
+          protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
         }
       }
     }

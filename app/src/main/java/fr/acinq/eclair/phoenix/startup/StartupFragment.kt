@@ -17,9 +17,11 @@
 package fr.acinq.eclair.phoenix.startup
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.biometric.BiometricManager
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
@@ -53,6 +55,9 @@ class StartupFragment : BaseFragment() {
     appKit.startupState.observe(viewLifecycleOwner, Observer {
       log.info("startup is now $it")
       startNodeIfNeeded()
+      if (it == StartupState.ERROR) {
+        Handler().postDelayed({ appKit.startupState.value = StartupState.OFF }, 2000)
+      }
     })
   }
 
@@ -90,21 +95,25 @@ class StartupFragment : BaseFragment() {
     context?.let { ctx ->
       if (appKit.startupState.value == StartupState.OFF && !appKit.isKitReady() && appKit.hasWalletBeenSetup(ctx)) {
         when {
-          Prefs.useBiometrics(ctx) ->
-            getBiometricAuth({
+          Prefs.useBiometrics(ctx) && BiometricManager.from(ctx).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS ->
+            getBiometricAuth(negativeCallback = {
+              mPinDialog?.reset()
               mPinDialog?.show()
-            }, {
+            }, successCallback = {
               try {
                 val pin = KeystoreHelper.decryptPin(ctx)?.toString(Charsets.UTF_8)
                 appKit.startAppKit(ctx, pin!!)
               } catch (e: Exception) {
                 log.error("could not decrypt pin: ", e)
+                appKit.startupErrorMessage.value = getString(R.string.startup_error_auth)
+                appKit.startupState.value = StartupState.ERROR
               }
             })
-          Prefs.getIsSeedEncrypted(ctx) ->
+          Prefs.getIsSeedEncrypted(ctx) -> {
+            mPinDialog?.reset()
             mPinDialog?.show()
-          else ->
-            appKit.startAppKit(ctx, Wallet.DEFAULT_PIN)
+          }
+          else -> appKit.startAppKit(ctx, Wallet.DEFAULT_PIN)
         }
       }
     } ?: log.warn("cannot start node with null context")
