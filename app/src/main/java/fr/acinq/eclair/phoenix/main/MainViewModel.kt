@@ -38,6 +38,8 @@ class MainViewModel : ViewModel() {
   private fun checkWalletIsSecure(context: Context) {
     if (!Prefs.getIsSeedEncrypted(context)) {
       notifications.value?.add(NotificationTypes.NO_PIN_SET)
+    } else {
+      notifications.value?.remove(NotificationTypes.NO_PIN_SET)
     }
   }
 

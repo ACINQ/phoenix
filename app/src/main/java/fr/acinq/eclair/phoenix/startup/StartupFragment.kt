@@ -38,9 +38,7 @@ import org.slf4j.LoggerFactory
 class StartupFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
-
   private lateinit var mBinding: FragmentStartupBinding
-
   private var mPinDialog: PinDialog? = null
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

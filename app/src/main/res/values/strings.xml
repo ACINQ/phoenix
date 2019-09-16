@@ -217,6 +217,7 @@
   <!-- //////////////// display seed //////////////// -->
 
   <string name="displayseed_title">My Wallet</string>
+  <string name="displayseed_authenticate_button">Display seed</string>
   <string name="displayseed_loading">Unlocking seed…</string>
   <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[

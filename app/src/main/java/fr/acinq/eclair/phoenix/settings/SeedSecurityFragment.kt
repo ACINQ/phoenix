@@ -324,6 +324,7 @@ class SeedSecurityViewModel : ViewModel() {
           protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
           protectionState.postValue(ProtectionState.PIN_ONLY)
           KeystoreHelper.deleteKeyForPin()
+          Prefs.setIsSeedEncrypted(context)
           Prefs.useBiometrics(context, false)
           messageEvent.postValue(R.string.seedsec_pin_update_success)
         } catch (e: java.lang.Exception) {

@@ -26,12 +26,14 @@ import android.view.ViewGroup
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.UiThread
+import androidx.biometric.BiometricManager
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsDisplaySeedBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
+import fr.acinq.eclair.phoenix.utils.KeystoreHelper
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
@@ -62,6 +64,11 @@ class DisplaySeedFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(DisplaySeedViewModel::class.java)
     mBinding.model = model
+    model.state.observe(viewLifecycleOwner, Observer { state ->
+      if (state == DisplaySeedState.INIT) {
+        unlockWallet()
+      }
+    })
     model.words.observe(viewLifecycleOwner, Observer { words ->
       mBinding.wordsTable.removeAllViews()
       var i = 0
@@ -88,29 +95,51 @@ class DisplaySeedFragment : BaseFragment() {
         if (mBinding.backupWarningCheckbox.isChecked) {
           Prefs.setMnemonicsSeenTimestamp(it, System.currentTimeMillis())
           refreshBackupWarning()
+          findNavController().navigate(R.id.global_action_any_to_main)
         }
       }
     }
-
+    mBinding.unlockButton.setOnClickListener { unlockWallet() }
     mBinding.backupWarningCheckbox.setOnCheckedChangeListener { _, isChecked -> model.userHasSavedSeed.value = isChecked }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
-
-    // -- retrieve seed if adequate
-    if (model.state.value == DisplaySeedState.INIT && model.words.value.isNullOrEmpty()) {
-      context?.let {
-        model.state.value = DisplaySeedState.UNLOCKING
-        if (Prefs.getIsSeedEncrypted(it)) {
-          getPinDialog()?.show()
-        } else {
-          model.getSeed(it, Wallet.DEFAULT_PIN)
-        }
-      }
-    }
   }
 
   override fun onStop() {
     super.onStop()
     mPinDialog?.dismiss()
+  }
+
+  private fun unlockWallet() {
+    if (model.state.value == DisplaySeedState.INIT) {
+      context?.let { ctx ->
+        mPinDialog = getPinDialog()
+        when {
+          Prefs.useBiometrics(ctx) && BiometricManager.from(ctx).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS ->
+            getBiometricAuth(negativeCallback = {
+              mPinDialog?.reset()
+              mPinDialog?.show()
+            }, successCallback = {
+              try {
+                model.state.value = DisplaySeedState.UNLOCKING
+                val pin = KeystoreHelper.decryptPin(ctx)?.toString(Charsets.UTF_8)
+                model.getSeed(ctx, pin!!)
+              } catch (e: Exception) {
+                log.error("could not decrypt pin: ", e)
+                model.state.value = DisplaySeedState.ERROR
+                model.errorMessage.value = getString(R.string.displayseed_error)
+              }
+            })
+          Prefs.getIsSeedEncrypted(ctx) -> {
+            mPinDialog?.reset()
+            mPinDialog?.show()
+          }
+          else -> {
+            model.state.value = DisplaySeedState.UNLOCKING
+            model.getSeed(ctx, Wallet.DEFAULT_PIN)
+          }
+        }
+      }
+    }
   }
 
   private fun refreshBackupWarning() {
@@ -122,7 +151,10 @@ class DisplaySeedFragment : BaseFragment() {
   private fun getPinDialog(): PinDialog? {
     return mPinDialog ?: getPinDialog(object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
-        context?.let { model.getSeed(it, pinCode) }
+        context?.let {
+          model.state.value = DisplaySeedState.UNLOCKING
+          model.getSeed(it, pinCode)
+        }
         dialog.dismiss()
       }
 

@@ -21,6 +21,10 @@
 
   <!-- global to startup -->
   <action
+    android:id="@+id/global_action_any_to_main"
+    app:destination="@id/main_fragment" />
+  <!-- global to startup -->
+  <action
     android:id="@+id/global_action_any_to_startup"
     app:destination="@id/startup_fragment"
     app:enterAnim="@anim/fade_in"
