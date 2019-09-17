@@ -17,8 +17,11 @@
 package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
+import android.text.format.DateUtils
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.phoenix.R
+import scala.Option
+import kotlin.math.abs
 
 object Transcriber {
   fun readableState(context: Context, state: State): String {
@@ -43,6 +46,19 @@ object Transcriber {
       state.toString().startsWith("WAIT_") -> context.getColor(R.color.salmon)
       state.toString().startsWith("ERR_") -> context.getColor(R.color.red)
       else -> context.getColor(R.color.salmon)
+    }
+  }
+
+  fun relativeTime(context: Context, optionalDateMillis: Option<Any>): String {
+    return if (optionalDateMillis.isDefined && optionalDateMillis.get() is Long) relativeTime(context, optionalDateMillis.get() as Long) else context.getString(R.string.utils_unknown)
+  }
+
+  fun relativeTime(context: Context, dateMillis: Long): String {
+    val delay: Long = dateMillis - System.currentTimeMillis()
+    return if (abs(delay) < 60 * 1000L) {
+      context.getString(R.string.utils_date_just_now)
+    } else {
+      DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), delay).toString()
     }
   }
 }

@@ -19,7 +19,6 @@ package fr.acinq.eclair.phoenix.paymentdetails
 import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.text.Html
-import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +38,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsBinding
+import fr.acinq.eclair.phoenix.utils.Transcriber
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -48,7 +48,6 @@ import scala.util.Left
 import scala.util.Right
 import java.text.DateFormat
 import java.util.*
-import kotlin.math.abs
 
 class PaymentDetailsFragment : BaseFragment() {
 
@@ -72,93 +71,35 @@ class PaymentDetailsFragment : BaseFragment() {
       it?.let {
         context?.let { ctx ->
           when {
-            //
-            // ========= OUTGOING PAYMENT
-            //
+            // OUTGOING PAYMENT
             it.isLeft -> {
               val p = it.left().get()
               when (p.status()) {
-                // ========= OUTGOING PAYMENT FAILED
                 `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_failed))
-
-                  val statusDrawable = ctx.getDrawable(R.drawable.ic_cross)
-                  statusDrawable?.setTint(ctx.getColor(R.color.red))
-                  mBinding.statusImage.setImageDrawable(statusDrawable)
-                  if (statusDrawable is Animatable) {
-                    statusDrawable.start()
-                  }
+                  drawStatusIcon(R.drawable.ic_cross, R.color.red)
                 }
-                // ========= OUTGOING PAYMENT PENDING
                 `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_pending))
                 }
-                // ========= OUTGOING PAYMENT SUCCESS
                 `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
-
-                  val relativeCompletedAt = if (p.completedAt().isDefined) {
-                    val completedAt: Long = p.completedAt().get() as Long
-                    val delaySincePayment: Long = completedAt - System.currentTimeMillis()
-                    if (abs(delaySincePayment) < 60 * 1000L) {
-                      ctx.getString(R.string.utils_date_just_now)
-                    } else {
-                      DateUtils.getRelativeTimeSpanString(completedAt, System.currentTimeMillis(), delaySincePayment)
-                    }
-                  } else {
-                    ctx.getString(R.string.utils_unknown)
-                  }
-                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, relativeCompletedAt))
-
-                  val statusDrawable = ctx.getDrawable(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static)
-                  statusDrawable?.setTint(ctx.getColor(R.color.green))
-                  mBinding.statusImage.setImageDrawable(statusDrawable)
-                  if (statusDrawable is Animatable) {
-                    statusDrawable.start()
-                  }
-
-                  mBinding.midSection.apply {
-                    alpha = 0f
-                    visibility = View.VISIBLE
-                    translationY = 20f
-                    animate()
-                      .alpha(1f)
-                      .setStartDelay(100)
-                      .setInterpolator(DecelerateInterpolator())
-                      .translationY(0f)
-                      .setDuration(400)
-                      .setListener(null)
-                  }
-
-                  mBinding.bottomSection.apply {
-                    alpha = 0f
-                    visibility = View.VISIBLE
-                    translationY = 30f
-                    animate()
-                      .alpha(1f)
-                      .setStartDelay(300)
-                      .setInterpolator(DecelerateInterpolator())
-                      .translationY(0f)
-                      .setDuration(600)
-                      .setListener(null)
-                  }
+                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, p.completedAt())))
+                  drawStatusIcon(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
                 }
               }
               mBinding.amountValue.setAmount(p.amount())
             }
-            //
-            // ========= INCOMING PAYMENT
-            //
+            // INCOMING PAYMENT
             it.isRight -> {
               val p = it.right().get()
               if (p.amount_opt().isDefined) {
-                //                mBinding.amountLabel.text = ctx.getString(R.string.paymentdetails_amount_received_successful_label)
-                val receivedAt = if (p.receivedAt_opt().isDefined) DateFormat.getDateTimeInstance().format(p.receivedAt_opt().get()) else context!!.getString(R.string.utils_unknown)
-                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_successful, receivedAt))
+                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, p.receivedAt_opt())))
                 mBinding.amountValue.setAmount(p.amount_opt().get())
+                drawStatusIcon(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
               } else {
-                //                mBinding.amountLabel.text = ctx.getString(R.string.paymentdetails_amount_received_pending_label)
                 mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_pending))
                 mBinding.amountValue.setAmount(MilliSatoshi(0))
+                drawStatusIcon(R.drawable.ic_clock, R.color.green)
               }
             }
           }
@@ -174,6 +115,47 @@ class PaymentDetailsFragment : BaseFragment() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.showTechnicalsButton.setOnClickListener { findNavController().navigate(R.id.action_payment_details_to_payment_details_technicals) }
+  }
+
+  private fun animateBottomSection() {
+    mBinding.bottomSection.apply {
+      alpha = 0f
+      visibility = View.VISIBLE
+      translationY = 30f
+      animate()
+        .alpha(1f)
+        .setStartDelay(300)
+        .setInterpolator(DecelerateInterpolator())
+        .translationY(0f)
+        .setDuration(600)
+        .setListener(null)
+    }
+  }
+
+  private fun animateMidSection() {
+    mBinding.midSection.apply {
+      alpha = 0f
+      visibility = View.VISIBLE
+      translationY = 20f
+      animate()
+        .alpha(1f)
+        .setStartDelay(100)
+        .setInterpolator(DecelerateInterpolator())
+        .translationY(0f)
+        .setDuration(400)
+        .setListener(null)
+    }
+  }
+
+  private fun drawStatusIcon(drawableResId: Int, colorResId: Int) {
+    val statusDrawable = resources.getDrawable(drawableResId, context?.theme)
+    statusDrawable?.setTint(resources.getColor(colorResId))
+    mBinding.statusImage.setImageDrawable(statusDrawable)
+    if (statusDrawable is Animatable) {
+      statusDrawable.start()
+    }
+    animateMidSection()
+    animateBottomSection()
   }
 
   private fun getPayment(isSentPayment: Boolean, identifier: String) {

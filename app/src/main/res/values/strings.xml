@@ -248,7 +248,7 @@
   <string name="paymentdetails_status_sent_failed"><![CDATA[Payment <b>failed</b>.<br />No money has been sent.]]></string>
 
   <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
-  <string name="paymentdetails_status_received_successful"><![CDATA[Payment <b>received</b> on %1$s!]]></string>
+  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s!]]></string>
 
   <string name="paymentdetails_amount_sent_pending_label">Sending</string>
   <string name="paymentdetails_amount_sent_failed_label">Tried to send</string>
