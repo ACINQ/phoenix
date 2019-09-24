@@ -96,16 +96,11 @@
         <Spinner
           android:id="@+id/amount_unit"
           android:layout_width="wrap_content"
+          style="@style/default_spinnerStyle"
           android:layout_height="wrap_content"
-          android:layout_marginBottom="@dimen/space_xxs"
+          android:layout_marginBottom="@dimen/space_sm"
           app:layout_constraintBottom_toBottomOf="@id/amount_value_layout"
-          app:layout_constraintEnd_toEndOf="parent"
-          android:background="@drawable/spinner_bg"
-          android:paddingLeft="@dimen/space_sm"
-          android:paddingTop="@dimen/space_xs"
-          android:paddingRight="@dimen/space_md_p"
-          android:paddingBottom="@dimen/space_xs"
-          android:spinnerMode="dialog" />
+          app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
           android:id="@+id/amount_converted"

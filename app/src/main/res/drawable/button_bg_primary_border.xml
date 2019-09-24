@@ -24,5 +24,5 @@
       <corners android:radius="@dimen/button_corner" />
     </shape>
   </item>
-  <item android:id="@android:id/background" android:drawable="@drawable/rounded_border" />
+  <item android:id="@android:id/background" android:drawable="@drawable/rounded_border_primary" />
 </ripple>

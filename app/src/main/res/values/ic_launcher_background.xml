@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +15,6 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="?attr/defaultRippleColor"
-  android:exitFadeDuration="@android:integer/config_mediumAnimTime">
-
-  <item android:id="@android:id/mask">
-    <shape android:shape="rectangle">
-      <solid android:color="?attr/defaultButtonColor" />
-      <corners android:radius="@dimen/button_corner" />
-    </shape>
-  </item>
-  <item android:id="@android:id/background" android:drawable="@drawable/rounded_border" />
-</ripple>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>

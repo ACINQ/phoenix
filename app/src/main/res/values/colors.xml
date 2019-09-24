@@ -30,7 +30,6 @@
   <color name="orange">#FFBF9C</color>
   <color name="green">#09BB74</color>
   <color name="blue">#138FE0</color>
-
   <color name="red">#CA4747</color>
   <color name="dawn">#F8EFF1</color>
   <color name="blossom">#DFBABA</color>
@@ -52,8 +51,9 @@
   <color name="grey_light_3">#EDEDED</color>
 
   <color name="slate">#73868D</color>
+  <color name="ripple">#A6AFC0CF</color>
   <color name="casper">#A9C1CC</color>
-  <color name="ripple">#66AFC0CF</color>
+  <color name="geyser">#E6F0F3</color>
   <color name="mystic">#E9F2F2</color>
   <color name="athens">#F1F7F9</color>
 </resources>

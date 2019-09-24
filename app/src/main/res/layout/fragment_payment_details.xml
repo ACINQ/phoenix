@@ -34,14 +34,6 @@
     android:background="@color/athens"
     tools:context=".paymentdetails.PaymentDetailsFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
-      android:id="@+id/action_bar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      android:background="@color/transparent"
-      app:text="@string/paymentdetails_title" />
-
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
@@ -50,7 +42,7 @@
       android:visibility="@{model.state == PaymentDetailsState.DONE}"
       app:layout_constrainedHeight="true"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar">
+      app:layout_constraintTop_toTopOf="parent">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -76,14 +68,14 @@
           android:id="@+id/top_section"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:paddingBottom="100dp"
+          android:paddingBottom="110dp"
           app:layout_constraintTop_toTopOf="parent">
 
           <ImageView
             android:id="@+id/status_image"
             android:layout_width="76dp"
             android:layout_height="76dp"
-            android:layout_marginTop="@dimen/space_xl"
+            android:layout_marginTop="@dimen/space_xxl"
             android:contentDescription="@null"
             android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
@@ -97,7 +89,6 @@
             android:layout_marginStart="@dimen/space_lg"
             android:layout_marginTop="@dimen/space_md"
             android:layout_marginEnd="@dimen/space_lg"
-            android:text="SENT TODAY 1:32"
             android:textAlignment="center"
             android:textAllCaps="true"
             app:layout_constrainedWidth="true"
@@ -239,6 +230,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="wrap_content"
+      app:layout_constraintStart_toStartOf="parent"
+      android:layout_height="wrap_content"
+      android:background="@color/transparent"
+      android:backgroundTint="@color/transparent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
       android:layout_width="wrap_content"

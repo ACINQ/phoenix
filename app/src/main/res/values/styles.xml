@@ -33,7 +33,8 @@
     <item name="defaultMutedTextColor">@color/casper</item>
     <item name="defaultErrorTextColor">@color/brandy</item>
     <item name="defaultMutedErrorTextColor">@color/blossom</item>
-    <item name="altBackgroundColor">@color/yellow</item>
+    <item name="altMutedBackgroundColor">@color/geyser</item>
+    <item name="altBackgroundColor">?attr/colorPrimary</item>
     <item name="altTextColor">@color/white</item>
 
     <!-- background -->
@@ -52,13 +53,14 @@
     <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
     <item name="actionBarViewStyle">@style/default_actionBar</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
+    <item name="android:spinnerItemStyle">@style/default_textAppearance</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
 
     <!-- status bar -->
-    <item name="android:statusBarColor">@color/mystic</item>
+    <item name="android:statusBarColor">?attr/altMutedBackgroundColor</item>
     <item name="android:windowLightStatusBar">true</item>
 
   </style>
@@ -158,6 +160,17 @@
     <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
     <item name="android:buttonTint">?attr/defaultTextColor</item>
+  </style>
+
+  <style name="default_spinnerStyle">
+    <item name="android:background">@drawable/spinner_bg</item>
+    <item name="android:minWidth">0dp</item>
+    <item name="android:padding">0dp</item>
+    <item name="android:paddingStart">4dp</item>
+    <item name="android:paddingEnd">22dp</item>
+    <item name="android:paddingTop">4dp</item>
+    <item name="android:paddingBottom">6dp</item>
+    <item name="android:spinnerMode">dialog</item>
   </style>
 
   <!-- ///////////// special styles ///////////// -->

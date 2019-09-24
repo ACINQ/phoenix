@@ -34,7 +34,11 @@ class ActionBarView @JvmOverloads constructor(context: Context, attrs: Attribute
   init {
     attrs?.let {
       val arr = context.obtainStyledAttributes(attrs, R.styleable.ActionBarView, defStyleAttr, R.style.default_actionBar)
-      mBinding.title.text = arr.getString(R.styleable.ActionBarView_text)
+      if (arr.hasValue(R.styleable.ActionBarView_text)) {
+        mBinding.title.text = arr.getString(R.styleable.ActionBarView_text)
+      } else {
+        mBinding.title.visibility = View.GONE
+      }
       arr.recycle()
     }
   }

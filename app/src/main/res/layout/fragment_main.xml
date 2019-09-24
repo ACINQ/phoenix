@@ -87,7 +87,7 @@
 
       <View
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="4dp"
         android:background="@drawable/rounded_top"
         android:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -109,7 +109,7 @@
         android:paddingTop="@dimen/space_md_p"
         android:paddingEnd="@dimen/space_md_p"
         android:paddingBottom="@dimen/space_md_p"
-        app:icon="@drawable/ic_settings_20dp" />
+        app:icon="@drawable/ic_settings" />
 
       <View
         style="@style/VSeparator"
@@ -132,7 +132,7 @@
         android:paddingTop="@dimen/space_md_p"
         android:paddingEnd="@dimen/space_md_p"
         android:paddingBottom="@dimen/space_md_p"
-        app:icon="@drawable/ic_receive_20dp"
+        app:icon="@drawable/ic_receive"
         app:text="@string/menu_receive"
         app:text_size="@dimen/text_lg" />
 
@@ -157,7 +157,7 @@
         android:paddingTop="@dimen/space_md_p"
         android:paddingEnd="@dimen/space_md_p"
         android:paddingBottom="@dimen/space_md_p"
-        app:icon="@drawable/ic_send_20dp"
+        app:icon="@drawable/ic_send"
         app:text="@string/menu_send"
         app:text_size="@dimen/text_lg" />
 

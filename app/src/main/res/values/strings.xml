@@ -112,20 +112,20 @@
 
   <string name="send_init_paste">Paste payment request</string>
 
-  <string name="send_balance_prefix">You have</string>
+  <string name="send_balance_prefix">Balance:</string>
   <string name="send_loading">Checking payment…</string>
   <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
   <string name="send_amount_error">Please enter a valid amount.</string>
   <string name="send_destination_label">Send to</string>
-  <string name="send_description_label">for</string>
+  <string name="send_description_label">Desc.</string>
   <string name="send_pay_button">Pay</string>
   <string name="send_cancel_button">Decline</string>
   <string name="send_pay_button_for_swap">Next</string>
   <string name="send_swap_in_progress">Swap in progress…</string>
-  <string name="send_swap_error">Swap failed. Please try again.</string>
-  <string name="send_swap_confirm_instructions">You\'ll send: %1$s\nPrice is: %2$s</string>
-  <string name="send_swap_confirm_confirm_button">Confirm and send</string>
-  <string name="send_swap_confirm_cancel_button">Cancel</string>
+  <string name="send_swap_error">Swap has failed. Please try again.</string>
+  <string name="send_swap_required_desc">This is a classic Bitcoin payment and must be swapped to Lightning first.</string>
+  <string name="send_swap_required_button">Swap payment</string>
+  <string name="send_swap_complete_recap"><![CDATA[Payment has been made instant! An additional <b>%1$s</b> cost is added to cover the swap.<br/><br/>Final amount is <b>%2$s</b>]]></string>
 
   <!-- //////////////// scan //////////////// -->
 

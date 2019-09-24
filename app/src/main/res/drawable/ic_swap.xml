@@ -15,48 +15,36 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="20dp"
-  android:height="20dp"
+  android:width="@dimen/button_height"
+  android:height="@dimen/button_height"
   android:viewportWidth="24"
   android:viewportHeight="24">
-
   <path
     android:fillColor="#00000000"
-    android:pathData="M22,2l-7,20 -4,-9 -9,-4 20,-7z"
-    android:strokeWidth="1"
-    android:strokeColor="@color/dark"
+    android:pathData="M17,1l4,4l-4,4"
+    android:strokeWidth="1.5"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
-
   <path
     android:fillColor="#00000000"
-    android:pathData="M18,6L11,13"
-    android:strokeWidth="1"
-    android:strokeColor="@color/dark"
+    android:pathData="M3,11V9a4,4 0,0 1,4 -4h14"
+    android:strokeWidth="1.5"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
-
   <path
     android:fillColor="#00000000"
-    android:pathData="M2,22L7,17"
-    android:strokeWidth="1"
-    android:strokeColor="@color/dark"
+    android:pathData="M7,23l-4,-4l4,-4"
+    android:strokeWidth="1.5"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
-
   <path
     android:fillColor="#00000000"
-    android:pathData="M3,17L6,14"
-    android:strokeWidth="1"
-    android:strokeColor="@color/dark"
-    android:strokeLineCap="round"
-    android:strokeLineJoin="round" />
-
-  <path
-    android:fillColor="#00000000"
-    android:pathData="M6,22L10,18"
-    android:strokeWidth="1"
-    android:strokeColor="@color/dark"
+    android:pathData="M21,13v2a4,4 0,0 1,-4 4H3"
+    android:strokeWidth="1.5"
+    android:strokeColor="?attr/defaultTextColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

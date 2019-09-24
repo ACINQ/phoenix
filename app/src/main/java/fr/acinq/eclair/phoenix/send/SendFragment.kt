@@ -18,25 +18,24 @@ package fr.acinq.eclair.phoenix.send
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
-import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
-import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.utils.Converter
@@ -54,6 +53,7 @@ class SendFragment : BaseFragment() {
   private val args: SendFragmentArgs by navArgs()
 
   private lateinit var model: SendViewModel
+  private var amountPristine = true // to prevent early validation error message if amount is not set in invoice
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSendBinding.inflate(inflater, container, false)
@@ -78,44 +78,54 @@ class SendFragment : BaseFragment() {
     model.invoice.observe(viewLifecycleOwner, Observer {
       it?.let {
         context?.let { ctx ->
+          amountPristine = true
           when {
             // invoice is a bitcoin uri not swapped yet
             it.isLeft && it.left().get().second == null -> {
-              mBinding.sendButton.setText(getString(R.string.send_pay_button_for_swap))
-              mBinding.sendButton.setIcon(resources.getDrawable(R.drawable.ic_arrow_next, activity?.theme))
-              mBinding.sendButton.background = resources.getDrawable(R.drawable.button_bg_square, activity?.theme)
+              model.swapState.value = SwapState.SWAP_REQUIRED
               it.left().get().first.amount?.let { amount -> mBinding.amount.setText(Converter.printAmountRaw(amount, ctx)) }
             }
-            // invoice is a bitcoin uri with a swap PR
+            // invoice is a bitcoin uri with a swapped LN invoice
             it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined -> {
-              try {
-                val amountInput = extractAmount()
-                if (amountInput.isDefined) {
-                  val fee = it.left().get().second!!.amount().get().amount() - amountInput.get().amount()
-                  mBinding.swapInstructions.text = getString(R.string.send_swap_confirm_instructions,
-                    Converter.printAmountPretty(amount = it.left().get().second!!.amount().get(), context = context!!, withUnit = true),
-                    Converter.printAmountPretty(amount = MilliSatoshi(fee), context = context!!, withUnit = true))
+              val amountInput = extractAmount()
+              if (amountInput.isDefined) {
+                val fee = it.left().get().second!!.amount().get().amount() - amountInput.get().amount()
+                if (fee <= 0) {
+                  model.swapState.value = SwapState.SWAP_REQUIRED
+                } else {
+                  mBinding.swapCompleteRecap.text = Html.fromHtml(getString(R.string.send_swap_complete_recap,
+                    Converter.printAmountPretty(amount = MilliSatoshi(fee), context = ctx, withUnit = true),
+                    Converter.printAmountPretty(amount = it.left().get().second!!.amount().get(), context = context!!, withUnit = true)), Html.FROM_HTML_MODE_COMPACT)
                 }
-                Unit
-              } catch (e: Exception) {
-                log.error("could not extract amount after swap:  ${e.message}")
               }
+              Unit
             }
             // invoice is a payment request
-            it.isRight && it.right().get().amount().isDefined -> mBinding.amount.setText(Converter.printAmountRaw(it.right().get().amount().get(), ctx))
-            else -> {
+            it.isRight && it.right().get().amount().isDefined -> {
+              model.swapState.value = SwapState.NO_SWAP
+              mBinding.amount.setText(Converter.printAmountRaw(it.right().get().amount().get(), ctx))
             }
+            else -> Unit
           }
         }
       }
     })
 
+    model.swapMessageEvent.observe(viewLifecycleOwner, Observer {
+      Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+    })
+
     model.checkAndSetPaymentRequest(args.invoice)
 
     mBinding.amount.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(s: Editable?) {}
+      override fun afterTextChanged(s: Editable?) {
+        amountPristine = false
+        if (model.swapState.value != SwapState.NO_SWAP) {
+          model.swapState.value = SwapState.SWAP_REQUIRED
+        }
+      }
 
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         refreshAmountConversionDisplay()
@@ -123,10 +133,12 @@ class SendFragment : BaseFragment() {
     })
 
     mBinding.unit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-      override fun onNothingSelected(parent: AdapterView<*>?) {
-      }
+      override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if (model.swapState.value != SwapState.NO_SWAP) {
+          model.swapState.value = SwapState.SWAP_REQUIRED
+        }
         refreshAmountConversionDisplay()
       }
     }
@@ -142,48 +154,40 @@ class SendFragment : BaseFragment() {
     mBinding.sendButton.setOnClickListener { _ ->
       model.invoice.value?.let {
         Wallet.hideKeyboard(context, mBinding.amount)
-        try {
-          val amount_opt = extractAmount()
-          if (amount_opt.isDefined) {
-            model.errorInAmount.value = false
-            val amount = amount_opt.get()
-            when {
-              it.isLeft -> {
-                // onchain payment must first be swapped
-                model.sendSubmarineSwap(Converter.msat2sat(amount), it.left().get().first)
-              }
-              it.isRight -> {
-                sendPaymentFinal(amount, it.right().get())
-              }
+        val amount_opt = extractAmount()
+        if (amount_opt.isDefined) {
+          model.errorInAmount.value = false
+          val amount = amount_opt.get()
+          when {
+            it.isLeft && model.swapState.value != SwapState.SWAP_REQUIRED -> {
+              it.left()?.get()?.second?.let { pr ->
+                if (pr.amount().isDefined) {
+                  sendPaymentFinal(pr.amount().get(), pr)
+                }
+              } ?: log.warn("invoice=$it in model is not valid for swap")
             }
-          } else {
-            throw RuntimeException("empty amount")
+            it.isRight -> {
+              sendPaymentFinal(amount, it.right().get())
+            }
           }
-        } catch (e: Exception) {
-          log.error("could not extract amount: ${e.message}")
+        }
+      }
+    }
+
+    mBinding.swapButton.setOnClickListener {
+      Wallet.hideKeyboard(context, mBinding.amount)
+      model.invoice.value?.let {
+        val amount_opt = extractAmount()
+        if (amount_opt.isDefined) {
+          model.errorInAmount.value = false
+          val amount = amount_opt.get()
+          if (it.isLeft) {
+            model.setupSubmarineSwap(Converter.msat2sat(amount), it.left().get().first)
+          }
+        } else {
           model.errorInAmount.value = true
         }
       }
-    }
-
-    mBinding.swapConfirmButton.setOnClickListener { _ ->
-      model.invoice.value?.let {
-        if (it.isLeft) {
-          it.left()?.get()?.second?.let { pr ->
-            if (pr.amount().isDefined) {
-              sendPaymentFinal(pr.amount().get(), pr)
-            }
-          } ?: log.warn("invoice=$it in model is not valid for swap confirmation state")
-        }
-      }
-    }
-
-    mBinding.cancelButton.setOnClickListener {
-      findNavController().navigate(R.id.action_send_to_main)
-    }
-
-    mBinding.swapCancelButton.setOnClickListener {
-      findNavController().navigate(R.id.action_send_to_main)
     }
   }
 
@@ -194,8 +198,8 @@ class SendFragment : BaseFragment() {
 
   private fun refreshAmountConversionDisplay() {
     context?.let {
-      try {
-        val amount = extractAmount()
+      val amount = extractAmount(false)
+      if (amount.isDefined) {
         val unit = mBinding.unit.selectedItem.toString()
         if (unit == Prefs.getFiatCurrency(it)) {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), it, withUnit = true))
@@ -203,21 +207,28 @@ class SendFragment : BaseFragment() {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
         }
         model.errorInAmount.value = false
-      } catch (e: Exception) {
-        log.info("could not extract amount: ${e.message}")
+      } else {
         mBinding.amountConverted.text = ""
-        model.errorInAmount.value = true
+        if (!amountPristine) {
+          model.errorInAmount.value = true
+        }
       }
     }
   }
 
-  private fun extractAmount(): Option<MilliSatoshi> {
+  private fun extractAmount(showError: Boolean = true): Option<MilliSatoshi> {
     val unit = mBinding.unit.selectedItem.toString()
     val amount = mBinding.amount.text.toString()
-    return if (unit == Prefs.getFiatCurrency(context!!)) {
-      Option.apply(Converter.convertFiatToMsat(context!!, amount))
-    } else {
-      Converter.string2Msat_opt(amount, unit)
+    return try {
+      if (unit == Prefs.getFiatCurrency(context!!)) {
+        Option.apply(Converter.convertFiatToMsat(context!!, amount))
+      } else {
+        Converter.string2Msat_opt(amount, unit)
+      }
+    } catch (e: Exception) {
+      log.error("could not extract amount: ${e.message}")
+      model.errorInAmount.value = showError
+      Option.empty()
     }
   }
 }

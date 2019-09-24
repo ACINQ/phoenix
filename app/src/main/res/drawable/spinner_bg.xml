@@ -21,23 +21,19 @@
   <item android:id="@android:id/mask">
     <shape android:shape="rectangle">
       <solid android:color="?attr/defaultButtonColor" />
-      <corners android:radius="@dimen/button_corner" />
+      <corners android:radius="6dp" />
     </shape>
   </item>
 
   <item>
     <layer-list>
       <item
-        android:id="@android:id/background"
-        android:drawable="@drawable/rounded_border" />
-      <item
         android:width="@dimen/text_lg"
         android:height="@dimen/text_lg"
         android:drawable="@drawable/ic_chevron_down"
         android:gravity="center|right"
-        android:right="12dp" />
+        android:right="4dp"
+        android:top="3dp" />
     </layer-list>
   </item>
-
-
 </ripple>

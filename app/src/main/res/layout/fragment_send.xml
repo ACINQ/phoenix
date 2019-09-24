@@ -22,6 +22,8 @@
 
     <import type="fr.acinq.eclair.phoenix.send.SendState" />
 
+    <import type="fr.acinq.eclair.phoenix.send.SwapState" />
+
     <variable
       name="model"
       type="fr.acinq.eclair.phoenix.send.SendViewModel" />
@@ -30,97 +32,128 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/defaultMutedBackgroundColor"
     android:fillViewport="true"
+    android:overScrollMode="never"
     tools:context=".send.SendFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:animateLayoutChanges="true"
-      android:padding="@dimen/space_md">
+      android:background="@color/athens">
+
+      <ImageView
+        android:id="@+id/shape"
+        android:layout_width="match_parent"
+        android:layout_height="146dp"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_bg1"
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintTop_toTopOf="@id/buttons_section" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/defaultBackgroundColor"
+        android:minHeight="@dimen/space_xl"
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/shape" />
 
       <ImageView
         android:layout_width="124dp"
         android:layout_height="124dp"
-        android:layout_margin="@dimen/space_lg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        android:alpha=".6"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_xxl"
+        android:alpha=".15"
         android:contentDescription="@null"
         android:src="@drawable/ic_send_lg"
-        android:tint="@color/mystic"
-        android:visibility="@{model.isFormVisible()}" />
-
-      <TextView
-        android:id="@+id/balance_prefix"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
-        android:text="@string/send_balance_prefix" />
-
-      <fr.acinq.eclair.phoenix.utils.customviews.CoinView
-        android:id="@+id/balance_value"
-        android:layout_width="wrap_content"
-        android:layout_marginStart="@dimen/space_xxs"
-        android:layout_marginTop="@dimen/space_md"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:tint="?attr/defaultMutedTextColor"
+        android:visibility="@{model.isFormVisible()}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintStart_toEndOf="@id/balance_prefix"
-        app:amount_size="@dimen/text_xl"
-        app:thin="false"
-        app:unit_size="@dimen/text_lg" />
-
-      <View
-        android:id="@+id/balance_separator"
-        android:layout_width="94dp"
-        android:layout_height="4dp"
-        android:layout_marginTop="@dimen/space_xs"
-        app:layout_constraintTop_toBottomOf="@id/balance_value"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/rounded"
-        android:backgroundTint="?attr/colorPrimary" />
+        app:layout_constraintTop_toBottomOf="@id/balance_section" />
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+        android:id="@+id/action_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/balance_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:padding="@dimen/space_md"
+        app:layout_constraintBottom_toBottomOf="@id/action_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/action_bar"
+        app:layout_constraintTop_toTopOf="@id/action_bar">
+
+        <TextView
+          android:id="@+id/balance_prefix"
+          style="@style/MutedLabelView"
+          android:text="@string/send_balance_prefix"
+          app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+          android:id="@+id/balance_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xxs"
+          app:amount_size="@dimen/text_md"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toEndOf="@id/balance_prefix"
+          app:layout_constraintTop_toTopOf="parent"
+          app:thin="false"
+          app:unit_color="?attr/defaultMutedTextColor"
+          app:unit_size="@dimen/text_sm" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
       <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_md"
         android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        app:layout_constraintStart_toStartOf="parent"
         android:visibility="@{model.state == SendState.VALIDATING_INVOICE}"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
         app:text="@string/send_loading"
         app:text_size="@dimen/text_lg" />
 
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/space_md"
+        android:padding="@dimen/space_md"
         android:text="@string/send_invalid_pr_generic"
-        android:visibility="@{model.state == SendState.INVALID_INVOICE}" />
+        android:visibility="@{model.state == SendState.INVALID_INVOICE}"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/payment_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xl"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        android:visibility="@{model.isFormVisible()}">
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constraintTop_toBottomOf="@id/balance_section">
 
         <EditText
           android:id="@+id/amount"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:layout_constrainedWidth="true"
-          app:layout_constrainedHeight="true"
-          app:layout_constraintEnd_toStartOf="@id/unit"
-          app:layout_constraintHorizontal_chainStyle="packed"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
           android:background="@null"
+          android:enabled="@{model.swapState != SwapState.SWAP_IN_PROGRESS}"
           android:fontFamily="sans-serif-light"
           android:importantForAutofill="no"
           android:inputType="numberDecimal"
@@ -128,190 +161,201 @@
           android:overScrollMode="always"
           android:singleLine="true"
           android:text=""
+          android:textAlignment="center"
           android:textSize="48sp"
+          app:layout_constrainedHeight="true"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toStartOf="@id/unit"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
           tools:ignore="LabelFor" />
 
         <Spinner
           android:id="@+id/unit"
+          style="@style/default_spinnerStyle"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginBottom="@dimen/space_xxs"
-          android:layout_marginStart="@dimen/space_xs"
           app:layout_constraintBaseline_toBaselineOf="@+id/amount"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/amount"
-          android:background="@drawable/spinner_bg"
-          android:paddingLeft="@dimen/space_xs"
-          android:paddingTop="@dimen/space_xxs"
-          android:paddingRight="@dimen/space_md_p"
-          android:paddingBottom="@dimen/space_xxs"
-          android:spinnerMode="dialog" />
+          tools:ignore="RtlHardcoded" />
+
+        <View
+          android:id="@+id/amount_underline"
+          android:layout_width="0dp"
+          android:layout_height="2dp"
+          android:background="@drawable/line_dots"
+          android:backgroundTint="?attr/colorPrimary"
+          android:layerType="software"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="@id/amount"
+          app:layout_constraintEnd_toEndOf="@id/unit"
+          app:layout_constraintStart_toStartOf="@id/amount" />
 
         <TextView
           android:id="@+id/amount_converted"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
-          app:layout_constraintTop_toBottomOf="@id/amount"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
+
           app:layout_constrainedWidth="true"
-          android:textColor="?attr/defaultMutedTextColor"
-          android:textSize="@dimen/text_md" />
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount_underline" />
 
         <TextView
           android:id="@+id/amount_error"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
-          app:layout_constraintTop_toBottomOf="@id/amount"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constrainedWidth="true"
           android:text="@string/send_amount_error"
           android:textAlignment="center"
           android:textColor="?attr/defaultErrorTextColor"
           android:textSize="@dimen/text_md"
-          android:visibility="@{model.errorInAmount}" />
+          android:visibility="@{model.errorInAmount}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount" />
 
         <androidx.constraintlayout.widget.Barrier
           android:id="@+id/amount_feedback_barrier"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:barrierDirection="bottom"
-          app:constraint_referenced_ids="amount_converted, amount_error" />
+          app:constraint_referenced_ids="amount_converted,amount_error" />
 
         <TextView
           android:id="@+id/destination_label"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginEnd="@dimen/space_xxs"
-          app:layout_constraintHorizontal_chainStyle="packed"
+          style="@style/MutedLabelView"
+          android:layout_width="60dp"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:text="@string/send_destination_label"
+          android:textAlignment="viewEnd"
           app:layout_constraintBaseline_toBaselineOf="@id/destination_value"
-          app:layout_constraintEnd_toStartOf="@id/destination_value"
-          app:layout_constraintStart_toStartOf="parent"
-          android:text="@string/send_destination_label" />
+          app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
           android:id="@+id/destination_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:layout_marginEnd="@dimen/space_lg"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toEndOf="@id/destination_label"
-          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
+          android:layout_marginStart="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:drawableStart="@{model.isLightning() ? @drawable/ic_zap : @drawable/ic_chain}"
+          android:drawablePadding="@dimen/space_xxs"
+          android:drawableTint="?attr/colorPrimary"
           android:ellipsize="end"
           android:singleLine="true"
           android:text="@{model.destination}"
-          android:textStyle="bold" />
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toEndOf="@id/destination_label"
+          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
 
         <TextView
           android:id="@+id/description_label"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginEnd="@dimen/space_xxs"
+          style="@style/MutedLabelView"
+          android:layout_width="60dp"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:text="@string/send_description_label"
+          android:textAlignment="viewEnd"
+          android:visibility="@{model.description.length() > 0}"
           app:layout_constraintBaseline_toBaselineOf="@id/description_value"
-          app:layout_constraintEnd_toStartOf="@id/description_value"
-          app:layout_constraintHorizontal_chainStyle="packed"
-          app:layout_constraintStart_toStartOf="parent"
-          android:text="@string/send_description_label" />
+          app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
           android:id="@+id/description_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_xs"
-          android:layout_marginEnd="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:text="@{model.description}"
+          android:visibility="@{model.description.length() > 0}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toEndOf="@id/description_label"
-          app:layout_constraintTop_toBottomOf="@id/destination_value"
-          android:text="@{model.description}"
-          android:textStyle="bold" />
+          app:layout_constraintTop_toBottomOf="@id/destination_value" />
+
+        <TextView
+          android:id="@+id/swap_required_desc"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          android:drawableStart="@drawable/ic_info"
+          android:paddingStart="@dimen/space_lg"
+          android:paddingTop="@dimen/space_md"
+          android:paddingEnd="@dimen/space_lg"
+          android:paddingBottom="@dimen/space_md"
+          android:text="@string/send_swap_required_desc"
+          android:visibility="@{model.swapState == SwapState.SWAP_REQUIRED || model.swapState == SwapState.SWAP_IN_PROGRESS}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintTop_toBottomOf="@id/description_value" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttons_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="38dp"
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constraintTop_toBottomOf="@id/payment_section">
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/cancel_button"
+          android:id="@+id/swap_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:layout_constraintBottom_toBottomOf="@+id/send_button"
-          app:layout_constraintEnd_toStartOf="@id/send_button"
-          app:layout_constraintHorizontal_chainStyle="spread"
+          android:background="@drawable/button_bg_primary_border"
+          android:visibility="@{model.swapState == SwapState.SWAP_REQUIRED || model.swapState == SwapState.SWAP_COMPLETE}"
+          app:enableOrFade="@{model.swapState == SwapState.SWAP_REQUIRED}"
+          app:icon="@drawable/ic_swap"
+          app:icon_tint="?attr/colorPrimary"
+          app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          android:backgroundTint="@color/transparent"
-          app:text="@string/send_cancel_button" />
+          app:layout_constraintTop_toTopOf="parent"
+          app:text="@string/send_swap_required_button" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/rounded_border"
+          android:padding="@dimen/text_md"
+          android:visibility="@{model.swapState == SwapState.SWAP_IN_PROGRESS}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:progress_tint="?attr/colorPrimary"
+          app:text="@string/send_swap_in_progress" />
+
+        <TextView
+          android:id="@+id/swap_complete_recap"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:drawableStart="@drawable/ic_zap"
+          android:drawableTint="?attr/colorPrimary"
+          android:padding="@dimen/space_lg"
+          android:text="@string/send_swap_complete_recap"
+          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+          app:layout_constraintTop_toBottomOf="@id/swap_button" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg_p"
+          android:backgroundTint="?attr/colorPrimary"
+          android:visibility="@{model.swapState == SwapState.NO_SWAP || model.swapState == SwapState.SWAP_COMPLETE}"
+          app:icon="@drawable/ic_send"
+          app:icon_tint="?attr/altTextColor"
           app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toEndOf="@id/cancel_button"
-          app:layout_constraintTop_toBottomOf="@id/description_value"
-          app:icon="@drawable/ic_check_circle"
-          app:icon_tint="@color/green"
-          app:text="@string/send_pay_button" />
-
-      </androidx.constraintlayout.widget.ConstraintLayout>
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        app:layout_constraintStart_toStartOf="parent"
-        android:text="@string/send_swap_in_progress"
-        android:visibility="@{model.state == SendState.SWAPPING}" />
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        app:layout_constraintStart_toStartOf="parent"
-        android:text="@string/send_swap_error"
-        android:visibility="@{model.state == SendState.SWAPPING_ERROR}" />
-
-      <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/balance_separator"
-        android:visibility="@{model.state == SendState.SWAP_CONFIRM}">
-
-        <TextView
-          android:id="@+id/swap_instructions"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          app:layout_constraintTop_toTopOf="parent"
-          android:text="@string/send_swap_confirm_instructions" />
-
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/swap_cancel_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          app:layout_constraintBottom_toBottomOf="@+id/swap_confirm_button"
-          app:layout_constraintEnd_toStartOf="@id/swap_confirm_button"
-          app:layout_constraintHorizontal_chainStyle="spread"
           app:layout_constraintStart_toStartOf="parent"
-          android:background="@drawable/button_bg_square"
-          app:text="@string/send_swap_confirm_cancel_button" />
-
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/swap_confirm_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg_p"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toEndOf="@id/swap_cancel_button"
-          app:layout_constraintTop_toBottomOf="@id/swap_instructions"
-          app:icon="@drawable/ic_check_circle"
-          app:icon_tint="@color/green"
-          app:text="@string/send_swap_confirm_confirm_button" />
+          app:layout_constraintTop_toBottomOf="@id/swap_complete_recap"
+          app:text="@string/send_pay_button"
+          app:text_color="?attr/altTextColor" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
