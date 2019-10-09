@@ -39,6 +39,7 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.db.PaymentDirection
 import fr.acinq.eclair.db.`IncomingPayment$`
 import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.payment.PaymentRequest
@@ -215,7 +216,7 @@ class ReceiveFragment : BaseFragment() {
   fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
     model.paymentRequest.value?.let {
       if (event is PaymentComplete) {
-        if (event.direction == `PaymentDirection$`.`MODULE$`.INCOMING() && event.identifier == it.paymentHash().toString()) {
+        if (event.direction is PaymentDirection.`IncomingPaymentDirection$` && event.identifier == it.paymentHash().toString()) {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
           findNavController().navigate(action)
         }

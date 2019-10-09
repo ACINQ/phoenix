@@ -292,7 +292,6 @@
   <string name="seedsec_biometrics_switch">Biometric authentication</string>
   <string name="seedsec_change_pin">Change my PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Biometric enrollment failed. Please try again.</string>
-  <string name="seedsec_biometric_not_supported">Your device does not support Biometric authentication.</string>
   <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
   <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
   <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
@@ -301,7 +300,7 @@
   <string name="seedsec_biometric_enabled">Biometric authentication activated</string>
   <string name="seedsec_biometric_disabled">Biometric authentication disabled</string>
 
-  <string name="seedsec_biometric_support_no_hw">Your device does not support biometric authentication</string>
+  <string name="seedsec_biometric_support_no_hw">Your device does not support biometric authentication.</string>
   <string name="seedsec_biometric_support_hw_unavailable">Biometric hardware is not available. Try again later.</string>
   <string name="seedsec_biometric_support_none_enrolled">Please enroll biometric first.</string>
 

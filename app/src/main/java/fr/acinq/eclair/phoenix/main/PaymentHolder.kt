@@ -27,9 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.db.Payment
-import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
-import fr.acinq.eclair.db.`PaymentDirection$`
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
@@ -54,7 +52,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
     val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
 
-    val isPaymentOutgoing = payment.direction() == `PaymentDirection$`.`MODULE$`.OUTGOING()
+    val isPaymentOutgoing = payment.direction() is PaymentDirection.`OutgoingPaymentDirection$`
     val amountView = itemView.findViewById<TextView>(R.id.amount)
     val unitView = itemView.findViewById<TextView>(R.id.unit)
     val descriptionView = itemView.findViewById<TextView>(R.id.description)
@@ -64,7 +62,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     // payment status ====> amount/colors/unit/description/avatar
     when (payment.status()) {
-      `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
+      is OutgoingPaymentStatus.Succeeded, is IncomingPaymentStatus.Received -> {
         // amount
         if (payment.finalAmount().isDefined) {
           if (displayAmountAsFiat) {
@@ -101,7 +99,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           timestampView.visibility = View.GONE
         }
       }
-      `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
+      is OutgoingPaymentStatus.`Pending$` -> {
         amountView.visibility = View.GONE
         unitView.visibility = View.GONE
         // desc + avatar
@@ -112,7 +110,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         timestampView.visibility = View.VISIBLE
         timestampView.text = itemView.context.getString(R.string.paymentholder_processing)
       }
-      `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
+      is OutgoingPaymentStatus.Failed -> {
         amountView.visibility = View.GONE
         unitView.visibility = View.GONE
         // desc + avatar
@@ -134,7 +132,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     // description
-    val desc = if (payment.paymentRequest().isDefined) PaymentRequest.readDescription(payment.paymentRequest().get()) else ""
+    val desc = if (payment.paymentRequest().isDefined) PaymentRequest.fastReadDescription(payment.paymentRequest().get()) else ""
     if (desc.isNullOrBlank()) {
       descriptionView.text = itemView.context.getString(R.string.paymentholder_no_desc)
       descriptionView.setTextColor(mutedTextColor)

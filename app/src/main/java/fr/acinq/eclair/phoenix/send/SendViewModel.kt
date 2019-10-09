@@ -96,7 +96,7 @@ class SendViewModel : ViewModel() {
       withContext(Dispatchers.Default) {
         swapState.postValue(SwapState.SWAP_IN_PROGRESS)
         try {
-          val json = JSONObject().put("amountSatoshis", amount.amount()).put("address", bitcoinURI.address).put("targetBlocks", targetBlocks)
+          val json = JSONObject().put("amountSatoshis", amount.toLong()).put("address", bitcoinURI.address).put("targetBlocks", targetBlocks)
           val request = Request.Builder().url(Api.SWAP_API_URL).post(RequestBody.create(Api.JSON, json.toString())).build()
           delay(300)
           val response = httpClient.newCall(request).execute()

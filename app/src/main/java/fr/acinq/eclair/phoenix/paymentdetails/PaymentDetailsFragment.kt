@@ -30,10 +30,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.`OutgoingPaymentStatus$`
-import fr.acinq.eclair.db.`PaymentDirection$`
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
@@ -75,15 +72,16 @@ class PaymentDetailsFragment : BaseFragment() {
             it.isLeft -> {
               val p = it.left().get()
               when (p.status()) {
-                `OutgoingPaymentStatus$`.`MODULE$`.FAILED() -> {
+                is OutgoingPaymentStatus.Failed -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_failed))
                   drawStatusIcon(R.drawable.ic_cross, R.color.red)
                 }
-                `OutgoingPaymentStatus$`.`MODULE$`.PENDING() -> {
+                is OutgoingPaymentStatus.`Pending$` -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_pending))
                 }
-                `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED() -> {
-                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, p.completedAt())))
+                is OutgoingPaymentStatus.Succeeded -> {
+                  val status = p.status() as OutgoingPaymentStatus.Succeeded
+                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
                   drawStatusIcon(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
                 }
               }
@@ -92,9 +90,10 @@ class PaymentDetailsFragment : BaseFragment() {
             // INCOMING PAYMENT
             it.isRight -> {
               val p = it.right().get()
-              if (p.amount_opt().isDefined) {
-                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, p.receivedAt_opt())))
-                mBinding.amountValue.setAmount(p.amount_opt().get())
+              if (p.status() is IncomingPaymentStatus.Received) {
+                val status = p.status() as IncomingPaymentStatus.Received
+                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, status.receivedAt())))
+                mBinding.amountValue.setAmount(status.amount())
                 drawStatusIcon(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
               } else {
                 mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_pending))
@@ -107,7 +106,7 @@ class PaymentDetailsFragment : BaseFragment() {
       }
     })
 
-    getPayment(args.direction == `PaymentDirection$`.`MODULE$`.OUTGOING().toString(), args.identifier)
+    getPayment(args.direction == PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`.toString(), args.identifier)
     mBinding.model = model
   }
 
@@ -197,12 +196,8 @@ class PaymentDetailsViewModel : ViewModel() {
   val description: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isLeft && it.left().get().paymentRequest_opt().isDefined -> {
-          PaymentRequest.readDescription(it.left().get().paymentRequest_opt().get())
-        }
-        it.isRight && it.right().get().paymentRequest_opt().isDefined -> {
-          PaymentRequest.readDescription(it.right().get().paymentRequest_opt().get())
-        }
+        it.isLeft && it.left().get().paymentRequest().isDefined -> it.left().get().paymentRequest().get().description().left().get()
+        it.isRight -> it.right().get().paymentRequest().description().left().get()
         else -> ""
       }
     } ?: ""
@@ -211,9 +206,7 @@ class PaymentDetailsViewModel : ViewModel() {
   val destination: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isLeft && it.left().get().targetNodeId().isDefined -> {
-          it.left().get().targetNodeId().get().toString()
-        }
+        it.isLeft -> it.left().get().targetNodeId().toString()
         else -> ""
       }
     } ?: ""
@@ -223,7 +216,7 @@ class PaymentDetailsViewModel : ViewModel() {
     it?.let {
       when {
         it.isLeft -> it.left().get().paymentHash().toString()
-        else -> it.right().get().paymentHash().toString()
+        else -> it.right().get().paymentRequest().paymentHash().toString()
       }
     } ?: ""
   }
@@ -231,8 +224,8 @@ class PaymentDetailsViewModel : ViewModel() {
   val paymentRequest: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isLeft && it.left().get().paymentRequest_opt().isDefined -> it.left().get().paymentRequest_opt().get()
-        it.isRight && it.right().get().paymentRequest_opt().isDefined -> it.right().get().paymentRequest_opt().get()
+        it.isLeft && it.left().get().paymentRequest().isDefined -> PaymentRequest.write(it.left().get().paymentRequest().get())
+        it.isRight -> PaymentRequest.write(it.right().get().paymentRequest())
         else -> ""
       }
     } ?: ""
@@ -241,9 +234,7 @@ class PaymentDetailsViewModel : ViewModel() {
   val preimage: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isRight && it.right().get().preimage_opt().isDefined -> {
-          it.right().get().preimage_opt().get().toString()
-        }
+        it.isRight -> it.right().get().paymentPreimage().toString()
         else -> ""
       }
     } ?: ""
@@ -262,20 +253,30 @@ class PaymentDetailsViewModel : ViewModel() {
   val completedAt: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isLeft && it.left().get().completedAt().isDefined -> DateFormat.getDateTimeInstance().format(it.left().get().completedAt().get())
-        it.isRight && it.right().get().receivedAt_opt().isDefined -> DateFormat.getDateTimeInstance().format(it.right().get().receivedAt_opt().get())
+        it.isLeft && it.left().get().status() is OutgoingPaymentStatus.Succeeded -> {
+          val status = it.left().get().status() as OutgoingPaymentStatus.Succeeded
+          DateFormat.getDateTimeInstance().format(status.completedAt())
+        }
+        it.isLeft && it.isLeft && it.left().get().status() is OutgoingPaymentStatus.Failed -> {
+          val status = it.left().get().status() as OutgoingPaymentStatus.Failed
+          DateFormat.getDateTimeInstance().format(status.completedAt())
+        }
+        it.isLeft -> DateFormat.getDateTimeInstance().format(it.left().get().createdAt())
+        it.isRight && it.right().get().status() is IncomingPaymentStatus.Received -> {
+          val status = it.left().get().status() as IncomingPaymentStatus.Received
+          DateFormat.getDateTimeInstance().format(status.receivedAt())
+        }
         else -> ""
       }
     } ?: ""
   }
 
   val expiredAt: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isRight && it.right().get().expireAt_opt().isDefined -> DateFormat.getDateTimeInstance().format(it.right().get().expireAt_opt().get())
-        else -> ""
-      }
-    } ?: ""
+    if (it != null && it.isRight && it.right().get().paymentRequest().expiry().isDefined) {
+      DateFormat.getDateTimeInstance().format(it.right().get().paymentRequest().expiry().get())
+    } else {
+      ""
+    }
   }
 
   val isSent: LiveData<Boolean> = Transformations.map(payment) { it?.isLeft ?: false }

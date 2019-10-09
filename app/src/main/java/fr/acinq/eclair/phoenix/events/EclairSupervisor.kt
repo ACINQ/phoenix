@@ -22,11 +22,14 @@ import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.*
+import fr.acinq.eclair.db.PaymentDirection
 import fr.acinq.eclair.db.`BackupCompleted$`
 import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
+import fr.acinq.eclair.payment.PaymentSent
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 
@@ -46,8 +49,8 @@ class EclairSupervisor : UntypedActor() {
   private val channelsMap = HashMap<ActorRef, Commitments>()
 
   private fun postBalance() {
-    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().amount() }.sum())
-    log.info("posting balance=${balance.amount()}")
+    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().toLong() }.sum())
+    log.info("posting balance=${balance}")
     EventBus.getDefault().post(BalanceEvent(balance))
   }
 
@@ -95,7 +98,7 @@ class EclairSupervisor : UntypedActor() {
       is AcceptPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.decision().trySuccess(true)) {
+          if (it.paymentPreimage().trySuccess(true)) {
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")
@@ -105,7 +108,7 @@ class EclairSupervisor : UntypedActor() {
       is RejectPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.decision().trySuccess(false)) {
+          if (it.paymentPreimage().trySuccess(false)) {
             log.info("payToOpen event has been rejected by user")
           } else {
             log.warn("success promise for $event has failed")
@@ -113,19 +116,19 @@ class EclairSupervisor : UntypedActor() {
         } ?: log.info("ignored $event because associated event for this payment_hash is unknown")
       }
       is PayToOpenRequestEvent -> {
-        log.info("adding PendingPayToOpenRequest for payment_hash=${event.paymentHash()}")
-        payToOpenMap[event.paymentHash()] = event
+        log.info("adding PendingPayToOpenRequest for payment_hash=${event.payToOpenRequest().paymentHash()}")
+        payToOpenMap[event.payToOpenRequest().paymentHash()] = event
         EventBus.getDefault().post(event)
       }
-      is PaymentLifecycle.PaymentSucceeded -> {
-        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.OUTGOING(), event.id().toString()))
+      is PaymentSent -> {
+        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
       }
-      is PaymentLifecycle.PaymentFailed -> {
+      is PaymentFailed -> {
         log.info("payment has failed [ ${event.failures().mkString(", ")} ]")
-        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.OUTGOING(), event.id().toString()))
+        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
       }
       is PaymentReceived -> {
-        EventBus.getDefault().post(PaymentComplete(`PaymentDirection$`.`MODULE$`.INCOMING(), event.paymentHash().toString()))
+        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`IncomingPaymentDirection$`.`MODULE$`, event.paymentHash().toString()))
       }
       else -> {
         log.warn("unhandled event $event")

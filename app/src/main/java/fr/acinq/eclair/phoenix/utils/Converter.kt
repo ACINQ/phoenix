@@ -101,7 +101,7 @@ object Converter {
     val fiat = Prefs.getFiatCurrency(context)
     val rate = Prefs.getExchangeRate(context, fiat)
 
-    return `package$`.`MODULE$`.satoshi2btc(amount.truncateToSatoshi()).amount().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
+    return `package$`.`MODULE$`.satoshi2btc(amount.truncateToSatoshi()).toBigDecimal().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
   }
 
   /**
@@ -126,7 +126,7 @@ object Converter {
       Option.apply(null)
     } else {
       val amount: MilliSatoshi = CoinUtils.convertStringAmountToMsat(input, Prefs.getCoinUnit(context).code())
-      Option.apply(if (amount.amount() == 0L) null else amount)
+      Option.apply(if (amount.toLong() == 0L) null else amount)
     }
   }
 
@@ -139,7 +139,7 @@ object Converter {
       Option.apply(null)
     } else {
       val res: MilliSatoshi = CoinUtils.convertStringAmountToMsat(amount, unit)
-      Option.apply(if (res.amount() == 0L) null else res)
+      Option.apply(if (res.toLong() == 0L) null else res)
     }
   }
 

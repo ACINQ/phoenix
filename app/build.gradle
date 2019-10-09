@@ -83,8 +83,8 @@ dependencies {
 
   // base dependencies
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation 'androidx.core:core-ktx:1.1.0'
   implementation "androidx.appcompat:appcompat:1.0.2"
-  implementation 'androidx.core:core-ktx:1.0.2'
 
   // ANDROIDX - navigation
   def nav_version = "2.2.0-alpha01"
@@ -111,7 +111,7 @@ dependencies {
 
   // eclair core
   def libsecp256k1_version = "1.2-SNAPSHOT"
-  def eclair_version = "0.3.3-android-phoenix-SNAPSHOT"
+  def eclair_version = "0.3.4-android-SNAPSHOT"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation ("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
     exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'

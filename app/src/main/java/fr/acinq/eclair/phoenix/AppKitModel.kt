@@ -33,10 +33,12 @@ import androidx.lifecycle.viewModelScope
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
-import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.crypto.LocalKeyManager
-import fr.acinq.eclair.db.*
+import fr.acinq.eclair.db.BackupEvent
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.OutgoingPayment
+import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.PaymentEvent
@@ -46,7 +48,6 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
-import fr.acinq.eclair.router.TrampolineHop
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -138,22 +139,24 @@ class AppKitModel : ViewModel() {
         _kit.value?.let {
           val list = mutableListOf<Payment>()
           val t = measureTimeMillis {
-            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedChannels()).asJava()
-            closed.forEach { hc ->
-              if (hc is DATA_CLOSING) {
-                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
-                txs.forEach { tx ->
-                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
-                  txsOut.forEach { txOut ->
-                    list.add(Payment(PaymentDirection.OUTGOING(), Option.apply(null), ByteVector32.Zeroes(), Option.apply(null),
-                      Option.apply(Converter.any2Msat(txOut.amount())), Option.apply(null), `OutgoingPaymentStatus$`.`MODULE$`.SUCCEEDED(),
-                      System.currentTimeMillis(), Option.apply(hc.waitingSince() * 1000), Option.apply(null)))
-                  }
-                }
-              } else {
-                log.info("closed channel is not DATA_CLOSING type")
-              }
-            }
+//            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedChannels()).asJava()
+//            closed.forEach { hc ->
+//              if (hc is DATA_CLOSING) {
+//                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
+//                txs.forEach { tx ->
+//                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
+//                  txsOut.forEach { txOut ->
+//                    list.add(Payment(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`,
+//                      Option.apply(null), ByteVector32.Zeroes(), Option.apply(null),
+//                      Option.apply(Converter.any2Msat(txOut.amount())), Option.apply(null),
+//                      OutgoingPaymentStatus.Succeeded.,
+//                      System.currentTimeMillis(), Option.apply(hc.waitingSince() * 1000), Option.apply(null)))
+//                  }
+//                }
+//              } else {
+//                log.info("closed channel is not DATA_CLOSING type")
+//              }
+//            }
             list.addAll(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
           }
           log.info("payment list query complete in ${t}ms")
@@ -184,7 +187,7 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.let {
-          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), 1000, 100, 144)
+          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.apply(_kit.value?.kit?.nodeParams()?.nodeId().toString()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
           val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
 
           val f = Patterns.ask(it.kit.paymentHandler(),
@@ -208,8 +211,7 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
-          val finalCltvExpiry = if (paymentRequest.minFinalCltvExpiry().isDefined && paymentRequest.minFinalCltvExpiry().get() is Long) paymentRequest.minFinalCltvExpiry().get() as Long
-          else Channel.MIN_CLTV_EXPIRY()
+          val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
 
           //          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
           //          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
@@ -220,30 +222,28 @@ class AppKitModel : ViewModel() {
 
           val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
 
-          val trampolines = if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) {
-            // direct payment to ACINQ: no trampoline
-            ScalaList.empty<TrampolineHop>()
-          } else if (paymentRequest.routingInfo().nonEmpty() && paymentRequest.routingInfo().head().nonEmpty() && paymentRequest.routingInfo().head().head().nodeId() == Wallet.ACINQ.nodeId()) {
-            // payment to another phoenix: no trampoline
-            ScalaList.empty<TrampolineHop>()
-          } else {
-            val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), 200, MilliSatoshi(100), true)
-            ScalaList.empty<TrampolineHop>().`$colon$colon`(trampoline)
-          }
+//          val trampolines = if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) {
+//            // direct payment to ACINQ: no trampoline
+//            ScalaList.empty<TrampolineHop>()
+//          } else if (paymentRequest.routingInfo().nonEmpty() && paymentRequest.routingInfo().head().nonEmpty() && paymentRequest.routingInfo().head().head().nodeId() == Wallet.ACINQ.nodeId()) {
+//            // payment to another phoenix: no trampoline
+//            ScalaList.empty<TrampolineHop>()
+//          } else {
+//            val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), cltvExpiryDelta, MilliSatoshi(100))
+//            ScalaList.empty<TrampolineHop>().`$colon$colon`(trampoline)
+//          }
 
           val sendRequest = PaymentInitiator.SendPaymentRequest(
             /* amount */ amount,
             /* paymentHash */ paymentRequest.paymentHash(),
             /* target */ paymentRequest.nodeId(),
             /* max attempts */ 10,
-            /* predefined route */ predefRoutes,
+            /* final cltv expiry delta */ cltvExpiryDelta,
             /* payment request */ Option.apply(paymentRequest),
-            /* assisted routes */ paymentRequest.routingInfo(), // assistedRoutes,
-            /* trampoline hops */ trampolines,
-            /* cltv expiry */ finalCltvExpiry + 1,
-            /* route params */ Option.apply(null),
-            /* allow amp */ paymentRequest.features().allowMultiPart() && trampolines.isEmpty,
-            /* amp total amount */ Option.apply(amount))
+            /* external id */ Option.empty(),
+            /* predefined route */ predefRoutes,
+            /* assisted routes */ paymentRequest.routingInfo(),
+            /* route params */ Option.apply(null))
 
           it.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
         } ?: log.warn("tried to send a payment but app kit is not initialized!!")
@@ -426,7 +426,7 @@ class AppKitModel : ViewModel() {
 
     Class.forName("org.sqlite.JDBC")
     // todo init address
-    val setup = Setup(Wallet.getDatadir(context), ConfigFactory.empty(), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet("2NDSyZrKHJNYtJtMrKtVQvsUwAU8rtAcVmc")), system)
+    val setup = Setup(Wallet.getDatadir(context), ConfigFactory.empty(), Option.apply(seed), Option.empty(), system)
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
     log.info("node setup ready")
 
@@ -435,7 +435,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
-    system.eventStream().subscribe(nodeSupervisor, PaymentLifecycle.PaymentResult::class.java)
+    // system.eventStream().subscribe(nodeSupervisor, PaymentLifecycle.PaymentResult::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
 

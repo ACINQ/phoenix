@@ -49,7 +49,10 @@ class MainActivity : AppCompatActivity() {
       when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
-            amountMsat = it.amountMsat().toLong(), fundingSat = it.fundingSatoshis().toLong(), feeSat = it.feeSatoshis().toLong(), paymentHash = it.paymentHash().toString())
+            amountMsat = it.payToOpenRequest().amountMsat().toLong(),
+            fundingSat = it.payToOpenRequest().fundingSatoshis().toLong(),
+            feeSat = it.payToOpenRequest().feeSatoshis().toLong(),
+            paymentHash = it.payToOpenRequest().paymentHash().toString())
           findNavController(R.id.nav_host_main).navigate(action)
         }
         else -> log.info("unhandled navigation event $it")

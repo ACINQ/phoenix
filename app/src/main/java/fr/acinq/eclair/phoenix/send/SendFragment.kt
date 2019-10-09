@@ -89,7 +89,7 @@ class SendFragment : BaseFragment() {
             it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined -> {
               val amountInput = extractAmount()
               if (amountInput.isDefined) {
-                val fee = it.left().get().second!!.amount().get().amount() - amountInput.get().amount()
+                val fee = it.left().get().second!!.amount().get().toLong() - amountInput.get().toLong()
                 if (fee <= 0) {
                   model.swapState.value = SwapState.SWAP_REQUIRED
                 } else {
