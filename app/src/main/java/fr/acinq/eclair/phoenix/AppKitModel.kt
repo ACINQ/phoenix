@@ -85,7 +85,9 @@ class AppKitModel : ViewModel() {
   private val log = LoggerFactory.getLogger(AppKitModel::class.java)
 
   private val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
+  private val longTimeout = Timeout(Duration.create(30, TimeUnit.SECONDS))
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
+  private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val navigationEvent = SingleLiveEvent<Any>()
 
@@ -303,15 +305,13 @@ class AppKitModel : ViewModel() {
           val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
 
-          it.kit.switchboard()
-
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("init closing of channel=$channelId")
-            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, timeout))
+            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
           }
 
-          val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), awaitDuration)
+          val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
           log.info("closing channels returns: $r")
         } ?: throw KitNotInitialized()
       }
@@ -340,6 +340,7 @@ class AppKitModel : ViewModel() {
               _kit.postValue(res)
               startupState.postValue(StartupState.DONE)
             } catch (t: Throwable) {
+              shutdown()
               log.info("aborted node startup")
               startupState.postValue(StartupState.ERROR)
               _kit.postValue(null)
