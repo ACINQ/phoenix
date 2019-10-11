@@ -45,6 +45,20 @@ class LogsSettingsFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    mBinding.viewButton.setOnClickListener {
+      context?.let {
+        try {
+          val logFile = Logging.getLastLogFile(it)
+          val uri = FileProvider.getUriForFile(it, BuildConfig.APPLICATION_ID + ".provider", logFile)
+          val viewIntent = Intent(Intent.ACTION_VIEW)
+          viewIntent.setDataAndType(uri, "text/plain").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+          val externalAppIntent = Intent.createChooser(viewIntent, getString(R.string.logs_view_with))
+          startActivity(externalAppIntent)
+        } catch (e: Exception) {
+          log.error("could not view log file: ", e)
+        }
+      }
+    }
     mBinding.shareButton.setOnClickListener {
       context?.let {
         try {
