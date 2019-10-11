@@ -51,6 +51,7 @@ class SendViewModel : ViewModel() {
 
   val state = MutableLiveData<SendState>(SendState.VALIDATING_INVOICE)
   val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
+  val useMaxBalance = MutableLiveData<Boolean>()
   val errorInAmount = MutableLiveData(false)
   val swapMessageEvent = SingleLiveEvent<Int>()
   val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
@@ -86,25 +87,32 @@ class SendViewModel : ViewModel() {
     state == SendState.VALID_INVOICE || state == SendState.SENDING
   }
 
+  init {
+    useMaxBalance.value = false
+  }
+
   // ---- end of computed values
 
   val httpClient = OkHttpClient()
 
   @UiThread
-  fun setupSubmarineSwap(amount: Satoshi, bitcoinURI: BitcoinURI, targetBlocks: Int = 6) {
+  fun setupSubmarineSwap(amount: Satoshi, bitcoinURI: BitcoinURI, targetBlocks: Int = 6, subtractFee: Boolean = false) {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         swapState.postValue(SwapState.SWAP_IN_PROGRESS)
         try {
-          val json = JSONObject().put("amountSatoshis", amount.toLong()).put("address", bitcoinURI.address).put("targetBlocks", targetBlocks)
+          val json = JSONObject()
+            .put("amountSatoshis", amount.toLong())
+            .put("address", bitcoinURI.address)
+            .put("targetBlocks", targetBlocks)
           val request = Request.Builder().url(Api.SWAP_API_URL).post(RequestBody.create(Api.JSON, json.toString())).build()
           delay(300)
           val response = httpClient.newCall(request).execute()
           val body = response.body()
           if (response.isSuccessful && body != null) {
-            val paymentRequest = body.string().removeSurrounding("\"")
+            val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""))
             log.info("swapped $bitcoinURI -> $paymentRequest")
-            invoice.postValue(Left.apply(Pair(bitcoinURI, PaymentRequest.read(paymentRequest))))
+            invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
             swapState.postValue(SwapState.SWAP_COMPLETE)
           } else {
             throw RuntimeException("swap responds with code ${response.code()}, aborting swap payment")

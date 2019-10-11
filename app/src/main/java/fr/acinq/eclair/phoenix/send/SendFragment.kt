@@ -28,8 +28,10 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
@@ -41,6 +43,8 @@ import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -55,6 +59,8 @@ class SendFragment : BaseFragment() {
   private lateinit var model: SendViewModel
   private var amountPristine = true // to prevent early validation error message if amount is not set in invoice
 
+  private lateinit var unitList: List<String>
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSendBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
@@ -67,9 +73,8 @@ class SendFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      ArrayAdapter(it,
-        android.R.layout.simple_spinner_item,
-        listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))).also { adapter ->
+      unitList = listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))
+      ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.unit.adapter = adapter
       }
@@ -90,8 +95,9 @@ class SendFragment : BaseFragment() {
               val amountInput = extractAmount()
               if (amountInput.isDefined) {
                 val fee = it.left().get().second!!.amount().get().toLong() - amountInput.get().toLong()
-                if (fee <= 0) {
+                if (fee < 0) {
                   model.swapState.value = SwapState.SWAP_REQUIRED
+                  log.error("fee after swap is < 0: $fee (input=${amountInput.get()} pr_amount=${it.left().get().second!!.amount().get().toLong()}")
                 } else {
                   mBinding.swapCompleteRecap.text = Html.fromHtml(getString(R.string.send_swap_complete_recap,
                     Converter.printAmountPretty(amount = MilliSatoshi(fee), context = ctx, withUnit = true),
@@ -113,6 +119,16 @@ class SendFragment : BaseFragment() {
 
     model.swapMessageEvent.observe(viewLifecycleOwner, Observer {
       Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+    })
+
+    model.useMaxBalance.observe(viewLifecycleOwner, Observer {useMax ->
+      if (useMax && context != null) {
+        appKit.nodeData.value?.run {
+          val unit = Prefs.getCoinUnit(context!!)
+          mBinding.unit.setSelection(unitList.indexOf(unit.code()))
+          mBinding.amount.setText(Converter.printAmountRaw(this.balance, context!!))
+        } ?: (log.warn("balance is not available yet").also { model.useMaxBalance.value = false })
+      }
     })
 
     model.checkAndSetPaymentRequest(args.invoice)
@@ -151,6 +167,8 @@ class SendFragment : BaseFragment() {
       mBinding.balanceValue.setAmount(it.balance)
     } ?: log.warn("balance is not available yet")
 
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+
     mBinding.sendButton.setOnClickListener { _ ->
       model.invoice.value?.let {
         Wallet.hideKeyboard(context, mBinding.amount)
@@ -182,7 +200,10 @@ class SendFragment : BaseFragment() {
           model.errorInAmount.value = false
           val amount = amount_opt.get()
           if (it.isLeft) {
-            model.setupSubmarineSwap(Converter.msat2sat(amount), it.left().get().first)
+            val subtractFee: Boolean = model.useMaxBalance.value ?: false
+            // TODO: provide deduct fee instead of using hard coded fee.....
+            val finalAmount: Satoshi = Converter.msat2sat(amount).`$minus`(if (subtractFee) Satoshi(300) else Satoshi(0))
+            model.setupSubmarineSwap(amount = finalAmount, bitcoinURI = it.left().get().first, subtractFee = subtractFee)
           }
         } else {
           model.errorInAmount.value = true
@@ -192,8 +213,14 @@ class SendFragment : BaseFragment() {
   }
 
   private fun sendPaymentFinal(amount: MilliSatoshi, pr: PaymentRequest) {
-    appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, checkFees = false)
-    findNavController().navigate(R.id.action_send_to_main)
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when sending payment: ", exception)
+      model.state.value = SendState.VALID_INVOICE
+    }) {
+      model.state.value = SendState.SENDING
+      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, deductFeeFromAmount = model.useMaxBalance.value ?: false, checkFees = false)
+      findNavController().navigate(R.id.action_send_to_main)
+    }
   }
 
   private fun refreshAmountConversionDisplay() {
