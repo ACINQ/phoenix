@@ -37,22 +37,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/button_bg_primary_border"
         app:icon="@drawable/ic_fire"
-        android:backgroundTint="@color/orange"
+        app:layout_constraintBottom_toTopOf="@id/restore_seed"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:text="@string/initwallet_create" />
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/restore_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_lg"
         android:layout_marginBottom="@dimen/space_md"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/button_bg_primary_border"
         app:layout_constraintEnd_toEndOf="parent"
+        app:icon="@drawable/ic_restore"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/create_seed"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:text="@string/initwallet_restore" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

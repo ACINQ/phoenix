@@ -215,7 +215,7 @@
   <!-- //////////////// init wallet //////////////// -->
 
   <string name="initwallet_create">New Wallet</string>
-  <string name="initwallet_restore">Or restore my wallet</string>
+  <string name="initwallet_restore">Restore my wallet</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
