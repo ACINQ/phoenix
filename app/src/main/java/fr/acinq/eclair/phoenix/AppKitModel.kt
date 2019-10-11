@@ -46,8 +46,10 @@ import fr.acinq.eclair.payment.PaymentInitiator
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
+import fr.acinq.eclair.phoenix.main.ClosingPayment
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -59,7 +61,6 @@ import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.collection.JavaConverters
-import scala.collection.Seq
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -135,30 +136,26 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
-  suspend fun getPayments(): List<Payment> {
+  suspend fun listPayments(): List<Payment> {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.let {
           val list = mutableListOf<Payment>()
           val t = measureTimeMillis {
-//            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedChannels()).asJava()
-//            closed.forEach { hc ->
-//              if (hc is DATA_CLOSING) {
-//                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
-//                txs.forEach { tx ->
-//                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
-//                  txsOut.forEach { txOut ->
-//                    list.add(Payment(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`,
-//                      Option.apply(null), ByteVector32.Zeroes(), Option.apply(null),
-//                      Option.apply(Converter.any2Msat(txOut.amount())), Option.apply(null),
-//                      OutgoingPaymentStatus.Succeeded.,
-//                      System.currentTimeMillis(), Option.apply(hc.waitingSince() * 1000), Option.apply(null)))
-//                  }
-//                }
-//              } else {
-//                log.info("closed channel is not DATA_CLOSING type")
-//              }
-//            }
+            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedLocalChannels()).asJava()
+            closed.forEach { hc ->
+              if (hc is DATA_CLOSING) {
+                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
+                txs.forEach { tx ->
+                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
+                  txsOut.forEach { txOut ->
+                    list.add(ClosingPayment(tx.txid().toString(), txOut.amount(), System.currentTimeMillis()))
+                  }
+                }
+              } else {
+                log.info("closed channel is not DATA_CLOSING type")
+              }
+            }
             list.addAll(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
           }
           log.info("payment list query complete in ${t}ms")
@@ -189,9 +186,8 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.let {
-          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.apply(_kit.value?.kit?.nodeParams()?.nodeId().toString()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
+          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
           val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-
           val f = Patterns.ask(it.kit.paymentHandler(),
             PaymentLifecycle.ReceivePayment(
               /* amount */ amount_opt,
@@ -208,6 +204,18 @@ class AppKitModel : ViewModel() {
   }
 
   @UiThread
+  suspend fun sendSwapIn() {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        _kit.value?.run {
+          this.kit.switchboard().tell(Peer.SendSwapInRequest(Wallet.ACINQ.nodeId()), ActorRef.noSender())
+          Unit
+        } ?: throw KitNotInitialized()
+      }
+    }.await()
+  }
+
+  @UiThread
   fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, checkFees: Boolean = false) {
     log.info("sending $amount for pr $paymentRequest")
     viewModelScope.launch {
@@ -215,37 +223,20 @@ class AppKitModel : ViewModel() {
         _kit.value?.let {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
 
-          //          val routeParams: Option<RouteParams> = if (checkFees) Option.apply(null) // when fee protection is enabled, use the default RouteParams with reasonable values
-          //          else Option.apply(RouteParams.apply( // otherwise, let's build a "no limit" RouteParams
-          //            false, // never randomize on mobile
-          //            `package$`.`MODULE$`.millibtc2millisatoshi(MilliBtc(BigDecimal.exact(1))).amount(), // at most 1mBTC base fee
-          //            1.0, // at most 100%
-          //            4, Router.DEFAULT_ROUTE_MAX_CLTV(), Option.empty()))
-
-          val predefRoutes = ScalaList.empty<Crypto.PublicKey>() as Seq<Crypto.PublicKey>
-
-//          val trampolines = if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) {
-//            // direct payment to ACINQ: no trampoline
-//            ScalaList.empty<TrampolineHop>()
-//          } else if (paymentRequest.routingInfo().nonEmpty() && paymentRequest.routingInfo().head().nonEmpty() && paymentRequest.routingInfo().head().head().nodeId() == Wallet.ACINQ.nodeId()) {
-//            // payment to another phoenix: no trampoline
-//            ScalaList.empty<TrampolineHop>()
-//          } else {
-//            val trampoline = TrampolineHop(Wallet.ACINQ.nodeId(), paymentRequest.nodeId(), cltvExpiryDelta, MilliSatoshi(100))
-//            ScalaList.empty<TrampolineHop>().`$colon$colon`(trampoline)
-//          }
-
           val sendRequest = PaymentInitiator.SendPaymentRequest(
-            /* amount */ amount,
+            /* amount to send */ amount,
             /* paymentHash */ paymentRequest.paymentHash(),
-            /* target */ paymentRequest.nodeId(),
+            /* payment target */ paymentRequest.nodeId(),
             /* max attempts */ 10,
             /* final cltv expiry delta */ cltvExpiryDelta,
             /* payment request */ Option.apply(paymentRequest),
             /* external id */ Option.empty(),
-            /* predefined route */ predefRoutes,
+            /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
             /* assisted routes */ paymentRequest.routingInfo(),
-            /* route params */ Option.apply(null))
+            /* route params */ Option.apply(null),
+            /* trampoline node public key: only if target is not ACINQ */ if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) Option.apply(null) as Option<Crypto.PublicKey> else Option.apply(Wallet.ACINQ.nodeId()),
+            /* trampoline fees */ MilliSatoshi(10000),
+            /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(144 * 5))
 
           it.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
         } ?: log.warn("tried to send a payment but app kit is not initialized!!")
@@ -374,7 +365,7 @@ class AppKitModel : ViewModel() {
   }
 
 
-  fun shutdown() {
+  private fun shutdown() {
     _kit.value?.let {
       it.kit.system().shutdown()
       it.kit.nodeParams().db().audit().close()
@@ -435,6 +426,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, BackupEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
+    system.eventStream().subscribe(nodeSupervisor, SwapInResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
     // system.eventStream().subscribe(nodeSupervisor, PaymentLifecycle.PaymentResult::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)

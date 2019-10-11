@@ -18,27 +18,36 @@ package fr.acinq.eclair.phoenix.receive
 
 import android.graphics.Bitmap
 import androidx.annotation.UiThread
-import androidx.lifecycle.*
-import fr.acinq.eclair.payment.PaymentRequest
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import fr.acinq.eclair.phoenix.utils.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
-enum class PaymentGenerationState {
-  INIT, IN_PROGRESS, BUILDING_BITMAP, ERROR, DONE
+interface ReceiveState
+
+// possible states when generating a lightning payment request
+enum class PaymentGenerationState : ReceiveState {
+  INIT, EDITING_REQUEST, IN_PROGRESS, ERROR, DONE
+}
+
+// possible states when swapping to on-chain tx
+enum class SwapInState : ReceiveState {
+  IN_PROGRESS, ERROR, DONE
 }
 
 class ReceiveViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveViewModel::class.java)
 
-  val paymentRequest = MutableLiveData<PaymentRequest>()
+  val invoice = MutableLiveData<String>()
   val bitmap = MutableLiveData<Bitmap>()
-  val state = MutableLiveData<PaymentGenerationState>()
+  val state = MutableLiveData<ReceiveState>()
 
   init {
-    paymentRequest.value = null
+    invoice.value = null
     bitmap.value = null
     state.value = PaymentGenerationState.INIT
   }
@@ -47,7 +56,12 @@ class ReceiveViewModel : ViewModel() {
   fun generateQrCodeBitmap() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
-        bitmap.postValue(QRCode.generateBitmap(PaymentRequest.write(paymentRequest.value)))
+        try {
+          bitmap.postValue(QRCode.generateBitmap(invoice.value!!))
+        } catch (e: Exception) {
+          log.error("error when generating bitmap QR for invoice=${invoice.value}")
+          state.postValue(PaymentGenerationState.ERROR)
+        }
       }
     }
   }

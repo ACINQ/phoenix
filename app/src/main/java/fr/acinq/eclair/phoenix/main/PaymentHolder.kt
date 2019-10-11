@@ -18,21 +18,21 @@ package fr.acinq.eclair.phoenix.main
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
-import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.common.base.Strings
 import fr.acinq.eclair.CoinUnit
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Converter
-import kotlinx.android.synthetic.main.holder_payment.view.*
+import fr.acinq.eclair.phoenix.utils.Transcriber
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -49,102 +49,136 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
 
     val primaryColor: Int = getAttrColor(R.attr.colorPrimary)
-    val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
-    val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
+    val context = itemView.context
 
-    val isPaymentOutgoing = payment.direction() is PaymentDirection.`OutgoingPaymentDirection$`
     val amountView = itemView.findViewById<TextView>(R.id.amount)
     val unitView = itemView.findViewById<TextView>(R.id.unit)
     val descriptionView = itemView.findViewById<TextView>(R.id.description)
-    val timestampView = itemView.findViewById<TextView>(R.id.timestamp)
-    val avatarBgView = itemView.findViewById<ImageView>(R.id.avatar_background)
-    val avatarView = itemView.findViewById<ImageView>(R.id.avatar)
+    val detailsView = itemView.findViewById<TextView>(R.id.details)
+    val iconBgView = itemView.findViewById<ImageView>(R.id.icon_background)
+    val iconView = itemView.findViewById<ImageView>(R.id.icon)
 
-    // payment status ====> amount/colors/unit/description/avatar
-    when (payment.status()) {
-      is OutgoingPaymentStatus.Succeeded, is IncomingPaymentStatus.Received -> {
-        // amount
-        if (payment.finalAmount().isDefined) {
-          if (displayAmountAsFiat) {
-            amountView.text = Converter.printFiatPretty(itemView.context, payment.finalAmount().get(), withUnit = false, withSign = true, isOutgoing = isPaymentOutgoing)
-          } else {
-            amountView.text = Converter.printAmountPretty(payment.finalAmount().get(), itemView.context, withUnit = false, withSign = true, isOutgoing = isPaymentOutgoing)
-          }
+    when {
 
-        } else {
-          amountView.text = itemView.context.getString(R.string.utils_unknown)
-        }
-        // color
-        if (isPaymentOutgoing) {
-          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.dark))
-        } else {
-          amountView.amount.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
-        }
+      // ------------ CLOSING CHANNEL "PAYMENT" ------------ //
+
+      payment is ClosingPayment -> {
         amountView.visibility = View.VISIBLE
-        // unit
-        unitView.text = if (displayAmountAsFiat) fiatCode else coinUnit.shortLabel()
         unitView.visibility = View.VISIBLE
-        // desc + avatar
-        descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
-        avatarBgView.imageTintList = ColorStateList.valueOf(primaryColor)
-        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_success))
-
-        // timestamp
-        if (payment.completedAt().isDefined) {
-          val l: Long = payment.completedAt().get() as Long
-          val delaySincePayment: Long = l - System.currentTimeMillis()
-          timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
-          timestampView.visibility = View.VISIBLE
-        } else {
-          timestampView.visibility = View.GONE
-        }
+        amountView.text = printAmount(amount = Converter.any2Msat(payment.amount), isOutgoing = true, displayAmountAsFiat = displayAmountAsFiat)
+        handleDescription(payment, descriptionView)
+        detailsView.text = Transcriber.relativeTime(context, payment.timestamp)
+        iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_success))
       }
-      is OutgoingPaymentStatus.`Pending$` -> {
+
+      // ------------ OUTGOING PAYMENTS ------------ //
+
+      payment is LightningPayment && payment.status() is OutgoingPaymentStatus.`Pending$` -> {
         amountView.visibility = View.GONE
         unitView.visibility = View.GONE
-        // desc + avatar
-        descriptionView.setTextColor(itemView.context.getColor(R.color.dark))
-        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.transparent))
-        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_pending))
-
-        timestampView.visibility = View.VISIBLE
-        timestampView.text = itemView.context.getString(R.string.paymentholder_processing)
+        handleDescription(payment, descriptionView)
+        detailsView.text = context.getString(R.string.paymentholder_processing)
+        iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
       }
-      is OutgoingPaymentStatus.Failed -> {
+
+      payment is LightningPayment && payment.status() is OutgoingPaymentStatus.Succeeded -> {
+        amountView.visibility = View.VISIBLE
+        unitView.visibility = View.VISIBLE
+        amountView.text = if (payment.finalAmount().isDefined) {
+          printAmount(payment.finalAmount().get(), true, displayAmountAsFiat)
+        } else {
+          context.getString(R.string.utils_unknown)
+        }
+        handleDescription(payment, descriptionView)
+        detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Succeeded).completedAt())
+        iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_success))
+      }
+
+      payment is LightningPayment && payment.status() is OutgoingPaymentStatus.Failed -> {
         amountView.visibility = View.GONE
         unitView.visibility = View.GONE
-        // desc + avatar
-        descriptionView.setTextColor(itemView.context.getColor(R.color.brandy))
-        avatarBgView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.transparent))
-        avatarView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_failed))
+        handleDescription(payment, descriptionView)
+        detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Failed).completedAt())
+        iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_failed))
+      }
 
-        // timestamp
-        if (payment.completedAt().isDefined) {
-          val l: Long = payment.completedAt().get() as Long
-          val delaySincePayment: Long = l - System.currentTimeMillis()
-          timestampView.text = DateUtils.getRelativeTimeSpanString(l, System.currentTimeMillis(), delaySincePayment)
-          timestampView.visibility = View.VISIBLE
+      // ------------ INCOMING PAYMENTS ------------ //
+
+      payment is LightningPayment && payment.status() is IncomingPaymentStatus.Received -> {
+        amountView.visibility = View.VISIBLE
+        unitView.visibility = View.VISIBLE
+        amountView.text = if (payment.finalAmount().isDefined) {
+          printAmount(payment.finalAmount().get(), false, displayAmountAsFiat)
         } else {
-          timestampView.visibility = View.GONE
+          itemView.context.getString(R.string.utils_unknown)
         }
+        handleDescription(payment, descriptionView)
+        detailsView.text = Transcriber.relativeTime(context, (payment.status() as IncomingPaymentStatus.Received).receivedAt())
+        iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
+        iconView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_success))
+      }
 
+      payment is LightningPayment && (payment.status() is IncomingPaymentStatus.`Pending$`) -> {
+        amountView.visibility = View.GONE
+        unitView.visibility = View.GONE
+        handleDescription(payment, descriptionView)
+        detailsView.text = context.getString(R.string.paymentholder_waiting)
+        iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
+      }
+
+      payment is LightningPayment && (payment.status() is IncomingPaymentStatus.`Expired$`) -> {
+        amountView.visibility = View.GONE
+        unitView.visibility = View.GONE
+        handleDescription(payment, descriptionView)
+        detailsView.text = context.getString(R.string.paymentholder_failed)
+        iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
+        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
       }
     }
 
-    // description
-    val desc = if (payment.paymentRequest().isDefined) PaymentRequest.fastReadDescription(payment.paymentRequest().get()) else ""
-    if (desc.isNullOrBlank()) {
-      descriptionView.text = itemView.context.getString(R.string.paymentholder_no_desc)
+    unitView.text = if (displayAmountAsFiat) fiatCode else coinUnit.code()
+
+    // clickable action
+    if (payment is LightningPayment) {
+      itemView.setOnClickListener {
+        val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(
+          payment.direction().toString(),
+          if (payment.direction() is PaymentDirection.`OutgoingPaymentDirection$` && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString(),
+          fromEvent = false)
+        it.findNavController().navigate(action)
+      }
+    } else {
+      itemView.setOnClickListener { Unit }
+    }
+  }
+
+  private fun handleDescription(payment: Payment, descriptionView: TextView) {
+    val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
+    val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
+    val desc = when (payment) {
+      is LightningPayment -> if (payment.paymentRequest().isDefined) PaymentRequest.fastReadDescription(payment.paymentRequest().get()) else null
+      is ClosingPayment -> payment.txId
+      else -> ""
+    }
+    if (Strings.isNullOrEmpty(desc)) {
+      descriptionView.text = descriptionView.context.getString(R.string.paymentholder_no_desc)
       descriptionView.setTextColor(mutedTextColor)
     } else {
       descriptionView.text = desc
       descriptionView.setTextColor(defaultTextColor)
     }
+  }
 
-    // clickable action
-    itemView.setOnClickListener {
-      val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(payment.direction().toString(), if (isPaymentOutgoing && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString(), fromEvent = false)
-      it.findNavController().navigate(action)
+  private fun printAmount(amount: MilliSatoshi, isOutgoing: Boolean, displayAmountAsFiat: Boolean): CharSequence {
+    return if (displayAmountAsFiat) {
+      Converter.printFiatPretty(itemView.context, amount = amount, withUnit = false, withSign = true, isOutgoing = isOutgoing).toString()
+    } else {
+      Converter.printAmountPretty(amount = amount, context = itemView.context, withUnit = false, withSign = true, isOutgoing = isOutgoing).toString()
     }
   }
 }

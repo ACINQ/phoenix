@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix.receive
 
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -32,7 +33,6 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.MilliSatoshi
@@ -40,8 +40,6 @@ import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.db.PaymentDirection
-import fr.acinq.eclair.db.`IncomingPayment$`
-import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.NavGraphMainDirections
@@ -51,6 +49,7 @@ import fr.acinq.eclair.phoenix.events.PaymentComplete
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.wire.SwapInResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -71,7 +70,7 @@ class ReceiveFragment : BaseFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-      findNavController().navigate(R.id.action_receive_to_main)
+      handleBackAction()
     }
   }
 
@@ -96,9 +95,8 @@ class ReceiveFragment : BaseFragment() {
       }
     }
 
-    model.paymentRequest.observe(viewLifecycleOwner, Observer {
+    model.invoice.observe(viewLifecycleOwner, Observer {
       if (it != null) {
-        model.state.value = PaymentGenerationState.BUILDING_BITMAP
         model.generateQrCodeBitmap()
       }
     })
@@ -118,19 +116,16 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.amountValue.addTextChangedListener(object : TextWatcher {
-      override fun afterTextChanged(s: Editable?) {
-      }
+      override fun afterTextChanged(s: Editable?) = Unit
 
-      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-      }
+      override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         refreshConversionDisplay()
       }
     })
     mBinding.amountUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-      override fun onNothingSelected(parent: AdapterView<*>?) {
-      }
+      override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         refreshConversionDisplay()
@@ -146,15 +141,30 @@ class ReceiveFragment : BaseFragment() {
       copyInvoice()
     }
     mBinding.shareButton.setOnClickListener {
-      model.paymentRequest.value?.let {
+      model.invoice.value?.let {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.receive_share_subject))
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "lightning:${PaymentRequest.write(it)}")
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "lightning:$it")
         startActivity(Intent.createChooser(shareIntent, getString(R.string.receive_share_title)))
       }
     }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_receive_to_main) })
+    mBinding.editButton.setOnClickListener {
+      model.state.value = PaymentGenerationState.EDITING_REQUEST
+    }
+    mBinding.swapInButton.setOnClickListener {
+      AlertDialog.Builder(context)
+        .setTitle(R.string.receive_swap_in_disclaimer_title)
+        .setMessage(R.string.receive_swap_in_disclaimer_message)
+        .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
+        .setNegativeButton(R.string.btn_cancel, null)
+        .show()
+    }
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { handleBackAction() })
+
+    if (model.state.value == PaymentGenerationState.INIT) {
+      generatePaymentRequest()
+    }
   }
 
   override fun onStop() {
@@ -162,10 +172,18 @@ class ReceiveFragment : BaseFragment() {
     EventBus.getDefault().unregister(this)
   }
 
+  private fun handleBackAction() {
+    if (model.state.value == PaymentGenerationState.EDITING_REQUEST) {
+      model.state.value = PaymentGenerationState.DONE
+    } else {
+      findNavController().navigate(R.id.action_receive_to_main)
+    }
+  }
+
   private fun copyInvoice() {
     try {
       val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-      clipboard.primaryClip = ClipData.newPlainText("Payment request", PaymentRequest.write(model.paymentRequest.value))
+      clipboard.primaryClip = ClipData.newPlainText("Payment request", model.invoice.value)
       Toast.makeText(activity!!.applicationContext, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       log.error("failed to copy: ${e.localizedMessage}")
@@ -181,7 +199,18 @@ class ReceiveFragment : BaseFragment() {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
       val desc = mBinding.descValue.text.toString()
-      model.paymentRequest.value = appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount())
+      model.invoice.value = PaymentRequest.write(appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount()))
+    }
+  }
+
+  private fun generateSwapIn() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when generating swap in: ", exception)
+      model.state.value = PaymentGenerationState.ERROR
+    }) {
+      Wallet.hideKeyboard(context, mBinding.amountValue)
+      model.state.value = SwapInState.IN_PROGRESS
+      appKit.sendSwapIn()
     }
   }
 
@@ -214,13 +243,18 @@ class ReceiveFragment : BaseFragment() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
-    model.paymentRequest.value?.let {
+    model.invoice.value?.let {
       if (event is PaymentComplete) {
-        if (event.direction is PaymentDirection.`IncomingPaymentDirection$` && event.identifier == it.paymentHash().toString()) {
+        if (event.direction is PaymentDirection.`IncomingPaymentDirection$` && event.identifier == PaymentRequest.fastReadPaymentHash(it).toString()) {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
           findNavController().navigate(action)
         }
       }
     }
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: SwapInResponse) {
+    model.invoice.value = event.bitcoinAddress()
   }
 }

@@ -26,7 +26,7 @@
   android:paddingBottom="@dimen/space_sm">
 
   <ImageView
-    android:id="@+id/avatar_background"
+    android:id="@+id/icon_background"
     android:layout_width="26dp"
     android:layout_height="26dp"
     app:layout_constraintStart_toStartOf="parent"
@@ -36,13 +36,13 @@
     android:contentDescription="@null" />
 
   <ImageView
-    android:id="@+id/avatar"
+    android:id="@+id/icon"
     android:layout_width="16dp"
     android:layout_height="16dp"
-    app:layout_constraintStart_toStartOf="@id/avatar_background"
-    app:layout_constraintTop_toTopOf="@id/avatar_background"
-    app:layout_constraintBottom_toBottomOf="@id/avatar_background"
-    app:layout_constraintEnd_toEndOf="@id/avatar_background"
+    app:layout_constraintStart_toStartOf="@id/icon_background"
+    app:layout_constraintTop_toTopOf="@id/icon_background"
+    app:layout_constraintBottom_toBottomOf="@id/icon_background"
+    app:layout_constraintEnd_toEndOf="@id/icon_background"
     android:src="@drawable/payment_holder_def_success"
     android:contentDescription="@null" />
 
@@ -57,7 +57,7 @@
     app:layout_constraintEnd_toStartOf="@id/amount"
     app:layout_constraintHorizontal_bias="0"
     app:layout_constraintHorizontal_chainStyle="packed"
-    app:layout_constraintStart_toEndOf="@id/avatar_background"
+    app:layout_constraintStart_toEndOf="@id/icon_background"
     app:layout_constraintTop_toTopOf="parent"
     android:ellipsize="end"
     android:lines="1"
@@ -97,7 +97,7 @@
     android:textSize="@dimen/text_sm" />
 
   <TextView
-    android:id="@+id/timestamp"
+    android:id="@+id/details"
     style="@style/default_textAppearance"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

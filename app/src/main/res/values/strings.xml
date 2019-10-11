@@ -79,6 +79,7 @@
 
   <string name="paymentholder_sending">Sending…</string>
   <string name="paymentholder_processing">Processing…</string>
+  <string name="paymentholder_waiting">Waiting…</string>
   <string name="paymentholder_failed">Failed</string>
   <string name="paymentholder_sent_prefix">-</string>
   <string name="paymentholder_received_prefix">+</string>
@@ -87,16 +88,22 @@
   <!-- //////////////// receive //////////////// -->
 
   <string name="receive_title">Create and share invoice</string>
-  <string name="receive_loading_message">Please hold…</string>
+  <string name="receive_in_progress_message">Please hold…</string>
   <string name="receive_error_message">There was an error when generating the invoice…\n\nPlease try again.</string>
   <string name="receive_amount_label">Amount (optional)</string>
-  <string name="receive_desc_label">Description:</string>
-  <string name="receive_desc_hint">Payment description (optional)</string>
+  <string name="receive_desc_label">Payment description (optional):</string>
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Create invoice</string>
+
   <string name="receive_share_subject">Please pay this payment</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
+
+  <string name="receive_swap_in_button">Swap payment on-chain</string>
+  <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
+  <string name="receive_swap_in_progress_message">Swapping payment\nPlease hold…</string>
+  <string name="receive_swap_in_disclaimer_title">Notice</string>
+  <string name="receive_swap_in_disclaimer_message">You can swap this payment into a classic Bitcoin transaction. A fee will be applied.</string>
 
   <!-- //////////////// receive with open channel //////////////// -->
 
@@ -141,6 +148,9 @@
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
 
+  <string name="utils_ok">Ok</string>
+  <string name="utils_proceed">Proceed</string>
+  <string name="utils_cancel">Cancel</string>
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>

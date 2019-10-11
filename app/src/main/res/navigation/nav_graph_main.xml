@@ -190,11 +190,12 @@
     <action
       android:id="@+id/action_receive_to_main"
       app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true"
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left"
       app:popEnterAnim="@anim/slide_in_right"
-      app:popExitAnim="@anim/slide_out_left"
-      app:popUpTo="@id/main_fragment" />
+      app:popExitAnim="@anim/slide_out_left" />
   </fragment>
 
   <!-- dialog to confirm money reception over new channel -->

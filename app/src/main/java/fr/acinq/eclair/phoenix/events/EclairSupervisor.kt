@@ -30,6 +30,7 @@ import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
+import fr.acinq.eclair.wire.SwapInResponse
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 
@@ -118,6 +119,10 @@ class EclairSupervisor : UntypedActor() {
       is PayToOpenRequestEvent -> {
         log.info("adding PendingPayToOpenRequest for payment_hash=${event.payToOpenRequest().paymentHash()}")
         payToOpenMap[event.payToOpenRequest().paymentHash()] = event
+        EventBus.getDefault().post(event)
+      }
+      is SwapInResponse -> {
+        log.info("received swap-in response: $event")
         EventBus.getDefault().post(event)
       }
       is PaymentSent -> {

@@ -21,6 +21,7 @@
   <data>
 
     <import type="fr.acinq.eclair.phoenix.receive.PaymentGenerationState" />
+    <import type="fr.acinq.eclair.phoenix.receive.SwapInState" />
 
     <variable
       name="model"
@@ -30,168 +31,246 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constrainedHeight="true"
     android:background="?attr/defaultMutedBackgroundColor"
     android:fillViewport="true"
     android:overScrollMode="never"
+    app:layout_constrainedHeight="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
     tools:context=".receive.ReceiveFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-      <View
-        android:id="@+id/mask"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/space_md_p"
-        app:layout_constraintTop_toBottomOf="@id/action_bar"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toBottomOf="@id/invoice_params_layout"
-        android:background="@drawable/square_border_hz" />
-
       <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:background="@color/athens"
-        app:text="@string/receive_title" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+<!--      <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:id="@+id/tab_buttons"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        app:layout_constraintStart_toEndOf="@id/action_bar"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/action_bar">-->
+
+<!--        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView-->
+<!--          android:id="@+id/lightning_tab_button"-->
+<!--          app:layout_constraintTop_toTopOf="parent"-->
+<!--          app:layout_constraintStart_toStartOf="parent"-->
+<!--          app:icon="@drawable/ic_zap"-->
+<!--          android:background="@drawable/button_tab_rounded"-->
+<!--          app:text="Lightning"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content" />-->
+
+<!--        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView-->
+<!--          android:id="@+id/swapin_tab_button"-->
+<!--          app:layout_constraintTop_toTopOf="parent"-->
+<!--          app:icon="@drawable/ic_chain"-->
+<!--          android:background="@drawable/button_bg_square"-->
+<!--          app:text="Swap-in"-->
+<!--          app:layout_constraintStart_toEndOf="@id/lightning_tab_button"-->
+<!--          android:layout_width="wrap_content"-->
+<!--          android:layout_height="wrap_content" />-->
+
+<!--      </androidx.constraintlayout.widget.ConstraintLayout>-->
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/invoice_params_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:layout_constrainedWidth="true"
-        android:paddingStart="@dimen/space_lg"
-        android:paddingTop="@dimen/space_md"
-        android:paddingEnd="@dimen/space_lg">
+        android:visibility="@{model.state == PaymentGenerationState.EDITING_REQUEST}"
+        app:layout_constraintTop_toBottomOf="@id/action_bar">
 
-        <com.google.android.material.textfield.TextInputLayout
-          android:id="@+id/amount_value_layout"
+        <View
+          android:id="@+id/mask"
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:layout_marginBottom="@dimen/space_md_p"
+          android:background="@drawable/square_border_hz"
+          app:layout_constrainedHeight="true"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <!--        <com.google.android.material.textfield.TextInputLayout-->
+        <!--          android:id="@+id/amount_value_layout"-->
+        <!--          android:layout_width="0dp"-->
+        <!--          android:layout_height="wrap_content"-->
+        <!--          android:layout_marginEnd="@dimen/space_xs"-->
+        <!--          app:layout_constraintTop_toTopOf="parent"-->
+        <!--          app:layout_constraintStart_toStartOf="parent"-->
+        <!--          app:layout_constraintEnd_toStartOf="@+id/amount_unit"-->
+        <!--          app:enableOrFade="@{model.state == PaymentGenerationState.INIT || model.state == PaymentGenerationState.ERROR || model.state == PaymentGenerationState.DONE}"-->
+        <!--          android:hint="@string/receive_amount_label"-->
+        <!--          android:textColorHint="?attr/defaultMutedTextColor"-->
+        <!--          app:hintAnimationEnabled="false">-->
+
+        <TextView
+          android:id="@+id/amount_label"
+          style="@style/MutedLabelView"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:labelFor="@id/amount_value"
+          android:text="@string/receive_amount_label"
+          app:layout_constrainedWidth="true"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:textAllCaps="false"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/amount_value"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_marginEnd="@dimen/space_xs"
-          app:layout_constraintTop_toTopOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toStartOf="@+id/amount_unit"
-          android:hint="@string/receive_amount_label"
-          android:textColorHint="?attr/defaultMutedTextColor"
-          app:hintAnimationEnabled="false">
+          android:importantForAutofill="no"
+          android:inputType="numberDecimal"
+          android:translationX="-3dp"
+          android:singleLine="true"
+          android:textSize="@dimen/text_lg"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toStartOf="@id/amount_unit"
+          app:layout_constraintStart_toStartOf="@id/amount_label"
+          app:layout_constraintTop_toBottomOf="@id/amount_label" />
 
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/amount_value"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:importantForAutofill="no"
-            android:inputType="numberDecimal"
-            android:singleLine="true"
-            android:textSize="@dimen/text_lg" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+        <!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <Spinner
           android:id="@+id/amount_unit"
-          android:layout_width="wrap_content"
           style="@style/default_spinnerStyle"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginBottom="@dimen/space_sm"
-          app:layout_constraintBottom_toBottomOf="@id/amount_value_layout"
-          app:layout_constraintEnd_toEndOf="parent" />
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintBottom_toBottomOf="@id/amount_value"
+          app:layout_constraintEnd_toEndOf="@id/amount_label"
+          />
 
         <TextView
           android:id="@+id/amount_converted"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_xxs"
-          app:layout_constraintTop_toBottomOf="@id/amount_value_layout"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintHorizontal_bias="0"
           android:textColor="?attr/defaultMutedTextColor"
-          android:textSize="@dimen/text_sm" />
+          android:singleLine="true"
+          android:ellipsize="end"
+          android:textSize="@dimen/text_md"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="@id/amount_label"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toStartOf="@id/amount_label"
+          app:layout_constraintTop_toBottomOf="@id/amount_value" />
 
-        <com.google.android.material.textfield.TextInputLayout
-          android:id="@+id/desc_value_layout"
-          android:layout_width="match_parent"
+        <TextView
+          android:id="@+id/desc_label"
+          style="@style/MutedLabelView"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_sm"
-          app:layout_constraintTop_toBottomOf="@id/amount_converted"
-          android:hint="@string/receive_desc_hint"
-          android:textColorHint="?attr/defaultMutedTextColor"
-          app:hintAnimationEnabled="false">
+          android:labelFor="@id/amount_value"
+          android:text="@string/receive_desc_label"
+          app:layout_constraintEnd_toEndOf="parent"
+          android:textAllCaps="false"
+          app:layout_constraintHorizontal_bias="0"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintStart_toStartOf="@id/amount_label"
+          app:layout_constraintTop_toBottomOf="@id/amount_converted" />
 
-          <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/desc_value"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:importantForAutofill="no"
-            android:inputType="textNoSuggestions"
-            android:singleLine="true"
-            android:textSize="@dimen/text_lg" />
+        <!--        <com.google.android.material.textfield.TextInputLayout-->
+        <!--          android:id="@+id/desc_value_layout"-->
+        <!--          android:layout_width="match_parent"-->
+        <!--          android:layout_height="wrap_content"-->
+        <!--          android:layout_marginTop="@dimen/space_sm"-->
+        <!--          app:enableOrFade="@{model.state == PaymentGenerationState.INIT || model.state == PaymentGenerationState.ERROR || model.state == PaymentGenerationState.DONE}"-->
+        <!--          app:layout_constraintTop_toBottomOf="@id/amount_converted"-->
+        <!--          android:hint="@string/receive_desc_hint"-->
+        <!--          android:textColorHint="?attr/defaultMutedTextColor"-->
+        <!--          app:hintAnimationEnabled="false">-->
 
-        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/desc_value"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:importantForAutofill="no"
+          android:inputType="textNoSuggestions"
+          android:singleLine="true"
+          android:translationX="-3dp"
+          android:textSize="@dimen/text_lg"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="@id/amount_label"
+          app:layout_constraintStart_toStartOf="@id/desc_label"
+          app:layout_constraintTop_toBottomOf="@id/desc_label" />
+
+        <!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/generate_button"
-          android:layout_marginTop="@dimen/space_md_p"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:layout_constraintTop_toBottomOf="@id/desc_value_layout"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          android:visibility="@{model.state == PaymentGenerationState.INIT || model.state == PaymentGenerationState.DONE || model.state == PaymentGenerationState.ERROR}"
+          android:layout_marginTop="@dimen/space_md_p"
           app:icon="@drawable/ic_qrcode"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/desc_value"
           app:text="@string/receive_generate_button" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
-          android:id="@+id/progress_bar"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
-          app:layout_constraintTop_toBottomOf="@id/desc_value_layout"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          android:background="@drawable/rounded_border"
-          android:padding="@dimen/space_sm_p"
-          android:visibility="@{model.state == PaymentGenerationState.IN_PROGRESS || model.state == PaymentGenerationState.BUILDING_BITMAP}"
-          app:text="@string/receive_loading_message" />
-
       </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+        android:id="@+id/invoice_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_lg"
+        android:visibility="@{model.state == PaymentGenerationState.IN_PROGRESS || model.state == SwapInState.IN_PROGRESS}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout"
+        app:text="@string/receive_in_progress_message" />
 
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout"
         android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_error_message"
-        android:visibility="@{model.state == PaymentGenerationState.ERROR}" />
+        android:visibility="@{model.state == PaymentGenerationState.ERROR}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
+
+      <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_alert_triangle"
+        android:padding="@dimen/space_lg"
+        android:text="@string/receive_swap_in_error_message"
+        android:visibility="@{model.state == SwapInState.ERROR}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constrainedWidth="true"
         android:paddingBottom="@dimen/space_lg_p"
-        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout"
-        android:visibility="@{model.state == PaymentGenerationState.DONE}">
+        android:visibility="@{model.state == PaymentGenerationState.DONE || model.state == SwapInState.DONE}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toBottomOf="@id/invoice_params_layout">
 
         <ImageView
           android:id="@+id/qr_image"
           android:layout_width="224dp"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginEnd="@dimen/space_lg"
           android:layout_marginTop="@dimen/space_lg"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
+          android:layout_marginEnd="@dimen/space_lg"
           android:adjustViewBounds="true"
           android:background="@drawable/rounded_border_primary"
           android:clickable="true"
@@ -199,30 +278,70 @@
           android:focusable="true"
           android:padding="@dimen/space_md_p"
           android:scaleType="fitCenter"
-          android:src="@drawable/qrcode_placeholder" />
+          android:src="@drawable/qrcode_placeholder"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          app:layout_constraintEnd_toStartOf="@id/share_button"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/qr_image"
-          app:layout_constraintHorizontal_chainStyle="packed"
           android:padding="@dimen/space_sm"
-          app:icon="@drawable/ic_copy" />
+          app:icon="@drawable/ic_copy"
+          app:layout_constraintEnd_toStartOf="@id/share_button"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/qr_image" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toEndOf="@id/copy_button"
-          app:layout_constraintTop_toTopOf="@id/copy_button"
           android:padding="@dimen/space_sm"
-          app:icon="@drawable/ic_share" />
+          app:icon="@drawable/ic_share"
+          app:layout_constraintEnd_toStartOf="@id/edit_button"
+          app:layout_constraintStart_toEndOf="@id/copy_button"
+          app:layout_constraintTop_toTopOf="@id/copy_button" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/edit_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_md"
+          android:padding="@dimen/space_sm"
+          android:visibility="@{model.state == PaymentGenerationState.DONE}"
+          app:icon="@drawable/ic_edit"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/share_button"
+          app:layout_constraintTop_toTopOf="@id/copy_button" />
+
+        <View
+          android:id="@+id/swap_in_sep"
+          android:layout_width="80dp"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/space_lg"
+          android:background="@drawable/line_dots"
+          android:layerType="software"
+          app:layout_constraintTop_toBottomOf="@id/copy_button"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/swap_in_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:layout_constraintStart_toStartOf="parent"
+          android:backgroundTint="@color/transparent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
+          android:layout_marginTop="@dimen/space_md"
+          app:icon_tint="?attr/colorPrimary"
+          app:icon="@drawable/ic_swap"
+          app:text="@string/receive_swap_in_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,19 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentComplete
 import fr.acinq.eclair.phoenix.events.PaymentPending
-import fr.acinq.eclair.phoenix.startup.StartupFragment
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -145,7 +142,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when fetching payments: ", exception)
     }) {
-      model.payments.value = appKit.getPayments()
+      model.payments.value = appKit.listPayments()
     }
   }
 

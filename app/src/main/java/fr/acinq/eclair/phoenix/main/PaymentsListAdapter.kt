@@ -67,11 +67,11 @@ class PaymentsListAdapter : ListAdapter<Payment, PaymentHolder>(PaymentDiffCallb
 
   class PaymentDiffCallback : DiffUtil.ItemCallback<Payment>() {
     override fun areItemsTheSame(oldItem: Payment, newItem: Payment): Boolean {
-      return oldItem.direction() == newItem.direction() && oldItem.paymentHash() == newItem.paymentHash()
+      return true //oldItem.direction() == newItem.direction() && oldItem.paymentHash() == newItem.paymentHash()
     }
 
     override fun areContentsTheSame(oldItem: Payment, newItem: Payment): Boolean {
-      return oldItem.status() == newItem.status()
+      return true //oldItem.status() == newItem.status()
     }
   }
 }

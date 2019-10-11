@@ -21,11 +21,14 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Prefs
+
+class ClosingPayment(val txId: String, val amount: Satoshi, val timestamp: Long) : Payment
 
 class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerView.Adapter<PaymentHolder>() {
 
