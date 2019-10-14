@@ -198,19 +198,21 @@
             app:layout_constraintBaseline_toBaselineOf="@id/fees_value"
             app:layout_constraintStart_toStartOf="parent" />
 
-          <TextView
+          <fr.acinq.eclair.phoenix.utils.customviews.CoinView
             android:id="@+id/fees_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
-            android:text="@string/utils_unknown"
+            app:amount_size="@dimen/text_lg"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/fees_label"
-            app:layout_constraintTop_toBottomOf="@id/desc_value" />
+            app:layout_constraintTop_toBottomOf="@id/desc_value"
+            app:thin="false"
+            app:unit_size="@dimen/text_md" />
 
           <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
             android:id="@+id/show_technicals_button"
@@ -234,10 +236,10 @@
     <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
       android:layout_height="wrap_content"
       android:background="@color/transparent"
       android:backgroundTint="@color/transparent"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

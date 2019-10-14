@@ -38,7 +38,6 @@
       android:importantForAutofill="no"
       android:inputType="none"
       android:maxLines="1"
-      android:minWidth="16dp"
       android:overScrollMode="always"
       android:text=""
       android:textSize="46sp"
