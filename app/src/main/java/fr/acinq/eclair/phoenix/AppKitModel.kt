@@ -169,7 +169,12 @@ class AppKitModel : ViewModel() {
   suspend fun getSentPayment(id: UUID): Option<OutgoingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw KitNotInitialized()
+        var payment: Option<OutgoingPayment> = Option.empty()
+        val t = measureTimeMillis {
+         payment = _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw KitNotInitialized()
+        }
+        log.info("get sent payment complete in ${t}ms")
+        payment
       }
     }.await()
   }
@@ -177,7 +182,12 @@ class AppKitModel : ViewModel() {
   suspend fun getReceivedPayment(paymentHash: ByteVector32): Option<IncomingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw KitNotInitialized()
+        var payment: Option<IncomingPayment> = Option.empty()
+        val t = measureTimeMillis {
+          payment = _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw KitNotInitialized()
+        }
+        log.info("get received payment complete in ${t}ms")
+        payment
       }
     }.await()
   }
