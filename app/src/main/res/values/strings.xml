@@ -162,6 +162,8 @@
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
 
+  <string name="copied">Copied to clipboard!</string>
+
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_general_title">General</string>

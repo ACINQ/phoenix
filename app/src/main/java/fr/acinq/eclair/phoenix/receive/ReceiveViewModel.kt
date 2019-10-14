@@ -18,14 +18,14 @@ package fr.acinq.eclair.phoenix.receive
 
 import android.graphics.Bitmap
 import androidx.annotation.UiThread
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.utils.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+import scala.util.Either
 
 interface ReceiveState
 
@@ -42,7 +42,7 @@ enum class SwapInState : ReceiveState {
 class ReceiveViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveViewModel::class.java)
 
-  val invoice = MutableLiveData<String>()
+  val invoice = MutableLiveData<Pair<PaymentRequest, String?>>()
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<ReceiveState>()
 
@@ -57,7 +57,8 @@ class ReceiveViewModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         try {
-          bitmap.postValue(QRCode.generateBitmap(invoice.value!!))
+          val source = invoice.value!!.second ?: PaymentRequest.write(invoice.value!!.first)
+          bitmap.postValue(QRCode.generateBitmap(source))
         } catch (e: Exception) {
           log.error("error when generating bitmap QR for invoice=${invoice.value}")
           state.postValue(PaymentGenerationState.ERROR)
