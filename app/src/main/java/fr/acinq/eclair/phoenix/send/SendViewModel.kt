@@ -51,8 +51,9 @@ class SendViewModel : ViewModel() {
 
   val state = MutableLiveData<SendState>(SendState.VALIDATING_INVOICE)
   val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
+  val isAmountFieldPristine = MutableLiveData(true) // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
-  val errorInAmount = MutableLiveData(false)
+  val amountErrorMessage = SingleLiveEvent<Int>()
   val swapMessageEvent = SingleLiveEvent<Int>()
   val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 

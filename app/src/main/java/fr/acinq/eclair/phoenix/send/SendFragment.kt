@@ -41,6 +41,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.utils.Converter
+import fr.acinq.eclair.phoenix.utils.InsufficientBalance
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
+import java.lang.RuntimeException
 
 class SendFragment : BaseFragment() {
 
@@ -57,7 +59,6 @@ class SendFragment : BaseFragment() {
   private val args: SendFragmentArgs by navArgs()
 
   private lateinit var model: SendViewModel
-  private var amountPristine = true // to prevent early validation error message if amount is not set in invoice
 
   private lateinit var unitList: List<String>
 
@@ -83,7 +84,7 @@ class SendFragment : BaseFragment() {
     model.invoice.observe(viewLifecycleOwner, Observer {
       it?.let {
         context?.let { ctx ->
-          amountPristine = true
+          model.isAmountFieldPristine.value = true
           when {
             // invoice is a bitcoin uri not swapped yet
             it.isLeft && it.left().get().second == null -> {
@@ -92,7 +93,7 @@ class SendFragment : BaseFragment() {
             }
             // invoice is a bitcoin uri with a swapped LN invoice
             it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined -> {
-              val amountInput = extractAmount()
+              val amountInput = checkAmount()
               if (amountInput.isDefined) {
                 val fee = it.left().get().second!!.amount().get().toLong() - amountInput.get().toLong()
                 if (fee < 0) {
@@ -121,7 +122,19 @@ class SendFragment : BaseFragment() {
       Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
     })
 
-    model.useMaxBalance.observe(viewLifecycleOwner, Observer {useMax ->
+    model.amountErrorMessage.observe(viewLifecycleOwner, Observer { msgId ->
+      if (model.isAmountFieldPristine.value != true) {
+        if (msgId != null) {
+          mBinding.amountConverted.text = ""
+          mBinding.amountError.text = getString(msgId)
+          mBinding.amountError.visibility = View.VISIBLE
+        } else {
+          mBinding.amountError.visibility = View.GONE
+        }
+      }
+    })
+
+    model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
       if (useMax && context != null) {
         appKit.nodeData.value?.run {
           val unit = Prefs.getCoinUnit(context!!)
@@ -135,7 +148,7 @@ class SendFragment : BaseFragment() {
 
     mBinding.amount.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(s: Editable?) {
-        amountPristine = false
+        model.isAmountFieldPristine.value = false
         if (model.swapState.value != SwapState.NO_SWAP) {
           model.swapState.value = SwapState.SWAP_REQUIRED
         }
@@ -144,7 +157,7 @@ class SendFragment : BaseFragment() {
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        refreshAmountConversionDisplay()
+        checkAmount()
       }
     })
 
@@ -155,7 +168,7 @@ class SendFragment : BaseFragment() {
         if (model.swapState.value != SwapState.NO_SWAP) {
           model.swapState.value = SwapState.SWAP_REQUIRED
         }
-        refreshAmountConversionDisplay()
+        checkAmount()
       }
     }
   }
@@ -170,11 +183,11 @@ class SendFragment : BaseFragment() {
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
 
     mBinding.sendButton.setOnClickListener { _ ->
+      model.isAmountFieldPristine.value = false
       model.invoice.value?.let {
         Wallet.hideKeyboard(context, mBinding.amount)
-        val amount_opt = extractAmount()
+        val amount_opt = checkAmount()
         if (amount_opt.isDefined) {
-          model.errorInAmount.value = false
           val amount = amount_opt.get()
           when {
             it.isLeft && model.swapState.value != SwapState.SWAP_REQUIRED -> {
@@ -193,11 +206,11 @@ class SendFragment : BaseFragment() {
     }
 
     mBinding.swapButton.setOnClickListener {
+      model.isAmountFieldPristine.value = false
       Wallet.hideKeyboard(context, mBinding.amount)
       model.invoice.value?.let {
-        val amount_opt = extractAmount()
+        val amount_opt = checkAmount()
         if (amount_opt.isDefined) {
-          model.errorInAmount.value = false
           val amount = amount_opt.get()
           if (it.isLeft) {
             val subtractFee: Boolean = model.useMaxBalance.value ?: false
@@ -205,8 +218,6 @@ class SendFragment : BaseFragment() {
             val finalAmount: Satoshi = Converter.msat2sat(amount).`$minus`(if (subtractFee) Satoshi(300) else Satoshi(0))
             model.setupSubmarineSwap(amount = finalAmount, bitcoinURI = it.left().get().first, subtractFee = subtractFee)
           }
-        } else {
-          model.errorInAmount.value = true
         }
       }
     }
@@ -223,38 +234,38 @@ class SendFragment : BaseFragment() {
     }
   }
 
-  private fun refreshAmountConversionDisplay() {
-    context?.let {
-      val amount = extractAmount(false)
-      if (amount.isDefined) {
-        val unit = mBinding.unit.selectedItem.toString()
-        if (unit == Prefs.getFiatCurrency(it)) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), it, withUnit = true))
-        } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, amount.get(), withUnit = true))
-        }
-        model.errorInAmount.value = false
-      } else {
-        mBinding.amountConverted.text = ""
-        if (!amountPristine) {
-          model.errorInAmount.value = true
-        }
-      }
-    }
-  }
-
-  private fun extractAmount(showError: Boolean = true): Option<MilliSatoshi> {
+  private fun checkAmount(): Option<MilliSatoshi> {
     val unit = mBinding.unit.selectedItem.toString()
-    val amount = mBinding.amount.text.toString()
+    val amountInput = mBinding.amount.text.toString()
+    val balance = appKit.nodeData.value?.balance
+
     return try {
-      if (unit == Prefs.getFiatCurrency(context!!)) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amount))
+      model.amountErrorMessage.value = null
+      val fiat = Prefs.getFiatCurrency(context!!)
+      val amount = if (unit == fiat) {
+        Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
       } else {
-        Converter.string2Msat_opt(amount, unit)
+        Converter.string2Msat_opt(amountInput, unit)
       }
+      if (amount.isDefined) {
+        if (unit == fiat) {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), context!!, withUnit = true))
+        } else {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount.get(), withUnit = true))
+        }
+        if (balance != null && amount.get().`$greater`(balance)) {
+          throw InsufficientBalance()
+        }
+      } else {
+        throw RuntimeException("amount is undefined")
+      }
+      amount
+    } catch (e: InsufficientBalance) {
+      model.amountErrorMessage.value = R.string.send_amount_error_balance
+      Option.empty()
     } catch (e: Exception) {
       log.error("could not extract amount: ${e.message}")
-      model.errorInAmount.value = showError
+      model.amountErrorMessage.value = R.string.send_amount_error
       Option.empty()
     }
   }

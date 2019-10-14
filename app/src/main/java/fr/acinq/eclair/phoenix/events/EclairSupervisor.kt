@@ -51,7 +51,7 @@ class EclairSupervisor : UntypedActor() {
 
   private fun postBalance() {
     val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().toLong() }.sum())
-    log.info("posting balance=${balance}")
+    log.debug("posting balance=${balance}")
     EventBus.getDefault().post(BalanceEvent(balance))
   }
 
@@ -62,12 +62,12 @@ class EclairSupervisor : UntypedActor() {
         log.info("channel $event has been created")
       }
       is ChannelRestored -> {
-        log.info("channel $event has been restored")
+        log.debug("channel $event has been restored")
         channelsMap[event.channel()] = event.currentData().commitments()
         postBalance()
       }
       is ChannelIdAssigned -> {
-        log.info("channel has been assigned id=${event.channelId()}")
+        log.debug("channel has been assigned id=${event.channelId()}")
       }
       is ChannelStateChanged -> {
         val data = event.currentData()
@@ -81,16 +81,13 @@ class EclairSupervisor : UntypedActor() {
         }
       }
       is ChannelSignatureSent -> {
-        log.info("signature sent on ${event.commitments().channelId()}")
+        log.debug("signature sent on ${event.commitments().channelId()}")
         EventBus.getDefault().post(PaymentPending())
       }
       is ChannelSignatureReceived -> {
-        log.info("signature $event has been sent")
+        log.debug("signature $event has been sent")
         channelsMap[event.channel()] = event.commitments()
         postBalance()
-      }
-      is `BackupCompleted$` -> {
-        log.info("channels have been backed up by core")
       }
       is Terminated -> {
         log.info("channel $event has been terminated")
@@ -126,6 +123,7 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(event)
       }
       is PaymentSent -> {
+        log.info("payment has been successfully sent: $event ")
         EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
       }
       is PaymentFailed -> {
@@ -133,16 +131,17 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
       }
       is PaymentReceived -> {
+        log.info("payment has been successfully received: $event ")
         EventBus.getDefault().post(PaymentComplete(PaymentDirection.`IncomingPaymentDirection$`.`MODULE$`, event.paymentHash().toString()))
       }
       else -> {
-        log.warn("unhandled event $event")
+        log.debug("unhandled event $event")
       }
     }
   }
 
   override fun aroundPostStop() {
     super.aroundPostStop()
-    log.info("eclair supervisor stopped")
+    log.debug("eclair supervisor stopped")
   }
 }
