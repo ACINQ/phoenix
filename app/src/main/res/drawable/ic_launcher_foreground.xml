@@ -1,24 +1,23 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="158.08264"
-    android:viewportHeight="158.08264">
-  <group android:translateX="47.161324"
-      android:translateY="47.911324">
+    android:viewportWidth="156.19835"
+    android:viewportHeight="156.19835">
+  <group android:translateX="24.822313"
+      android:translateY="26.991735">
     <path
-        android:pathData="M0.76,51l17,-34c7,-13 13,-17 26,-17h12v16h-3v16h-3v16L25.76,48q-6,0 -9,6l-2,4z"
-        android:fillColor="#f7931e"/>
+        android:pathData="M57,24c6.51,-0.28 21,0 21,7 0,9.06 -21,5 -21,5s24.5,1.5 24.5,9.5C81.5,55.5 54,51 54,51a55.88,55.88 0,0 0,7 1c5.66,0.41 12.5,0.84 12.5,4.5 0,8 -22.5,6.5 -36.5,6.5l-1.5,7.5c-1,5 -4,9 -7.5,8.5 -5.94,-0.85 -3.21,-13.7 3.5,-36.5 5,-17 14,-18 25.5,-18.5z"
+        android:strokeLineJoin="round"
+        android:strokeWidth="6"
+        android:fillColor="#fff"
+        android:strokeColor="#00d885"
+        android:strokeLineCap="round"/>
     <path
-        android:pathData="M55.76,8m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
-        android:fillColor="#f7931e"/>
-    <path
-        android:pathData="M52.76,24m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
-        android:fillColor="#f7931e"/>
-    <path
-        android:pathData="M49.76,40m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
-        android:fillColor="#f7931e"/>
-    <path
-        android:pathData="M7.81,54.45m-7.81,0a7.81,7.81 0,1 1,15.62 0a7.81,7.81 0,1 1,-15.62 0"
-        android:fillColor="#f7931e"/>
+        android:pathData="M57,24c6.51,-0.28 21,0 21,7 0,9.06 -21,5 -21,5s24.5,1.5 24.5,9.5C81.5,55.5 54,51 54,51a55.88,55.88 0,0 0,7 1c5.66,0.41 12.5,0.84 12.5,4.5 0,8 -22.5,6.5 -36.5,6.5l-1.5,7.5c-1,5 -4,9 -7.5,8.5 -5.94,-0.85 -3.21,-13.7 3.5,-36.5 5,-17 14,-18 25.5,-18.5z"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2"
+        android:fillColor="#fff"
+        android:strokeColor="#00d885"
+        android:strokeLineCap="round"/>
   </group>
 </vector>

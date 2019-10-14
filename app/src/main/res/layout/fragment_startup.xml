@@ -25,37 +25,35 @@
     tools:context=".startup.StartupFragment">
 
     <ImageView
+      android:id="@+id/icon"
       android:layout_width="160dp"
       android:layout_height="160dp"
-      app:layout_constraintBottom_toBottomOf="@id/starting"
-      app:layout_constraintTop_toTopOf="@id/starting"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
       android:contentDescription="@null"
       android:src="@drawable/ic_phoenix"
-      android:tint="@color/white" />
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
       android:id="@+id/error"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
       android:drawableStart="@drawable/ic_alert_triangle"
       android:text="@{appKitModel.startupErrorMessage}"
-      android:visibility="@{appKitModel.startupState == StartupState.ERROR}" />
+      android:visibility="@{appKitModel.startupState == StartupState.ERROR}"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/icon" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:id="@+id/starting"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintBottom_toBottomOf="parent"
+      android:visibility="@{appKitModel.startupState == StartupState.IN_PROGRESS}"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      android:visibility="@{appKitModel.startupState == StartupState.IN_PROGRESS}"
+      app:layout_constraintTop_toBottomOf="@id/icon"
       app:text="@string/startup_wait" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 
