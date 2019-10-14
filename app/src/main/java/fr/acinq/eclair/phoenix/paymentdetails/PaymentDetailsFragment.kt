@@ -35,7 +35,6 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsBinding
-import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Transcriber
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -75,9 +74,14 @@ class PaymentDetailsFragment : BaseFragment() {
               when (p.status()) {
                 is OutgoingPaymentStatus.Failed -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_failed))
-                  mBinding.feesValue.visibility = View.GONE
-                  mBinding.feesLabel.visibility = View.GONE
                   showStatusIconAndDetails(R.drawable.ic_cross, R.color.red)
+                  val status = p.status() as OutgoingPaymentStatus.Failed
+                  val errorMessages = ArrayList<String>()
+                  val iterator = status.failures().iterator()
+                  while (iterator.hasNext()) {
+                    errorMessages += iterator.next().failureMessage()
+                  }
+                  mBinding.errorValue.text = errorMessages.joinToString(", ")
                 }
                 is OutgoingPaymentStatus.`Pending$` -> {
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_pending))
@@ -104,8 +108,6 @@ class PaymentDetailsFragment : BaseFragment() {
                 mBinding.amountValue.setAmount(MilliSatoshi(0))
                 showStatusIconAndDetails(R.drawable.ic_clock, R.color.green)
               }
-              mBinding.feesValue.visibility = View.GONE
-              mBinding.feesLabel.visibility = View.GONE
             }
           }
         }
@@ -288,6 +290,14 @@ class PaymentDetailsViewModel : ViewModel() {
     } else {
       ""
     }
+  }
+
+  val isFeeVisible: LiveData<Boolean> = Transformations.map(payment) {
+    it != null && it.isLeft && it.left().get().status() is OutgoingPaymentStatus.Succeeded
+  }
+
+  val isErrorVisible: LiveData<Boolean> = Transformations.map(payment) {
+    it != null && it.isLeft && it.left().get().status() is OutgoingPaymentStatus.Failed
   }
 
   val isSent: LiveData<Boolean> = Transformations.map(payment) { it?.isLeft ?: false }

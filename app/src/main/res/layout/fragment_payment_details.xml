@@ -195,6 +195,7 @@
             android:layout_width="60dp"
             android:text="@string/paymentdetails_fees_label"
             android:textAlignment="viewEnd"
+            android:visibility="@{model.isFeeVisible()}"
             app:layout_constraintBaseline_toBaselineOf="@id/fees_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -204,6 +205,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
+            android:visibility="@{model.isFeeVisible()}"
             app:amount_size="@dimen/text_lg"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
@@ -213,6 +215,30 @@
             app:layout_constraintTop_toBottomOf="@id/desc_value"
             app:thin="false"
             app:unit_size="@dimen/text_md" />
+
+          <TextView
+            android:id="@+id/error_label"
+            style="@style/MutedLabelView"
+            android:layout_width="60dp"
+            android:text="@string/paymentdetails_error_label"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.isErrorVisible()}"
+            app:layout_constraintBaseline_toBaselineOf="@id/error_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/error_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:visibility="@{model.isErrorVisible()}"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/error_label"
+            app:layout_constraintTop_toBottomOf="@id/fees_value" />
 
           <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
             android:id="@+id/show_technicals_button"
@@ -224,7 +250,7 @@
             app:icon_tint="?attr/defaultMutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fees_value"
+            app:layout_constraintTop_toBottomOf="@id/error_value"
             app:text="@string/paymentdetails_technicals_button"
             app:text_color="?attr/defaultMutedTextColor"
             app:text_size="@dimen/text_md" />
