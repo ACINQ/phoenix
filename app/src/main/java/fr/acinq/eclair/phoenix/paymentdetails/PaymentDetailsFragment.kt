@@ -180,24 +180,27 @@ class PaymentDetailsFragment : BaseFragment() {
         val p = appKit.getSentPayment(UUID.fromString(identifier))
         if (p.isDefined) {
           model.payment.value = Left.apply(p.get())
+          model.state.value = PaymentDetailsState.DONE
         } else {
           model.payment.value = null
+          model.state.value = PaymentDetailsState.NONE
         }
       } else {
         val p = appKit.getReceivedPayment(ByteVector32.fromValidHex(identifier))
         if (p.isDefined) {
           model.payment.value = Right.apply(p.get())
+          model.state.value = PaymentDetailsState.DONE
         } else {
           model.payment.value = null
+          model.state.value = PaymentDetailsState.NONE
         }
       }
-      model.state.value = PaymentDetailsState.DONE
     }
   }
 }
 
 enum class PaymentDetailsState {
-  INIT, RETRIEVING_PAYMENT_DATA, DONE, ERROR
+  INIT, RETRIEVING_PAYMENT_DATA, DONE, ERROR, NONE
 }
 
 class PaymentDetailsViewModel : ViewModel() {

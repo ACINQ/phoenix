@@ -258,6 +258,7 @@
   <string name="paymentdetails_title"></string>
   <string name="paymentdetails_loading">Retrieving payment details…</string>
   <string name="paymentdetails_error">This payment could not be found…</string>
+  <string name="paymentdetails_none">No payment found…</string>
 
   <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Sent</b> %1$s]]></string>
   <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pending…</b>]]></string>
