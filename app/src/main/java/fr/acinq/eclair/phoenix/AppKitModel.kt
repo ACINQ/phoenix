@@ -30,6 +30,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
@@ -121,6 +122,11 @@ class AppKitModel : ViewModel() {
 
   fun hasWalletBeenSetup(context: Context): Boolean {
     return Wallet.getSeedFile(context).exists()
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PaymentComplete) {
+    navigationEvent.value = event
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)

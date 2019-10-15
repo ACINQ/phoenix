@@ -28,6 +28,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.phoenix.databinding.ActivityMainBinding
+import fr.acinq.eclair.phoenix.events.PaymentComplete
+import fr.acinq.eclair.phoenix.events.PaymentPending
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.eclair.phoenix.send.SendFragmentDirections
 import fr.acinq.eclair.phoenix.utils.IntentCodes
@@ -53,6 +55,10 @@ class MainActivity : AppCompatActivity() {
             fundingSat = it.payToOpenRequest().fundingSatoshis().toLong(),
             feeSat = it.payToOpenRequest().feeSatoshis().toLong(),
             paymentHash = it.payToOpenRequest().paymentHash().toString())
+          findNavController(R.id.nav_host_main).navigate(action)
+        }
+        is PaymentComplete -> {
+          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(it.direction.toString(), it.identifier, fromEvent = true)
           findNavController(R.id.nav_host_main).navigate(action)
         }
         else -> log.info("unhandled navigation event $it")

@@ -130,14 +130,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
-    when (event) {
-      is PaymentComplete -> {
-        val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
-        findNavController().navigate(action)
-      }
-      is PaymentPending -> refreshPaymentList()
-    }
+  fun handleEvent(event: PaymentPending) {
+    refreshPaymentList()
   }
 
   private fun refreshPaymentList() {
