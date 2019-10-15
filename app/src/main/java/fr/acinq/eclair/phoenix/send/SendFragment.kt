@@ -264,7 +264,7 @@ class SendFragment : BaseFragment() {
       model.amountErrorMessage.value = R.string.send_amount_error_balance
       Option.empty()
     } catch (e: Exception) {
-      log.error("could not extract amount: ${e.message}")
+      log.info("could not check amount: ${e.message}")
       model.amountErrorMessage.value = R.string.send_amount_error
       Option.empty()
     }

@@ -1,20 +1,31 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+  android:width="108dp"
+  android:height="108dp"
+  android:viewportWidth="108"
+  android:viewportHeight="108">
   <path
-      android:pathData="M57,24c6.51,-0.28 21,0 21,7 0,9.06 -21,5 -21,5s24.5,1.5 24.5,9.5C81.5,55.5 54,51 54,51a55.88,55.88 0,0 0,7 1c5.66,0.41 12.5,0.84 12.5,4.5 0,8 -22.5,6.5 -36.5,6.5l-1.5,7.5c-1,5 -4,9 -7.5,8.5 -5.94,-0.85 -3.21,-13.7 3.5,-36.5 5,-17 14,-18 25.5,-18.5z"
-      android:strokeLineJoin="round"
-      android:strokeWidth="6"
-      android:fillColor="#fff"
-      android:strokeColor="?attr/colorPrimary"
-      android:strokeLineCap="round"/>
+    android:fillColor="?attr/colorPrimary"
+    android:pathData="M29.66,85.05a8.69,8.69 0,0 1,-1.23 -0.05,7 7,0 0,1 -4.94,-3.18c-3.19,-5 -1.86,-14.29 5.67,-39.91C35,22 46.18,22 58,22c15.17,0 23.61,3.18 25.79,9.73a7.16,7.16 0,0 1,-1 7,6 6,0 0,1 -0.58,0.65c2.89,1.93 4.67,4.64 4.31,8.52 -0.39,4.36 -3.36,6.65 -8,7.76A5.52,5.52 0,0 1,79 58a7.7,7.7 0,0 1,-3.16 6.14c-6.73,5.4 -24.74,5.57 -34.59,4.42C39,79.51 35.11,85.05 29.66,85.05z" />
   <path
-      android:pathData="M57,24c6.51,-0.28 21,0 21,7 0,9.06 -21,5 -21,5s24.5,1.5 24.5,9.5C81.5,55.5 54,51 54,51a55.88,55.88 0,0 0,7 1c5.66,0.41 12.5,0.84 12.5,4.5 0,8 -22.5,6.5 -36.5,6.5l-1.5,7.5c-1,5 -4,9 -7.5,8.5 -5.94,-0.85 -3.21,-13.7 3.5,-36.5 5,-17 14,-18 25.5,-18.5z"
-      android:strokeLineJoin="round"
-      android:strokeWidth="2"
-      android:fillColor="#fff"
-      android:strokeColor="?attr/colorPrimary"
-      android:strokeLineCap="round"/>
+    android:fillColor="?attr/defaultBackgroundColor"
+    android:pathData="M58,26c8,0 20,1 22,7 2.24,6.71 -11,6 -21,5 9,1 24.18,2 23.5,9.5C82,53 72,53 55,52c8,1 20,2 20,6 0,8 -28,8 -37,6 -2,13 -5.5,17.5 -9,17 -5.94,-0.85 -2.71,-15.2 4,-38 5,-17 13.49,-17 25,-17z"
+    android:strokeWidth="2"
+    android:strokeColor="?attr/colorPrimary"
+    android:strokeLineCap="round"
+    android:strokeLineJoin="round" />
 </vector>

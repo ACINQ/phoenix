@@ -33,6 +33,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentComplete
 import fr.acinq.eclair.phoenix.events.PaymentPending
+import fr.acinq.eclair.phoenix.utils.KitNotInitialized
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -110,12 +111,13 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     }
     Wallet.hideKeyboard(context, mBinding.main)
 
-    refreshPaymentList()
     context?.let { model.updateNotifications(it) }
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
+
+    refreshPaymentList()
   }
 
   override fun onStop() {
@@ -139,8 +141,10 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   private fun refreshPaymentList() {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when fetching payments: ", exception)
+    lifecycleScope.launch(CoroutineExceptionHandler { _, e ->
+      if (e !is KitNotInitialized) {
+        log.error("error when fetching payments: ", e)
+      }
     }) {
       model.payments.value = appKit.listPayments()
     }
