@@ -47,7 +47,6 @@ import fr.acinq.eclair.payment.PaymentInitiator
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.events.*
-import fr.acinq.eclair.phoenix.main.ClosingPayment
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.wire.SwapInResponse
@@ -233,28 +232,44 @@ class AppKitModel : ViewModel() {
         _kit.value?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
 
-          val fee: MilliSatoshi =
+
+          val routingHeadShortChannelId = if (paymentRequest.routingInfo().headOption().isDefined && paymentRequest.routingInfo().head().headOption().isDefined)
+            Option.apply(paymentRequest.routingInfo().head().head().shortChannelId()) else Option.empty()
+
+          val trampolineNode: Option<Crypto.PublicKey> = when {
+            // payment target is ACINQ: no trampoline
+            paymentRequest.nodeId() == Wallet.ACINQ.nodeId() -> Option.empty()
+            // routing info head is a peer id: target is a phoenix app
+            routingHeadShortChannelId.isDefined && ShortChannelId.isPeerId(routingHeadShortChannelId.get()) -> Option.empty()
+            // otherwise, we use ACINQ node for trampoline
+            else -> Option.apply(Wallet.ACINQ.nodeId())
+          }
+
+          val trampolineFee: MilliSatoshi = if (trampolineNode.isDefined) {
             Converter.any2Msat(Satoshi(5)).`$times`(5) // base fee covering 5 hops with a base fee of 5 sat
               .`$plus`(amount.`$times`(0.001))  // + proportional fee = 0.1 % of payment amount
+          } else {
+            MilliSatoshi(0) // no fee when we are not using trampoline
+          }
 
-          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(fee) else amount
+          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(trampolineFee) else amount
 
           val sendRequest = PaymentInitiator.SendPaymentRequest(
-            /* amount to send */ if (deductFeeFromAmount) amount.`$minus`(fee) else amount,
+            /* amount to send */ if (deductFeeFromAmount) amount.`$minus`(trampolineFee) else amount,
             /* paymentHash */ paymentRequest.paymentHash(),
             /* payment target */ paymentRequest.nodeId(),
-            /* max attempts */ 10,
+            /* max attempts */ 1,
             /* final cltv expiry delta */ cltvExpiryDelta,
             /* payment request */ Option.apply(paymentRequest),
             /* external id */ Option.empty(),
             /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
             /* assisted routes */ paymentRequest.routingInfo(),
             /* route params */ Option.apply(null),
-            /* trampoline node public key: only if target is not ACINQ */ if (paymentRequest.nodeId() == Wallet.ACINQ.nodeId()) Option.apply(null) as Option<Crypto.PublicKey> else Option.apply(Wallet.ACINQ.nodeId()),
-            /* trampoline fees */ fee,
+            /* trampoline node public key */ trampolineNode,
+            /* trampoline fees */ trampolineFee,
             /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(144 * 5))
 
-          log.info("sending $amountFinal with fee=$fee (deducted: $deductFeeFromAmount) for pr $paymentRequest")
+          log.info("sending $amountFinal with fee=$trampolineFee (deducted: $deductFeeFromAmount) for pr $paymentRequest")
           this.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
