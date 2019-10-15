@@ -17,10 +17,18 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
+  <data>
+
+    <import type="fr.acinq.eclair.phoenix.StartupState" />
+
+    <variable
+      name="appKitModel"
+      type="fr.acinq.eclair.phoenix.AppKitModel" />
+  </data>
+
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/athens"
     android:padding="@dimen/space_lg"
     tools:context=".startup.StartupFragment">
 
@@ -56,13 +64,4 @@
       app:layout_constraintTop_toBottomOf="@id/icon"
       app:text="@string/startup_wait" />
   </androidx.constraintlayout.widget.ConstraintLayout>
-
-  <data>
-
-    <import type="fr.acinq.eclair.phoenix.StartupState" />
-
-    <variable
-      name="appKitModel"
-      type="fr.acinq.eclair.phoenix.AppKitModel" />
-  </data>
 </layout>

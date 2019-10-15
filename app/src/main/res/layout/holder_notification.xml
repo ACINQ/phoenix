@@ -20,7 +20,7 @@
   android:layout_height="wrap_content"
   android:layout_marginStart="@dimen/space_md"
   android:layout_marginEnd="@dimen/space_md"
-  android:layout_marginBottom="@dimen/space_xs"
+  android:layout_marginTop="@dimen/space_xs"
   android:background="@drawable/app_notif_bg"
   android:padding="@dimen/space_sm">
 

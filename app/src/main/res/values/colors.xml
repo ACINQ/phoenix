@@ -34,6 +34,7 @@
   <color name="dawn">#F8EFF1</color>
   <color name="blossom">#DFBABA</color>
   <color name="brandy">#C58181</color>
+  <color name="chico">#885050</color>
 
   <!-- basic -->
   <color name="transparent">#00000000</color>
@@ -49,6 +50,10 @@
   <color name="grey_light_1">#BABABA</color>
   <color name="grey_light_2">#D4D4D4</color>
   <color name="grey_light_3">#EDEDED</color>
+
+  <color name="oxford">#363F4E</color>
+  <color name="mako">#454E52</color>
+  <color name="shuttle">#596469</color>
 
   <color name="slate">#73868D</color>
   <color name="ripple">#A6AFC0CF</color>

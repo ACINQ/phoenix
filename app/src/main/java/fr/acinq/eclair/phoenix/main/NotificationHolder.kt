@@ -17,11 +17,11 @@
 package fr.acinq.eclair.phoenix.main
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginTop
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
@@ -29,11 +29,17 @@ import fr.acinq.eclair.phoenix.R
 class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   fun bindItem(notification: NotificationTypes, position: Int) {
-
     val messageView = itemView.findViewById<TextView>(R.id.notif_message)
     val iconView = itemView.findViewById<ImageView>(R.id.notif_icon)
     val actionButton = itemView.findViewById<Button>(R.id.notif_button)
-    val padding = itemView.resources.getDimensionPixelSize(R.dimen.space_sm)
+    val spaceMd = itemView.resources.getDimensionPixelSize(R.dimen.space_md)
+    val spaceSm = itemView.resources.getDimensionPixelSize(R.dimen.space_sm)
+
+    if (position == 0) {
+      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMd, 0, spaceMd, 0)
+    } else {
+      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMd, spaceMd, spaceMd, 0)
+    }
 
     messageView.text = itemView.resources.getString(notification.messageResId)
     iconView.setImageDrawable(itemView.resources.getDrawable(notification.imageResId, itemView.context.theme))
@@ -48,10 +54,10 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           NotificationTypes.MNEMONICS_REMINDER -> {}
         }
       }
-      itemView.setPadding(padding, padding, padding, 0)
+      itemView.setPadding(spaceSm, spaceSm, spaceSm, 0)
     } else {
       actionButton.visibility = View.GONE
-      itemView.setPadding(padding, padding, padding, padding)
+      itemView.setPadding(spaceSm, spaceSm, spaceSm, spaceSm)
     }
   }
 }

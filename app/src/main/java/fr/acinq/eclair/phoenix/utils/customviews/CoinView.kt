@@ -39,6 +39,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomCoinViewBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.ThemeHelper
 import org.slf4j.LoggerFactory
 import scala.Option
 
@@ -63,7 +64,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
       try {
         mBinding.amount.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_amount_size, R.dimen.text_lg).toFloat())
-        mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ContextCompat.getColor(context, R.color.dark)))
+        mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
         mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -99,7 +100,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         handleEmptyAmountIfEditable()
 
         mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
-        mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ContextCompat.getColor(context, R.color.dark)))
+        mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
         mBinding.unit.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
         if (!isEditable) {

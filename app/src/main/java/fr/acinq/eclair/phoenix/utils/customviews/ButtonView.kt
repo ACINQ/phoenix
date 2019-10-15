@@ -18,16 +18,19 @@ package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import androidx.annotation.AttrRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomButtonViewBinding
+import fr.acinq.eclair.phoenix.utils.ThemeHelper
 
 
 class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.buttonViewStyle) : ConstraintLayout(context, attrs, R.attr.buttonViewStyle) {
@@ -45,7 +48,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (arr.hasValue(R.styleable.ButtonView_text_size)) {
           mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.ButtonView_text_size, R.dimen.text_lg).toFloat())
         }
-        mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ContextCompat.getColor(getContext(), R.color.dark)))
+        mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
       } else {
         mBinding.text.visibility = View.GONE
         val params = LayoutParams(resources.getDimensionPixelOffset(R.dimen.button_height), resources.getDimensionPixelOffset(R.dimen.button_height))
@@ -62,7 +65,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
       if (arr.hasValue(R.styleable.ButtonView_icon)) {
         mBinding.image.setImageDrawable(arr.getDrawable(R.styleable.ButtonView_icon))
         if (arr.hasValue(R.styleable.ButtonView_icon_tint)) {
-          mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ContextCompat.getColor(getContext(), R.color.dark)))
+          mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.defaultTextColor)))
         }
       } else {
         mBinding.image.visibility = GONE
