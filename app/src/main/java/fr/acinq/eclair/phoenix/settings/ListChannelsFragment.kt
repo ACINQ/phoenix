@@ -17,10 +17,12 @@
 package fr.acinq.eclair.phoenix.settings
 
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +34,9 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsListChannelsBinding
 import fr.acinq.eclair.phoenix.settings.adapters.ChannelsAdapter
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import upickle.`default$`
@@ -82,8 +86,19 @@ class ListChannelsFragment : BaseFragment() {
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
 
     mBinding.shareButton.setOnClickListener {
-      model.channels.value?.let {
-        val data = it.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
+      model.channels.value?.let { list ->
+        shareChannelsData(list)
+      }
+    }
+  }
+
+  private fun shareChannelsData(list: MutableList<RES_GETINFO>) {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when serializing channels: ", exception)
+      context?.run { Toast.makeText(this, R.string.listallchannels_serialization_error, Toast.LENGTH_SHORT).show() }
+    }) {
+      withContext(this.coroutineContext + Dispatchers.Default) {
+        val data = list.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))

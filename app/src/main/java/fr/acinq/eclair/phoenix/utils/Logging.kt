@@ -50,6 +50,7 @@ object Logging {
     val localFileAppender = getLocalFileAppender(context, lc)
 
     // set level
+    lc.getLogger("com.google.zxing").level = Level.WARN
     lc.getLogger("fr.acinq.eclair.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
     lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
     if (BuildConfig.DEBUG) {

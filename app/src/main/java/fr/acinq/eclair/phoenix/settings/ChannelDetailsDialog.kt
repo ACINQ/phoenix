@@ -16,34 +16,30 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.addCallback
-import androidx.annotation.UiThread
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.*
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.`JsonSerializers$`
+import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.phoenix.AppKitModel
 import fr.acinq.eclair.phoenix.R
-import fr.acinq.eclair.phoenix.databinding.FragmentReceiveWithOpenBinding
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsChannelDetailsBinding
-import fr.acinq.eclair.phoenix.databinding.FragmentTestDialogBinding
-import fr.acinq.eclair.phoenix.send.SendFragmentArgs
-import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
 import upickle.`default$`
 
 class ChannelDetailsDialog : DialogFragment() {
@@ -69,6 +65,9 @@ class ChannelDetailsDialog : DialogFragment() {
       model = ViewModelProvider(this).get(ChannelDetailsViewModel::class.java)
       mBinding.model = model
     } ?: dismiss()
+    model.rawData.observe(viewLifecycleOwner, Observer { json ->
+      json?.run { mBinding.rawData.text = this } // direct assignment has better perfs than binding
+    })
   }
 
   override fun onStart() {
@@ -78,7 +77,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }
 
     mBinding.copyButton.setOnClickListener {
-      context?.let {ctx ->
+      context?.let { ctx ->
         try {
           val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
           clipboard.primaryClip = ClipData.newPlainText("Channel data", model.rawData.value)
@@ -88,6 +87,7 @@ class ChannelDetailsDialog : DialogFragment() {
         }
       }
     }
+
     mBinding.shareButton.setOnClickListener {
       model.rawData.value?.let {
         val shareIntent = Intent(Intent.ACTION_SEND)
@@ -97,10 +97,28 @@ class ChannelDetailsDialog : DialogFragment() {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
       }
     }
+
     mBinding.closeButton.setOnClickListener {
       dismiss()
     }
   }
+
+  private fun shareChannelsData(list: MutableList<RES_GETINFO>) {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when serializing channels: ", exception)
+      context?.run { Toast.makeText(this, R.string.listallchannels_serialization_error, Toast.LENGTH_SHORT).show() }
+    }) {
+      withContext(this.coroutineContext + Dispatchers.Default) {
+        val data = list.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))
+        shareIntent.putExtra(Intent.EXTRA_TEXT, data)
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
+      }
+    }
+  }
+
 
   private fun getChannel() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
@@ -108,11 +126,12 @@ class ChannelDetailsDialog : DialogFragment() {
       model.state.value = ChannelDetailsState.ERROR
     }) {
       model.state.value = ChannelDetailsState.IN_PROGRESS
-      val channel = appKit.getChannel(ByteVector32.fromValidHex(args.channelId))
-      model.state.postValue(ChannelDetailsState.DONE)
-      val json = `default$`.`MODULE$`.write(channel, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter())
-      mBinding.rawData.text = json // direct assignment has better perfs
-      model.rawData.postValue(json)
+      withContext(this.coroutineContext + Dispatchers.Default) {
+        val channel = appKit.getChannel(ByteVector32.fromValidHex(args.channelId))
+        val json = `default$`.`MODULE$`.write(channel, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter())
+        model.rawData.postValue(json)
+        model.state.postValue(ChannelDetailsState.DONE)
+      }
     }
   }
 }
