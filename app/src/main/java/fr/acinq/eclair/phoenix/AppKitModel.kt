@@ -171,15 +171,17 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
-  suspend fun getSentPayment(id: UUID): Option<OutgoingPayment> {
+  suspend fun getSentPayments(parentId: UUID): List<OutgoingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        var payment: Option<OutgoingPayment> = Option.empty()
-        val t = measureTimeMillis {
-         payment = _kit.value?.kit?.nodeParams()?.db()?.payments()?.getOutgoingPayment(id) ?: throw KitNotInitialized()
-        }
-        log.info("get sent payment complete in ${t}ms")
-        payment
+        _kit.value?.run {
+          var payments: List<OutgoingPayment> = ArrayList()
+          val t = measureTimeMillis {
+           payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
+          }
+          log.info("get sent payments complete in ${t}ms")
+          payments
+        } ?: throw KitNotInitialized()
       }
     }.await()
   }
@@ -187,12 +189,14 @@ class AppKitModel : ViewModel() {
   suspend fun getReceivedPayment(paymentHash: ByteVector32): Option<IncomingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
+        _kit.value?.run {
         var payment: Option<IncomingPayment> = Option.empty()
         val t = measureTimeMillis {
-          payment = _kit.value?.kit?.nodeParams()?.db()?.payments()?.getIncomingPayment(paymentHash) ?: throw KitNotInitialized()
+          payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
         }
         log.info("get received payment complete in ${t}ms")
         payment
+        } ?: throw KitNotInitialized()
       }
     }.await()
   }

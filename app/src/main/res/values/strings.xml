@@ -278,6 +278,7 @@
   <string name="paymentdetails_destination_label">Sent to</string>
   <string name="paymentdetails_fees_label">Fees</string>
   <string name="paymentdetails_error_label">Error</string>
+  <string name="paymentdetails_multipart">This is an atomic multipart payment</string>
 
   <string name="paymentdetails_technicals_button">Show technical data</string>
 

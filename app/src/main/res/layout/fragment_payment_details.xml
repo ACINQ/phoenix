@@ -123,7 +123,7 @@
             android:layout_height="5dp"
             android:layout_marginTop="@dimen/space_lg"
             android:background="@drawable/rounded"
-            android:backgroundTint="?attr/colorPrimary"
+            android:backgroundTint="?attr/defaultMutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/amount_value" />
@@ -233,26 +233,38 @@
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
             android:visibility="@{model.isErrorVisible()}"
-            app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/error_label"
             app:layout_constraintTop_toBottomOf="@id/fees_value" />
 
+          <TextView
+            android:id="@+id/mulitpart_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:visibility="@{model.multiPartCount > 1}"
+            android:textSize="@dimen/text_xs"
+            android:textColor="?attr/defaultMutedTextColor"
+            android:text="@string/paymentdetails_multipart"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/error_value" />
+
           <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
             android:id="@+id/show_technicals_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md_p"
-            android:background="@drawable/button_bg_square"
-            app:icon="@drawable/ic_arrow_next"
+            android:layout_marginTop="@dimen/space_lg"
+            app:icon="@drawable/ic_tool"
             app:icon_tint="?attr/defaultMutedTextColor"
+            app:text_color="?attr/defaultMutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_value"
+            app:layout_constraintTop_toBottomOf="@id/mulitpart_info"
             app:text="@string/paymentdetails_technicals_button"
-            app:text_color="?attr/defaultMutedTextColor"
             app:text_size="@dimen/text_md" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

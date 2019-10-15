@@ -148,7 +148,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       itemView.setOnClickListener {
         val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(
           payment.direction().toString(),
-          if (payment.direction() is PaymentDirection.`OutgoingPaymentDirection$` && payment.id().isDefined) payment.id().get().toString() else payment.paymentHash().toString(),
+          if (payment.direction() is PaymentDirection.`OutgoingPaymentDirection$` && payment.parentId().isDefined) payment.parentId().get().toString() else payment.paymentHash().toString(),
           fromEvent = false)
         it.findNavController().navigate(action)
       }
