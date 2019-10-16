@@ -114,7 +114,6 @@ class SendViewModel : ViewModel() {
             val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""), true)
             log.info("swapped $bitcoinURI -> $paymentRequest")
             invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
-            swapState.postValue(SwapState.SWAP_COMPLETE)
           } else {
             throw RuntimeException("swap responds with code ${response.code()}, aborting swap payment")
           }

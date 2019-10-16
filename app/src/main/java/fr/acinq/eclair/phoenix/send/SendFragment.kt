@@ -100,9 +100,10 @@ class SendFragment : BaseFragment() {
                   model.swapState.value = SwapState.SWAP_REQUIRED
                   log.error("fee after swap is < 0: $fee (input=${amountInput.get()} pr_amount=${it.left().get().second!!.amount().get().toLong()}")
                 } else {
-                  mBinding.swapCompleteRecap.text = Html.fromHtml(getString(R.string.send_swap_complete_recap,
+                  mBinding.swapCompleteRecap.text = Converter.html(getString(R.string.send_swap_complete_recap,
                     Converter.printAmountPretty(amount = MilliSatoshi(fee), context = ctx, withUnit = true),
-                    Converter.printAmountPretty(amount = it.left().get().second!!.amount().get(), context = context!!, withUnit = true)), Html.FROM_HTML_MODE_COMPACT)
+                    Converter.printAmountPretty(amount = it.left().get().second!!.amount().get(), context = context!!, withUnit = true)))
+                  model.swapState.value = SwapState.SWAP_COMPLETE
                 }
               }
               Unit
