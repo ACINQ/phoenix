@@ -191,7 +191,7 @@
   <string name="listallchannels_title">Channels List</string>
   <string name="listallchannels_in_progress">Please hold…</string>
   <string name="listallchannels_error">There was an error when retrieving the list of channels. Please try again.</string>
-  <string name="listallchannels_node_id">Your node id: %1$s\n\n</string>
+  <string name="listallchannels_node_id">Node id: %1$s</string>
   <string name="listallchannels_no_channels">You don\'t have any channels yet.</string>
   <plurals name="listallchannels_channels_header">
     <item quantity="one">You have %1$d channel.</item>
