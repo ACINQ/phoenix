@@ -29,6 +29,7 @@ import androidx.core.view.marginStart
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomSwitchViewBinding
+import fr.acinq.eclair.phoenix.utils.ThemeHelper
 
 
 class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.buttonViewStyle) : ConstraintLayout(context, attrs, R.attr.buttonViewStyle) {
@@ -44,13 +45,13 @@ class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet
       if (arr.hasValue(R.styleable.SwitchView_text_size)) {
         mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.SwitchView_text_size, R.dimen.text_lg).toFloat())
       }
-      mBinding.text.setTextColor(arr.getColor(R.styleable.SwitchView_text_color, R.attr.defaultTextColor))
+      mBinding.text.setTextColor(arr.getColor(R.styleable.SwitchView_text_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
 
       // optional image
       if (arr.hasValue(R.styleable.SwitchView_icon)) {
         mBinding.icon.setImageDrawable(arr.getDrawable(R.styleable.SwitchView_icon))
         if (arr.hasValue(R.styleable.SwitchView_icon_tint)) {
-          mBinding.icon.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.SwitchView_icon_tint, ContextCompat.getColor(getContext(), R.color.dark)))
+          mBinding.icon.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.SwitchView_icon_tint, ThemeHelper.color(context, R.attr.defaultTextColor)))
         }
       } else {
         mBinding.icon.visibility = GONE
