@@ -37,10 +37,12 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsBinding
 import fr.acinq.eclair.phoenix.utils.Transcriber
+import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters
 import scala.util.Either
 import scala.util.Left
 import scala.util.Right
@@ -92,7 +94,14 @@ class PaymentDetailsFragment : BaseFragment() {
                   val status = p.status() as OutgoingPaymentStatus.Succeeded
                   mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
                   val statuses: List<OutgoingPaymentStatus.Succeeded> = payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
-                  mBinding.feesValue.setAmount(MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum()))
+                  val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
+
+//                  val isTrampoline = p.paymentRequest().isDefined && statuses.map { o -> JavaConverters.seqAsJavaListConverter(o.route()).asJava().size == 1 }.reduce { acc, b -> acc && b }
+                  val trampolineData = Wallet.getTrampoline(p.amount(), p.paymentRequest().get())
+                  val finalFees = fees.`$plus`(trampolineData.second)
+                  log.info("trampoline data=${trampolineData}")
+
+                  mBinding.feesValue.setAmount(finalFees)
                   showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
                 }
               }
