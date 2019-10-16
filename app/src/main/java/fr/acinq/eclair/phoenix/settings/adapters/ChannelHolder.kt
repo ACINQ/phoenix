@@ -41,6 +41,7 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val icon = itemView.findViewById<ImageView>(R.id.channel_icon)
     val state = itemView.findViewById<TextView>(R.id.channel_state)
     val balance = itemView.findViewById<CoinView>(R.id.channel_balance_value)
+    val capacity = itemView.findViewById<CoinView>(R.id.channel_capacity_value)
 
     state.text = Transcriber.readableState(itemView.context, channel.state())
     icon.imageTintList = ColorStateList.valueOf(Transcriber.colorForState(itemView.context, channel.state()))
@@ -48,6 +49,7 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val data = channel.data()
     if (data is HasCommitments) {
       balance.setAmount(data.commitments().availableBalanceForSend())
+      capacity.setAmount(data.commitments().localCommit().spec().totalFunds())
       itemView.setOnClickListener {
         try {
           val action = ListChannelsFragmentDirections.actionListChannelsToChannelDetails(data.channelId().toString())

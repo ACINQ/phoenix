@@ -25,40 +25,64 @@
     android:id="@+id/channel_icon"
     android:layout_width="8dp"
     android:layout_height="8dp"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    android:src="@drawable/ic_bullet"
     android:adjustViewBounds="true"
     android:contentDescription="@null"
-    android:scaleType="fitCenter" />
+    android:scaleType="fitCenter"
+    android:src="@drawable/ic_bullet"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <TextView
     android:id="@+id/channel_state"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/space_sm"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toEndOf="@+id/channel_icon"
-    app:layout_constraintHorizontal_bias="0"
-    app:layout_constraintEnd_toStartOf="@id/channel_balance_value"
     android:layout_marginEnd="@dimen/space_lg"
     android:ellipsize="end"
-    app:layout_constrainedWidth="true"
     android:maxLines="2"
     android:text="@string/lipsum"
-    android:textSize="@dimen/text_md" />
+    android:textSize="@dimen/text_md"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/channel_balance_value"
+    app:layout_constraintHorizontal_bias="0"
+    app:layout_constraintStart_toEndOf="@+id/channel_icon"
+    app:layout_constraintTop_toTopOf="parent" />
 
   <fr.acinq.eclair.phoenix.utils.customviews.CoinView
     android:id="@+id/channel_balance_value"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:layout_constrainedWidth="true"
+    android:layout_marginEnd="@dimen/space_xxs"
     app:amount_size="@dimen/text_md"
-    app:unit_size="@dimen/text_sm"
-    app:thin="false"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/channel_balance_separator"
     app:layout_constraintHorizontal_bias="1"
-    app:layout_constraintBaseline_toBaselineOf="@id/channel_state"
-    app:layout_constraintEnd_toEndOf="parent" />
+    app:layout_constraintTop_toTopOf="parent"
+    app:thin="false"
+    app:unit_size="@dimen/text_sm" />
+
+  <TextView
+    android:id="@+id/channel_balance_separator"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/space_xxs"
+    android:text="/"
+    app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
+    app:layout_constraintEnd_toStartOf="@id/channel_capacity_value" />
+
+  <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+    android:id="@+id/channel_capacity_value"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:amount_size="@dimen/text_md"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="1"
+    app:thin="false"
+    app:unit_size="@dimen/text_sm" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
