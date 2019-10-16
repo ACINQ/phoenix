@@ -33,6 +33,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsDisplaySeedBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
+import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.KeystoreHelper
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -56,7 +57,7 @@ class DisplaySeedFragment : BaseFragment() {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsDisplaySeedBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
-    mBinding.instructions.text = Html.fromHtml(getString(R.string.displayseed_instructions), Html.FROM_HTML_MODE_COMPACT)
+    mBinding.instructions.text = Converter.html(getString(R.string.displayseed_instructions))
     return mBinding.root
   }
 
@@ -167,7 +168,7 @@ class DisplaySeedFragment : BaseFragment() {
     val rightPadding = if (hasRightPadding) resources.getDimensionPixelSize(R.dimen.space_lg) else 0
     val textView = TextView(context)
     textView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-    textView.text = Html.fromHtml(getString(R.string.newseed_words_td, i + 1, word))
+    textView.text = Converter.html(getString(R.string.newseed_words_td, i + 1, word))
     textView.setPadding(0, 0, rightPadding, bottomPadding)
     return textView
   }

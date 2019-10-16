@@ -30,6 +30,7 @@ import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.DialogPinBinding
+import fr.acinq.eclair.phoenix.utils.Converter
 import java.util.*
 
 class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val mPinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default) :
@@ -41,7 +42,7 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
   init {
     setContentView(mBinding.root)
     setOnCancelListener { mPinCallback.onPinCancel(this@PinDialog) }
-    mBinding.pinTitle.text = Html.fromHtml(getContext().getString(titleResId), Html.FROM_HTML_MODE_COMPACT)
+    mBinding.pinTitle.text = Converter.html(getContext().getString(titleResId))
 
     val mButtonsList = ArrayList<View>()
     mButtonsList.add(mBinding.pinNum1)

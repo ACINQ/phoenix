@@ -31,6 +31,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletCreateBinding
+import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,7 +78,7 @@ class CreateSeedFragment : InitWalletBaseFragment() {
     val rightPadding = if (hasRightPadding) resources.getDimensionPixelSize(R.dimen.space_lg) else 0
     val textView = TextView(context)
     textView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-    textView.text = Html.fromHtml(getString(R.string.newseed_words_td, i + 1, word))
+    textView.text = Converter.html(getString(R.string.newseed_words_td, i + 1, word))
     textView.setPadding(0, 0, rightPadding, bottomPadding)
     return textView
   }

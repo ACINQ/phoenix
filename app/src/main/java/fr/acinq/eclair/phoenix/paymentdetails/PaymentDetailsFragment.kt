@@ -36,6 +36,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsBinding
+import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Transcriber
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -77,7 +78,7 @@ class PaymentDetailsFragment : BaseFragment() {
               val p = it.left().get().first()
               when (p.status()) {
                 is OutgoingPaymentStatus.Failed -> {
-                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_failed))
+                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
                   showStatusIconAndDetails(R.drawable.ic_cross, R.color.red)
                   val status = p.status() as OutgoingPaymentStatus.Failed
                   val errorMessages = ArrayList<String>()
@@ -88,11 +89,11 @@ class PaymentDetailsFragment : BaseFragment() {
                   mBinding.errorValue.text = errorMessages.joinToString(", ")
                 }
                 is OutgoingPaymentStatus.`Pending$` -> {
-                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_pending))
+                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
                 }
                 is OutgoingPaymentStatus.Succeeded -> {
                   val status = p.status() as OutgoingPaymentStatus.Succeeded
-                  mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
+                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
                   val statuses: List<OutgoingPaymentStatus.Succeeded> = payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
                   val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
 
@@ -112,11 +113,11 @@ class PaymentDetailsFragment : BaseFragment() {
               val p = it.right().get()
               if (p.status() is IncomingPaymentStatus.Received) {
                 val status = p.status() as IncomingPaymentStatus.Received
-                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, status.receivedAt())))
+                mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, status.receivedAt())))
                 mBinding.amountValue.setAmount(status.amount())
                 showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
               } else {
-                mBinding.statusText.text = Html.fromHtml(ctx.getString(R.string.paymentdetails_status_received_pending))
+                mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_pending))
                 mBinding.amountValue.setAmount(MilliSatoshi(0))
                 showStatusIconAndDetails(R.drawable.ic_clock, R.color.green)
               }

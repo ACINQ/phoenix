@@ -17,6 +17,7 @@
 package fr.acinq.eclair.phoenix.utils
 
 import android.content.Context
+import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import fr.acinq.bitcoin.Btc
@@ -75,18 +76,27 @@ object Converter {
     val formattedParts = amount.split(Pattern.quote(DECIMAL_SEPARATOR).toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     val prefix = if (withSign) context.getString(if (isOutgoing) R.string.paymentholder_sent_prefix else R.string.paymentholder_received_prefix) else ""
 
-    return if (formattedParts.size == 2) {
+    val output = if (formattedParts.size == 2) {
       if (withUnit) {
-        Html.fromHtml(context.getString(R.string.utils_pretty_amount_with_unit, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1], unit), Html.FROM_HTML_MODE_COMPACT)
+        context.getString(R.string.utils_pretty_amount_with_unit, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1], unit)
       } else {
-        Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1]), Html.FROM_HTML_MODE_COMPACT)
+        context.getString(R.string.utils_pretty_amount, prefix, formattedParts[0] + DECIMAL_SEPARATOR, formattedParts[1])
       }
     } else {
       if (withUnit) {
-        Html.fromHtml(context.getString(R.string.utils_pretty_amount_with_unit, prefix, amount, "", unit), Html.FROM_HTML_MODE_COMPACT)
+        context.getString(R.string.utils_pretty_amount_with_unit, prefix, amount, "", unit)
       } else {
-        Html.fromHtml(context.getString(R.string.utils_pretty_amount, prefix, amount, ""), Html.FROM_HTML_MODE_COMPACT)
+        context.getString(R.string.utils_pretty_amount, prefix, amount, "")
       }
+    }
+    return html(output)
+  }
+
+  public fun html(source: String): Spanned {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT)
+    } else {
+      Html.fromHtml(source)
     }
   }
 
