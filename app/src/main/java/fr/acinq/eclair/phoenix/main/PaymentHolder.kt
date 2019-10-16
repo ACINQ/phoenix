@@ -62,15 +62,15 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
       // ------------ CLOSING CHANNEL "PAYMENT" ------------ //
 
-      payment is ClosingPayment -> {
-        amountView.visibility = View.VISIBLE
-        unitView.visibility = View.VISIBLE
-        amountView.text = printAmount(amount = Converter.any2Msat(payment.amount), isOutgoing = true, displayAmountAsFiat = displayAmountAsFiat)
-        handleDescription(payment, descriptionView)
-        detailsView.text = Transcriber.relativeTime(context, payment.timestamp)
-        iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
-        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_success))
-      }
+//      payment is ClosingPayment -> {
+//        amountView.visibility = View.VISIBLE
+//        unitView.visibility = View.VISIBLE
+//        amountView.text = printAmount(amount = Converter.any2Msat(payment.amount), isOutgoing = true, displayAmountAsFiat = displayAmountAsFiat)
+//        handleDescription(payment, descriptionView)
+//        detailsView.text = Transcriber.relativeTime(context, payment.timestamp)
+//        iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
+//        iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_success))
+//      }
 
       // ------------ OUTGOING PAYMENTS ------------ //
 
@@ -91,6 +91,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         } else {
           context.getString(R.string.utils_unknown)
         }
+        amountView.setTextColor(context.getColor(R.color.red))
         handleDescription(payment, descriptionView)
         detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Succeeded).completedAt())
         iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
@@ -116,6 +117,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         } else {
           itemView.context.getString(R.string.utils_unknown)
         }
+        amountView.setTextColor(context.getColor(R.color.green))
         handleDescription(payment, descriptionView)
         detailsView.text = Transcriber.relativeTime(context, (payment.status() as IncomingPaymentStatus.Received).receivedAt())
         iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
