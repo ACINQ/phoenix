@@ -60,15 +60,26 @@
       app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
     <TextView
-      android:id="@+id/channels_found_header"
+      android:id="@+id/node_id"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:paddingStart="@dimen/space_lg"
       android:layout_marginTop="@dimen/space_md"
       android:paddingEnd="@dimen/space_lg"
-      android:text="@string/listallchannels_no_channels"
+      android:text="@string/listallchannels_node_id"
       android:visibility="@{model.state == ListChannelsState.DONE}"
       app:layout_constraintTop_toBottomOf="@id/action_bar" />
+
+    <TextView
+      android:id="@+id/channels_found_header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingStart="@dimen/space_lg"
+      android:layout_marginTop="@dimen/space_xs"
+      android:paddingEnd="@dimen/space_lg"
+      android:text="@string/listallchannels_no_channels"
+      android:visibility="@{model.state == ListChannelsState.DONE}"
+      app:layout_constraintTop_toBottomOf="@id/node_id" />
 
     <View
       android:id="@+id/share_all_bg"

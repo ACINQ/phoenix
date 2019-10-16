@@ -84,7 +84,7 @@ class ListChannelsFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
-
+    mBinding.nodeId.text = getString(R.string.listallchannels_node_id, appKit.kit.value?.kit?.nodeParams()?.nodeId()?.toString() ?: getString(R.string.utils_unknown))
     mBinding.shareButton.setOnClickListener {
       model.channels.value?.let { list ->
         shareChannelsData(list)
