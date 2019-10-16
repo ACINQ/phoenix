@@ -111,7 +111,7 @@ object Wallet {
       // payment target is ACINQ: no trampoline
       paymentRequest.nodeId() == ACINQ.nodeId() -> Option.empty()
       // routing info head is a peer id: target is a phoenix app
-      routingHeadShortChannelId.isDefined && ShortChannelId.isPeerId(routingHeadShortChannelId.get()) -> Option.empty()
+      // routingHeadShortChannelId.isDefined && ShortChannelId.isPeerId(routingHeadShortChannelId.get()) -> Option.empty()
       // otherwise, we use ACINQ node for trampoline
       else -> Option.apply(ACINQ.nodeId())
     }
