@@ -21,14 +21,22 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.eclair.ShortChannelId
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BuildConfig
-import fr.acinq.eclair.phoenix.send.ReadingState
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import scala.Option
 import java.io.File
 import java.lang.RuntimeException
 
 object Wallet {
+
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   // ------------------------ DATADIR & FILES
 
@@ -75,18 +83,47 @@ object Wallet {
   }
 
   fun checkInvoice(input: String): String {
-    val cleanInvoice = cleanInvoice(input)
+    val invoice = cleanInvoice(input)
     return try {
-      PaymentRequest.read(cleanInvoice, true)
-      cleanInvoice
+      PaymentRequest.read(invoice, true)
+      invoice
     } catch (e1: Exception) {
       try {
-        BitcoinURI(cleanInvoice)
-        cleanInvoice
+        BitcoinURI(invoice)
+        invoice
       } catch (e2: Exception) {
         throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage}")
       }
     }
+  }
+
+  /**
+   * Return a Pair object containing the trampoline data for a payment request if necessary. Left contains the trampoline node,
+   * Right contains the trampoline fee.
+   *
+   * If trampoline is not needed, the node will be None, and the fee will be 0 msat.
+   */
+  fun getTrampoline(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<Option<Crypto.PublicKey>, MilliSatoshi> {
+    val routingHeadShortChannelId = if (paymentRequest.routingInfo().headOption().isDefined && paymentRequest.routingInfo().head().headOption().isDefined)
+      Option.apply(paymentRequest.routingInfo().head().head().shortChannelId()) else Option.empty()
+
+    val trampolineNode: Option<Crypto.PublicKey> = when {
+      // payment target is ACINQ: no trampoline
+      paymentRequest.nodeId() == ACINQ.nodeId() -> Option.empty()
+      // routing info head is a peer id: target is a phoenix app
+      routingHeadShortChannelId.isDefined && ShortChannelId.isPeerId(routingHeadShortChannelId.get()) -> Option.empty()
+      // otherwise, we use ACINQ node for trampoline
+      else -> Option.apply(ACINQ.nodeId())
+    }
+
+    val trampolineFee: MilliSatoshi = if (trampolineNode.isDefined) {
+      Converter.any2Msat(Satoshi(5)).`$times`(5) // base fee covering 5 hops with a base fee of 5 sat
+        .`$plus`(amount.`$times`(0.001))  // + proportional fee = 0.1 % of payment amount
+    } else {
+      MilliSatoshi(0) // no fee when we are not using trampoline
+    }
+
+    return Pair(trampolineNode, trampolineFee)
   }
 
   fun extractInvoice(input: String): Any {
