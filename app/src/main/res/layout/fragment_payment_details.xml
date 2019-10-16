@@ -152,7 +152,7 @@
 
           <TextView
             android:id="@+id/destination_value"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:ellipsize="end"
@@ -177,7 +177,7 @@
 
           <TextView
             android:id="@+id/desc_value"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
@@ -228,7 +228,7 @@
 
           <TextView
             android:id="@+id/error_value"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
