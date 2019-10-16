@@ -19,7 +19,6 @@ package fr.acinq.eclair.phoenix.paymentdetails
 import android.content.res.ColorStateList
 import android.graphics.drawable.Animatable
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +42,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scala.collection.JavaConverters
 import scala.util.Either
 import scala.util.Left
 import scala.util.Right
@@ -191,7 +189,13 @@ class PaymentDetailsFragment : BaseFragment() {
     }) {
       model.state.value = PaymentDetailsState.RETRIEVING_PAYMENT_DATA
       if (isSentPayment) {
-        val payments = appKit.getSentPayments(UUID.fromString(identifier))
+        val payments: List<OutgoingPayment> = if (args.fromEvent) {
+          // we don't know parent id, identifier is payment id in base
+          val payment = appKit.getSentPaymentFromId(UUID.fromString(identifier))
+          if (payment.isDefined) listOf(payment.get()) else ArrayList()
+        } else {
+          appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
+        }
         if (payments.isEmpty()) {
           model.payment.value = null
           model.state.value = PaymentDetailsState.NONE

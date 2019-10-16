@@ -171,7 +171,22 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
-  suspend fun getSentPayments(parentId: UUID): List<OutgoingPayment> {
+  suspend fun getSentPaymentFromId(id: UUID): Option<OutgoingPayment> {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        _kit.value?.run {
+          var payment: Option<OutgoingPayment> = Option.empty()
+          val t = measureTimeMillis {
+            payment = kit.nodeParams().db().payments().getOutgoingPayment(id)
+          }
+          log.info("get sent payments complete in ${t}ms")
+          payment
+        } ?: throw KitNotInitialized()
+      }
+    }.await()
+  }
+
+  suspend fun getSentPaymentsFromParentId(parentId: UUID): List<OutgoingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
