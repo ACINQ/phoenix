@@ -24,7 +24,7 @@
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nThis feature is intended for advanced users who wish to restore a previous installation of this application.</string>
+  <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\n</string>
   <string name="restore_disclaimer_checkbox">I understand.</string>
   <string name="restore_disclaimer_next">Next</string>
   <string name="restore_instructions">Your wallet\'s seed should be a list of 12 or 24 english words. Please note that passphrases are not supported.</string>
