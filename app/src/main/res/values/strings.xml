@@ -166,9 +166,10 @@
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_general_title">General</string>
+  <string name="settings_display_title">Display</string>
   <string name="settings_security_title">Security</string>
   <string name="settings_advanced_title">Advanced</string>
+  <string name="settings_danger_title">Danger zone</string>
   <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_display_seed">My wallet\'s seed</string>
   <string name="settings_seed_security">Wallet security</string>
@@ -178,8 +179,19 @@
   <!-- //////////////// close all channels //////////////// -->
 
   <string name="closeall_title">Empty Wallet</string>
-  <string name="closeall_instructions">Do you want to empty your wallet and send all your funds to a Bitcoin address?\n\nNote that fees depending on the current state of the Bitcoin network will apply.</string>
+  <string name="closeall_instructions"><![CDATA[
+    This page is intended for advanced users. It can be used to withdraw all funds to a regular Bitcoin address.
+    <br/><br/>
+    Note that <b>mining fees will apply!</b> These fees can be substantial. You should check the current mining fee rate in the Bitcoin network before proceeding.
+    <br/><br/>
+    If you simply want to empty your wallet, it\'s probably best to use the regular payment window, and tick the \"All funds\" box to send all your funds away.
+    <br/><br/>
+    <b>Do not use this feature without fully understanding what it entails.</b>
+  ]]></string>
+  <string name="closeall_force_close_label">Use force-close</string>
+  <string name="closeall_force_close_disclaimer">You should only force-close if the channels peer is offline or uncooperative. Note that additional cost will incur, along with a significant reception delay!\n\nNote that funds will be sent to an address derived from the wallet seed (Bech32).</string>
   <string name="closeall_hint">Enter Bitcoin address</string>
+  <string name="closeall_confirm_dialog_message">Are you sure you want to proceed?</string>
   <string name="closeall_checking_channels">Checking funds, please hold…</string>
   <string name="closeall_no_channels">You don\'t have any funds that can be withdrawn yet.</string>
   <string name="closeall_message_error">There was a problem. Please try again later.</string>

@@ -16,18 +16,22 @@
 
 package fr.acinq.eclair.phoenix.settings
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsCloseAllChannelsBinding
+import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -52,13 +56,20 @@ class CloseAllChannelsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(CloseAllChannelsViewModel::class.java)
     mBinding.model = model
+    mBinding.instructions.text = Converter.html(getString(R.string.closeall_instructions))
   }
 
   override fun onStart() {
     super.onStart()
     getChannels()
-    mBinding.confirmButton.setOnClickListener { closeAllChannels() }
-    mBinding.backButton.setOnClickListener { findNavController().popBackStack() }
+    mBinding.confirmButton.setOnClickListener {
+      AlertDialog.Builder(context)
+        .setMessage(R.string.closeall_confirm_dialog_message)
+        .setPositiveButton(R.string.btn_confirm) { _, _ -> closeAllChannels() }
+        .setNegativeButton(R.string.btn_cancel, null)
+        .show()
+    }
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
   }
 
   private fun getChannels() {
@@ -84,8 +95,20 @@ class CloseAllChannelsFragment : BaseFragment() {
       Handler().postDelayed({ model.state.value = ClosingChannelsState.READY }, 2000)
     }) {
       model.state.value = ClosingChannelsState.IN_PROGRESS
-      appKit.closeAllChannels(mBinding.addressInput.text.toString())
+      appKit.closeAllChannels(mBinding.addressInput.text.toString(), model.forceClose.value!!)
       model.state.value = ClosingChannelsState.DONE
     }
   }
+}
+
+enum class ClosingChannelsState {
+  CHECKING_CHANNELS, NO_CHANNELS, READY, IN_PROGRESS, DONE, ERROR
+}
+
+class CloseAllChannelsViewModel : ViewModel() {
+  private val log = LoggerFactory.getLogger(CloseAllChannelsViewModel::class.java)
+
+  val state = MutableLiveData(ClosingChannelsState.CHECKING_CHANNELS)
+  val forceClose = MutableLiveData(false)
+
 }

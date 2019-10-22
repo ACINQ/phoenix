@@ -15,8 +15,7 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
 
@@ -30,74 +29,63 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="?attr/defaultBackgroundColor">
 
-    <ImageButton
-      android:id="@+id/back_button"
-      android:layout_width="wrap_content"
+    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      android:backgroundTint="@color/transparent"
-      android:contentDescription="@string/btn_back"
-      android:padding="@dimen/space_md"
-      android:src="@drawable/ic_arrow_back" />
-
-    <TextView
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginEnd="@dimen/space_lg"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintTop_toTopOf="@id/back_button"
-      app:layout_constraintBottom_toBottomOf="@id/back_button"
-      app:layout_constraintStart_toEndOf="@id/back_button"
-      android:ellipsize="end"
-      android:singleLine="true"
-      android:text="@string/closeall_title" />
+      app:text="@string/closeall_title" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/back_button"
       android:background="@color/white"
       android:padding="@dimen/space_lg"
       android:visibility="@{model.state == ClosingChannelsState.CHECKING_CHANNELS}"
+      app:layout_constraintTop_toBottomOf="@id/action_bar"
       app:text="@string/closeall_checking_channels" />
 
     <TextView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/back_button"
       android:background="@color/white"
       android:padding="@dimen/space_lg"
       android:text="@string/closeall_no_channels"
-      android:visibility="@{model.state == ClosingChannelsState.NO_CHANNELS}" />
+      android:visibility="@{model.state == ClosingChannelsState.NO_CHANNELS}"
+      app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
     <ScrollView
+      android:id="@+id/scroll"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      app:layout_constraintTop_toBottomOf="@id/back_button"
       android:fillViewport="true"
-      android:paddingBottom="@dimen/space_lg"
-      android:visibility="@{model.state != ClosingChannelsState.NO_CHANNELS &amp;&amp; model.state != ClosingChannelsState.CHECKING_CHANNELS}">
+      android:overScrollMode="never"
+      android:visibility="@{model.state != ClosingChannelsState.NO_CHANNELS &amp;&amp; model.state != ClosingChannelsState.CHECKING_CHANNELS}"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         android:paddingStart="@dimen/space_lg"
-        android:paddingTop="@dimen/space_md_p"
+        android:paddingTop="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
-        android:paddingBottom="@dimen/space_lg">
+        android:paddingBottom="@dimen/space_xl"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          app:layout_constraintTop_toTopOf="parent"
-          android:text="@string/closeall_instructions" />
+          android:focusable="true"
+          android:focusableInTouchMode="true"
+          android:text="@string/closeall_instructions"
+          app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
           android:id="@+id/address_layout"
@@ -105,55 +93,80 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          app:layout_constraintTop_toBottomOf="@id/instructions"
+          android:visibility="@{!model.forceClose}"
           android:alpha="@{model.state == ClosingChannelsState.READY ? 1f : 0.4f}"
           android:hint="@string/closeall_hint"
-          android:textColorHint="?attr/colorPrimary">
+          android:textColorHint="?attr/colorPrimary"
+          app:layout_constraintTop_toBottomOf="@id/instructions">
 
           <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/address_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/message"
             android:backgroundTint="?attr/colorPrimary"
             android:enabled="@{model.state == ClosingChannelsState.READY}"
-            android:inputType="textVisiblePassword|textNoSuggestions" />
+            android:inputType="textVisiblePassword|textNoSuggestions"
+            app:layout_constraintTop_toBottomOf="@id/message" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <CheckBox
+          android:id="@+id/force_close_checkbox"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:buttonTint="?attr/colorPrimary"
+          android:checked="@={model.forceClose}"
+          android:text="@string/closeall_force_close_label"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/address_layout" />
+
+        <TextView
+          android:id="@+id/force_close_disclaimer"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          android:background="@drawable/rounded_sm"
+          android:backgroundTint="?attr/defaultMutedBackgroundColor"
+          android:padding="@dimen/space_sm"
+          android:text="@string/closeall_force_close_disclaimer"
+          android:textSize="@dimen/text_md"
+          android:visibility="@{model.forceClose}"
+          app:layout_constraintTop_toBottomOf="@id/force_close_checkbox" />
 
         <TextView
           android:layout_width="match_parent"
-          android:layout_marginTop="@dimen/space_lg"
           android:layout_height="wrap_content"
-          app:layout_constraintTop_toBottomOf="@id/address_layout"
+          android:layout_marginTop="@dimen/space_lg"
           android:drawableStart="@drawable/ic_alert_triangle"
           android:text="@string/closeall_message_error"
-          android:visibility="@{model.state == ClosingChannelsState.ERROR}" />
+          android:visibility="@{model.state == ClosingChannelsState.ERROR}"
+          app:layout_constraintTop_toBottomOf="@id/force_close_disclaimer" />
 
         <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/address_layout"
           android:background="@drawable/rounded"
           android:backgroundTint="@color/green"
           android:drawableStart="@drawable/ic_check"
-          android:drawableTint="?attr/altTextColor"
           android:drawablePadding="@dimen/space_sm"
+          android:drawableTint="?attr/altTextColor"
           android:padding="@dimen/space_md"
           android:text="@string/closeall_message_done"
           android:textColor="?attr/altTextColor"
-          android:visibility="@{model.state == ClosingChannelsState.DONE}" />
+          android:visibility="@{model.state == ClosingChannelsState.DONE}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/force_close_disclaimer" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/address_layout"
           android:background="@drawable/rounded_border"
           android:padding="@dimen/space_md"
           android:visibility="@{model.state == ClosingChannelsState.IN_PROGRESS}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/force_close_disclaimer"
           app:text="@string/closeall_message_in_progress" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
@@ -161,11 +174,11 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/address_layout"
           android:visibility="@{model.state == ClosingChannelsState.READY}"
           app:icon="@drawable/ic_check_circle"
           app:icon_tint="@color/green"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/force_close_disclaimer"
           app:text="@string/btn_confirm" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

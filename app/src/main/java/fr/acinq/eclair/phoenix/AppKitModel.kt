@@ -324,7 +324,7 @@ class AppKitModel : ViewModel() {
   }
 
   @UiThread
-  suspend fun closeAllChannels(address: String) {
+  suspend fun closeAllChannels(address: String, force: Boolean) {
     return coroutineScope {
       async(Dispatchers.Default) {
         delay(500)
@@ -335,7 +335,11 @@ class AppKitModel : ViewModel() {
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("init closing of channel=$channelId")
-            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
+            if (force) {
+              closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
+            } else {
+              closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
+            }
           }
 
           val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
