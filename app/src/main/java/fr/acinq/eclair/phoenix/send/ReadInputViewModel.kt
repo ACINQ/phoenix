@@ -17,9 +17,7 @@
 package fr.acinq.eclair.phoenix.send
 
 import androidx.annotation.UiThread
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,11 +28,11 @@ enum class ReadingState {
   SCANNING, READING, DONE, ERROR
 }
 
-class InitSendViewModel : ViewModel() {
-  private val log = LoggerFactory.getLogger(InitSendViewModel::class.java)
+class ReadInputViewModel : ViewModel() {
+  private val log = LoggerFactory.getLogger(ReadInputViewModel::class.java)
 
   val hasCameraAccess = MutableLiveData(false)
-  val invoice = MutableLiveData<String>(null)
+  val invoice = MutableLiveData<Any>(null)
   val readingState = MutableLiveData<ReadingState>()
 
   init {
@@ -48,7 +46,7 @@ class InitSendViewModel : ViewModel() {
       viewModelScope.launch {
         withContext(Dispatchers.Default) {
           try {
-            invoice.postValue(Wallet.checkInvoice(input))
+            invoice.postValue(Wallet.extractInvoice(input))
             readingState.postValue(ReadingState.DONE)
           } catch (e1: Exception) {
             invoice.postValue(null)

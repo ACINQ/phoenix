@@ -335,6 +335,10 @@
   <string name="seedsec_bio_prompt_title">Enable biometric lock</string>
   <string name="seedsec_bio_prompt_negative">Cancel</string>
 
+  <!-- //////////////// ln url login //////////////// -->
 
+  <string name="lnurl_login_instructions">Log in to %1$s</string>
+  <string name="lnurl_login_button">Log in</string>
+  <string name="lnurl_login_in_progress">Logging in, please wait…</string>
 
 </resources>

@@ -77,8 +77,8 @@
       app:enterAnim="@anim/slide_in_left"
       app:exitAnim="@anim/slide_out_right" />
     <action
-      android:id="@+id/action_main_to_init_send"
-      app:destination="@id/send_init"
+      android:id="@+id/action_main_to_read_input"
+      app:destination="@id/read_input"
       app:launchSingleTop="true" />
     <action
       android:id="@+id/action_main_to_settings"
@@ -234,15 +234,19 @@
       app:popUpTo="@+id/main_fragment"
       app:popUpToInclusive="true" />
     <argument
-      android:name="invoice"
+      android:name="payload"
       app:argType="string" />
   </fragment>
 
   <!-- prepare send money (scan/paste invoice) -->
   <fragment
-    android:id="@+id/send_init"
-    android:name="fr.acinq.eclair.phoenix.send.InitSendFragment"
-    android:label="InitSendFragment" />
+    android:id="@+id/read_input"
+    android:name="fr.acinq.eclair.phoenix.send.ReadInputFragment"
+    android:label="ReadInputFragment" >
+    <action
+      android:id="@+id/action_read_input_to_lnurl_login"
+      app:destination="@id/lnurl_login" />
+  </fragment>
 
   <!-- settings/tools page -->
   <fragment
@@ -343,5 +347,13 @@
     android:id="@+id/seed_security"
     android:name="fr.acinq.eclair.phoenix.settings.SeedSecurityFragment"
     android:label="seed_security" />
+  <fragment
+    android:id="@+id/lnurl_login"
+    android:name="fr.acinq.eclair.phoenix.send.LNUrlLoginFragment"
+    android:label="LNUrlLogin" >
+    <argument
+      android:name="uri"
+      app:argType="string" />
+  </fragment>
 
 </navigation>

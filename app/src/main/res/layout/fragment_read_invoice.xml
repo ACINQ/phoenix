@@ -24,7 +24,7 @@
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.send.InitSendViewModel" />
+      type="fr.acinq.eclair.phoenix.send.ReadInputViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout

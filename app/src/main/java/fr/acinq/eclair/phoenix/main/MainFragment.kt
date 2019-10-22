@@ -28,10 +28,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.BaseFragment
-import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
-import fr.acinq.eclair.phoenix.events.PaymentComplete
 import fr.acinq.eclair.phoenix.events.PaymentPending
 import fr.acinq.eclair.phoenix.utils.KitNotInitialized
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -115,7 +113,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
-    mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_init_send) }
+    mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
 
     refreshPaymentList()
   }

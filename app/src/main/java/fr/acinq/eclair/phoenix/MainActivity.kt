@@ -74,16 +74,4 @@ class MainActivity : AppCompatActivity() {
   fun getActivityThis(): Context {
     return this@MainActivity
   }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-
-    if (requestCode == IntentCodes.SCAN_PAYMENT_REQUEST_RESULT) {
-      if (resultCode == Activity.RESULT_OK) {
-        val invoice = data!!.getStringExtra(IntentCodes.SEND_PAYMENT_INVOICE_EXTRA)
-        val action = SendFragmentDirections.globalActionAnyToSend(invoice)
-        findNavController(R.id.nav_host_main).navigate(action)
-      }
-    }
-  }
 }

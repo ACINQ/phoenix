@@ -145,7 +145,7 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.checkAndSetPaymentRequest(args.invoice)
+    model.checkAndSetPaymentRequest(args.payload)
 
     mBinding.amount.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(s: Editable?) {

@@ -19,6 +19,6 @@ package fr.acinq.eclair.phoenix.utils
 import okhttp3.MediaType
 
 object Api {
-  val JSON = MediaType.get("application/json; charset=utf-8")
+  val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val SWAP_API_URL = "https://endurance-p2c.acinq.co/api/paytochain"
 }

@@ -24,7 +24,6 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.ShortChannelId
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BuildConfig
@@ -32,7 +31,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
 import java.io.File
-import java.lang.RuntimeException
 
 object Wallet {
 
@@ -82,17 +80,19 @@ object Wallet {
     }
   }
 
-  fun checkInvoice(input: String): String {
+  fun extractInvoice(input: String): Any {
     val invoice = cleanInvoice(input)
     return try {
       PaymentRequest.read(invoice, true)
-      invoice
     } catch (e1: Exception) {
       try {
         BitcoinURI(invoice)
-        invoice
       } catch (e2: Exception) {
-        throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage}")
+        try {
+          LNUrl(input)
+        } catch (e3: Exception) {
+          throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
+        }
       }
     }
   }
@@ -126,19 +126,6 @@ object Wallet {
     return Pair(trampolineNode, trampolineFee)
   }
 
-  fun extractInvoice(input: String): Any {
-    val cleanInvoice = cleanInvoice(input)
-    return try {
-      PaymentRequest.read(cleanInvoice, true)
-    } catch (e1: Exception) {
-      try {
-        BitcoinURI(cleanInvoice)
-      } catch (e2: Exception) {
-        throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage}")
-      }
-    }
-  }
-
   fun showKeyboard(context: Context?, view: View) {
     context?.let {
       val imm = it.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -149,7 +136,7 @@ object Wallet {
   fun hideKeyboard(context: Context?, view: View) {
     context?.let {
       val imm = it.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-      imm.hideSoftInputFromWindow(view.windowToken, 0 )
+      imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
   }
 

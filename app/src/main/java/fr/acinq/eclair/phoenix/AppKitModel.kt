@@ -92,13 +92,9 @@ class AppKitModel : ViewModel() {
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val navigationEvent = SingleLiveEvent<Any>()
-
   val startupState = MutableLiveData(StartupState.OFF)
   val startupErrorMessage = MutableLiveData<String>()
-
   val nodeData = MutableLiveData<NodeData>()
-
-
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
 

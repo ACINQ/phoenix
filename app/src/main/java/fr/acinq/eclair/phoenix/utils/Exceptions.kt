@@ -19,3 +19,8 @@ package fr.acinq.eclair.phoenix.utils
 class NetworkException : RuntimeException()
 class KitNotInitialized : RuntimeException("kit is not initialized")
 class InsufficientBalance : RuntimeException()
+class BitcoinURIParseException : Exception {
+  constructor(s: String) : super(s)
+
+  constructor(s: String, throwable: Throwable) : super(s, throwable)
+}

@@ -24,12 +24,6 @@ import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.payment.PaymentRequest
 
-class BitcoinURIParseException : Exception {
-  constructor(s: String) : super(s)
-
-  constructor(s: String, throwable: Throwable) : super(s, throwable)
-}
-
 class BitcoinURI(input: String) {
 
   public val address: String
