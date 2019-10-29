@@ -107,7 +107,9 @@
         <TextView
           android:id="@+id/danger_zone_title"
           style="@style/SettingsCategory"
+          android:layout_marginTop="@dimen/space_lg"
           android:text="@string/settings_danger_title"
+          android:textColor="?attr/defaultErrorTextColor"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/logs_button" />
 

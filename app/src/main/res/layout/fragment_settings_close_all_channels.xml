@@ -87,17 +87,26 @@
           android:text="@string/closeall_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
+        <RadioButton
+          android:id="@+id/regular_close_radio"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          android:checked="@={!model.forceClose}"
+          app:layout_constraintTop_toBottomOf="@id/instructions"
+          android:text="@string/closeall_regular_close_label" />
+
         <com.google.android.material.textfield.TextInputLayout
           android:id="@+id/address_layout"
           style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
           android:layout_width="match_parent"
+          android:layout_marginTop="@dimen/space_xs"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
           android:visibility="@{!model.forceClose}"
           android:alpha="@{model.state == ClosingChannelsState.READY ? 1f : 0.4f}"
           android:hint="@string/closeall_hint"
           android:textColorHint="?attr/colorPrimary"
-          app:layout_constraintTop_toBottomOf="@id/instructions">
+          app:layout_constraintTop_toBottomOf="@id/regular_close_radio">
 
           <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/address_input"
@@ -109,16 +118,14 @@
             app:layout_constraintTop_toBottomOf="@id/message" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox
-          android:id="@+id/force_close_checkbox"
+        <RadioButton
+          android:id="@+id/force_close_radio"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
-          android:buttonTint="?attr/colorPrimary"
           android:checked="@={model.forceClose}"
-          android:text="@string/closeall_force_close_label"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/address_layout" />
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintTop_toBottomOf="@id/address_layout"
+          android:text="@string/closeall_force_close_label" />
 
         <TextView
           android:id="@+id/force_close_disclaimer"
@@ -131,7 +138,7 @@
           android:text="@string/closeall_force_close_disclaimer"
           android:textSize="@dimen/text_md"
           android:visibility="@{model.forceClose}"
-          app:layout_constraintTop_toBottomOf="@id/force_close_checkbox" />
+          app:layout_constraintTop_toBottomOf="@id/force_close_radio" />
 
         <TextView
           android:layout_width="match_parent"

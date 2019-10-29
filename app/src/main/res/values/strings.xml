@@ -188,6 +188,7 @@
     <br/><br/>
     <b>Do not use this feature without fully understanding what it entails.</b>
   ]]></string>
+  <string name="closeall_regular_close_label">Use regular close</string>
   <string name="closeall_force_close_label">Use force-close</string>
   <string name="closeall_force_close_disclaimer">You should only force-close if the channels peer is offline or uncooperative. Note that additional cost will incur, along with a significant reception delay!\n\nNote that funds will be sent to an address derived from the wallet seed (Bech32).</string>
   <string name="closeall_hint">Enter Bitcoin address</string>
