@@ -23,6 +23,7 @@ import android.util.Base64
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.`CoinUtils$`
+import fr.acinq.eclair.phoenix.R
 
 object Prefs {
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
@@ -40,6 +41,9 @@ object Prefs {
   private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
   private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+
+  // -- other
+  const val PREFS_THEME: String = "PREFS_THEME"
 
   fun isFirstTime(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)
@@ -147,5 +151,12 @@ object Prefs {
 
   fun setFiatCurrency(context: Context, code: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
+  }
+
+  fun getTheme(context: Context): Int {
+    return when (PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, "light") ?: "light") {
+      "dark" -> R.style.dark_theme
+      else -> R.style.default_theme
+    }
   }
 }

@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    this.setTheme(Prefs.getTheme(applicationContext))
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     appKit = ViewModelProvider(this).get(AppKitModel::class.java)
     appKit.navigationEvent.observe(this, Observer {

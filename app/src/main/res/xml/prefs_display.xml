@@ -1,0 +1,51 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <ListPreference
+    android:defaultValue="USD"
+    android:dialogIcon="@drawable/ic_btc_icon"
+    android:dialogTitle="@string/prefs_display_fiat_label"
+    android:entries="@array/fiat_labels"
+    android:entryValues="@array/fiat_values"
+    android:key="PREFS_FIAT_CURRENCY"
+    android:summary="%s"
+    android:title="@string/prefs_display_fiat_label"
+    app:iconSpaceReserved="false" />
+
+  <ListPreference
+    android:defaultValue="btc"
+    android:dialogTitle="@string/prefs_display_coin_label"
+    android:entries="@array/btc_unit_labels"
+    android:entryValues="@array/btc_unit_values"
+    android:key="PREFS_COIN_UNIT"
+    android:summary="%s"
+    android:title="@string/prefs_display_coin_label"
+    app:iconSpaceReserved="false" />
+
+  <ListPreference
+    android:defaultValue="light"
+    android:dialogTitle="@string/prefs_display_theme_label"
+    android:entries="@array/theme_labels"
+    android:entryValues="@array/theme_values"
+    android:key="PREFS_THEME"
+    android:summary="%s"
+    android:title="@string/prefs_display_theme_label"
+    app:iconSpaceReserved="false" />
+
+</PreferenceScreen>

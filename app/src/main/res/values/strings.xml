@@ -167,14 +167,15 @@
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_display_title">Display</string>
+  <string name="settings_display_prefs">Currency, Theme…</string>
   <string name="settings_security_title">Security</string>
-  <string name="settings_advanced_title">Advanced</string>
-  <string name="settings_danger_title">Danger zone</string>
-  <string name="settings_close_all_channels">Empty wallet</string>
   <string name="settings_display_seed">My wallet\'s seed</string>
   <string name="settings_seed_security">Wallet security</string>
+  <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">List my channels</string>
   <string name="settings_logs">App logs</string>
+  <string name="settings_danger_title">Danger zone</string>
+  <string name="settings_close_all_channels">Empty wallet</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -353,5 +354,12 @@
   <string name="lnurl_login_instructions">Log in to %1$s</string>
   <string name="lnurl_login_button">Log in</string>
   <string name="lnurl_login_in_progress">Logging in, please wait…</string>
+
+  <!-- //////////////// display preferences //////////////// -->
+
+  <string name="prefs_display_title">Display options</string>
+  <string name="prefs_display_coin_label">Bitcoin unit</string>
+  <string name="prefs_display_fiat_label">Fiat currency</string>
+  <string name="prefs_display_theme_label">Application theme</string>
 
 </resources>

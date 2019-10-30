@@ -16,38 +16,62 @@
 
 package fr.acinq.eclair.phoenix.settings
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceFragmentCompat
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
-import fr.acinq.eclair.phoenix.databinding.FragmentSettingsBinding
+import fr.acinq.eclair.phoenix.databinding.FragmentSettingsPrefsDisplayBinding
+import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
-class SettingsFragment : BaseFragment() {
+class DisplayPrefsFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  private lateinit var mBinding: FragmentSettingsBinding
+  private lateinit var mBinding: FragmentSettingsPrefsDisplayBinding
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    mBinding = FragmentSettingsBinding.inflate(inflater, container, false)
+    mBinding = FragmentSettingsPrefsDisplayBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
+    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this)
     return mBinding.root
+  }
+
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    activity?.run {
+      this.supportFragmentManager
+        .beginTransaction()
+        .replace(R.id.prefs_display_fragment_container, InnerPreferencesFragment())
+        .commit()
+    }
   }
 
   override fun onStart() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
-    mBinding.prefsDisplayButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_prefs_display) }
-    mBinding.closeChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_close_all_channels) }
-    mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
-    mBinding.seedSecurityButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_seed_security) }
-    mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
-    mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
+  }
+
+  override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
+    activity?.run {
+      when (key) {
+        Prefs.PREFS_THEME -> this.recreate()
+      }
+    }
+  }
+
+  class InnerPreferencesFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+      addPreferencesFromResource(R.xml.prefs_display)
+    }
   }
 }
+
+

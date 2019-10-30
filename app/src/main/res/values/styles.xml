@@ -248,8 +248,7 @@
   </style>
 
   <!-- DARK THEME -->
-
-  <style name="dark_theme" parent="Theme.AppCompat.Light.NoActionBar">
+  <style name="dark_theme" parent="Theme.AppCompat.NoActionBar">
     <!-- colors definition -->
     <item name="colorPrimary">@color/salmon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
@@ -295,7 +294,6 @@
     <!-- status bar -->
     <item name="android:statusBarColor">?attr/altMutedBackgroundColor</item>
     <item name="android:windowLightStatusBar">true</item>
-
   </style>
 
 </resources>

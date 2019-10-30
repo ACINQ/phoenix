@@ -268,6 +268,9 @@
     <action
       android:id="@+id/action_settings_to_seed_security"
       app:destination="@id/seed_security" />
+    <action
+      android:id="@+id/action_settings_to_prefs_display"
+      app:destination="@id/prefs_display" />
   </fragment>
 
   <!-- settings: close all channels and empty wallet  -->
@@ -355,5 +358,9 @@
       android:name="uri"
       app:argType="string" />
   </fragment>
+  <fragment
+    android:id="@+id/prefs_display"
+    android:name="fr.acinq.eclair.phoenix.settings.DisplayPrefsFragment"
+    android:label="DisplayPrefsFragment" />
 
 </navigation>
