@@ -19,10 +19,7 @@ package fr.acinq.eclair.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.*
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
@@ -67,6 +64,10 @@ object Wallet {
 
   fun getChainHash(): ByteVector32 {
     return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
+  }
+
+  fun getNodeKeyPath(): DeterministicWallet.KeyPath {
+    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
   }
 
   fun cleanInvoice(input: String): String {
