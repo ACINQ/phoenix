@@ -84,26 +84,30 @@ dependencies {
   // base dependencies
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation 'androidx.core:core-ktx:1.1.0'
-  implementation "androidx.appcompat:appcompat:1.0.2"
+  implementation "androidx.appcompat:appcompat:1.1.0"
 
   // ANDROIDX - navigation
-  def nav_version = "2.2.0-alpha01"
+  def nav_version = "2.2.0-rc01"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ANDROIDX - constraint layout
-  def constraint_version = "2.0.0-beta2"
+  def constraint_version = "2.0.0-beta3"
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
-  def lifecycle_version = "2.2.0-alpha03"
+  def lifecycle_version = "2.2.0-rc01"
   implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
   // ANDROIDX - biometric
-  def biometric_version = "1.0.0-beta01"
+  def biometric_version = "1.0.0-rc02"
   implementation "androidx.biometric:biometric:$biometric_version"
+
+  // ANDROIDX - preferences
+  def preference_version = "1.1.0"
+  implementation "androidx.preference:preference-ktx:$preference_version"
 
   // logging
   implementation 'org.slf4j:slf4j-api:1.7.25'
