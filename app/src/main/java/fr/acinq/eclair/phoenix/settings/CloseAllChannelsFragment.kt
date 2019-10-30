@@ -56,16 +56,24 @@ class CloseAllChannelsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(CloseAllChannelsViewModel::class.java)
     mBinding.model = model
-    mBinding.instructions.text = Converter.html(getString(R.string.closeall_instructions))
+    mBinding.mutualCloseInstructions.text = Converter.html(getString(R.string.closechannels_mutual_instructions))
+    mBinding.forceCloseInstructions.text = Converter.html(getString(R.string.closechannels_force_instructions))
   }
 
   override fun onStart() {
     super.onStart()
     getChannels()
-    mBinding.confirmButton.setOnClickListener {
+    mBinding.mutualConfirmButton.setOnClickListener {
       AlertDialog.Builder(context)
-        .setMessage(R.string.closeall_confirm_dialog_message)
-        .setPositiveButton(R.string.btn_confirm) { _, _ -> closeAllChannels() }
+        .setMessage(R.string.closechannels_confirm_dialog_message)
+        .setPositiveButton(R.string.btn_confirm) { _, _ -> doMutualClose() }
+        .setNegativeButton(R.string.btn_cancel, null)
+        .show()
+    }
+    mBinding.forceConfirmButton.setOnClickListener {
+      AlertDialog.Builder(context)
+        .setMessage(R.string.closechannels_confirm_dialog_message)
+        .setPositiveButton(R.string.btn_confirm) { _, _ -> doForceClose() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()
     }
@@ -75,40 +83,65 @@ class CloseAllChannelsFragment : BaseFragment() {
   private fun getChannels() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when retrieving list of channels: ", exception)
-      model.state.value = ClosingChannelsState.ERROR
+      model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
-      model.state.value = ClosingChannelsState.CHECKING_CHANNELS
-      val channels = appKit.getChannels(null)
-      val normals = channels.filter { c -> c.state() == `NORMAL$`.`MODULE$` }
-      if (normals.isEmpty()) {
-        model.state.value = ClosingChannelsState.NO_CHANNELS
+      log.info("listing channels")
+      model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
+      val channels = appKit.getChannels(`NORMAL$`.`MODULE$`)
+      if (channels.count() == 0) {
+        model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
-        model.state.value = ClosingChannelsState.READY
+        model.state.value = PreChannelsCloseState.READY
       }
     }
   }
 
-  private fun closeAllChannels() {
+  private fun doMutualClose() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when closing all channels: ", exception)
-      model.state.value = ClosingChannelsState.ERROR
-      Handler().postDelayed({ model.state.value = ClosingChannelsState.READY }, 2000)
+      log.error("error in mutal close: ", exception)
+      model.state.value = MutualCloseState.ERROR
+      Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
     }) {
-      model.state.value = ClosingChannelsState.IN_PROGRESS
-      appKit.closeAllChannels(mBinding.addressInput.text.toString(), model.forceClose.value!!)
-      model.state.value = ClosingChannelsState.DONE
+      model.state.value = MutualCloseState.IN_PROGRESS
+      appKit.mutualCloseAllChannels(mBinding.mutualCloseAddressInput.text.toString())
+      model.state.value = MutualCloseState.DONE
+    }
+  }
+
+  private fun doForceClose() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error in force close: ", exception)
+      model.state.value = ForceCloseState.ERROR
+      Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
+    }) {
+      model.state.value = ForceCloseState.IN_PROGRESS
+      appKit.forceCloseAllChannels()
+      model.state.value = ForceCloseState.DONE
     }
   }
 }
 
-enum class ClosingChannelsState {
-  CHECKING_CHANNELS, NO_CHANNELS, READY, IN_PROGRESS, DONE, ERROR
+interface ChannelsCloseBaseState
+
+enum class PreChannelsCloseState : ChannelsCloseBaseState {
+  CHECKING_CHANNELS, NO_CHANNELS, READY
+}
+
+enum class MutualCloseState : ChannelsCloseBaseState {
+  IN_PROGRESS, DONE, ERROR
+}
+
+enum class ForceCloseState : ChannelsCloseBaseState {
+  IN_PROGRESS, DONE, ERROR
 }
 
 class CloseAllChannelsViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(CloseAllChannelsViewModel::class.java)
 
-  val state = MutableLiveData(ClosingChannelsState.CHECKING_CHANNELS)
-  val forceClose = MutableLiveData(false)
+  val state = MutableLiveData<ChannelsCloseBaseState>()
+
+  init {
+    state.value = PreChannelsCloseState.CHECKING_CHANNELS
+  }
 
 }

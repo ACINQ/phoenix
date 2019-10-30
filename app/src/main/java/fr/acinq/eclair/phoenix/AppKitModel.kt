@@ -290,6 +290,8 @@ class AppKitModel : ViewModel() {
     _kit.value?.kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
   }
 
+  suspend fun getChannels(): Iterable<RES_GETINFO> = getChannels(null)
+
   /**
    * Retrieves the list of channels from the router. Can filter by state.
    */
@@ -324,26 +326,38 @@ class AppKitModel : ViewModel() {
   }
 
   @UiThread
-  suspend fun closeAllChannels(address: String, force: Boolean) {
+  suspend fun mutualCloseAllChannels(address: String) {
     return coroutineScope {
       async(Dispatchers.Default) {
         delay(500)
         kit.value?.let {
           val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
-
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
-            log.info("init closing of channel=$channelId")
-            if (force) {
-              closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
-            } else {
-              closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
-            }
+            log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
+            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
           }
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Unit
+        } ?: throw KitNotInitialized()
+      }
+    }.await()
+  }
 
-          val r = Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
-          log.info("closing channels returns: $r")
+  @UiThread
+  suspend fun forceCloseAllChannels() {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        kit.value?.let {
+          val closingFutures = ArrayList<Future<String>>()
+          getChannels().map { res ->
+            val channelId = res.channelId()
+            log.info("attempting to force close channel=$channelId")
+            closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
+          }
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Unit
         } ?: throw KitNotInitialized()
       }
     }.await()

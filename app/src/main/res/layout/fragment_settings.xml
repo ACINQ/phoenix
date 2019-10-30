@@ -108,20 +108,11 @@
           android:id="@+id/logs_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
+          android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
           app:text="@string/settings_logs" />
-
-        <TextView
-          android:id="@+id/danger_zone_title"
-          style="@style/SettingsCategory"
-          android:layout_marginTop="@dimen/space_lg"
-          android:text="@string/settings_danger_title"
-          android:textColor="?attr/defaultErrorTextColor"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/logs_button" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/close_channels_button"
@@ -130,8 +121,9 @@
           android:background="@drawable/button_bg_square"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/danger_zone_title"
-          app:text="@string/settings_close_all_channels" />
+          app:text_color="@color/red"
+          app:layout_constraintTop_toBottomOf="@id/logs_button"
+          app:text="@string/settings_danger_zone" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -169,36 +169,39 @@
   <string name="settings_display_title">Display</string>
   <string name="settings_display_prefs">Currency, Theme…</string>
   <string name="settings_security_title">Security</string>
-  <string name="settings_display_seed">My wallet\'s seed</string>
+  <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_seed_security">Wallet security</string>
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">List my channels</string>
   <string name="settings_logs">App logs</string>
-  <string name="settings_danger_title">Danger zone</string>
-  <string name="settings_close_all_channels">Empty wallet</string>
+  <string name="settings_danger_zone">Danger zone</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closeall_title">Empty Wallet</string>
-  <string name="closeall_instructions"><![CDATA[
-    This page is intended for advanced users. It can be used to withdraw all funds to a regular Bitcoin address.
+  <string name="closechannels_title">Close channels</string>
+  <string name="closechannels_checking_channels">Checking channels, please hold…</string>
+  <string name="closechannels_no_channels">You don\'t have any channels that could be closed.\n\nGo to the \'List channels\' page to see your current channels.</string>
+  <string name="closechannels_mutual_title">Mutual close</string>
+  <string name="closechannels_mutual_instructions"><![CDATA[
+    This is the mutual close description text.
     <br/><br/>
-    Note that <b>mining fees will apply!</b> These fees can be substantial. You should check the current mining fee rate in the Bitcoin network before proceeding.
+    This explains what a mutual close does and what it costs.
+  ]]></string>
+  <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
+  <string name="closechannels_mutual_button">Mutual close channels</string>
+  <string name="closechannels_force_title">Force close</string>
+  <string name="closechannels_force_instructions"><![CDATA[
+    This is the force close description text. <b>Very dangerous!</b>
     <br/><br/>
-    If you simply want to empty your wallet, it\'s probably best to use the regular payment window, and tick the \"All funds\" box to send all your funds away.
+    Very expensive! Long delay!
     <br/><br/>
     <b>Do not use this feature without fully understanding what it entails.</b>
   ]]></string>
-  <string name="closeall_regular_close_label">Use regular close</string>
-  <string name="closeall_force_close_label">Use force-close</string>
-  <string name="closeall_force_close_disclaimer">You should only force-close if the channels peer is offline or uncooperative. Note that additional cost will incur, along with a significant reception delay!\n\nNote that funds will be sent to an address derived from the wallet seed (Bech32).</string>
-  <string name="closeall_hint">Enter Bitcoin address</string>
-  <string name="closeall_confirm_dialog_message">Are you sure you want to proceed?</string>
-  <string name="closeall_checking_channels">Checking funds, please hold…</string>
-  <string name="closeall_no_channels">You don\'t have any funds that can be withdrawn yet.</string>
-  <string name="closeall_message_error">There was a problem. Please try again later.</string>
-  <string name="closeall_message_done">Funds sent.</string>
-  <string name="closeall_message_in_progress">Please wait…</string>
+  <string name="closechannels_force_button">Force close channels</string>
+  <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
+  <string name="closechannels_message_error">There was a problem. Please try again later.</string>
+  <string name="closechannels_message_done">Funds sent.</string>
+  <string name="closechannels_message_in_progress">Please wait…</string>
 
   <!-- //////////////// list all channels //////////////// -->
 
