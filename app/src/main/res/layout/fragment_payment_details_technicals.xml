@@ -40,7 +40,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:text="@string/paymentdetails_technicals_title" />
+      app:title="@string/paymentdetails_technicals_title" />
 
     <ScrollView
       android:layout_width="match_parent"

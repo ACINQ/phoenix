@@ -32,6 +32,7 @@
     <item name="defaultTextColor">@color/dark</item>
     <item name="defaultMutedTextColor">@color/casper</item>
     <item name="defaultErrorTextColor">@color/brandy</item>
+    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
     <item name="defaultMutedErrorTextColor">@color/blossom</item>
     <item name="altMutedBackgroundColor">@color/geyser</item>
     <item name="altBackgroundColor">?attr/colorPrimary</item>
@@ -203,6 +204,18 @@
     <item name="android:textSize">@dimen/text_sm</item>
   </style>
 
+  <style name="SubActionBarView" parent="default_textAppearance">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textSize">@dimen/text_md</item>
+    <item name="android:textColor">?attr/defaultTextColorOnMutedBackground</item>
+    <item name="android:background">?attr/defaultMutedBackgroundColor</item>
+    <item name="android:paddingStart">@dimen/space_xl</item>
+    <item name="android:paddingTop">@dimen/space_xs</item>
+    <item name="android:paddingEnd">@dimen/space_md</item>
+    <item name="android:paddingBottom">@dimen/space_sm</item>
+  </style>
+
   <style name="TitleView" parent="default_textAppearance">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">wrap_content</item>
@@ -270,6 +283,7 @@
 
     <item name="defaultTextColor">@color/white</item>
     <item name="defaultMutedTextColor">@color/shuttle</item>
+    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
     <item name="defaultErrorTextColor">@color/brandy</item>
     <item name="defaultMutedErrorTextColor">@color/chico</item>
     <item name="altMutedBackgroundColor">@color/yellow</item>

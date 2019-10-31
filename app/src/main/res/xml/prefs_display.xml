@@ -19,7 +19,6 @@
 
   <ListPreference
     android:defaultValue="USD"
-    android:dialogIcon="@drawable/ic_btc_icon"
     android:dialogTitle="@string/prefs_display_fiat_label"
     android:entries="@array/fiat_labels"
     android:entryValues="@array/fiat_values"

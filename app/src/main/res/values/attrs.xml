@@ -33,6 +33,7 @@
 
   <attr name="defaultTextColor" format="reference" />
   <attr name="defaultMutedTextColor" format="reference" />
+  <attr name="defaultTextColorOnMutedBackground" format="reference" />
   <attr name="defaultErrorTextColor" format="reference" />
   <attr name="defaultMutedErrorTextColor" format="reference" />
 
@@ -82,6 +83,7 @@
     <attr name="icon_size" />
   </declare-styleable>
   <declare-styleable name="ActionBarView">
-    <attr name="text" />
+    <attr name="title" format="string" />
+    <attr name="subtitle" format="string" />
   </declare-styleable>
 </resources>

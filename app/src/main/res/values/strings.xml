@@ -275,7 +275,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Application logs</string>
-  <string name="logs_instructions">You can extract and share the application logs from this page.</string>
+  <string name="logs_subtitle">You can extract and share the application logs from this page.</string>
   <string name="logs_view_button">View logs…</string>
   <string name="logs_view_with">View logs with…</string>
   <string name="logs_share_button">Share logs…</string>
@@ -334,8 +334,7 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Security</string>
-
-  <string name="seedsec_instructions">Your wallet should always be protected by a PIN in case your phone is compromised. If your device supports it, you can use biometric authentication.</string>
+  <string name="seedsec_subtitle">Your wallet should always be protected by a PIN in case your phone is compromised. If your device supports it, you can use biometric authentication.</string>
   <string name="seedsec_pin_switch">PIN authentication</string>
   <string name="seedsec_biometrics_switch">Biometric authentication</string>
   <string name="seedsec_change_pin">Change my PIN…</string>

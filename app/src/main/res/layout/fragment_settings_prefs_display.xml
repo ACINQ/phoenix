@@ -29,7 +29,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:text="@string/prefs_display_title" />
+      app:title="@string/prefs_display_title" />
 
     <FrameLayout
       android:id="@+id/supermachin"

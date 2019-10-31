@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <merge>
 
@@ -23,25 +22,39 @@
       android:id="@+id/back_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
       android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
       android:padding="@dimen/space_md"
-      android:src="@drawable/ic_arrow_back" />
+      android:src="@drawable/ic_arrow_back"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
       android:id="@+id/title"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginEnd="@dimen/space_lg"
+      android:ellipsize="end"
+      android:singleLine="true"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="@id/back_button"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/back_button"
+      app:layout_constraintTop_toTopOf="@id/back_button" />
+
+    <TextView
+      android:id="@+id/subtitle"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_xs"
+      android:layout_marginEnd="@dimen/space_lg"
+      android:paddingBottom="@dimen/space_sm"
+      android:textColor="?attr/defaultTextColorOnMutedBackground"
+      android:textSize="@dimen/text_md"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="@id/back_button"
-      app:layout_constraintBottom_toBottomOf="@id/back_button"
-      app:layout_constraintStart_toEndOf="@id/back_button"
-      android:ellipsize="end"
-      android:singleLine="true" />
+      app:layout_constraintStart_toStartOf="@id/title"
+      app:layout_constraintTop_toBottomOf="@id/title" />
 
   </merge>
 </layout>

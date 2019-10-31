@@ -48,39 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@color/athens"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-
-<!--      <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--        android:id="@+id/tab_buttons"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/action_bar"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/action_bar">-->
-
-<!--        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView-->
-<!--          android:id="@+id/lightning_tab_button"-->
-<!--          app:layout_constraintTop_toTopOf="parent"-->
-<!--          app:layout_constraintStart_toStartOf="parent"-->
-<!--          app:icon="@drawable/ic_zap"-->
-<!--          android:background="@drawable/button_tab_rounded"-->
-<!--          app:text="Lightning"-->
-<!--          android:layout_width="wrap_content"-->
-<!--          android:layout_height="wrap_content" />-->
-
-<!--        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView-->
-<!--          android:id="@+id/swapin_tab_button"-->
-<!--          app:layout_constraintTop_toTopOf="parent"-->
-<!--          app:icon="@drawable/ic_chain"-->
-<!--          android:background="@drawable/button_bg_square"-->
-<!--          app:text="Swap-in"-->
-<!--          app:layout_constraintStart_toEndOf="@id/lightning_tab_button"-->
-<!--          android:layout_width="wrap_content"-->
-<!--          android:layout_height="wrap_content" />-->
-
-<!--      </androidx.constraintlayout.widget.ConstraintLayout>-->
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/invoice_params_layout"
@@ -99,19 +67,6 @@
           app:layout_constrainedHeight="true"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
-
-        <!--        <com.google.android.material.textfield.TextInputLayout-->
-        <!--          android:id="@+id/amount_value_layout"-->
-        <!--          android:layout_width="0dp"-->
-        <!--          android:layout_height="wrap_content"-->
-        <!--          android:layout_marginEnd="@dimen/space_xs"-->
-        <!--          app:layout_constraintTop_toTopOf="parent"-->
-        <!--          app:layout_constraintStart_toStartOf="parent"-->
-        <!--          app:layout_constraintEnd_toStartOf="@+id/amount_unit"-->
-        <!--          app:enableOrFade="@{model.state == PaymentGenerationState.INIT || model.state == PaymentGenerationState.ERROR || model.state == PaymentGenerationState.DONE}"-->
-        <!--          android:hint="@string/receive_amount_label"-->
-        <!--          android:textColorHint="?attr/defaultMutedTextColor"-->
-        <!--          app:hintAnimationEnabled="false">-->
 
         <TextView
           android:id="@+id/amount_label"
@@ -154,8 +109,7 @@
           android:layout_marginBottom="@dimen/space_sm"
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintBottom_toBottomOf="@id/amount_value"
-          app:layout_constraintEnd_toEndOf="@id/amount_label"
-          />
+          app:layout_constraintEnd_toEndOf="@id/amount_label" />
 
         <TextView
           android:id="@+id/amount_converted"
@@ -185,17 +139,6 @@
           app:layout_constraintStart_toStartOf="@id/amount_label"
           app:layout_constraintTop_toBottomOf="@id/amount_converted" />
 
-        <!--        <com.google.android.material.textfield.TextInputLayout-->
-        <!--          android:id="@+id/desc_value_layout"-->
-        <!--          android:layout_width="match_parent"-->
-        <!--          android:layout_height="wrap_content"-->
-        <!--          android:layout_marginTop="@dimen/space_sm"-->
-        <!--          app:enableOrFade="@{model.state == PaymentGenerationState.INIT || model.state == PaymentGenerationState.ERROR || model.state == PaymentGenerationState.DONE}"-->
-        <!--          app:layout_constraintTop_toBottomOf="@id/amount_converted"-->
-        <!--          android:hint="@string/receive_desc_hint"-->
-        <!--          android:textColorHint="?attr/defaultMutedTextColor"-->
-        <!--          app:hintAnimationEnabled="false">-->
-
         <com.google.android.material.textfield.TextInputEditText
           android:id="@+id/desc_value"
           android:layout_width="0dp"
@@ -209,8 +152,6 @@
           app:layout_constraintEnd_toEndOf="@id/amount_label"
           app:layout_constraintStart_toStartOf="@id/desc_label"
           app:layout_constraintTop_toBottomOf="@id/desc_label" />
-
-        <!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/generate_button"
