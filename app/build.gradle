@@ -76,6 +76,11 @@ android {
   dataBinding {
     enabled = true
   }
+  externalNativeBuild {
+    cmake {
+      path 'CMakeLists.txt'
+    }
+  }
 }
 
 dependencies {
@@ -114,7 +119,7 @@ dependencies {
   implementation 'com.github.tony19:logback-android:2.0.0'
 
   // eclair core
-  def libsecp256k1_version = "1.2-SNAPSHOT"
+  def libsecp256k1_version = "1.3-SNAPSHOT"
   def eclair_version = "0.3.4-android-phoenix-SNAPSHOT"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation ("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
