@@ -22,12 +22,16 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
+import com.google.common.base.Strings
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomActionBarViewBinding
+import org.slf4j.LoggerFactory
 
 
 class ActionBarView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.actionBarViewStyle) :
   ConstraintLayout(context, attrs, R.attr.actionBarViewStyle) {
+
+  private val log = LoggerFactory.getLogger(this::class.java)
 
   private var mBinding: CustomActionBarViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.custom_action_bar_view, this, true)
 
@@ -50,7 +54,26 @@ class ActionBarView @JvmOverloads constructor(context: Context, attrs: Attribute
     }
   }
 
-  fun setOnBackAction(l : OnClickListener) {
+  fun setSubtitle(s: String?) {
+    if (!Strings.isNullOrEmpty(s)) {
+      mBinding.subtitle.text = s
+      mBinding.subtitle.visibility = View.VISIBLE
+    } else {
+      mBinding.subtitle.visibility = View.GONE
+    }
+    postInvalidate()
+  }
+
+  fun setTitle(s: String?) {
+    if (!Strings.isNullOrEmpty(s)) {
+      mBinding.title.text = s
+      mBinding.title.visibility = View.VISIBLE
+    } else {
+      mBinding.title.visibility = View.GONE
+    }
+  }
+
+  fun setOnBackAction(l: OnClickListener) {
     mBinding.backButton.setOnClickListener(l)
   }
 }

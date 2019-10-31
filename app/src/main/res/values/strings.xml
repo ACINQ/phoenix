@@ -87,7 +87,8 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_title">Create and share invoice</string>
+  <string name="receive_edit_title">Edit my invoice</string>
+  <string name="receive_edit_subtitle">You can change the requested amount and the description of the invoice.</string>
   <string name="receive_in_progress_message">Please hold…</string>
   <string name="receive_error_message">There was an error when generating the invoice…\n\nPlease try again.</string>
   <string name="receive_amount_label">Amount (optional)</string>
