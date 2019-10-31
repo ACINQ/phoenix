@@ -21,6 +21,7 @@
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
   <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
   <application
     android:name=".App"
@@ -55,6 +56,15 @@
         android:resource="@xml/provider_paths" />
     </provider>
 
+    <!-- broadcast receivers -->
+    <receiver
+      android:name=".background.BootReceiver"
+      android:enabled="true"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+      </intent-filter>
+    </receiver>
 
   </application>
 </manifest>

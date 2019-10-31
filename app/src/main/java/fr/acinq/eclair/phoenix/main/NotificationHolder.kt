@@ -21,7 +21,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
@@ -32,13 +31,14 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val messageView = itemView.findViewById<TextView>(R.id.notif_message)
     val iconView = itemView.findViewById<ImageView>(R.id.notif_icon)
     val actionButton = itemView.findViewById<Button>(R.id.notif_button)
-    val spaceMd = itemView.resources.getDimensionPixelSize(R.dimen.space_md)
-    val spaceSm = itemView.resources.getDimensionPixelSize(R.dimen.space_sm)
+    val spaceMD = itemView.resources.getDimensionPixelSize(R.dimen.space_md)
+    val spaceSM = itemView.resources.getDimensionPixelSize(R.dimen.space_sm)
+    val spaceXS = itemView.resources.getDimensionPixelSize(R.dimen.space_xs)
 
     if (position == 0) {
-      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMd, 0, spaceMd, 0)
+      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMD, 0, spaceMD, 0)
     } else {
-      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMd, spaceMd, spaceMd, 0)
+      (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMD, spaceXS, spaceMD, 0)
     }
 
     messageView.text = itemView.resources.getString(notification.messageResId)
@@ -54,10 +54,10 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           NotificationTypes.MNEMONICS_REMINDER -> {}
         }
       }
-      itemView.setPadding(spaceSm, spaceSm, spaceSm, 0)
+      itemView.setPadding(spaceSM, spaceSM, spaceSM, 0)
     } else {
       actionButton.visibility = View.GONE
-      itemView.setPadding(spaceSm, spaceSm, spaceSm, spaceSm)
+      itemView.setPadding(spaceSM, spaceSM, spaceSM, spaceSM)
     }
   }
 }

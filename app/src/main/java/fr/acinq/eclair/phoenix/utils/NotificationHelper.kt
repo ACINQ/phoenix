@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package fr.acinq.eclair.phoenix.db
+package fr.acinq.eclair.phoenix.utils
 
-import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "", null, 1) {
-
-  override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-    TODO("not implemented")
-  }
-
-  override fun onCreate(db: SQLiteDatabase?) {
-    db?.execSQL("")
-
-
-    this.writableDatabase
-  }
+object NotificationHelper {
+  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
+  const val WATCHER_REQUEST_CODE = 37921816
 }

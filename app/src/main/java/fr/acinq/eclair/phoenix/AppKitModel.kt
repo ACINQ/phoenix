@@ -45,6 +45,7 @@ import fr.acinq.eclair.payment.PaymentEvent
 import fr.acinq.eclair.payment.PaymentInitiator
 import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
@@ -381,6 +382,7 @@ class AppKitModel : ViewModel() {
               val res = startNode(context, pin)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
               _kit.postValue(res)
+              ChannelsWatcher.schedule()
               startupState.postValue(StartupState.DONE)
             } catch (t: Throwable) {
               shutdown()

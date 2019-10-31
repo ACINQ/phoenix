@@ -36,6 +36,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.Exception
 
 
 class CloseAllChannelsFragment : BaseFragment() {
@@ -57,7 +58,12 @@ class CloseAllChannelsFragment : BaseFragment() {
     model = ViewModelProvider(this).get(CloseAllChannelsViewModel::class.java)
     mBinding.model = model
     mBinding.mutualCloseInstructions.text = Converter.html(getString(R.string.closechannels_mutual_instructions))
-    mBinding.forceCloseInstructions.text = Converter.html(getString(R.string.closechannels_force_instructions))
+    val finalAddress = try {
+      appKit.kit.value!!.kit.wallet().finalAddress.value().get().get()
+    } catch (e: Exception) {
+      getString(R.string.utils_unknown)
+    }
+    mBinding.forceCloseInstructions.text = Converter.html(getString(R.string.closechannels_force_instructions, finalAddress))
   }
 
   override fun onStart() {

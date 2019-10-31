@@ -19,7 +19,8 @@ package fr.acinq.eclair.phoenix.main
 import fr.acinq.eclair.phoenix.R
 
 enum class NotificationTypes(val priority: Int, val messageResId: Int, val imageResId: Int, val actionResId: Int?) {
-  NO_PIN_SET(1, R.string.notifications_set_up_pin, R.drawable.ic_alert_triangle, R.string.notifications_set_up_pin_action),
+  NO_PIN_SET(1, R.string.notifications_set_up_pin, R.drawable.ic_unlock, R.string.notifications_set_up_pin_action),
   MNEMONICS_NEVER_SEEN(1, R.string.notifications_mnemonics_never_seen, R.drawable.ic_alert_triangle, R.string.notifications_mnemonics_never_seen_action),
   MNEMONICS_REMINDER(2, R.string.notifications_mnemonics_reminder, R.drawable.ic_alert_triangle, null),
+  BACKGROUND_WORKER_CANNOT_RUN(3, R.string.notifications_background_worker_cannot_run, R.drawable.ic_battery_charging, null),
 }

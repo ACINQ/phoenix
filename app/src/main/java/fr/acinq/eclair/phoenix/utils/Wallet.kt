@@ -19,6 +19,10 @@ package fr.acinq.eclair.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import com.google.common.base.Strings
+import com.google.common.net.HostAndPort
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.NodeURI
@@ -28,6 +32,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
 import java.io.File
+import java.util.*
 
 object Wallet {
 
@@ -139,6 +144,29 @@ object Wallet {
       val imm = it.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
       imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+  }
+
+  /**
+   * Builds a TypeSafe configuration for the node. Returns an empty config if there are no valid user's prefs.
+   */
+  fun getOverrideConfig(context: Context): Config {
+    val electrumServer = Prefs.getElectrumServer(context)
+    if (!Strings.isNullOrEmpty(electrumServer)) {
+      try {
+        val address = HostAndPort.fromString(electrumServer).withDefaultPort(50002)
+        val conf = HashMap<String, Any>()
+        if (!Strings.isNullOrEmpty(address.host)) {
+          conf["eclair.electrum.host"] = address.host
+          conf["eclair.electrum.port"] = address.port
+          // custom server certificate must be valid
+          conf["eclair.electrum.ssl"] = "strict"
+          return ConfigFactory.parseMap(conf)
+        }
+      } catch (e: Exception) {
+        log.error("invalid electrum server=$electrumServer, using empty config instead", e)
+      }
+    }
+    return ConfigFactory.empty()
   }
 
   // ------------------------ NODES & API URLS

@@ -176,6 +176,14 @@
   <string name="settings_logs">App logs</string>
   <string name="settings_danger_zone">Danger zone</string>
 
+  <!-- //////////////// notification - watcher //////////////// -->
+
+  <string name="notif_watcher_cheating_title">Please start Phoenix</string>
+  <string name="notif_watcher_cheating_message">Cheating attempt description placeholder</string>
+
+  <string name="notif_watcher_connection_title">Phoenix needs network access</string>
+  <string name="notif_watcher_connection_message">Network access description</string>
+
   <!-- //////////////// close all channels //////////////// -->
 
   <string name="closechannels_title">Close channels</string>
@@ -194,6 +202,8 @@
     This is the force close description text. <b>Very dangerous!</b>
     <br/><br/>
     Very expensive! Long delay!
+    <br/><br/>
+    Funds will be sent to: %1$s
     <br/><br/>
     <b>Do not use this feature without fully understanding what it entails.</b>
   ]]></string>
@@ -245,6 +255,7 @@
   <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you backed up your wallet?</string>
   <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
+  <string name="notifications_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
 
   <!-- //////////////// display seed //////////////// -->
 

@@ -22,6 +22,7 @@ import android.preference.PreferenceManager
 import android.util.Base64
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
+import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.eclair.phoenix.R
 
@@ -41,6 +42,14 @@ object Prefs {
   private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
   private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+
+  // -- background channels watcher
+  private const val PREFS_WATCHER_LAST_ATTEMPT_TIMESTAMP: String = "PREFS_WATCHER_LAST_ATTEMPT_TIMESTAMP"
+  private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME"
+  private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP"
+
+  // -- node configuration
+  const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
@@ -159,4 +168,32 @@ object Prefs {
       else -> R.style.default_theme
     }
   }
+
+  fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {
+    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    val outcome: WatchListener.WatchResult? = when (prefs.getString(PREFS_WATCHER_LAST_ATTEMPT_OUTCOME, "")) {
+      "Ok" -> WatchListener.`Ok$`.`MODULE$`
+      "NotOk" -> WatchListener.`NotOk$`.`MODULE$`
+      "Unknown" -> WatchListener.`Unknown$`.`MODULE$`
+      else -> null
+    }
+    val timestamp = prefs.getLong(PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP, 0L)
+    return Pair(outcome, timestamp)
+  }
+
+  fun saveWatcherAttemptOutcome(context: Context, result: WatchListener.WatchResult) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .putLong(PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP, System.currentTimeMillis())
+      .putString(PREFS_WATCHER_LAST_ATTEMPT_OUTCOME, result.toString())
+      .apply()
+  }
+
+  fun getElectrumServer(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ELECTRUM_ADDRESS, "") ?: ""
+  }
+
+  fun saveElectrumServer(context: Context, address: String) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ELECTRUM_ADDRESS, address.trim()).apply()
+  }
+
 }

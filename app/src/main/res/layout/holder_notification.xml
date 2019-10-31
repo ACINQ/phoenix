@@ -26,8 +26,8 @@
 
   <ImageView
     android:id="@+id/notif_icon"
-    android:layout_width="@dimen/button_height"
-    android:layout_height="@dimen/button_height"
+    android:layout_width="18dp"
+    android:layout_height="18dp"
     android:layout_marginStart="@dimen/space_xs"
     android:adjustViewBounds="true"
     android:contentDescription="@null"
