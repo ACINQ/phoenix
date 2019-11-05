@@ -27,18 +27,18 @@
   <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\n</string>
   <string name="restore_disclaimer_checkbox">I understand.</string>
   <string name="restore_disclaimer_next">Next</string>
-  <string name="restore_instructions">Your wallet\'s seed should be a list of 12 or 24 english words. Please note that passphrases are not supported.</string>
-  <string name="restore_mnemonics_label">Use the keyboard below to type the seed:</string>
+  <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words. Please note that passphrases are not supported.</string>
+  <string name="restore_mnemonics_label">Use the keyboard below to enter the seed:</string>
   <string name="restore_in_progress">Restoring your wallet…</string>
   <string name="restore_import_button">Import</string>
-  <string name="restore_error">This seed is not valid and cannot be imported.\n\nPlease try again</string>
+  <string name="restore_error">This seed is invalid and cannot be imported.\n\nPlease try again</string>
 
   <!-- //////////////// init wallet / create seed //////////////// -->
 
-  <string name="newseed_instructions">This words list is the key to your wallet. Save it somewhere safe (not on this phone).</string>
+  <string name="newseed_instructions">This word list is the key to your wallet. Save it somewhere safe (not on this phone).</string>
   <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="newseed_generating_seed">Generating seed…</string>
-  <string name="newseed_seed_saved_checkbox">I have saved this list of words.</string>
+  <string name="newseed_seed_saved_checkbox">I have made a backup of this list of words.</string>
   <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds.\nOnly I possess it.</string>
   <string name="newseed_next">Next</string>
 
@@ -100,7 +100,7 @@
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
-  <string name="receive_swap_in_button">Receive on-chain</string>
+  <string name="receive_swap_in_button">Show a bitcoin address</string>
   <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
   <string name="receive_swap_in_progress_message">Requesting a swap-in bitcoin address…</string>
   <string name="receive_swap_in_disclaimer_title">Receive on-chain</string>
@@ -133,16 +133,16 @@
   <string name="send_pay_button_for_swap">Next</string>
   <string name="send_swap_in_progress">Swap in progress…</string>
   <string name="send_swap_error">Swap has failed. Please try again.</string>
-  <string name="send_swap_required_desc">This is an on-chain Bitcoin address, this payment will be a swap.</string>
+  <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
   <string name="send_swap_required_button">Request a swap</string>
   <string name="send_swap_complete_recap"><![CDATA[Swap details:<br/><br/>Send: <b>%1$s</b><br/>Fee: <b>%1$s</b><br/>Total: <b>%2$s</b>]]></string>
 
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Grant camera permission</string>
-  <string name="scan_instructions">Place a payment request barcode\ninside the rectangle to scan it</string>
+  <string name="scan_instructions">Place a payment request QR code\ninside the rectangle to scan it</string>
   <string name="scan_state_reading">Reading payment request</string>
-  <string name="scan_state_error">This is not a valid payment.\nPlease try again.</string>
+  <string name="scan_state_error">This is not a valid payment request.\nPlease try again.</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
@@ -171,10 +171,10 @@
   <string name="settings_display_prefs">Currency, Theme…</string>
   <string name="settings_security_title">Security</string>
   <string name="settings_display_seed">Recovery phrase</string>
-  <string name="settings_seed_security">Wallet security</string>
+  <string name="settings_seed_security">App access settings</string>
   <string name="settings_advanced_title">Advanced</string>
-  <string name="settings_list_channels">List my channels</string>
-  <string name="settings_logs">App logs</string>
+  <string name="settings_list_channels">Channels list</string>
+  <string name="settings_logs">Logs</string>
   <string name="settings_danger_zone">Danger zone</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
@@ -253,7 +253,7 @@
 
   <string name="notifications_set_up_pin">Your wallet is not protected.</string>
   <string name="notifications_set_up_pin_action">Set a PIN</string>
-  <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you backed up your wallet?</string>
+  <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you made a back up of your wallet?</string>
   <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
   <string name="notifications_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
