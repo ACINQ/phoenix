@@ -190,12 +190,12 @@
     <action
       android:id="@+id/action_receive_to_main"
       app:destination="@id/main_fragment"
-      app:popUpTo="@id/main_fragment"
-      app:popUpToInclusive="true"
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left"
       app:popEnterAnim="@anim/slide_in_right"
-      app:popExitAnim="@anim/slide_out_left" />
+      app:popExitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
   </fragment>
 
   <!-- dialog to confirm money reception over new channel -->
@@ -242,7 +242,7 @@
   <fragment
     android:id="@+id/read_input"
     android:name="fr.acinq.eclair.phoenix.send.ReadInputFragment"
-    android:label="ReadInputFragment" >
+    android:label="ReadInputFragment">
     <action
       android:id="@+id/action_read_input_to_lnurl_login"
       app:destination="@id/lnurl_login" />
@@ -254,8 +254,11 @@
     android:name="fr.acinq.eclair.phoenix.settings.SettingsFragment"
     android:label="SettingsFragment">
     <action
-      android:id="@+id/action_settings_to_close_all_channels"
-      app:destination="@id/close_all_channels" />
+      android:id="@+id/action_settings_to_mutual_close"
+      app:destination="@id/mutual_close" />
+    <action
+      android:id="@+id/action_settings_to_force_close"
+      app:destination="@id/force_close" />
     <action
       android:id="@+id/action_settings_to_list_channels"
       app:destination="@id/list_channels" />
@@ -273,11 +276,17 @@
       app:destination="@id/prefs_display" />
   </fragment>
 
-  <!-- settings: close all channels and empty wallet  -->
+  <!-- settings: mutual close all channels -->
   <fragment
-    android:id="@+id/close_all_channels"
-    android:name="fr.acinq.eclair.phoenix.settings.CloseAllChannelsFragment"
-    android:label="CloseAllChannelsFragment" />
+    android:id="@+id/mutual_close"
+    android:name="fr.acinq.eclair.phoenix.settings.MutualCloseFragment"
+    android:label="MutualCloseFragment" />
+
+  <!-- settings: mutual close all channels -->
+  <fragment
+    android:id="@+id/force_close"
+    android:name="fr.acinq.eclair.phoenix.settings.ForceCloseFragment"
+    android:label="ForceCloseFragment" />
 
   <!-- settings: list all channels -->
   <fragment
@@ -300,6 +309,18 @@
     android:id="@+id/logs_fragment"
     android:name="fr.acinq.eclair.phoenix.settings.LogsSettingsFragment"
     android:label="LogsSettingsFragment" />
+
+  <!-- settings: set pin/biometric -->
+  <fragment
+    android:id="@+id/seed_security"
+    android:name="fr.acinq.eclair.phoenix.settings.SeedSecurityFragment"
+    android:label="seed_security" />
+
+  <!-- settings: change display settings (theme, currency...) -->
+  <fragment
+    android:id="@+id/prefs_display"
+    android:name="fr.acinq.eclair.phoenix.settings.DisplayPrefsFragment"
+    android:label="DisplayPrefsFragment" />
 
   <!-- nested graph with shared view model for payment details -->
   <navigation
@@ -346,21 +367,15 @@
       android:name="channel_id"
       app:argType="string" />
   </dialog>
-  <fragment
-    android:id="@+id/seed_security"
-    android:name="fr.acinq.eclair.phoenix.settings.SeedSecurityFragment"
-    android:label="seed_security" />
+
+  <!-- login with LNURL -->
   <fragment
     android:id="@+id/lnurl_login"
     android:name="fr.acinq.eclair.phoenix.send.LNUrlLoginFragment"
-    android:label="LNUrlLogin" >
+    android:label="LNUrlLogin">
     <argument
       android:name="uri"
       app:argType="string" />
   </fragment>
-  <fragment
-    android:id="@+id/prefs_display"
-    android:name="fr.acinq.eclair.phoenix.settings.DisplayPrefsFragment"
-    android:label="DisplayPrefsFragment" />
 
 </navigation>

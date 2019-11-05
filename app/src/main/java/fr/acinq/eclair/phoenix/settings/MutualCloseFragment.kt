@@ -30,40 +30,31 @@ import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
-import fr.acinq.eclair.phoenix.databinding.FragmentSettingsCloseAllChannelsBinding
+import fr.acinq.eclair.phoenix.databinding.FragmentSettingsMutualCloseBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 
 
-class CloseAllChannelsFragment : BaseFragment() {
+class MutualCloseFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
-
-  private lateinit var mBinding: FragmentSettingsCloseAllChannelsBinding
-
-  private lateinit var model: CloseAllChannelsViewModel
+  private lateinit var mBinding: FragmentSettingsMutualCloseBinding
+  private lateinit var model: MutualCloseViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-    mBinding = FragmentSettingsCloseAllChannelsBinding.inflate(inflater, container, false)
+    mBinding = FragmentSettingsMutualCloseBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(CloseAllChannelsViewModel::class.java)
+    model = ViewModelProvider(this).get(MutualCloseViewModel::class.java)
     mBinding.model = model
-    mBinding.mutualCloseInstructions.text = Converter.html(getString(R.string.closechannels_mutual_instructions))
-    val finalAddress = try {
-      appKit.kit.value!!.kit.wallet().finalAddress.value().get().get()
-    } catch (e: Exception) {
-      getString(R.string.utils_unknown)
-    }
-    mBinding.forceCloseInstructions.text = Converter.html(getString(R.string.closechannels_force_instructions, finalAddress))
+    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.closechannels_mutual_instructions)))
   }
 
   override fun onStart() {
@@ -76,13 +67,6 @@ class CloseAllChannelsFragment : BaseFragment() {
         .setNegativeButton(R.string.btn_cancel, null)
         .show()
     }
-    mBinding.forceConfirmButton.setOnClickListener {
-      AlertDialog.Builder(context)
-        .setMessage(R.string.closechannels_confirm_dialog_message)
-        .setPositiveButton(R.string.btn_confirm) { _, _ -> doForceClose() }
-        .setNegativeButton(R.string.btn_cancel, null)
-        .show()
-    }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
   }
 
@@ -91,7 +75,6 @@ class CloseAllChannelsFragment : BaseFragment() {
       log.error("error when retrieving list of channels: ", exception)
       model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
-      log.info("listing channels")
       model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
       val channels = appKit.getChannels(`NORMAL$`.`MODULE$`)
       if (channels.count() == 0) {
@@ -113,18 +96,6 @@ class CloseAllChannelsFragment : BaseFragment() {
       model.state.value = MutualCloseState.DONE
     }
   }
-
-  private fun doForceClose() {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error in force close: ", exception)
-      model.state.value = ForceCloseState.ERROR
-      Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
-    }) {
-      model.state.value = ForceCloseState.IN_PROGRESS
-      appKit.forceCloseAllChannels()
-      model.state.value = ForceCloseState.DONE
-    }
-  }
 }
 
 interface ChannelsCloseBaseState
@@ -137,13 +108,9 @@ enum class MutualCloseState : ChannelsCloseBaseState {
   IN_PROGRESS, DONE, ERROR
 }
 
-enum class ForceCloseState : ChannelsCloseBaseState {
-  IN_PROGRESS, DONE, ERROR
-}
+class MutualCloseViewModel : ViewModel() {
 
-class CloseAllChannelsViewModel : ViewModel() {
-  private val log = LoggerFactory.getLogger(CloseAllChannelsViewModel::class.java)
-
+  private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<ChannelsCloseBaseState>()
 
   init {

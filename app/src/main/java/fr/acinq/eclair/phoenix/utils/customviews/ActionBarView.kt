@@ -17,6 +17,7 @@
 package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
+import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -52,6 +53,11 @@ class ActionBarView @JvmOverloads constructor(context: Context, attrs: Attribute
       }
       arr.recycle()
     }
+  }
+
+  fun setSubtitle(s: Spanned) {
+    mBinding.subtitle.text = s
+    mBinding.subtitle.visibility = View.VISIBLE
   }
 
   fun setSubtitle(s: String?) {

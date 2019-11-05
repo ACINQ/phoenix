@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <import type="fr.acinq.eclair.phoenix.settings.PreChannelsCloseState" />
+
+    <import type="fr.acinq.eclair.phoenix.settings.ForceCloseState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.eclair.phoenix.settings.ForceCloseViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/defaultMutedBackgroundColor">
+
+    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:subtitle="@string/closechannels_force_instructions"
+      app:title="@string/closechannels_force_title" />
+
+    <ScrollView
+      android:id="@+id/scroll"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:overScrollMode="never"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/action_bar">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/defaultBackgroundColor">
+
+        <View
+          android:id="@+id/separator"
+          style="@style/HLineSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/separator"
+          app:text="@string/closechannels_checking_channels" />
+
+        <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:text="@string/closechannels_no_channels"
+          android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
+          app:layout_constraintTop_toBottomOf="@id/separator" />
+
+        <TextView
+          android:id="@+id/force_error"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?attr/defaultErrorBackgroundColor"
+          android:drawableStart="@drawable/ic_alert_triangle"
+          android:padding="@dimen/space_md"
+          android:text="@string/closechannels_message_error"
+          android:visibility="@{model.state == ForceCloseState.ERROR}"
+          app:layout_constraintTop_toBottomOf="@id/separator" />
+
+        <TextView
+          android:id="@+id/force_done"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@color/green"
+          android:drawableStart="@drawable/ic_check"
+          android:drawablePadding="@dimen/space_sm"
+          android:drawableTint="?attr/altTextColor"
+          android:padding="@dimen/space_md"
+          android:text="@string/closechannels_message_done"
+          android:textColor="?attr/altTextColor"
+          android:visibility="@{model.state == ForceCloseState.DONE}"
+          app:layout_constraintTop_toBottomOf="@id/separator" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+          android:id="@+id/force_in_progress"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:visibility="@{model.state == ForceCloseState.IN_PROGRESS}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/separator"
+          app:text="@string/closechannels_message_in_progress" />
+
+        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          android:id="@+id/force_confirm_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
+          android:visibility="@{model.state == PreChannelsCloseState.READY}"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_cross_circle"
+          app:icon_tint="@color/red"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/separator"
+          app:text="@string/closechannels_force_button" />
+
+        <View
+          style="@style/HLineSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintBottom_toBottomOf="parent" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

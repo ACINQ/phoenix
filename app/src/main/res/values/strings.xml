@@ -172,10 +172,13 @@
   <string name="settings_security_title">Security</string>
   <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_seed_security">App access settings</string>
+  <string name="settings_debugging_title">Debugging</string>
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">Channels list</string>
   <string name="settings_logs">Logs</string>
-  <string name="settings_danger_zone">Danger zone</string>
+  <string name="settings_electrum">Electrum server</string>
+  <string name="settings_mutual_close">Empty wallet</string>
+  <string name="settings_force_close">Danger zone</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -190,14 +193,13 @@
   <string name="closechannels_title">Close channels</string>
   <string name="closechannels_checking_channels">Checking channels, please hold…</string>
   <string name="closechannels_no_channels">You don\'t have any channels that could be closed.\n\nGo to the \'List channels\' page to see your current channels.</string>
-  <string name="closechannels_mutual_title">Mutual close</string>
+  <string name="closechannels_mutual_title">Empty wallet</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    This is the mutual close description text.
-    <br/><br/>
-    This explains what a mutual close does and what it costs.
+    Use this page to empty your wallet to a Bitcoin address.
   ]]></string>
+  <string name="closechannels_mutual_input_instructions">Your funds will be sent to this Bitcoin address. Make sure that the address is correct before sending.</string>
   <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
-  <string name="closechannels_mutual_button">Mutual close channels</string>
+  <string name="closechannels_mutual_button">Empty my wallet</string>
   <string name="closechannels_force_title">Force close</string>
   <string name="closechannels_force_instructions"><![CDATA[
     This is the force close description text. <b>Very dangerous!</b>

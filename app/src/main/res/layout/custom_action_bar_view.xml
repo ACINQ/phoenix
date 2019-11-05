@@ -24,7 +24,10 @@
       android:layout_height="wrap_content"
       android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
-      android:padding="@dimen/space_md"
+      android:paddingStart="@dimen/space_md"
+      android:paddingTop="@dimen/space_md"
+      android:paddingBottom="@dimen/space_md"
+      android:paddingEnd="@dimen/space_sm"
       android:src="@drawable/ic_arrow_back"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
