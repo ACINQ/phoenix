@@ -42,8 +42,13 @@
   <dimen name="pin_button_size">64dp</dimen>
 
   <!-- button content height -->
-  <dimen name="button_height">22dp</dimen>
+  <dimen name="button_height">18dp</dimen>
+  <dimen name="button_height_sm">18dp</dimen>
   <dimen name="button_corner">30dp</dimen>
+
+  <!-- main page -->
+  <dimen name="main_button_padding">20dp</dimen>
+  <dimen name="main_button_height">72dp</dimen>
 
   <!-- scanner -->
   <dimen name="scanner_size">250dp</dimen>

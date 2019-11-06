@@ -72,6 +72,7 @@
     <attr name="icon" />
     <attr name="icon_tint" />
     <attr name="icon_size" />
+    <attr name="spacer_size" format="dimension" />
     <attr name="hz_bias" format="float" />
   </declare-styleable>
   <declare-styleable name="SwitchView">

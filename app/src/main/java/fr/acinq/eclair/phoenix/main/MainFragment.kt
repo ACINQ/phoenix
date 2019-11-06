@@ -16,7 +16,9 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -114,6 +116,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
+    mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://acinq.co/phoenix"))) }
 
     refreshPaymentList()
   }

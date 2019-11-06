@@ -18,15 +18,12 @@ package fr.acinq.eclair.phoenix.utils.customviews
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import androidx.annotation.AttrRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.CustomButtonViewBinding
@@ -51,9 +48,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
       } else {
         mBinding.text.visibility = View.GONE
-        val params = LayoutParams(resources.getDimensionPixelOffset(R.dimen.button_height), resources.getDimensionPixelOffset(R.dimen.button_height))
-        params.setMargins(0, 0, 0, 0)
-        mBinding.image.layoutParams = params
+        mBinding.spacer.visibility = View.GONE
       }
 
       if (arr.hasValue(R.styleable.ButtonView_hz_bias)) {
@@ -67,8 +62,19 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (arr.hasValue(R.styleable.ButtonView_icon_tint)) {
           mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.defaultTextColor)))
         }
+        if (arr.hasValue(R.styleable.ButtonView_icon_size)) {
+          val imageSize = arr.getDimensionPixelOffset(R.styleable.ButtonView_icon_size, R.dimen.button_height)
+          mBinding.image.layoutParams.width = imageSize
+          mBinding.image.layoutParams.height = imageSize
+        }
       } else {
-        mBinding.image.visibility = GONE
+        mBinding.image.visibility = View.GONE
+        mBinding.spacer.visibility = View.GONE
+      }
+
+      // spacer size
+      if (arr.hasValue(R.styleable.ButtonView_spacer_size)) {
+        mBinding.spacer.layoutParams.width = arr.getDimensionPixelOffset(R.styleable.ButtonView_spacer_size, R.dimen.space_sm)
       }
 
       arr.recycle()
