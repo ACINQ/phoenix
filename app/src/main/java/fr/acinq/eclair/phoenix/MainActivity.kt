@@ -67,6 +67,11 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  override fun onResume() {
+    super.onResume()
+    appKit.reconnect()
+  }
+
   override fun onDestroy() {
     super.onDestroy()
     log.info("main activity destroyed")

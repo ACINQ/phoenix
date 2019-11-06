@@ -37,7 +37,6 @@
       android:fontFamily="sans-serif-light"
       android:importantForAutofill="no"
       android:inputType="none"
-      android:maxLines="1"
       android:overScrollMode="always"
       android:text=""
       android:textSize="46sp"
@@ -55,7 +54,6 @@
       app:layout_constraintStart_toEndOf="@id/amount"
       android:background="@null"
       android:fontFamily="sans-serif-light"
-      android:maxLines="1"
       android:text=""
       android:textSize="@dimen/text_md" />
 
@@ -68,8 +66,6 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0"
       app:layout_constraintStart_toStartOf="@id/amount"
-      android:ellipsize="end"
-      android:maxLines="1"
       android:text=""
       android:textAlignment="textStart"
       android:textColor="?attr/defaultMutedTextColor"
