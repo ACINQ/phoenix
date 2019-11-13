@@ -33,6 +33,7 @@ import androidx.lifecycle.viewModelScope
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.BackupEvent
@@ -76,7 +77,7 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
-data class NodeData(var balance: MilliSatoshi, var activeChannelsCount: Int)
+data class NodeData(var balance: MilliSatoshi, var electrumAddress: String? = "")
 class AppKit(val kit: Kit, val api: Eclair)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
@@ -91,7 +92,7 @@ class AppKitModel : ViewModel() {
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val navigationEvent = SingleLiveEvent<Any>()
-  val startupState = MutableLiveData(StartupState.OFF)
+  val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
   val nodeData = MutableLiveData<NodeData>()
   private val _kit = MutableLiveData<AppKit>()
@@ -101,7 +102,8 @@ class AppKitModel : ViewModel() {
 
   init {
     _kit.value = null
-    nodeData.value = NodeData(MilliSatoshi(0), 0)
+    startupState.value = StartupState.OFF
+    nodeData.value = NodeData(MilliSatoshi(0), "")
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -132,6 +134,11 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
     nodeData.value = nodeData.value?.copy(balance = event.available)
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: ElectrumClient.ElectrumReady) {
+    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().hostString)
   }
 
   @UiThread
@@ -383,12 +390,9 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun startAppKit(context: Context, pin: String) {
     when {
-      isKitReady() -> {
-        log.warn("ignoring attempt to start node because kit is already setup")
-      }
-      startupState.value == StartupState.IN_PROGRESS -> {
-        log.info("ignoring attempt to start node because startup is already in progress")
-      }
+      isKitReady() -> log.warn("ignoring attempt to start node because kit is already setup")
+      startupState.value == StartupState.IN_PROGRESS -> log.info("ignoring attempt to start node because startup is already in progress")
+      startupState.value == StartupState.DONE -> log.info("ignoring attempt to start node because startup is done")
       else -> {
         startupState.value = StartupState.IN_PROGRESS
         viewModelScope.launch {
@@ -433,8 +437,7 @@ class AppKitModel : ViewModel() {
     }
   }
 
-
-  private fun shutdown() {
+  public fun shutdown() {
     _kit.value?.let {
       it.kit.system().shutdown()
       it.kit.nodeParams().db().audit().close()
@@ -442,7 +445,7 @@ class AppKitModel : ViewModel() {
       it.kit.nodeParams().db().network().close()
       it.kit.nodeParams().db().peers().close()
       it.kit.nodeParams().db().pendingRelay().close()
-    } ?: log.warn("could not close db connection and shutdown system because kit is not initialized!")
+    } ?: log.warn("could not shutdown system because kit is not initialized!")
   }
 
   @WorkerThread
@@ -472,6 +475,7 @@ class AppKitModel : ViewModel() {
     system.registerOnTermination {
       log.info("system has been shutdown, all actors are terminated")
       _kit.postValue(null)
+      startupState.postValue(StartupState.OFF)
     }
 
     checkConnectivity(context)
@@ -486,7 +490,7 @@ class AppKitModel : ViewModel() {
     log.info("using single address=$bech32Address")
 
     Class.forName("org.sqlite.JDBC")
-    val setup = Setup(Wallet.getDatadir(context), ConfigFactory.empty(), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
+    val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
     log.info("node setup ready")
 
@@ -498,6 +502,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
+    system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
       Runnable { httpClient.newCall(Request.Builder().url(Wallet.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())

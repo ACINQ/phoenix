@@ -52,7 +52,6 @@ class StartupFragment : BaseFragment() {
     mBinding.appKitModel = appKit
     appKit.startupState.observe(viewLifecycleOwner, Observer {
       log.info("startup is now $it")
-      startNodeIfNeeded()
       if (it == StartupState.ERROR) {
         Handler().postDelayed({ appKit.startupState.value = StartupState.OFF }, 2000)
       }
@@ -73,7 +72,6 @@ class StartupFragment : BaseFragment() {
         override fun onPinCancel(dialog: PinDialog) {}
       })
     }
-    startNodeIfNeeded()
   }
 
   override fun onStop() {
@@ -83,9 +81,14 @@ class StartupFragment : BaseFragment() {
 
   override fun appCheckup() {
     if (appKit.isKitReady()) {
+      log.debug("kit is ready, redirecting to main page")
       findNavController().navigate(R.id.action_startup_to_main)
     } else if (context != null && !appKit.hasWalletBeenSetup(context!!)) {
+      log.debug("kit is not ready and wallet is not setup, redirecting to init wallet")
       findNavController().navigate(R.id.global_action_any_to_init_wallet)
+    } else {
+      log.info("kit is not ready, must be started!")
+      startNodeIfNeeded()
     }
   }
 

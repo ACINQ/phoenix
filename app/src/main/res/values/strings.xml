@@ -378,4 +378,21 @@
   <string name="prefs_display_fiat_label">Fiat currency</string>
   <string name="prefs_display_theme_label">Application theme</string>
 
+  <!-- //////////////// electrum server //////////////// -->
+
+  <string name="electrum_title">Electrum server</string>
+  <string name="electrum_subtitle">The app connects to a random electrum server for access to the Bitcoin blockchain. You can choose to connect only to a specific electrum server if you prefer.</string>
+  <string name="electrum_connecting">Establishing connection…</string>
+  <string name="electrum_connecting_to_custom">Establishing connection with %1$s…</string>
+  <string name="electrum_connected">Connected to: %1$s</string>
+  <string name="electrum_random">This server was randomly selected from a pool.</string>
+  <string name="electrum_custom">Current server: %1$s</string>
+  <string name="electrum_wait">Checking channels, please hold…</string>
+  <string name="electrum_done">Checking channels, please hold…</string>
+  <string name="electrum_error">Checking channels, please hold…</string>
+
+  <string name="electrum_dialog_checkbox">Use a custom Electrum server</string>
+  <string name="electrum_dialog_ssl">Server must have a valid certificate if not using an .onion address.</string>
+  <string name="electrum_dialog_input">Server address (host:port).</string>
+
 </resources>

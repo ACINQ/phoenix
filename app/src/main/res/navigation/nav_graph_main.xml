@@ -274,6 +274,9 @@
     <action
       android:id="@+id/action_settings_to_prefs_display"
       app:destination="@id/prefs_display" />
+    <action
+      android:id="@+id/action_settings_to_electrum"
+      app:destination="@id/electrum_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -377,5 +380,11 @@
       android:name="uri"
       app:argType="string" />
   </fragment>
+
+  <!-- settings: electrum server -->
+  <fragment
+    android:id="@+id/electrum_fragment"
+    android:name="fr.acinq.eclair.phoenix.settings.ElectrumServerFragment"
+    android:label="ElectrumServerFragment" />
 
 </navigation>

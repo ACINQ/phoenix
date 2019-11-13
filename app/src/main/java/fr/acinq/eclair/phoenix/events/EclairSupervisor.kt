@@ -21,6 +21,7 @@ import akka.actor.Terminated
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.PaymentDirection
 import fr.acinq.eclair.db.`BackupCompleted$`
@@ -58,6 +59,7 @@ class EclairSupervisor : UntypedActor() {
   override fun onReceive(event: Any?) {
     log.debug("received event $event")
     when (event) {
+      // -------------- CHANNELS LIFECYCLE -------------
       is ChannelCreated -> {
         log.info("channel $event has been created")
       }
@@ -93,6 +95,11 @@ class EclairSupervisor : UntypedActor() {
         log.info("channel $event has been terminated")
         channelsMap.remove(event.actor)
       }
+
+      // -------------- ELECTRUM -------------
+      is ElectrumClient.ElectrumReady -> EventBus.getDefault().post(event)
+
+      // -------------- PAY TO OPEN -------------
       is AcceptPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
@@ -118,6 +125,8 @@ class EclairSupervisor : UntypedActor() {
         payToOpenMap[event.payToOpenRequest().paymentHash()] = event
         EventBus.getDefault().post(event)
       }
+
+      // -------------- PAYMENTS -------------
       is SwapInResponse -> {
         log.info("received swap-in response: $event")
         EventBus.getDefault().post(event)
@@ -134,6 +143,7 @@ class EclairSupervisor : UntypedActor() {
         log.info("payment has been successfully received: $event ")
         EventBus.getDefault().post(PaymentComplete(PaymentDirection.`IncomingPaymentDirection$`.`MODULE$`, event.paymentHash().toString()))
       }
+      // -------------- UNHANDLED -------------
       else -> {
         log.debug("unhandled event $event")
       }

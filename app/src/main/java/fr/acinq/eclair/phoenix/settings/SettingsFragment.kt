@@ -44,6 +44,7 @@ class SettingsFragment : BaseFragment() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.prefsDisplayButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_prefs_display) }
+    mBinding.electrumButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_electrum) }
     mBinding.mutualCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_mutual_close) }
     mBinding.forceCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_force_close) }
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
