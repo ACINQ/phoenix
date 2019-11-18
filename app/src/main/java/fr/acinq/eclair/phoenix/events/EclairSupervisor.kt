@@ -98,6 +98,7 @@ class EclairSupervisor : UntypedActor() {
 
       // -------------- ELECTRUM -------------
       is ElectrumClient.ElectrumReady -> EventBus.getDefault().post(event)
+      is ElectrumClient.`ElectrumDisconnected$` -> EventBus.getDefault().post(event)
 
       // -------------- PAY TO OPEN -------------
       is AcceptPayToOpen -> {

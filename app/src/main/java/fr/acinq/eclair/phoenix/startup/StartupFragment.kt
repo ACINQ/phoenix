@@ -51,9 +51,12 @@ class StartupFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     mBinding.appKitModel = appKit
     appKit.startupState.observe(viewLifecycleOwner, Observer {
-      log.info("startup is now $it")
+      log.debug("startup in state $it")
       if (it == StartupState.ERROR) {
-        Handler().postDelayed({ appKit.startupState.value = StartupState.OFF }, 2000)
+        Handler().postDelayed({ appKit.startupState.value = StartupState.OFF }, 3200)
+      }
+      if (it == StartupState.OFF) {
+        startNodeIfNeeded()
       }
     })
   }
@@ -70,8 +73,13 @@ class StartupFragment : BaseFragment() {
         }
 
         override fun onPinCancel(dialog: PinDialog) {}
-      })
+      }, cancelable = false)
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    startNodeIfNeeded()
   }
 
   override fun onStop() {
@@ -87,7 +95,7 @@ class StartupFragment : BaseFragment() {
       log.debug("kit is not ready and wallet is not setup, redirecting to init wallet")
       findNavController().navigate(R.id.global_action_any_to_init_wallet)
     } else {
-      log.info("kit is not ready, must be started!")
+      log.info("kit is not ready, let's start it if needed!")
       startNodeIfNeeded()
     }
   }
@@ -116,6 +124,8 @@ class StartupFragment : BaseFragment() {
           }
           else -> appKit.startAppKit(ctx, Wallet.DEFAULT_PIN)
         }
+      } else {
+        log.info("kit on standby [ state=${appKit.startupState.value}, kit=${appKit.kit.value}, init=${appKit.hasWalletBeenSetup(ctx)} ]")
       }
     } ?: log.warn("cannot start node with null context")
   }

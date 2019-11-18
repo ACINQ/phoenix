@@ -20,7 +20,6 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Handler
 import android.text.Editable
-import android.text.Html
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -33,7 +32,7 @@ import fr.acinq.eclair.phoenix.databinding.DialogPinBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import java.util.*
 
-class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val mPinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default) :
+class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) :
   Dialog(context, themeResId) {
 
   private val mBinding: DialogPinBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
@@ -41,8 +40,9 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
 
   init {
     setContentView(mBinding.root)
-    setOnCancelListener { mPinCallback.onPinCancel(this@PinDialog) }
+    setOnCancelListener { pinCallback.onPinCancel(this@PinDialog) }
     mBinding.pinTitle.text = Converter.html(getContext().getString(titleResId))
+    setCancelable(cancelable)
 
     val mButtonsList = ArrayList<View>()
     mButtonsList.add(mBinding.pinNum1)
@@ -62,7 +62,7 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         if (s != null && s.length == PIN_LENGTH) {
           // automatically confirm pin when pin is long enough
-          Handler().postDelayed({ mPinCallback.onPinConfirm(this@PinDialog, mPinValue) }, 300)
+          Handler().postDelayed({ pinCallback.onPinConfirm(this@PinDialog, mPinValue) }, 300)
         }
       }
 

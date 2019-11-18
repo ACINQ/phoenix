@@ -17,6 +17,7 @@
 package fr.acinq.eclair.phoenix.settings
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,15 +29,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.eclair.phoenix.utils.BindingHelpers
+import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 
 class ElectrumServerFragment : BaseFragment() {
 
@@ -55,16 +59,16 @@ class ElectrumServerFragment : BaseFragment() {
     model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
     appKit.nodeData.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
-        val currentPrefsAddress = Prefs.getElectrumServer(ctx)
-        mBinding.currentState.text = if (Strings.isNullOrEmpty(it.electrumAddress)) {
-          if (Strings.isNullOrEmpty(currentPrefsAddress)) {
+        val prefElectrumAddress = Prefs.getElectrumServer(ctx)
+        mBinding.currentState.text = Converter.html(if (Strings.isNullOrEmpty(it?.electrumAddress)) {
+          if (Strings.isNullOrEmpty(prefElectrumAddress)) {
             resources.getString(R.string.electrum_connecting)
           } else {
-            resources.getString(R.string.electrum_connecting_to_custom, currentPrefsAddress)
+            resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
           }
         } else {
           resources.getString(R.string.electrum_connected, it.electrumAddress)
-        }
+        })
       }
     })
     mBinding.model = model
@@ -72,49 +76,59 @@ class ElectrumServerFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.changeServerButton.setOnClickListener {
-      val alertDialog: AlertDialog? = activity?.let {
-        val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
-        val sslWarning = view.findViewById<TextView>(R.id.elec_dialog_ssl)
-        val checkbox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
-        val inputLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
-        val inputValue = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
-        val currentPrefsAddress = Prefs.getElectrumServer(it)
-
-        fun updateState(isChecked: Boolean) {
-          BindingHelpers.enableOrFade(inputLabel, isChecked)
-          BindingHelpers.enableOrFade(inputValue, isChecked)
-          sslWarning.visibility = if (isChecked) View.VISIBLE else View.GONE
-        }
-
-        checkbox.setOnCheckedChangeListener { v, isChecked -> updateState(isChecked) }
-
-        if (Strings.isNullOrEmpty(currentPrefsAddress)) {
-          checkbox.isChecked = false
-          updateState(false)
-        } else {
-          checkbox.isChecked = true
-          inputValue.setText(currentPrefsAddress)
-          updateState(true)
-        }
-
-        val builder = AlertDialog.Builder(it)
-        builder.setView(view)
-          .setPositiveButton(R.string.btn_confirm) { dialog, id ->
-            val address = inputValue.text.toString()
-            if (checkbox.isChecked && Strings.isNullOrEmpty(address)) {
-              Toast.makeText(context, "Invalid address", Toast.LENGTH_SHORT).show()
-            } else {
-              Prefs.saveElectrumServer(it, if (checkbox.isChecked) inputValue.text.toString() else "")
-              appKit.shutdown()
-            }
-          }
-          .setNegativeButton(R.string.btn_cancel) { _, _ -> }
-        builder.create()
+      context?.let {
+        getElectrumDialog(it).show()
       }
-      alertDialog?.show()
-
     }
+  }
+
+  private fun getElectrumDialog(context: Context): AlertDialog {
+    val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
+    val sslWarning = view.findViewById<TextView>(R.id.elec_dialog_ssl)
+    val checkbox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
+    val inputLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
+    val inputValue = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
+    val currentPrefsAddress = Prefs.getElectrumServer(context)
+
+    fun updateState(isChecked: Boolean) {
+      BindingHelpers.enableOrFade(inputLabel, isChecked)
+      BindingHelpers.enableOrFade(inputValue, isChecked)
+      sslWarning.visibility = if (isChecked) View.VISIBLE else View.GONE
+    }
+
+    checkbox.setOnCheckedChangeListener { v, isChecked -> updateState(isChecked) }
+
+    if (Strings.isNullOrEmpty(currentPrefsAddress)) {
+      checkbox.isChecked = false
+      updateState(false)
+    } else {
+      checkbox.isChecked = true
+      inputValue.setText(currentPrefsAddress)
+      updateState(true)
+    }
+
+    val dialog = AlertDialog.Builder(context).setView(view)
+      .setPositiveButton(R.string.btn_confirm, null)
+      .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+      .create()
+
+    dialog.setOnShowListener {
+      val confirmButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+      confirmButton.setOnClickListener {
+        val address = inputValue.text.toString()
+        if (checkbox.isChecked && Strings.isNullOrEmpty(address)) {
+          Toast.makeText(context, R.string.electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
+        } else {
+          Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
+          dialog.dismiss()
+          appKit.shutdown()
+        }
+      }
+    }
+
+    return dialog
   }
 }
 

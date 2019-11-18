@@ -381,18 +381,15 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">The app connects to a random electrum server for access to the Bitcoin blockchain. You can choose to connect only to a specific electrum server if you prefer.</string>
+  <string name="electrum_subtitle">For access to the Bitcoin blockchain, the app connects by default to a random electrum server. You can also choose to only connect to a specific server.</string>
+
   <string name="electrum_connecting">Establishing connection…</string>
-  <string name="electrum_connecting_to_custom">Establishing connection with %1$s…</string>
-  <string name="electrum_connected">Connected to: %1$s</string>
-  <string name="electrum_random">This server was randomly selected from a pool.</string>
-  <string name="electrum_custom">Current server: %1$s</string>
-  <string name="electrum_wait">Checking channels, please hold…</string>
-  <string name="electrum_done">Checking channels, please hold…</string>
-  <string name="electrum_error">Checking channels, please hold…</string>
+  <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
+  <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>
 
   <string name="electrum_dialog_checkbox">Use a custom Electrum server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate if not using an .onion address.</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
+  <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 
 </resources>

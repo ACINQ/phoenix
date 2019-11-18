@@ -138,7 +138,12 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().hostString)
+    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().toString())
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
+    nodeData.value = nodeData.value?.copy(electrumAddress = "")
   }
 
   @UiThread
@@ -390,9 +395,10 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun startAppKit(context: Context, pin: String) {
     when {
-      isKitReady() -> log.warn("ignoring attempt to start node because kit is already setup")
-      startupState.value == StartupState.IN_PROGRESS -> log.info("ignoring attempt to start node because startup is already in progress")
-      startupState.value == StartupState.DONE -> log.info("ignoring attempt to start node because startup is done")
+      isKitReady() -> log.info("silently ignoring attempt to start node because kit is already started")
+      startupState.value == StartupState.ERROR -> log.info("silently ignoring attempt to start node because startup is in error")
+      startupState.value == StartupState.IN_PROGRESS -> log.info("silently ignoring attempt to start node because startup is already in progress")
+      startupState.value == StartupState.DONE -> log.info("silently ignoring attempt to start node because startup is done")
       else -> {
         startupState.value = StartupState.IN_PROGRESS
         viewModelScope.launch {
@@ -404,29 +410,25 @@ class AppKitModel : ViewModel() {
               ChannelsWatcher.schedule()
               startupState.postValue(StartupState.DONE)
             } catch (t: Throwable) {
-              shutdown()
               log.info("aborted node startup")
               startupState.postValue(StartupState.ERROR)
+              closeConnections()
               _kit.postValue(null)
               when (t) {
                 is GeneralSecurityException -> {
                   log.info("user entered wrong PIN")
-                  startupState.postValue(StartupState.ERROR)
                   startupErrorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
                 }
                 is NetworkException, is UnknownHostException -> {
                   log.info("network error: ", t)
-                  startupState.postValue(StartupState.ERROR)
                   startupErrorMessage.postValue(context.getString(R.string.startup_error_network))
                 }
                 is IOException, is IllegalAccessException -> {
                   log.error("seed file not readable: ", t)
-                  startupState.postValue(StartupState.ERROR)
                   startupErrorMessage.postValue(context.getString(R.string.startup_error_unreadable))
                 }
                 else -> {
                   log.error("error when starting node: ", t)
-                  startupState.postValue(StartupState.ERROR)
                   startupErrorMessage.postValue(context.getString(R.string.startup_error_generic))
                 }
               }
@@ -437,7 +439,7 @@ class AppKitModel : ViewModel() {
     }
   }
 
-  public fun shutdown() {
+  private fun closeConnections() {
     _kit.value?.let {
       it.kit.system().shutdown()
       it.kit.nodeParams().db().audit().close()
@@ -446,6 +448,12 @@ class AppKitModel : ViewModel() {
       it.kit.nodeParams().db().peers().close()
       it.kit.nodeParams().db().pendingRelay().close()
     } ?: log.warn("could not shutdown system because kit is not initialized!")
+  }
+
+  public fun shutdown() {
+    closeConnections()
+    nodeData.postValue(NodeData(MilliSatoshi(0), ""))
+    _kit.postValue(null)
   }
 
   @WorkerThread
@@ -461,7 +469,7 @@ class AppKitModel : ViewModel() {
   @WorkerThread
   private fun checkConnectivity(context: Context) {
     val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    if (!cm.activeNetworkInfo?.isConnected!!) {
+    if (cm.activeNetworkInfo == null || !cm.activeNetworkInfo?.isConnected!!) {
       throw NetworkException()
     }
   }
@@ -474,8 +482,6 @@ class AppKitModel : ViewModel() {
     val system = ActorSystem.create("system")
     system.registerOnTermination {
       log.info("system has been shutdown, all actors are terminated")
-      _kit.postValue(null)
-      startupState.postValue(StartupState.OFF)
     }
 
     checkConnectivity(context)

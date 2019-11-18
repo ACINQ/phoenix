@@ -19,6 +19,7 @@ package fr.acinq.eclair.phoenix
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -70,6 +71,8 @@ abstract class BaseFragment : Fragment() {
         log.info("biometric auth error ($errorCode): $errString")
         if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
           negativeCallback()
+        } else if (errorCode == BiometricConstants.ERROR_USER_CANCELED) {
+          negativeCallback()
         }
       }
 
@@ -87,17 +90,17 @@ abstract class BaseFragment : Fragment() {
     return biometricPrompt
   }
 
-  fun getPinDialog(callback: PinDialog.PinDialogCallback): PinDialog? {
-    return context?.let {
-      val pinDialog = PinDialog((requireActivity() as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback)
+  fun getPinDialog(callback: PinDialog.PinDialogCallback, cancelable: Boolean = true): PinDialog? {
+    return activity?.let {
+      val pinDialog = PinDialog((it as MainActivity).getActivityThis(), R.style.dialog_fullScreen, pinCallback = callback, cancelable = cancelable)
       pinDialog.setCanceledOnTouchOutside(false)
       pinDialog
     }
   }
 
-  fun getPinDialog(titleResId: Int, callback: PinDialog.PinDialogCallback): PinDialog? {
-    return context?.let {
-      val pinDialog = PinDialog(it, R.style.dialog_fullScreen, callback, titleResId)
+  fun getPinDialog(titleResId: Int, callback: PinDialog.PinDialogCallback, cancelable: Boolean = true): PinDialog? {
+    return activity?.let {
+      val pinDialog = PinDialog((it as MainActivity).getActivityThis(), R.style.dialog_fullScreen, callback, titleResId, cancelable)
       pinDialog.setCanceledOnTouchOutside(false)
       pinDialog
     }
