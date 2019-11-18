@@ -199,7 +199,7 @@
   ]]></string>
   <string name="closechannels_mutual_input_instructions">Your funds will be sent to this Bitcoin address. Make sure that the address is correct before sending.</string>
   <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
-  <string name="closechannels_mutual_button">Empty my wallet</string>
+  <string name="closechannels_mutual_button">EMPTY MY WALLET</string>
   <string name="closechannels_force_title">Force close</string>
   <string name="closechannels_force_instructions"><![CDATA[
     This is the force close description text. <b>Very dangerous!</b>
@@ -382,6 +382,7 @@
 
   <string name="electrum_title">Electrum server</string>
   <string name="electrum_subtitle">For access to the Bitcoin blockchain, the app connects by default to a random electrum server. You can also choose to only connect to a specific server.</string>
+  <string name="electrum_change_button">SET SERVER…</string>
 
   <string name="electrum_connecting">Establishing connection…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>

@@ -111,64 +111,86 @@
             app:layout_constraintTop_toBottomOf="@id/message" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <View
-          android:id="@+id/separator_input"
-          style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          android:layout_marginTop="@dimen/space_md"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
-
         <TextView
           android:id="@+id/mutual_error"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="?attr/defaultErrorBackgroundColor"
           android:drawableStart="@drawable/ic_alert_triangle"
+          android:layout_marginTop="@dimen/space_md"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_error"
           android:visibility="@{model.state == MutualCloseState.ERROR}"
-          app:layout_constraintTop_toBottomOf="@id/separator_input" />
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
 
         <TextView
           android:id="@+id/mutual_done"
-          android:layout_width="match_parent"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@color/green"
+          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/rounded"
+          android:backgroundTint="@color/green"
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
           android:drawableTint="?attr/altTextColor"
-          android:padding="@dimen/space_md"
+          android:paddingStart="@dimen/space_md"
+          android:paddingTop="@dimen/space_sm"
+          android:paddingEnd="@dimen/space_md"
+          android:paddingBottom="@dimen/space_sm"
           android:text="@string/closechannels_message_done"
           android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == MutualCloseState.DONE}"
-          app:layout_constraintTop_toBottomOf="@id/separator_input" />
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
+          app:text_size="@dimen/text_md" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
           android:id="@+id/mutual_in_progress"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
+          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/rounded_border"
+          android:paddingStart="@dimen/space_md"
+          android:paddingTop="@dimen/space_sm"
+          android:paddingEnd="@dimen/space_md"
+          android:paddingBottom="@dimen/space_sm"
           android:visibility="@{model.state == MutualCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/separator_input"
-          app:text="@string/closechannels_message_in_progress" />
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
+          app:text="@string/closechannels_message_in_progress"
+          app:text_size="@dimen/text_md" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
-          android:layout_width="match_parent"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
+          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
+          android:paddingStart="@dimen/space_md"
+          android:paddingTop="@dimen/space_sm"
+          android:paddingEnd="@dimen/space_md"
+          android:paddingBottom="@dimen/space_sm"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:hz_bias="0"
           app:icon="@drawable/ic_check_circle"
-          app:icon_tint="@color/green"
-          app:layout_constraintTop_toBottomOf="@id/separator_input"
-          app:text="@string/closechannels_mutual_button" />
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
+          app:text="@string/closechannels_mutual_button"
+          app:text_size="@dimen/text_sm" />
+
+        <androidx.constraintlayout.widget.Barrier
+          android:id="@+id/action_bottom"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:barrierDirection="bottom"
+          app:constraint_referenced_ids="mutual_confirm_button,mutual_error,mutual_in_progress,mutual_done" />
 
         <View
           style="@style/HLineSeparator"
+          android:layout_marginTop="@dimen/space_md"
           android:layout_width="match_parent"
-          app:layout_constraintBottom_toBottomOf="parent" />
+          app:layout_constraintTop_toBottomOf="@+id/action_bottom" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
