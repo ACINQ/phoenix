@@ -30,12 +30,12 @@ class App : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    Logging.setupLogger(applicationContext)
     init()
     log.info("app created")
   }
 
   private fun init() {
+    Logging.setupLogger(applicationContext)
     when (Prefs.getCoinUnit(applicationContext)) {
       `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
       `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
