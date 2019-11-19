@@ -214,7 +214,7 @@
           android:layout_marginTop="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_lg"
           android:adjustViewBounds="true"
-          android:background="@drawable/rounded_border_primary"
+          android:background="@drawable/rounded_border_primary_white_bg"
           android:clickable="true"
           android:contentDescription="@string/utils_unknown"
           android:focusable="true"

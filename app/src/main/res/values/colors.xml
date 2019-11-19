@@ -27,6 +27,7 @@
   <color name="yellow_light_1">#FFDAA2</color>
   <color name="yellow">#FDBF55</color>
   <color name="apple">#50B338</color>
+  <color name="gold">#B88C3F</color>
   <color name="salmon">#FF874F</color>
   <color name="orange">#F86622</color>
   <color name="green">#09BB74</color>
@@ -52,9 +53,11 @@
   <color name="grey_light_2">#D4D4D4</color>
   <color name="grey_light_3">#EDEDED</color>
 
+  <color name="ebony">#272F3B</color>
+  <color name="mako">#303845</color>
   <color name="oxford">#363F4E</color>
-  <color name="mako">#454E52</color>
-  <color name="shuttle">#596469</color>
+  <color name="shuttle">#59676D</color>
+  <color name="edward">#CCD6DB</color>
 
   <color name="slate">#73868D</color>
   <color name="ripple">#A6AFC0CF</color>

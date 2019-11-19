@@ -34,7 +34,6 @@
     <item name="defaultErrorTextColor">@color/brandy</item>
     <item name="defaultTextColorOnMutedBackground">@color/slate</item>
     <item name="defaultMutedErrorTextColor">@color/blossom</item>
-    <item name="altMutedBackgroundColor">@color/geyser</item>
     <item name="altBackgroundColor">?attr/colorPrimary</item>
     <item name="altTextColor">@color/white</item>
 
@@ -61,7 +60,7 @@
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
 
     <!-- status bar -->
-    <item name="android:statusBarColor">?attr/altMutedBackgroundColor</item>
+    <item name="android:statusBarColor">?attr/defaultMutedBackgroundColor</item>
     <item name="android:windowLightStatusBar">true</item>
   </style>
 
@@ -270,23 +269,22 @@
   <!-- DARK THEME -->
   <style name="dark_theme" parent="Theme.AppCompat.NoActionBar">
     <!-- colors definition -->
-    <item name="colorPrimary">@color/salmon</item>
+    <item name="colorPrimary">@color/green</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">@color/blue</item>
 
-    <item name="defaultBackgroundColor">@color/dark</item>
-    <item name="defaultMutedBackgroundColor">@color/mako</item>
+    <item name="defaultBackgroundColor">@color/oxford</item>
+    <item name="defaultMutedBackgroundColor">@color/ebony</item>
     <item name="defaultErrorBackgroundColor">@color/chico</item>
 
     <item name="defaultButtonColor">@color/mako</item>
-    <item name="defaultRippleColor">@color/slate</item>
+    <item name="defaultRippleColor">@color/shuttle</item>
 
-    <item name="defaultTextColor">@color/white</item>
+    <item name="defaultTextColor">@color/edward</item>
     <item name="defaultMutedTextColor">@color/shuttle</item>
     <item name="defaultTextColorOnMutedBackground">@color/slate</item>
     <item name="defaultErrorTextColor">@color/brandy</item>
     <item name="defaultMutedErrorTextColor">@color/chico</item>
-    <item name="altMutedBackgroundColor">@color/yellow</item>
     <item name="altBackgroundColor">?attr/colorPrimary</item>
     <item name="altTextColor">@color/dark</item>
 
@@ -313,8 +311,8 @@
     <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
 
     <!-- status bar -->
-    <item name="android:statusBarColor">?attr/altMutedBackgroundColor</item>
-    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:statusBarColor">?attr/defaultMutedBackgroundColor</item>
+    <item name="android:windowLightStatusBar">false</item>
   </style>
 
 </resources>
