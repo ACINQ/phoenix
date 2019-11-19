@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
@@ -80,6 +81,10 @@ class MutualCloseFragment : BaseFragment() {
       if (channels.count() == 0) {
         model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
+        context?.let {
+          val balance = appKit.nodeData.value?.balance ?: MilliSatoshi(0)
+          mBinding.channelsState.text = Converter.html(getString(R.string.closechannels_channels_recap, channels.count(), Converter.printAmountPretty(balance, it, withUnit = true)))
+        }
         model.state.value = PreChannelsCloseState.READY
       }
     }

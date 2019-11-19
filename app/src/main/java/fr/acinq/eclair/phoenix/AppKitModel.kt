@@ -20,6 +20,7 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.dispatch.Futures
+import akka.dispatch.OnComplete
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.content.Context
@@ -30,22 +31,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
+import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.BackupEvent
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.Payment
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.PaymentEvent
-import fr.acinq.eclair.payment.PaymentInitiator
-import fr.acinq.eclair.payment.PaymentLifecycle
-import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
@@ -133,7 +129,18 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
-    nodeData.value = nodeData.value?.copy(balance = event.available)
+    kit.value?.run {
+      api.usableBalances(timeout).onComplete(object : OnComplete<UsableBalances?>() {
+        override fun onComplete(t: Throwable?, result: UsableBalances?) {
+          if (t == null && result != null) {
+            log.warn("retrieved balances: $result")
+            val total = JavaConverters.seqAsJavaListConverter(result.balances()).asJava().map { b -> b.canSend().toLong() }.sum()
+            log.info("refreshed balance=$total msat")
+            nodeData.postValue(nodeData.value?.copy(balance = MilliSatoshi(total)))
+          }
+        }
+      }, kit.system().dispatcher())
+    } ?: log.info("unhandled balance event with empty kit")
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -146,6 +153,30 @@ class AppKitModel : ViewModel() {
     nodeData.value = nodeData.value?.copy(electrumAddress = "")
   }
 
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: ChannelClosingEvent) {
+    // store channel closing event as an outgoing payment in database.
+    kit.value?.run {
+      val id = UUID.randomUUID()
+      val preimage = `package$`.`MODULE$`.randomBytes32()
+      val paymentHash = Crypto.hash256(preimage.bytes())
+      val date = System.currentTimeMillis()
+      val paymentCounterpart = OutgoingPayment(
+        /* id and parent id */ id, id,
+        /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
+        /* placeholder payment hash */ paymentHash,
+        /* balance */ event.balance,
+        /* target node id */ `package$`.`MODULE$`.randomKey().publicKey(), /* creation date */ date,
+        /* payment request */ Option.empty(),
+        /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
+      kit.nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+
+      val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
+      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+      kit.nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+    }
+  }
+
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
@@ -153,23 +184,9 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.let {
-          val list = mutableListOf<Payment>()
+          var list = mutableListOf<Payment>()
           val t = measureTimeMillis {
-//            val closed = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().channels().listClosedLocalChannels()).asJava()
-//            closed.forEach { hc ->
-//              if (hc is DATA_CLOSING) {
-//                val txs = JavaConverters.seqAsJavaListConverter(hc.mutualClosePublished()).asJava()
-//                txs.forEach { tx ->
-//                  val txsOut = JavaConverters.seqAsJavaListConverter(tx.txOut()).asJava()
-//                  txsOut.forEach { txOut ->
-//                    list.add(ClosingPayment(tx.txid().toString(), txOut.amount(), System.currentTimeMillis()))
-//                  }
-//                }
-//              } else {
-//                log.info("closed channel is not DATA_CLOSING type")
-//              }
-//            }
-            list.addAll(JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava())
+            list = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava()
           }
           log.info("payment list query complete in ${t}ms")
           list
@@ -199,7 +216,7 @@ class AppKitModel : ViewModel() {
         _kit.value?.run {
           var payments: List<OutgoingPayment> = ArrayList()
           val t = measureTimeMillis {
-           payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
+            payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
           }
           log.info("get sent payments complete in ${t}ms")
           payments
@@ -212,12 +229,12 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
-        var payment: Option<IncomingPayment> = Option.empty()
-        val t = measureTimeMillis {
-          payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
-        }
-        log.info("get received payment complete in ${t}ms")
-        payment
+          var payment: Option<IncomingPayment> = Option.empty()
+          val t = measureTimeMillis {
+            payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
+          }
+          log.info("get received payment complete in ${t}ms")
+          payment
         } ?: throw KitNotInitialized()
       }
     }.await()

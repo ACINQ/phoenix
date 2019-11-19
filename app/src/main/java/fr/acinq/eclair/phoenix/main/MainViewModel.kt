@@ -55,7 +55,7 @@ class MainViewModel : ViewModel() {
    */
   private fun checkBackgroundWorkerCanRun(context:Context) {
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
-    if (System.currentTimeMillis() - channelsWatchOutcome.second > DELAY_BEFORE_BACKGROUND_WARNING) {
+    if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
       notifications.value?.add(NotificationTypes.BACKGROUND_WORKER_CANNOT_RUN)
     } else {

@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix.events
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.PaymentDirection
 import fr.acinq.eclair.io.PayToOpenRequestEvent
@@ -26,6 +27,8 @@ interface PaymentEvent
 class PaymentPending : PaymentEvent
 class PaymentComplete(val direction: PaymentDirection, val identifier: String) : PaymentEvent
 
-class BalanceEvent(val available: MilliSatoshi)
+class BalanceEvent()//val available: MilliSatoshi)
 
 class ReceiveWithOpen(val request: PayToOpenRequestEvent)
+
+class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32)

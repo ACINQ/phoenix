@@ -75,7 +75,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
-          android:text="@string/closechannels_no_channels"
+          android:text="@string/closechannels_channels_none"
           android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
           app:layout_constraintTop_toBottomOf="@id/separator" />
 

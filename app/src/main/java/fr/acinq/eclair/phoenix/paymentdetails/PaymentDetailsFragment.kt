@@ -42,6 +42,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.spongycastle.crypto.tls.ContentType
 import scala.util.Either
 import scala.util.Left
 import scala.util.Right
@@ -96,11 +97,14 @@ class PaymentDetailsFragment : BaseFragment() {
                   val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
 
 //                  val isTrampoline = p.paymentRequest().isDefined && statuses.map { o -> JavaConverters.seqAsJavaListConverter(o.route()).asJava().size == 1 }.reduce { acc, b -> acc && b }
-                  val trampolineData = Wallet.getTrampoline(p.amount(), p.paymentRequest().get())
-                  val finalFees = fees.`$plus`(trampolineData.second)
-                  log.info("trampoline data=${trampolineData}")
-
-                  mBinding.feesValue.setAmount(finalFees)
+                  if (p.paymentRequest().isDefined) {
+                    val trampolineData = Wallet.getTrampoline(p.amount(), p.paymentRequest().get())
+                    val finalFees = fees.`$plus`(trampolineData.second)
+                    mBinding.feesValue.setAmount(finalFees)
+                  } else if (p.externalId().isDefined && p.externalId().get().startsWith("closing-")) {
+                    // special case: this outgoing payment represents a channel closing/closed
+                    mBinding.closingDescValue.text = getString(R.string.paymentdetails_closing_mock_desc, p.externalId().get().split("-").last())
+                  }
                   showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.color.green)
                 }
               }
@@ -331,5 +335,12 @@ class PaymentDetailsViewModel : ViewModel() {
   }
 
   val isSent: LiveData<Boolean> = Transformations.map(payment) { it?.isLeft ?: false }
+
+  val isClosingChannelMock: LiveData<Boolean> = Transformations.map(payment) {
+    it?.let {
+      it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().paymentRequest().isEmpty
+        && it.left().get().first().externalId().isDefined && it.left().get().first().externalId().get().startsWith("closing-")
+    } ?: false
+  }
 
 }

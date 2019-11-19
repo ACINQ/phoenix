@@ -28,8 +28,6 @@ import fr.acinq.eclair.db.Payment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Prefs
 
-class ClosingPayment(val txId: String, val amount: Satoshi, val timestamp: Long) : Payment
-
 class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerView.Adapter<PaymentHolder>() {
 
   private var fiat = "usd"

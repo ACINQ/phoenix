@@ -146,7 +146,7 @@
             android:layout_width="60dp"
             android:text="@string/paymentdetails_destination_label"
             android:textAlignment="viewEnd"
-            android:visibility="@{model.isSent()}"
+            android:visibility="@{model.isSent() &amp;&amp; !model.isClosingChannelMock()}"
             app:layout_constraintBaseline_toBaselineOf="@id/destination_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -158,7 +158,7 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:text="@{model.destination}"
-            android:visibility="@{model.isSent()}"
+            android:visibility="@{model.isSent() &amp;&amp; !model.isClosingChannelMock()}"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -172,6 +172,7 @@
             android:layout_width="60dp"
             android:text="@string/paymentdetails_desc_label"
             android:textAlignment="viewEnd"
+            android:visibility="@{!model.isClosingChannelMock()}"
             app:layout_constraintBaseline_toBaselineOf="@id/desc_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -182,6 +183,7 @@
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
             android:text="@{model.description}"
+            android:visibility="@{!model.isClosingChannelMock()}"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -190,12 +192,36 @@
             app:layout_constraintTop_toBottomOf="@id/destination_value" />
 
           <TextView
+            android:id="@+id/closing_desc_label"
+            style="@style/MutedLabelView"
+            android:layout_width="60dp"
+            android:text="@string/paymentdetails_desc_label"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.isClosingChannelMock()}"
+            app:layout_constraintBaseline_toBaselineOf="@id/closing_desc_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/closing_desc_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:visibility="@{model.isClosingChannelMock()}"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/closing_desc_label"
+            app:layout_constraintTop_toBottomOf="@id/desc_value" />
+
+          <TextView
             android:id="@+id/fees_label"
             style="@style/MutedLabelView"
             android:layout_width="60dp"
             android:text="@string/paymentdetails_fees_label"
             android:textAlignment="viewEnd"
-            android:visibility="@{model.isFeeVisible()}"
+            android:visibility="@{model.isFeeVisible() &amp;&amp; !model.isClosingChannelMock()}"
             app:layout_constraintBaseline_toBaselineOf="@id/fees_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -205,14 +231,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
-            android:visibility="@{model.isFeeVisible()}"
+            android:visibility="@{model.isFeeVisible() &amp;&amp; !model.isClosingChannelMock()}"
             app:amount_size="@dimen/text_lg"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/fees_label"
-            app:layout_constraintTop_toBottomOf="@id/desc_value"
+            app:layout_constraintTop_toBottomOf="@id/closing_desc_value"
             app:thin="false"
             app:unit_size="@dimen/text_md" />
 
@@ -244,10 +270,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
-            android:visibility="@{model.multiPartCount > 1}"
-            android:textSize="@dimen/text_xs"
-            android:textColor="?attr/defaultMutedTextColor"
             android:text="@string/paymentdetails_multipart"
+            android:textColor="?attr/defaultMutedTextColor"
+            android:textSize="@dimen/text_xs"
+            android:visibility="@{model.multiPartCount > 1}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -260,11 +286,12 @@
             android:layout_marginTop="@dimen/space_lg"
             app:icon="@drawable/ic_tool"
             app:icon_tint="?attr/defaultMutedTextColor"
-            app:text_color="?attr/defaultMutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{!model.isClosingChannelMock()}"
             app:layout_constraintTop_toBottomOf="@id/mulitpart_info"
             app:text="@string/paymentdetails_technicals_button"
+            app:text_color="?attr/defaultMutedTextColor"
             app:text_size="@dimen/text_md" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

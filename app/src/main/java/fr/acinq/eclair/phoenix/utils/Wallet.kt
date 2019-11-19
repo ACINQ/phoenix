@@ -104,10 +104,10 @@ object Wallet {
   }
 
   /**
-   * Return a Pair object containing the trampoline data for a payment request if necessary. Left contains the trampoline node,
-   * Right contains the trampoline fee.
-   *
+   * Returns a Pair object containing the trampoline data for a payment request, only if it is necessary.
    * If trampoline is not needed, the node will be None, and the fee will be 0 msat.
+   *
+   * @return Left: optional trampoline node, Right: trampoline fee.
    */
   fun getTrampoline(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<Option<Crypto.PublicKey>, MilliSatoshi> {
     val routingHeadShortChannelId = if (paymentRequest.routingInfo().headOption().isDefined && paymentRequest.routingInfo().head().headOption().isDefined)

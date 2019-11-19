@@ -48,12 +48,8 @@ class EclairSupervisor : UntypedActor() {
   // key is payment hash
   private val payToOpenMap = HashMap<ByteVector32, PayToOpenRequestEvent>()
 
-  private val channelsMap = HashMap<ActorRef, Commitments>()
-
   private fun postBalance() {
-    val balance = MilliSatoshi(channelsMap.map { c -> c.value.localCommit().spec().toLocal().toLong() }.sum())
-    log.debug("posting balance=${balance}")
-    EventBus.getDefault().post(BalanceEvent(balance))
+    EventBus.getDefault().post(BalanceEvent())
   }
 
   override fun onReceive(event: Any?) {
@@ -65,7 +61,6 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelRestored -> {
         log.debug("channel $event has been restored")
-        channelsMap[event.channel()] = event.currentData().commitments()
         postBalance()
       }
       is ChannelIdAssigned -> {
@@ -74,10 +69,10 @@ class EclairSupervisor : UntypedActor() {
       is ChannelStateChanged -> {
         val data = event.currentData()
         if (data is HasCommitments) {
-          if (data is DATA_CLOSING || data is DATA_SHUTDOWN) {
-            channelsMap.remove(event.channel())
-          } else {
-            channelsMap[event.channel()] = data.commitments()
+          // dispatch closing if the channel's goes to closing. Do NOT dispatch if the channel is restored and was already closing (i.e closing from an internal state).
+          if (data is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && event.previousState() != `WAIT_FOR_INIT_INTERNAL$`.`MODULE$`) {
+            log.info("closing channel ${data.channelId()}")
+            EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId()))
           }
           postBalance()
         }
@@ -88,12 +83,10 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelSignatureReceived -> {
         log.debug("signature $event has been sent")
-        channelsMap[event.channel()] = event.commitments()
         postBalance()
       }
       is Terminated -> {
         log.info("channel $event has been terminated")
-        channelsMap.remove(event.actor)
       }
 
       // -------------- ELECTRUM -------------
