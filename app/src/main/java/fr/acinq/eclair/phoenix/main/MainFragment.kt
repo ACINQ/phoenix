@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -33,7 +34,9 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentPending
+import fr.acinq.eclair.phoenix.utils.InAppNotifications
 import fr.acinq.eclair.phoenix.utils.KitNotInitialized
+import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -42,6 +45,10 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.DateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -99,7 +106,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       //      paymentsListAdapter.submitList(it)
       paymentsAdapter.update(it)
     })
-    model.notifications.observe(viewLifecycleOwner, Observer {
+    appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
     })
   }
@@ -111,7 +118,9 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     }
     Wallet.hideKeyboard(context, mBinding.main)
 
-    context?.let { model.updateNotifications(it) }
+    context?.let {
+      refreshNotifications(it)
+    }
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
@@ -127,7 +136,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-    context?.let { model.updateNotifications(it) }
+    context?.let { refreshNotifications(it) }
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -142,6 +151,52 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       }
     }) {
       model.payments.value = appKit.listPayments()
+    }
+  }
+
+  private fun refreshNotifications(context: Context) {
+    checkWalletIsSecure(context)
+    checkMnemonics(context)
+    checkBackgroundWorkerCanRun(context)
+  }
+
+  /**
+   * If the background channels watcher has not run since (now) - (DELAY_BEFORE_BACKGROUND_WARNING), we consider that the device is
+   * blocking this application from working in background, and show a notification.
+   *
+   * Some devices vendors are known to aggressively kill applications (including background jobs) in order to save battery,
+   * unless the app is whitelisted by the user in a custom OS setting page. This behaviour is hard to detect and not
+   * standard, and does not happen on a stock android. In this case, the user has to whitelist the app.
+   */
+  private fun checkBackgroundWorkerCanRun(context: Context) {
+    val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
+    if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > InAppNotifications.DELAY_BEFORE_BACKGROUND_WARNING) {
+      log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
+      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.BACKGROUND_WORKER_CANNOT_RUN)
+    } else {
+      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.BACKGROUND_WORKER_CANNOT_RUN)
+    }
+  }
+
+  private fun checkWalletIsSecure(context: Context) {
+    if (!Prefs.getIsSeedEncrypted(context)) {
+      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.NO_PIN_SET)
+    } else {
+      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.NO_PIN_SET)
+    }
+  }
+
+  private fun checkMnemonics(context: Context) {
+    val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
+    if (timestamp == 0L) {
+      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN)
+    } else {
+      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN)
+      if (System.currentTimeMillis() - timestamp > InAppNotifications.MNEMONICS_REMINDER_INTERVAL) {
+        //notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+      } else {
+        appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_REMINDER)
+      }
     }
   }
 

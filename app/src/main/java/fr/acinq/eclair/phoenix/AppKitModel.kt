@@ -49,10 +49,14 @@ import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Request
+import okhttp3.Response
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
@@ -87,14 +91,13 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
+  val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
   val nodeData = MutableLiveData<NodeData>()
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
-
-  val httpClient = OkHttpClient()
 
   init {
     _kit.value = null
@@ -103,6 +106,7 @@ class AppKitModel : ViewModel() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
+    checkWalletContext()
   }
 
   override fun onCleared() {
@@ -133,14 +137,12 @@ class AppKitModel : ViewModel() {
       api.usableBalances(timeout).onComplete(object : OnComplete<UsableBalances?>() {
         override fun onComplete(t: Throwable?, result: UsableBalances?) {
           if (t == null && result != null) {
-            log.warn("retrieved balances: $result")
             val total = JavaConverters.seqAsJavaListConverter(result.balances()).asJava().map { b -> b.canSend().toLong() }.sum()
-            log.info("refreshed balance=$total msat")
             nodeData.postValue(nodeData.value?.copy(balance = MilliSatoshi(total)))
           }
         }
       }, kit.system().dispatcher())
-    } ?: log.info("unhandled balance event with empty kit")
+    } ?: log.info("unhandled balance event with kit not initialized")
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -510,7 +512,6 @@ class AppKitModel : ViewModel() {
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
     val pk = DeterministicWallet.derivePrivateKey(DeterministicWallet.generate(seed), Wallet.getNodeKeyPath())
     val bech32Address = fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(pk.publicKey(), Wallet.getChainHash())
-    log.info("using single address=$bech32Address")
 
     Class.forName("org.sqlite.JDBC")
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
@@ -528,7 +529,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
-      Runnable { httpClient.newCall(Request.Builder().url(Wallet.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
+      Runnable { Api.httpClient.newCall(Request.Builder().url(Wallet.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
@@ -594,5 +595,40 @@ class AppKitModel : ViewModel() {
       log.debug("could not read {} from price api response", code)
     }
     Prefs.setExchangeRate(context, code, rate)
+  }
+
+  private fun checkWalletContext() {
+    Api.httpClient.newCall(Request.Builder().url(Api.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve wallet context from acinq")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        val body = response.body()
+        if (response.isSuccessful && body != null) {
+          try {
+            val json = JSONObject(body.string())
+            log.debug("wallet context responded with {}", json.toString(2))
+            val installedVersion = BuildConfig.VERSION_CODE
+            val latestVersion = json.getJSONObject(BuildConfig.CHAIN).getInt("version")
+            if (latestVersion - installedVersion >= 2) {
+              notifications.value?.run {
+                add(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
+                notifications.postValue(this)
+              }
+            } else {
+              notifications.value?.run {
+                remove(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
+                notifications.postValue(this)
+              }
+            }
+          } catch (e: JSONException) {
+            log.error("could not read wallet context body", e)
+          }
+        } else {
+          log.warn("wallet context query responds with code {}", response.code())
+        }
+      }
+    })
   }
 }

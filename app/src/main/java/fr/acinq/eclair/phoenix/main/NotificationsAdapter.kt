@@ -20,8 +20,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
+import fr.acinq.eclair.phoenix.utils.InAppNotifications
 
-class NotificationsAdapter(private var notifications: MutableSet<NotificationTypes>) : RecyclerView.Adapter<NotificationHolder>() {
+class NotificationsAdapter(private var notifications: MutableSet<InAppNotifications.NotificationTypes>) : RecyclerView.Adapter<NotificationHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.holder_notification, parent, false)
@@ -37,7 +38,7 @@ class NotificationsAdapter(private var notifications: MutableSet<NotificationTyp
     return this.notifications.size
   }
 
-  fun update(notifs: MutableSet<NotificationTypes>) {
+  fun update(notifs: MutableSet<InAppNotifications.NotificationTypes>) {
     if (this.notifications != notifs) {
       this.notifications.clear()
       this.notifications.addAll(notifs)

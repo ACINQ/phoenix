@@ -60,7 +60,7 @@
     app:layout_constraintStart_toEndOf="@id/icon_background"
     app:layout_constraintTop_toTopOf="parent"
     android:ellipsize="end"
-    android:lines="1"
+    android:singleLine="true"
     android:text="@string/lipsum_short"
     android:textSize="@dimen/text_lg" />
 

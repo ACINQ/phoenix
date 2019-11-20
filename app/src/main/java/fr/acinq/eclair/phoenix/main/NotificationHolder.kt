@@ -24,10 +24,11 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
+import fr.acinq.eclair.phoenix.utils.InAppNotifications
 
 class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-  fun bindItem(notification: NotificationTypes, position: Int) {
+  fun bindItem(notification: InAppNotifications.NotificationTypes, position: Int) {
     val messageView = itemView.findViewById<TextView>(R.id.notif_message)
     val iconView = itemView.findViewById<ImageView>(R.id.notif_icon)
     val actionButton = itemView.findViewById<Button>(R.id.notif_button)
@@ -47,12 +48,10 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     if (notification.actionResId != null) {
       actionButton.visibility = View.VISIBLE
       actionButton.text = itemView.resources.getString(notification.actionResId)
-      actionButton.setOnClickListener {
-        when (notification) {
-          NotificationTypes.NO_PIN_SET -> { itemView.findNavController().navigate(R.id.action_main_to_seed_security) }
-          NotificationTypes.MNEMONICS_NEVER_SEEN -> { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
-          NotificationTypes.MNEMONICS_REMINDER -> {}
-        }
+      when (notification) {
+        InAppNotifications.NotificationTypes.NO_PIN_SET -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_seed_security) }
+        InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
+        else -> {}
       }
       itemView.setPadding(spaceSM, spaceSM, spaceSM, 0)
     } else {

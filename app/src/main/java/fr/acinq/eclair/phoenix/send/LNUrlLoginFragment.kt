@@ -73,7 +73,7 @@ class LNUrlLoginFragment : BaseFragment() {
       model.state.value = LNUrlLoginState.IN_PROGRESS
       val json = JSONObject()
       val request = Request.Builder().url(args.uri).post(RequestBody.create(Api.JSON, json.toString())).build()
-      val response = appKit.httpClient.newCall(request).execute()
+      val response = Api.httpClient.newCall(request).execute()
       val body = response.body()
       if (response.isSuccessful && body != null) {
       } else {

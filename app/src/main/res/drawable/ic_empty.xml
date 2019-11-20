@@ -15,15 +15,15 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
+    android:width="@dimen/button_height"
+    android:height="@dimen/button_height"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
       android:pathData="M20,10.46h1a2,2 0,0 1,2 2V21a2,2 0,0 1,-2 2H3a2,2 0,0 1,-2 -2v-8.54a2,2 0,0 1,2 -2h1M17,7.46l-5,-6 -5,6M12,1.46V17"
       android:strokeLineJoin="round"
-      android:strokeWidth="2"
+      android:strokeWidth="1.5"
       android:fillColor="#00000000"
-      android:strokeColor="#000"
+      android:strokeColor="?attr/defaultTextColor"
       android:strokeLineCap="round"/>
 </vector>

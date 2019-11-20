@@ -40,8 +40,6 @@
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/space_sm"
-    android:ellipsize="end"
-    android:maxLines="2"
     android:text="@string/lipsum"
     android:textSize="@dimen/text_md"
     app:layout_constraintEnd_toEndOf="parent"

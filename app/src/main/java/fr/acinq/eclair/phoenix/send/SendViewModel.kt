@@ -29,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
@@ -94,8 +93,6 @@ class SendViewModel : ViewModel() {
 
   // ---- end of computed values
 
-  val httpClient = OkHttpClient()
-
   @UiThread
   fun setupSubmarineSwap(amount: Satoshi, bitcoinURI: BitcoinURI, targetBlocks: Int = 6, subtractFee: Boolean = false) {
     viewModelScope.launch {
@@ -108,7 +105,7 @@ class SendViewModel : ViewModel() {
             .put("targetBlocks", targetBlocks)
           val request = Request.Builder().url(Api.SWAP_API_URL).post(RequestBody.create(Api.JSON, json.toString())).build()
           delay(300)
-          val response = httpClient.newCall(request).execute()
+          val response = Api.httpClient.newCall(request).execute()
           val body = response.body()
           if (response.isSuccessful && body != null) {
             val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""), true)

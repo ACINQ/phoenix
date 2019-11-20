@@ -66,7 +66,6 @@
         <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="@color/white"
           android:padding="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
           app:layout_constraintTop_toBottomOf="@id/top_separator"
@@ -76,7 +75,6 @@
           android:id="@+id/channels_state"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="@color/white"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_channels_none"
           app:layout_constraintTop_toBottomOf="@id/top_separator" />
