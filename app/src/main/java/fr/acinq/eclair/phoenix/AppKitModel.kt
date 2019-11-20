@@ -473,6 +473,7 @@ class AppKitModel : ViewModel() {
     closeConnections()
     nodeData.postValue(NodeData(MilliSatoshi(0), ""))
     _kit.postValue(null)
+    startupState.postValue(StartupState.OFF)
   }
 
   @WorkerThread
