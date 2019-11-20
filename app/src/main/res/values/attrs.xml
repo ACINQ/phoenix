@@ -37,7 +37,6 @@
   <attr name="defaultErrorTextColor" format="reference" />
   <attr name="defaultMutedErrorTextColor" format="reference" />
 
-  <attr name="altBackgroundColor" format="reference" />
   <attr name="altTextColor" format="reference" />
 
   <attr name="text" format="string" />

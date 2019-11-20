@@ -16,26 +16,9 @@
 
 <resources>
 
-  <style name="default_theme" parent="Theme.AppCompat.Light.NoActionBar">
-    <!-- colors definition -->
-    <item name="colorPrimary">@color/apple</item>
+  <style name="default_theme" parent="Theme.AppCompat.NoActionBar">
     <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="colorAccent">@color/blue</item>
-
-    <item name="defaultBackgroundColor">@color/white</item>
-    <item name="defaultMutedBackgroundColor">@color/athens</item>
-    <item name="defaultErrorBackgroundColor">@color/blossom</item>
-
-    <item name="defaultButtonColor">@color/mystic</item>
-    <item name="defaultRippleColor">@color/ripple</item>
-
-    <item name="defaultTextColor">@color/dark</item>
-    <item name="defaultMutedTextColor">@color/casper</item>
-    <item name="defaultErrorTextColor">@color/brandy</item>
-    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
-    <item name="defaultMutedErrorTextColor">@color/blossom</item>
-    <item name="altBackgroundColor">?attr/colorPrimary</item>
-    <item name="altTextColor">@color/white</item>
+    <item name="colorAccent">?attr/colorPrimary</item>
 
     <!-- background -->
     <item name="android:colorBackground">?attr/defaultBackgroundColor</item>
@@ -62,7 +45,46 @@
 
     <!-- status bar -->
     <item name="android:statusBarColor">?attr/defaultMutedBackgroundColor</item>
+  </style>
+
+  <style name="light_theme" parent="default_theme">
+    <item name="colorPrimary">@color/apple</item>
+
+    <item name="defaultBackgroundColor">@color/white</item>
+    <item name="defaultMutedBackgroundColor">@color/athens</item>
+    <item name="defaultErrorBackgroundColor">@color/blossom</item>
+
+    <item name="defaultButtonColor">@color/mystic</item>
+    <item name="defaultRippleColor">@color/ripple</item>
+
+    <item name="defaultTextColor">@color/dark</item>
+    <item name="defaultMutedTextColor">@color/casper</item>
+    <item name="defaultErrorTextColor">@color/brandy</item>
+    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
+    <item name="defaultMutedErrorTextColor">@color/blossom</item>
+    <item name="altTextColor">@color/white</item>
+
     <item name="android:windowLightStatusBar">true</item>
+  </style>
+
+  <style name="dark_theme" parent="default_theme">
+    <item name="colorPrimary">@color/green</item>
+
+    <item name="defaultBackgroundColor">@color/oxford</item>
+    <item name="defaultMutedBackgroundColor">@color/ebony</item>
+    <item name="defaultErrorBackgroundColor">@color/chico</item>
+
+    <item name="defaultButtonColor">@color/mako</item>
+    <item name="defaultRippleColor">@color/shuttle</item>
+
+    <item name="defaultTextColor">@color/edward</item>
+    <item name="defaultMutedTextColor">@color/shuttle</item>
+    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
+    <item name="defaultErrorTextColor">@color/brandy</item>
+    <item name="defaultMutedErrorTextColor">@color/chico</item>
+    <item name="altTextColor">@color/dark</item>
+
+    <item name="android:windowLightStatusBar">false</item>
   </style>
 
   <style name="default_textAppearance" parent="TextAppearance.AppCompat.Body1">
@@ -264,56 +286,6 @@
     <item name="android:textColor">?attr/defaultTextColor</item>
     <item name="android:textSize">20sp</item>
     <item name="android:background">@drawable/button_pin</item>
-  </style>
-
-  <!-- DARK THEME -->
-  <style name="dark_theme" parent="Theme.AppCompat.NoActionBar">
-    <!-- colors definition -->
-    <item name="colorPrimary">@color/green</item>
-    <item name="colorPrimaryDark">@color/transparent</item>
-    <item name="colorAccent">@color/blue</item>
-
-    <item name="defaultBackgroundColor">@color/oxford</item>
-    <item name="defaultMutedBackgroundColor">@color/ebony</item>
-    <item name="defaultErrorBackgroundColor">@color/chico</item>
-
-    <item name="defaultButtonColor">@color/mako</item>
-    <item name="defaultRippleColor">@color/shuttle</item>
-
-    <item name="defaultTextColor">@color/edward</item>
-    <item name="defaultMutedTextColor">@color/shuttle</item>
-    <item name="defaultTextColorOnMutedBackground">@color/slate</item>
-    <item name="defaultErrorTextColor">@color/brandy</item>
-    <item name="defaultMutedErrorTextColor">@color/chico</item>
-    <item name="altBackgroundColor">?attr/colorPrimary</item>
-    <item name="altTextColor">@color/dark</item>
-
-    <!-- background -->
-    <item name="android:colorBackground">?attr/defaultBackgroundColor</item>
-    <item name="android:windowBackground">@drawable/app_bg_default</item>
-
-    <!-- text -->
-    <item name="android:textColor">?attr/defaultTextColor</item>
-    <item name="android:textColorPrimary">?attr/defaultTextColor</item>
-    <item name="android:textSize">@dimen/text_lg</item>
-
-    <!-- controls -->
-    <item name="colorControlNormal">?attr/defaultMutedTextColor</item>
-    <item name="colorControlActivated">?attr/colorPrimary</item>
-
-    <!-- widget overrides -->
-    <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
-    <item name="actionBarViewStyle">@style/default_actionBar</item>
-    <item name="buttonViewStyle">@style/default_buttonStyle</item>
-    <item name="android:spinnerItemStyle">@style/default_textAppearance</item>
-    <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
-    <item name="android:buttonStyle">@style/default_buttonStyle</item>
-    <item name="android:dialogTheme">@style/default_dialogTheme</item>
-    <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
-
-    <!-- status bar -->
-    <item name="android:statusBarColor">?attr/defaultMutedBackgroundColor</item>
-    <item name="android:windowLightStatusBar">false</item>
   </style>
 
 </resources>

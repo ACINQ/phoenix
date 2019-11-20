@@ -165,7 +165,7 @@ object Prefs {
   fun getTheme(context: Context): Int {
     return when (PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, "light") ?: "light") {
       "dark" -> R.style.dark_theme
-      else -> R.style.default_theme
+      else -> R.style.light_theme
     }
   }
 
