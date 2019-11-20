@@ -31,7 +31,7 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/defaultMutedBackgroundColor"
+    android:background="?attr/mutedBgColor"
     tools:context=".paymentdetails.PaymentDetailsFragment">
 
     <ScrollView
@@ -60,7 +60,7 @@
         <View
           android:layout_width="match_parent"
           android:layout_height="0dp"
-          android:background="?attr/defaultBackgroundColor"
+          android:background="?attr/bgColor"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mid_section" />
 
@@ -108,13 +108,13 @@
             android:id="@+id/amount_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:amount_color="?attr/defaultTextColor"
+            app:amount_color="?attr/textColor"
             app:amount_size="34sp"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:unit_color="?attr/defaultTextColor"
+            app:unit_color="?attr/textColor"
             app:unit_size="@dimen/text_md" />
 
           <View
@@ -123,7 +123,7 @@
             android:layout_height="5dp"
             android:layout_marginTop="@dimen/space_lg"
             android:background="@drawable/rounded"
-            android:backgroundTint="?attr/defaultMutedTextColor"
+            android:backgroundTint="?attr/mutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/amount_value" />
@@ -271,7 +271,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
             android:text="@string/paymentdetails_multipart"
-            android:textColor="?attr/defaultMutedTextColor"
+            android:textColor="?attr/mutedTextColor"
             android:textSize="@dimen/text_xs"
             android:visibility="@{model.multiPartCount > 1}"
             app:layout_constrainedWidth="true"
@@ -285,13 +285,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_lg"
             app:icon="@drawable/ic_tool"
-            app:icon_tint="?attr/defaultMutedTextColor"
+            app:icon_tint="?attr/mutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:visibility="@{!model.isClosingChannelMock()}"
             app:layout_constraintTop_toBottomOf="@id/mulitpart_info"
             app:text="@string/paymentdetails_technicals_button"
-            app:text_color="?attr/defaultMutedTextColor"
+            app:text_color="?attr/mutedTextColor"
             app:text_size="@dimen/text_md" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -340,7 +340,7 @@
       android:layout_margin="@dimen/space_lg"
       android:text="@string/paymentdetails_loading"
       android:textAlignment="center"
-      android:textColor="?attr/defaultMutedTextColor"
+      android:textColor="?attr/mutedTextColor"
       android:visibility="@{model.state == PaymentDetailsState.RETRIEVING_PAYMENT_DATA}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent"

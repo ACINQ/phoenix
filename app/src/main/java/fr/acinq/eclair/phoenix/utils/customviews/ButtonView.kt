@@ -45,7 +45,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         if (arr.hasValue(R.styleable.ButtonView_text_size)) {
           mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.ButtonView_text_size, R.dimen.text_lg).toFloat())
         }
-        mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
+        mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.textColor)))
       } else {
         mBinding.text.visibility = View.GONE
         mBinding.spacer.visibility = View.GONE
@@ -60,7 +60,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
       if (arr.hasValue(R.styleable.ButtonView_icon)) {
         mBinding.image.setImageDrawable(arr.getDrawable(R.styleable.ButtonView_icon))
         if (arr.hasValue(R.styleable.ButtonView_icon_tint)) {
-          mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.defaultTextColor)))
+          mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.textColor)))
         }
         if (arr.hasValue(R.styleable.ButtonView_icon_size)) {
           val imageSize = arr.getDimensionPixelOffset(R.styleable.ButtonView_icon_size, R.dimen.button_height)

@@ -32,7 +32,7 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/defaultMutedBackgroundColor"
+    android:background="?attr/mutedBgColor"
     android:fillViewport="true"
     android:overScrollMode="never"
     tools:context=".send.SendFragment">
@@ -55,7 +55,7 @@
       <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="?attr/defaultBackgroundColor"
+        android:background="?attr/bgColor"
         android:minHeight="@dimen/space_xl"
         android:visibility="@{model.isFormVisible()}"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -69,7 +69,7 @@
         android:alpha=".15"
         android:contentDescription="@null"
         android:src="@drawable/ic_send_lg"
-        android:tint="?attr/defaultMutedTextColor"
+        android:tint="?attr/mutedTextColor"
         android:visibility="@{model.isFormVisible()}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -113,7 +113,7 @@
           app:layout_constraintStart_toEndOf="@id/balance_prefix"
           app:layout_constraintTop_toTopOf="parent"
           app:thin="false"
-          app:unit_color="?attr/defaultMutedTextColor"
+          app:unit_color="?attr/mutedTextColor"
           app:unit_size="@dimen/text_sm" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
@@ -212,7 +212,7 @@
           android:layout_marginTop="@dimen/space_xs"
           android:text="@string/send_amount_error"
           android:textAlignment="center"
-          android:textColor="?attr/defaultErrorTextColor"
+          android:textColor="?attr/negativeColor"
           android:textSize="@dimen/text_md"
           android:visibility="gone"
           app:layout_constrainedWidth="true"

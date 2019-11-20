@@ -31,7 +31,7 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/defaultMutedBackgroundColor">
+    android:background="?attr/mutedBgColor">
 
     <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
@@ -54,7 +54,7 @@
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/defaultBackgroundColor"
+        android:background="?attr/bgColor"
         app:layout_constraintTop_toTopOf="parent">
 
         <View
@@ -127,7 +127,7 @@
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_md"
           android:background="@drawable/rounded"
-          android:backgroundTint="@color/green"
+          android:backgroundTint="?attr/positiveColor"
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
           android:drawableTint="?attr/altTextColor"

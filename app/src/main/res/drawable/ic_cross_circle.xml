@@ -23,21 +23,21 @@
     android:fillColor="#00000000"
     android:pathData="M12,12m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"
     android:strokeWidth="1.5"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
   <path
     android:fillColor="#00000000"
     android:pathData="M15,9L9,15"
     android:strokeWidth="1.5"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
   <path
     android:fillColor="#00000000"
     android:pathData="M9,9L15,15"
     android:strokeWidth="1.5"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

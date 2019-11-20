@@ -43,7 +43,7 @@
       android:id="@+id/raw_data_layout"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      android:background="?attr/defaultMutedBackgroundColor"
+      android:background="?attr/mutedBgColor"
       app:layout_constrainedHeight="true"
       app:layout_constraintHeight_default="percent"
       app:layout_constraintHeight_percent="0.85"

@@ -30,7 +30,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
 import fr.acinq.eclair.MilliSatoshi
@@ -64,7 +63,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
       try {
         mBinding.amount.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_amount_size, R.dimen.text_lg).toFloat())
-        mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
+        mBinding.amount.setTextColor(arr.getColor(R.styleable.CoinView_amount_color, ThemeHelper.color(context, R.attr.textColor)))
         mBinding.amount.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -100,7 +99,7 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         handleEmptyAmountIfEditable()
 
         mBinding.unit.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.CoinView_unit_size, R.dimen.text_sm).toFloat())
-        mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ThemeHelper.color(context, R.attr.defaultTextColor)))
+        mBinding.unit.setTextColor(arr.getColor(R.styleable.CoinView_unit_color, ThemeHelper.color(context, R.attr.textColor)))
         mBinding.unit.typeface = Typeface.create(if (arr.getBoolean(R.styleable.CoinView_thin, true)) "sans-serif-light" else "sans-serif", Typeface.NORMAL)
 
         if (!isEditable) {

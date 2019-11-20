@@ -23,22 +23,23 @@
     <attr name="buttonViewStyle" />
   </declare-styleable>
 
-  <attr name="defaultBackgroundColor" format="reference" />
-  <attr name="defaultMutedBackgroundColor" format="reference" />
-  <attr name="defaultErrorBackgroundColor" format="reference" />
+  <!-- theme background attributes -->
+  <attr name="bgColor" format="reference" />
+  <attr name="mutedBgColor" format="reference" />
 
-  <attr name="defaultButtonColor" format="reference" />
-  <attr name="defaultRippleColor" format="reference" />
-  <attr name="contrastedRippleColor" format="reference" />
+  <!-- theme misc attributes -->
+  <attr name="borderColor" format="reference" />
+  <attr name="buttonRippleColor" format="reference" />
 
-  <attr name="defaultTextColor" format="reference" />
-  <attr name="defaultMutedTextColor" format="reference" />
-  <attr name="defaultTextColorOnMutedBackground" format="reference" />
-  <attr name="defaultErrorTextColor" format="reference" />
-  <attr name="defaultMutedErrorTextColor" format="reference" />
-
+  <!-- theme text attributes -->
+  <attr name="textColor" format="reference" />
+  <attr name="mutedTextColor" format="reference" />
+  <attr name="onMutedBgTextColor" format="reference" />
+  <attr name="negativeColor" format="reference" />
+  <attr name="positiveColor" format="reference" />
   <attr name="altTextColor" format="reference" />
 
+  <!-- widgets attributes -->
   <attr name="text" format="string" />
   <attr name="text_color" format="color" />
   <attr name="text_size" format="dimension" />

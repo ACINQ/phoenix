@@ -54,7 +54,7 @@
         android:layout_marginTop="@dimen/space_md_p"
         android:text="@string/receive_with_open_title"
         android:textAllCaps="true"
-        android:textColor="?attr/defaultMutedTextColor"
+        android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_sm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +69,7 @@
         android:contentDescription="@string/receive_with_open_help_desc"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_help_circle"
-        android:tint="?attr/defaultMutedTextColor"
+        android:tint="?attr/mutedTextColor"
         app:layout_constraintBottom_toBottomOf="@id/title"
         app:layout_constraintStart_toEndOf="@id/title"
         app:layout_constraintTop_toTopOf="@id/title" />
@@ -82,10 +82,10 @@
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginEnd="@dimen/space_lg"
         android:background="@drawable/rounded_sm"
-        android:backgroundTint="?attr/defaultMutedBackgroundColor"
+        android:backgroundTint="?attr/mutedBgColor"
         android:padding="@dimen/space_sm"
         android:text="@string/receive_with_open_help"
-        android:textColor="?attr/defaultMutedTextColor"
+        android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_sm"
         android:visibility="@{model.showHelp}"
         app:layout_constrainedWidth="true"
@@ -137,7 +137,7 @@
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
         android:textAlignment="center"
-        android:textColor="?attr/defaultMutedTextColor"
+        android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_md"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
@@ -171,10 +171,10 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         app:icon="@drawable/ic_check_circle"
-        app:icon_tint="@color/green"
+        app:icon_tint="?attr/positiveColor"
         app:layout_constraintTop_toBottomOf="@id/accept_separator"
         app:text="@string/receive_with_open_accept"
-        app:text_color="@color/green" />
+        app:text_color="?attr/positiveColor" />
 
       <View
         android:id="@+id/decline_separator"

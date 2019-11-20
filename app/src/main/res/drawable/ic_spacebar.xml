@@ -24,7 +24,7 @@
     android:fillColor="#00000000"
     android:pathData="M28,15v2h-26v-2"
     android:strokeWidth=".75"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="miter" />
 </vector>

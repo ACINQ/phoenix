@@ -24,7 +24,7 @@
     android:fillColor="#00000000"
     android:pathData="M22,2l-7,20 -4,-9 -9,-4 20,-7z"
     android:strokeWidth="1.75"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 
@@ -32,7 +32,7 @@
     android:fillColor="#00000000"
     android:pathData="M18,6L11,13"
     android:strokeWidth="1.75"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 
@@ -40,7 +40,7 @@
     android:fillColor="#00000000"
     android:pathData="M2,22L7,17"
     android:strokeWidth="1"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 
@@ -48,7 +48,7 @@
     android:fillColor="#00000000"
     android:pathData="M3,17L6,14"
     android:strokeWidth="1"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 
@@ -56,7 +56,7 @@
     android:fillColor="#00000000"
     android:pathData="M6,22L10,18"
     android:strokeWidth="1"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

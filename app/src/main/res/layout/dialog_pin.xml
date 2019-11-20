@@ -59,7 +59,7 @@
         android:letterSpacing="0.2"
         android:alpha=".3"
         android:text="@string/pindialog_pwd_placeholder"
-        android:textColor="?attr/defaultMutedTextColor"
+        android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_xl"
         tools:ignore="MissingConstraints" />
 
@@ -70,7 +70,7 @@
         app:layout_constraintBaseline_toBaselineOf="@id/pin_display_placeholder"
         app:layout_constraintStart_toStartOf="@id/pin_display_placeholder"
         android:letterSpacing="0.2"
-        android:textColor="?attr/defaultMutedTextColor"
+        android:textColor="?attr/mutedTextColor"
         android:textSize="@dimen/text_xl" />
 
       <GridLayout
@@ -130,7 +130,7 @@
           android:id="@+id/pin_num_clear"
           style="@style/PinButtonStyle"
           android:src="@drawable/ic_trash"
-          android:tint="?attr/defaultMutedTextColor" />
+          android:tint="?attr/mutedTextColor" />
 
         <Button
           android:id="@+id/pin_num_0"
@@ -141,7 +141,7 @@
           android:id="@+id/pin_backspace"
           style="@style/PinButtonStyle"
           android:src="@drawable/ic_backspace"
-          android:tint="?attr/defaultMutedTextColor" />
+          android:tint="?attr/mutedTextColor" />
 
       </GridLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

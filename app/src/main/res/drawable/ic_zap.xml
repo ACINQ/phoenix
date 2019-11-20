@@ -23,7 +23,7 @@
     android:fillColor="#00000000"
     android:pathData="M13,2l-10,12l9,0l-1,8l10,-12l-9,0l1,-8z"
     android:strokeWidth="1.5"
-    android:strokeColor="?attr/defaultTextColor"
+    android:strokeColor="?attr/textColor"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

@@ -68,7 +68,7 @@
       app:layout_constraintStart_toStartOf="@id/amount"
       android:text=""
       android:textAlignment="textStart"
-      android:textColor="?attr/defaultMutedTextColor"
+      android:textColor="?attr/mutedTextColor"
       android:textSize="@dimen/text_lg"
       android:visibility="gone" />
 

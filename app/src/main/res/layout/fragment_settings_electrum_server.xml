@@ -27,7 +27,7 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/defaultMutedBackgroundColor">
+    android:background="?attr/mutedBgColor">
 
     <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
@@ -48,7 +48,7 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/defaultBackgroundColor"
+        android:background="?attr/bgColor"
         app:layout_constraintTop_toTopOf="parent">
 
         <View

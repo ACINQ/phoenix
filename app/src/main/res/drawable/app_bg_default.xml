@@ -18,8 +18,8 @@
     <shape android:shape="rectangle">
       <gradient
         android:angle="135"
-        android:endColor="?attr/defaultBackgroundColor"
-        android:startColor="?attr/defaultMutedBackgroundColor"
+        android:endColor="?attr/bgColor"
+        android:startColor="?attr/mutedBgColor"
         android:type="linear" />
     </shape>
   </item>

@@ -16,49 +16,32 @@
   -->
 
 <resources>
-  <color name="deepblue_light_1">#0073BF</color>
-  <color name="deepblue">#0063A6</color>
-  <color name="deepblue_dark_1">#00548B</color>
-  <color name="deepblue_dark_2">#004774</color>
-  <color name="deepblue_dark_3">#003759</color>
-
-  <!-- tints -->
+  <!-- base tints -->
   <color name="purple">#5741D9</color>
-  <color name="yellow_light_1">#FFDAA2</color>
   <color name="yellow">#FDBF55</color>
   <color name="apple">#50B338</color>
-  <color name="gold">#B88C3F</color>
   <color name="salmon">#FF874F</color>
-  <color name="orange">#F86622</color>
   <color name="green">#09BB74</color>
   <color name="blue">#138FE0</color>
   <color name="red">#CA4747</color>
-  <color name="dawn">#F8EFF1</color>
-  <color name="blossom">#F3D8D8</color>
-  <color name="brandy">#C58181</color>
-  <color name="chico">#885050</color>
 
-  <!-- basic -->
+  <!-- utils -->
   <color name="transparent">#00000000</color>
-  <color name="dark">#2B313E</color>
   <color name="black">#000000</color>
   <color name="white">#FFFFFF</color>
-  <color name="white_high_op">#CCFFFFFF</color>
   <color name="white_mid_op">#88FFFFFF</color>
   <color name="white_low_op">#33FFFFFF</color>
-
-  <!-- greys -->
-  <color name="grey">#888888</color>
-  <color name="grey_light_1">#BABABA</color>
-  <color name="grey_light_2">#D4D4D4</color>
-  <color name="grey_light_3">#EDEDED</color>
-
+  
+  <!-- dark theme -->
   <color name="ebony">#272F3B</color>
   <color name="mako">#303845</color>
   <color name="oxford">#363F4E</color>
   <color name="shuttle">#59676D</color>
   <color name="edward">#CCD6DB</color>
 
+  <!-- light theme mostly -->
+  <color name="dark">#2B313E</color>
+  <color name="brandy">#CA7575</color>
   <color name="slate">#73868D</color>
   <color name="ripple">#A6AFC0CF</color>
   <color name="casper">#A9C1CC</color>

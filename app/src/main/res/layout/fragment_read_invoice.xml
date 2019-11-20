@@ -39,7 +39,7 @@
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      android:background="?attr/defaultBackgroundColor">
+      android:background="?attr/bgColor">
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/paste_button"
@@ -140,7 +140,7 @@
       app:layout_constraintTop_toTopOf="@id/scan_view"
       android:background="@drawable/rounded"
       android:drawableStart="@drawable/ic_alert_triangle"
-      android:drawableTint="@color/red"
+      android:drawableTint="?attr/negativeColor"
       android:padding="@dimen/space_md_p"
       android:text="@string/scan_state_error"
       android:visibility="@{model.readingState == ReadingState.ERROR}" />

@@ -21,7 +21,7 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/defaultMutedBackgroundColor"
+    android:background="?attr/mutedBgColor"
     tools:context=".settings.SettingsFragment">
 
     <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
@@ -41,7 +41,7 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/defaultBackgroundColor">
+        android:background="?attr/bgColor">
 
         <TextView
           android:id="@+id/display_title"
@@ -121,7 +121,7 @@
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:text_color="@color/red"
+          app:text_color="?attr/negativeColor"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
           app:text="@string/settings_force_close" />
 

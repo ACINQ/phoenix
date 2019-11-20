@@ -49,6 +49,8 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
 
     val primaryColor: Int = getAttrColor(R.attr.colorPrimary)
+    val positiveColor: Int = getAttrColor(R.attr.positiveColor)
+    val negativeColor: Int = getAttrColor(R.attr.negativeColor)
     val context = itemView.context
 
     val amountView = itemView.findViewById<TextView>(R.id.amount)
@@ -80,7 +82,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           } else {
             context.getString(R.string.utils_unknown)
           }
-          amountView.setTextColor(context.getColor(R.color.red))
+          amountView.setTextColor(negativeColor)
           handleDescription(payment, descriptionView)
           detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Succeeded).completedAt())
           iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
@@ -106,7 +108,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           } else {
             itemView.context.getString(R.string.utils_unknown)
           }
-          amountView.setTextColor(context.getColor(R.color.green))
+          amountView.setTextColor(positiveColor)
           handleDescription(payment, descriptionView)
           detailsView.text = Transcriber.relativeTime(context, (payment.status() as IncomingPaymentStatus.Received).receivedAt())
           iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
@@ -149,8 +151,8 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   }
 
   private fun handleDescription(payment: LightningPayment, descriptionView: TextView) {
-    val defaultTextColor: Int = getAttrColor(R.attr.defaultTextColor)
-    val mutedTextColor: Int = getAttrColor(R.attr.defaultMutedTextColor)
+    val defaultTextColor: Int = getAttrColor(R.attr.textColor)
+    val mutedTextColor: Int = getAttrColor(R.attr.mutedTextColor)
     val desc = if (payment.paymentRequest().isDefined) {
       PaymentRequest.fastReadDescription(payment.paymentRequest().get())
     } else if (payment.externalId().isDefined && payment.externalId().get().startsWith("closing-")) {

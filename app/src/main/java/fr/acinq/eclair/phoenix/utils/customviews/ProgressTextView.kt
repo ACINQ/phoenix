@@ -33,7 +33,7 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
       val arr = context.obtainStyledAttributes(it, R.styleable.ProgressTextView, 0, defStyle)
       mBinding.label.text = arr.getString(R.styleable.ProgressTextView_text)
       if (arr.hasValue(R.styleable.ProgressTextView_text_color)) {
-        mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, R.attr.defaultTextColor))
+        mBinding.label.setTextColor(arr.getColor(R.styleable.ProgressTextView_text_color, R.attr.textColor))
       }
 
       if (arr.hasValue(R.styleable.ProgressTextView_text_size)) {
@@ -42,7 +42,7 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
       }
 
       if (arr.hasValue(R.styleable.ProgressTextView_progress_tint)) {
-        mBinding.progressBar.indeterminateDrawable.setColorFilter(arr.getColor(R.styleable.ProgressTextView_progress_tint, R.attr.defaultTextColor), PorterDuff.Mode.SRC_IN)
+        mBinding.progressBar.indeterminateDrawable.setColorFilter(arr.getColor(R.styleable.ProgressTextView_progress_tint, R.attr.textColor), PorterDuff.Mode.SRC_IN)
       }
       arr.recycle()
     }
