@@ -169,7 +169,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      AlertDialog.Builder(context)
+      AlertDialog.Builder(context, R.style.default_dialogTheme)
         .setTitle(R.string.receive_swap_in_disclaimer_title)
         .setMessage(R.string.receive_swap_in_disclaimer_message)
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }

@@ -95,7 +95,7 @@ class StartupFragment : BaseFragment() {
       log.debug("kit is not ready and wallet is not setup, redirecting to init wallet")
       findNavController().navigate(R.id.global_action_any_to_init_wallet)
     } else {
-      log.info("kit is not ready, let's start it if needed!")
+      log.debug("kit is not ready, let's start it if needed!")
       startNodeIfNeeded()
     }
   }

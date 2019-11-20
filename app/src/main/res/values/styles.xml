@@ -43,6 +43,7 @@
 
     <!-- text -->
     <item name="android:textColor">?attr/defaultTextColor</item>
+    <item name="android:textColorPrimary">?attr/defaultTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
 
     <!-- controls -->
@@ -147,12 +148,18 @@
     <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
-    <item name="android:textViewStyle">@style/default_textAppearance</item>
     <item name="buttonStyle">@style/default_buttonStyle</item>
+    <item name="android:windowTitleStyle">@style/dialog_title</item>
+    <item name="android:textColorPrimary">?attr/defaultTextColor</item>
   </style>
 
   <style name="dialog_fullScreen" parent="default_dialogTheme">
     <item name="android:windowFullscreen">true</item>
+  </style>
+
+  <style name="dialog_title" parent="default_textAppearance">
+    <item name="android:textSize">@dimen/text_xl</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
   </style>
 
   <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
@@ -213,13 +220,6 @@
     <item name="android:paddingTop">@dimen/space_xs</item>
     <item name="android:paddingEnd">@dimen/space_md</item>
     <item name="android:paddingBottom">@dimen/space_sm</item>
-  </style>
-
-  <style name="TitleView" parent="default_textAppearance">
-    <item name="android:layout_width">match_parent</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:textSize">@dimen/text_xl</item>
-    <item name="android:textStyle">bold</item>
   </style>
 
   <style name="SettingsCategory" parent="default_textAppearance">
@@ -294,6 +294,7 @@
 
     <!-- text -->
     <item name="android:textColor">?attr/defaultTextColor</item>
+    <item name="android:textColorPrimary">?attr/defaultTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
 
     <!-- controls -->

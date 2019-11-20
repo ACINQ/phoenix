@@ -68,7 +68,7 @@ class ForceCloseFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.forceConfirmButton.setOnClickListener {
-      AlertDialog.Builder(context)
+      AlertDialog.Builder(context, R.style.default_dialogTheme)
         .setMessage(R.string.closechannels_confirm_dialog_message)
         .setPositiveButton(R.string.btn_confirm) { _, _ -> doForceClose() }
         .setNegativeButton(R.string.btn_cancel, null)

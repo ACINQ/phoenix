@@ -62,7 +62,7 @@ class MutualCloseFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.mutualConfirmButton.setOnClickListener {
-      AlertDialog.Builder(context)
+      AlertDialog.Builder(context, R.style.default_dialogTheme)
         .setMessage(R.string.closechannels_confirm_dialog_message)
         .setPositiveButton(R.string.btn_confirm) { _, _ -> doMutualClose() }
         .setNegativeButton(R.string.btn_cancel, null)

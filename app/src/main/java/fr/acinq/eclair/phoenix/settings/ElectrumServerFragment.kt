@@ -95,7 +95,7 @@ class ElectrumServerFragment : BaseFragment() {
     fun updateState(isChecked: Boolean) {
       BindingHelpers.enableOrFade(inputLabel, isChecked)
       BindingHelpers.enableOrFade(inputValue, isChecked)
-      sslWarning.visibility = if (isChecked) View.VISIBLE else View.GONE
+      BindingHelpers.enableOrFade(sslWarning, isChecked)
     }
 
     checkbox.setOnCheckedChangeListener { v, isChecked -> updateState(isChecked) }
@@ -109,7 +109,8 @@ class ElectrumServerFragment : BaseFragment() {
       updateState(true)
     }
 
-    val dialog = AlertDialog.Builder(context).setView(view)
+    val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
+      .setView(view)
       .setPositiveButton(R.string.btn_confirm, null)
       .setNegativeButton(R.string.btn_cancel) { _, _ -> }
       .create()
