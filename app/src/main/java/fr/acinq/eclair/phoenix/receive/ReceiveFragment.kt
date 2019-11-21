@@ -76,7 +76,6 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentReceiveBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this

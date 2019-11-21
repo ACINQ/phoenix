@@ -17,6 +17,7 @@
 <resources>
 
   <style name="default_theme" parent="Theme.AppCompat.NoActionBar">
+    <item name="colorPrimary">@color/green</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
 
@@ -26,12 +27,14 @@
 
     <!-- text -->
     <item name="android:textColor">?attr/textColor</item>
-    <item name="android:textColorPrimary">?attr/textColor</item>
+    <item name="android:textColorPrimary">?attr/colorPrimary</item>
+    <item name="android:textColorSecondary">?attr/onMutedBgTextColor</item>
     <item name="android:textSize">@dimen/text_lg</item>
 
     <!-- controls -->
     <item name="colorControlNormal">?attr/mutedTextColor</item>
     <item name="colorControlActivated">?attr/colorPrimary</item>
+    <item name="android:colorControlActivated">?attr/colorPrimary</item>
 
     <!-- widget overrides -->
     <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
@@ -40,48 +43,46 @@
     <item name="android:spinnerItemStyle">@style/default_textAppearance</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="android:buttonStyle">@style/default_buttonStyle</item>
+
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
-    <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
+    <item name="dialogTheme">@style/default_dialogTheme</item>
+    <item name="alertDialogTheme">@style/default_dialogTheme</item>
 
     <!-- status bar -->
     <item name="android:statusBarColor">?attr/mutedBgColor</item>
+
+    <!-- preferences -->
+    <item name="textColorAlertDialogListItem">?attr/textColor</item>
   </style>
 
   <style name="light_theme" parent="default_theme">
+    <item name="isLightTheme">true</item>
     <item name="colorPrimary">@color/apple</item>
-
     <item name="bgColor">@color/white</item>
     <item name="mutedBgColor">@color/athens</item>
-
     <item name="borderColor">@color/mystic</item>
     <item name="buttonRippleColor">@color/ripple</item>
-
     <item name="textColor">@color/dark</item>
     <item name="mutedTextColor">@color/casper</item>
     <item name="onMutedBgTextColor">@color/slate</item>
     <item name="negativeColor">@color/brandy</item>
     <item name="positiveColor">@color/apple</item>
     <item name="altTextColor">@color/white</item>
-
     <item name="android:windowLightStatusBar">true</item>
   </style>
 
   <style name="dark_theme" parent="default_theme">
     <item name="colorPrimary">@color/green</item>
-
     <item name="bgColor">@color/oxford</item>
     <item name="mutedBgColor">@color/ebony</item>
-
     <item name="borderColor">@color/mako</item>
     <item name="buttonRippleColor">@color/shuttle</item>
-
     <item name="textColor">@color/edward</item>
     <item name="mutedTextColor">@color/shuttle</item>
     <item name="onMutedBgTextColor">@color/slate</item>
     <item name="negativeColor">@color/red</item>
     <item name="positiveColor">@color/green</item>
     <item name="altTextColor">@color/dark</item>
-
     <item name="android:windowLightStatusBar">false</item>
   </style>
 
@@ -100,8 +101,6 @@
   <style name="default_textAppearance_alt" parent="default_textAppearance">
     <item name="android:textColor">?altTextColor</item>
   </style>
-
-  <!-- Widgets overrides -->
 
   <style name="paragraph_textViewStyle" parent="default_textAppearance">
     <item name="android:drawablePadding">@dimen/space_md</item>
@@ -162,7 +161,12 @@
     <item name="android:textSize">@dimen/text_xl</item>
   </style>
 
-  <style name="default_dialogTheme" parent="@style/Theme.MaterialComponents.Light.Dialog">
+<!--  <style name="prefs_dialogTheme" parent="@style/default_dialogTheme">-->
+<!--    <item name="colorPrimary">@color/green</item>-->
+<!--    <item name="colorPrimaryDark">@color/green</item>-->
+<!--  </style>-->
+
+  <style name="default_dialogTheme" parent="@style/default_theme">
     <item name="android:windowIsFloating">true</item>
     <item name="android:windowFrame">@null</item>
     <item name="android:windowBackground">@drawable/rounded</item>
@@ -170,7 +174,8 @@
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="buttonStyle">@style/default_buttonStyle</item>
     <item name="android:windowTitleStyle">@style/dialog_title</item>
-    <item name="android:textColorPrimary">?attr/textColor</item>
+    <item name="android:textColorPrimary">?attr/colorPrimary</item>
+    <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
   </style>
 
   <style name="dialog_fullScreen" parent="default_dialogTheme">
@@ -180,12 +185,6 @@
   <style name="dialog_title" parent="default_textAppearance">
     <item name="android:textSize">@dimen/text_xl</item>
     <item name="android:fontFamily">sans-serif-medium</item>
-  </style>
-
-  <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
-    <item name="android:textColor">?attr/textColor</item>
-    <item name="android:textSize">@dimen/text_lg</item>
-    <item name="android:buttonTint">?attr/textColor</item>
   </style>
 
   <style name="default_spinnerStyle">
