@@ -89,7 +89,7 @@ object Wallet {
   fun extractInvoice(input: String): Any {
     val invoice = cleanInvoice(input)
     return try {
-      PaymentRequest.read(invoice, true)
+      PaymentRequest.read(invoice)
     } catch (e1: Exception) {
       try {
         BitcoinURI(invoice)

@@ -108,7 +108,7 @@ class SendViewModel : ViewModel() {
           val response = Api.httpClient.newCall(request).execute()
           val body = response.body()
           if (response.isSuccessful && body != null) {
-            val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""), true)
+            val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""))
             log.info("swapped $bitcoinURI -> $paymentRequest")
             invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
           } else {

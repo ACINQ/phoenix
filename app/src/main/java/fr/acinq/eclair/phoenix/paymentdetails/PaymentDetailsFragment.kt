@@ -52,6 +52,11 @@ import java.util.*
 
 class PaymentDetailsFragment : BaseFragment() {
 
+  companion object {
+    val OUTGOING = "OUTGOING"
+    val INCOMING = "INCOMING"
+  }
+
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentPaymentDetailsBinding
@@ -130,7 +135,7 @@ class PaymentDetailsFragment : BaseFragment() {
       }
     })
 
-    getPayment(args.direction == PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`.toString(), args.identifier)
+    getPayment(args.direction == OUTGOING, args.identifier)
     mBinding.model = model
   }
 
@@ -194,13 +199,7 @@ class PaymentDetailsFragment : BaseFragment() {
     }) {
       model.state.value = PaymentDetailsState.RETRIEVING_PAYMENT_DATA
       if (isSentPayment) {
-        val payments: List<OutgoingPayment> = if (args.fromEvent) {
-          // we don't know parent id, identifier is payment id in base
-          val payment = appKit.getSentPaymentFromId(UUID.fromString(identifier))
-          if (payment.isDefined) listOf(payment.get()) else ArrayList()
-        } else {
-          appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
-        }
+        val payments: List<OutgoingPayment> = appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
         if (payments.isEmpty()) {
           model.payment.value = null
           model.state.value = PaymentDetailsState.NONE

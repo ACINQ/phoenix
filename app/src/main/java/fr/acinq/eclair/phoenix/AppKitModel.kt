@@ -41,7 +41,9 @@ import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
-import fr.acinq.eclair.payment.PaymentEvent
+import fr.acinq.eclair.payment.receive.MultiPartHandler
+import fr.acinq.eclair.payment.relay.Relayer
+import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
@@ -122,7 +124,17 @@ class AppKitModel : ViewModel() {
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PaymentComplete) {
+  fun handleEvent(event: PaymentSent) {
+    navigationEvent.value = event
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PaymentFailed) {
+    navigationEvent.value = event
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PaymentReceived) {
     navigationEvent.value = event
   }
 
@@ -134,10 +146,10 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
     kit.value?.run {
-      api.usableBalances(timeout).onComplete(object : OnComplete<UsableBalances?>() {
-        override fun onComplete(t: Throwable?, result: UsableBalances?) {
-          if (t == null && result != null) {
-            val total = JavaConverters.seqAsJavaListConverter(result.balances()).asJava().map { b -> b.canSend().toLong() }.sum()
+      api.usableBalances(timeout).onComplete(object : OnComplete<scala.collection.Iterable<Relayer.UsableBalance>>() {
+        override fun onComplete(t: Throwable?, result: scala.collection.Iterable<Relayer.UsableBalance>) {
+          if (t == null) {
+            val total = JavaConverters.seqAsJavaListConverter(result.toSeq()).asJava().map { b -> b.canSend().toLong() }.sum()
             nodeData.postValue(nodeData.value?.copy(balance = MilliSatoshi(total)))
           }
         }
@@ -205,7 +217,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             payment = kit.nodeParams().db().payments().getOutgoingPayment(id)
           }
-          log.info("get sent payments complete in ${t}ms")
+          log.info("get sent payment details in ${t}ms")
           payment
         } ?: throw KitNotInitialized()
       }
@@ -220,7 +232,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
           }
-          log.info("get sent payments complete in ${t}ms")
+          log.info("get sent payment details in ${t}ms")
           payments
         } ?: throw KitNotInitialized()
       }
@@ -235,7 +247,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
           }
-          log.info("get received payment complete in ${t}ms")
+          log.info("get received payment details in ${t}ms")
           payment
         } ?: throw KitNotInitialized()
       }
@@ -250,7 +262,7 @@ class AppKitModel : ViewModel() {
           val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
           val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
           val f = Patterns.ask(it.kit.paymentHandler(),
-            PaymentLifecycle.ReceivePayment(
+            MultiPartHandler.ReceivePayment(
               /* amount */ amount_opt,
               /* description */ description,
               /* expiry seconds */ Option.empty(),
@@ -282,27 +294,33 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         _kit.value?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
-
           val trampolineData = Wallet.getTrampoline(amount, paymentRequest)
-
           val amountFinal = if (deductFeeFromAmount) amount.`$minus`(trampolineData.second) else amount
 
-          val sendRequest = PaymentInitiator.SendPaymentRequest(
-            /* amount to send */ amountFinal,
-            /* paymentHash */ paymentRequest.paymentHash(),
-            /* payment target */ paymentRequest.nodeId(),
-            /* max attempts */ 3,
-            /* final cltv expiry delta */ cltvExpiryDelta,
-            /* payment request */ Option.apply(paymentRequest),
-            /* external id */ Option.empty(),
-            /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
-            /* assisted routes */ paymentRequest.routingInfo(),
-            /* route params */ Option.apply(null),
-            /* trampoline node public key */ trampolineData.first,
-            /* trampoline fees */ trampolineData.second,
-            /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(144 * 5))
+          val sendRequest: Any = if (trampolineData.first.isDefined) {
+            PaymentInitiator.SendTrampolinePaymentRequest(
+              /* amount to send */ amountFinal,
+              /* trampoline fees */ trampolineData.second,
+              /* payment request */ paymentRequest,
+              /* trampoline node public key */ trampolineData.first.get(),
+              /* final cltv expiry delta */ cltvExpiryDelta,
+              /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(144 * 5),
+              /* route params */ Option.apply(null))
+          } else {
+            PaymentInitiator.SendPaymentRequest(
+              /* amount to send */ amountFinal,
+              /* paymentHash */ paymentRequest.paymentHash(),
+              /* payment target */ paymentRequest.nodeId(),
+              /* max attempts */ 3,
+              /* final cltv expiry delta */ cltvExpiryDelta,
+              /* payment request */ Option.apply(paymentRequest),
+              /* external id */ Option.empty(),
+              /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
+              /* assisted routes */ paymentRequest.routingInfo(),
+              /* route params */ Option.apply(null))
+          }
 
-          log.info("sending $amountFinal with fee=${trampolineData.second} (deducted: $deductFeeFromAmount) for pr $paymentRequest")
+          log.info("sending $amountFinal with trampoline=${trampolineData.first} fee=${trampolineData.second} (deducted: $deductFeeFromAmount) for pr $paymentRequest")
           this.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()

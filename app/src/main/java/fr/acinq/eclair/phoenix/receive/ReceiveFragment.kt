@@ -39,13 +39,13 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
-import fr.acinq.eclair.db.PaymentDirection
+import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
-import fr.acinq.eclair.phoenix.events.PaymentComplete
+import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -58,8 +58,6 @@ import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
-import scala.util.Left
-import scala.util.Right
 
 class ReceiveFragment : BaseFragment() {
 
@@ -259,13 +257,11 @@ class ReceiveFragment : BaseFragment() {
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: fr.acinq.eclair.phoenix.events.PaymentEvent) {
+  fun handleEvent(event: PaymentReceived) {
     model.invoice.value?.let {
-      if (event is PaymentComplete) {
-        if (event.direction is PaymentDirection.`IncomingPaymentDirection$` && event.identifier == it.first.paymentHash().toString()) {
-          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(event.direction.toString(), event.identifier, fromEvent = true)
-          findNavController().navigate(action)
-        }
+      if (event.paymentHash() == it.first.paymentHash()) {
+        val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.INCOMING, event.paymentHash().toString(), fromEvent = true)
+        findNavController().navigate(action)
       }
     }
   }

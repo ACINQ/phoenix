@@ -23,12 +23,9 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.PaymentDirection
 import fr.acinq.eclair.db.`BackupCompleted$`
-import fr.acinq.eclair.db.`PaymentDirection$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
-import fr.acinq.eclair.payment.PaymentLifecycle
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.eclair.wire.SwapInResponse
@@ -126,16 +123,16 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(event)
       }
       is PaymentSent -> {
-        log.info("payment has been successfully sent: $event ")
-        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
+        log.info("payment has been successfully sent: $event")
+        EventBus.getDefault().post(event)
       }
       is PaymentFailed -> {
         log.info("payment has failed [ ${event.failures().mkString(", ")} ]")
-        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`OutgoingPaymentDirection$`.`MODULE$`, event.id().toString()))
+        EventBus.getDefault().post(event)
       }
       is PaymentReceived -> {
         log.info("payment has been successfully received: $event ")
-        EventBus.getDefault().post(PaymentComplete(PaymentDirection.`IncomingPaymentDirection$`.`MODULE$`, event.paymentHash().toString()))
+        EventBus.getDefault().post(event)
       }
       // -------------- UNHANDLED -------------
       else -> {

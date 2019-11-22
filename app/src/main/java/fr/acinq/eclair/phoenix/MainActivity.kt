@@ -16,23 +16,20 @@
 
 package fr.acinq.eclair.phoenix
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import fr.acinq.eclair.payment.PaymentFailed
+import fr.acinq.eclair.payment.PaymentReceived
+import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.eclair.phoenix.databinding.ActivityMainBinding
-import fr.acinq.eclair.phoenix.events.PaymentComplete
-import fr.acinq.eclair.phoenix.events.PaymentPending
+import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
-import fr.acinq.eclair.phoenix.send.SendFragmentDirections
-import fr.acinq.eclair.phoenix.utils.IntentCodes
 import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
 
@@ -58,8 +55,16 @@ class MainActivity : AppCompatActivity() {
             paymentHash = it.payToOpenRequest().paymentHash().toString())
           findNavController(R.id.nav_host_main).navigate(action)
         }
-        is PaymentComplete -> {
-          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(it.direction.toString(), it.identifier, fromEvent = true)
+        is PaymentSent -> {
+          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
+          findNavController(R.id.nav_host_main).navigate(action)
+        }
+        is PaymentFailed -> {
+          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
+          findNavController(R.id.nav_host_main).navigate(action)
+        }
+        is PaymentReceived -> {
+          val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.INCOMING, it.paymentHash().toString(), fromEvent = true)
           findNavController(R.id.nav_host_main).navigate(action)
         }
         else -> log.info("unhandled navigation event $it")

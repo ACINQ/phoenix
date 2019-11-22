@@ -63,7 +63,7 @@ class BitcoinURI(input: String) {
     if (Strings.isNullOrEmpty(lightningParam)) {
       this.lightning = null
     } else {
-      this.lightning = PaymentRequest.read(lightningParam, true)
+      this.lightning = PaymentRequest.read(lightningParam)
     }
 
     // -- read and validate amount field parameter. Amount is in BTC in the URI, and is converted to Satoshi,
