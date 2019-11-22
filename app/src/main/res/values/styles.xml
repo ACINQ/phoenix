@@ -47,6 +47,7 @@
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="dialogTheme">@style/default_dialogTheme</item>
     <item name="alertDialogTheme">@style/default_dialogTheme</item>
+    <item name="android:checkboxStyle">@style/default_checkboxStyle</item>
 
     <!-- status bar -->
     <item name="android:statusBarColor">?attr/mutedBgColor</item>
@@ -185,6 +186,12 @@
   <style name="dialog_title" parent="default_textAppearance">
     <item name="android:textSize">@dimen/text_xl</item>
     <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="default_checkboxStyle" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
+    <item name="android:textColor">?attr/textColor</item>
+    <item name="android:textSize">@dimen/text_lg</item>
+    <item name="android:buttonTint">?attr/textColor</item>
   </style>
 
   <style name="default_spinnerStyle">

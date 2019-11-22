@@ -47,6 +47,7 @@ import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.wire.SwapOutResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
@@ -179,6 +180,9 @@ class SendFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    if (!EventBus.getDefault().isRegistered(this)) {
+      EventBus.getDefault().register(this)
+    }
 
     appKit.nodeData.value?.let {
       mBinding.balanceValue.setAmount(it.balance)
@@ -212,6 +216,11 @@ class SendFragment : BaseFragment() {
     mBinding.swapButton.setOnClickListener {
       sendSwapOut()
     }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    EventBus.getDefault().unregister(this)
   }
 
   private fun sendSwapOut() {

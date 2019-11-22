@@ -24,7 +24,7 @@
       android:layout_height="wrap_content"
       android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
-      android:paddingStart="@dimen/space_md"
+      android:paddingStart="@dimen/space_sm"
       android:paddingTop="@dimen/space_md"
       android:paddingBottom="@dimen/space_md"
       android:paddingEnd="@dimen/space_sm"
