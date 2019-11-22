@@ -28,7 +28,9 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
+import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
+import fr.acinq.eclair.wire.SwapOutResponse
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 
@@ -117,11 +119,21 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(event)
       }
 
-      // -------------- PAYMENTS -------------
+      // ------------- SWAPPING IN/OUT ------------
       is SwapInResponse -> {
         log.info("received swap-in response: $event")
         EventBus.getDefault().post(event)
       }
+      is SwapInPending -> {
+        log.info("received pending swap-in event=$event")
+        EventBus.getDefault().post(event)
+      }
+      is SwapOutResponse -> {
+        log.info("received swap-out response: $event")
+        EventBus.getDefault().post(event)
+      }
+
+      // -------------- PAYMENTS -------------
       is PaymentSent -> {
         log.info("payment has been successfully sent: $event")
         EventBus.getDefault().post(event)

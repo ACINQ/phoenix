@@ -48,7 +48,9 @@ import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
+import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.eclair.wire.`NodeAddress$`
 import kotlinx.coroutines.*
 import okhttp3.Call
@@ -93,6 +95,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
+  val pendingSwapIn = MutableLiveData<Boolean>()
   val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
@@ -102,6 +105,7 @@ class AppKitModel : ViewModel() {
   val kit: LiveData<AppKit> get() = _kit
 
   init {
+    pendingSwapIn.value = false
     _kit.value = null
     startupState.value = StartupState.OFF
     nodeData.value = NodeData(MilliSatoshi(0), "")
@@ -141,6 +145,11 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PayToOpenRequestEvent) {
     navigationEvent.value = event
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: SwapInPending) {
+    pendingSwapIn.value = true
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -276,7 +285,18 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
-  @UiThread
+  suspend fun sendSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
+    return coroutineScope {
+      async(Dispatchers.Default) {
+        _kit.value?.run {
+          log.info("sending swap-out request to switchboard for address=$address with amount=$amount")
+          this.kit.switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
+          Unit
+        } ?: throw KitNotInitialized()
+      }
+    }.await()
+  }
+
   suspend fun sendSwapIn() {
     return coroutineScope {
       async(Dispatchers.Default) {
@@ -541,6 +561,8 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, BackupEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
+    system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
+    system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)

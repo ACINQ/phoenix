@@ -112,6 +112,12 @@ class ReceiveFragment : BaseFragment() {
         }
       }
     })
+
+    appKit.pendingSwapIn.observe(viewLifecycleOwner, Observer {
+      if (it) {
+        findNavController().navigate(R.id.action_receive_to_main)
+      }
+    })
   }
 
   override fun onStart() {

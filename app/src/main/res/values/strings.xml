@@ -253,6 +253,11 @@
   <string name="initwallet_create">New Wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
 
+  <!-- //////////////// main //////////////////// -->
+
+  <string name="main_swapin_incoming">Incoming swap-in</string>
+
+
   <!-- //////////////// notifications //////////////////// -->
 
   <string name="notifications_set_up_pin">Your wallet is not protected.</string>

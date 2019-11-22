@@ -98,10 +98,15 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(MainViewModel::class.java)
     appKit.nodeData.observe(viewLifecycleOwner, Observer { nodeData ->
       nodeData?.let {mBinding.balance.setAmount(it.balance)}
     })
+    appKit.pendingSwapIn.observe(viewLifecycleOwner, Observer { isPending ->
+      mBinding.swapInInfo.visibility = if (isPending) View.VISIBLE else View.GONE
+    })
+    mBinding.appKitModel = appKit
+
+    model = ViewModelProvider(this).get(MainViewModel::class.java)
     model.payments.observe(viewLifecycleOwner, Observer {
       //      paymentsListAdapter.submitList(it)
       paymentsAdapter.update(it)

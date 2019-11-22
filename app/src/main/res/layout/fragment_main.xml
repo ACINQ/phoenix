@@ -20,6 +20,9 @@
 
   <data>
 
+    <variable
+      name="appKitModel"
+      type="fr.acinq.eclair.phoenix.AppKitModel" />
   </data>
 
   <androidx.constraintlayout.motion.widget.MotionLayout
@@ -104,9 +107,9 @@
         android:layout_height="@dimen/main_button_height"
         android:background="@drawable/button_main_page_left"
         android:padding="@dimen/space_md_p"
-        app:layout_constrainedWidth="true"
-        app:icon_size="@dimen/button_height"
         app:icon="@drawable/ic_settings"
+        app:icon_size="@dimen/button_height"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -160,14 +163,33 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="@dimen/space_md"
       android:layout_marginEnd="@dimen/space_md"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
       android:backgroundTint="?attr/mutedBgColor"
       android:padding="@dimen/space_xs"
       app:icon="@drawable/ic_help_circle"
       app:icon_size="16dp"
-      app:text="FAQ"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
       app:spacer_size="@dimen/space_xs"
+      app:text="FAQ"
       app:text_size="@dimen/text_sm" />
+
+    <TextView
+      android:id="@+id/swap_in_info"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      android:background="@drawable/rounded"
+      android:backgroundTint="?attr/mutedBgColor"
+      android:drawableStart="@drawable/ic_receive"
+      android:drawablePadding="@dimen/space_xs"
+      android:drawableTint="?attr/colorPrimary"
+      android:padding="@dimen/space_xs"
+      android:text="@string/main_swapin_incoming"
+      android:textSize="@dimen/text_sm"
+      android:visibility="gone"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/help_button" />
+
   </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

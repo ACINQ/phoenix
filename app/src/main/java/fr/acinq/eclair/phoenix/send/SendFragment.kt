@@ -18,7 +18,6 @@ package fr.acinq.eclair.phoenix.send
 
 import android.os.Bundle
 import android.text.Editable
-import android.text.Html
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
@@ -40,16 +39,20 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
+import fr.acinq.eclair.phoenix.receive.SwapInState
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.InsufficientBalance
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.wire.SwapOutResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
-import java.lang.RuntimeException
+import scala.util.Left
 
 class SendFragment : BaseFragment() {
 
@@ -207,6 +210,16 @@ class SendFragment : BaseFragment() {
     }
 
     mBinding.swapButton.setOnClickListener {
+      sendSwapOut()
+    }
+  }
+
+  private fun sendSwapOut() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when sending SwapOut: ", exception)
+      model.swapState.postValue(SwapState.SWAP_REQUIRED)
+      model.swapMessageEvent.postValue(R.string.send_swap_error)
+    }) {
       model.isAmountFieldPristine.value = false
       Wallet.hideKeyboard(context, mBinding.amount)
       model.invoice.value?.let {
@@ -214,10 +227,18 @@ class SendFragment : BaseFragment() {
         if (amount_opt.isDefined) {
           val amount = amount_opt.get()
           if (it.isLeft) {
-            val subtractFee: Boolean = model.useMaxBalance.value ?: false
-            // TODO: provide deduct fee instead of using hard coded fee.....
-            val finalAmount: Satoshi = Converter.msat2sat(amount).`$minus`(if (subtractFee) Satoshi(300) else Satoshi(0))
-            model.setupSubmarineSwap(amount = finalAmount, bitcoinURI = it.left().get().first, subtractFee = subtractFee)
+            val rawAmount = Converter.msat2sat(amount)
+            val finalAmount: Satoshi = if (model.useMaxBalance.value == true) {
+              // when trying to send all the available balance on chain, a fee should be subtracted from the amount
+              // FIXME: stop using hard coded fee...
+              rawAmount.`$minus`(Satoshi(300))
+            } else {
+              rawAmount
+            }
+            // FIXME: use feerate provided by user, like in eclair mobile
+            val feeratePerKw = appKit.kit.value?.run { kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: 0L
+            model.swapState.postValue(SwapState.SWAP_IN_PROGRESS)
+            appKit.sendSwapOut(amount = finalAmount, address = it.left().get().first.address, feeratePerKw = feeratePerKw)
           }
         }
       }
@@ -268,6 +289,18 @@ class SendFragment : BaseFragment() {
       log.info("could not check amount: ${e.message}")
       model.amountErrorMessage.value = R.string.send_amount_error
       Option.empty()
+    }
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: SwapOutResponse) {
+    model.invoice.value?.run {
+      if (isLeft) {
+        val bitcoinURI = left().get().first
+        val paymentRequest = PaymentRequest.read(event.paymentRequest())
+        log.info("swapped $bitcoinURI -> $paymentRequest")
+        model.invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
+      }
     }
   }
 }

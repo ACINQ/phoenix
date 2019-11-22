@@ -18,20 +18,13 @@ package fr.acinq.eclair.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.phoenix.R
-import fr.acinq.eclair.phoenix.utils.Api
 import fr.acinq.eclair.phoenix.utils.BitcoinURI
 import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import scala.util.Either
 import scala.util.Left
@@ -92,36 +85,6 @@ class SendViewModel : ViewModel() {
   }
 
   // ---- end of computed values
-
-  @UiThread
-  fun setupSubmarineSwap(amount: Satoshi, bitcoinURI: BitcoinURI, targetBlocks: Int = 6, subtractFee: Boolean = false) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        swapState.postValue(SwapState.SWAP_IN_PROGRESS)
-        try {
-          val json = JSONObject()
-            .put("amountSatoshis", amount.toLong())
-            .put("address", bitcoinURI.address)
-            .put("targetBlocks", targetBlocks)
-          val request = Request.Builder().url(Api.SWAP_API_URL).post(RequestBody.create(Api.JSON, json.toString())).build()
-          delay(300)
-          val response = Api.httpClient.newCall(request).execute()
-          val body = response.body()
-          if (response.isSuccessful && body != null) {
-            val paymentRequest = PaymentRequest.read(body.string().removeSurrounding("\""))
-            log.info("swapped $bitcoinURI -> $paymentRequest")
-            invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
-          } else {
-            throw RuntimeException("swap responds with code ${response.code()}, aborting swap payment")
-          }
-        } catch (e: Exception) {
-          log.error("error in swap http request, aborting swap payment: ", e)
-          swapState.postValue(SwapState.SWAP_REQUIRED)
-          swapMessageEvent.postValue(R.string.send_swap_error)
-        }
-      }
-    }
-  }
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
