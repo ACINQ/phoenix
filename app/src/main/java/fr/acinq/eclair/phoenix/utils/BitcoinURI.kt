@@ -26,6 +26,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 
 class BitcoinURI(input: String) {
 
+  public val raw: String
   public val address: String
   public val message: String?
   public val label: String?
@@ -38,7 +39,7 @@ class BitcoinURI(input: String) {
 
     // -- should have no scheme (bitcoin: and bitcoin:// are stripped)
     if (uri.scheme != null) {
-      throw BitcoinURIParseException("scheme is not valid")
+      throw BitcoinURIParseException("scheme=${uri.scheme} is not valid")
     }
 
     // -- read and validate address
@@ -78,9 +79,11 @@ class BitcoinURI(input: String) {
     // see https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
     for (p in uri.queryParameterNames) {
       if (p.startsWith("req-")) {
-        throw BitcoinURIParseException("unhandled required param: $p")
+        throw BitcoinURIParseException("unhandled required param=$p")
       }
     }
+
+    raw = input
   }
 
   private fun stripScheme(uri: String): String {
@@ -94,11 +97,11 @@ class BitcoinURI(input: String) {
 
   override fun toString(): String {
     return javaClass.simpleName + "[ " +
-      "address: " + this.address + ", " +
-      "amount: " + this.amount + ", " +
-      "label: " + this.label + ", " +
-      "message: " + this.message + ", " +
-      "lightning: " + this.lightning + " ]"
+      "address=" + this.address + ", " +
+      "amount=" + this.amount + ", " +
+      "label=" + this.label + ", " +
+      "message=" + this.message + ", " +
+      "lightning=" + this.lightning + " ]"
   }
 
   companion object {

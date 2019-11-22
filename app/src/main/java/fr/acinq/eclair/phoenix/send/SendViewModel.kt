@@ -125,6 +125,7 @@ class SendViewModel : ViewModel() {
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
+    log.debug("checking input=$input")
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         try {
@@ -136,7 +137,7 @@ class SendViewModel : ViewModel() {
           }
           state.postValue(SendState.VALID_INVOICE)
         } catch (e: Exception) {
-          log.info("invalid payment request $input: ${e.message}")
+          log.error("invalid payment request $input: ${e.message}")
           invoice.postValue(null)
           state.postValue(SendState.INVALID_INVOICE)
         }

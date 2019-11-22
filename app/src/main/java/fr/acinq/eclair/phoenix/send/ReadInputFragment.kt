@@ -67,7 +67,7 @@ class ReadInputFragment : BaseFragment() {
       if (it != null) {
         when {
           it is PaymentRequest -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it)))
-          it is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.toString()))
+          it is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
           it is LNUrl && it.isLogin() -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.uri.toString()))
           it is LNUrl -> {
             log.info("cannot handle LNurl with uri=${it.uri}")

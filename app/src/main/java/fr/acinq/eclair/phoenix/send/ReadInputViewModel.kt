@@ -41,6 +41,7 @@ class ReadInputViewModel : ViewModel() {
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
+    log.debug("checking input=$input")
     if (readingState.value == ReadingState.SCANNING) {
       readingState.value = ReadingState.READING
       viewModelScope.launch {
