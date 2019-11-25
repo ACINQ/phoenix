@@ -64,8 +64,8 @@ class ReceiveFragment : BaseFragment() {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentReceiveBinding
-
   private lateinit var model: ReceiveViewModel
+  private lateinit var unitList: List<String>
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -86,12 +86,13 @@ class ReceiveFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      ArrayAdapter(it,
-        android.R.layout.simple_spinner_item,
-        listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))).also { adapter ->
+      unitList = listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))
+      ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.amountUnit.adapter = adapter
       }
+      val unit = Prefs.getCoinUnit(it)
+      mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
     }
 
     model.invoice.observe(viewLifecycleOwner, Observer {

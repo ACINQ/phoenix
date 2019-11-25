@@ -83,6 +83,8 @@ class SendFragment : BaseFragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.unit.adapter = adapter
       }
+      val unit = Prefs.getCoinUnit(it)
+      mBinding.unit.setSelection(unitList.indexOf(unit.code()))
     }
 
     model.invoice.observe(viewLifecycleOwner, Observer {
