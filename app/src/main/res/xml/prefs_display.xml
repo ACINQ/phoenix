@@ -28,7 +28,7 @@
     app:iconSpaceReserved="false" />
 
   <ListPreference
-    android:defaultValue="btc"
+    android:defaultValue="sat"
     android:dialogTitle="@string/prefs_display_coin_label"
     android:entries="@array/btc_unit_labels"
     android:entryValues="@array/btc_unit_values"
