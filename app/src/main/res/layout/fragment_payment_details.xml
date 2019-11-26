@@ -21,6 +21,7 @@
   <data>
 
     <import type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsState" />
+
     <import type="android.view.View" />
 
     <variable
@@ -45,9 +46,10 @@
       app:layout_constraintTop_toTopOf="parent">
 
       <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
-        android:animateLayoutChanges="true"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <!-- curved background image -->
         <ImageView

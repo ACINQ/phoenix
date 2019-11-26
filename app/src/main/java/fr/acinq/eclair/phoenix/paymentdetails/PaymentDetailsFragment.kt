@@ -72,7 +72,9 @@ class PaymentDetailsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-
+    if (args.fromEvent) {
+      mBinding.mainLayout.layoutTransition = null
+    }
     model.payment.observe(viewLifecycleOwner, Observer {
       it?.let {
         context?.let { ctx ->
