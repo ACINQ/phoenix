@@ -21,6 +21,7 @@
   <data>
 
     <import type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsState" />
+    <import type="android.view.View" />
 
     <variable
       name="model"
@@ -39,15 +40,16 @@
       android:layout_height="0dp"
       android:fillViewport="true"
       android:overScrollMode="never"
-      android:visibility="@{model.state == PaymentDetailsState.DONE}"
       app:layout_constrainedHeight="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toTopOf="parent">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:animateLayoutChanges="true"
         android:layout_height="wrap_content">
 
+        <!-- curved background image -->
         <ImageView
           android:layout_width="match_parent"
           android:layout_height="240dp"
@@ -57,6 +59,7 @@
           app:layout_constrainedHeight="true"
           app:layout_constraintBottom_toBottomOf="@id/mid_section" />
 
+        <!-- bottom solid background -->
         <View
           android:layout_width="match_parent"
           android:layout_height="0dp"
@@ -64,11 +67,53 @@
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mid_section" />
 
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="@dimen/space_lg"
+          android:drawableStart="@drawable/ic_alert_triangle"
+          android:text="@string/paymentdetails_error"
+          android:textAlignment="center"
+          android:visibility="@{model.state == PaymentDetailsState.ERROR}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="@dimen/space_lg"
+          android:text="@string/paymentdetails_none"
+          android:textAlignment="center"
+          android:visibility="@{model.state == PaymentDetailsState.NONE}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_margin="@dimen/space_lg"
+          android:text="@string/paymentdetails_loading"
+          android:textAlignment="center"
+          android:textColor="?attr/mutedTextColor"
+          android:visibility="@{model.state == PaymentDetailsState.RETRIEVING_PAYMENT_DATA}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/top_section"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:paddingBottom="110dp"
+          android:visibility="@{model.state == PaymentDetailsState.DONE ? View.VISIBLE : View.INVISIBLE}"
           app:layout_constraintTop_toTopOf="parent">
 
           <ImageView
@@ -102,6 +147,7 @@
           android:id="@+id/mid_section"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:visibility="@{model.state == PaymentDetailsState.DONE ? View.VISIBLE : View.INVISIBLE}"
           app:layout_constraintTop_toBottomOf="@id/top_section">
 
           <fr.acinq.eclair.phoenix.utils.customviews.CoinView
@@ -284,11 +330,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_lg"
+            android:visibility="@{!model.isClosingChannelMock()}"
             app:icon="@drawable/ic_tool"
             app:icon_tint="?attr/mutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:visibility="@{!model.isClosingChannelMock()}"
             app:layout_constraintTop_toBottomOf="@id/mulitpart_info"
             app:text="@string/paymentdetails_technicals_button"
             app:text_color="?attr/mutedTextColor"
@@ -306,47 +352,6 @@
       android:backgroundTint="@color/transparent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/space_lg"
-      android:drawableStart="@drawable/ic_alert_triangle"
-      android:text="@string/paymentdetails_error"
-      android:textAlignment="center"
-      android:visibility="@{model.state == PaymentDetailsState.ERROR}"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/space_lg"
-      android:text="@string/paymentdetails_none"
-      android:textAlignment="center"
-      android:visibility="@{model.state == PaymentDetailsState.NONE}"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/space_lg"
-      android:text="@string/paymentdetails_loading"
-      android:textAlignment="center"
-      android:textColor="?attr/mutedTextColor"
-      android:visibility="@{model.state == PaymentDetailsState.RETRIEVING_PAYMENT_DATA}"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
