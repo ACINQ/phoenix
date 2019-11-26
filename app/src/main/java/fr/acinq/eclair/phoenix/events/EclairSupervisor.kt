@@ -28,6 +28,7 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
+import fr.acinq.eclair.wire.SwapInConfirmed
 import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
@@ -47,10 +48,6 @@ class EclairSupervisor : UntypedActor() {
   // key is payment hash
   private val payToOpenMap = HashMap<ByteVector32, PayToOpenRequestEvent>()
 
-  private fun postBalance() {
-    EventBus.getDefault().post(BalanceEvent())
-  }
-
   override fun onReceive(event: Any?) {
     log.debug("received event $event")
     when (event) {
@@ -60,7 +57,7 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelRestored -> {
         log.debug("channel $event has been restored")
-        postBalance()
+        EventBus.getDefault().post(BalanceEvent())
       }
       is ChannelIdAssigned -> {
         log.debug("channel has been assigned id=${event.channelId()}")
@@ -73,7 +70,7 @@ class EclairSupervisor : UntypedActor() {
             log.info("closing channel ${data.channelId()}")
             EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId()))
           }
-          postBalance()
+          EventBus.getDefault().post(BalanceEvent())
         }
       }
       is ChannelSignatureSent -> {
@@ -82,7 +79,7 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelSignatureReceived -> {
         log.debug("signature $event has been sent")
-        postBalance()
+        EventBus.getDefault().post(BalanceEvent())
       }
       is Terminated -> {
         log.info("channel $event has been terminated")
@@ -126,6 +123,10 @@ class EclairSupervisor : UntypedActor() {
       }
       is SwapInPending -> {
         log.info("received pending swap-in event=$event")
+        EventBus.getDefault().post(event)
+      }
+      is SwapInConfirmed -> {
+        log.info("received confirmed swap-in=$event")
         EventBus.getDefault().post(event)
       }
       is SwapOutResponse -> {

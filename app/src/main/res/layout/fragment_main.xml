@@ -176,6 +176,7 @@
       android:drawableStart="@drawable/ic_chain"
       android:drawablePadding="@dimen/space_xxs"
       android:drawableTint="?attr/colorPrimary"
+      android:textColor="?attr/onMutedBgTextColor"
       android:padding="@dimen/space_xs"
       android:text="@string/main_swapin_incoming"
       android:textSize="@dimen/text_sm" />

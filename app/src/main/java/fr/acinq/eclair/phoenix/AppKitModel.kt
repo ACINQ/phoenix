@@ -46,12 +46,10 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
+import fr.acinq.eclair.phoenix.events.PayToOpenResponse
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
-import fr.acinq.eclair.wire.SwapInPending
-import fr.acinq.eclair.wire.SwapInResponse
-import fr.acinq.eclair.wire.SwapOutResponse
-import fr.acinq.eclair.wire.`NodeAddress$`
+import fr.acinq.eclair.wire.*
 import kotlinx.coroutines.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -152,6 +150,20 @@ class AppKitModel : ViewModel() {
       add(event)
       pendingSwapIns.postValue(this)
     }
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: SwapInConfirmed) {
+    // a confirmed swap-in means that a channel was opened ; this event is stored as an incoming payment in payment database.
+    kit.value?.run {
+      try {
+        val pr = doGeneratePaymentRequest("On-chain payment to ${event.bitcoinAddress()}", Option.apply(event.amount()), ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>())
+        kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
+        navigationEvent.postValue(PaymentReceived(pr.paymentHash(), ScalaList.empty<PaymentReceived.PartialPayment>()))
+      } catch (e: Exception) {
+        log.error("failed to create and settle payment request placeholder for ${event.bitcoinAddress()}: ", e)
+      }
+    } ?: log.error("could not create and settle placeholder for on-chain payment because kit is not initialized")
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -272,22 +284,27 @@ class AppKitModel : ViewModel() {
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.let {
-          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
-          val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-          val f = Patterns.ask(it.kit.paymentHandler(),
-            MultiPartHandler.ReceivePayment(
-              /* amount */ amount_opt,
-              /* description */ description,
-              /* expiry seconds */ Option.empty(),
-              /* extra routing info */ routes,
-              /* fallback onchain address */ Option.empty(),
-              /* payment preimage */ Option.empty(),
-              /* allow multi part payment */ true), timeout)
-          Await.result(f, awaitDuration) as PaymentRequest
-        } ?: throw KitNotInitialized()
+        val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
+        val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
+        doGeneratePaymentRequest(description, amount_opt, routes)
       }
     }.await()
+  }
+
+  @WorkerThread
+  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>): PaymentRequest {
+    return _kit.value?.let {
+      val f = Patterns.ask(it.kit.paymentHandler(),
+        MultiPartHandler.ReceivePayment(
+          /* amount */ amount_opt,
+          /* description */ description,
+          /* expiry seconds */ Option.empty(),
+          /* extra routing info */ routes,
+          /* fallback onchain address */ Option.empty(),
+          /* payment preimage */ Option.empty(),
+          /* allow multi part payment */ true), timeout)
+      Await.result(f, awaitDuration) as PaymentRequest
+    } ?: throw KitNotInitialized()
   }
 
   suspend fun sendSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
@@ -568,6 +585,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
+    system.eventStream().subscribe(nodeSupervisor, SwapInConfirmed::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
