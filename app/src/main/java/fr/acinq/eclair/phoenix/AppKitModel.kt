@@ -158,7 +158,9 @@ class AppKitModel : ViewModel() {
       api.usableBalances(timeout).onComplete(object : OnComplete<scala.collection.Iterable<Relayer.UsableBalance>>() {
         override fun onComplete(t: Throwable?, result: scala.collection.Iterable<Relayer.UsableBalance>) {
           if (t == null) {
-            val total = JavaConverters.seqAsJavaListConverter(result.toSeq()).asJava().map { b -> b.canSend().toLong() }.sum()
+            val balances = JavaConverters.seqAsJavaListConverter(result.toSeq()).asJava()
+            val total = balances.map { b -> b.canSend().toLong() }.sum()
+            log.debug("update balance to total=$total")
             nodeData.postValue(nodeData.value?.copy(balance = MilliSatoshi(total)))
           }
         }
