@@ -34,10 +34,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentPending
-import fr.acinq.eclair.phoenix.utils.InAppNotifications
-import fr.acinq.eclair.phoenix.utils.KitNotInitialized
-import fr.acinq.eclair.phoenix.utils.Prefs
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -98,14 +95,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    appKit.nodeData.observe(viewLifecycleOwner, Observer { nodeData ->
-      nodeData?.let {mBinding.balance.setAmount(it.balance)}
-    })
-    appKit.pendingSwapIn.observe(viewLifecycleOwner, Observer { isPending ->
-      mBinding.swapInInfo.visibility = if (isPending) View.VISIBLE else View.GONE
-    })
-    mBinding.appKitModel = appKit
-
     model = ViewModelProvider(this).get(MainViewModel::class.java)
     model.payments.observe(viewLifecycleOwner, Observer {
       //      paymentsListAdapter.submitList(it)
@@ -113,6 +102,18 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     })
     appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
+    })
+    appKit.nodeData.observe(viewLifecycleOwner, Observer { nodeData ->
+      nodeData?.let { mBinding.balance.setAmount(it.balance) }
+    })
+    appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
+      if (swapIns == null || swapIns.isEmpty()) {
+        mBinding.swapInInfo.visibility = View.INVISIBLE
+      } else {
+        val total = swapIns.map { s -> s.amount() }.reduce { acc, amount -> acc.`$plus`(amount) }
+        context?.let { mBinding.swapInInfo.text = getString(R.string.main_swapin_incoming, Converter.printAmountPretty(total, it, withUnit = true)) }
+        mBinding.swapInInfo.visibility = View.VISIBLE
+      }
     })
   }
 

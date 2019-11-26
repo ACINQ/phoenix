@@ -114,9 +114,14 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    appKit.pendingSwapIn.observe(viewLifecycleOwner, Observer {
-      if (it) {
-        findNavController().navigate(R.id.action_receive_to_main)
+    appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer {
+      model.invoice.value?.let { invoice ->
+        // if user is swapping in and a payment is incoming on this address, move to main
+        if (invoice.second != null && invoice.second != null && model.state.value == SwapInState.DONE) {
+          if (it.map { pending -> pending.bitcoinAddress() }.contains(invoice.second)) {
+            findNavController().navigate(R.id.action_receive_to_main)
+          }
+        }
       }
     })
   }

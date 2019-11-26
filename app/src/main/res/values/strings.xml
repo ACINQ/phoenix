@@ -255,7 +255,7 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_swapin_incoming">Incoming swap-in</string>
+  <string name="main_swapin_incoming">+%1$s Incoming</string>
 
 
   <!-- //////////////// notifications //////////////////// -->

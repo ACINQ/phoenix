@@ -95,7 +95,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
-  val pendingSwapIn = MutableLiveData<Boolean>()
+  val pendingSwapIns = MutableLiveData(HashSet<SwapInPending>())
   val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
@@ -105,7 +105,6 @@ class AppKitModel : ViewModel() {
   val kit: LiveData<AppKit> get() = _kit
 
   init {
-    pendingSwapIn.value = false
     _kit.value = null
     startupState.value = StartupState.OFF
     nodeData.value = NodeData(MilliSatoshi(0), "")
@@ -149,7 +148,10 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: SwapInPending) {
-    pendingSwapIn.value = true
+    pendingSwapIns.value?.run {
+      add(event)
+      pendingSwapIns.postValue(this)
+    }
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -158,6 +160,7 @@ class AppKitModel : ViewModel() {
       api.usableBalances(timeout).onComplete(object : OnComplete<scala.collection.Iterable<Relayer.UsableBalance>>() {
         override fun onComplete(t: Throwable?, result: scala.collection.Iterable<Relayer.UsableBalance>) {
           if (t == null) {
+            log.debug("model received usable_balances=$result")
             val balances = JavaConverters.seqAsJavaListConverter(result.toSeq()).asJava()
             val total = balances.map { b -> b.canSend().toLong() }.sum()
             log.debug("update balance to total=$total")
