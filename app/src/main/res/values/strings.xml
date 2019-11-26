@@ -262,7 +262,7 @@
 
   <string name="notifications_set_up_pin">Your wallet is not protected.</string>
   <string name="notifications_set_up_pin_action">Set a PIN</string>
-  <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you made a back up of your wallet?</string>
+  <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
   <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
   <string name="notifications_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
