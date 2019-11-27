@@ -17,6 +17,7 @@
 package fr.acinq.eclair.phoenix.send
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -36,11 +37,9 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReadInvoiceBinding
-import fr.acinq.eclair.phoenix.utils.BitcoinURI
-import fr.acinq.eclair.phoenix.utils.Clipboard
-import fr.acinq.eclair.phoenix.utils.IntentCodes
-import fr.acinq.eclair.phoenix.utils.LNUrl
+import fr.acinq.eclair.phoenix.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -65,13 +64,42 @@ class ReadInputFragment : BaseFragment() {
 
     model.invoice.observe(viewLifecycleOwner, Observer {
       if (it != null) {
-        when {
-          it is PaymentRequest -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it)))
-          it is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
-          it is LNUrl && it.isLogin() -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.uri.toString()))
-          it is LNUrl -> {
-            log.info("cannot handle LNurl with uri=${it.uri}")
+        when (it) {
+          is PaymentRequest -> {
+            // check payment request chain
+            val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
+            // additional controls
+            if (appKit.kit.value != null && appKit.kit.value!!.kit.nodeParams().nodeId() == it.nodeId()) {
+              log.debug("abort payment to self")
+              model.readingState.postValue(ReadingState.ERROR)
+              model.errorMessage.postValue(R.string.scan_error_pay_to_self)
+            } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
+              // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
+              AlertDialog.Builder(context, R.style.default_dialogTheme)
+                .setCancelable(false)
+                .setTitle(R.string.scan_amountless_legacy_title)
+                .setMessage(R.string.scan_amountless_legacy_message)
+                .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it))) }
+                .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
+                  mBinding.scanView.resume()
+                  model.readingState.value = ReadingState.SCANNING
+                }
+                .show()
+            } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.prefix()) {
+              model.readingState.postValue(ReadingState.ERROR)
+              model.errorMessage.postValue(R.string.scan_error_invalid_chain)
+            } else {
+              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it)))
+            }
+          }
+          is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
+          is LNUrl -> {
+            if (it.isLogin()) {
+              // findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.uri.toString()))
+            }
+            log.info("cannot handle LNURL=${it.uri}")
             model.readingState.postValue(ReadingState.ERROR)
+            model.errorMessage.postValue(R.string.scan_error_lnurl_unsupported)
           }
           else -> model.invoice.value = null
         }
@@ -81,7 +109,7 @@ class ReadInputFragment : BaseFragment() {
       when (it) {
         ReadingState.ERROR -> {
           mBinding.scanView.resume()
-          Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1250)
+          Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1750)
         }
         ReadingState.READING -> {
           mBinding.scanView.pause()

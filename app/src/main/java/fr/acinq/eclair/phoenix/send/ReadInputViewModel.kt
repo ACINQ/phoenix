@@ -18,6 +18,7 @@ package fr.acinq.eclair.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,12 +32,16 @@ enum class ReadingState {
 class ReadInputViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReadInputViewModel::class.java)
 
-  val hasCameraAccess = MutableLiveData(false)
-  val invoice = MutableLiveData<Any>(null)
+  val hasCameraAccess = MutableLiveData<Boolean>()
+  val invoice = MutableLiveData<Any>()
   val readingState = MutableLiveData<ReadingState>()
+  val errorMessage = MutableLiveData<Int>()
 
   init {
+    hasCameraAccess.value = false
+    invoice.value = null
     readingState.value = ReadingState.SCANNING
+    errorMessage.value = R.string.scan_error_default
   }
 
   @UiThread
@@ -49,13 +54,14 @@ class ReadInputViewModel : ViewModel() {
           try {
             invoice.postValue(Wallet.extractInvoice(input))
             readingState.postValue(ReadingState.DONE)
-          } catch (e1: Exception) {
+          } catch (e: Exception) {
+            log.info("invalid invoice: ${e.localizedMessage}")
             invoice.postValue(null)
             readingState.postValue(ReadingState.ERROR)
+            errorMessage.postValue(R.string.scan_error_default)
           }
         }
       }
     }
   }
-
 }

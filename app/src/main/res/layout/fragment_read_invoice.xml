@@ -35,20 +35,21 @@
       android:id="@+id/actions_layout"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:background="?attr/bgColor"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      android:background="?attr/bgColor">
+      app:layout_constraintStart_toStartOf="parent">
 
       <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
         android:id="@+id/paste_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md_p"
         app:icon="@drawable/ic_clipboard"
+        app:enableOrFade="@{model.readingState == ReadingState.SCANNING}"
+        app:layout_constraintTop_toTopOf="parent"
         app:text="@string/send_init_paste" />
 
       <View
@@ -61,9 +62,9 @@
         android:id="@+id/cancel_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sep"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md_p"
+        app:layout_constraintTop_toBottomOf="@id/sep"
         app:text="@string/btn_cancel" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -84,48 +85,48 @@
       android:id="@+id/scan_crosshairs"
       android:layout_width="@dimen/scanner_size"
       android:layout_height="@dimen/scanner_size"
+      android:background="@drawable/rounded_white_low_op"
+      android:visibility="@{model.hasCameraAccess}"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintEnd_toEndOf="@id/scan_view"
       app:layout_constraintStart_toStartOf="@id/scan_view"
-      app:layout_constraintTop_toTopOf="@id/scan_view"
-      android:background="@drawable/rounded_white_low_op"
-      android:visibility="@{model.hasCameraAccess}" />
+      app:layout_constraintTop_toTopOf="@id/scan_view" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:padding="@dimen/space_xs"
+      android:visibility="@{model.readingState == ReadingState.READING}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/scan_crosshairs"
       app:layout_constraintEnd_toEndOf="@id/scan_crosshairs"
       app:layout_constraintStart_toStartOf="@id/scan_crosshairs"
       app:layout_constraintTop_toTopOf="@id/scan_crosshairs"
-      android:padding="@dimen/space_xs"
-      app:progress_tint="?attr/colorPrimary"
-      android:visibility="@{model.readingState == ReadingState.READING}" />
+      app:progress_tint="?attr/colorPrimary" />
 
     <TextView
       android:id="@+id/instructions"
       style="@style/default_textAppearance"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintBottom_toBottomOf="@id/scan_view"
       android:padding="@dimen/space_sm"
       android:text="@string/scan_instructions"
       android:textAlignment="center"
       android:textColor="@color/white_mid_op"
       android:textSize="@dimen/text_sm"
-      android:visibility="@{model.hasCameraAccess}" />
+      android:visibility="@{model.hasCameraAccess}"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view" />
 
     <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
       android:id="@+id/camera_access_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_margin="@dimen/space_lg"
-      app:layout_constraintBottom_toBottomOf="@id/scan_view"
-      app:layout_constraintTop_toTopOf="@id/scan_view"
       android:visibility="@{!model.hasCameraAccess}"
       app:background="@drawable/rounded"
       app:icon="@drawable/ic_photo_camera"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
+      app:layout_constraintTop_toTopOf="@id/scan_view"
       app:text="@string/scan_request_camera_access"
       app:text_size="@dimen/text_lg" />
 
@@ -133,17 +134,17 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="@dimen/space_lg"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="@id/scan_view"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/scan_view"
       android:background="@drawable/rounded"
       android:drawableStart="@drawable/ic_alert_triangle"
       android:drawableTint="?attr/negativeColor"
       android:padding="@dimen/space_md_p"
-      android:text="@string/scan_state_error"
-      android:visibility="@{model.readingState == ReadingState.ERROR}" />
+      android:text="@{model.errorMessage}"
+      android:visibility="@{model.readingState == ReadingState.ERROR}"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@id/scan_view" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

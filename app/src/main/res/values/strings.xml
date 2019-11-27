@@ -143,7 +143,16 @@
   <string name="scan_request_camera_access">Grant camera permission</string>
   <string name="scan_instructions">Place a payment request QR code\ninside the rectangle to scan it</string>
   <string name="scan_state_reading">Reading payment request</string>
-  <string name="scan_state_error">This is not a valid payment request.\nPlease try again.</string>
+
+  <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
+  <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
+  <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
+  <string name="scan_error_lnurl_unsupported">LNURL is not supported yet!</string>
+
+  <string name="scan_amountless_legacy_title">Warning</string>
+  <string name="scan_amountless_legacy_message">This is an amountless legacy invoice. Dangerous. To be safe, the payee should specify an amount in the payment request.\n\nAre you sure you want to pay this invoice?</string>
+  <string name="scan_amountless_legacy_confirm_button">Confirm</string>
+  <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
