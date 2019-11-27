@@ -110,7 +110,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       if (swapIns == null || swapIns.isEmpty()) {
         mBinding.swapInInfo.visibility = View.INVISIBLE
       } else {
-        val total = swapIns.map { s -> s.amount() }.reduce { acc, amount -> acc.`$plus`(amount) }
+        val total = swapIns.values.map { s -> s.amount() }.reduce { acc, amount -> acc.`$plus`(amount) }
         context?.let { mBinding.swapInInfo.text = getString(R.string.main_swapin_incoming, Converter.printAmountPretty(total, it, withUnit = true)) }
         mBinding.swapInInfo.visibility = View.VISIBLE
       }

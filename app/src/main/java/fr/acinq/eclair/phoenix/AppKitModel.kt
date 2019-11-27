@@ -93,7 +93,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
-  val pendingSwapIns = MutableLiveData(HashSet<SwapInPending>())
+  val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
@@ -147,7 +147,7 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: SwapInPending) {
     pendingSwapIns.value?.run {
-      add(event)
+      put(event.bitcoinAddress(), event)
       pendingSwapIns.postValue(this)
     }
   }
@@ -159,6 +159,7 @@ class AppKitModel : ViewModel() {
       try {
         val pr = doGeneratePaymentRequest("On-chain payment to ${event.bitcoinAddress()}", Option.apply(event.amount()), ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>())
         kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
+        pendingSwapIns.value?.remove(event.bitcoinAddress())
         navigationEvent.postValue(PaymentReceived(pr.paymentHash(), ScalaList.empty<PaymentReceived.PartialPayment>()))
       } catch (e: Exception) {
         log.error("failed to create and settle payment request placeholder for ${event.bitcoinAddress()}: ", e)
