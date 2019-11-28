@@ -16,7 +16,6 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -32,6 +31,7 @@ import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsMutualCloseBinding
+import fr.acinq.eclair.phoenix.utils.AlertHelper
 import fr.acinq.eclair.phoenix.utils.Converter
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -62,8 +62,7 @@ class MutualCloseFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.mutualConfirmButton.setOnClickListener {
-      AlertDialog.Builder(context, R.style.default_dialogTheme)
-        .setMessage(R.string.closechannels_confirm_dialog_message)
+      AlertHelper.build(layoutInflater, null, R.string.closechannels_confirm_dialog_message)
         .setPositiveButton(R.string.btn_confirm) { _, _ -> doMutualClose() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()

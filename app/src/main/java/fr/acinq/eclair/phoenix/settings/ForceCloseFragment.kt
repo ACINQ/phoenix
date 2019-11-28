@@ -16,7 +16,6 @@
 
 package fr.acinq.eclair.phoenix.settings
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -31,13 +30,12 @@ import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsForceCloseBinding
+import fr.acinq.eclair.phoenix.utils.AlertHelper
 import fr.acinq.eclair.phoenix.utils.Converter
-import kotlinx.android.synthetic.main.custom_action_bar_view.view.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 
 
 class ForceCloseFragment : BaseFragment() {
@@ -68,8 +66,7 @@ class ForceCloseFragment : BaseFragment() {
     super.onStart()
     getChannels()
     mBinding.forceConfirmButton.setOnClickListener {
-      AlertDialog.Builder(context, R.style.default_dialogTheme)
-        .setMessage(R.string.closechannels_confirm_dialog_message)
+      AlertHelper.build(layoutInflater, null, R.string.closechannels_confirm_dialog_message)
         .setPositiveButton(R.string.btn_confirm) { _, _ -> doForceClose() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()

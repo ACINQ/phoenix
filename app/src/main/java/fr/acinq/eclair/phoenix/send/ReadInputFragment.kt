@@ -17,7 +17,6 @@
 package fr.acinq.eclair.phoenix.send
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -75,10 +74,8 @@ class ReadInputFragment : BaseFragment() {
               model.errorMessage.postValue(R.string.scan_error_pay_to_self)
             } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
               // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
-              AlertDialog.Builder(context, R.style.default_dialogTheme)
+              AlertHelper.build(layoutInflater, R.string.scan_amountless_legacy_title, R.string.scan_amountless_legacy_message)
                 .setCancelable(false)
-                .setTitle(R.string.scan_amountless_legacy_title)
-                .setMessage(R.string.scan_amountless_legacy_message)
                 .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it))) }
                 .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
                   mBinding.scanView.resume()

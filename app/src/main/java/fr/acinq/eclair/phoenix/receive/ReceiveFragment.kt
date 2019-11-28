@@ -16,7 +16,6 @@
 
 package fr.acinq.eclair.phoenix.receive
 
-import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -46,6 +45,7 @@ import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
+import fr.acinq.eclair.phoenix.utils.AlertHelper
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -179,9 +179,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      AlertDialog.Builder(context, R.style.default_dialogTheme)
-        .setTitle(R.string.receive_swap_in_disclaimer_title)
-        .setMessage(R.string.receive_swap_in_disclaimer_message)
+      AlertHelper.build(layoutInflater, R.string.receive_swap_in_disclaimer_title, R.string.receive_swap_in_disclaimer_message)
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()
