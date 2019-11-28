@@ -16,6 +16,7 @@
 
 package fr.acinq.eclair.phoenix.main
 
+import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -25,6 +26,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.InAppNotifications
+import fr.acinq.eclair.phoenix.utils.ThemeHelper
 
 class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -36,6 +38,16 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val spaceSM = itemView.resources.getDimensionPixelSize(R.dimen.space_sm)
     val spaceXS = itemView.resources.getDimensionPixelSize(R.dimen.space_xs)
 
+    if (notification.priority == 1) {
+      itemView.background = itemView.context.getDrawable(R.drawable.app_notif_bg_critical)
+      messageView.setTextColor(itemView.context.getColor(R.color.white))
+      iconView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.white))
+    } else {
+      itemView.background = itemView.context.getDrawable(R.drawable.app_notif_bg)
+      messageView.setTextColor(ThemeHelper.color(itemView.context, R.attr.textColor))
+      iconView.imageTintList = ColorStateList.valueOf(ThemeHelper.color(itemView.context, R.attr.textColor))
+    }
+
     if (position == 0) {
       (itemView.layoutParams as ViewGroup.MarginLayoutParams).setMargins(spaceMD, 0, spaceMD, 0)
     } else {
@@ -43,7 +55,7 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     messageView.text = itemView.resources.getString(notification.messageResId)
-    iconView.setImageDrawable(itemView.resources.getDrawable(notification.imageResId, itemView.context.theme))
+    iconView.setImageDrawable(itemView.context.getDrawable(notification.imageResId))
 
     if (notification.actionResId != null) {
       actionButton.visibility = View.VISIBLE

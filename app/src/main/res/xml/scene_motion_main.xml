@@ -18,8 +18,8 @@
   xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <Transition
-    app:constraintSetEnd="@id/collapsed"
-    app:constraintSetStart="@id/expanded">
+    app:constraintSetEnd="@id/small_top"
+    app:constraintSetStart="@id/big_top">
 
     <OnSwipe
       app:dragDirection="dragUp"
@@ -27,7 +27,7 @@
       app:touchAnchorSide="top" />
   </Transition>
 
-  <ConstraintSet android:id="@+id/expanded">
+  <ConstraintSet android:id="@+id/big_top">
 
     <Constraint
       android:id="@id/top_section"
@@ -40,10 +40,10 @@
       android:id="@id/top_limiter"
       android:layout_width="64dp"
       android:layout_height="8dp"
-      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintBottom_toBottomOf="@id/top_section"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/balance"
-      app:layout_constraintBottom_toBottomOf="@id/top_section" />
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/balance" />
 
     <Constraint
       android:id="@id/balance"
@@ -52,26 +52,19 @@
       app:layout_constraintBottom_toBottomOf="@id/top_section"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/top_section">
-      <!--<CustomAttribute-->
-        <!--app:attributeName="amountSize"-->
-        <!--app:customFloatValue="48" />-->
-      <!--<CustomAttribute-->
-        <!--app:attributeName="unitSize"-->
-        <!--app:customFloatValue="22" />-->
-    </Constraint>
+      app:layout_constraintTop_toTopOf="@id/top_section" />
 
     <Constraint
       android:id="@id/swap_in_info"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/balance"
       app:visibilityMode="ignore" />
   </ConstraintSet>
 
-  <ConstraintSet android:id="@+id/collapsed">
+  <ConstraintSet android:id="@+id/small_top">
 
     <Constraint
       android:id="@id/top_section"
@@ -84,8 +77,8 @@
       android:id="@id/top_limiter"
       android:layout_width="match_parent"
       android:layout_height="4dp"
-      android:layout_marginStart="@dimen/space_lg"
-      android:layout_marginEnd="@dimen/space_lg"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
       app:layout_constraintTop_toBottomOf="@id/top_section" />
 
     <Constraint
@@ -95,21 +88,14 @@
       android:layout_marginBottom="@dimen/space_lg"
       app:layout_constraintBottom_toBottomOf="@id/top_section"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent">
-      <!--<CustomAttribute-->
-        <!--app:attributeName="amountSize"-->
-        <!--app:customFloatValue="38" />-->
-      <!--<CustomAttribute-->
-        <!--app:attributeName="unitSize"-->
-        <!--app:customFloatValue="20" />-->
-    </Constraint>
+      app:layout_constraintStart_toStartOf="parent" />
 
     <Constraint
       android:id="@id/swap_in_info"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/balance"
       app:visibilityMode="ignore" />
 

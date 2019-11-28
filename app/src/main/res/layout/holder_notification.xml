@@ -19,8 +19,8 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:layout_marginStart="@dimen/space_md"
-  android:layout_marginEnd="@dimen/space_md"
   android:layout_marginTop="@dimen/space_xs"
+  android:layout_marginEnd="@dimen/space_md"
   android:background="@drawable/app_notif_bg"
   android:padding="@dimen/space_sm">
 
@@ -28,10 +28,12 @@
     android:id="@+id/notif_icon"
     android:layout_width="18dp"
     android:layout_height="18dp"
-    android:layout_marginStart="@dimen/space_xs"
+    android:layout_marginStart="@dimen/space_xxxs"
+    android:layout_marginTop="@dimen/space_xxxs"
     android:adjustViewBounds="true"
     android:contentDescription="@null"
     android:scaleType="fitCenter"
+    android:src="@drawable/ic_alert_triangle"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +41,7 @@
     android:id="@+id/notif_message"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/space_sm"
+    android:layout_marginStart="@dimen/space_xs"
     android:text="@string/lipsum"
     android:textSize="@dimen/text_md"
     app:layout_constraintEnd_toEndOf="parent"

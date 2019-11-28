@@ -665,7 +665,7 @@ class AppKitModel : ViewModel() {
   private fun checkWalletContext() {
     Api.httpClient.newCall(Request.Builder().url(Api.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("could not retrieve wallet context from acinq")
+        log.warn("could not retrieve wallet context from remote: ", e)
       }
 
       override fun onResponse(call: Call, response: Response) {
@@ -676,22 +676,24 @@ class AppKitModel : ViewModel() {
             log.debug("wallet context responded with {}", json.toString(2))
             val installedVersion = BuildConfig.VERSION_CODE
             val latestVersion = json.getJSONObject(BuildConfig.CHAIN).getInt("version")
-            if (latestVersion - installedVersion >= 2) {
-              notifications.value?.run {
+            val latestCriticalVersion = json.getJSONObject(BuildConfig.CHAIN).getInt("latest_critical_version")
+            notifications.value?.run {
+              if (installedVersion < latestCriticalVersion) {
+                log.info("a critical update (v$latestCriticalVersion) is deemed available")
+                add(InAppNotifications.NotificationTypes.UPGRADE_WALLET_CRITICAL)
+              } else if (latestVersion - installedVersion >= 2) {
                 add(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
-                notifications.postValue(this)
-              }
-            } else {
-              notifications.value?.run {
+              } else {
+                remove(InAppNotifications.NotificationTypes.UPGRADE_WALLET_CRITICAL)
                 remove(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
-                notifications.postValue(this)
               }
+              notifications.postValue(this)
             }
           } catch (e: JSONException) {
-            log.error("could not read wallet context body", e)
+            log.error("could not read wallet context body: ", e)
           }
         } else {
-          log.warn("wallet context query responds with code {}", response.code())
+          log.warn("could not retrieve wallet context from remote, code=${response.code()}")
         }
       }
     })

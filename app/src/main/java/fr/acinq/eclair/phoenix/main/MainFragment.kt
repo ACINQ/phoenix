@@ -83,7 +83,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
     // init notification recycler view
     notificationsManager = LinearLayoutManager(context)
-    notificationsAdapter = NotificationsAdapter(HashSet())
+    notificationsAdapter = NotificationsAdapter(mutableListOf())
     mBinding.notificationList.apply {
       setHasFixedSize(true)
       layoutManager = notificationsManager
@@ -199,7 +199,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     } else {
       appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN)
       if (System.currentTimeMillis() - timestamp > InAppNotifications.MNEMONICS_REMINDER_INTERVAL) {
-        //notifications.value?.add(NotificationTypes.MNEMONICS_REMINDER)
+        appKit.notifications.value?.add(InAppNotifications.NotificationTypes.MNEMONICS_REMINDER)
       } else {
         appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_REMINDER)
       }

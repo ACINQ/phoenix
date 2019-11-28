@@ -18,8 +18,7 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
-  <data>
-  </data>
+  <data></data>
 
   <androidx.constraintlayout.motion.widget.MotionLayout
     android:id="@+id/main"
@@ -176,9 +175,9 @@
       android:drawableStart="@drawable/ic_chain"
       android:drawablePadding="@dimen/space_xxs"
       android:drawableTint="?attr/colorPrimary"
-      android:textColor="?attr/onMutedBgTextColor"
       android:padding="@dimen/space_xs"
       android:text="@string/main_swapin_incoming"
+      android:textColor="?attr/onMutedBgTextColor"
       android:textSize="@dimen/text_sm" />
 
   </androidx.constraintlayout.motion.widget.MotionLayout>
