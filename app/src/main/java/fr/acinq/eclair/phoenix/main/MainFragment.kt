@@ -25,8 +25,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,9 +32,10 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentPending
-import fr.acinq.eclair.phoenix.utils.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
+import fr.acinq.eclair.phoenix.utils.Converter
+import fr.acinq.eclair.phoenix.utils.InAppNotifications
+import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -45,13 +44,10 @@ import org.slf4j.LoggerFactory
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
-
-  private lateinit var model: MainViewModel
   private lateinit var mBinding: FragmentMainBinding
 
   private lateinit var paymentsAdapter: PaymentsAdapter
@@ -95,8 +91,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(MainViewModel::class.java)
-    model.payments.observe(viewLifecycleOwner, Observer {
+    appKit.payments.observe(viewLifecycleOwner, Observer {
       //      paymentsListAdapter.submitList(it)
       paymentsAdapter.update(it)
     })
@@ -133,7 +128,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://acinq.co/phoenix"))) }
 
-    refreshPaymentList()
+    appKit.refreshPayments()
   }
 
   override fun onStop() {
@@ -147,17 +142,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
-    refreshPaymentList()
-  }
-
-  private fun refreshPaymentList() {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, e ->
-      if (e !is KitNotInitialized) {
-        log.error("error when fetching payments: ", e)
-      }
-    }) {
-      model.payments.value = appKit.listPayments()
-    }
+    appKit.refreshPayments()
   }
 
   private fun refreshNotifications(context: Context) {

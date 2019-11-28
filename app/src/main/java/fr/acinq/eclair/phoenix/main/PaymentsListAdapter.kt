@@ -41,7 +41,7 @@ class PaymentsListAdapter : ListAdapter<Payment, PaymentHolder>(PaymentDiffCallb
 
   override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
 //    val payment = this.payments!![position]
-    holder.bindPaymentItem(position, getItem(position), "usd", CoinUtils.getUnitFromString("btc"), false)
+    holder.bindPaymentItem(position, getItem(position))//, "usd", CoinUtils.getUnitFromString("btc"), false)
   }
 
 //  override fun getItemCount(): Int {

@@ -25,7 +25,6 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
-import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.payment.PaymentRequest
@@ -33,6 +32,7 @@ import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.eclair.phoenix.utils.Converter
+import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Transcriber
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -47,7 +47,11 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   }
 
   @SuppressLint("SetTextI18n")
-  fun bindPaymentItem(position: Int, payment: Payment, fiatCode: String, coinUnit: CoinUnit, displayAmountAsFiat: Boolean) {
+  fun bindPaymentItem(position: Int, payment: Payment) {
+
+    val fiatCode = Prefs.getFiatCurrency(itemView.context)
+    val coinUnit = Prefs.getCoinUnit(itemView.context)
+    val displayAmountAsFiat = Prefs.getShowAmountInFiat(itemView.context)
 
     val primaryColor: Int = getAttrColor(R.attr.colorPrimary)
     val positiveColor: Int = getAttrColor(R.attr.positiveColor)

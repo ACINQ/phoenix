@@ -94,6 +94,7 @@ class AppKitModel : ViewModel() {
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
+  val payments = MutableLiveData<List<Payment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
@@ -221,34 +222,20 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
-  suspend fun listPayments(): List<Payment> {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        _kit.value?.let {
-          var list = mutableListOf<Payment>()
-          val t = measureTimeMillis {
-            list = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava()
-          }
-          log.info("payment list query complete in ${t}ms")
-          list
-        } ?: throw KitNotInitialized()
-      }
-    }.await()
-  }
 
-  suspend fun getSentPaymentFromId(id: UUID): Option<OutgoingPayment> {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        _kit.value?.run {
-          var payment: Option<OutgoingPayment> = Option.empty()
+  fun refreshPayments() {
+    viewModelScope.launch {
+      withContext(Dispatchers.Default) {
+        _kit.value?.let {
+          var p: List<Payment>? = ArrayList()
           val t = measureTimeMillis {
-            payment = kit.nodeParams().db().payments().getOutgoingPayment(id)
+            p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava()
           }
-          log.info("get sent payment details in ${t}ms")
-          payment
-        } ?: throw KitNotInitialized()
+          log.info("list payments in ${t}ms")
+          payments.postValue(p)
+        } ?: log.info("kit non initialized, cannot list payments")
       }
-    }.await()
+    }
   }
 
   suspend fun getSentPaymentsFromParentId(parentId: UUID): List<OutgoingPayment> {

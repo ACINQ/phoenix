@@ -61,8 +61,6 @@
     <attr name="unit" format="string" />
     <attr name="unit_size" format="dimension" />
     <attr name="unit_color" format="color" />
-    <attr name="editable" format="boolean" />
-    <attr name="hint" format="reference" />
   </declare-styleable>
   <declare-styleable name="ButtonView">
     <attr name="text" />
