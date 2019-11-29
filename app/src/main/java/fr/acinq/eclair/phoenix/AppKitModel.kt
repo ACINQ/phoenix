@@ -94,7 +94,7 @@ class AppKitModel : ViewModel() {
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
-  val payments = MutableLiveData<List<Payment>>()
+  val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
@@ -227,9 +227,9 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         _kit.value?.let {
-          var p: List<Payment>? = ArrayList()
+          var p: List<PlainPayment>? = ArrayList()
           val t = measureTimeMillis {
-            p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPayments(50)).asJava()
+            p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
           }
           log.info("list payments in ${t}ms")
           payments.postValue(p)

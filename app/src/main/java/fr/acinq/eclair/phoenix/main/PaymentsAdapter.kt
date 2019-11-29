@@ -21,11 +21,11 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import fr.acinq.eclair.db.Payment
+import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Prefs
 
-class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerView.Adapter<PaymentHolder>() {
+class PaymentsAdapter(private var payments: MutableList<PlainPayment>?) : RecyclerView.Adapter<PaymentHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
     val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
@@ -49,7 +49,7 @@ class PaymentsAdapter(private var payments: MutableList<Payment>?) : RecyclerVie
     }
   }
 
-  fun update(payments: List<Payment>?) {
+  fun update(payments: List<PlainPayment>?) {
     if (payments == null) {
       this.payments = payments
     } else if (this.payments != payments) {

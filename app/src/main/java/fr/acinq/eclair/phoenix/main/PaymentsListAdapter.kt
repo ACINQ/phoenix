@@ -20,13 +20,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.CoinUtils
-import fr.acinq.eclair.db.Payment
+import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.phoenix.R
 
-class PaymentsListAdapter : ListAdapter<Payment, PaymentHolder>(PaymentDiffCallback()) {
+class PaymentsListAdapter : ListAdapter<PlainPayment, PaymentHolder>(PaymentDiffCallback()) {
   
 //  private var fiatCode = "usd"
 //  private var coinUnit = CoinUtils.getUnitFromString("btc")
@@ -65,12 +62,12 @@ class PaymentsListAdapter : ListAdapter<Payment, PaymentHolder>(PaymentDiffCallb
 //    notifyDataSetChanged()
 //  }
 
-  class PaymentDiffCallback : DiffUtil.ItemCallback<Payment>() {
-    override fun areItemsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+  class PaymentDiffCallback : DiffUtil.ItemCallback<PlainPayment>() {
+    override fun areItemsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
       return true //oldItem.direction() == newItem.direction() && oldItem.paymentHash() == newItem.paymentHash()
     }
 
-    override fun areContentsTheSame(oldItem: Payment, newItem: Payment): Boolean {
+    override fun areContentsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
       return true //oldItem.status() == newItem.status()
     }
   }

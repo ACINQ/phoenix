@@ -47,7 +47,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   }
 
   @SuppressLint("SetTextI18n")
-  fun bindPaymentItem(position: Int, payment: Payment) {
+  fun bindPaymentItem(position: Int, payment: PlainPayment) {
 
     val fiatCode = Prefs.getFiatCurrency(itemView.context)
     val coinUnit = Prefs.getCoinUnit(itemView.context)
@@ -65,7 +65,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val iconBgView = itemView.findViewById<ImageView>(R.id.icon_background)
     val iconView = itemView.findViewById<ImageView>(R.id.icon)
 
-    if (payment is IncomingLightningPayment) {
+    if (payment is PlainIncomingPayment) {
       when {
         payment.status() is IncomingPaymentStatus.Received -> {
           amountView.visibility = View.VISIBLE
@@ -100,7 +100,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
         }
       }
-    } else if (payment is OutgoingLightningPayment) {
+    } else if (payment is PlainOutgoingPayment) {
       when {
         payment.status() is OutgoingPaymentStatus.`Pending$` -> {
           amountView.visibility = View.GONE
@@ -141,11 +141,11 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     // clickable action
     itemView.setOnClickListener {
       when (payment) {
-        is IncomingLightningPayment -> {
+        is PlainIncomingPayment -> {
           val id = payment.paymentHash().toString()
           it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.INCOMING, id, false))
         }
-        is OutgoingLightningPayment -> {
+        is PlainOutgoingPayment -> {
           val id: String = if (payment.parentId().isDefined) payment.parentId().get().toString() else payment.paymentHash().toString()
           it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, id, false))
         }
@@ -154,12 +154,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
   }
 
-  private fun handleDescription(payment: LightningPayment, descriptionView: TextView) {
+  private fun handleDescription(payment: PlainPayment, descriptionView: TextView) {
     val defaultTextColor: Int = getAttrColor(R.attr.textColor)
     val mutedTextColor: Int = getAttrColor(R.attr.mutedTextColor)
     val desc: String? = if (payment.paymentRequest().isDefined) {
       PaymentRequest.fastReadDescription(payment.paymentRequest().get())
-    } else if (payment is OutgoingLightningPayment && payment.externalId().isDefined && payment.externalId().get().startsWith("closing-")) {
+    } else if (payment is PlainOutgoingPayment && payment.externalId().isDefined && payment.externalId().get().startsWith("closing-")) {
       descriptionView.context.getString(R.string.paymentholder_closing_desc, payment.externalId().get().split("-").last())
     } else {
       null
