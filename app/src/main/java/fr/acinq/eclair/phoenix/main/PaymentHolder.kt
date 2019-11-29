@@ -34,8 +34,12 @@ import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Transcriber
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private fun getAttrColor(resId: Int): Int {
     val typedValue = TypedValue()
@@ -48,6 +52,8 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: PlainPayment) {
+
+    log.info("bind payment item #$position")
 
     val fiatCode = Prefs.getFiatCurrency(itemView.context)
     val coinUnit = Prefs.getCoinUnit(itemView.context)

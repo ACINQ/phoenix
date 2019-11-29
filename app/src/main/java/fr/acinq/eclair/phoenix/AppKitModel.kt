@@ -221,6 +221,7 @@ class AppKitModel : ViewModel() {
             p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
           }
           log.info("list payments in ${t}ms")
+          log.info("refresh payment value in kit model")
           payments.postValue(p)
         } ?: log.info("kit non initialized, cannot list payments")
       }

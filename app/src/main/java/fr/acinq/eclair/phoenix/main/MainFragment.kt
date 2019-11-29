@@ -92,7 +92,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     appKit.payments.observe(viewLifecycleOwner, Observer {
-      //      paymentsListAdapter.submitList(it)
+
       paymentsAdapter.update(it)
     })
     appKit.notifications.observe(viewLifecycleOwner, Observer {
@@ -128,6 +128,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://acinq.co/phoenix"))) }
 
+    log.info("refresh payments from fragment.start")
     appKit.refreshPayments()
   }
 
@@ -142,6 +143,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
+    log.info("refresh payments from handle pending payment event")
     appKit.refreshPayments()
   }
 
