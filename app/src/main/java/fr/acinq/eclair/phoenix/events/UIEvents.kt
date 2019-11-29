@@ -22,7 +22,7 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 
 class PaymentPending
 
-class BalanceEvent
+class BalanceEvent(val balance: MilliSatoshi)
 
 class ReceiveWithOpen(val request: PayToOpenRequestEvent)
 

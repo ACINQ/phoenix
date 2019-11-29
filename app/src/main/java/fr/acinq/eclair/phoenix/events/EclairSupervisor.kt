@@ -28,12 +28,14 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
+import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.wire.SwapInConfirmed
 import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters
 
 interface PayToOpenResponse
 class AcceptPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
@@ -57,7 +59,6 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelRestored -> {
         log.debug("channel $event has been restored")
-        EventBus.getDefault().post(BalanceEvent())
       }
       is ChannelIdAssigned -> {
         log.debug("channel has been assigned id=${event.channelId()}")
@@ -70,7 +71,6 @@ class EclairSupervisor : UntypedActor() {
             log.info("closing channel ${data.channelId()}")
             EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId()))
           }
-          EventBus.getDefault().post(BalanceEvent())
         }
       }
       is ChannelSignatureSent -> {
@@ -79,10 +79,15 @@ class EclairSupervisor : UntypedActor() {
       }
       is ChannelSignatureReceived -> {
         log.debug("signature $event has been sent")
-        EventBus.getDefault().post(BalanceEvent())
       }
       is Terminated -> {
         log.info("channel $event has been terminated")
+      }
+
+      is Relayer.OutgoingChannels -> {
+        val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
+        val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())
+        EventBus.getDefault().post(BalanceEvent(total))
       }
 
       // -------------- ELECTRUM -------------

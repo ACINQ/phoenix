@@ -52,6 +52,7 @@ object Logging {
     // set level
     lc.getLogger("fr.acinq.eclair.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
     lc.getLogger("fr.acinq.eclair").level = Level.INFO
+    lc.getLogger("fr.acinq.eclair.phoenix").level = Level.DEBUG
     lc.getLogger("fr.acinq.eclair.channel").level = Level.DEBUG
     lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
     if (BuildConfig.DEBUG) {

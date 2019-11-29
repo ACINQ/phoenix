@@ -20,7 +20,6 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.dispatch.Futures
-import akka.dispatch.OnComplete
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.content.Context
@@ -171,17 +170,7 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
     kit.value?.run {
-      api.usableBalances(timeout).onComplete(object : OnComplete<scala.collection.Iterable<Relayer.UsableBalance>>() {
-        override fun onComplete(t: Throwable?, result: scala.collection.Iterable<Relayer.UsableBalance>) {
-          if (t == null) {
-            log.debug("model received usable_balances=$result")
-            val balances = JavaConverters.seqAsJavaListConverter(result.toSeq()).asJava()
-            val total = balances.map { b -> b.canSend().toLong() }.sum()
-            log.debug("update balance to total=$total")
-            nodeData.postValue(nodeData.value?.copy(balance = MilliSatoshi(total)))
-          }
-        }
-      }, kit.system().dispatcher())
+      nodeData.postValue(nodeData.value?.copy(balance = event.balance))
     } ?: log.info("unhandled balance event with kit not initialized")
   }
 
@@ -570,6 +559,7 @@ class AppKitModel : ViewModel() {
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, BackupEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
+    system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
