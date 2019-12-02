@@ -136,7 +136,9 @@
   <string name="send_swap_error">Swap has failed. Please try again.</string>
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
   <string name="send_swap_required_button">Request a swap</string>
-  <string name="send_swap_complete_recap"><![CDATA[Swap details:<br/><br/>Send: <b>%1$s</b><br/>Fee: <b>%1$s</b><br/>Total: <b>%2$s</b>]]></string>
+  <string name="send_swap_complete_recap_amount">Amount</string>
+  <string name="send_swap_complete_recap_fee">Fee</string>
+  <string name="send_swap_complete_recap_total">Total</string>
 
   <!-- //////////////// scan //////////////// -->
 

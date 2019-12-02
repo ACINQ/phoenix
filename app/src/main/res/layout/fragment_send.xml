@@ -237,6 +237,7 @@
           android:checked="@={model.useMaxBalance}"
           android:text="@string/send_use_all_balance"
           android:textSize="@dimen/text_sm"
+          android:visibility="@{model.isLightning()}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -349,16 +350,90 @@
           app:progress_tint="?attr/colorPrimary"
           app:text="@string/send_swap_in_progress" />
 
-        <TextView
-          android:id="@+id/swap_complete_recap"
-          android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/swap_recap"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:drawableStart="@drawable/ic_zap"
-          android:drawableTint="?attr/colorPrimary"
-          android:padding="@dimen/space_lg"
-          android:text="@string/send_swap_complete_recap"
-          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
-          app:layout_constraintTop_toBottomOf="@id/swap_button" />
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:paddingTop="@dimen/space_lg"
+          android:paddingBottom="@dimen/space_lg"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_button">
+
+          <TextView
+            android:id="@+id/swap_recap_amount_label"
+            style="@style/MutedLabelView"
+            android:layout_width="60dp"
+            android:text="@string/send_swap_complete_recap_amount"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_amount_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_amount_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:textStyle="bold"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_recap_amount_label"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_label"
+            style="@style/MutedLabelView"
+            android:layout_width="60dp"
+            android:text="@string/send_swap_complete_recap_fee"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:textStyle="bold"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_recap_fee_label"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+
+          <TextView
+            android:id="@+id/swap_recap_total_label"
+            style="@style/MutedLabelView"
+            android:layout_width="60dp"
+            android:text="@string/send_swap_complete_recap_total"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_total_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_total_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:textStyle="bold"
+            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_recap_total_label"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"
@@ -371,7 +446,7 @@
           app:icon_tint="?attr/altTextColor"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/swap_complete_recap"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap"
           app:text="@string/send_pay_button"
           app:text_color="?attr/altTextColor" />
 

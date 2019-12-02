@@ -101,16 +101,19 @@ class SendFragment : BaseFragment() {
             it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined -> {
               val amountInput = checkAmount()
               if (amountInput.isDefined) {
-                val fee = it.left().get().second!!.amount().get().toLong() - amountInput.get().toLong()
-                if (fee < 0) {
+                val total = it.left().get().second!!.amount().get()
+                val fee = total.`$minus`(amountInput.get())
+                log.info("swap-out [ amount=$amountInput fee=$fee total=$total ]")
+                if (fee.toLong() < 0) {
                   model.swapState.value = SwapState.SWAP_REQUIRED
-                  log.error("fee after swap is < 0: $fee (input=${amountInput.get()} pr_amount=${it.left().get().second!!.amount().get().toLong()}")
                 } else {
-                  mBinding.swapCompleteRecap.text = Converter.html(getString(R.string.send_swap_complete_recap,
-                    Converter.printAmountPretty(amount = MilliSatoshi(fee), context = ctx, withUnit = true),
-                    Converter.printAmountPretty(amount = it.left().get().second!!.amount().get(), context = context!!, withUnit = true)))
+                  mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amount = amountInput.get(), context = ctx, withUnit = true)
+                  mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(amount = fee, context = ctx, withUnit = true)
+                  mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(amount = total, context = ctx, withUnit = true)
                   model.swapState.value = SwapState.SWAP_COMPLETE
                 }
+              } else {
+                model.swapState.value = SwapState.SWAP_REQUIRED
               }
               Unit
             }
@@ -239,17 +242,10 @@ class SendFragment : BaseFragment() {
           val amount = amount_opt.get()
           if (it.isLeft) {
             val rawAmount = Converter.msat2sat(amount)
-            val finalAmount: Satoshi = if (model.useMaxBalance.value == true) {
-              // when trying to send all the available balance on chain, a fee should be subtracted from the amount
-              // FIXME: stop using hard coded fee...
-              rawAmount.`$minus`(Satoshi(300))
-            } else {
-              rawAmount
-            }
             // FIXME: use feerate provided by user, like in eclair mobile
             val feeratePerKw = appKit.kit.value?.run { kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: 0L
             model.swapState.postValue(SwapState.SWAP_IN_PROGRESS)
-            appKit.sendSwapOut(amount = finalAmount, address = it.left().get().first.address, feeratePerKw = feeratePerKw)
+            appKit.sendSwapOut(amount = rawAmount, address = it.left().get().first.address, feeratePerKw = feeratePerKw)
           }
         }
       }
