@@ -37,6 +37,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.`MnemonicCode$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletRestoreBinding
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.customviews.VirtualKeyboardView
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
@@ -256,7 +257,7 @@ class RestoreSeedViewModel : ViewModel() {
           MnemonicCode.validate(mnemonics)
           val seed: ByteArray = Hex.encode(mnemonics.toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, Wallet.DEFAULT_PIN)
+          EncryptedSeed.writeSeedToFile(context, seed, Constants.DEFAULT_PIN)
           log.info("seed written to file")
           state.postValue(RestoreSeedState.DONE)
         } catch (t: Throwable) {

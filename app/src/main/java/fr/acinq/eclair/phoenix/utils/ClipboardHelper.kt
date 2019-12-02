@@ -16,7 +16,12 @@
 
 package fr.acinq.eclair.phoenix.utils
 
-object NotificationHelper {
-  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
-  const val WATCHER_REQUEST_CODE = 37921816
+import android.content.ClipboardManager
+import android.content.Context
+
+object ClipboardHelper {
+  fun read(context: Context): String {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    return clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+  }
 }

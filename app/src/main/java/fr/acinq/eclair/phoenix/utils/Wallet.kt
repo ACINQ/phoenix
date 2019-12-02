@@ -28,6 +28,7 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BuildConfig
+import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -38,6 +39,9 @@ object Wallet {
 
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
+  val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@34.250.234.192:9735")
+  val httpClient = OkHttpClient()
+
   // ------------------------ DATADIR & FILES
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
@@ -45,7 +49,6 @@ object Wallet {
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
   private const val NETWORK_DB_FILE = "network.sqlite"
   private const val WALLET_DB_FILE = "wallet.sqlite"
-  internal const val DEFAULT_PIN = "111111"
 
   fun getDatadir(context: Context): File {
     return File(context.filesDir, ECLAIR_BASE_DATADIR)
@@ -114,9 +117,6 @@ object Wallet {
    * @return Left: optional trampoline node, Right: trampoline fee.
    */
   fun getTrampoline(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<Option<Crypto.PublicKey>, MilliSatoshi> {
-    val routingHeadShortChannelId = if (paymentRequest.routingInfo().headOption().isDefined && paymentRequest.routingInfo().head().headOption().isDefined)
-      Option.apply(paymentRequest.routingInfo().head().head().shortChannelId()) else Option.empty()
-
     val trampolineNode: Option<Crypto.PublicKey> = when {
       // payment target is ACINQ: no trampoline
       paymentRequest.nodeId() == ACINQ.nodeId() -> Option.empty()
@@ -172,11 +172,4 @@ object Wallet {
     }
     return ConfigFactory.empty()
   }
-
-  // ------------------------ NODES & API URLS
-
-  const val PRICE_RATE_API = "https://blockchain.info/ticker"
-  val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@34.250.234.192:9735")
-  const val WALLET_CONTEXT_SOURCE = "https://acinq.co/mobile/walletcontext.json"
-  const val DEFAULT_ONCHAIN_EXPLORER = "https://api.blockcypher.com/v1/btc/test3/txs/"
 }

@@ -31,7 +31,7 @@ import fr.acinq.eclair.db.Databases
 import fr.acinq.eclair.phoenix.BuildConfig
 import fr.acinq.eclair.phoenix.MainActivity
 import fr.acinq.eclair.phoenix.R
-import fr.acinq.eclair.phoenix.utils.NotificationHelper
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Transcriber
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -109,7 +109,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
         // if there is no network connectivity, return failure
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
-        return if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting) {
+        return if (activeNetwork == null || !activeNetwork.isConnected) {
           if (!isLastCheckFresh(context)) {
             log.warn("last watcher result is stale and we cannot watch the chain due to no connection...")
             showNotification(context, false)
@@ -142,15 +142,15 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
     startIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
     val title = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_title)
     val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_message)
-    val builder = NotificationCompat.Builder(context, NotificationHelper.WATCHER_NOTIFICATION_CHANNEL_ID)
+    val builder = NotificationCompat.Builder(context, Constants.WATCHER_NOTIFICATION_CHANNEL_ID)
       .setSmallIcon(R.drawable.ic_phoenix)
       .setContentTitle(title)
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-      .setContentIntent(PendingIntent.getActivity(context, NotificationHelper.WATCHER_REQUEST_CODE, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+      .setContentIntent(PendingIntent.getActivity(context, Constants.WATCHER_REQUEST_CODE, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
       .setOngoing(isAlert)
       .setAutoCancel(true)
-    NotificationManagerCompat.from(context).notify(NotificationHelper.WATCHER_REQUEST_CODE, builder.build())
+    NotificationManagerCompat.from(context).notify(Constants.WATCHER_REQUEST_CODE, builder.build())
   }
 
   companion object {
@@ -169,11 +169,11 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
      */
     private const val MAX_FRESH_WINDOW_IF_OK = DateUtils.DAY_IN_MILLIS * 5
 
-    fun schedule() {
+    fun schedule(context: Context) {
       log.info("scheduling electrum check work")
       val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 23, TimeUnit.HOURS, 12, TimeUnit.HOURS)
         .addTag(WATCHER_WORKER_TAG)
-      WorkManager.getInstance().enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, work.build())
+      WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, work.build())
     }
   }
 }

@@ -29,6 +29,7 @@ import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.StartupState
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.KeystoreHelper
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
@@ -122,7 +123,7 @@ class StartupFragment : BaseFragment() {
             mPinDialog?.reset()
             mPinDialog?.show()
           }
-          else -> appKit.startAppKit(ctx, Wallet.DEFAULT_PIN)
+          else -> appKit.startAppKit(ctx, Constants.DEFAULT_PIN)
         }
       } else {
         log.info("kit on standby [ state=${appKit.startupState.value}, kit=${appKit.kit.value}, init=${appKit.hasWalletBeenSetup(ctx)} ]")

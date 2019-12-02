@@ -16,12 +16,31 @@
 
 package fr.acinq.eclair.phoenix.utils
 
+import android.text.format.DateUtils
+import fr.acinq.eclair.io.NodeURI
 import okhttp3.MediaType
-import okhttp3.OkHttpClient
 
-object Api {
-  val httpClient = OkHttpClient()
+/**
+ * Created by DPA on 02/12/19.
+ */
+object Constants {
+
+  // -- apis
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val SWAP_API_URL = "https://endurance-p2c.acinq.co/api/paytochain"
   const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
+  const val PRICE_RATE_API = "https://blockchain.info/ticker"
+
+  // -- default values
+  internal const val DEFAULT_PIN = "111111"
+
+  // -- intents
+  const val INTENT_CAMERA_PERMISSION_REQUEST = 1
+
+  const val MNEMONICS_REMINDER_INTERVAL = DateUtils.DAY_IN_MILLIS * 30
+  const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
+
+  // -- android notifications
+  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
+  const val WATCHER_REQUEST_CODE = 37921816
 }

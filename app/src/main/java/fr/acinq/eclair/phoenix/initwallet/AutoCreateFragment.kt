@@ -29,6 +29,7 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentInitWalletAutoCreateBinding
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Wallet
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
@@ -99,7 +100,7 @@ class AutoCreateViewModel : ViewModel() {
           val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
           val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, Wallet.DEFAULT_PIN)
+          EncryptedSeed.writeSeedToFile(context, seed, Constants.DEFAULT_PIN)
           log.info("words written to file")
           state.postValue(AutoCreateState.DONE)
         } catch (t: Throwable) {

@@ -31,10 +31,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsSeedSecurityBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
-import fr.acinq.eclair.phoenix.utils.KeystoreHelper
-import fr.acinq.eclair.phoenix.utils.Prefs
-import fr.acinq.eclair.phoenix.utils.SingleLiveEvent
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.*
 import org.slf4j.Logger
@@ -94,7 +91,7 @@ class SeedSecurityFragment : BaseFragment() {
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.pinSwitch.setOnClickListener {
       model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
-      model.readSeed(context, Wallet.DEFAULT_PIN)
+      model.readSeed(context, Constants.DEFAULT_PIN)
     }
     mBinding.updatePinButton.setOnClickListener {
       model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
@@ -296,7 +293,7 @@ class SeedSecurityViewModel : ViewModel() {
             protectionUpdateState.postValue(ProtectionUpdateState.SET_NEW_PIN)
           } catch (e: Exception) {
             log.error("could not read seed: ", e)
-            if (pin == Wallet.DEFAULT_PIN) {
+            if (pin == Constants.DEFAULT_PIN) {
               // preference pin status is probably obsolete
               Prefs.setIsSeedEncrypted(context)
             }

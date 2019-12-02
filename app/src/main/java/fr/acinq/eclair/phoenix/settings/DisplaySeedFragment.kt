@@ -33,10 +33,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsDisplaySeedBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
-import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.KeystoreHelper
-import fr.acinq.eclair.phoenix.utils.Prefs
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -136,7 +133,7 @@ class DisplaySeedFragment : BaseFragment() {
           }
           else -> {
             model.state.value = DisplaySeedState.UNLOCKING
-            model.getSeed(ctx, Wallet.DEFAULT_PIN)
+            model.getSeed(ctx, Constants.DEFAULT_PIN)
           }
         }
       }

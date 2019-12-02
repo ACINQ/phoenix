@@ -28,7 +28,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.databinding.FragmentLnurlLoginBinding
-import fr.acinq.eclair.phoenix.utils.Api
+import fr.acinq.eclair.phoenix.utils.Constants
+import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import okhttp3.Request
@@ -72,8 +73,8 @@ class LNUrlLoginFragment : BaseFragment() {
     }) {
       model.state.value = LNUrlLoginState.IN_PROGRESS
       val json = JSONObject()
-      val request = Request.Builder().url(args.uri).post(RequestBody.create(Api.JSON, json.toString())).build()
-      val response = Api.httpClient.newCall(request).execute()
+      val request = Request.Builder().url(args.uri).post(RequestBody.create(Constants.JSON, json.toString())).build()
+      val response = Wallet.httpClient.newCall(request).execute()
       val body = response.body()
       if (response.isSuccessful && body != null) {
       } else {

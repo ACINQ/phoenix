@@ -22,12 +22,6 @@ import androidx.databinding.BindingConversion
 
 object BindingHelpers {
 
-  @BindingAdapter("app:hideIfZero")
-  @JvmStatic
-  fun hideIfZero(view: View, number: Int) {
-    view.visibility = if (number == 0) View.GONE else View.VISIBLE
-  }
-
   @BindingAdapter("app:enableOrFade")
   @JvmStatic
   fun enableOrFade(view: View, enabled: Boolean) {

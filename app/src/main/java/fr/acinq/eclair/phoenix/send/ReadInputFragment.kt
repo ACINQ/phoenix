@@ -114,6 +114,7 @@ class ReadInputFragment : BaseFragment() {
         ReadingState.SCANNING -> {
           mBinding.scanView.resume()
         }
+        else -> {}
       }
     })
   }
@@ -127,18 +128,18 @@ class ReadInputFragment : BaseFragment() {
     mBinding.scanView.initializeFromIntent(barcodeIntent)
 
     mBinding.cameraAccessButton.setOnClickListener {
-      activity?.let { ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.CAMERA), IntentCodes.CAMERA_PERMISSION_REQUEST) }
+      activity?.let { ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST) }
     }
 
     mBinding.pasteButton.setOnClickListener {
-      context?.let { model.checkAndSetPaymentRequest(Clipboard.read(it)) }
+      context?.let { model.checkAndSetPaymentRequest(ClipboardHelper.read(it)) }
     }
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
     context?.let {
       if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
         model.hasCameraAccess.value = false
         activity?.let { act ->
-          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), IntentCodes.CAMERA_PERMISSION_REQUEST)
+          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST)
         }
       }
     }
@@ -175,7 +176,7 @@ class ReadInputFragment : BaseFragment() {
   }
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-    if (requestCode == IntentCodes.CAMERA_PERMISSION_REQUEST) {
+    if (requestCode == Constants.INTENT_CAMERA_PERMISSION_REQUEST) {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         model.hasCameraAccess.value = true
         startScanning()

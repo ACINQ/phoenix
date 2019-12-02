@@ -34,8 +34,8 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
 import fr.acinq.eclair.phoenix.events.PaymentPending
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.InAppNotifications
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -176,32 +176,32 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
    */
   private fun checkBackgroundWorkerCanRun(context: Context) {
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
-    if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > InAppNotifications.DELAY_BEFORE_BACKGROUND_WARNING) {
+    if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > Constants.DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
-      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.BACKGROUND_WORKER_CANNOT_RUN)
+      appKit.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.BACKGROUND_WORKER_CANNOT_RUN)
+      appKit.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
   }
 
   private fun checkWalletIsSecure(context: Context) {
     if (!Prefs.getIsSeedEncrypted(context)) {
-      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.NO_PIN_SET)
+      appKit.notifications.value?.add(InAppNotifications.NO_PIN_SET)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.NO_PIN_SET)
+      appKit.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
     }
   }
 
   private fun checkMnemonics(context: Context) {
     val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
     if (timestamp == 0L) {
-      appKit.notifications.value?.add(InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN)
+      appKit.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_NEVER_SEEN)
-      if (System.currentTimeMillis() - timestamp > InAppNotifications.MNEMONICS_REMINDER_INTERVAL) {
-        appKit.notifications.value?.add(InAppNotifications.NotificationTypes.MNEMONICS_REMINDER)
+      appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      if (System.currentTimeMillis() - timestamp > Constants.MNEMONICS_REMINDER_INTERVAL) {
+        appKit.notifications.value?.add(InAppNotifications.MNEMONICS_REMINDER)
       } else {
-        appKit.notifications.value?.remove(InAppNotifications.NotificationTypes.MNEMONICS_REMINDER)
+        appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_REMINDER)
       }
     }
   }

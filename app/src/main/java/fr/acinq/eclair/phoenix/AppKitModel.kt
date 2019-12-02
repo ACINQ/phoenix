@@ -46,6 +46,7 @@ import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.events.*
 import fr.acinq.eclair.phoenix.events.PayToOpenResponse
+import fr.acinq.eclair.phoenix.main.InAppNotifications
 import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.phoenix.utils.encrypt.EncryptedSeed
 import fr.acinq.eclair.wire.*
@@ -94,7 +95,7 @@ class AppKitModel : ViewModel() {
 
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
-  val notifications = MutableLiveData(HashSet<InAppNotifications.NotificationTypes>())
+  val notifications = MutableLiveData(HashSet<InAppNotifications>())
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
@@ -462,7 +463,7 @@ class AppKitModel : ViewModel() {
               val res = startNode(context, pin)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
               _kit.postValue(res)
-              ChannelsWatcher.schedule()
+              ChannelsWatcher.schedule(context)
               startupState.postValue(StartupState.DONE)
             } catch (t: Throwable) {
               log.info("aborted node startup")
@@ -570,7 +571,7 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
-      Runnable { Api.httpClient.newCall(Request.Builder().url(Wallet.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
+      Runnable { Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
@@ -639,7 +640,7 @@ class AppKitModel : ViewModel() {
   }
 
   private fun checkWalletContext() {
-    Api.httpClient.newCall(Request.Builder().url(Api.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
+    Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
         log.warn("could not retrieve wallet context from remote: ", e)
       }
@@ -656,12 +657,12 @@ class AppKitModel : ViewModel() {
             notifications.value?.run {
               if (installedVersion < latestCriticalVersion) {
                 log.info("a critical update (v$latestCriticalVersion) is deemed available")
-                add(InAppNotifications.NotificationTypes.UPGRADE_WALLET_CRITICAL)
+                add(InAppNotifications.UPGRADE_WALLET_CRITICAL)
               } else if (latestVersion - installedVersion >= 2) {
-                add(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
+                add(InAppNotifications.UPGRADE_WALLET)
               } else {
-                remove(InAppNotifications.NotificationTypes.UPGRADE_WALLET_CRITICAL)
-                remove(InAppNotifications.NotificationTypes.UPGRADE_WALLET)
+                remove(InAppNotifications.UPGRADE_WALLET_CRITICAL)
+                remove(InAppNotifications.UPGRADE_WALLET)
               }
               notifications.postValue(this)
             }
