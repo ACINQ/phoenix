@@ -52,7 +52,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: PlainPayment) {
-
+    log.debug("binding payment #$position")
     val fiatCode = Prefs.getFiatCurrency(itemView.context)
     val coinUnit = Prefs.getCoinUnit(itemView.context)
     val displayAmountAsFiat = Prefs.getShowAmountInFiat(itemView.context)

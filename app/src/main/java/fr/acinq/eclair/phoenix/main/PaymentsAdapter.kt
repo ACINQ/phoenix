@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package fr.acinq.eclair.phoenix.main
 
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.db.PlainIncomingPayment
@@ -27,79 +27,61 @@ import fr.acinq.eclair.db.PlainOutgoingPayment
 import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.utils.Prefs
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
-class PaymentsAdapter(private var mPayments: MutableList<PlainPayment>) : RecyclerView.Adapter<PaymentHolder>() {
 
-  val log: Logger = LoggerFactory.getLogger(this::class.java)
+class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
-    val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
-    prefs.registerOnSharedPreferenceChangeListener(prefsListener)
-    val view = LayoutInflater.from(parent.context).inflate(R.layout.holder_payment, parent, false)
-    return PaymentHolder(view)
-  }
-
-  override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
-    val payment = this.mPayments[position]
-    log.debug("bind payment to view holder #$position")
-    holder.bindPaymentItem(position, payment)
-  }
-
-  override fun getItemCount(): Int {
-    return this.mPayments.size
-  }
-
-  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+  private val mPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       notifyDataSetChanged()
     }
   }
 
-  fun update(payments: List<PlainPayment>) {
-    val diff = DiffUtil.calculateDiff(PaymentDiffCallback(mPayments, payments))
-    this.mPayments.clear()
-    this.mPayments.addAll(payments)
-    diff.dispatchUpdatesTo(this)
+  private val mDiffer: AsyncListDiffer<PlainPayment> = AsyncListDiffer(this, DIFF_CALLBACK)
+
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
+    val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
+    prefs.registerOnSharedPreferenceChangeListener(mPrefsListener)
+    return PaymentHolder(LayoutInflater.from(parent.context).inflate(R.layout.holder_payment, parent, false))
   }
 
-  class PaymentDiffCallback(val oldList: MutableList<PlainPayment>, val newList: List<PlainPayment>) : DiffUtil.Callback() {
-    val log: Logger = LoggerFactory.getLogger(this::class.java)
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-      val oldItem = oldList[oldItemPosition]
-      val newItem = newList[newItemPosition]
-      return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
-        val sameId = oldItem.parentId().isDefined && newItem.parentId().isDefined && oldItem.parentId().get() == newItem.parentId().get()
-        sameId
-      } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
-        val sameId = oldItem.paymentHash() == newItem.paymentHash()
-        sameId
-      } else {
-        false
-      }
-    }
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-      val oldItem = oldList[oldItemPosition]
-      val newItem = newList[newItemPosition]
-      return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
-        val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
-          || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-        oldItem.status()::class == newItem.status()::class && sameAmount
-      } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
-        val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
-          || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-        oldItem.status()::class == newItem.status()::class && sameAmount
-      } else {
-        false
-      }
-    }
-
-    override fun getOldListSize(): Int = oldList.size
-
-    override fun getNewListSize(): Int = newList.size
+  override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
+    holder.bindPaymentItem(position, mDiffer.currentList[position])
   }
 
+  override fun getItemCount(): Int = mDiffer.currentList.size
+
+  fun submitList(list: List<PlainPayment>) {
+    mDiffer.submitList(list)
+  }
+
+  companion object {
+    val DIFF_CALLBACK: DiffUtil.ItemCallback<PlainPayment> = object : DiffUtil.ItemCallback<PlainPayment>() {
+      override fun areItemsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
+        return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
+          val sameId = oldItem.parentId().isDefined && newItem.parentId().isDefined && oldItem.parentId().get() == newItem.parentId().get()
+          sameId
+        } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
+          val sameId = oldItem.paymentHash() == newItem.paymentHash()
+          sameId
+        } else {
+          false
+        }
+      }
+
+      override fun areContentsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
+        return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
+          val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
+            || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
+          oldItem.status()::class == newItem.status()::class && sameAmount
+        } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
+          val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
+            || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
+          oldItem.status()::class == newItem.status()::class && sameAmount
+        } else {
+          false
+        }
+      }
+    }
+  }
 }

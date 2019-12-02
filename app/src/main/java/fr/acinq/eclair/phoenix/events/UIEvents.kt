@@ -18,12 +18,9 @@ package fr.acinq.eclair.phoenix.events
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.io.PayToOpenRequestEvent
 
 class PaymentPending
 
 class BalanceEvent(val balance: MilliSatoshi)
-
-class ReceiveWithOpen(val request: PayToOpenRequestEvent)
 
 class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32)

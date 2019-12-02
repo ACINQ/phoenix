@@ -25,11 +25,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
@@ -38,10 +36,6 @@ import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -49,7 +43,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.text.DateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -68,7 +61,12 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
     // init payment recycler view
     paymentsManager = LinearLayoutManager(context)
-    paymentsAdapter = PaymentsAdapter(ArrayList())
+    paymentsAdapter = PaymentsAdapter()
+    paymentsAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+      override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+        mBinding.paymentList.scrollToPosition(0)
+      }
+    })
     mBinding.paymentList.apply {
       setHasFixedSize(true)
       layoutManager = paymentsManager
@@ -89,7 +87,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     appKit.payments.observe(viewLifecycleOwner, Observer {
-      updatePaymentAdapter(it)
+      paymentsAdapter.submitList(it)
     })
     appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
@@ -138,18 +136,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
+    log.debug("pending payment, refreshing list...")
     appKit.refreshPayments()
-  }
-
-  private fun updatePaymentAdapter(payments: List<PlainPayment>) {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when updating payments: ", exception)
-    }) {
-      withContext(this.coroutineContext + Dispatchers.Default) {
-        paymentsAdapter.update(payments)
-      }
-      mBinding.paymentList.scrollToPosition(0)
-    }
   }
 
   private fun refreshNotifications(context: Context) {

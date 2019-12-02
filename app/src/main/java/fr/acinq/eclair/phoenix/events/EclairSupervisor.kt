@@ -16,14 +16,12 @@
 
 package fr.acinq.eclair.phoenix.events
 
-import akka.actor.ActorRef
 import akka.actor.Terminated
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.`BackupCompleted$`
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
