@@ -105,11 +105,8 @@ class PaymentDetailsFragment : BaseFragment() {
                   val statuses: List<OutgoingPaymentStatus.Succeeded> = payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
                   val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
 
-//                  val isTrampoline = p.paymentRequest().isDefined && statuses.map { o -> JavaConverters.seqAsJavaListConverter(o.route()).asJava().size == 1 }.reduce { acc, b -> acc && b }
                   if (p.paymentRequest().isDefined) {
-                    val trampolineData = Wallet.getTrampoline(p.amount(), p.paymentRequest().get())
-                    val finalFees = fees.`$plus`(trampolineData.second)
-                    mBinding.feesValue.setAmount(finalFees)
+                    mBinding.feesValue.setAmount(fees)
                   } else if (p.externalId().isDefined && p.externalId().get().startsWith("closing-")) {
                     // special case: this outgoing payment represents a channel closing/closed
                     mBinding.closingDescValue.text = getString(R.string.paymentdetails_closing_mock_desc, p.externalId().get().split("-").last())
