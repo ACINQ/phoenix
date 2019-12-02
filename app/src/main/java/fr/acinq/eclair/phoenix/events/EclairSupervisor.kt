@@ -16,7 +16,6 @@
 
 package fr.acinq.eclair.phoenix.events
 
-import akka.actor.Terminated
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
@@ -52,15 +51,6 @@ class EclairSupervisor : UntypedActor() {
     log.debug("received event $event")
     when (event) {
       // -------------- CHANNELS LIFECYCLE -------------
-      is ChannelCreated -> {
-        log.info("channel $event has been created")
-      }
-      is ChannelRestored -> {
-        log.debug("channel $event has been restored")
-      }
-      is ChannelIdAssigned -> {
-        log.debug("channel has been assigned id=${event.channelId()}")
-      }
       is ChannelStateChanged -> {
         val data = event.currentData()
         if (data is HasCommitments) {
@@ -72,16 +62,8 @@ class EclairSupervisor : UntypedActor() {
         }
       }
       is ChannelSignatureSent -> {
-        log.debug("signature sent on ${event.commitments().channelId()}")
         EventBus.getDefault().post(PaymentPending())
       }
-      is ChannelSignatureReceived -> {
-        log.debug("signature $event has been sent")
-      }
-      is Terminated -> {
-        log.info("channel $event has been terminated")
-      }
-
       is Relayer.OutgoingChannels -> {
         val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
         val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())

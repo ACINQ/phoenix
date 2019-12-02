@@ -557,8 +557,8 @@ class AppKitModel : ViewModel() {
     log.info("node setup ready")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
-    system.eventStream().subscribe(nodeSupervisor, BackupEvent::class.java)
-    system.eventStream().subscribe(nodeSupervisor, ChannelEvent::class.java)
+    system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
+    system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
@@ -566,7 +566,6 @@ class AppKitModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, SwapInConfirmed::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
-    system.eventStream().subscribe(nodeSupervisor, ByteVector32::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
