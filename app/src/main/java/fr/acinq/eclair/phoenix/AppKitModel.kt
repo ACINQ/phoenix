@@ -117,7 +117,7 @@ class AppKitModel : ViewModel() {
     shutdown()
 
     super.onCleared()
-    log.info("appkit has been cleared")
+    log.debug("appkit has been cleared")
   }
 
   fun hasWalletBeenSetup(context: Context): Boolean {
@@ -211,7 +211,6 @@ class AppKitModel : ViewModel() {
   @UiThread
   fun isKitReady(): Boolean = kit.value != null
 
-
   fun refreshPayments() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
@@ -220,8 +219,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
           }
-          log.info("list payments in ${t}ms")
-          log.info("refresh payment value in kit model")
+          log.debug("list payments in ${t}ms")
           payments.postValue(p)
         } ?: log.info("kit non initialized, cannot list payments")
       }
@@ -236,7 +234,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
           }
-          log.info("get sent payment details in ${t}ms")
+          log.debug("get sent payment details in ${t}ms")
           payments
         } ?: throw KitNotInitialized()
       }
@@ -251,7 +249,7 @@ class AppKitModel : ViewModel() {
           val t = measureTimeMillis {
             payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
           }
-          log.info("get received payment details in ${t}ms")
+          log.debug("get received payment details in ${t}ms")
           payment
         } ?: throw KitNotInitialized()
       }

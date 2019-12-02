@@ -43,8 +43,8 @@ class PaymentsAdapter(private var mPayments: MutableList<PlainPayment>) : Recycl
 
   override fun onBindViewHolder(holder: PaymentHolder, position: Int) {
     val payment = this.mPayments[position]
+    log.debug("bind payment to view holder #$position")
     holder.bindPaymentItem(position, payment)
-    log.info("bind payment view holder #$position")
   }
 
   override fun getItemCount(): Int {
@@ -58,12 +58,10 @@ class PaymentsAdapter(private var mPayments: MutableList<PlainPayment>) : Recycl
   }
 
   fun update(payments: List<PlainPayment>) {
-    log.debug("update payment adapter list=$payments")
     val diff = DiffUtil.calculateDiff(PaymentDiffCallback(mPayments, payments))
     this.mPayments.clear()
     this.mPayments.addAll(payments)
     diff.dispatchUpdatesTo(this)
-    //    notifyDataSetChanged()
   }
 
   class PaymentDiffCallback(val oldList: MutableList<PlainPayment>, val newList: List<PlainPayment>) : DiffUtil.Callback() {
@@ -74,11 +72,9 @@ class PaymentsAdapter(private var mPayments: MutableList<PlainPayment>) : Recycl
       val newItem = newList[newItemPosition]
       return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
         val sameId = oldItem.parentId().isDefined && newItem.parentId().isDefined && oldItem.parentId().get() == newItem.parentId().get()
-        log.debug("old outgoing parent_id=${oldItem.parentId()}, new outgoing parent_id=${newItem.parentId()} / same?=$sameId")
         sameId
       } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
         val sameId = oldItem.paymentHash() == newItem.paymentHash()
-        log.debug("old incoming parent_id=${oldItem.paymentHash()}, new incoming parent_id=${newItem.paymentHash()} / same?=$sameId")
         sameId
       } else {
         false
@@ -91,12 +87,10 @@ class PaymentsAdapter(private var mPayments: MutableList<PlainPayment>) : Recycl
       return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
         val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
           || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-        log.debug("old outgoing status=${oldItem.status()}, new outgoing status=${newItem.status()} / same?=${oldItem.status()::class == newItem.status()::class}")
         oldItem.status()::class == newItem.status()::class && sameAmount
       } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
         val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
           || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-        log.debug("old incoming status=${oldItem.status()}, new incoming status=${newItem.status()} / same?=${oldItem.status()::class == newItem.status()::class}")
         oldItem.status()::class == newItem.status()::class && sameAmount
       } else {
         false

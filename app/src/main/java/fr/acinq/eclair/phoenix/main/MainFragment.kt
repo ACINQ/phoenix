@@ -25,9 +25,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentMainBinding
@@ -36,6 +38,10 @@ import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.InAppNotifications
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.Wallet
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -51,7 +57,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private lateinit var mBinding: FragmentMainBinding
 
   private lateinit var paymentsAdapter: PaymentsAdapter
-  //  private lateinit var paymentsListAdapter: PaymentsListAdapter
   private lateinit var paymentsManager: RecyclerView.LayoutManager
 
   private lateinit var notificationsAdapter: NotificationsAdapter
@@ -69,14 +74,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = paymentsManager
       adapter = paymentsAdapter
     }
-    //    paymentsListAdapter = PaymentsListAdapter()
-    //    mBinding.paymentList.apply {
-    //      setHasFixedSize(true)
-    //      layoutManager = paymentsManager
-    //      adapter = paymentsListAdapter
-    //    }
-
-
     // init notification recycler view
     notificationsManager = LinearLayoutManager(context)
     notificationsAdapter = NotificationsAdapter(mutableListOf())
@@ -92,8 +89,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     appKit.payments.observe(viewLifecycleOwner, Observer {
-
-      paymentsAdapter.update(it)
+      updatePaymentAdapter(it)
     })
     appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
@@ -128,7 +124,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://acinq.co/phoenix"))) }
 
-    log.info("refresh payments from fragment.start")
     appKit.refreshPayments()
   }
 
@@ -143,8 +138,18 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
-    log.info("refresh payments from handle pending payment event")
     appKit.refreshPayments()
+  }
+
+  private fun updatePaymentAdapter(payments: List<PlainPayment>) {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when updating payments: ", exception)
+    }) {
+      withContext(this.coroutineContext + Dispatchers.Default) {
+        paymentsAdapter.update(payments)
+      }
+      mBinding.paymentList.scrollToPosition(0)
+    }
   }
 
   private fun refreshNotifications(context: Context) {
@@ -153,6 +158,14 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     checkBackgroundWorkerCanRun(context)
   }
 
+  /**
+   * If the background channels watcher has not run since (now) - (DELAY_BEFORE_BACKGROUND_WARNING), we consider that the device is
+   * blocking this application from working in background, and show a notification.
+   *
+   * Some devices vendors are known to aggressively kill applications (including background jobs) in order to save battery,
+   * unless the app is whitelisted by the user in a custom OS setting page. This behaviour is hard to detect and not
+   * standard, and does not happen on a stock android. In this case, the user has to whitelist the app.
+   */
   /**
    * If the background channels watcher has not run since (now) - (DELAY_BEFORE_BACKGROUND_WARNING), we consider that the device is
    * blocking this application from working in background, and show a notification.

@@ -53,8 +53,6 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   @SuppressLint("SetTextI18n")
   fun bindPaymentItem(position: Int, payment: PlainPayment) {
 
-    log.info("bind payment item #$position")
-
     val fiatCode = Prefs.getFiatCurrency(itemView.context)
     val coinUnit = Prefs.getCoinUnit(itemView.context)
     val displayAmountAsFiat = Prefs.getShowAmountInFiat(itemView.context)
@@ -72,6 +70,10 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val iconView = itemView.findViewById<ImageView>(R.id.icon)
 
     if (payment is PlainIncomingPayment) {
+      itemView.setOnClickListener {
+        val id = payment.paymentHash().toString()
+        it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.INCOMING, id, false))
+      }
       when {
         payment.status() is IncomingPaymentStatus.Received -> {
           amountView.visibility = View.VISIBLE
@@ -107,6 +109,10 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
       }
     } else if (payment is PlainOutgoingPayment) {
+      itemView.setOnClickListener {
+        val id: String = if (payment.parentId().isDefined) payment.parentId().get().toString() else payment.paymentHash().toString()
+        it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, id, false))
+      }
       when {
         payment.status() is OutgoingPaymentStatus.`Pending$` -> {
           amountView.visibility = View.GONE
@@ -143,21 +149,6 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       }
     }
     unitView.text = if (displayAmountAsFiat) fiatCode else coinUnit.code()
-
-    // clickable action
-    itemView.setOnClickListener {
-      when (payment) {
-        is PlainIncomingPayment -> {
-          val id = payment.paymentHash().toString()
-          it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.INCOMING, id, false))
-        }
-        is PlainOutgoingPayment -> {
-          val id: String = if (payment.parentId().isDefined) payment.parentId().get().toString() else payment.paymentHash().toString()
-          it.findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, id, false))
-        }
-        else -> Unit
-      }
-    }
   }
 
   private fun handleDescription(payment: PlainPayment, descriptionView: TextView) {
