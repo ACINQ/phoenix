@@ -24,14 +24,12 @@ import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
-import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BuildConfig
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scala.Option
 import java.io.File
 import java.util.*
 
@@ -78,7 +76,7 @@ object Wallet {
     return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
   }
 
-  fun cleanInvoice(input: String): String {
+  fun cleanUpInvoice(input: String): String {
     val trimmed = input.replace("\\u00A0", "").trim()
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
@@ -90,7 +88,7 @@ object Wallet {
   }
 
   fun extractInvoice(input: String): Any {
-    val invoice = cleanInvoice(input)
+    val invoice = cleanUpInvoice(input)
     return try {
       PaymentRequest.read(invoice)
     } catch (e1: Exception) {
@@ -108,32 +106,6 @@ object Wallet {
         }
       }
     }
-  }
-
-  /**
-   * Returns a Pair object containing the trampoline data for a payment request, only if it is necessary.
-   * If trampoline is not needed, the node will be None, and the fee will be 0 msat.
-   *
-   * @return Left: optional trampoline node, Right: trampoline fee.
-   */
-  fun getTrampoline(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<Option<Crypto.PublicKey>, MilliSatoshi> {
-    val trampolineNode: Option<Crypto.PublicKey> = when {
-      // payment target is ACINQ: no trampoline
-      paymentRequest.nodeId() == ACINQ.nodeId() -> Option.empty()
-      // routing info head is a peer id: target is a phoenix app
-      // routingHeadShortChannelId.isDefined && ShortChannelId.isPeerId(routingHeadShortChannelId.get()) -> Option.empty()
-      // otherwise, we use ACINQ node for trampoline
-      else -> Option.apply(ACINQ.nodeId())
-    }
-
-    val trampolineFee: MilliSatoshi = if (trampolineNode.isDefined) {
-      Converter.any2Msat(Satoshi(5)).`$times`(5) // base fee covering 5 hops with a base fee of 5 sat
-        .`$plus`(amount.`$times`(0.001))  // + proportional fee = 0.1 % of payment amount
-    } else {
-      MilliSatoshi(0) // no fee when we are not using trampoline
-    }
-
-    return Pair(trampolineNode, trampolineFee)
   }
 
   fun showKeyboard(context: Context?, view: View) {

@@ -45,10 +45,7 @@ import fr.acinq.eclair.phoenix.NavGraphMainDirections
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment
-import fr.acinq.eclair.phoenix.utils.AlertHelper
-import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.Prefs
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.wire.SwapInResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -179,7 +176,9 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      AlertHelper.build(layoutInflater, R.string.receive_swap_in_disclaimer_title, R.string.receive_swap_in_disclaimer_message)
+      val swapInFee = 100 * (appKit.swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+      AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
+        Converter.html(getString(R.string.receive_swap_in_disclaimer_message, String.format("%.2f", swapInFee))))
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()

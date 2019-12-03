@@ -82,6 +82,8 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
+data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
+data class SwapInSettings(var feePercent: Double)
 data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
 class AppKit(val kit: Kit, val api: Eclair)
 enum class StartupState {
@@ -102,6 +104,8 @@ class AppKitModel : ViewModel() {
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
+  val trampolineSettings = MutableLiveData<TrampolineSettings>()
+  val swapInSettings = MutableLiveData<SwapInSettings>()
   val nodeData = MutableLiveData<NodeData>()
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
@@ -109,7 +113,9 @@ class AppKitModel : ViewModel() {
   init {
     _kit.value = null
     startupState.value = StartupState.OFF
-    nodeData.value = NodeData(MilliSatoshi(0), "", 0, 0)
+    nodeData.value = Constants.DEFAULT_NODE_DATA
+    trampolineSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
+    swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -317,17 +323,23 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         _kit.value?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
-          val trampolineData = Wallet.getTrampoline(amount, paymentRequest)
-          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(trampolineData.second) else amount
+          val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
+          val fee = if (isTrampoline) {
+            trampolineSettings.value!!.feeBase.`$times`(trampolineSettings.value!!.hopsCount.toLong()) // base fee per hop
+              .`$plus`(amount.`$times`(trampolineSettings.value!!.feePercent))  // proportional fee, defaults to 0.1 % of payment amount
+          } else {
+            MilliSatoshi(0)
+          }
+          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(fee) else amount
 
-          val sendRequest: Any = if (trampolineData.first.isDefined) {
+          val sendRequest: Any = if (isTrampoline) {
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
-              /* trampoline fees */ trampolineData.second,
+              /* trampoline fees */ fee,
               /* payment request */ paymentRequest,
-              /* trampoline node public key */ trampolineData.first.get(),
+              /* trampoline node public key */ Wallet.ACINQ.nodeId(),
               /* final cltv expiry delta */ cltvExpiryDelta,
-              /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(144 * 5),
+              /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(trampolineSettings.value!!.cltvExpiry * trampolineSettings.value!!.hopsCount),
               /* route params */ Option.apply(null))
           } else {
             PaymentInitiator.SendPaymentRequest(
@@ -343,7 +355,7 @@ class AppKitModel : ViewModel() {
               /* route params */ Option.apply(null))
           }
 
-          log.info("sending $amountFinal with trampoline=${trampolineData.first} fee=${trampolineData.second} (deducted: $deductFeeFromAmount) for pr $paymentRequest")
+          log.info("sending payment [ amount=$amountFinal, fee=$fee, isTrampoline=$isTrampoline, deductFee=$deductFeeFromAmount ] for pr=$paymentRequest with trampolineSettings=${trampolineSettings.value}")
           this.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
@@ -512,7 +524,9 @@ class AppKitModel : ViewModel() {
 
   public fun shutdown() {
     closeConnections()
-    nodeData.postValue(NodeData(MilliSatoshi(0), "", 0, 0))
+    trampolineSettings.postValue(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
+    swapInSettings.postValue(Constants.DEFAULT_SWAP_IN_SETTINGS)
+    nodeData.postValue(Constants.DEFAULT_NODE_DATA)
     _kit.postValue(null)
     startupState.postValue(StartupState.OFF)
   }
@@ -652,11 +666,12 @@ class AppKitModel : ViewModel() {
         val body = response.body()
         if (response.isSuccessful && body != null) {
           try {
-            val json = JSONObject(body.string())
+            val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
             log.debug("wallet context responded with {}", json.toString(2))
+            // -- version context
             val installedVersion = BuildConfig.VERSION_CODE
-            val latestVersion = json.getJSONObject(BuildConfig.CHAIN).getInt("version")
-            val latestCriticalVersion = json.getJSONObject(BuildConfig.CHAIN).getInt("latest_critical_version")
+            val latestVersion = json.getInt("version")
+            val latestCriticalVersion = json.getInt("latest_critical_version")
             notifications.value?.run {
               if (installedVersion < latestCriticalVersion) {
                 log.info("a critical update (v$latestCriticalVersion) is deemed available")
@@ -669,6 +684,19 @@ class AppKitModel : ViewModel() {
               }
               notifications.postValue(this)
             }
+
+            // -- trampoline settings
+            val remoteTrampolineSettings = json.getJSONObject("trampoline").getJSONObject("v1")
+            trampolineSettings.postValue(TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(remoteTrampolineSettings.getLong("fee_base_sat"))),
+              feePercent = remoteTrampolineSettings.getDouble("fee_percent"),
+              hopsCount = remoteTrampolineSettings.getInt("hops_count"),
+              cltvExpiry = remoteTrampolineSettings.getInt("cltv_expiry")))
+            log.info("trampoline settings set to ${trampolineSettings.value}")
+
+            // -- swap-in settings
+            val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1")
+            swapInSettings.postValue(SwapInSettings(feePercent = remoteSwapInSettings.getDouble("fee_percent")))
+            log.info("swap_in settings set to ${swapInSettings.value}")
           } catch (e: JSONException) {
             log.error("could not read wallet context body: ", e)
           }

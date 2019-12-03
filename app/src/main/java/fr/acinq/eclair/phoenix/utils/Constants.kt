@@ -17,7 +17,12 @@
 package fr.acinq.eclair.phoenix.utils
 
 import android.text.format.DateUtils
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.NodeURI
+import fr.acinq.eclair.phoenix.NodeData
+import fr.acinq.eclair.phoenix.SwapInSettings
+import fr.acinq.eclair.phoenix.TrampolineSettings
 import okhttp3.MediaType
 
 /**
@@ -43,4 +48,9 @@ object Constants {
   // -- android notifications
   const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
   const val WATCHER_REQUEST_CODE = 37921816
+
+  // -- default wallet values
+  val DEFAULT_NODE_DATA = NodeData(MilliSatoshi(0), "", 0, 0)
+  val DEFAULT_TRAMPOLINE_SETTINGS = TrampolineSettings(MilliSatoshi(5000), 0.001, 5, 144)
+  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
 }

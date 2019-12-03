@@ -24,12 +24,12 @@ import fr.acinq.eclair.phoenix.R
 
 object AlertHelper {
 
-  fun build(inflater: LayoutInflater, titleResId: Int?, messageResId: Int?, html: Boolean = false): AlertDialog.Builder {
+  fun build(inflater: LayoutInflater, titleResId: Int?, messageResId: Int?): AlertDialog.Builder {
     val context = inflater.context
-    return build(inflater, titleResId?.let { context.getString(it) }, messageResId?.let { context.getString(it) }, html)
+    return build(inflater, titleResId?.let { context.getString(it) }, messageResId?.let { context.getString(it) })
   }
 
-  fun build(inflater: LayoutInflater, title: String?, message: String?, html: Boolean = false): AlertDialog.Builder {
+  fun build(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?): AlertDialog.Builder {
     val context = inflater.context
     val view = inflater.inflate(R.layout.dialog_alert, null)
     val titleView = view.findViewById<TextView>(R.id.alert_title)
@@ -37,12 +37,12 @@ object AlertHelper {
 
     title?.run {
       titleView.visibility = View.VISIBLE
-      titleView.text = if (html) Converter.html(this) else this
+      titleView.text = this
     }
 
     message?.run {
       messageView.visibility = View.VISIBLE
-      messageView.text = if (html) Converter.html(this) else this
+      messageView.text = this
     }
 
     return AlertDialog.Builder(context, R.style.default_dialogTheme)
