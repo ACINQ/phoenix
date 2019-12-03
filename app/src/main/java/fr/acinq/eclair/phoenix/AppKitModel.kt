@@ -334,7 +334,7 @@ class AppKitModel : ViewModel() {
               /* amount to send */ amountFinal,
               /* paymentHash */ paymentRequest.paymentHash(),
               /* payment target */ paymentRequest.nodeId(),
-              /* max attempts */ 3,
+              /* max attempts */ 5,
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),

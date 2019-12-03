@@ -57,7 +57,7 @@ object Logging {
     // lc.getLogger("fr.acinq.eclair.phoenix.events.EclairSupervisor").level = Level.OFF
     // lc.getLogger("fr.acinq.eclair.Diagnostics").level = Level.OFF
     // lc.getLogger("fr.acinq.eclair.channel").level = Level.DEBUG
-    // lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
+     lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
     if (BuildConfig.DEBUG) {
       lc.getLogger("io.netty").level = Level.INFO
     } else {
