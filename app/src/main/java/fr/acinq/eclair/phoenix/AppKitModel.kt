@@ -164,7 +164,8 @@ class AppKitModel : ViewModel() {
         val pr = doGeneratePaymentRequest("On-chain payment to ${event.bitcoinAddress()}", Option.apply(event.amount()), ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>())
         kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
         pendingSwapIns.value?.remove(event.bitcoinAddress())
-        navigationEvent.postValue(PaymentReceived(pr.paymentHash(), ScalaList.empty<PaymentReceived.PartialPayment>()))
+        navigationEvent.postValue(PaymentReceived(pr.paymentHash(),
+          ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
       } catch (e: Exception) {
         log.error("failed to create and settle payment request placeholder for ${event.bitcoinAddress()}: ", e)
       }
