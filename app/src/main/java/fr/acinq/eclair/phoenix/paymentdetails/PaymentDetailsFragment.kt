@@ -31,7 +31,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.*
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.IncomingPaymentStatus
+import fr.acinq.eclair.db.OutgoingPayment
+import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
@@ -39,12 +42,10 @@ import fr.acinq.eclair.phoenix.databinding.FragmentPaymentDetailsBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.ThemeHelper
 import fr.acinq.eclair.phoenix.utils.Transcriber
-import fr.acinq.eclair.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongycastle.crypto.tls.ContentType
 import scala.util.Either
 import scala.util.Left
 import scala.util.Right
@@ -102,7 +103,8 @@ class PaymentDetailsFragment : BaseFragment() {
                 is OutgoingPaymentStatus.Succeeded -> {
                   val status = p.status() as OutgoingPaymentStatus.Succeeded
                   mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
-                  val statuses: List<OutgoingPaymentStatus.Succeeded> = payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
+                  val statuses: List<OutgoingPaymentStatus.Succeeded> =
+                    payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
                   val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
 
                   if (p.paymentRequest().isDefined) {
@@ -272,6 +274,7 @@ class PaymentDetailsViewModel : ViewModel() {
   val preimage: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
+        it.isLeft && it.left().get().isNotEmpty() && it.left().get()[0].status() is OutgoingPaymentStatus.Succeeded -> (it.left().get()[0].status() as OutgoingPaymentStatus.Succeeded).paymentPreimage().toString()
         it.isRight -> it.right().get().paymentPreimage().toString()
         else -> ""
       }
