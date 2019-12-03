@@ -17,12 +17,18 @@
 package fr.acinq.eclair.phoenix
 
 import android.content.Context
+import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import com.google.android.material.snackbar.Snackbar
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
@@ -40,11 +46,25 @@ class MainActivity : AppCompatActivity() {
   private lateinit var mBinding: ActivityMainBinding
   private lateinit var appKit: AppKitModel
 
+  private val connectivitySnackbar: Snackbar by lazy {
+    Snackbar.make(mBinding.root, R.string.main_connectivity_issue, Snackbar.LENGTH_INDEFINITE)
+      .setAction(R.string.main_connectivity_issue_button) {
+        startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+      }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     this.setTheme(Prefs.getTheme(applicationContext))
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     appKit = ViewModelProvider(this).get(AppKitModel::class.java)
+    appKit.networkAvailable.observe(this, Observer {
+      if (it) {
+        connectivitySnackbar.dismiss()
+      } else {
+        connectivitySnackbar.show()
+      }
+    })
     appKit.navigationEvent.observe(this, Observer {
       when (it) {
         is PayToOpenRequestEvent -> {
@@ -72,9 +92,35 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+    override fun onAvailable(network: Network) {
+      super.onAvailable(network)
+      log.info("network available")
+      appKit.networkAvailable.postValue(true)
+    }
+
+    override fun onLost(network: Network) {
+      super.onLost(network)
+      log.info("network lost")
+      appKit.networkAvailable.postValue(false)
+    }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val connectivityManager: ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    connectivityManager.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
+  }
+
   override fun onResume() {
     super.onResume()
     appKit.reconnect()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    val connectivityManager: ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    connectivityManager.unregisterNetworkCallback(networkCallback)
   }
 
   override fun onDestroy() {

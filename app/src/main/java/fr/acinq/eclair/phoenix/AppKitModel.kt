@@ -98,6 +98,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
+  val networkAvailable = MutableLiveData(false)
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
