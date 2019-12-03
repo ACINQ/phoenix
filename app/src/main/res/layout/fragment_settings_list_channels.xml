@@ -37,27 +37,6 @@
       app:layout_constraintTop_toTopOf="parent"
       app:title="@string/listallchannels_title" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_md"
-      android:paddingStart="@dimen/space_lg"
-      android:paddingEnd="@dimen/space_lg"
-      android:visibility="@{model.state == ListChannelsState.IN_PROGRESS}"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar"
-      app:text="@string/listallchannels_in_progress" />
-
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_md"
-      android:paddingStart="@dimen/space_lg"
-      android:paddingEnd="@dimen/space_lg"
-      android:text="@string/listallchannels_error"
-      android:visibility="@{model.state == ListChannelsState.ERROR}"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
     <TextView
       android:id="@+id/node_id"
       android:layout_width="match_parent"
@@ -71,8 +50,17 @@
       android:textColor="@color/slate"
       android:textIsSelectable="true"
       android:textSize="@dimen/text_sm"
-      android:visibility="@{model.state == ListChannelsState.DONE}"
       app:layout_constraintTop_toBottomOf="@id/action_bar" />
+
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_md"
+      android:paddingStart="@dimen/space_lg"
+      android:paddingEnd="@dimen/space_lg"
+      android:text="@string/listallchannels_error"
+      android:visibility="@{model.state == ListChannelsState.ERROR}"
+      app:layout_constraintTop_toBottomOf="@id/node_id" />
 
     <TextView
       android:id="@+id/channels_found_header"
@@ -111,18 +99,25 @@
       app:text="@string/listallchannels_share_all"
       app:text_size="@dimen/text_sm" />
 
-    <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/channels_list"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+      android:id="@+id/swipe_refresh"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:clipToPadding="false"
-      android:overScrollMode="never"
-      android:visibility="@{model.state == ListChannelsState.DONE}"
       app:layout_behavior="@string/appbar_scrolling_view_behavior"
       app:layout_constrainedHeight="true"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/share_button"
-      app:layout_constraintVertical_bias="0" />
+      app:layout_constraintTop_toBottomOf="@id/share_button">
 
+      <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/channels_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+
+        android:visibility="@{model.state == ListChannelsState.DONE}"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

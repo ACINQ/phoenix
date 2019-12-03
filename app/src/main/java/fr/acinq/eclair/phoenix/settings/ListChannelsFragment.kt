@@ -17,7 +17,6 @@
 package fr.acinq.eclair.phoenix.settings
 
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +26,7 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.eclair.phoenix.BaseFragment
@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory
 import upickle.`default$`
 
 
-class ListChannelsFragment : BaseFragment() {
+class ListChannelsFragment : BaseFragment(), OnRefreshListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -70,6 +70,10 @@ class ListChannelsFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ListChannelsViewModel::class.java)
+    mBinding.swipeRefresh.setOnRefreshListener(this)
+    model.state.observe(viewLifecycleOwner, Observer {
+      mBinding.swipeRefresh.isRefreshing = (it == ListChannelsState.IN_PROGRESS)
+    })
     model.channels.observe(viewLifecycleOwner, Observer {
       val channelsCount = it.count()
       when {
@@ -119,6 +123,10 @@ class ListChannelsFragment : BaseFragment() {
       model.channels.value = channels
       model.state.value = ListChannelsState.DONE
     }
+  }
+
+  override fun onRefresh() {
+    getChannels()
   }
 }
 
