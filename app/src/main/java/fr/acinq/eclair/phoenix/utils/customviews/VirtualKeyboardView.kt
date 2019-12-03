@@ -66,20 +66,19 @@ class VirtualKeyboardView @JvmOverloads constructor(context: Context, attrs: Att
   }
 
   private fun dispatchCharEvent(keyCode: Int) {
-    mHandler!!.removeMessages(MSG_REPEAT)
+    mHandler?.removeMessages(MSG_REPEAT)
     if (mListener != null) {
       if (keyCode != KEY_DELETE) {
         isHapticFeedbackEnabled = true
         performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
       }
-      mListener!!.onEvent(keyCode)
+      mListener?.onEvent(keyCode)
     }
   }
 
   val mBinding: CustomVirtualKeyboardViewBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.custom_virtual_keyboard_view, this, true)
 
   init {
-
     mBinding.keyA.setOnClickListener { dispatchCharEvent('a'.toInt()) }
     mBinding.keyB.setOnClickListener { dispatchCharEvent('b'.toInt()) }
     mBinding.keyC.setOnClickListener { dispatchCharEvent('c'.toInt()) }
@@ -117,7 +116,7 @@ class VirtualKeyboardView @JvmOverloads constructor(context: Context, attrs: Att
         MotionEvent.ACTION_DOWN -> {
           dispatchCharEvent(KEY_DELETE)
           mHandler?.removeMessages(MSG_LONGPRESS)
-          mHandler?.sendMessageDelayed(mHandler!!.obtainMessage(MSG_LONGPRESS, KEY_DELETE), LONGPRESS_TIMEOUT.toLong())
+          mHandler?.sendMessageDelayed(mHandler?.obtainMessage(MSG_LONGPRESS, KEY_DELETE), LONGPRESS_TIMEOUT.toLong())
         }
         MotionEvent.ACTION_UP -> {
           mHandler?.removeMessages(MSG_REPEAT)

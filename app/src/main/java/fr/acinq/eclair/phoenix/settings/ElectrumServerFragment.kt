@@ -32,14 +32,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
+import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.eclair.phoenix.utils.BindingHelpers
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
+import fr.acinq.eclair.phoenix.utils.Transcriber
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.NumberFormat
 
 
 class ElectrumServerFragment : BaseFragment() {
@@ -59,8 +62,9 @@ class ElectrumServerFragment : BaseFragment() {
     model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
     appKit.nodeData.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
+        // -- connection status
         val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-        mBinding.currentState.text = Converter.html(if (Strings.isNullOrEmpty(it?.electrumAddress)) {
+        mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(it?.electrumAddress)) {
           if (Strings.isNullOrEmpty(prefElectrumAddress)) {
             resources.getString(R.string.electrum_connecting)
           } else {
@@ -69,6 +73,28 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           resources.getString(R.string.electrum_connected, it.electrumAddress)
         })
+        // -- tip timestamp
+        if (it.tipTime == 0L) {
+          mBinding.tipTime.visibility = View.GONE
+        } else {
+          mBinding.tipTime.visibility = View.VISIBLE
+          mBinding.tipTime.text = Transcriber.plainTime(it.tipTime * 1000L)
+        }
+        // -- block height
+        if (it.blockHeight == 0) {
+          mBinding.blockHeight.visibility = View.GONE
+        } else {
+          mBinding.blockHeight.visibility = View.VISIBLE
+          mBinding.blockHeight.text = NumberFormat.getInstance().format(it.blockHeight)
+        }
+        // -- feerate
+        if (appKit.kit.value == null) {
+          mBinding.feeRate.visibility = View.GONE
+        } else {
+          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
+          mBinding.feeRate.visibility = View.VISIBLE
+          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+        }
       }
     })
     mBinding.model = model

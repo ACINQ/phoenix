@@ -57,4 +57,7 @@
   <dimen name="balance_default_height">220dp</dimen>
   <dimen name="balance_min_height">140dp</dimen>
 
+  <!-- data row label width -->
+  <dimen name="data_row_label_width">120dp</dimen>
+
 </resources>

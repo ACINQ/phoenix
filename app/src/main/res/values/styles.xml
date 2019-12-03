@@ -162,10 +162,10 @@
     <item name="android:textSize">@dimen/text_xl</item>
   </style>
 
-<!--  <style name="prefs_dialogTheme" parent="@style/default_dialogTheme">-->
-<!--    <item name="colorPrimary">@color/green</item>-->
-<!--    <item name="colorPrimaryDark">@color/green</item>-->
-<!--  </style>-->
+  <!--  <style name="prefs_dialogTheme" parent="@style/default_dialogTheme">-->
+  <!--    <item name="colorPrimary">@color/green</item>-->
+  <!--    <item name="colorPrimaryDark">@color/green</item>-->
+  <!--  </style>-->
 
   <style name="default_dialogTheme" parent="@style/default_theme">
     <item name="android:windowIsFloating">true</item>
@@ -262,22 +262,24 @@
 
   <style name="TechnicalsBaseView" parent="default_textAppearance">
     <item name="android:paddingStart">@dimen/space_md</item>
-    <item name="android:paddingTop">@dimen/space_md</item>
-    <item name="android:paddingBottom">@dimen/space_md</item>
+    <item name="android:paddingTop">@dimen/space_sm</item>
+    <item name="android:paddingBottom">@dimen/space_sm</item>
     <item name="android:layout_height">wrap_content</item>
+    <item name="android:paddingEnd">@dimen/space_md</item>
     <item name="android:textColor">?attr/textColor</item>
   </style>
 
   <style name="TechnicalsLabelView" parent="TechnicalsBaseView">
-    <item name="android:layout_width">140dp</item>
+    <item name="android:layout_width">@dimen/data_row_label_width</item>
     <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textSize">@dimen/text_md</item>
   </style>
 
   <style name="TechnicalsValueView" parent="TechnicalsBaseView">
-    <item name="android:paddingEnd">@dimen/space_md</item>
+    <item name="android:paddingStart">0dp</item>
     <item name="android:layout_width">0dp</item>
     <item name="android:textIsSelectable">true</item>
-    <item name="android:layout_gravity">fill</item>
+    <item name="android:layout_gravity">fill_horizontal</item>
   </style>
 
   <style name="PinButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless.Colored">

@@ -360,6 +360,7 @@
           android:paddingBottom="@dimen/space_lg"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
+          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
           app:layout_constraintTop_toBottomOf="@id/swap_button">
 
           <TextView
@@ -368,7 +369,6 @@
             android:layout_width="60dp"
             android:text="@string/send_swap_complete_recap_amount"
             android:textAlignment="viewEnd"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_amount_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -378,7 +378,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:textStyle="bold"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
@@ -391,7 +390,6 @@
             android:layout_width="60dp"
             android:text="@string/send_swap_complete_recap_fee"
             android:textAlignment="viewEnd"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -402,7 +400,6 @@
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
             android:textStyle="bold"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
@@ -415,7 +412,6 @@
             android:layout_width="60dp"
             android:text="@string/send_swap_complete_recap_total"
             android:textAlignment="viewEnd"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_total_value"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -426,7 +422,6 @@
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
             android:textStyle="bold"
-            android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"

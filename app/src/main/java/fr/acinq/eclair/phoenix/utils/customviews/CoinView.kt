@@ -32,12 +32,15 @@ import fr.acinq.eclair.phoenix.databinding.CustomCoinViewBinding
 import fr.acinq.eclair.phoenix.utils.Converter
 import fr.acinq.eclair.phoenix.utils.Prefs
 import fr.acinq.eclair.phoenix.utils.ThemeHelper
+import org.slf4j.LoggerFactory
 import scala.Option
 
 class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = R.style.default_theme) : ConstraintLayout(context, attrs, defStyle) {
 
   val mBinding: CustomCoinViewBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.custom_coin_view, this, true)
+  private val log = LoggerFactory.getLogger(this::class.java)
   private var _amount: Option<MilliSatoshi> = Option.apply(null)
+
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       refreshFields()
@@ -64,6 +67,8 @@ class CoinView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
           Prefs.setShowAmountInFiat(context, !showAmountInFiat)
         }
       } catch (e: Exception) {
+        log.error("error in CoinView: ", e)
+      } finally {
         arr.recycle()
       }
     }

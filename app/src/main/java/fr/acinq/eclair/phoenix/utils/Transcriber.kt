@@ -21,6 +21,8 @@ import android.text.format.DateUtils
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.phoenix.R
 import scala.Option
+import java.text.DateFormat
+import java.util.*
 import kotlin.math.abs
 
 object Transcriber {
@@ -60,5 +62,9 @@ object Transcriber {
     } else {
       DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), delay).toString()
     }
+  }
+
+  fun plainTime(timeInMillis: Long): String {
+    return DateFormat.getDateTimeInstance().format(Date(timeInMillis))
   }
 }

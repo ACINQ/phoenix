@@ -45,48 +45,88 @@
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
 
-      <androidx.constraintlayout.widget.ConstraintLayout
+      <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/bgColor"
-        app:layout_constraintTop_toTopOf="parent">
+        android:columnCount="2">
 
         <View
-          android:id="@+id/separator"
           style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          app:layout_constraintTop_toTopOf="parent" />
+          android:layout_columnSpan="2" />
 
         <TextView
-          android:id="@+id/current_state"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
-          android:text="@string/electrum_connecting"
-          app:layout_constraintTop_toBottomOf="@id/separator" />
+          style="@style/TechnicalsLabelView"
+          android:text="@string/electrum_connection_label" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
-          android:id="@+id/change_server_button"
-          android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
-          android:paddingStart="@dimen/space_md"
-          android:paddingTop="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingBottom="@dimen/space_sm"
-          app:icon="@drawable/ic_edit"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/current_state"
-          app:text="@string/electrum_change_button"
-          app:text_size="@dimen/text_sm" />
+          android:layout_gravity="fill_horizontal"
+          android:layout_columnWeight="1">
+
+          <TextView
+            android:id="@+id/connection_state_value"
+            style="@style/TechnicalsValueView"
+            android:text="@string/lipsum_short"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+            android:id="@+id/change_server_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/space_md"
+            android:paddingTop="@dimen/space_sm"
+            android:paddingEnd="@dimen/space_md"
+            android:paddingBottom="@dimen/space_sm"
+            app:icon="@drawable/ic_edit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/connection_state_value"
+            app:text="@string/electrum_change_button"
+            app:text_size="@dimen/text_sm" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
           style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          android:layout_marginTop="@dimen/space_md"
-          app:layout_constraintTop_toBottomOf="@id/change_server_button" />
+          android:layout_columnSpan="2"
+          android:layout_marginTop="@dimen/space_md" />
 
-      </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+          style="@style/TechnicalsLabelView"
+          android:text="@string/electrum_block_height_label" />
+
+        <TextView
+          android:id="@+id/block_height"
+          style="@style/TechnicalsValueView" />
+
+        <View
+          style="@style/HLineSeparator"
+          android:layout_columnSpan="2" />
+
+        <TextView
+          style="@style/TechnicalsLabelView"
+          android:text="@string/electrum_tip_label" />
+
+        <TextView
+          android:id="@+id/tip_time"
+          style="@style/TechnicalsValueView" />
+
+        <View
+          style="@style/HLineSeparator"
+          android:layout_columnSpan="2" />
+
+        <TextView
+          style="@style/TechnicalsLabelView"
+          android:text="@string/electrum_fee_rate_label" />
+
+        <TextView
+          android:id="@+id/fee_rate"
+          style="@style/TechnicalsValueView" />
+
+      </GridLayout>
     </ScrollView>
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

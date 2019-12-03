@@ -405,6 +405,11 @@
   <string name="electrum_subtitle">For access to the Bitcoin blockchain, the app connects by default to a random electrum server. You can also choose to only connect to a specific server.</string>
   <string name="electrum_change_button">SET SERVER…</string>
 
+  <string name="electrum_block_height_label">Block height</string>
+  <string name="electrum_tip_label">Tip timestamp</string>
+  <string name="electrum_fee_rate_label">Fee rate</string>
+  <string name="electrum_fee_rate">%1$s sat/byte</string>
+  <string name="electrum_connection_label">Server</string>
   <string name="electrum_connecting">Establishing connection…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>

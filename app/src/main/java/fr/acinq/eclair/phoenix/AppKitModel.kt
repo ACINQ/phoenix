@@ -36,7 +36,10 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.*
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.OutgoingPayment
+import fr.acinq.eclair.db.OutgoingPaymentStatus
+import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
@@ -79,7 +82,7 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
-data class NodeData(var balance: MilliSatoshi, var electrumAddress: String? = "")
+data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
 class AppKit(val kit: Kit, val api: Eclair)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
@@ -106,7 +109,7 @@ class AppKitModel : ViewModel() {
   init {
     _kit.value = null
     startupState.value = StartupState.OFF
-    nodeData.value = NodeData(MilliSatoshi(0), "")
+    nodeData.value = NodeData(MilliSatoshi(0), "", 0, 0)
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -177,7 +180,7 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().toString())
+    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -508,7 +511,7 @@ class AppKitModel : ViewModel() {
 
   public fun shutdown() {
     closeConnections()
-    nodeData.postValue(NodeData(MilliSatoshi(0), ""))
+    nodeData.postValue(NodeData(MilliSatoshi(0), "", 0, 0))
     _kit.postValue(null)
     startupState.postValue(StartupState.OFF)
   }
