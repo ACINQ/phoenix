@@ -41,11 +41,10 @@
 
   <!-- light theme mostly -->
   <color name="dark">#2B313E</color>
-  <color name="brandy">#CA7575</color>
+  <color name="brandy">#C76D6D</color>
   <color name="slate">#73868D</color>
   <color name="ripple">#A6AFC0CF</color>
-  <color name="casper">#A9C1CC</color>
-  <color name="geyser">#E6F0F3</color>
-  <color name="mystic">#E9F2F2</color>
-  <color name="athens">#F1F7F9</color>
+  <color name="casper">#ABC1C9</color>
+  <color name="geyser">#E1EBED</color>
+  <color name="athens">#F0F5F7</color>
 </resources>

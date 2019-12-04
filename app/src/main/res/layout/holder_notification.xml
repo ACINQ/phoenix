@@ -50,7 +50,7 @@
 
   <Button
     android:id="@+id/notif_button"
-    style="?attr/notifButtonStyle"
+    style="@style/default_notifButtonStyle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:layout_constraintStart_toEndOf="@id/notif_icon"

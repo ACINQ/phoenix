@@ -78,7 +78,7 @@
             android:text="@{model.paymentHash}" />
 
           <View
-            style="@style/HLineMutedSeparator"
+            style="@style/HLineSeparator"
             android:layout_columnSpan="2" />
 
           <TextView
@@ -92,7 +92,7 @@
             android:text="@{model.paymentRequest}" />
 
           <View
-            style="@style/HLineMutedSeparator"
+            style="@style/HLineSeparator"
             android:layout_columnSpan="2" />
 
           <TextView
@@ -106,7 +106,7 @@
             android:text="@{model.preimage}" />
 
           <View
-            style="@style/HLineMutedSeparator"
+            style="@style/HLineSeparator"
             android:layout_height="24dp"
             android:layout_columnSpan="2" />
 
@@ -121,7 +121,7 @@
             android:text="@{model.createdAt}" />
 
           <View
-            style="@style/HLineMutedSeparator"
+            style="@style/HLineSeparator"
             android:layout_columnSpan="2" />
 
           <TextView
@@ -137,7 +137,7 @@
             android:visibility="@{!model.isSent()}" />
 
           <View
-            style="@style/HLineMutedSeparator"
+            style="@style/HLineSeparator"
             android:layout_columnSpan="2"
             android:visibility="@{!model.isSent()}" />
 

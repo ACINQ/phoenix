@@ -278,7 +278,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:backgroundTint="@color/transparent"
           android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"

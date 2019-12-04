@@ -91,6 +91,10 @@ dependencies {
   implementation 'androidx.core:core-ktx:1.1.0'
   implementation "androidx.appcompat:appcompat:1.1.0"
 
+  // ANDROIDX - material
+  def material_version = "1.2.0-alpha02"
+  implementation "com.google.android.material:material:$material_version"
+
   // ANDROIDX - navigation
   def nav_version = "2.2.0-rc01"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"

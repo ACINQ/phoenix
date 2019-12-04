@@ -16,12 +16,14 @@
 
 <resources>
 
-  <style name="default_theme" parent="Theme.AppCompat.NoActionBar">
+  <style name="default_theme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     <item name="colorPrimary">@color/green</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
 
     <!-- background -->
+    <item name="colorSurface">?attr/bgColor</item>
+    <item name="colorOnSurface">?attr/onMutedBgTextColor</item>
     <item name="android:colorBackground">?attr/bgColor</item>
     <item name="android:windowBackground">@drawable/app_bg_default</item>
 
@@ -37,12 +39,13 @@
     <item name="android:colorControlActivated">?attr/colorPrimary</item>
 
     <!-- widget overrides -->
-    <item name="notifButtonStyle">@style/default_notifButtonStyle</item>
     <item name="actionBarViewStyle">@style/default_actionBar</item>
     <item name="buttonViewStyle">@style/default_buttonStyle</item>
     <item name="android:spinnerItemStyle">@style/default_textAppearance</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
-    <item name="android:buttonStyle">@style/default_buttonStyle</item>
+    <item name="materialButtonStyle">@style/material_buttonStyle</item>
+    <item name="snackbarStyle">@style/snackbarStyle</item>
+    <item name="snackbarTextViewStyle">@style/default_textAppearance_alt</item>
 
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="dialogTheme">@style/default_dialogTheme</item>
@@ -61,7 +64,7 @@
     <item name="colorPrimary">@color/apple</item>
     <item name="bgColor">@color/white</item>
     <item name="mutedBgColor">@color/athens</item>
-    <item name="borderColor">@color/mystic</item>
+    <item name="borderColor">@color/geyser</item>
     <item name="buttonRippleColor">@color/ripple</item>
     <item name="textColor">@color/dark</item>
     <item name="mutedTextColor">@color/casper</item>
@@ -113,34 +116,39 @@
     <item name="android:textColor">?altTextColor</item>
   </style>
 
-  <style name="default_buttonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
-    <item name="android:layout_width">wrap_content</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:minHeight">0dp</item>
-    <item name="android:minWidth">0dp</item>
-    <item name="android:gravity">start|center</item>
-    <item name="android:paddingTop">@dimen/space_sm_p</item>
-    <item name="android:paddingBottom">@dimen/space_sm_p</item>
-    <item name="android:paddingLeft">@dimen/space_md</item>
-    <item name="android:paddingRight">@dimen/space_md</item>
-    <item name="android:background">@drawable/button_bg</item>
+  <style name="material_buttonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton">
+    <item name="android:textColor">?attr/textColor</item>
     <item name="android:textAppearance">@style/default_textAppearance</item>
     <item name="android:fontFamily">sans-serif</item>
+    <item name="android:paddingTop">@dimen/space_sm</item>
+    <item name="android:paddingBottom">@dimen/space_sm</item>
+    <item name="android:paddingLeft">@dimen/space_md</item>
+    <item name="android:paddingRight">@dimen/space_md</item>
+    <item name="android:minHeight">0dp</item>
+    <item name="android:minWidth">0dp</item>
   </style>
 
-  <style name="default_notifButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+  <style name="default_buttonStyle" parent="@style/material_buttonStyle">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:gravity">start|center</item>
+    <item name="android:background">@drawable/button_bg</item>
+  </style>
+
+  <style name="default_notifButtonStyle" parent="@style/material_buttonStyle">
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:minHeight">0dp</item>
     <item name="android:minWidth">0dp</item>
     <item name="android:gravity">start|center</item>
-    <item name="android:paddingTop">@dimen/space_sm</item>
-    <item name="android:paddingBottom">@dimen/space_sm</item>
+    <item name="android:paddingTop">@dimen/space_xs</item>
+    <item name="android:paddingBottom">@dimen/space_xs</item>
     <item name="android:paddingLeft">@dimen/space_sm</item>
     <item name="android:paddingRight">@dimen/space_sm</item>
     <item name="android:background">@drawable/button_bg_square</item>
     <item name="android:textSize">@dimen/text_sm</item>
     <item name="android:textAllCaps">true</item>
+    <item name="android:textColor">?attr/textColor</item>
     <item name="android:fontFamily">sans-serif-medium</item>
   </style>
 
@@ -162,18 +170,12 @@
     <item name="android:textSize">@dimen/text_xl</item>
   </style>
 
-  <!--  <style name="prefs_dialogTheme" parent="@style/default_dialogTheme">-->
-  <!--    <item name="colorPrimary">@color/green</item>-->
-  <!--    <item name="colorPrimaryDark">@color/green</item>-->
-  <!--  </style>-->
-
   <style name="default_dialogTheme" parent="@style/default_theme">
     <item name="android:windowIsFloating">true</item>
     <item name="android:windowFrame">@null</item>
     <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
-    <item name="buttonStyle">@style/default_buttonStyle</item>
     <item name="android:windowTitleStyle">@style/dialog_title</item>
     <item name="android:textColorPrimary">?attr/colorPrimary</item>
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
@@ -194,6 +196,10 @@
     <item name="android:buttonTint">?attr/textColor</item>
   </style>
 
+  <style name="snackbarStyle">
+    <item name="android:background">@color/dark</item>
+  </style>
+
   <style name="default_spinnerStyle">
     <item name="android:background">@drawable/spinner_bg</item>
     <item name="android:minWidth">0dp</item>
@@ -207,16 +213,10 @@
 
   <!-- ///////////// special styles ///////////// -->
 
-  <style name="HLineMutedSeparator">
-    <item name="android:layout_width">match_parent</item>
-    <item name="android:layout_height">1dp</item>
-    <item name="android:background">?attr/mutedBgColor</item>
-  </style>
-
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">?attr/borderColor</item>
+    <item name="android:background">?attr/mutedBgColor</item>
   </style>
 
   <style name="VSeparator" parent="HLineSeparator">

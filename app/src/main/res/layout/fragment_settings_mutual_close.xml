@@ -95,7 +95,7 @@
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_md"
           android:hint="@string/closechannels_mutual_input_hint"
-          android:textColorHint="?attr/colorPrimary"
+          style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
           app:enableOrFade="@{model.state == PreChannelsCloseState.READY}"
           app:layout_constraintTop_toBottomOf="@id/instructions">
 
@@ -113,7 +113,7 @@
           android:id="@+id/mutual_error"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:drawableStart="@drawable/ic_alert_triangle"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_error"
@@ -125,57 +125,43 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:background="@drawable/rounded"
           android:backgroundTint="?attr/positiveColor"
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
           android:drawableTint="?attr/altTextColor"
-          android:paddingStart="@dimen/space_md"
-          android:paddingTop="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingBottom="@dimen/space_sm"
+          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_done"
           android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == MutualCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
-          app:text_size="@dimen/text_md" />
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
           android:id="@+id/mutual_in_progress"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:background="@drawable/rounded_border"
-          android:paddingStart="@dimen/space_md"
-          android:paddingTop="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingBottom="@dimen/space_sm"
+          android:padding="@dimen/space_md"
           android:visibility="@{model.state == MutualCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
-          app:text="@string/closechannels_message_in_progress"
-          app:text_size="@dimen/text_md" />
+          app:text="@string/closechannels_message_in_progress" />
 
         <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
-          android:layout_marginTop="@dimen/space_md"
-          android:paddingStart="@dimen/space_md"
-          android:paddingTop="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingBottom="@dimen/space_sm"
+          android:layout_marginTop="@dimen/space_md_p"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
-          app:hz_bias="0"
           app:icon="@drawable/ic_empty"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
-          app:text="@string/closechannels_mutual_button"
-          app:text_size="@dimen/text_sm" />
+          app:text="@string/closechannels_mutual_button"/>
 
         <androidx.constraintlayout.widget.Barrier
           android:id="@+id/action_bottom"

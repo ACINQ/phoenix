@@ -84,8 +84,7 @@
             app:icon="@drawable/ic_edit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/connection_state_value"
-            app:text="@string/electrum_change_button"
-            app:text_size="@dimen/text_sm" />
+            app:text="@string/electrum_change_button" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
