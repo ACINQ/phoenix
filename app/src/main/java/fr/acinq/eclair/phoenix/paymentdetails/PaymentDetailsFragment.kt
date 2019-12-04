@@ -99,6 +99,7 @@ class PaymentDetailsFragment : BaseFragment() {
                 }
                 is OutgoingPaymentStatus.`Pending$` -> {
                   mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
+                  showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
                 }
                 is OutgoingPaymentStatus.Succeeded -> {
                   val status = p.status() as OutgoingPaymentStatus.Succeeded
