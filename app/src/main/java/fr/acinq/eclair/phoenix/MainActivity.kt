@@ -17,12 +17,10 @@
 package fr.acinq.eclair.phoenix
 
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
 import android.os.Bundle
-import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -48,9 +46,6 @@ class MainActivity : AppCompatActivity() {
 
   private val connectivitySnackbar: Snackbar by lazy {
     Snackbar.make(mBinding.root, R.string.main_connectivity_issue, Snackbar.LENGTH_INDEFINITE)
-      .setAction(R.string.main_connectivity_issue_button) {
-        startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
-      }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
