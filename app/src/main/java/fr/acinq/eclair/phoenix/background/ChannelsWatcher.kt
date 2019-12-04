@@ -141,7 +141,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
     val startIntent = Intent(context, MainActivity::class.java)
     startIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
     val title = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_title)
-    val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_message)
+    val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_message else R.string.notif_watcher_connection_message)
     val builder = NotificationCompat.Builder(context, Constants.WATCHER_NOTIFICATION_CHANNEL_ID)
       .setSmallIcon(R.drawable.ic_phoenix)
       .setContentTitle(title)
@@ -155,25 +155,29 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
 
   companion object {
     private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
-    val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
+    private const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
 
     /**
-     * Delay in milliseconds in which the last electrum check can be considered fresh enough that users do not need
-     * to be reminded that eclair needs a working connection.
+     * Time window in milliseconds in which the last channels watch result can be considered fresh enough that the user
+     * does not need to be reminded that phoenix needs a working connection.
      */
     private const val MAX_FRESH_WINDOW = DateUtils.DAY_IN_MILLIS * 3
 
     /**
-     * Delay in milliseconds in which the last electrum check can be considered fresh enough that users do not need
-     * to be reminded that eclair needs a working connection, IF this last check returned OK.
+     * Time window similar to [MAX_FRESH_WINDOW], but only if the last result was OK.
      */
     private const val MAX_FRESH_WINDOW_IF_OK = DateUtils.DAY_IN_MILLIS * 5
 
     fun schedule(context: Context) {
-      log.info("scheduling electrum check work")
+      log.info("scheduling channels watcher")
       val work = PeriodicWorkRequest.Builder(ChannelsWatcher::class.java, 23, TimeUnit.HOURS, 12, TimeUnit.HOURS)
         .addTag(WATCHER_WORKER_TAG)
       WorkManager.getInstance(context).enqueueUniquePeriodicWork(WATCHER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, work.build())
+    }
+
+    fun scheduleASAP() {
+      val work = OneTimeWorkRequest.Builder(ChannelsWatcher::class.java).addTag(WATCHER_WORKER_TAG).build()
+      WorkManager.getInstance().enqueueUniqueWork(WATCHER_WORKER_TAG, ExistingWorkPolicy.REPLACE, work)
     }
   }
 }

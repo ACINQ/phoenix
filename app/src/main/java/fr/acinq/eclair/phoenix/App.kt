@@ -17,9 +17,13 @@
 package fr.acinq.eclair.phoenix
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.phoenix.utils.Constants
 import fr.acinq.eclair.phoenix.utils.Logging
 import fr.acinq.eclair.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
@@ -36,10 +40,22 @@ class App : Application() {
 
   private fun init() {
     Logging.setupLogger(applicationContext)
+
+    // rates & coin patterns
     when (Prefs.getCoinUnit(applicationContext)) {
       `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
       `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
       else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
+    }
+
+    // notification channels (android 8+)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channelWatcherChannel = NotificationChannel(Constants.WATCHER_NOTIFICATION_CHANNEL_ID,
+        getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH)
+      channelWatcherChannel.description = getString(R.string.notification_channels_watcher_desc)
+
+      // Register notifications channels with the system
+      getSystemService(NotificationManager::class.java)?.createNotificationChannel(channelWatcherChannel)
     }
   }
 }

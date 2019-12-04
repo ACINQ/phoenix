@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.StartupState
+import fr.acinq.eclair.phoenix.background.ChannelsWatcher
 import fr.acinq.eclair.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.eclair.phoenix.security.PinDialog
 import fr.acinq.eclair.phoenix.utils.Constants

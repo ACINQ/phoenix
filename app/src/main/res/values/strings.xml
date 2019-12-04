@@ -17,6 +17,11 @@
 <resources>
   <string name="app_name">Phoenix</string>
 
+  <!-- //////////////// system notification channels //////////////// -->
+
+  <string name="notification_channels_watcher_title">Background watcher</string>
+  <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
+
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
   <string name="autocreate_generating">Creating your wallet…</string>
@@ -201,10 +206,10 @@
   <!-- //////////////// notification - watcher //////////////// -->
 
   <string name="notif_watcher_cheating_title">Please start Phoenix</string>
-  <string name="notif_watcher_cheating_message">Cheating attempt description placeholder</string>
+  <string name="notif_watcher_cheating_message">A cheating attempt has been detected.</string>
 
   <string name="notif_watcher_connection_title">Phoenix needs network access</string>
-  <string name="notif_watcher_connection_message">Network access description</string>
+  <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -279,14 +284,14 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="notifications_set_up_pin">Your wallet is not protected.</string>
-  <string name="notifications_set_up_pin_action">Set a PIN</string>
-  <string name="notifications_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
-  <string name="notifications_mnemonics_never_seen_action">Backup my wallet</string>
-  <string name="notifications_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
-  <string name="notifications_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
-  <string name="notifications_upgrade">A new version of the wallet is available.</string>
-  <string name="notifications_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
+  <string name="inappnotif_set_up_pin">Your wallet is not protected.</string>
+  <string name="inappnotif_set_up_pin_action">Set a PIN</string>
+  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
+  <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
+  <string name="inappnotif_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
+  <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
+  <string name="inappnotif_upgrade">A new version of the wallet is available.</string>
+  <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
 
   <!-- //////////////// display seed //////////////// -->
 
