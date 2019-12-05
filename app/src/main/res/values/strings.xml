@@ -164,7 +164,7 @@
   <string name="scan_error_lnurl_unsupported">LNURL is not supported yet!</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
-  <string name="scan_amountless_legacy_message">This is an amountless legacy invoice. Dangerous. To be safe, the payee should specify an amount in the payment request.\n\nAre you sure you want to pay this invoice?</string>
+  <string name="scan_amountless_legacy_message">This invoice doesn't include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, the payee should specify an amount in the payment request.\n\nAre you sure you want to pay this invoice?</string>
   <string name="scan_amountless_legacy_confirm_button">Confirm</string>
   <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 
@@ -235,7 +235,7 @@
     <br/><br/>
     Funds will eventually be sent to: %1$s
     <br/><br/>
-    <b>Do not use this feature without fully understanding what it does.</b>
+    <b>Do not use this feature if you don't fully understand what it does.</b>
   ]]></string>
   <string name="closechannels_force_button">Force close channels</string>
   <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
