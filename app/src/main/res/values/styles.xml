@@ -196,7 +196,7 @@
     <item name="android:buttonTint">?attr/textColor</item>
   </style>
 
-  <style name="snackbarStyle">
+  <style name="snackbarStyle" parent="Widget.MaterialComponents.Snackbar.FullWidth">
     <item name="android:background">@color/dark</item>
   </style>
 
