@@ -13,7 +13,7 @@ class PaymentRequestTest {
     val start = System.currentTimeMillis()
     var dummy = 0
     for(i in 1..50) {
-      val pr = PaymentRequest.read(raw, true)
+      val pr = PaymentRequest.read(raw)
       val nodeId = pr.nodeId()
       dummy += nodeId.value()[0]
     }
