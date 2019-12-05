@@ -66,7 +66,7 @@ class ReceiveFragment : BaseFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+    activity?.onBackPressedDispatcher?.addCallback(this) {
       handleBackAction()
     }
   }

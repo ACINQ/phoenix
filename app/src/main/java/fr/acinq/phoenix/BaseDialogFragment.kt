@@ -17,11 +17,9 @@
 package fr.acinq.phoenix
 
 import android.os.Bundle
-import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -39,9 +37,6 @@ abstract class BaseDialogFragment : DialogFragment() {
       appKit.kit.observe(activity!!, Observer {
         handleKit()
       })
-      requireActivity().onBackPressedDispatcher.addCallback(this) {
-        log.info("back pressed should be disabled here")
-      }
     }
   }
 

@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
@@ -36,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.collection.JavaConverters
@@ -44,6 +46,7 @@ class AutoCreateFragment : Fragment() {
 
   private lateinit var mBinding: FragmentInitWalletAutoCreateBinding
   private lateinit var model: AutoCreateViewModel
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentInitWalletAutoCreateBinding.inflate(inflater, container, false)
@@ -62,6 +65,9 @@ class AutoCreateFragment : Fragment() {
         findNavController().navigate(R.id.global_action_any_to_startup)
       }
     })
+    activity?.onBackPressedDispatcher?.addCallback(this) {
+      log.debug("back button disabled")
+    }
     mBinding.model = model
   }
 

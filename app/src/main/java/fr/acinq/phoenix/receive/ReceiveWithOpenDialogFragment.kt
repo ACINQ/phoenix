@@ -62,8 +62,8 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
       mBinding.model = model
 
-      activity!!.onBackPressedDispatcher.addCallback(this) {
-        log.info("back pressed should be disabled here")
+      activity?.onBackPressedDispatcher?.addCallback(this) {
+        log.debug("back pressed disabled here")
       }
     }
   }
