@@ -24,7 +24,7 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 android {
   compileSdkVersion 28
   defaultConfig {
-    applicationId "fr.acinq.phoenix.testnet"
+    applicationId "fr.acinq.phoenix.mainnet"
     minSdkVersion 23
     targetSdkVersion 28
     versionCode 1
@@ -33,13 +33,13 @@ android {
   }
   buildTypes {
     debug {
-      resValue "string", "CHAIN", CHAIN_TESTNET
-      buildConfigField "String", "CHAIN", CHAIN_TESTNET
+      resValue "string", "CHAIN", CHAIN_MAINNET
+      buildConfigField "String", "CHAIN", CHAIN_MAINNET
       debuggable true
     }
     release {
-      resValue "string", "CHAIN", CHAIN_TESTNET
-      buildConfigField "String", "CHAIN", CHAIN_TESTNET
+      resValue "string", "CHAIN", CHAIN_MAINNET
+      buildConfigField "String", "CHAIN", CHAIN_MAINNET
       minifyEnabled false
       debuggable false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

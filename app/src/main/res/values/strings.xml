@@ -15,7 +15,7 @@
   -->
 
 <resources>
-  <string name="app_name">Phoenix (Testnet)</string>
+  <string name="app_name">Phoenix</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
