@@ -40,10 +40,7 @@ import fr.acinq.eclair.phoenix.BaseFragment
 import fr.acinq.eclair.phoenix.R
 import fr.acinq.eclair.phoenix.databinding.FragmentSendBinding
 import fr.acinq.eclair.phoenix.receive.SwapInState
-import fr.acinq.eclair.phoenix.utils.Converter
-import fr.acinq.eclair.phoenix.utils.InsufficientBalance
-import fr.acinq.eclair.phoenix.utils.Prefs
-import fr.acinq.eclair.phoenix.utils.Wallet
+import fr.acinq.eclair.phoenix.utils.*
 import fr.acinq.eclair.wire.SwapOutResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -285,10 +282,17 @@ class SendFragment : BaseFragment() {
         if (balance != null && amount.get().`$greater`(balance)) {
           throw InsufficientBalance()
         }
+        val isSwapOut = model.invoice.value?.isLeft ?: false
+        if (isSwapOut && amount.get().`$less`(Satoshi(10000))) {
+          throw SwapOutInsufficientAmount()
+        }
       } else {
         throw RuntimeException("amount is undefined")
       }
       amount
+    } catch (e: SwapOutInsufficientAmount) {
+      model.amountErrorMessage.value = R.string.send_amount_error_swap_out_too_small
+      Option.empty()
     } catch (e: InsufficientBalance) {
       model.amountErrorMessage.value = R.string.send_amount_error_balance
       Option.empty()
