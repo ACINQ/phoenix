@@ -122,9 +122,9 @@
 
   <string name="receive_with_open_title">Incoming Payment</string>
   <string name="receive_with_open_help_desc">What\'s this?</string>
-  <string name="receive_with_open_help">A swap payment converts a classic on-chain transaction into an instant Lightning payment in a trustless fashion. A fee is applied to cover the miners fees.</string>
-  <string name="receive_with_open_amount_label">You have a pending payment of</string>
-  <string name="receive_with_open_cost"><![CDATA[A new channel will automatically be created for a <b>%1$s</b> fee if you accept this payment.]]></string>
+  <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don't have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
+  <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
+  <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b>.]]></string>
   <string name="receive_with_open_accept">Accept</string>
   <string name="receive_with_open_decline">Decline</string>
 
@@ -226,13 +226,15 @@
   <string name="closechannels_mutual_button">Empty my wallet</string>
   <string name="closechannels_force_title">Force close</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    This is the force close description text. <b>Very dangerous!</b>
+    Force close allows you to unilaterally close your channels.
     <br/><br/>
-    Very expensive! Long delay!
+    This feature is not a "fix everything magic button"; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if ACINQ disappears from the surface of the earth, preventing you from spending your money. In all other cases, if you experience issues with Phoenix you should contact support.
     <br/><br/>
-    Funds will be sent to: %1$s
+    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.<b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
-    <b>Do not use this feature without fully understanding what it entails.</b>
+    Funds will eventually be sent to: %1$s
+    <br/><br/>
+    <b>Do not use this feature without fully understanding what it does.</b>
   ]]></string>
   <string name="closechannels_force_button">Force close channels</string>
   <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
@@ -415,7 +417,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">For access to the Bitcoin blockchain, the app connects by default to a random electrum server. You can also choose to only connect to a specific server.</string>
+  <string name="electrum_subtitle">By default Phoenix connects to random electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server.</string>
   <string name="electrum_change_button">Set server…</string>
 
   <string name="electrum_block_height_label">Block height</string>
