@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.send.ReadingState" />
+    <import type="fr.acinq.phoenix.send.ReadingState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.send.ReadInputViewModel" />
+      type="fr.acinq.phoenix.send.ReadInputViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/paste_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/paste_button" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/cancel_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
       app:layout_constraintStart_toStartOf="@id/scan_view"
       app:layout_constraintTop_toTopOf="@id/scan_view" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.utils.customviews.ProgressTextView
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:padding="@dimen/space_xs"
@@ -117,7 +117,7 @@
       android:visibility="@{model.hasCameraAccess}"
       app:layout_constraintBottom_toBottomOf="@id/scan_view" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/camera_access_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

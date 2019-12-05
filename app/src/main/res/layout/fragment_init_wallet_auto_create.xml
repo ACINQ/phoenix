@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.initwallet.AutoCreateState" />
+    <import type="fr.acinq.phoenix.initwallet.AutoCreateState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.initwallet.AutoCreateViewModel" />
+      type="fr.acinq.phoenix.initwallet.AutoCreateViewModel" />
 
   </data>
 
@@ -34,7 +34,7 @@
     android:padding="@dimen/space_lg"
     tools:context=".initwallet.AutoCreateFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.utils.customviews.ProgressTextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"

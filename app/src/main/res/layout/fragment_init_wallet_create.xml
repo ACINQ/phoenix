@@ -24,7 +24,7 @@
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.initwallet.CreateSeedFragment.CreateSeedViewModel" />
+      type="fr.acinq.phoenix.initwallet.CreateSeedFragment.CreateSeedViewModel" />
 
   </data>
 
@@ -39,7 +39,7 @@
       android:layout_height="wrap_content"
       android:padding="@dimen/space_lg">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:id="@+id/generating_seed_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
         android:checked="@={model.userHasAcknowledgedSoleRecourse}"
         android:text="@string/newseed_words_sole_recourse_checkbox" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/next_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

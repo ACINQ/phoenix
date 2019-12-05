@@ -61,7 +61,7 @@
       app:layout_constrainedHeight="true"
       app:layout_constraintTop_toBottomOf="@id/top_section" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+    <fr.acinq.phoenix.utils.customviews.CoinView
       android:id="@+id/balance"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/settings_button"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/main_button_height"
@@ -115,7 +115,7 @@
         app:layout_constraintStart_toEndOf="@id/settings_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/receive_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
@@ -136,7 +136,7 @@
         app:layout_constraintStart_toEndOf="@id/receive_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/send_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
@@ -150,7 +150,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/help_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

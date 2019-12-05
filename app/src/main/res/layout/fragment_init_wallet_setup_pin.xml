@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.initwallet.SetupPinFragment.SeedEncryptionState" />
+    <import type="fr.acinq.phoenix.initwallet.SetupPinFragment.SeedEncryptionState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.initwallet.SetupPinFragment.SetupPinViewModel" />
+      type="fr.acinq.phoenix.initwallet.SetupPinFragment.SetupPinViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +32,7 @@
     android:layout_height="match_parent"
     tools:context=".initwallet.SetupPinFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.utils.customviews.ProgressTextView
       android:id="@+id/wait_encrypting_seed"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

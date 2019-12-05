@@ -20,10 +20,10 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.send.LNUrlLoginState" />
+    <import type="fr.acinq.phoenix.send.LNUrlLoginState" />
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.send.LNUrlLoginViewModel" />
+      type="fr.acinq.phoenix.send.LNUrlLoginViewModel" />
   </data>
 
   <ScrollView
@@ -38,7 +38,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/text_lg"
@@ -65,7 +65,7 @@
         android:visibility="@{model.state == LNUrlLoginState.INIT}"
         app:text="@string/lnurl_login_button" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"

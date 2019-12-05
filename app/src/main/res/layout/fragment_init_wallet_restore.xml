@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.initwallet.RestoreSeedState" />
+    <import type="fr.acinq.phoenix.initwallet.RestoreSeedState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.initwallet.RestoreSeedViewModel" />
+      type="fr.acinq.phoenix.initwallet.RestoreSeedViewModel" />
 
   </data>
 
@@ -68,7 +68,7 @@
         app:layout_constraintHorizontal_bias="0"
         android:text="@string/restore_disclaimer_checkbox" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/disclaimer_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.eclair.phoenix.utils.customviews.VirtualKeyboardView
+      <fr.acinq.phoenix.utils.customviews.VirtualKeyboardView
         android:id="@+id/keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -162,7 +162,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/import_button"
         android:layout_width="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
@@ -174,7 +174,7 @@
         app:icon="@drawable/ic_check_circle"
         app:text="@string/restore_import_button" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/import_button"

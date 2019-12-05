@@ -50,7 +50,7 @@
     app:layout_constraintStart_toEndOf="@+id/channel_icon"
     app:layout_constraintTop_toTopOf="parent" />
 
-  <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+  <fr.acinq.phoenix.utils.customviews.CoinView
     android:id="@+id/channel_balance_value"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
     app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
     app:layout_constraintEnd_toStartOf="@id/channel_capacity_value" />
 
-  <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+  <fr.acinq.phoenix.utils.customviews.CoinView
     android:id="@+id/channel_capacity_value"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

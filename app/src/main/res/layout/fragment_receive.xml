@@ -20,13 +20,13 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.receive.PaymentGenerationState" />
+    <import type="fr.acinq.phoenix.receive.PaymentGenerationState" />
 
-    <import type="fr.acinq.eclair.phoenix.receive.SwapInState" />
+    <import type="fr.acinq.phoenix.receive.SwapInState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.receive.ReceiveViewModel" />
+      type="fr.acinq.phoenix.receive.ReceiveViewModel" />
   </data>
 
   <ScrollView
@@ -44,7 +44,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
           app:layout_constraintStart_toStartOf="@id/desc_label"
           app:layout_constraintTop_toBottomOf="@id/desc_label" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/generate_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -167,7 +167,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:id="@+id/invoice_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -226,7 +226,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -238,7 +238,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/qr_image" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
           app:layout_constraintStart_toEndOf="@id/copy_button"
           app:layout_constraintTop_toTopOf="@id/copy_button" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/edit_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -273,7 +273,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/copy_button" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/swap_in_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

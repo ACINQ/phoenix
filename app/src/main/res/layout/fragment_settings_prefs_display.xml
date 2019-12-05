@@ -24,7 +24,7 @@
     android:animateLayoutChanges="true"
     tools:context=".settings.DisplaySeedFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

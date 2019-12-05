@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsState" />
+    <import type="fr.acinq.phoenix.paymentdetails.PaymentDetailsState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsViewModel" />
+      type="fr.acinq.phoenix.paymentdetails.PaymentDetailsViewModel" />
 
   </data>
 
@@ -35,7 +35,7 @@
     android:background="@color/athens"
     tools:context=".paymentdetails.PaymentDetailsTechnicalsFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

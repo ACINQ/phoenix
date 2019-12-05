@@ -22,7 +22,7 @@
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.receive.ReceiveWithOpenViewModel" />
+      type="fr.acinq.phoenix.receive.ReceiveWithOpenViewModel" />
 
   </data>
 
@@ -165,7 +165,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cost" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/accept_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -182,7 +182,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/accept_button" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/decline_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

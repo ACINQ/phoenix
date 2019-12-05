@@ -20,13 +20,13 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.send.SendState" />
+    <import type="fr.acinq.phoenix.send.SendState" />
 
-    <import type="fr.acinq.eclair.phoenix.send.SwapState" />
+    <import type="fr.acinq.phoenix.send.SwapState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.send.SendViewModel" />
+      type="fr.acinq.phoenix.send.SendViewModel" />
   </data>
 
   <ScrollView
@@ -75,7 +75,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
           app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
           app:layout_constraintStart_toStartOf="parent" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.CoinView
+        <fr.acinq.phoenix.utils.customviews.CoinView
           android:id="@+id/balance_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_md"
@@ -324,7 +324,7 @@
         android:visibility="@{model.isFormVisible()}"
         app:layout_constraintTop_toBottomOf="@id/payment_section">
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/swap_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -338,7 +338,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:text="@string/send_swap_required_button" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+        <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/rounded_border"
@@ -430,7 +430,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

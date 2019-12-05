@@ -69,7 +69,7 @@
   <!-- main fragment -->
   <fragment
     android:id="@+id/main_fragment"
-    android:name="fr.acinq.eclair.phoenix.main.MainFragment"
+    android:name="fr.acinq.phoenix.main.MainFragment"
     android:label="MainFragment">
     <action
       android:id="@+id/action_main_to_receive"
@@ -94,7 +94,7 @@
   <!-- init wallet -->
   <fragment
     android:id="@+id/init_wallet_fragment"
-    android:name="fr.acinq.eclair.phoenix.initwallet.InitWalletFragment"
+    android:name="fr.acinq.phoenix.initwallet.InitWalletFragment"
     android:label="InitSeedFragment">
     <action
       android:id="@+id/action_init_wallet_to_restore"
@@ -116,7 +116,7 @@
   <!-- init wallet: restore seed -->
   <fragment
     android:id="@+id/restore_seed_fragment"
-    android:name="fr.acinq.eclair.phoenix.initwallet.RestoreSeedFragment"
+    android:name="fr.acinq.phoenix.initwallet.RestoreSeedFragment"
     android:label="RestoreSeedFragment">
     <action
       android:id="@+id/action_restore_seed_to_setup_pin"
@@ -129,7 +129,7 @@
   <!-- init wallet: create seed manually -->
   <fragment
     android:id="@+id/create_seed_fragment"
-    android:name="fr.acinq.eclair.phoenix.initwallet.CreateSeedFragment"
+    android:name="fr.acinq.phoenix.initwallet.CreateSeedFragment"
     android:label="CreateSeedFragment">
     <action
       android:id="@+id/action_create_seed_to_setup_pin"
@@ -142,7 +142,7 @@
   <!-- init wallet: setup pin -->
   <fragment
     android:id="@+id/setup_pin_fragment"
-    android:name="fr.acinq.eclair.phoenix.initwallet.SetupPinFragment"
+    android:name="fr.acinq.phoenix.initwallet.SetupPinFragment"
     android:label="SetupPinFragment">
     <argument
       android:name="serialized_seed"
@@ -157,7 +157,7 @@
   <!-- init wallet: automated seed creation -->
   <fragment
     android:id="@+id/auto_create_fragment"
-    android:name="fr.acinq.eclair.phoenix.initwallet.AutoCreateFragment"
+    android:name="fr.acinq.phoenix.initwallet.AutoCreateFragment"
     android:label="AutoCreateFragment">
     <action
       android:id="@+id/action_auto_create_to_startup"
@@ -171,7 +171,7 @@
   <!-- startup node -->
   <fragment
     android:id="@+id/startup_fragment"
-    android:name="fr.acinq.eclair.phoenix.startup.StartupFragment"
+    android:name="fr.acinq.phoenix.startup.StartupFragment"
     android:label="StartupFragment">
     <action
       android:id="@+id/action_startup_to_main"
@@ -185,7 +185,7 @@
   <!-- receive money -->
   <fragment
     android:id="@+id/receive_fragment"
-    android:name="fr.acinq.eclair.phoenix.receive.ReceiveFragment"
+    android:name="fr.acinq.phoenix.receive.ReceiveFragment"
     android:label="ReceiveFragment">
     <action
       android:id="@+id/action_receive_to_main"
@@ -201,7 +201,7 @@
   <!-- dialog to confirm money reception over new channel -->
   <dialog
     android:id="@+id/receive_with_open_dialog"
-    android:name="fr.acinq.eclair.phoenix.receive.ReceiveWithOpenDialogFragment">
+    android:name="fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragment">
     <argument
       android:name="fundingSat"
       app:argType="long" />
@@ -219,14 +219,10 @@
       app:destination="@+id/main_fragment" />
   </dialog>
 
-  <dialog
-    android:id="@+id/test_dialog"
-    android:name="fr.acinq.eclair.phoenix.receive.TestDialog" />
-
   <!-- send money -->
   <fragment
     android:id="@+id/send"
-    android:name="fr.acinq.eclair.phoenix.send.SendFragment"
+    android:name="fr.acinq.phoenix.send.SendFragment"
     android:label="SendFragment">
     <action
       android:id="@+id/action_send_to_main"
@@ -241,7 +237,7 @@
   <!-- prepare send money (scan/paste invoice) -->
   <fragment
     android:id="@+id/read_input"
-    android:name="fr.acinq.eclair.phoenix.send.ReadInputFragment"
+    android:name="fr.acinq.phoenix.send.ReadInputFragment"
     android:label="ReadInputFragment">
     <action
       android:id="@+id/action_read_input_to_lnurl_login"
@@ -251,7 +247,7 @@
   <!-- settings/tools page -->
   <fragment
     android:id="@+id/settings"
-    android:name="fr.acinq.eclair.phoenix.settings.SettingsFragment"
+    android:name="fr.acinq.phoenix.settings.SettingsFragment"
     android:label="SettingsFragment">
     <action
       android:id="@+id/action_settings_to_mutual_close"
@@ -282,19 +278,19 @@
   <!-- settings: mutual close all channels -->
   <fragment
     android:id="@+id/mutual_close"
-    android:name="fr.acinq.eclair.phoenix.settings.MutualCloseFragment"
+    android:name="fr.acinq.phoenix.settings.MutualCloseFragment"
     android:label="MutualCloseFragment" />
 
   <!-- settings: mutual close all channels -->
   <fragment
     android:id="@+id/force_close"
-    android:name="fr.acinq.eclair.phoenix.settings.ForceCloseFragment"
+    android:name="fr.acinq.phoenix.settings.ForceCloseFragment"
     android:label="ForceCloseFragment" />
 
   <!-- settings: list all channels -->
   <fragment
     android:id="@+id/list_channels"
-    android:name="fr.acinq.eclair.phoenix.settings.ListChannelsFragment"
+    android:name="fr.acinq.phoenix.settings.ListChannelsFragment"
     android:label="ListChannelsFragment">
     <action
       android:id="@+id/action_list_channels_to_channel_details"
@@ -304,25 +300,25 @@
   <!-- settings: display wallet seed -->
   <fragment
     android:id="@+id/display_seed"
-    android:name="fr.acinq.eclair.phoenix.settings.DisplaySeedFragment"
+    android:name="fr.acinq.phoenix.settings.DisplaySeedFragment"
     android:label="DisplaySeedFragment" />
 
   <!-- settings: share logs -->
   <fragment
     android:id="@+id/logs_fragment"
-    android:name="fr.acinq.eclair.phoenix.settings.LogsSettingsFragment"
+    android:name="fr.acinq.phoenix.settings.LogsSettingsFragment"
     android:label="LogsSettingsFragment" />
 
   <!-- settings: set pin/biometric -->
   <fragment
     android:id="@+id/seed_security"
-    android:name="fr.acinq.eclair.phoenix.settings.SeedSecurityFragment"
+    android:name="fr.acinq.phoenix.settings.SeedSecurityFragment"
     android:label="seed_security" />
 
   <!-- settings: change display settings (theme, currency...) -->
   <fragment
     android:id="@+id/prefs_display"
-    android:name="fr.acinq.eclair.phoenix.settings.DisplayPrefsFragment"
+    android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
     android:label="DisplayPrefsFragment" />
 
   <!-- nested graph with shared view model for payment details -->
@@ -333,7 +329,7 @@
     <!-- payment details overview -->
     <fragment
       android:id="@+id/payment_details"
-      android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsFragment"
+      android:name="fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment"
       android:label="PaymentDetailsFragment">
       <action
         android:id="@+id/action_payment_details_to_payment_details_technicals"
@@ -357,14 +353,14 @@
     <!-- payment details technical data -->
     <fragment
       android:id="@+id/payment_details_technicals"
-      android:name="fr.acinq.eclair.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
+      android:name="fr.acinq.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
       android:label="PaymentDetailsTechnicalsFragment" />
   </navigation>
 
   <!-- channel details dialog -->
   <dialog
     android:id="@+id/channel_details"
-    android:name="fr.acinq.eclair.phoenix.settings.ChannelDetailsDialog"
+    android:name="fr.acinq.phoenix.settings.ChannelDetailsDialog"
     android:label="channel_details">
     <argument
       android:name="channel_id"
@@ -374,7 +370,7 @@
   <!-- login with LNURL -->
   <fragment
     android:id="@+id/lnurl_login"
-    android:name="fr.acinq.eclair.phoenix.send.LNUrlLoginFragment"
+    android:name="fr.acinq.phoenix.send.LNUrlLoginFragment"
     android:label="LNUrlLogin">
     <argument
       android:name="uri"
@@ -384,7 +380,7 @@
   <!-- settings: electrum server -->
   <fragment
     android:id="@+id/electrum_fragment"
-    android:name="fr.acinq.eclair.phoenix.settings.ElectrumServerFragment"
+    android:name="fr.acinq.phoenix.settings.ElectrumServerFragment"
     android:label="ElectrumServerFragment" />
 
 </navigation>

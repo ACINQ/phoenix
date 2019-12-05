@@ -122,7 +122,7 @@
 
   <string name="receive_with_open_title">Incoming Payment</string>
   <string name="receive_with_open_help_desc">What\'s this?</string>
-  <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don't have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
+  <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
   <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
   <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b>.]]></string>
   <string name="receive_with_open_accept">Accept</string>
@@ -431,7 +431,7 @@
   <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>
 
   <string name="electrum_dialog_checkbox">Use a custom Electrum server</string>
-  <string name="electrum_dialog_ssl">Server must have a valid certificate if not using an .onion address.</string>
+  <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 

@@ -32,7 +32,7 @@
       android:layout_height="wrap_content"
       tools:context=".initwallet.InitWalletFragment">
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/create_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/initwallet_create" />
 
-      <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/restore_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

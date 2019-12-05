@@ -19,18 +19,18 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.ListChannelsState" />
+    <import type="fr.acinq.phoenix.settings.ListChannelsState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.ListChannelsViewModel" />
+      type="fr.acinq.phoenix.settings.ListChannelsViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
       app:layout_constraintTop_toBottomOf="@id/channels_found_header"
       app:layout_constraintTop_toTopOf="@id/share_button" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/share_button"
       android:layout_width="0dp"
       android:layout_height="wrap_content"

@@ -20,13 +20,13 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.SeedSecurityViewModel.ProtectionUpdateState" />
+    <import type="fr.acinq.phoenix.settings.SeedSecurityViewModel.ProtectionUpdateState" />
 
-    <import type="fr.acinq.eclair.phoenix.settings.SeedSecurityViewModel.ProtectionState" />
+    <import type="fr.acinq.phoenix.settings.SeedSecurityViewModel.ProtectionState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.SeedSecurityViewModel" />
+      type="fr.acinq.phoenix.settings.SeedSecurityViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +35,7 @@
     android:animateLayoutChanges="true"
     tools:context=".settings.SeedSecurityFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.utils.customviews.SwitchView
           android:id="@+id/pin_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/pin_switch" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/update_pin_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/update_pin_button" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.utils.customviews.SwitchView
           android:id="@+id/biometrics_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

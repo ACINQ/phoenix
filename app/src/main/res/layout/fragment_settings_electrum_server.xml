@@ -21,7 +21,7 @@
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.ElectrumServerViewModel" />
+      type="fr.acinq.phoenix.settings.ElectrumServerViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,7 +29,7 @@
     android:layout_height="match_parent"
     android:background="?attr/mutedBgColor">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-          <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.utils.customviews.ButtonView
             android:id="@+id/change_server_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

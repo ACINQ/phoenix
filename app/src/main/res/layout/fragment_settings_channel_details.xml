@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.ChannelDetailsState" />
+    <import type="fr.acinq.phoenix.settings.ChannelDetailsState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.ChannelDetailsViewModel" />
+      type="fr.acinq.phoenix.settings.ChannelDetailsViewModel" />
   </data>
 
 
@@ -71,7 +71,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/copy_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/share_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
       app:layout_constraintStart_toEndOf="@id/copy_button"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/close_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

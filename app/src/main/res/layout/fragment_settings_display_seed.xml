@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.DisplaySeedState" />
+    <import type="fr.acinq.phoenix.settings.DisplaySeedState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.DisplaySeedViewModel" />
+      type="fr.acinq.phoenix.settings.DisplaySeedViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,14 +33,14 @@
     android:animateLayoutChanges="true"
     tools:context=".settings.DisplaySeedFragment">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
       app:title="@string/displayseed_title" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.utils.customviews.ButtonView
       android:id="@+id/unlock_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
       app:layout_constraintTop_toBottomOf="@id/action_bar"
       app:text="@string/displayseed_authenticate_button" />
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.utils.customviews.ProgressTextView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:padding="@dimen/space_lg"
@@ -123,7 +123,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/backup_warning_separator" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/backup_warning_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

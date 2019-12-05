@@ -19,13 +19,13 @@
 
   <data>
 
-    <import type="fr.acinq.eclair.phoenix.settings.PreChannelsCloseState" />
+    <import type="fr.acinq.phoenix.settings.PreChannelsCloseState" />
 
-    <import type="fr.acinq.eclair.phoenix.settings.MutualCloseState" />
+    <import type="fr.acinq.phoenix.settings.MutualCloseState" />
 
     <variable
       name="model"
-      type="fr.acinq.eclair.phoenix.settings.MutualCloseViewModel" />
+      type="fr.acinq.phoenix.settings.MutualCloseViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +33,7 @@
     android:layout_height="match_parent"
     android:background="?attr/mutedBgColor">
 
-    <fr.acinq.eclair.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
           android:layout_width="match_parent"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+        <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
@@ -138,7 +138,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ProgressTextView
+        <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:id="@+id/mutual_in_progress"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
           app:text="@string/closechannels_message_in_progress" />
 
-        <fr.acinq.eclair.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
