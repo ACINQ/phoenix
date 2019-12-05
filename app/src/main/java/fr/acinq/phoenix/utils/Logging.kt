@@ -51,21 +51,13 @@ object Logging {
 
     // set level
     lc.getLogger("fr.acinq.eclair.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
-    lc.getLogger("fr.acinq.eclair").level = Level.INFO
     lc.getLogger("fr.acinq.eclair.db.BackupHandler").level = Level.WARN
-    // lc.getLogger("fr.acinq.phoenix").level = Level.DEBUG
-    // lc.getLogger("fr.acinq.phoenix.events.EclairSupervisor").level = Level.OFF
-    // lc.getLogger("fr.acinq.eclair.Diagnostics").level = Level.OFF
-    // lc.getLogger("fr.acinq.eclair.channel").level = Level.DEBUG
-     lc.getLogger("fr.acinq.eclair.payment").level = Level.DEBUG
-    if (BuildConfig.DEBUG) {
-      lc.getLogger("io.netty").level = Level.INFO
-    } else {
-      lc.getLogger("io.netty").level = Level.WARN
-    }
+    lc.getLogger("fr.acinq.eclair").level = Level.INFO
+    lc.getLogger("fr.acinq.phoenix").level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
+    lc.getLogger("io.netty").level = if (BuildConfig.DEBUG) Level.INFO else Level.WARN
 
     val root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-    root.level = Level.DEBUG // if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
+    root.level = Level.DEBUG
     root.addAppender(logcatAppender)
     root.addAppender(localFileAppender)
   }
