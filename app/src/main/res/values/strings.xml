@@ -231,7 +231,7 @@
     <br/><br/>
     This feature is not a "fix everything magic button"; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if ACINQ disappears from the surface of the earth, preventing you from spending your money. In all other cases, if you experience issues with Phoenix you should contact support.
     <br/><br/>
-    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.<b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
+    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
     Funds will eventually be sent to: %1$s
     <br/><br/>
