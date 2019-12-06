@@ -47,7 +47,7 @@
       android:paddingEnd="@dimen/space_lg"
       android:paddingBottom="@dimen/space_md"
       android:text="@string/listallchannels_node_id"
-      android:textColor="@color/slate"
+      android:textColor="?attr/onMutedBgTextColor"
       android:textIsSelectable="true"
       android:textSize="@dimen/text_sm"
       app:layout_constraintTop_toBottomOf="@id/action_bar" />

@@ -83,7 +83,7 @@
     <item name="buttonRippleColor">@color/shuttle</item>
     <item name="textColor">@color/edward</item>
     <item name="mutedTextColor">@color/shuttle</item>
-    <item name="onMutedBgTextColor">@color/slate</item>
+    <item name="onMutedBgTextColor">@color/regent</item>
     <item name="negativeColor">@color/red</item>
     <item name="positiveColor">@color/green</item>
     <item name="altTextColor">@color/dark</item>
