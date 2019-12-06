@@ -18,17 +18,17 @@
 
   <merge>
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
       android:id="@+id/back_button"
+      style="@style/roundMaterial_buttonStyle"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:backgroundTint="@color/transparent"
       android:contentDescription="@string/btn_back"
       android:paddingStart="@dimen/space_sm"
       android:paddingTop="@dimen/space_md"
-      android:paddingBottom="@dimen/space_md"
       android:paddingEnd="@dimen/space_sm"
-      android:src="@drawable/ic_arrow_back"
+      android:paddingBottom="@dimen/space_md"
+      app:icon="@drawable/ic_arrow_back"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
