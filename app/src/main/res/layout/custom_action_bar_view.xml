@@ -53,6 +53,7 @@
       android:layout_marginEnd="@dimen/space_lg"
       android:paddingBottom="@dimen/space_sm"
       android:textColor="?attr/onMutedBgTextColor"
+      android:textIsSelectable="true"
       android:textSize="@dimen/text_md"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
