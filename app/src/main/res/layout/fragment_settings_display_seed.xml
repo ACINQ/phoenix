@@ -98,19 +98,23 @@
           android:layout_marginTop="@dimen/space_lg"
           app:layout_constraintTop_toBottomOf="@id/instructions" />
 
+        <TextView
+          android:id="@+id/derivation_path"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:textSize="@dimen/text_sm"
+          android:textColor="?attr/mutedTextColor"
+          android:textAlignment="center"
+          android:text="@string/displayseed_derivation_path"
+          app:layout_constraintTop_toBottomOf="@id/words_table" />
+
         <androidx.constraintlayout.widget.Group
           android:id="@+id/backgrup_warning_group"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:visibility="@{model.showUserBackupWarning}"
-          app:constraint_referenced_ids="backup_warning_separator,backup_warning_checkbox,backup_warning_button" />
-
-        <View
-          android:id="@+id/backup_warning_separator"
-          style="@style/HSeparator"
-          android:layout_marginTop="@dimen/space_lg"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/words_table" />
+          app:constraint_referenced_ids="backup_warning_checkbox,backup_warning_button" />
 
         <CheckBox
           android:id="@+id/backup_warning_checkbox"
@@ -121,7 +125,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/backup_warning_separator" />
+          app:layout_constraintTop_toBottomOf="@id/derivation_path" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/backup_warning_button"
