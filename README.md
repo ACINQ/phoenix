@@ -2,7 +2,7 @@
 
 Phoenix is a Bitcoin wallet. It allows you to send and receive bitcoins securely. It is non custodial and provides a simple and clean UX. Thanks to native Lightning support, payments are faster and cheaper.
 
-It is developed by ACINQ, one of the leading companies working on Bitcoin scalability.
+It is developed by [ACINQ](https://acinq.co), one of the leading companies working on Bitcoin scalability.
 
 Head to our website for more information: https://phoenix.acinq.co
 
@@ -10,7 +10,7 @@ Head to our website for more information: https://phoenix.acinq.co
 
 This wallet is available for Android, and will hopefully be available for iOS in the future.
 
-You can download the binary from the [Release page](https://github.com/ACINQ/phoenix/releases), or from our [Google Play page](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet
+You can download the binary from the [Release page](https://github.com/ACINQ/phoenix/releases), or from our [Google Play page](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet).
 
 # Build the project
 
