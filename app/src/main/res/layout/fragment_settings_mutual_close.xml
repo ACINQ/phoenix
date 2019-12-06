@@ -85,7 +85,7 @@
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_mutual_input_instructions"
-          app:enableOrFade="@{model.state == PreChannelsCloseState.READY}"
+          app:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:layout_constraintTop_toBottomOf="@id/channels_state" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -96,7 +96,7 @@
           android:layout_marginEnd="@dimen/space_md"
           android:hint="@string/closechannels_mutual_input_hint"
           style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-          app:enableOrFade="@{model.state == PreChannelsCloseState.READY}"
+          app:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:layout_constraintTop_toBottomOf="@id/instructions">
 
           <com.google.android.material.textfield.TextInputEditText
