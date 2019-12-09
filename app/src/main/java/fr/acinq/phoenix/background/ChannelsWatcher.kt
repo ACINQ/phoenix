@@ -155,7 +155,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
 
   companion object {
     private val log = LoggerFactory.getLogger(ChannelsWatcher::class.java)
-    private const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
+    public const val WATCHER_WORKER_TAG = BuildConfig.APPLICATION_ID + ".ChannelsWatcher"
 
     /**
      * Time window in milliseconds in which the last channels watch result can be considered fresh enough that the user

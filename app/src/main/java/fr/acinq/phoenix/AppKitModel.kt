@@ -30,6 +30,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
@@ -534,13 +535,23 @@ class AppKitModel : ViewModel() {
   }
 
   @WorkerThread
-  private fun cancelBackgroundJobs() {
-    // cancel all the jobs scheduled by the work manager that would lock up the eclair DB
-  }
-
-  @WorkerThread
-  private fun setupApp() {
-    // initialize app, clean data, init notification channels...
+  private fun cancelBackgroundJobs(context: Context) {
+    val workManager = WorkManager.getInstance(context)
+    try {
+      val jobs = workManager.getWorkInfosByTag(ChannelsWatcher.WATCHER_WORKER_TAG).get()
+      if (jobs.isEmpty()) {
+        log.info("no background jobs found")
+      } else {
+        for (job in jobs) {
+          log.info("found a background job={}", job)
+          workManager.cancelWorkById(job.id).result.get()
+          log.info("successfully cancelled job={}", job)
+        }
+      }
+    } catch (e: Exception) {
+      log.error("failed to retrieve or cancel background jobs: ", e)
+      throw RuntimeException("could not cancel background jobs")
+    }
   }
 
   @WorkerThread
@@ -554,7 +565,6 @@ class AppKitModel : ViewModel() {
   @WorkerThread
   private fun startNode(context: Context, pin: String): AppKit {
     log.info("starting up node...")
-    // TODO before startup: migration scripts + check datadir + restore backups
 
     val system = ActorSystem.create("system")
     system.registerOnTermination {
@@ -562,8 +572,7 @@ class AppKitModel : ViewModel() {
     }
 
     checkConnectivity(context)
-    setupApp()
-    cancelBackgroundJobs()
+    cancelBackgroundJobs(context)
 
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
