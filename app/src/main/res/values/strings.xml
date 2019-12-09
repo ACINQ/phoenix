@@ -305,7 +305,7 @@
     This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
     <br /><br />
     <b>Do not share it with anyone.</b>
-    <b>Do not lose it.</b> If you lose your word list and your phone, you've lost your funds...
+    <b>Do not lose it.</b> If you lose your word list and your phone, you\'ve lost your funds…
   ]]></string>
   <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
