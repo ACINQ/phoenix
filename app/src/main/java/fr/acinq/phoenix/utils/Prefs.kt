@@ -162,11 +162,8 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
   }
 
-  fun getTheme(context: Context): Int {
-    return when (PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, "light") ?: "light") {
-      "dark" -> R.style.dark_theme
-      else -> R.style.light_theme
-    }
+  fun getTheme(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default
   }
 
   fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {

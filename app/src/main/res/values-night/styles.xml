@@ -16,22 +16,21 @@
 
 <resources>
 
-  <style name="default_theme" parent="Theme.MaterialComponents.Light.NoActionBar">
-    <item name="isLightTheme">true</item>
-    <item name="colorPrimary">@color/apple</item>
+  <style name="default_theme" parent="Theme.MaterialComponents.NoActionBar">
+    <item name="colorPrimary">@color/green</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
-    <item name="bgColor">@color/white</item>
-    <item name="mutedBgColor">@color/athens</item>
-    <item name="borderColor">@color/geyser</item>
-    <item name="buttonRippleColor">@color/ripple</item>
-    <item name="textColor">@color/dark</item>
-    <item name="mutedTextColor">@color/casper</item>
-    <item name="onMutedBgTextColor">@color/slate</item>
-    <item name="negativeColor">@color/brandy</item>
-    <item name="positiveColor">@color/apple</item>
-    <item name="altTextColor">@color/white</item>
-    <item name="android:windowLightStatusBar">true</item>
+    <item name="bgColor">@color/oxford</item>
+    <item name="mutedBgColor">@color/ebony</item>
+    <item name="borderColor">@color/mako</item>
+    <item name="buttonRippleColor">@color/shuttle</item>
+    <item name="textColor">@color/edward</item>
+    <item name="mutedTextColor">@color/shuttle</item>
+    <item name="onMutedBgTextColor">@color/regent</item>
+    <item name="negativeColor">@color/red</item>
+    <item name="positiveColor">@color/green</item>
+    <item name="altTextColor">@color/dark</item>
+    <item name="android:windowLightStatusBar">false</item>
 
     <!-- background -->
     <item name="colorSurface">?attr/bgColor</item>
