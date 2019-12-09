@@ -60,6 +60,18 @@ class ElectrumServerFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
+    appKit.kit.observe(viewLifecycleOwner, Observer {
+      // -- xpub / feerate from appkit
+      if (appKit.kit.value == null) {
+        mBinding.feeRate.text = getString(R.string.utils_unknown)
+        mBinding.xpub.text = getString(R.string.utils_unknown)
+      } else {
+        mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
+        val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
+        mBinding.feeRate.visibility = View.VISIBLE
+        mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+      }
+    })
     appKit.nodeData.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
         // -- connection status
@@ -86,14 +98,6 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           mBinding.blockHeight.visibility = View.VISIBLE
           mBinding.blockHeight.text = NumberFormat.getInstance().format(it.blockHeight)
-        }
-        // -- feerate
-        if (appKit.kit.value == null) {
-          mBinding.feeRate.visibility = View.GONE
-        } else {
-          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
-          mBinding.feeRate.visibility = View.VISIBLE
-          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
         }
       }
     })

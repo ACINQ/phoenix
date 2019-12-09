@@ -120,6 +120,18 @@
           android:id="@+id/fee_rate"
           style="@style/TechnicalsValueView" />
 
+        <View
+          style="@style/HLineSeparator"
+          android:layout_columnSpan="2" />
+
+        <TextView
+          style="@style/TechnicalsLabelView"
+          android:text="@string/electrum_xpub_label" />
+
+        <TextView
+          android:id="@+id/xpub"
+          style="@style/TechnicalsValueView" />
+
       </GridLayout>
     </ScrollView>
   </androidx.constraintlayout.widget.ConstraintLayout>

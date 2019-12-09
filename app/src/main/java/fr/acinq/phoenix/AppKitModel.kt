@@ -85,7 +85,8 @@ import scala.collection.immutable.List as ScalaList
 data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
 data class SwapInSettings(var feePercent: Double)
 data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
-class AppKit(val kit: Kit, val api: Eclair)
+data class Xpub(val xpub: String, val path: String)
+class AppKit(val kit: Kit, val api: Eclair, val xpub: Xpub)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
 }
@@ -567,8 +568,14 @@ class AppKitModel : ViewModel() {
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
-    val pk = DeterministicWallet.derivePrivateKey(DeterministicWallet.generate(seed), Wallet.getNodeKeyPath())
+    val master = DeterministicWallet.generate(seed)
+
+    val pk = DeterministicWallet.derivePrivateKey(master, Wallet.getNodeKeyPath())
     val bech32Address = fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(pk.publicKey(), Wallet.getChainHash())
+
+    val xpubPath = Wallet.getXpubKeyPath()
+    val pubkey = DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, xpubPath))
+    val xpub = Xpub(DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()), DeterministicWallet.KeyPath(xpubPath.path()).toString())
 
     Class.forName("org.sqlite.JDBC")
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
@@ -594,7 +601,7 @@ class AppKitModel : ViewModel() {
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
     val eclair = EclairImpl(kit)
-    return AppKit(kit, eclair)
+    return AppKit(kit, eclair, xpub)
   }
 
   private fun getExchangeRateHandler(context: Context): Callback {

@@ -71,30 +71,13 @@
           app:text="@string/settings_electrum" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/mutual_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/electrum_button"
-          app:text="@string/settings_mutual_close" />
-
-        <TextView
-          android:id="@+id/security_title"
-          style="@style/SettingsCategory"
-          android:text="@string/settings_security_title"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_button" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/display_seed_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/security_title"
+          app:layout_constraintTop_toBottomOf="@id/electrum_button"
           app:text="@string/settings_display_seed" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
@@ -125,13 +108,23 @@
           app:text="@string/settings_list_channels" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/logs_button"
+          android:id="@+id/mutual_close_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
+          app:text="@string/settings_mutual_close" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/logs_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
           app:text="@string/settings_logs" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView

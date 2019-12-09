@@ -199,8 +199,8 @@
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">Channels list</string>
   <string name="settings_logs">Logs</string>
-  <string name="settings_electrum">Electrum server</string>
-  <string name="settings_mutual_close">Close all channel and send all funds</string>
+  <string name="settings_electrum">Wallet info</string>
+  <string name="settings_mutual_close">Close all channels</string>
   <string name="settings_force_close">Danger zone</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
@@ -425,6 +425,8 @@
   <string name="electrum_block_height_label">Block height</string>
   <string name="electrum_tip_label">Tip timestamp</string>
   <string name="electrum_fee_rate_label">Fee rate</string>
+  <string name="electrum_xpub_label">Master public key</string>
+  <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Server</string>
   <string name="electrum_connecting">Establishing connection…</string>
