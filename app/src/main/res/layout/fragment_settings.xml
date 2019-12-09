@@ -115,24 +115,24 @@
           app:text="@string/settings_list_channels" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/mutual_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
-          app:text="@string/settings_mutual_close" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/logs_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
+          app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
           app:text="@string/settings_logs" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/mutual_close_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/logs_button"
+          app:text="@string/settings_mutual_close" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/force_close_button"
@@ -142,7 +142,7 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:text_color="?attr/negativeColor"
-          app:layout_constraintTop_toBottomOf="@id/logs_button"
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
           app:text="@string/settings_force_close" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
