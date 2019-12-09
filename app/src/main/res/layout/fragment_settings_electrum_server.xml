@@ -68,7 +68,6 @@
           <TextView
             android:id="@+id/connection_state_value"
             style="@style/TechnicalsValueView"
-            android:text="@string/lipsum_short"
             app:layout_constrainedWidth="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -77,10 +76,6 @@
             android:id="@+id/change_server_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/space_md"
-            android:paddingTop="@dimen/space_sm"
-            android:paddingEnd="@dimen/space_md"
-            android:paddingBottom="@dimen/space_sm"
             app:icon="@drawable/ic_edit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/connection_state_value"

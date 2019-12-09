@@ -79,7 +79,6 @@ class ForceCloseFragment : BaseFragment() {
       log.error("error when retrieving list of channels: ", exception)
       model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
-      log.info("listing channels")
       model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
       val channels = appKit.getChannels(`NORMAL$`.`MODULE$`)
       if (channels.count() == 0) {
@@ -109,7 +108,6 @@ enum class ForceCloseState : ChannelsCloseBaseState {
 
 class ForceCloseViewModel : ViewModel() {
 
-  private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<ChannelsCloseBaseState>()
 
   init {

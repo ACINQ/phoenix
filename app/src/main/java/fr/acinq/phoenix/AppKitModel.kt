@@ -46,13 +46,13 @@ import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
+import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.background.ChannelsWatcher
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
-import fr.acinq.eclair.wire.*
 import kotlinx.coroutines.*
 import okhttp3.Call
 import okhttp3.Callback

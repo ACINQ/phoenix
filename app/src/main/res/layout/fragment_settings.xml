@@ -44,9 +44,9 @@
         android:background="?attr/bgColor">
 
         <TextView
-          android:id="@+id/display_title"
+          android:id="@+id/general_title"
           style="@style/SettingsCategory"
-          android:text="@string/settings_display_title"
+          android:text="@string/settings_general_title"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,15 +57,35 @@
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/display_title"
+          app:layout_constraintTop_toBottomOf="@id/general_title"
           app:text="@string/settings_display_prefs" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/electrum_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/prefs_display_button"
+          app:text="@string/settings_electrum" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/mutual_close_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/electrum_button"
+          app:text="@string/settings_mutual_close" />
 
         <TextView
           android:id="@+id/security_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_security_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/prefs_display_button" />
+          app:layout_constraintTop_toBottomOf="@id/mutual_close_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/display_seed_button"
@@ -95,51 +115,13 @@
           app:layout_constraintTop_toBottomOf="@id/seed_security_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/electrum_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/advanced_title"
-          app:text="@string/settings_electrum" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/mutual_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/electrum_button"
-          app:text="@string/settings_mutual_close" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/force_close_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:text_color="?attr/negativeColor"
-          app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
-          app:text="@string/settings_force_close" />
-
-        <TextView
-          android:id="@+id/debugging_title"
-          style="@style/SettingsCategory"
-          android:text="@string/settings_debugging_title"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/force_close_button" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/list_all_channels_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:layout_constraintTop_toBottomOf="@id/debugging_title"
+          app:layout_constraintTop_toBottomOf="@id/advanced_title"
           app:text="@string/settings_list_channels" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
@@ -151,6 +133,17 @@
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/list_all_channels_button"
           app:text="@string/settings_logs" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/force_close_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:text_color="?attr/negativeColor"
+          app:layout_constraintTop_toBottomOf="@id/logs_button"
+          app:text="@string/settings_force_close" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

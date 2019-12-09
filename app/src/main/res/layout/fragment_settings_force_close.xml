@@ -38,8 +38,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/main_layout"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="?attr/bgColor">
+      android:layout_height="wrap_content">
 
       <fr.acinq.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
@@ -49,80 +48,83 @@
         app:subtitle="@string/closechannels_force_instructions"
         app:title="@string/closechannels_force_title" />
 
-      <View
-        android:id="@+id/separator"
-        style="@style/HLineSeparator"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
       <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
         android:padding="@dimen/space_md"
         android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:text="@string/closechannels_checking_channels" />
 
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:background="?attr/bgColor"
         android:padding="@dimen/space_md"
         android:text="@string/closechannels_channels_none"
         android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
-        app:layout_constraintTop_toBottomOf="@id/separator" />
+        app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
       <TextView
         android:id="@+id/force_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
         android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_md"
         android:text="@string/closechannels_message_error"
         android:visibility="@{model.state == ForceCloseState.ERROR}"
-        app:layout_constraintTop_toBottomOf="@id/separator" />
+        app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
       <TextView
         android:id="@+id/force_done"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?attr/positiveColor"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_md"
+        android:background="@drawable/rounded"
+        android:backgroundTint="?attr/positiveColor"
         android:drawableStart="@drawable/ic_check"
         android:drawablePadding="@dimen/space_sm"
         android:drawableTint="?attr/altTextColor"
-        android:padding="@dimen/space_md"
+        android:paddingStart="@dimen/space_md"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingEnd="@dimen/space_md"
+        android:paddingBottom="@dimen/space_sm"
         android:text="@string/closechannels_message_done"
         android:textColor="?attr/altTextColor"
         android:visibility="@{model.state == ForceCloseState.DONE}"
-        app:layout_constraintTop_toBottomOf="@id/separator" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
       <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:id="@+id/force_in_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_md"
         android:padding="@dimen/space_md"
         android:visibility="@{model.state == ForceCloseState.IN_PROGRESS}"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:text="@string/closechannels_message_in_progress" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/force_confirm_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_square"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_md"
         android:visibility="@{model.state == PreChannelsCloseState.READY}"
         app:hz_bias="0"
         app:icon="@drawable/ic_cross_circle"
         app:icon_tint="?attr/negativeColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:text="@string/closechannels_force_button" />
-
-      <View
-        style="@style/HLineSeparator"
-        android:layout_width="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

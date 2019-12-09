@@ -191,17 +191,16 @@
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_display_title">Display</string>
-  <string name="settings_display_prefs">Currency, Theme…</string>
+  <string name="settings_general_title">General</string>
+  <string name="settings_display_prefs">Display</string>
   <string name="settings_security_title">Security</string>
   <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_seed_security">App access settings</string>
-  <string name="settings_debugging_title">Debugging</string>
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">Channels list</string>
   <string name="settings_logs">Logs</string>
   <string name="settings_electrum">Electrum server</string>
-  <string name="settings_mutual_close">Empty wallet</string>
+  <string name="settings_mutual_close">Close all channel and send all funds</string>
   <string name="settings_force_close">Danger zone</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
