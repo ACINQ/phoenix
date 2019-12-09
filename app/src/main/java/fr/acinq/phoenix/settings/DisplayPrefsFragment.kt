@@ -27,6 +27,7 @@ import androidx.preference.PreferenceFragmentCompat
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsPrefsDisplayBinding
+import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -63,6 +64,7 @@ class DisplayPrefsFragment : BaseFragment(), SharedPreferences.OnSharedPreferenc
     activity?.run {
       when (key) {
         Prefs.PREFS_THEME -> this.recreate()
+        Prefs.PREFS_COIN_UNIT -> Converter.refreshCoinPattern(applicationContext)
       }
     }
   }

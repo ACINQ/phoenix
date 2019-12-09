@@ -24,6 +24,7 @@ import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Logging
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
@@ -40,13 +41,7 @@ class App : Application() {
 
   private fun init() {
     Logging.setupLogger(applicationContext)
-
-    // rates & coin patterns
-    when (Prefs.getCoinUnit(applicationContext)) {
-      `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
-      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
-      else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
-    }
+    Converter.refreshCoinPattern(applicationContext)
 
     // notification channels (android 8+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
