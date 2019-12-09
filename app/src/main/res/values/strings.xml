@@ -229,7 +229,7 @@
   <string name="closechannels_force_instructions"><![CDATA[
     Force close allows you to unilaterally close your channels.
     <br/><br/>
-    This feature is not a "fix everything magic button"; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if ACINQ disappears from the surface of the earth, preventing you from spending your money. In all other cases, if you experience issues with Phoenix you should contact support.
+    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
     <br/><br/>
     Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
@@ -298,14 +298,15 @@
 
   <!-- //////////////// display seed //////////////// -->
 
-  <string name="displayseed_title">My Wallet</string>
+  <string name="displayseed_title">Wallet recovery phrase</string>
   <string name="displayseed_authenticate_button">Display seed</string>
   <string name="displayseed_loading">Unlocking seed…</string>
   <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
-    This words list is the key to your wallet. Only you possess it. Save it somewhere safe (not on this phone)!
+    This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
     <br /><br />
-    <b>Should you lose this words list, your funds will be lost.</b>
+    <b>Do not share it with anyone.</b>
+    <b>Do not lose it.</b> If you lose your word list and your phone, you've lost your funds...
   ]]></string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
@@ -374,7 +375,7 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Security</string>
-  <string name="seedsec_subtitle">Your wallet should always be protected by a PIN in case your phone is compromised. If your device supports it, you can use biometric authentication.</string>
+  <string name="seedsec_subtitle">We highly recommend setting a PIN to protect your wallet. If your device supports it, you can use biometric authentication.</string>
   <string name="seedsec_pin_switch">PIN authentication</string>
   <string name="seedsec_biometrics_switch">Biometric authentication</string>
   <string name="seedsec_change_pin">Change my PIN…</string>
