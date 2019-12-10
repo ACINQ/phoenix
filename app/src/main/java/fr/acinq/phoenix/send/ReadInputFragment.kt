@@ -76,7 +76,7 @@ class ReadInputFragment : BaseFragment() {
               model.errorMessage.postValue(R.string.scan_error_pay_to_self)
             } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
               // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
-              AlertHelper.build(layoutInflater, R.string.scan_amountless_legacy_title, R.string.scan_amountless_legacy_message)
+              AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
                 .setCancelable(false)
                 .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it))) }
                 .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
