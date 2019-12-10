@@ -587,8 +587,9 @@ class AppKitModel : ViewModel() {
     val xpub = Xpub(DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()), DeterministicWallet.KeyPath(xpubPath.path()).toString())
 
     Class.forName("org.sqlite.JDBC")
+    val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
-    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
+    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
     log.info("node setup ready")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
