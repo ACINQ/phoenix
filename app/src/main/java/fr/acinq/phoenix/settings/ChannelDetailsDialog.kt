@@ -80,7 +80,7 @@ class ChannelDetailsDialog : DialogFragment() {
       context?.let { ctx ->
         try {
           val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-          clipboard.primaryClip = ClipData.newPlainText("Channel data", model.rawData.value)
+          clipboard.setPrimaryClip(ClipData.newPlainText("Channel data", model.rawData.value))
           Toast.makeText(ctx, getString(R.string.utils_copied), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
           log.error("failed to copy raw channel data: ${e.localizedMessage}")

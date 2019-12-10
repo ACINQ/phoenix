@@ -17,6 +17,7 @@
 package fr.acinq.phoenix
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
@@ -34,6 +35,7 @@ import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
+import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.ThemeHelper
 import org.slf4j.LoggerFactory
@@ -111,6 +113,23 @@ class MainActivity : AppCompatActivity() {
   override fun onResume() {
     super.onResume()
     appKit.reconnect()
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    readURIIntent(intent)
+  }
+
+  private fun readURIIntent(intent: Intent) {
+    val data = intent.data
+    if (data != null && data.scheme != null) {
+      when (data.scheme) {
+        "bitcoin", "lightning" -> {
+          findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(payload = data.toString()))
+        }
+        else -> log.info("unhandled payment scheme $data")
+      }
+    }
   }
 
   override fun onStop() {

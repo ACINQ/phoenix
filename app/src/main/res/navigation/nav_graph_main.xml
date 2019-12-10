@@ -48,6 +48,12 @@
     app:destination="@id/send"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
+  <!-- global to read input -->
+  <action
+    android:id="@+id/global_action_any_to_read_input"
+    app:destination="@id/read_input"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
   <!-- global to payment details page -->
   <action
     android:id="@+id/global_action_any_to_payment_details"
@@ -242,6 +248,11 @@
     <action
       android:id="@+id/action_read_input_to_lnurl_login"
       app:destination="@id/lnurl_login" />
+    <argument
+      android:name="payload"
+      app:argType="string"
+      app:nullable="true"
+      android:defaultValue="@null" />
   </fragment>
 
   <!-- settings/tools page -->
