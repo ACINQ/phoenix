@@ -30,6 +30,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
@@ -46,13 +47,13 @@ import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
+import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.background.ChannelsWatcher
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
-import fr.acinq.eclair.wire.*
 import kotlinx.coroutines.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -85,7 +86,8 @@ import scala.collection.immutable.List as ScalaList
 data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
 data class SwapInSettings(var feePercent: Double)
 data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
-class AppKit(val kit: Kit, val api: Eclair)
+data class Xpub(val xpub: String, val path: String)
+class AppKit(val kit: Kit, val api: Eclair, val xpub: Xpub)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
 }
@@ -533,13 +535,23 @@ class AppKitModel : ViewModel() {
   }
 
   @WorkerThread
-  private fun cancelBackgroundJobs() {
-    // cancel all the jobs scheduled by the work manager that would lock up the eclair DB
-  }
-
-  @WorkerThread
-  private fun setupApp() {
-    // initialize app, clean data, init notification channels...
+  private fun cancelBackgroundJobs(context: Context) {
+    val workManager = WorkManager.getInstance(context)
+    try {
+      val jobs = workManager.getWorkInfosByTag(ChannelsWatcher.WATCHER_WORKER_TAG).get()
+      if (jobs.isEmpty()) {
+        log.info("no background jobs found")
+      } else {
+        for (job in jobs) {
+          log.info("found a background job={}", job)
+          workManager.cancelWorkById(job.id).result.get()
+          log.info("successfully cancelled job={}", job)
+        }
+      }
+    } catch (e: Exception) {
+      log.error("failed to retrieve or cancel background jobs: ", e)
+      throw RuntimeException("could not cancel background jobs")
+    }
   }
 
   @WorkerThread
@@ -553,7 +565,6 @@ class AppKitModel : ViewModel() {
   @WorkerThread
   private fun startNode(context: Context, pin: String): AppKit {
     log.info("starting up node...")
-    // TODO before startup: migration scripts + check datadir + restore backups
 
     val system = ActorSystem.create("system")
     system.registerOnTermination {
@@ -561,18 +572,24 @@ class AppKitModel : ViewModel() {
     }
 
     checkConnectivity(context)
-    setupApp()
-    cancelBackgroundJobs()
+    cancelBackgroundJobs(context)
 
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
-    val pk = DeterministicWallet.derivePrivateKey(DeterministicWallet.generate(seed), Wallet.getNodeKeyPath())
+    val master = DeterministicWallet.generate(seed)
+
+    val pk = DeterministicWallet.derivePrivateKey(master, Wallet.getNodeKeyPath())
     val bech32Address = fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(pk.publicKey(), Wallet.getChainHash())
 
+    val xpubPath = Wallet.getXpubKeyPath()
+    val pubkey = DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, xpubPath))
+    val xpub = Xpub(DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()), DeterministicWallet.KeyPath(xpubPath.path()).toString())
+
     Class.forName("org.sqlite.JDBC")
+    val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
-    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
+    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
     log.info("node setup ready")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
@@ -594,7 +611,7 @@ class AppKitModel : ViewModel() {
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
     val eclair = EclairImpl(kit)
-    return AppKit(kit, eclair)
+    return AppKit(kit, eclair, xpub)
   }
 
   private fun getExchangeRateHandler(context: Context): Callback {

@@ -21,9 +21,9 @@
   <color name="yellow">#FDBF55</color>
   <color name="apple">#50B338</color>
   <color name="salmon">#FF874F</color>
-  <color name="green">#09BB74</color>
+  <color name="green">#1AC486</color>
   <color name="blue">#138FE0</color>
-  <color name="red">#CA4747</color>
+  <color name="red">#D14F4F</color>
 
   <!-- utils -->
   <color name="transparent">#00000000</color>
@@ -36,13 +36,14 @@
   <color name="ebony">#272F3B</color>
   <color name="mako">#303845</color>
   <color name="oxford">#363F4E</color>
-  <color name="shuttle">#59676D</color>
+  <color name="shuttle">#5C6A70</color>
+  <color name="regent">#8a989f</color>
   <color name="edward">#CCD6DB</color>
 
   <!-- light theme mostly -->
   <color name="dark">#2B313E</color>
   <color name="brandy">#C76D6D</color>
-  <color name="slate">#73868D</color>
+  <color name="slate">#637179</color>
   <color name="ripple">#A6AFC0CF</color>
   <color name="casper">#ABC1C9</color>
   <color name="geyser">#E1EBED</color>

@@ -72,6 +72,9 @@ object Wallet {
     return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
 
+  fun getXpubKeyPath(): DeterministicWallet.KeyPath {
+    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
+  }
   fun getNodeKeyPath(): DeterministicWallet.KeyPath {
     return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
   }

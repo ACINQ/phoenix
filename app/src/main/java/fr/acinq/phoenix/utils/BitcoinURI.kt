@@ -53,7 +53,7 @@ class BitcoinURI(input: String) {
       throw BitcoinURIParseException(e.localizedMessage, e)
     }
 
-    this.address = path
+    this.address = path!!
 
     // -- read label/message field parameter
     this.label = uri.getQueryParameter("label")

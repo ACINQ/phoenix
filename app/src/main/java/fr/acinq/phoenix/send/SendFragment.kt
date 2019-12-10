@@ -36,11 +36,11 @@ import fr.acinq.eclair.`BtcUnit$`
 import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSendBinding
 import fr.acinq.phoenix.utils.*
-import fr.acinq.eclair.wire.SwapOutResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -114,9 +114,11 @@ class SendFragment : BaseFragment() {
               Unit
             }
             // invoice is a payment request
-            it.isRight && it.right().get().amount().isDefined -> {
+            it.isRight -> {
+              if (it.right().get().amount().isDefined) {
+                mBinding.amount.setText(Converter.printAmountRaw(it.right().get().amount().get(), ctx))
+              }
               model.swapState.value = SwapState.NO_SWAP
-              mBinding.amount.setText(Converter.printAmountRaw(it.right().get().amount().get(), ctx))
             }
             else -> Unit
           }

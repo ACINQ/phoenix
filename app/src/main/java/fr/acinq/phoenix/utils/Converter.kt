@@ -24,9 +24,7 @@ import fr.acinq.bitcoin.Btc
 import fr.acinq.bitcoin.BtcAmount
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.bitcoin.`package$`
-import fr.acinq.eclair.CoinUtils
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.`CoinUtils$`
+import fr.acinq.eclair.*
 import fr.acinq.phoenix.R
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -46,6 +44,14 @@ object Converter {
   init {
     FIAT_FORMAT.minimumFractionDigits = 2
     FIAT_FORMAT.maximumFractionDigits = 2
+  }
+
+  fun refreshCoinPattern(context: Context) {
+    when (Prefs.getCoinUnit(context)) {
+      `SatUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0")
+      `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
+      else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
+    }
   }
 
   fun printAmountRaw(amount: BtcAmount, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()

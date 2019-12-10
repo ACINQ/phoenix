@@ -31,7 +31,7 @@
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/light_theme">
+    android:theme="@style/default_theme">
 
     <activity
       android:name=".MainActivity"
@@ -42,6 +42,16 @@
 
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <!-- handle payment uris -->
+      <intent-filter android:label="@string/app_name">
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.BROWSABLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <data android:scheme="bitcoin" />
+        <data android:scheme="lightning" />
       </intent-filter>
     </activity>
 

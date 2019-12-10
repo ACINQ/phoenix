@@ -29,6 +29,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.google.common.base.Strings
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.Intents
@@ -47,7 +49,7 @@ class ReadInputFragment : BaseFragment() {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentReadInvoiceBinding
-
+  private val args: ReadInputFragmentArgs by navArgs()
   private lateinit var model: ReadInputViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -74,7 +76,7 @@ class ReadInputFragment : BaseFragment() {
               model.errorMessage.postValue(R.string.scan_error_pay_to_self)
             } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
               // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
-              AlertHelper.build(layoutInflater, R.string.scan_amountless_legacy_title, R.string.scan_amountless_legacy_message)
+              AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
                 .setCancelable(false)
                 .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it))) }
                 .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
@@ -114,7 +116,7 @@ class ReadInputFragment : BaseFragment() {
         ReadingState.SCANNING -> {
           mBinding.scanView.resume()
         }
-        else -> {}
+        else -> Unit
       }
     })
   }
@@ -126,6 +128,10 @@ class ReadInputFragment : BaseFragment() {
     barcodeIntent.putExtra(Intents.Scan.FORMATS, BarcodeFormat.QR_CODE.name)
     mBinding.scanView.statusView.visibility = View.GONE
     mBinding.scanView.initializeFromIntent(barcodeIntent)
+
+    if (!Strings.isNullOrEmpty(args.payload)) {
+      model.checkAndSetPaymentRequest(args.payload!!)
+    }
 
     mBinding.cameraAccessButton.setOnClickListener {
       activity?.let { ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST) }

@@ -164,7 +164,11 @@
   <string name="scan_error_lnurl_unsupported">LNURL is not supported yet!</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
-  <string name="scan_amountless_legacy_message">This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, the payee should specify an amount in the payment request.\n\nAre you sure you want to pay this invoice?</string>
+  <string name="scan_amountless_legacy_message"><![CDATA[
+    This invoice doesn\'t include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, you should <b>ask the payee to specify an amount</b> in the payment request.
+    <br /><br />
+    Are you sure you want to pay this invoice?
+  ]]></string>
   <string name="scan_amountless_legacy_confirm_button">Confirm</string>
   <string name="scan_amountless_legacy_cancel_button">Cancel</string>
 
@@ -191,17 +195,16 @@
 
   <!-- //////////////// settings //////////////// -->
 
-  <string name="settings_display_title">Display</string>
-  <string name="settings_display_prefs">Currency, Theme…</string>
+  <string name="settings_general_title">General</string>
+  <string name="settings_display_prefs">Display</string>
   <string name="settings_security_title">Security</string>
   <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_seed_security">App access settings</string>
-  <string name="settings_debugging_title">Debugging</string>
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_list_channels">Channels list</string>
   <string name="settings_logs">Logs</string>
   <string name="settings_electrum">Electrum server</string>
-  <string name="settings_mutual_close">Empty wallet</string>
+  <string name="settings_mutual_close">Close all channels</string>
   <string name="settings_force_close">Danger zone</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
@@ -229,9 +232,9 @@
   <string name="closechannels_force_instructions"><![CDATA[
     Force close allows you to unilaterally close your channels.
     <br/><br/>
-    This feature is not a "fix everything magic button"; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if ACINQ disappears from the surface of the earth, preventing you from spending your money. In all other cases, if you experience issues with Phoenix you should contact support.
+    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
     <br/><br/>
-    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days.<b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
+    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
     Funds will eventually be sent to: %1$s
     <br/><br/>
@@ -298,15 +301,17 @@
 
   <!-- //////////////// display seed //////////////// -->
 
-  <string name="displayseed_title">My Wallet</string>
+  <string name="displayseed_title">Wallet recovery phrase</string>
   <string name="displayseed_authenticate_button">Display seed</string>
   <string name="displayseed_loading">Unlocking seed…</string>
   <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
-    This words list is the key to your wallet. Only you possess it. Save it somewhere safe (not on this phone)!
+    This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
     <br /><br />
-    <b>Should you lose this words list, your funds will be lost.</b>
+    <b>Do not share it with anyone.</b>
+    <b>Do not lose it.</b> If you lose your words list and your phone, you\'ve lost your funds.
   ]]></string>
+  <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
   <string name="displayseed_has_saved_seed_button">Confirm</string>
@@ -374,7 +379,7 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Security</string>
-  <string name="seedsec_subtitle">Your wallet should always be protected by a PIN in case your phone is compromised. If your device supports it, you can use biometric authentication.</string>
+  <string name="seedsec_subtitle">We highly recommend setting a PIN to protect your wallet. If your device supports it, you can use biometric authentication.</string>
   <string name="seedsec_pin_switch">PIN authentication</string>
   <string name="seedsec_biometrics_switch">Biometric authentication</string>
   <string name="seedsec_change_pin">Change my PIN…</string>
@@ -424,6 +429,8 @@
   <string name="electrum_block_height_label">Block height</string>
   <string name="electrum_tip_label">Tip timestamp</string>
   <string name="electrum_fee_rate_label">Fee rate</string>
+  <string name="electrum_xpub_label">Master public key</string>
+  <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Server</string>
   <string name="electrum_connecting">Establishing connection…</string>

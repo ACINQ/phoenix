@@ -40,13 +40,13 @@ import fr.acinq.eclair.`MBtcUnit$`
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.NavGraphMainDirections
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.utils.*
-import fr.acinq.eclair.wire.SwapInResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -208,7 +208,7 @@ class ReceiveFragment : BaseFragment() {
     try {
       val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
-      clipboard.primaryClip = ClipData.newPlainText("Payment request", source)
+      clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
       Toast.makeText(activity!!.applicationContext, R.string.copied, Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       log.error("failed to copy: ${e.localizedMessage}")

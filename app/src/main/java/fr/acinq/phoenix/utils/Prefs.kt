@@ -33,7 +33,7 @@ object Prefs {
   // -- unit, fiat, conversion...
   const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
   private const val PREFS_FIAT_CURRENCY: String = "PREFS_FIAT_CURRENCY"
-  private const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
+  const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
 
@@ -102,16 +102,8 @@ object Prefs {
   // -- unit, fiat, conversion...
   // -- ==================================
 
-  fun getCoinUnit(prefs: SharedPreferences): CoinUnit {
-    return `CoinUtils$`.`MODULE$`.getUnitFromString(prefs.getString(PREFS_COIN_UNIT, SatUnit.code()))
-  }
-
   fun getCoinUnit(context: Context): CoinUnit {
     return `CoinUtils$`.`MODULE$`.getUnitFromString(PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_COIN_UNIT, SatUnit.code()))
-  }
-
-  fun setCoinUnit(context: Context, unit: CoinUnit) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_COIN_UNIT, unit.code()).apply()
   }
 
   fun getMnemonicsSeenTimestamp(context: Context): Long {
@@ -162,11 +154,8 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
   }
 
-  fun getTheme(context: Context): Int {
-    return when (PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, "light") ?: "light") {
-      "dark" -> R.style.dark_theme
-      else -> R.style.light_theme
-    }
+  fun getTheme(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default
   }
 
   fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {
