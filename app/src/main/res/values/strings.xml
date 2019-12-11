@@ -287,6 +287,8 @@
   <string name="main_connectivity_issue_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
   <string name="main_notification_summary">You have %1$d notifications…</string>
+  <string name="main_faq_button">FAQ</string>
+  <string name="main_stores_button">Stores</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
