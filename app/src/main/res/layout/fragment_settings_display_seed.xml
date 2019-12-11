@@ -75,6 +75,8 @@
       android:layout_height="0dp"
       android:fillViewport="true"
       android:visibility="@{model.state == DisplaySeedState.DONE}"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -103,10 +105,10 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          android:textSize="@dimen/text_sm"
-          android:textColor="?attr/mutedTextColor"
-          android:textAlignment="center"
           android:text="@string/displayseed_derivation_path"
+          android:textAlignment="center"
+          android:textColor="?attr/mutedTextColor"
+          android:textSize="@dimen/text_sm"
           app:layout_constraintTop_toBottomOf="@id/words_table" />
 
         <androidx.constraintlayout.widget.Group
