@@ -106,6 +106,7 @@
             android:backgroundTint="?attr/colorPrimary"
             android:enabled="@{model.state == PreChannelsCloseState.READY}"
             android:inputType="textVisiblePassword|textNoSuggestions"
+            android:text="@={model.addressInput}"
             app:layout_constraintTop_toBottomOf="@id/message" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -159,6 +160,7 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_md_p"
+          app:enableOrFade="@{model.addressInput.length() > 0}"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:icon="@drawable/ic_empty"
           app:layout_constraintStart_toStartOf="parent"

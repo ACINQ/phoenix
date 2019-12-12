@@ -116,6 +116,7 @@ class MutualCloseViewModel : ViewModel() {
 
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<ChannelsCloseBaseState>()
+  val addressInput = MutableLiveData<String>()
 
   init {
     state.value = PreChannelsCloseState.CHECKING_CHANNELS
