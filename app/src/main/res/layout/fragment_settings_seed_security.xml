@@ -52,7 +52,8 @@
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/bgColor">
 
         <View
           android:id="@+id/sep_pin_state"
@@ -79,8 +80,8 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square"
-          app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
           android:visibility="@{model.protectionState != ProtectionState.NONE}"
+          app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
           app:hz_bias="0"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_pin_update"
@@ -97,8 +98,8 @@
           android:id="@+id/biometrics_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
           android:visibility="@{model.protectionState != ProtectionState.NONE}"
+          app:enableOrFade="@{model.protectionUpdateState == ProtectionUpdateState.IDLE}"
           app:icon="@drawable/ic_fingerprint"
           app:layout_constraintTop_toBottomOf="@id/sep_biometrics"
           app:text="@string/seedsec_biometrics_switch" />

@@ -18,7 +18,7 @@
 
   <style name="default_theme" parent="Theme.MaterialComponents.Light.NoActionBar">
     <item name="isLightTheme">true</item>
-    <item name="colorPrimary">@color/apple</item>
+    <item name="colorPrimary">@color/horizon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/white</item>
@@ -37,7 +37,7 @@
     <item name="colorSurface">?attr/bgColor</item>
     <item name="colorOnSurface">?attr/onMutedBgTextColor</item>
     <item name="android:colorBackground">?attr/bgColor</item>
-    <item name="android:windowBackground">@drawable/app_bg_default</item>
+    <item name="android:windowBackground">@drawable/app_bg_testnet</item>
 
     <!-- text -->
     <item name="android:textColor">?attr/textColor</item>

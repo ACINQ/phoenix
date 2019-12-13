@@ -21,7 +21,6 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mutedBgColor"
     tools:context=".settings.SettingsFragment">
 
     <fr.acinq.phoenix.utils.customviews.ActionBarView

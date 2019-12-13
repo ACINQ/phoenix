@@ -17,7 +17,7 @@
 <resources>
 
   <style name="default_theme" parent="Theme.MaterialComponents.NoActionBar">
-    <item name="colorPrimary">@color/green</item>
+    <item name="colorPrimary">@color/horizon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/oxford</item>
@@ -36,7 +36,7 @@
     <item name="colorSurface">?attr/bgColor</item>
     <item name="colorOnSurface">?attr/onMutedBgTextColor</item>
     <item name="android:colorBackground">?attr/bgColor</item>
-    <item name="android:windowBackground">@drawable/app_bg_default</item>
+    <item name="android:windowBackground">@drawable/app_bg_testnet</item>
 
     <!-- text -->
     <item name="android:textColor">?attr/textColor</item>

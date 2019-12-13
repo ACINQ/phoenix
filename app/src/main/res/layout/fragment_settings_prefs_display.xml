@@ -31,17 +31,12 @@
       app:layout_constraintTop_toTopOf="parent"
       app:title="@string/prefs_display_title" />
 
-    <FrameLayout
-      android:id="@+id/supermachin"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
     <androidx.fragment.app.FragmentContainerView
       android:id="@+id/prefs_display_fragment_container"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toBottomOf="@id/supermachin" />
+      android:background="?attr/bgColor"
+      app:layout_constraintTop_toBottomOf="@id/action_bar" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

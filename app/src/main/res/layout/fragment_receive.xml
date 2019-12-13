@@ -32,7 +32,6 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mutedBgColor"
     android:fillViewport="true"
     android:overScrollMode="never"
     app:layout_constrainedHeight="true"
@@ -48,10 +47,11 @@
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:title="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_title : null}"
+        app:layout_constraintTop_toTopOf="parent"
         app:subtitle="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_subtitle : null}"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:title="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_title : null}" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/invoice_params_layout"
