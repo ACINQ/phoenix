@@ -67,8 +67,9 @@
       android:id="@+id/stores_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
       android:layout_marginStart="@dimen/space_md"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/help_button" />
 
     <Constraint
@@ -120,8 +121,9 @@
       android:id="@+id/stores_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      app:layout_constraintStart_toStartOf="parent"
       android:layout_marginStart="@dimen/space_xs"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/help_button" />
 
     <Constraint
