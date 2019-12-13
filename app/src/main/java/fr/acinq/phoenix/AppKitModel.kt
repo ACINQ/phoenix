@@ -183,9 +183,7 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
-    kit.value?.run {
-      nodeData.postValue(nodeData.value?.copy(balance = event.balance))
-    } ?: log.info("unhandled balance event with kit not initialized")
+    nodeData.postValue(nodeData.value?.copy(balance = event.balance))
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
