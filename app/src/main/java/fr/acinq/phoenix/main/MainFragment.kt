@@ -92,8 +92,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
     })
-    appKit.nodeData.observe(viewLifecycleOwner, Observer { nodeData ->
-      nodeData?.let { mBinding.balance.setAmount(it.balance) }
+    appKit.balance.observe(viewLifecycleOwner, Observer {
+      mBinding.balance.setAmount(it)
     })
     appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
       if (swapIns == null || swapIns.isEmpty()) {

@@ -21,6 +21,7 @@
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/oxford</item>
+    <item name="altBgColor">@color/ebony</item>
     <item name="mutedBgColor">@color/ebony</item>
     <item name="borderColor">@color/mako</item>
     <item name="buttonRippleColor">@color/shuttle</item>

@@ -71,6 +71,12 @@
       android:defaultValue="false"
       app:argType="boolean" />
   </action>
+  <!-- global to electrum server -->
+  <action
+    android:id="@+id/global_action_any_to_electrum"
+    app:destination="@id/electrum_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
 
   <!-- main fragment -->
   <fragment

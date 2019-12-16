@@ -143,12 +143,12 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null) {
-        appKit.nodeData.value?.run {
+      if (useMax && context != null && appKit.balance.value != null) {
+        appKit.balance.value!!.run {
           val unit = Prefs.getCoinUnit(context!!)
           mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-          mBinding.amount.setText(Converter.printAmountRaw(this.balance, context!!))
-        } ?: (log.warn("balance is not available yet").also { model.useMaxBalance.value = false })
+          mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
+        }
       }
     })
 
@@ -187,8 +187,8 @@ class SendFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
-    appKit.nodeData.value?.let {
-      mBinding.balanceValue.setAmount(it.balance)
+    appKit.balance.value?.let {
+      mBinding.balanceValue.setAmount(it)
     } ?: log.warn("balance is not available yet")
 
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
@@ -264,7 +264,7 @@ class SendFragment : BaseFragment() {
   private fun checkAmount(): Option<MilliSatoshi> {
     val unit = mBinding.unit.selectedItem.toString()
     val amountInput = mBinding.amount.text.toString()
-    val balance = appKit.nodeData.value?.balance
+    val balance = appKit.balance.value
 
     return try {
       model.amountErrorMessage.value = null

@@ -85,8 +85,9 @@ import scala.collection.immutable.List as ScalaList
 
 data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
 data class SwapInSettings(var feePercent: Double)
-data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
 data class Xpub(val xpub: String, val path: String)
+data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
+data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
 class AppKit(val kit: Kit, val api: Eclair, val xpub: Xpub)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
@@ -100,7 +101,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
-  val networkAvailable = MutableLiveData(false)
+  val networkInfo = MutableLiveData<NetworkInfo>()
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
@@ -109,14 +110,15 @@ class AppKitModel : ViewModel() {
   val startupErrorMessage = MutableLiveData<String>()
   val trampolineSettings = MutableLiveData<TrampolineSettings>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
-  val nodeData = MutableLiveData<NodeData>()
+  val balance = MutableLiveData<MilliSatoshi>()
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
 
   init {
     _kit.value = null
     startupState.value = StartupState.OFF
-    nodeData.value = Constants.DEFAULT_NODE_DATA
+    networkInfo.value = Constants.DEFAULT_NETWORK_INFO
+    balance.value = MilliSatoshi(0)
     trampolineSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
     if (!EventBus.getDefault().isRegistered(this)) {
@@ -183,17 +185,17 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
-    nodeData.postValue(nodeData.value?.copy(balance = event.balance))
+    balance.postValue(event.balance)
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
+    networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = "")
+    networkInfo.value = networkInfo.value?.copy(electrumServer = null)
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -525,9 +527,8 @@ class AppKitModel : ViewModel() {
 
   public fun shutdown() {
     closeConnections()
-    trampolineSettings.postValue(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
-    swapInSettings.postValue(Constants.DEFAULT_SWAP_IN_SETTINGS)
-    nodeData.postValue(Constants.DEFAULT_NODE_DATA)
+    balance.postValue(MilliSatoshi(0))
+    networkInfo.postValue(Constants.DEFAULT_NETWORK_INFO)
     _kit.postValue(null)
     startupState.postValue(StartupState.OFF)
   }

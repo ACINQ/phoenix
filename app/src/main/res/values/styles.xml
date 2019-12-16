@@ -22,6 +22,7 @@
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/white</item>
+    <item name="altBgColor">@color/ebony</item>
     <item name="mutedBgColor">@color/athens</item>
     <item name="borderColor">@color/geyser</item>
     <item name="buttonRippleColor">@color/ripple</item>

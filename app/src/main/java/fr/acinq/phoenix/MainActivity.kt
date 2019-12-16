@@ -24,12 +24,13 @@ import android.net.Network
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import com.google.android.material.snackbar.Snackbar
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
@@ -49,10 +50,6 @@ class MainActivity : AppCompatActivity() {
   private lateinit var mBinding: ActivityMainBinding
   private lateinit var appKit: AppKitModel
 
-  private val connectivitySnackbar: Snackbar by lazy {
-    Snackbar.make(mBinding.root, R.string.main_connectivity_issue, Snackbar.LENGTH_INDEFINITE)
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
@@ -61,11 +58,20 @@ class MainActivity : AppCompatActivity() {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     appKit = ViewModelProvider(this).get(AppKitModel::class.java)
-    appKit.networkAvailable.observe(this, Observer {
-      if (it) {
-        connectivitySnackbar.dismiss()
+    appKit.networkInfo.observe(this, Observer {
+      if (!it.networkConnected) {
+        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_network_lost)
+        mBinding.alertBlockingButton.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
+        mBinding.alertBlocking.visibility = View.VISIBLE
+      } else if (it.electrumServer == null) {
+        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_electrum_connecting)
+        mBinding.alertBlockingButton.setOnClickListener { findNavController(R.id.nav_host_main).navigate(R.id.global_action_any_to_electrum) }
+        mBinding.alertBlocking.visibility = View.VISIBLE
+      } else if (!it.lightningConnected) {
+        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_lightning_connection_lost)
+        mBinding.alertBlocking.visibility = View.VISIBLE
       } else {
-        connectivitySnackbar.show()
+        mBinding.alertBlocking.visibility = View.GONE
       }
     })
     appKit.navigationEvent.observe(this, Observer {
@@ -98,14 +104,14 @@ class MainActivity : AppCompatActivity() {
   private val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
-      log.info("network available")
-      appKit.networkAvailable.postValue(true)
+      log.debug("network available")
+      appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = true))
     }
 
     override fun onLost(network: Network) {
       super.onLost(network)
-      log.info("network lost")
-      appKit.networkAvailable.postValue(false)
+      log.debug("network lost")
+      appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = false))
     }
   }
 

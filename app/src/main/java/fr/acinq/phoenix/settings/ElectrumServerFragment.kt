@@ -72,32 +72,22 @@ class ElectrumServerFragment : BaseFragment() {
         mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
       }
     })
-    appKit.nodeData.observe(viewLifecycleOwner, Observer {
+    appKit.networkInfo.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
-        // -- connection status
-        val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-        mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(it?.electrumAddress)) {
-          if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+        val electrumServer = it.electrumServer
+        if (electrumServer == null) {
+          // -- no connection to electrum server yet
+          val prefElectrumAddress = Prefs.getElectrumServer(ctx)
+          mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(prefElectrumAddress)) {
             resources.getString(R.string.electrum_connecting)
           } else {
             resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-          }
+          })
         } else {
-          resources.getString(R.string.electrum_connected, it.electrumAddress)
-        })
-        // -- tip timestamp
-        if (it.tipTime == 0L) {
-          mBinding.tipTime.visibility = View.GONE
-        } else {
-          mBinding.tipTime.visibility = View.VISIBLE
-          mBinding.tipTime.text = Transcriber.plainTime(it.tipTime * 1000L)
-        }
-        // -- block height
-        if (it.blockHeight == 0) {
-          mBinding.blockHeight.visibility = View.GONE
-        } else {
-          mBinding.blockHeight.visibility = View.VISIBLE
-          mBinding.blockHeight.text = NumberFormat.getInstance().format(it.blockHeight)
+          // -- successfully connected to electrum
+          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
+          mBinding.tipTime.text = Transcriber.plainTime(it.electrumServer.tipTime * 1000L)
+          mBinding.blockHeight.text = NumberFormat.getInstance().format(it.electrumServer.blockHeight)
         }
       }
     })
