@@ -702,17 +702,18 @@ class AppKitModel : ViewModel() {
             }
 
             // -- trampoline settings
-            val remoteTrampolineSettings = json.getJSONObject("trampoline").getJSONObject("v1")
-            trampolineSettings.postValue(TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(remoteTrampolineSettings.getLong("fee_base_sat"))),
-              feePercent = remoteTrampolineSettings.getDouble("fee_percent"),
-              hopsCount = remoteTrampolineSettings.getInt("hops_count"),
-              cltvExpiry = remoteTrampolineSettings.getInt("cltv_expiry")))
-            log.info("trampoline settings set to ${trampolineSettings.value}")
+            val trampolineJson = json.getJSONObject("trampoline").getJSONObject("v1")
+            val remoteTrampoline = TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(trampolineJson.getLong("fee_base_sat"))),
+              feePercent = trampolineJson.getDouble("fee_percent"),
+              hopsCount = trampolineJson.getInt("hops_count"),
+              cltvExpiry = trampolineJson.getInt("cltv_expiry"))
+            trampolineSettings.postValue(remoteTrampoline)
+            log.info("trampoline settings set to $remoteTrampoline")
 
             // -- swap-in settings
-            val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1")
-            swapInSettings.postValue(SwapInSettings(feePercent = remoteSwapInSettings.getDouble("fee_percent")))
-            log.info("swap_in settings set to ${swapInSettings.value}")
+            val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
+            swapInSettings.postValue(remoteSwapInSettings)
+            log.info("swap_in settings set to $remoteSwapInSettings")
           } catch (e: JSONException) {
             log.error("could not read wallet context body: ", e)
           }
