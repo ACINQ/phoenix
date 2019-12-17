@@ -31,10 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.`BtcUnit$`
-import fr.acinq.eclair.`MBtcUnit$`
-import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.BaseFragment
@@ -74,7 +71,7 @@ class SendFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      unitList = listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))
+      unitList = listOf(SatUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.unit.adapter = adapter
@@ -262,11 +259,10 @@ class SendFragment : BaseFragment() {
   }
 
   private fun checkAmount(): Option<MilliSatoshi> {
-    val unit = mBinding.unit.selectedItem.toString()
-    val amountInput = mBinding.amount.text.toString()
-    val balance = appKit.balance.value
-
     return try {
+      val unit = mBinding.unit.selectedItem.toString()
+      val amountInput = mBinding.amount.text.toString()
+      val balance = appKit.balance.value
       model.amountErrorMessage.value = null
       val fiat = Prefs.getFiatCurrency(context!!)
       val amount = if (unit == fiat) {

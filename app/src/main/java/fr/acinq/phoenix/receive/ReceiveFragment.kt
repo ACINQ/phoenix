@@ -34,10 +34,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.acinq.eclair.BtcUnit
+import fr.acinq.eclair.MBtcUnit
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.`BtcUnit$`
-import fr.acinq.eclair.`MBtcUnit$`
-import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapInResponse
@@ -83,7 +83,7 @@ class ReceiveFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      unitList = listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))
+      unitList = listOf(SatUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.amountUnit.adapter = adapter
@@ -257,12 +257,16 @@ class ReceiveFragment : BaseFragment() {
   }
 
   private fun extractAmount(): Option<MilliSatoshi> {
-    val unit = mBinding.amountUnit.selectedItem.toString()
-    val amount = mBinding.amountValue.text.toString()
-    return if (unit == Prefs.getFiatCurrency(context!!)) {
-      Option.apply(Converter.convertFiatToMsat(context!!, amount))
+    val unit = mBinding.amountUnit.selectedItem
+    return if (unit == null || context == null) {
+      Option.empty()
     } else {
-      Converter.string2Msat_opt(amount, unit)
+      val amount = mBinding.amountValue.text.toString()
+      if (unit == Prefs.getFiatCurrency(context!!)) {
+        Option.apply(Converter.convertFiatToMsat(context!!, amount))
+      } else {
+        Converter.string2Msat_opt(amount, unit.toString())
+      }
     }
   }
 
