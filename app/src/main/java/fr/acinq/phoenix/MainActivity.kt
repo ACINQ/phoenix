@@ -104,8 +104,9 @@ class MainActivity : AppCompatActivity() {
   private val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
-      log.debug("network available")
+      log.info("network available")
       appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = true))
+      appKit.reconnect()
     }
 
     override fun onLost(network: Network) {
@@ -119,11 +120,6 @@ class MainActivity : AppCompatActivity() {
     super.onStart()
     val connectivityManager: ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     connectivityManager.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
-  }
-
-  override fun onResume() {
-    super.onResume()
-    appKit.reconnect()
   }
 
   override fun onNewIntent(intent: Intent) {
