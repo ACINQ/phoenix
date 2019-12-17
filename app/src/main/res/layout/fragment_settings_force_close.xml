@@ -38,7 +38,7 @@
       android:id="@+id/main_layout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:paddingBottom="@dimen/space_xl">
+      android:paddingBottom="@dimen/space_xxl">
 
       <fr.acinq.phoenix.utils.customviews.ActionBarView
         android:id="@+id/action_bar"

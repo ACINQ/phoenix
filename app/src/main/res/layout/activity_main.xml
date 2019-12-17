@@ -44,6 +44,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="?attr/altBgColor"
+      android:clickable="true"
+      android:focusable="true"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent">
 

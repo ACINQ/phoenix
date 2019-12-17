@@ -101,6 +101,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
+  val currentNav = MutableLiveData<Int>()
   val networkInfo = MutableLiveData<NetworkInfo>()
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
@@ -115,6 +116,7 @@ class AppKitModel : ViewModel() {
   val kit: LiveData<AppKit> get() = _kit
 
   init {
+    currentNav.value = R.id.startup_fragment
     _kit.value = null
     startupState.value = StartupState.OFF
     networkInfo.value = Constants.DEFAULT_NETWORK_INFO

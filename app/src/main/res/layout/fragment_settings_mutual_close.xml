@@ -28,33 +28,33 @@
       type="fr.acinq.phoenix.settings.MutualCloseViewModel" />
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <ScrollView
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    app:layout_constrainedHeight="true"
+    app:layout_constraintBottom_toBottomOf="parent">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
-      android:id="@+id/action_bar"
+    <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/closechannels_mutual_instructions"
-      app:title="@string/closechannels_mutual_title" />
+      android:paddingBottom="@dimen/space_xxl">
 
-    <ScrollView
-      android:id="@+id/scroll"
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:overScrollMode="never"
-      app:layout_constrainedHeight="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar">
+      <fr.acinq.phoenix.utils.customviews.ActionBarView
+        android:id="@+id/action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:subtitle="@string/closechannels_mutual_instructions"
+        app:title="@string/closechannels_mutual_title" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/bgColor"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/action_bar">
 
         <View
           android:id="@+id/top_separator"
@@ -159,8 +159,8 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_md_p"
-          app:enableOrFade="@{model.addressInput.length() > 0}"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
+          app:enableOrFade="@{model.addressInput.length() > 0}"
           app:icon="@drawable/ic_empty"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
@@ -180,6 +180,6 @@
           app:layout_constraintTop_toBottomOf="@+id/action_bottom" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-  </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
 </layout>
