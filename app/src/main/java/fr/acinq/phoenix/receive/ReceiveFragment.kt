@@ -34,10 +34,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.eclair.BtcUnit
-import fr.acinq.eclair.MBtcUnit
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.SatUnit
+import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapInResponse
@@ -83,7 +80,7 @@ class ReceiveFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      unitList = listOf(SatUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
+      unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.amountUnit.adapter = adapter

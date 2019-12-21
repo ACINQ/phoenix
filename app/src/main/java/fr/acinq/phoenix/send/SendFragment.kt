@@ -71,7 +71,7 @@ class SendFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      unitList = listOf(SatUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
+      unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.unit.adapter = adapter
