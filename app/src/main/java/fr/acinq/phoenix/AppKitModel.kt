@@ -459,9 +459,9 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         kit.value?.run {
-          log.info("sending reconnect to ACINQ actor")
-          kit.system().actorSelection("/system/user/*/switchboard/peer-${Wallet.ACINQ.nodeId()}").tell(Peer.`Reconnect$`.`MODULE$`, ActorRef.noSender())
-        } ?: log.info("appkit not ready yet")
+          log.info("sending connect to ACINQ actor")
+          kit.switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+        } ?: log.debug("appkit not ready yet")
       }
     }
   }

@@ -60,9 +60,19 @@ class MainActivity : AppCompatActivity() {
       appKit.reconnect()
     }
 
+    override fun onLosing(network: Network?, maxMsToLive: Int) {
+      super.onLosing(network, maxMsToLive)
+      log.info("losing network....")
+    }
+
+    override fun onUnavailable() {
+      super.onUnavailable()
+      log.info("network unavailable")
+    }
+
     override fun onLost(network: Network) {
       super.onLost(network)
-      log.debug("network lost")
+      log.info("network lost")
       appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = false))
     }
   }
@@ -116,8 +126,8 @@ class MainActivity : AppCompatActivity() {
   override fun onStart() {
     super.onStart()
     findNavController(R.id.nav_host_main).addOnDestinationChangedListener(navigationCallback)
-    val connectivityManager: ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    connectivityManager.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
+    val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    connectivityManager?.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -166,8 +176,8 @@ class MainActivity : AppCompatActivity() {
   override fun onStop() {
     super.onStop()
     findNavController(R.id.nav_host_main).removeOnDestinationChangedListener(navigationCallback)
-    val connectivityManager: ConnectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    connectivityManager.unregisterNetworkCallback(networkCallback)
+    val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    connectivityManager?.unregisterNetworkCallback(networkCallback)
   }
 
   override fun onDestroy() {
