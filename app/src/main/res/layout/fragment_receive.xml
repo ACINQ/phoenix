@@ -226,6 +226,16 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+          android:id="@+id/power_save_mode_warning"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textAlignment="center"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintTop_toBottomOf="@id/qr_image"
+          android:text="power save mode on!"
+          android:visibility="@{model.isPowerSavingMode() &amp;&amp; model.state == PaymentGenerationState.DONE}" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
@@ -236,7 +246,7 @@
           app:layout_constraintEnd_toStartOf="@id/share_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/qr_image" />
+          app:layout_constraintTop_toBottomOf="@id/power_save_mode_warning" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"

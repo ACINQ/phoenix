@@ -16,11 +16,9 @@
 
 package fr.acinq.phoenix.receive
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
+import android.os.PowerManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -60,6 +58,7 @@ class ReceiveFragment : BaseFragment() {
   private lateinit var mBinding: FragmentReceiveBinding
   private lateinit var model: ReceiveViewModel
   private lateinit var unitList: List<String>
+  private var powerSavingReceiver: BroadcastReceiver? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -186,11 +185,28 @@ class ReceiveFragment : BaseFragment() {
     if (model.state.value == PaymentGenerationState.INIT) {
       generatePaymentRequest()
     }
+
+    // listen to power saving mode
+    context?.let {
+      val powerManager = it.getSystemService(Context.POWER_SERVICE) as PowerManager
+      powerSavingReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+          log.info("power saving ? ${powerManager.isPowerSaveMode}")
+          model.isPowerSavingMode.value = powerManager.isPowerSaveMode
+        }
+      }
+      it.registerReceiver(powerSavingReceiver, IntentFilter("android.os.action.POWER_SAVE_MODE_CHANGED"))
+    }
   }
 
   override fun onStop() {
     super.onStop()
     EventBus.getDefault().unregister(this)
+    context?.let {
+      if (powerSavingReceiver != null) {
+        it.unregisterReceiver(powerSavingReceiver!!)
+      }
+    }
   }
 
   private fun handleBackAction() {
