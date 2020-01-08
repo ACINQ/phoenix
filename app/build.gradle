@@ -21,6 +21,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+
 android {
   compileSdkVersion 29
   defaultConfig {
@@ -28,7 +30,7 @@ android {
     minSdkVersion 24
     targetSdkVersion 29
     versionCode 3
-    versionName "BUILD.191213"
+    versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
