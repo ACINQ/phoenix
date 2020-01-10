@@ -293,8 +293,7 @@ class AppKitModel : ViewModel() {
           /* expiry seconds */ Option.empty(),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
-          /* payment preimage */ Option.empty(),
-          /* allow multi part payment */ true), timeout)
+          /* payment preimage */ Option.empty()), timeout)
       Await.result(f, awaitDuration) as PaymentRequest
     } ?: throw KitNotInitialized()
   }
