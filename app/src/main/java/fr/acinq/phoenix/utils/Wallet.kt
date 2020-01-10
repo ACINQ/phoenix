@@ -99,12 +99,12 @@ object Wallet {
         BitcoinURI(invoice)
       } catch (e2: Exception) {
         try {
-          LNUrl(input)
+          LNUrl.extractLNUrl(input)
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
           log.debug("invalid as BitcoinURI: ${e2.localizedMessage}")
-          log.debug("invalid as LNURL: ${e3.localizedMessage}")
+          log.debug("invalid as LNURL: ", e3)
           throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
         }
       }

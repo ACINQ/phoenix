@@ -92,11 +92,9 @@ class ReadInputFragment : BaseFragment() {
             }
           }
           is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
+          is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it))
           is LNUrl -> {
-            if (it.isLogin()) {
-              // findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.uri.toString()))
-            }
-            log.info("cannot handle LNURL=${it.uri}")
+            log.info("unhandled LNURL=${it}")
             model.readingState.postValue(ReadingState.ERROR)
             model.errorMessage.postValue(R.string.scan_error_lnurl_unsupported)
           }

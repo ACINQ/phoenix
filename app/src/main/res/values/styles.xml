@@ -162,6 +162,8 @@
     <item name="android:windowFrame">@null</item>
     <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
+    <item name="android:windowMinWidthMajor">65%</item>
+    <item name="android:windowMinWidthMinor">85%</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="android:windowTitleStyle">@style/dialog_title</item>
     <item name="android:textColorPrimary">?attr/colorPrimary</item>
