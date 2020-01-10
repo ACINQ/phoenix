@@ -18,7 +18,7 @@
 
   <style name="default_theme" parent="Theme.MaterialComponents.Light.NoActionBar">
     <item name="isLightTheme">true</item>
-    <item name="colorPrimary">@color/horizon</item>
+    <item name="colorPrimary">@color/purple</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/white</item>

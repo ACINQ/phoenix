@@ -26,7 +26,7 @@
   <item>
     <bitmap
       android:dither="true"
-      android:src="@drawable/testnet_bg"
+      android:src="@drawable/mainnet_bg"
       android:tileMode="repeat" />
   </item>
 </layer-list>
