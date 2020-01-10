@@ -54,7 +54,6 @@ class SendFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSendBinding
   private val args: SendFragmentArgs by navArgs()
-
   private lateinit var model: SendViewModel
 
   private lateinit var unitList: List<String>

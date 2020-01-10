@@ -256,9 +256,15 @@
       app:destination="@id/lnurl_login" />
     <argument
       android:name="payload"
+      android:defaultValue="@null"
       app:argType="string"
-      app:nullable="true"
-      android:defaultValue="@null" />
+      app:nullable="true" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_pay"
+      app:destination="@+id/lnurl_pay" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_withdraw"
+      app:destination="@+id/lnurl_witdhraw" />
   </fragment>
 
   <!-- settings/tools page -->
@@ -384,7 +390,7 @@
       app:argType="string" />
   </dialog>
 
-  <!-- login with LNURL -->
+  <!-- LNURL: login -->
   <fragment
     android:id="@+id/lnurl_login"
     android:name="fr.acinq.phoenix.send.LNUrlLoginFragment"
@@ -399,5 +405,25 @@
     android:id="@+id/electrum_fragment"
     android:name="fr.acinq.phoenix.settings.ElectrumServerFragment"
     android:label="ElectrumServerFragment" />
+
+  <!-- LNURL: pay -->
+  <dialog
+    android:id="@+id/lnurl_pay"
+    android:name="fr.acinq.phoenix.send.LNUrlPayFragment"
+    android:label="LNUrlPayFragment">
+    <argument
+      android:name="url"
+      app:argType="string" />
+  </dialog>
+
+  <!-- LNURL: withdraw -->
+  <dialog
+    android:id="@+id/lnurl_witdhraw"
+    android:name="fr.acinq.phoenix.send.LNUrlWithdrawFragment"
+    android:label="LNUrlWithdrawFragment">
+    <argument
+      android:name="url"
+      app:argType="fr.acinq.phoenix.utils.LNUrlWithdraw" />
+  </dialog>
 
 </navigation>

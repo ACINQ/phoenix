@@ -131,6 +131,7 @@
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Paste payment request</string>
+  <string name="send_init_reading">Reading scan…</string>
 
   <string name="send_balance_prefix">Balance:</string>
   <string name="send_use_all_balance">Send all</string>
@@ -161,7 +162,8 @@
   <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
-  <string name="scan_error_lnurl_unsupported">LNURL is not supported yet!</string>
+  <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
+  <string name="scan_error_lnurl_pay_failed">There was an error when retrieving the invoice from this merchant.\n\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -416,6 +418,27 @@
   <string name="lnurl_login_instructions">Log in to %1$s</string>
   <string name="lnurl_login_button">Log in</string>
   <string name="lnurl_login_in_progress">Logging in, please wait…</string>
+
+  <!-- //////////////// ln url pay //////////////// -->
+
+  <string name="lnurl_pay_wait">Retrieving payment details…</string>
+  <string name="lnurl_pay_error_remote">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_remote_code">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_missing_callback">There was an error when handling this invoice. Please try again later.</string>
+
+  <!-- //////////////// ln url withdraw //////////////// -->
+
+  <string name="lnurl_withdraw_amount_label">Amount to receive</string>
+  <string name="lnurl_withdraw_description_label">Details</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[You can withdraw funds from<br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Withdraw</string>
+  <string name="lnurl_withdraw_wait">Retrieving withdrawal details…</string>
+  <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
+  <string name="lnurl_withdraw_error_amount">Generic amount error</string>
+  <string name="lnurl_withdraw_error_internal">There was an error. Please try again.</string>
+  <string name="lnurl_withdraw_error_callback_remote">Error from %1$s (%2$s).\n\nTry again or contact their support.</string>
+  <string name="lnurl_withdraw_error_json">Invalid data</string>
+  <string name="lnurl_withdraw_error_generic">General failure</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
