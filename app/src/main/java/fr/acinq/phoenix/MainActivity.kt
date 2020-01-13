@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
       appKit.reconnect()
     }
 
-    override fun onLosing(network: Network?, maxMsToLive: Int) {
+    override fun onLosing(network: Network, maxMsToLive: Int) {
       super.onLosing(network, maxMsToLive)
       log.info("losing network....")
     }

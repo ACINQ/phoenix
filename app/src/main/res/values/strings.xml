@@ -125,8 +125,9 @@
   <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
   <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
   <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accept</string>
+  <string name="receive_with_open_accept">Accept (expires in %1$ds)</string>
   <string name="receive_with_open_decline">Decline</string>
+  <string name="receive_with_open_expired">Request has expired!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -192,6 +193,7 @@
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
+  <string name="btn_close">Close</string>
 
   <string name="copied">Copied to clipboard!</string>
 
