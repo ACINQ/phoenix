@@ -315,7 +315,9 @@ class PaymentDetailsViewModel : ViewModel() {
 
   val expiredAt: LiveData<String> = Transformations.map(payment) {
     if (it != null && it.isRight && it.right().get().paymentRequest().expiry().isDefined) {
-      DateFormat.getDateTimeInstance().format(it.right().get().paymentRequest().expiry().get())
+      val expiry = it.right().get().paymentRequest().expiry().get() as Long
+      val timestamp = it.right().get().paymentRequest().timestamp()
+      DateFormat.getDateTimeInstance().format(1000 * (timestamp + expiry))
     } else {
       ""
     }
