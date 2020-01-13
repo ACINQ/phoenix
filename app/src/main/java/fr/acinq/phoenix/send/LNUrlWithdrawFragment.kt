@@ -22,19 +22,20 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentLnurlWithdrawBinding
-import fr.acinq.phoenix.receive.PaymentGenerationState
 import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -45,18 +46,17 @@ import org.slf4j.LoggerFactory
 import scala.Option
 import java.io.IOException
 
-class LNUrlWithdrawFragment : DialogFragment() {
-  val log: Logger = LoggerFactory.getLogger(this::class.java)
+class LNUrlWithdrawFragment : BaseFragment() {
+  override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentLnurlWithdrawBinding
-  private lateinit var appKit: AppKitModel
   private lateinit var model: LNUrlWithdrawViewModel
   private val args: LNUrlWithdrawFragmentArgs by navArgs()
 
   private lateinit var unitList: List<String>
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    mBinding = FragmentLnurlWithdrawBinding.inflate(inflater, container, true)
+    mBinding = FragmentLnurlWithdrawBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
@@ -68,17 +68,15 @@ class LNUrlWithdrawFragment : DialogFragment() {
       model = ViewModelProvider(this).get(LNUrlWithdrawViewModel::class.java)
       mBinding.model = model
 
-      context?.let {
-        unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
-        ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
-          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-          mBinding.amountUnit.adapter = adapter
-        }
-        val unit = Prefs.getCoinUnit(it)
-        mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
+      unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
+      ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        mBinding.amountUnit.adapter = adapter
       }
+      val unit = Prefs.getCoinUnit(it)
+      mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
 
-    } ?: dismiss()
+    } ?: findNavController().navigate(R.id.global_action_any_to_main)
     model.url.value = args.url
   }
 
@@ -91,30 +89,17 @@ class LNUrlWithdrawFragment : DialogFragment() {
       override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
       override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        try {
-          val unit = mBinding.amountUnit.selectedItem.toString()
-          val amountInput = mBinding.amountValue.text.toString()
-          mBinding.amountError.text = ""
-          val fiat = Prefs.getFiatCurrency(context!!)
-          val amount = if (unit == fiat) {
-            Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
-          } else {
-            Converter.string2Msat_opt(amountInput, unit)
-          }
-          if (amount.isDefined) {
-            if (unit == fiat) {
-              mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), context!!, withUnit = true))
-            } else {
-              mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount.get(), withUnit = true))
-            }
-          } else {
-            throw RuntimeException("amount is undefined")
-          }
-        } catch (e: Exception) {
-          mBinding.amountError.text = getString(R.string.lnurl_withdraw_error_amount)
-        }
+        checkAmount()
       }
     })
+
+    mBinding.amountUnit.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+
+      override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        checkAmount()
+      }
+    }
 
     model.url.value?.let {
       try {
@@ -122,30 +107,57 @@ class LNUrlWithdrawFragment : DialogFragment() {
         mBinding.confirmButton.setOnClickListener { _ -> sendWithdrawToRemote(url.newBuilder().addEncodedQueryParameter("k1", it.walletIdentifier), it.description) }
         mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, url.topPrivateDomain()))
         context?.let { ctx -> mBinding.amountValue.setText(Converter.printAmountRaw(it.maxWithdrawable, ctx)) }
+        model.editableAmount.value = it.maxWithdrawable.toLong() != it.minWithdrawable.toLong()
       } catch (e: Exception) {
         log.error("error when reading lnurl-withdraw=$it")
-        dismiss()
+        model.state.value = LNUrlWithdrawState.ERROR
+        mBinding.error.text = getString(R.string.lnurl_withdraw_error_unreadable)
       }
+    }
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.global_action_any_to_main) })
+  }
+
+  private fun checkAmount(): Option<MilliSatoshi> {
+    return try {
+      val unit = mBinding.amountUnit.selectedItem.toString()
+      val amountInput = mBinding.amountValue.text.toString()
+      mBinding.amountError.text = ""
+      val fiat = Prefs.getFiatCurrency(context!!)
+      val amountOpt = if (unit == fiat) {
+        Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
+      } else {
+        Converter.string2Msat_opt(amountInput, unit)
+      }
+      if (amountOpt.isDefined) {
+        val amount = amountOpt.get()
+        if (amount.`$less`(args.url.minWithdrawable)) {
+          throw LNUrlWithdrawAtLeastMinSat(args.url.minWithdrawable)
+        } else if (amount.`$greater`(args.url.maxWithdrawable)) {
+          throw LNUrlWithdrawAtMostMaxSat(args.url.maxWithdrawable)
+        }
+        if (unit == fiat) {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, context!!, withUnit = true))
+        } else {
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount, withUnit = true))
+        }
+      } else {
+        throw RuntimeException("amount is undefined")
+      }
+      amountOpt
+    } catch (e: Exception) {
+      mBinding.amountConverted.text = ""
+      mBinding.amountError.text = when (e) {
+        is LNUrlWithdrawAtLeastMinSat -> getString(R.string.lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
+        is LNUrlWithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, context!!, withUnit = true) } ?: "")
+        else -> getString(R.string.lnurl_withdraw_error_amount)
+      }
+      Option.empty<MilliSatoshi>()
     }
   }
 
   private fun handleRemoteError(message: String) {
     model.state.postValue(LNUrlWithdrawState.ERROR)
     mBinding.error.text = message
-  }
-
-  private fun extractAmount(): Option<MilliSatoshi> {
-    val unit = mBinding.amountUnit.selectedItem
-    return if (unit == null || context == null) {
-      Option.empty()
-    } else {
-      val amount = mBinding.amountValue.text.toString()
-      if (unit == Prefs.getFiatCurrency(context!!)) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amount))
-      } else {
-        Converter.string2Msat_opt(amount, unit.toString())
-      }
-    }
   }
 
   private fun sendWithdrawToRemote(urlBuilder: HttpUrl.Builder, description: String) {
@@ -156,11 +168,9 @@ class LNUrlWithdrawFragment : DialogFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       if (model.state.value == LNUrlWithdrawState.INIT) {
-        model.state.value = LNUrlWithdrawState.IN_PROGRESS
-        val amount = extractAmount()
-        if (amount.isEmpty) {
-          handleRemoteError(getString(R.string.lnurl_withdraw_error_amount))
-        } else {
+        val amount = checkAmount()
+        if (!amount.isEmpty) {
+          model.state.value = LNUrlWithdrawState.IN_PROGRESS
           val pr = appKit.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
           val url = urlBuilder
             .addEncodedQueryParameter("pr", PaymentRequest.write(pr))
@@ -190,14 +200,9 @@ class LNUrlWithdrawFragment : DialogFragment() {
             }
           })
         }
-
       }
     }
-
-
-
   }
-
 }
 
 enum class LNUrlWithdrawState {
@@ -209,5 +214,5 @@ class LNUrlWithdrawViewModel : ViewModel() {
 
   val state = MutableLiveData(LNUrlWithdrawState.INIT)
   val url = MutableLiveData<LNUrlWithdraw>()
-
+  val editableAmount = MutableLiveData(true)
 }

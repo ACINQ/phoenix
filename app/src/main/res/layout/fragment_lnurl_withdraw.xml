@@ -38,6 +38,14 @@
       android:layout_height="wrap_content"
       android:paddingBottom="@dimen/space_xs">
 
+      <fr.acinq.phoenix.utils.customviews.ActionBarView
+        android:id="@+id/action_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
       <TextView
         android:id="@+id/service_host"
         android:layout_width="0dp"
@@ -50,7 +58,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/action_bar" />
 
       <TextView
         android:id="@+id/amount_label"
@@ -80,7 +88,7 @@
         android:singleLine="true"
         android:textAlignment="viewEnd"
         android:textSize="48sp"
-        app:enableOrFade="@{model.state == LNUrlWithdrawState.INIT}"
+        app:enableOrFade="@{model.state == LNUrlWithdrawState.INIT &amp;&amp; model.editableAmount}"
         app:layout_constrainedHeight="true"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@id/amount_unit"
@@ -94,7 +102,7 @@
         style="@style/default_spinnerStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_xs"
+        android:layout_marginStart="@dimen/space_xxs"
         app:enableOrFade="@{model.state == LNUrlWithdrawState.INIT}"
         app:layout_constraintBaseline_toBaselineOf="@id/amount_value"
         app:layout_constraintEnd_toEndOf="parent"
@@ -132,7 +140,6 @@
         android:textAlignment="center"
         android:textColor="?attr/negativeColor"
         android:textSize="@dimen/text_md"
-        android:visibility="gone"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -195,26 +202,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
-
-      <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/cancel_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="confirm_button,processing,error" />
-
-      <fr.acinq.phoenix.utils.customviews.ButtonView
-        android:id="@+id/cancel_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_md"
-        android:backgroundTint="@color/transparent"
-        android:visibility="@{model.state != LNUrlWithdrawState.DONE}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cancel_barrier"
-        app:text="@string/btn_cancel"
-        app:text_color="?attr/mutedTextColor" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
