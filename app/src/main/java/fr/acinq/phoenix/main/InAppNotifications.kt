@@ -23,7 +23,6 @@ enum class InAppNotifications(val priority: Int, val messageResId: Int, val imag
   UPGRADE_WALLET_CRITICAL(1, R.string.inappnotif_upgrade_critical, R.drawable.ic_alert_triangle, null),
   MNEMONICS_NEVER_SEEN(2, R.string.inappnotif_mnemonics_never_seen, R.drawable.ic_alert_triangle, R.string.inappnotif_mnemonics_never_seen_action),
   NO_PIN_SET(3, R.string.inappnotif_set_up_pin, R.drawable.ic_unlock, R.string.inappnotif_set_up_pin_action),
-  MNEMONICS_REMINDER(3, R.string.inappnotif_mnemonics_reminder, R.drawable.ic_alert_triangle, null),
   BACKGROUND_WORKER_CANNOT_RUN(3, R.string.inappnotif_background_worker_cannot_run, R.drawable.ic_battery_charging, null),
   UPGRADE_WALLET(3, R.string.inappnotif_upgrade, R.drawable.ic_refresh, null),
 }
