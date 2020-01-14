@@ -91,6 +91,9 @@ class ReceiveFragment : BaseFragment() {
     model.invoice.observe(viewLifecycleOwner, Observer {
       if (it != null) {
         model.generateQrCodeBitmap()
+        mBinding.rawInvoice.text = if (it.second == null) PaymentRequest.write(it.first) else it.second
+      } else {
+        mBinding.rawInvoice.text = ""
       }
     })
 

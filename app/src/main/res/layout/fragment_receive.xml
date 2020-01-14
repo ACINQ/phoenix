@@ -211,7 +211,7 @@
           android:layout_width="224dp"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginEnd="@dimen/space_lg"
           android:adjustViewBounds="true"
           android:background="@drawable/rounded_border_primary_white_bg"
@@ -227,14 +227,54 @@
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-          android:id="@+id/power_save_mode_warning"
-          android:layout_width="match_parent"
+          android:id="@+id/raw_invoice_label"
+          style="@style/MutedLabelView"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textAlignment="center"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:text="@string/receive_address_label"
+          android:visibility="@{model.state == SwapInState.DONE}"
+          app:layout_constraintBaseline_toBaselineOf="@id/raw_invoice"
+          app:layout_constraintEnd_toStartOf="@id/raw_invoice"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+          android:id="@+id/raw_invoice"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:maxLines="3"
+          android:ellipsize="none"
+          android:fontFamily="monospace"
+          android:textIsSelectable="true"
+          android:textSize="@dimen/text_md"
+          android:visibility="@{model.state == SwapInState.DONE}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/raw_invoice_label"
           app:layout_constraintTop_toBottomOf="@id/qr_image"
-          android:text="power save mode on!"
-          android:visibility="@{model.isPowerSavingMode() &amp;&amp; model.state == PaymentGenerationState.DONE}" />
+          app:layout_goneMarginTop="@dimen/space_md" />
+
+        <TextView
+          android:id="@+id/power_save_mode_warning"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:text="@string/receive_power_save_disclaimer"
+          android:textAlignment="center"
+          android:textColor="?attr/mutedTextColor"
+          android:textSize="@dimen/text_sm"
+          android:visibility="gone"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/raw_invoice" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"

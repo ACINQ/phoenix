@@ -106,6 +106,9 @@
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
+  <string name="receive_address_label">Address</string>
+  <string name="receive_power_save_disclaimer">You\'re in power save mode. To receive the payment make sure that the app is allowed to run in background.</string>
+
   <string name="receive_swap_in_button">Show a bitcoin address</string>
   <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
   <string name="receive_swap_in_progress_message">Requesting a swap-in bitcoin address…</string>
