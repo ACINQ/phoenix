@@ -426,6 +426,11 @@
     <argument
       android:name="url"
       app:argType="fr.acinq.phoenix.utils.LNUrlWithdraw" />
+    <action
+      android:id="@+id/action_lnurl_withdraw_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
   </fragment>
 
 </navigation>

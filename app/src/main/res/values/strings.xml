@@ -108,6 +108,7 @@
 
   <string name="receive_address_label">Address</string>
   <string name="receive_power_save_disclaimer">You\'re in power save mode. To receive the payment make sure that the app is allowed to run in background.</string>
+  <string name="receive_withdraw_button">Withdraw with LNURL</string>
 
   <string name="receive_swap_in_button">Show a bitcoin address</string>
   <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
@@ -436,7 +437,7 @@
   <string name="lnurl_withdraw_description_label">Details</string>
   <string name="lnurl_withdraw_service_host_label"><![CDATA[You can withdraw funds from<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Withdraw</string>
-  <string name="lnurl_withdraw_wait">Retrieving withdrawal details…</string>
+  <string name="lnurl_withdraw_wait">Requesting funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
   <string name="lnurl_withdraw_error_unreadable">Invoice is invalid. Please try again.</string>
   <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>

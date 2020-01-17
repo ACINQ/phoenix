@@ -183,6 +183,10 @@ class ReceiveFragment : BaseFragment() {
         .show()
     }
 
+    mBinding.withdrawButton.setOnClickListener {
+      findNavController().navigate(R.id.global_action_any_to_read_input)
+    }
+
     mBinding.actionBar.setOnBackAction(View.OnClickListener { handleBackAction() })
 
     if (model.state.value == PaymentGenerationState.INIT) {

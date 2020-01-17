@@ -76,7 +76,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
       val unit = Prefs.getCoinUnit(it)
       mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
 
-    } ?: findNavController().navigate(R.id.global_action_any_to_main)
+    } ?: findNavController().navigate(R.id.action_lnurl_withdraw_to_main)
     model.url.value = args.url
   }
 
@@ -114,7 +114,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         mBinding.error.text = getString(R.string.lnurl_withdraw_error_unreadable)
       }
     }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.global_action_any_to_main) })
+    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_lnurl_withdraw_to_main) })
   }
 
   private fun checkAmount(): Option<MilliSatoshi> {
