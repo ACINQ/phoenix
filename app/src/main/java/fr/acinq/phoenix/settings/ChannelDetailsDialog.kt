@@ -103,23 +103,6 @@ class ChannelDetailsDialog : DialogFragment() {
     }
   }
 
-  private fun shareChannelsData(list: MutableList<RES_GETINFO>) {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when serializing channels: ", exception)
-      context?.run { Toast.makeText(this, R.string.listallchannels_serialization_error, Toast.LENGTH_SHORT).show() }
-    }) {
-      withContext(this.coroutineContext + Dispatchers.Default) {
-        val data = list.joinToString("\n\n", "", "", -1) { `default$`.`MODULE$`.write(it, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter()) }
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.listallchannels_share_subject))
-        shareIntent.putExtra(Intent.EXTRA_TEXT, data)
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.listallchannels_share_title)))
-      }
-    }
-  }
-
-
   private fun getChannel() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when retrieving channel: ", exception)
