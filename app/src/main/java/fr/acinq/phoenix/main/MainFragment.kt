@@ -187,11 +187,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       appKit.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
       appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
-      if (System.currentTimeMillis() - timestamp > Constants.MNEMONICS_REMINDER_INTERVAL) {
-        appKit.notifications.value?.add(InAppNotifications.MNEMONICS_REMINDER)
-      } else {
-        appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_REMINDER)
-      }
     }
   }
 

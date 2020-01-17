@@ -32,6 +32,8 @@ class LNUrlUnhandledTag(tag: String) : RuntimeException("unhandled LNURL tag=$ta
 class LNUrlRemoteFailure(message: String) : RuntimeException(message)
 class LNUrlRemoteError(message: String) : RuntimeException(message)
 class LNUrlAuthMissingK1 : RuntimeException("missing parameter k1 in LNURL-auth url")
+class LNUrlWithdrawAtLeastMinSat(val min: MilliSatoshi) : RuntimeException()
+class LNUrlWithdrawAtMostMaxSat(val max: MilliSatoshi) : RuntimeException()
 
 interface LNUrl {
 
@@ -107,7 +109,5 @@ interface LNUrl {
 class LNUrlAuth(val callback: String, val k1: String) : LNUrl, Parcelable
 
 @Parcelize
-class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String, val description: String, val minWithdrawable: MilliSatoshi, val maxWithdrawable: MilliSatoshi) : LNUrl,
-                                                                                                                                                                                             Parcelable {
-
-}
+class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,
+  val description: String, val minWithdrawable: MilliSatoshi, val maxWithdrawable: MilliSatoshi) : LNUrl, Parcelable

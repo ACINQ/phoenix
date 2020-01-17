@@ -37,7 +37,6 @@ object Constants {
   // -- intents
   const val INTENT_CAMERA_PERMISSION_REQUEST = 1
 
-  const val MNEMONICS_REMINDER_INTERVAL = DateUtils.DAY_IN_MILLIS * 30
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
 
   // -- android notifications

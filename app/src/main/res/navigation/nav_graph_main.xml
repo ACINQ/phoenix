@@ -264,7 +264,9 @@
       app:destination="@+id/lnurl_pay" />
     <action
       android:id="@+id/action_read_input_to_lnurl_withdraw"
-      app:destination="@+id/lnurl_witdhraw" />
+      app:destination="@+id/lnurl_withdraw"
+      app:launchSingleTop="true"
+      app:popUpTo="@+id/main_fragment" />
   </fragment>
 
   <!-- settings/tools page -->
@@ -417,13 +419,18 @@
   </dialog>
 
   <!-- LNURL: withdraw -->
-  <dialog
-    android:id="@+id/lnurl_witdhraw"
+  <fragment
+    android:id="@+id/lnurl_withdraw"
     android:name="fr.acinq.phoenix.send.LNUrlWithdrawFragment"
     android:label="LNUrlWithdrawFragment">
     <argument
       android:name="url"
       app:argType="fr.acinq.phoenix.utils.LNUrlWithdraw" />
-  </dialog>
+    <action
+      android:id="@+id/action_lnurl_withdraw_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
 
 </navigation>

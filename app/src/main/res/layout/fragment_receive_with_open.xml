@@ -153,6 +153,7 @@
         android:layout_marginEnd="@dimen/space_lg"
         android:text="@string/receive_with_open_cost"
         android:textAlignment="center"
+        android:visibility="@{!model.hasExpired}"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -165,14 +166,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cost" />
 
+      <TextView
+        android:id="@+id/expired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:padding="@dimen/space_sm"
+        android:text="@string/receive_with_open_expired"
+        android:textAlignment="center"
+        android:visibility="@{model.hasExpired}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accept_separator" />
+
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/accept_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
+        android:visibility="@{!model.hasExpired}"
         app:icon="@drawable/ic_check_circle"
         app:icon_tint="?attr/positiveColor"
-        app:layout_constraintTop_toBottomOf="@id/accept_separator"
+        app:layout_constraintTop_toBottomOf="@id/expired"
         app:text="@string/receive_with_open_accept"
         app:text_color="?attr/positiveColor" />
 
@@ -183,14 +200,25 @@
         app:layout_constraintTop_toBottomOf="@id/accept_button" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/dismiss_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg_square"
+        android:textAlignment="center"
+        android:visibility="@{model.hasExpired}"
+        app:icon="@drawable/ic_cross_circle"
+        app:layout_constraintTop_toBottomOf="@id/decline_separator"
+        app:text="@string/btn_close" />
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/decline_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
+        android:visibility="@{!model.hasExpired}"
         app:icon="@drawable/ic_cross_circle"
         app:layout_constraintTop_toBottomOf="@id/decline_separator"
         app:text="@string/receive_with_open_decline" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

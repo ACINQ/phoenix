@@ -91,6 +91,9 @@ class ReceiveFragment : BaseFragment() {
     model.invoice.observe(viewLifecycleOwner, Observer {
       if (it != null) {
         model.generateQrCodeBitmap()
+        mBinding.rawInvoice.text = if (it.second == null) PaymentRequest.write(it.first) else it.second
+      } else {
+        mBinding.rawInvoice.text = ""
       }
     })
 
@@ -178,6 +181,10 @@ class ReceiveFragment : BaseFragment() {
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()
+    }
+
+    mBinding.withdrawButton.setOnClickListener {
+      findNavController().navigate(R.id.global_action_any_to_read_input)
     }
 
     mBinding.actionBar.setOnBackAction(View.OnClickListener { handleBackAction() })

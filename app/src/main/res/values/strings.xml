@@ -106,6 +106,10 @@
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
+  <string name="receive_address_label">Address</string>
+  <string name="receive_power_save_disclaimer">You\'re in power save mode. To receive the payment make sure that the app is allowed to run in background.</string>
+  <string name="receive_withdraw_button">Withdraw with LNURL</string>
+
   <string name="receive_swap_in_button">Show a bitcoin address</string>
   <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
   <string name="receive_swap_in_progress_message">Requesting a swap-in bitcoin address…</string>
@@ -125,8 +129,9 @@
   <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
   <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
   <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accept</string>
+  <string name="receive_with_open_accept">Accept (expires in %1$ds)</string>
   <string name="receive_with_open_decline">Decline</string>
+  <string name="receive_with_open_expired">Request has expired!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -192,6 +197,7 @@
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
+  <string name="btn_close">Close</string>
 
   <string name="copied">Copied to clipboard!</string>
 
@@ -300,7 +306,6 @@
   <string name="inappnotif_set_up_pin_action">Set a PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
-  <string name="inappnotif_mnemonics_reminder">For a safe usage, make sure that you have safely backed up your wallet.</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
   <string name="inappnotif_upgrade">A new version of the wallet is available.</string>
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
@@ -432,9 +437,12 @@
   <string name="lnurl_withdraw_description_label">Details</string>
   <string name="lnurl_withdraw_service_host_label"><![CDATA[You can withdraw funds from<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Withdraw</string>
-  <string name="lnurl_withdraw_wait">Retrieving withdrawal details…</string>
+  <string name="lnurl_withdraw_wait">Requesting funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
-  <string name="lnurl_withdraw_error_amount">Generic amount error</string>
+  <string name="lnurl_withdraw_error_unreadable">Invoice is invalid. Please try again.</string>
+  <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
+  <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
+  <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
   <string name="lnurl_withdraw_error_internal">There was an error. Please try again.</string>
   <string name="lnurl_withdraw_error_callback_remote">Error from %1$s (%2$s).\n\nTry again or contact their support.</string>
   <string name="lnurl_withdraw_error_json">Invalid data</string>

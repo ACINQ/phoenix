@@ -33,12 +33,6 @@
     android:layout_height="wrap_content"
     tools:context=".settings.ChannelDetailsDialog">
 
-    <androidx.constraintlayout.widget.Group
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:visibility="@{model.state == ChannelDetailsState.DONE}"
-      app:constraint_referenced_ids="copy_button,share_button,close_button,raw_data_layout" />
-
     <ScrollView
       android:id="@+id/raw_data_layout"
       android:layout_width="match_parent"
@@ -57,6 +51,7 @@
           android:id="@+id/raw_data"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:fontFamily="monospace"
           android:padding="@dimen/space_md"
           android:textIsSelectable="true"
           android:textSize="@dimen/text_xs"
@@ -76,11 +71,11 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:background="@drawable/button_bg_square"
+      android:contentDescription="@string/listallchannels_copy"
       android:padding="@dimen/space_md"
       app:icon="@drawable/ic_copy"
       app:layout_constrainedWidth="true"
       app:layout_constraintHorizontal_bias="0"
-      android:contentDescription="@string/listallchannels_copy"
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
@@ -90,9 +85,9 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:background="@drawable/button_bg_square"
+      android:contentDescription="@string/listallchannels_share"
       android:padding="@dimen/space_md"
       app:icon="@drawable/ic_share"
-      android:contentDescription="@string/listallchannels_share"
       app:layout_constrainedWidth="true"
       app:layout_constraintStart_toEndOf="@id/copy_button"
       app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
@@ -103,27 +98,37 @@
       android:layout_height="wrap_content"
       android:background="@drawable/button_bg_square"
       android:padding="@dimen/space_md"
-      app:text="@string/listallchannels_close"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout"
+      app:text="@string/listallchannels_close" />
 
     <TextView
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
+      android:background="@drawable/rounded"
+      android:backgroundTint="@color/white_mid_op"
+      android:padding="@dimen/space_md_p"
       android:text="@string/channel_loading"
       android:textAlignment="center"
       android:visibility="@{model.state == ChannelDetailsState.INIT || model.state == ChannelDetailsState.IN_PROGRESS}"
+      app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
-      android:text="@string/channel_loading"
+      android:background="@drawable/rounded"
+      android:backgroundTint="@color/white_mid_op"
+      android:padding="@dimen/space_md_p"
+      android:text="@string/channel_error"
       android:textAlignment="center"
       android:visibility="@{model.state == ChannelDetailsState.ERROR}"
+      app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
