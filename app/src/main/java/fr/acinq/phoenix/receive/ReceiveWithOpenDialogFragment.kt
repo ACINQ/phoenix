@@ -18,6 +18,7 @@ package fr.acinq.phoenix.receive
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -29,14 +30,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.AppKitModel
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReceiveWithOpenBinding
 import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 
 open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
@@ -70,10 +72,24 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    object : CountDownTimer(30000, 1000) {
+      override fun onTick(millisUntilFinished: Long) {
+        mBinding.acceptButton.setText(getString(R.string.receive_with_open_accept, millisUntilFinished / 1000))
+      }
+
+      override fun onFinish() {
+        log.info("pay to open with payment_hash=${args.paymentHash} has expired and is declined")
+        model.hasExpired.value = true
+        appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+      }
+    }.start()
+
     context?.let {
       mBinding.amountValue.text = Converter.printAmountPretty(MilliSatoshi(args.amountMsat), it, withUnit = true)
       mBinding.amountFiat.text = Converter.html(getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, MilliSatoshi(args.amountMsat), withUnit = true)))
-      mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost, Converter.printAmountPretty(Satoshi(args.feeSat), it, withUnit = true), Converter.printFiatPretty(it, Converter.any2Msat(Satoshi(args.feeSat)), withUnit = true)))
+      mBinding.cost.text = Html.fromHtml(getString(R.string.receive_with_open_cost,
+        Converter.printAmountPretty(Satoshi(args.feeSat), it, withUnit = true),
+        Converter.printFiatPretty(it, Converter.any2Msat(Satoshi(args.feeSat)), withUnit = true)))
     }
   }
 
@@ -89,6 +105,7 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
       dismiss()
     }
+    mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.helpButton.setOnClickListener {
       model.showHelp.value?.let {
         model.showHelp.value = !it
@@ -110,4 +127,5 @@ class ReceiveWithOpenViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveWithOpenViewModel::class.java)
 
   val showHelp = MutableLiveData(false)
+  val hasExpired = MutableLiveData(false)
 }

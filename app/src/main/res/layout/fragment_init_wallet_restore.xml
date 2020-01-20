@@ -45,39 +45,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="@{model.state == RestoreSeedState.INIT}"
-        app:constraint_referenced_ids="disclaimer_message, disclaimer_checkbox, disclaimer_button" />
+        app:constraint_referenced_ids="disclaimer_message,disclaimer_checkbox,disclaimer_button" />
 
       <TextView
         android:id="@+id/disclaimer_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
-        android:text="@string/restore_disclaimer_message" />
+        android:text="@string/restore_disclaimer_message"
+        app:layout_constraintTop_toTopOf="parent" />
 
       <CheckBox
         android:id="@+id/disclaimer_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
         android:layout_marginStart="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/disclaimer_message"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/space_md"
+        android:text="@string/restore_disclaimer_checkbox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
-        android:text="@string/restore_disclaimer_checkbox" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/disclaimer_message" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/disclaimer_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
-        app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:enableOrFade="@{model.userHasCheckedDisclaimer}"
         app:icon="@drawable/ic_arrow_next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
         app:text="@string/restore_disclaimer_next" />
 
       <androidx.constraintlayout.widget.Group
@@ -85,63 +85,63 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="@{model.state != RestoreSeedState.INIT}"
-        app:constraint_referenced_ids="instructions, mnemonics_layout, keyboard" />
+        app:constraint_referenced_ids="instructions,mnemonics_layout,keyboard" />
 
       <TextView
         android:id="@+id/instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="parent"
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
-        android:text="@string/restore_instructions" />
+        android:text="@string/restore_instructions"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mnemonics_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
         android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/instructions"
         android:background="@drawable/rounded_sm"
-        android:backgroundTint="?attr/mutedBgColor">
+        android:backgroundTint="?attr/mutedBgColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructions">
 
         <TextView
           android:id="@+id/mnemonics_input_label"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
-          app:layout_constraintTop_toTopOf="parent"
           android:paddingStart="@dimen/space_sm"
           android:paddingEnd="@dimen/space_sm"
           android:text="@string/restore_mnemonics_label"
           android:textColor="?attr/mutedTextColor"
-          android:textSize="@dimen/text_sm" />
+          android:textSize="@dimen/text_sm"
+          app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
           android:id="@+id/mnemonics_input"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintTop_toBottomOf="@id/mnemonics_input_label"
           android:paddingStart="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_sm" />
+          android:paddingEnd="@dimen/space_sm"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintTop_toBottomOf="@id/mnemonics_input_label" />
 
         <HorizontalScrollView
           android:id="@+id/autocomplete_scroll"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          app:layout_constraintTop_toBottomOf="@id/mnemonics_input"
           android:fadeScrollbars="false"
           android:fillViewport="true"
           android:scrollbarAlwaysDrawHorizontalTrack="true"
           android:scrollbarSize="4dp"
-          android:scrollbars="horizontal">
+          android:scrollbars="horizontal"
+          app:layout_constraintTop_toBottomOf="@id/mnemonics_input">
 
           <TextView
             android:id="@+id/autocomplete"
@@ -165,23 +165,23 @@
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/import_button"
         android:layout_width="wrap_content"
-        android:layout_marginTop="@dimen/space_lg"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/keyboard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/space_lg"
         android:visibility="@{model.state == RestoreSeedState.INPUT_DATA}"
         app:icon="@drawable/ic_check_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/keyboard"
         app:text="@string/restore_import_button" />
 
       <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/import_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:padding="@dimen/space_md"
         android:visibility="@{model.state == RestoreSeedState.IN_PROGRESS}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/import_button"
         app:text="@string/restore_in_progress" />
 
       <TextView
@@ -190,21 +190,18 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mnemonics_layout"
         android:background="@drawable/rounded"
         android:clickable="true"
         android:elevation="4dp"
         android:focusable="true"
         android:padding="@dimen/space_md"
         android:text="@string/restore_error"
-        android:visibility="@{model.state == RestoreSeedState.ERROR}" />
+        android:visibility="@{model.state == RestoreSeedState.ERROR}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
   </ScrollView>
-
-
 </layout>

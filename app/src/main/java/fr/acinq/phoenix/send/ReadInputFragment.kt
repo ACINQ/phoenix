@@ -28,6 +28,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.common.base.Strings
@@ -92,11 +94,9 @@ class ReadInputFragment : BaseFragment() {
             }
           }
           is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
+          is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it))
           is LNUrl -> {
-            if (it.isLogin()) {
-              // findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.uri.toString()))
-            }
-            log.info("cannot handle LNURL=${it.uri}")
+            log.info("unhandled LNURL=${it}")
             model.readingState.postValue(ReadingState.ERROR)
             model.errorMessage.postValue(R.string.scan_error_lnurl_unsupported)
           }
@@ -107,7 +107,7 @@ class ReadInputFragment : BaseFragment() {
     model.readingState.observe(viewLifecycleOwner, Observer {
       when (it) {
         ReadingState.ERROR -> {
-          mBinding.scanView.resume()
+          mBinding.scanView.pause()
           Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1750)
         }
         ReadingState.READING -> {
@@ -140,6 +140,7 @@ class ReadInputFragment : BaseFragment() {
     mBinding.pasteButton.setOnClickListener {
       context?.let { model.checkAndSetPaymentRequest(ClipboardHelper.read(it)) }
     }
+
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
     context?.let {
       if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -168,6 +169,9 @@ class ReadInputFragment : BaseFragment() {
   }
 
   private fun startScanning() {
+    if (model.readingState.value == ReadingState.ERROR || model.readingState.value == ReadingState.DONE) {
+      model.readingState.postValue(ReadingState.SCANNING)
+    }
     mBinding.scanView.decodeContinuous(object : BarcodeCallback {
       override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) {
       }

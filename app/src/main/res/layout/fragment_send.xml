@@ -32,7 +32,6 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mutedBgColor"
     android:fillViewport="true"
     android:overScrollMode="never"
     tools:context=".send.SendFragment">
@@ -79,6 +78,7 @@
         android:id="@+id/action_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -358,9 +358,9 @@
           android:layout_marginEnd="@dimen/space_lg"
           android:paddingTop="@dimen/space_lg"
           android:paddingBottom="@dimen/space_lg"
+          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
           app:layout_constraintTop_toBottomOf="@id/swap_button">
 
           <TextView

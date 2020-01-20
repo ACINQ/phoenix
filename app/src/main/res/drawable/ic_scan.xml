@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2019 ACINQ SAS
+  ~ Copyright 2020 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="64dp"
-  android:height="64dp"
+  android:width="@dimen/button_height"
+  android:height="@dimen/button_height"
   android:viewportWidth="64"
   android:viewportHeight="64">
   <path
-    android:fillColor="?attr/bgColor"
-    android:pathData="M64,64H0V56Q0,44 12,38L52,18Q64,12 64,0Z" />
+    android:fillColor="?attr/textColor"
+    android:pathData="M11,14v11h5v-9h9v-5H14a3,3 0,0 0,-3 3zM14,53h11v-5h-9v-9h-5v11a3,3 0,0 0,3 3zM53,49.998V39h-5v9h-9v5h11c1.657,0 3,-1.345 3,-3.002zM49.997,11H39v5h9v9h5V14c0,-1.657 -1.346,-3 -3.003,-3z" />
 </vector>

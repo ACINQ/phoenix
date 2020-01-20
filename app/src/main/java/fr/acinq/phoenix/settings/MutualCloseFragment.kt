@@ -81,7 +81,7 @@ class MutualCloseFragment : BaseFragment() {
         model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
         context?.let {
-          val balance = appKit.nodeData.value?.balance ?: MilliSatoshi(0)
+          val balance = appKit.balance.value ?: MilliSatoshi(0)
           mBinding.channelsState.text = Converter.html(getString(R.string.closechannels_channels_recap, channels.count(), Converter.printAmountPretty(balance, it, withUnit = true)))
         }
         model.state.value = PreChannelsCloseState.READY
@@ -116,6 +116,7 @@ class MutualCloseViewModel : ViewModel() {
 
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<ChannelsCloseBaseState>()
+  val addressInput = MutableLiveData<String>()
 
   init {
     state.value = PreChannelsCloseState.CHECKING_CHANNELS

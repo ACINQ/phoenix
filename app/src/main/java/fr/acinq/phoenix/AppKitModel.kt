@@ -85,8 +85,9 @@ import scala.collection.immutable.List as ScalaList
 
 data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
 data class SwapInSettings(var feePercent: Double)
-data class NodeData(var balance: MilliSatoshi, var electrumAddress: String, var blockHeight: Int, var tipTime: Long)
 data class Xpub(val xpub: String, val path: String)
+data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
+data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
 class AppKit(val kit: Kit, val api: Eclair, val xpub: Xpub)
 enum class StartupState {
   OFF, IN_PROGRESS, DONE, ERROR
@@ -100,7 +101,9 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
-  val networkAvailable = MutableLiveData(false)
+  val currentURIIntent = MutableLiveData<String>()
+  val currentNav = MutableLiveData<Int>()
+  val networkInfo = MutableLiveData<NetworkInfo>()
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
@@ -109,14 +112,16 @@ class AppKitModel : ViewModel() {
   val startupErrorMessage = MutableLiveData<String>()
   val trampolineSettings = MutableLiveData<TrampolineSettings>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
-  val nodeData = MutableLiveData<NodeData>()
+  val balance = MutableLiveData<MilliSatoshi>()
   private val _kit = MutableLiveData<AppKit>()
   val kit: LiveData<AppKit> get() = _kit
 
   init {
+    currentNav.value = R.id.startup_fragment
     _kit.value = null
     startupState.value = StartupState.OFF
-    nodeData.value = Constants.DEFAULT_NODE_DATA
+    networkInfo.value = Constants.DEFAULT_NETWORK_INFO
+    balance.value = MilliSatoshi(0)
     trampolineSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
     if (!EventBus.getDefault().isRegistered(this)) {
@@ -183,19 +188,17 @@ class AppKitModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
-    kit.value?.run {
-      nodeData.postValue(nodeData.value?.copy(balance = event.balance))
-    } ?: log.info("unhandled balance event with kit not initialized")
+    balance.postValue(event.balance)
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
+    networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
-    nodeData.value = nodeData.value?.copy(electrumAddress = "")
+    networkInfo.value = networkInfo.value?.copy(electrumServer = null)
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -291,8 +294,7 @@ class AppKitModel : ViewModel() {
           /* expiry seconds */ Option.empty(),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
-          /* payment preimage */ Option.empty(),
-          /* allow multi part payment */ true), timeout)
+          /* payment preimage */ Option.empty()), timeout)
       Await.result(f, awaitDuration) as PaymentRequest
     } ?: throw KitNotInitialized()
   }
@@ -457,9 +459,9 @@ class AppKitModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         kit.value?.run {
-          log.debug("sending reconnect to ACINQ actor")
-          kit.system().actorSelection("/system/user/*/switchboard/peer-${Wallet.ACINQ.nodeId()}").tell(Peer.`Reconnect$`.`MODULE$`, ActorRef.noSender())
-        } ?: log.info("appkit not ready yet")
+          log.info("sending connect to ACINQ actor")
+          kit.switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+        } ?: log.debug("appkit not ready yet")
       }
     }
   }
@@ -527,9 +529,8 @@ class AppKitModel : ViewModel() {
 
   public fun shutdown() {
     closeConnections()
-    trampolineSettings.postValue(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
-    swapInSettings.postValue(Constants.DEFAULT_SWAP_IN_SETTINGS)
-    nodeData.postValue(Constants.DEFAULT_NODE_DATA)
+    balance.postValue(MilliSatoshi(0))
+    networkInfo.postValue(Constants.DEFAULT_NETWORK_INFO)
     _kit.postValue(null)
     startupState.postValue(StartupState.OFF)
   }
@@ -704,17 +705,18 @@ class AppKitModel : ViewModel() {
             }
 
             // -- trampoline settings
-            val remoteTrampolineSettings = json.getJSONObject("trampoline").getJSONObject("v1")
-            trampolineSettings.postValue(TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(remoteTrampolineSettings.getLong("fee_base_sat"))),
-              feePercent = remoteTrampolineSettings.getDouble("fee_percent"),
-              hopsCount = remoteTrampolineSettings.getInt("hops_count"),
-              cltvExpiry = remoteTrampolineSettings.getInt("cltv_expiry")))
-            log.info("trampoline settings set to ${trampolineSettings.value}")
+            val trampolineJson = json.getJSONObject("trampoline").getJSONObject("v1")
+            val remoteTrampoline = TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(trampolineJson.getLong("fee_base_sat"))),
+              feePercent = trampolineJson.getDouble("fee_percent"),
+              hopsCount = trampolineJson.getInt("hops_count"),
+              cltvExpiry = trampolineJson.getInt("cltv_expiry"))
+            trampolineSettings.postValue(remoteTrampoline)
+            log.info("trampoline settings set to $remoteTrampoline")
 
             // -- swap-in settings
-            val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1")
-            swapInSettings.postValue(SwapInSettings(feePercent = remoteSwapInSettings.getDouble("fee_percent")))
-            log.info("swap_in settings set to ${swapInSettings.value}")
+            val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
+            swapInSettings.postValue(remoteSwapInSettings)
+            log.info("swap_in settings set to $remoteSwapInSettings")
           } catch (e: JSONException) {
             log.error("could not read wallet context body: ", e)
           }

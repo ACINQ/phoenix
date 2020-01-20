@@ -24,6 +24,7 @@
 
   <!-- theme background attributes -->
   <attr name="bgColor" format="reference" />
+  <attr name="altBgColor" format="reference" />
   <attr name="mutedBgColor" format="reference" />
 
   <!-- theme misc attributes -->

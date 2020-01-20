@@ -92,8 +92,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     appKit.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
     })
-    appKit.nodeData.observe(viewLifecycleOwner, Observer { nodeData ->
-      nodeData?.let { mBinding.balance.setAmount(it.balance) }
+    appKit.balance.observe(viewLifecycleOwner, Observer {
+      mBinding.balance.setAmount(it)
     })
     appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
       if (swapIns == null || swapIns.isEmpty()) {
@@ -120,6 +120,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
+    mBinding.storesButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/stores"))) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
 
     appKit.refreshPayments()
@@ -186,11 +187,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       appKit.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
       appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
-      if (System.currentTimeMillis() - timestamp > Constants.MNEMONICS_REMINDER_INTERVAL) {
-        appKit.notifications.value?.add(InAppNotifications.MNEMONICS_REMINDER)
-      } else {
-        appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_REMINDER)
-      }
     }
   }
 

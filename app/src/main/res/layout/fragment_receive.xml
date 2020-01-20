@@ -32,7 +32,6 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/mutedBgColor"
     android:fillViewport="true"
     android:overScrollMode="never"
     app:layout_constrainedHeight="true"
@@ -48,10 +47,11 @@
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
         app:layout_constraintStart_toStartOf="parent"
-        app:title="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_title : null}"
+        app:layout_constraintTop_toTopOf="parent"
         app:subtitle="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_subtitle : null}"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:title="@{model.state == PaymentGenerationState.EDITING_REQUEST ? @string/receive_edit_title : null}" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/invoice_params_layout"
@@ -211,7 +211,7 @@
           android:layout_width="224dp"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md_p"
           android:layout_marginEnd="@dimen/space_lg"
           android:adjustViewBounds="true"
           android:background="@drawable/rounded_border_primary_white_bg"
@@ -226,6 +226,56 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+          android:id="@+id/raw_invoice_label"
+          style="@style/MutedLabelView"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:text="@string/receive_address_label"
+          android:visibility="@{model.state == SwapInState.DONE}"
+          app:layout_constraintBaseline_toBaselineOf="@id/raw_invoice"
+          app:layout_constraintEnd_toStartOf="@id/raw_invoice"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+          android:id="@+id/raw_invoice"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:maxLines="3"
+          android:ellipsize="none"
+          android:fontFamily="monospace"
+          android:textIsSelectable="true"
+          android:textSize="@dimen/text_md"
+          android:visibility="@{model.state == SwapInState.DONE}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/raw_invoice_label"
+          app:layout_constraintTop_toBottomOf="@id/qr_image"
+          app:layout_goneMarginTop="@dimen/space_md" />
+
+        <TextView
+          android:id="@+id/power_save_mode_warning"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:text="@string/receive_power_save_disclaimer"
+          android:textAlignment="center"
+          android:textColor="?attr/mutedTextColor"
+          android:textSize="@dimen/text_sm"
+          android:visibility="gone"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/raw_invoice" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
@@ -236,7 +286,7 @@
           app:layout_constraintEnd_toStartOf="@id/share_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/qr_image" />
+          app:layout_constraintTop_toBottomOf="@id/power_save_mode_warning" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
@@ -285,6 +335,19 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
           app:text="@string/receive_swap_in_button" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/withdraw_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:visibility="@{model.state == PaymentGenerationState.DONE}"
+          app:icon="@drawable/ic_scan"
+          app:icon_tint="?attr/colorPrimary"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_in_button"
+          app:text="@string/receive_withdraw_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

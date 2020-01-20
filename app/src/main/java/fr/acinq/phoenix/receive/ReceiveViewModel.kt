@@ -44,11 +44,13 @@ class ReceiveViewModel : ViewModel() {
   val invoice = MutableLiveData<Pair<PaymentRequest, String?>>()
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<ReceiveState>()
+  val isPowerSavingMode = MutableLiveData<Boolean>()
 
   init {
     invoice.value = null
     bitmap.value = null
     state.value = PaymentGenerationState.INIT
+    isPowerSavingMode.value = false
   }
 
   @UiThread

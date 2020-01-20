@@ -45,7 +45,7 @@
   <!-- global to send -->
   <action
     android:id="@+id/global_action_any_to_send"
-    app:destination="@id/send"
+    app:destination="@id/send_fragment"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
   <!-- global to read input -->
@@ -71,6 +71,12 @@
       android:defaultValue="false"
       app:argType="boolean" />
   </action>
+  <!-- global to electrum server -->
+  <action
+    android:id="@+id/global_action_any_to_electrum"
+    app:destination="@id/electrum_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
 
   <!-- main fragment -->
   <fragment
@@ -227,7 +233,7 @@
 
   <!-- send money -->
   <fragment
-    android:id="@+id/send"
+    android:id="@+id/send_fragment"
     android:name="fr.acinq.phoenix.send.SendFragment"
     android:label="SendFragment">
     <action
@@ -250,9 +256,17 @@
       app:destination="@id/lnurl_login" />
     <argument
       android:name="payload"
+      android:defaultValue="@null"
       app:argType="string"
-      app:nullable="true"
-      android:defaultValue="@null" />
+      app:nullable="true" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_pay"
+      app:destination="@+id/lnurl_pay" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_withdraw"
+      app:destination="@+id/lnurl_withdraw"
+      app:launchSingleTop="true"
+      app:popUpTo="@+id/main_fragment" />
   </fragment>
 
   <!-- settings/tools page -->
@@ -262,13 +276,13 @@
     android:label="SettingsFragment">
     <action
       android:id="@+id/action_settings_to_mutual_close"
-      app:destination="@id/mutual_close" />
+      app:destination="@id/mutual_close_fragment" />
     <action
       android:id="@+id/action_settings_to_force_close"
-      app:destination="@id/force_close" />
+      app:destination="@id/force_close_fragment" />
     <action
       android:id="@+id/action_settings_to_list_channels"
-      app:destination="@id/list_channels" />
+      app:destination="@id/channels_list_fragment" />
     <action
       android:id="@+id/action_settings_to_display_seed"
       app:destination="@id/display_seed" />
@@ -288,19 +302,19 @@
 
   <!-- settings: mutual close all channels -->
   <fragment
-    android:id="@+id/mutual_close"
+    android:id="@+id/mutual_close_fragment"
     android:name="fr.acinq.phoenix.settings.MutualCloseFragment"
     android:label="MutualCloseFragment" />
 
   <!-- settings: mutual close all channels -->
   <fragment
-    android:id="@+id/force_close"
+    android:id="@+id/force_close_fragment"
     android:name="fr.acinq.phoenix.settings.ForceCloseFragment"
     android:label="ForceCloseFragment" />
 
   <!-- settings: list all channels -->
   <fragment
-    android:id="@+id/list_channels"
+    android:id="@+id/channels_list_fragment"
     android:name="fr.acinq.phoenix.settings.ListChannelsFragment"
     android:label="ListChannelsFragment">
     <action
@@ -378,7 +392,7 @@
       app:argType="string" />
   </dialog>
 
-  <!-- login with LNURL -->
+  <!-- LNURL: login -->
   <fragment
     android:id="@+id/lnurl_login"
     android:name="fr.acinq.phoenix.send.LNUrlLoginFragment"
@@ -393,5 +407,30 @@
     android:id="@+id/electrum_fragment"
     android:name="fr.acinq.phoenix.settings.ElectrumServerFragment"
     android:label="ElectrumServerFragment" />
+
+  <!-- LNURL: pay -->
+  <dialog
+    android:id="@+id/lnurl_pay"
+    android:name="fr.acinq.phoenix.send.LNUrlPayFragment"
+    android:label="LNUrlPayFragment">
+    <argument
+      android:name="url"
+      app:argType="string" />
+  </dialog>
+
+  <!-- LNURL: withdraw -->
+  <fragment
+    android:id="@+id/lnurl_withdraw"
+    android:name="fr.acinq.phoenix.send.LNUrlWithdrawFragment"
+    android:label="LNUrlWithdrawFragment">
+    <argument
+      android:name="url"
+      app:argType="fr.acinq.phoenix.utils.LNUrlWithdraw" />
+    <action
+      android:id="@+id/action_lnurl_withdraw_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
 
 </navigation>

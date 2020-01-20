@@ -31,10 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.`BtcUnit$`
-import fr.acinq.eclair.`MBtcUnit$`
-import fr.acinq.eclair.`SatUnit$`
+import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.BaseFragment
@@ -57,7 +54,6 @@ class SendFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSendBinding
   private val args: SendFragmentArgs by navArgs()
-
   private lateinit var model: SendViewModel
 
   private lateinit var unitList: List<String>
@@ -74,7 +70,7 @@ class SendFragment : BaseFragment() {
     mBinding.model = model
 
     context?.let {
-      unitList = listOf(`SatUnit$`.`MODULE$`.code(), `MBtcUnit$`.`MODULE$`.code(), `BtcUnit$`.`MODULE$`.code(), Prefs.getFiatCurrency(it))
+      unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         mBinding.unit.adapter = adapter
@@ -143,12 +139,12 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null) {
-        appKit.nodeData.value?.run {
+      if (useMax && context != null && appKit.balance.value != null) {
+        appKit.balance.value!!.run {
           val unit = Prefs.getCoinUnit(context!!)
           mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-          mBinding.amount.setText(Converter.printAmountRaw(this.balance, context!!))
-        } ?: (log.warn("balance is not available yet").also { model.useMaxBalance.value = false })
+          mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
+        }
       }
     })
 
@@ -187,8 +183,8 @@ class SendFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
-    appKit.nodeData.value?.let {
-      mBinding.balanceValue.setAmount(it.balance)
+    appKit.balance.value?.let {
+      mBinding.balanceValue.setAmount(it)
     } ?: log.warn("balance is not available yet")
 
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
@@ -262,11 +258,10 @@ class SendFragment : BaseFragment() {
   }
 
   private fun checkAmount(): Option<MilliSatoshi> {
-    val unit = mBinding.unit.selectedItem.toString()
-    val amountInput = mBinding.amount.text.toString()
-    val balance = appKit.nodeData.value?.balance
-
     return try {
+      val unit = mBinding.unit.selectedItem.toString()
+      val amountInput = mBinding.amount.text.toString()
+      val balance = appKit.balance.value
       model.amountErrorMessage.value = null
       val fiat = Prefs.getFiatCurrency(context!!)
       val amount = if (unit == fiat) {

@@ -18,9 +18,7 @@ package fr.acinq.phoenix.utils
 
 import android.text.format.DateUtils
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.phoenix.NodeData
-import fr.acinq.phoenix.SwapInSettings
-import fr.acinq.phoenix.TrampolineSettings
+import fr.acinq.phoenix.*
 import okhttp3.MediaType
 
 /**
@@ -39,7 +37,6 @@ object Constants {
   // -- intents
   const val INTENT_CAMERA_PERMISSION_REQUEST = 1
 
-  const val MNEMONICS_REMINDER_INTERVAL = DateUtils.DAY_IN_MILLIS * 30
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
 
   // -- android notifications
@@ -47,7 +44,7 @@ object Constants {
   const val WATCHER_REQUEST_CODE = 37921816
 
   // -- default wallet values
-  val DEFAULT_NODE_DATA = NodeData(MilliSatoshi(0), "", 0, 0)
+  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = true)
   val DEFAULT_TRAMPOLINE_SETTINGS = TrampolineSettings(MilliSatoshi(5000), 0.001, 5, 144)
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
 }

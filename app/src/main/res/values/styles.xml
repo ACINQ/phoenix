@@ -22,6 +22,7 @@
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
     <item name="bgColor">@color/white</item>
+    <item name="altBgColor">@color/ebony</item>
     <item name="mutedBgColor">@color/athens</item>
     <item name="borderColor">@color/geyser</item>
     <item name="buttonRippleColor">@color/ripple</item>
@@ -57,7 +58,7 @@
     <item name="android:textViewStyle">@style/paragraph_textViewStyle</item>
     <item name="materialButtonStyle">@style/material_buttonStyle</item>
     <item name="snackbarStyle">@style/snackbarStyle</item>
-    <item name="snackbarTextViewStyle">@style/default_textAppearance_alt</item>
+    <item name="snackbarTextViewStyle">@style/snackbarTextStyle</item>
 
     <item name="android:dialogTheme">@style/default_dialogTheme</item>
     <item name="dialogTheme">@style/default_dialogTheme</item>
@@ -84,7 +85,7 @@
   </style>
 
   <style name="default_textAppearance_alt" parent="default_textAppearance">
-    <item name="android:textColor">?altTextColor</item>
+    <item name="android:textColor">?attr/altTextColor</item>
   </style>
 
   <style name="paragraph_textViewStyle" parent="default_textAppearance">
@@ -94,7 +95,7 @@
   </style>
 
   <style name="paragraph_textViewStyle_alt" parent="paragraph_textViewStyle">
-    <item name="android:textColor">?altTextColor</item>
+    <item name="android:textColor">?attr/altTextColor</item>
   </style>
 
   <style name="material_buttonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton">
@@ -161,6 +162,8 @@
     <item name="android:windowFrame">@null</item>
     <item name="android:windowBackground">@drawable/rounded</item>
     <item name="android:windowFullscreen">false</item>
+    <item name="android:windowMinWidthMajor">65%</item>
+    <item name="android:windowMinWidthMinor">85%</item>
     <item name="android:windowCloseOnTouchOutside">false</item>
     <item name="android:windowTitleStyle">@style/dialog_title</item>
     <item name="android:textColorPrimary">?attr/colorPrimary</item>
@@ -183,7 +186,11 @@
   </style>
 
   <style name="snackbarStyle" parent="Widget.MaterialComponents.Snackbar.FullWidth">
-    <item name="android:background">@color/dark</item>
+    <item name="android:background">@color/ebony</item>
+  </style>
+
+  <style name="snackbarTextStyle" parent="default_textAppearance">
+    <item name="android:textColor">@color/white</item>
   </style>
 
   <style name="default_spinnerStyle">

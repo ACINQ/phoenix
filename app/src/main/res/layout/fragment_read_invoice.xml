@@ -47,8 +47,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md_p"
-        app:icon="@drawable/ic_clipboard"
         app:enableOrFade="@{model.readingState == ReadingState.SCANNING}"
+        app:icon="@drawable/ic_clipboard"
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/send_init_paste" />
 
@@ -92,18 +92,6 @@
       app:layout_constraintStart_toStartOf="@id/scan_view"
       app:layout_constraintTop_toTopOf="@id/scan_view" />
 
-    <fr.acinq.phoenix.utils.customviews.ProgressTextView
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:padding="@dimen/space_xs"
-      android:visibility="@{model.readingState == ReadingState.READING}"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="@id/scan_crosshairs"
-      app:layout_constraintEnd_toEndOf="@id/scan_crosshairs"
-      app:layout_constraintStart_toStartOf="@id/scan_crosshairs"
-      app:layout_constraintTop_toTopOf="@id/scan_crosshairs"
-      app:progress_tint="?attr/colorPrimary" />
-
     <TextView
       android:id="@+id/instructions"
       style="@style/default_textAppearance"
@@ -145,6 +133,19 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/scan_view" />
+
+    <fr.acinq.phoenix.utils.customviews.ProgressTextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/rounded"
+      android:padding="@dimen/space_md"
+      android:visibility="@{model.readingState == ReadingState.READING}"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="@id/scan_view"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@id/scan_view"
+      app:text="@string/send_init_reading" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
