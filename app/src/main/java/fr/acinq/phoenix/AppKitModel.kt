@@ -101,6 +101,7 @@ class AppKitModel : ViewModel() {
   private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
   private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
+  val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
   val networkInfo = MutableLiveData<NetworkInfo>()
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
