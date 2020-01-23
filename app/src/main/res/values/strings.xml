@@ -129,9 +129,9 @@
   <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
   <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
   <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accept (expires in %1$ds)</string>
+  <string name="receive_with_open_accept">Accept (expires in %1$ss)</string>
   <string name="receive_with_open_decline">Decline</string>
-  <string name="receive_with_open_expired">Request has expired!</string>
+  <string name="receive_with_open_expired">This payment has expired!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -307,7 +307,7 @@
   <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
-  <string name="inappnotif_upgrade">A new version of the wallet is available.</string>
+  <string name="inappnotif_upgrade">An update for this app is available.</string>
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
 
   <!-- //////////////// display seed //////////////// -->

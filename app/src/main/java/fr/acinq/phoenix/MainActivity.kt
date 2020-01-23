@@ -97,6 +97,7 @@ class MainActivity : AppCompatActivity() {
       handleNetworkAlert()
     })
     appKit.navigationEvent.observe(this, Observer {
+      log.info("navigation event @ $it")
       when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
