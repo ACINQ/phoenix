@@ -57,7 +57,7 @@ object Logging {
     lc.getLogger("io.netty").level = if (BuildConfig.DEBUG) Level.INFO else Level.WARN
 
     val root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-    root.level = Level.DEBUG
+    root.level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
     root.addAppender(logcatAppender)
     root.addAppender(localFileAppender)
   }
