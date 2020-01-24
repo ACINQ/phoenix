@@ -165,6 +165,7 @@
   <string name="scan_state_reading">Reading payment request</string>
 
   <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
+  <string name="scan_error_expired">Payment has expired.</string>
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
