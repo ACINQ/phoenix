@@ -76,6 +76,9 @@ class ReadInputFragment : BaseFragment() {
               log.debug("abort payment to self")
               model.readingState.postValue(ReadingState.ERROR)
               model.errorMessage.postValue(R.string.scan_error_pay_to_self)
+            } else if (it.isExpired) {
+              model.readingState.postValue(ReadingState.ERROR)
+              model.errorMessage.postValue(R.string.scan_error_expired)
             } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
               // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
               AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
