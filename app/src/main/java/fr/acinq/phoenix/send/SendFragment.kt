@@ -79,6 +79,10 @@ class SendFragment : BaseFragment() {
       mBinding.unit.setSelection(unitList.indexOf(unit.code()))
     }
 
+    model.swapTotalTooLarge.observe(viewLifecycleOwner, Observer {
+      context?.let { ctx -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, if (it) R.attr.negativeColor else R.attr.textColor))}
+    })
+
     model.invoice.observe(viewLifecycleOwner, Observer {
       it?.let {
         context?.let { ctx ->
@@ -102,6 +106,7 @@ class SendFragment : BaseFragment() {
                   mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amount = amountInput.get(), context = ctx, withUnit = true)
                   mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(amount = fee, context = ctx, withUnit = true)
                   mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(amount = total, context = ctx, withUnit = true)
+                  model.swapTotalTooLarge.value = total.`$greater`(appKit.balance.value)
                   model.swapState.value = SwapState.SWAP_COMPLETE
                 }
               } else {
@@ -120,10 +125,6 @@ class SendFragment : BaseFragment() {
           }
         }
       }
-    })
-
-    model.swapMessageEvent.observe(viewLifecycleOwner, Observer {
-      Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
     })
 
     model.amountErrorMessage.observe(viewLifecycleOwner, Observer { msgId ->
@@ -226,8 +227,9 @@ class SendFragment : BaseFragment() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when sending SwapOut: ", exception)
       model.swapState.postValue(SwapState.SWAP_REQUIRED)
-      model.swapMessageEvent.postValue(R.string.send_swap_error)
+      Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
+      model.swapTotalTooLarge.value = false
       model.isAmountFieldPristine.value = false
       Wallet.hideKeyboard(context, mBinding.amount)
       model.invoice.value?.let {

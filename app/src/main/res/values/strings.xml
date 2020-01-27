@@ -155,8 +155,9 @@
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
   <string name="send_swap_required_button">Request a swap</string>
   <string name="send_swap_complete_recap_amount">Amount</string>
-  <string name="send_swap_complete_recap_fee">Fee</string>
+  <string name="send_swap_complete_recap_fee">Miner Fee</string>
   <string name="send_swap_complete_recap_total">Total</string>
+  <string name="send_swap_complete_cannot_afford">Total exceeds your balance.\n\nLower the amount, or try again later when fees have decreased.</string>
 
   <!-- //////////////// scan //////////////// -->
 
