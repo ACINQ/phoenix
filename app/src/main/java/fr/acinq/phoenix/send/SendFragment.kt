@@ -79,8 +79,13 @@ class SendFragment : BaseFragment() {
       mBinding.unit.setSelection(unitList.indexOf(unit.code()))
     }
 
-    model.swapTotalTooLarge.observe(viewLifecycleOwner, Observer {
-      context?.let { ctx -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, if (it) R.attr.negativeColor else R.attr.textColor))}
+    model.swapState.observe(viewLifecycleOwner, Observer {
+      if (context != null) {
+        when (it) {
+          SwapState.SWAP_EXCEEDS_BALANCE -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(context!!, R.attr.negativeColor))
+          else -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(context!!, R.attr.textColor))
+        }
+      }
     })
 
     model.invoice.observe(viewLifecycleOwner, Observer {
@@ -106,8 +111,11 @@ class SendFragment : BaseFragment() {
                   mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amount = amountInput.get(), context = ctx, withUnit = true)
                   mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(amount = fee, context = ctx, withUnit = true)
                   mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(amount = total, context = ctx, withUnit = true)
-                  model.swapTotalTooLarge.value = total.`$greater`(appKit.balance.value)
-                  model.swapState.value = SwapState.SWAP_COMPLETE
+                  if (total.`$greater`(appKit.balance.value)) {
+                    model.swapState.value = SwapState.SWAP_EXCEEDS_BALANCE
+                  } else {
+                    model.swapState.value = SwapState.SWAP_COMPLETE
+                  }
                 }
               } else {
                 model.swapState.value = SwapState.SWAP_REQUIRED
@@ -229,7 +237,6 @@ class SendFragment : BaseFragment() {
       model.swapState.postValue(SwapState.SWAP_REQUIRED)
       Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
-      model.swapTotalTooLarge.value = false
       model.isAmountFieldPristine.value = false
       Wallet.hideKeyboard(context, mBinding.amount)
       model.invoice.value?.let {
