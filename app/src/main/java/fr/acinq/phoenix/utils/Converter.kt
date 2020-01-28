@@ -43,7 +43,7 @@ object Converter {
 
   init {
     FIAT_FORMAT.minimumFractionDigits = 2
-    FIAT_FORMAT.maximumFractionDigits = 2
+    FIAT_FORMAT.maximumFractionDigits = 3
   }
 
   fun refreshCoinPattern(context: Context) {
