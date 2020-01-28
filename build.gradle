@@ -22,6 +22,7 @@ buildscript {
   repositories {
     google()
     jcenter()
+    maven { url uri('libs') } // for the managed dependency eclair-core
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:3.5.3'

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>fr.acinq.eclair</groupId>
+  <artifactId>eclair_2.11</artifactId>
+  <versioning>
+    <versions>
+      <version>0.3.7-android-phoenix-deterministic-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20200129163014</lastUpdated>
+  </versioning>
+</metadata>
