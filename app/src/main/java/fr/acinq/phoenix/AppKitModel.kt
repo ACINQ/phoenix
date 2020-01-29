@@ -482,6 +482,7 @@ class AppKitModel : ViewModel() {
           withContext(Dispatchers.Default) {
             try {
               val res = startNode(context, pin)
+              Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
               _kit.postValue(res)
               ChannelsWatcher.schedule(context)
