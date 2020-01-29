@@ -28,6 +28,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.eclair.WatchListener
 import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
@@ -155,19 +156,16 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
    * unless the app is whitelisted by the user in a custom OS setting page. This behaviour is hard to detect and not
    * standard, and does not happen on a stock android. In this case, the user has to whitelist the app.
    */
-  /**
-   * If the background channels watcher has not run since (now) - (DELAY_BEFORE_BACKGROUND_WARNING), we consider that the device is
-   * blocking this application from working in background, and show a notification.
-   *
-   * Some devices vendors are known to aggressively kill applications (including background jobs) in order to save battery,
-   * unless the app is whitelisted by the user in a custom OS setting page. This behaviour is hard to detect and not
-   * standard, and does not happen on a stock android. In this case, the user has to whitelist the app.
-   */
   private fun checkBackgroundWorkerCanRun(context: Context) {
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
     if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > Constants.DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
       appKit.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      if (appKit.isKitReady()) {
+        // the user has been notified once, but since the node has started he is safe anyway
+        // the background watcher notification countdown can be reset so that it does not spam the user
+        Prefs.saveWatcherAttemptOutcome(context, WatchListener.`Ok$`.`MODULE$`)
+      }
     } else {
       appKit.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
