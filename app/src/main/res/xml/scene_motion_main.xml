@@ -73,7 +73,7 @@
       app:layout_constraintTop_toTopOf="@id/help_button" />
 
     <Constraint
-      android:id="@id/swap_in_info"
+      android:id="@id/incoming_funds_notif"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:layout_constraintEnd_toEndOf="parent"
@@ -127,7 +127,7 @@
       app:layout_constraintTop_toTopOf="@id/help_button" />
 
     <Constraint
-      android:id="@id/swap_in_info"
+      android:id="@id/incoming_funds_notif"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:layout_constraintEnd_toEndOf="parent"

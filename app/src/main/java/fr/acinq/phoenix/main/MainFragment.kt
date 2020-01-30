@@ -21,22 +21,33 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.WatchListener
-import fr.acinq.phoenix.databinding.FragmentMainBinding
+import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.databinding.FragmentMainBinding
+import fr.acinq.phoenix.events.ChannelStateChange
 import fr.acinq.phoenix.events.PaymentPending
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -49,12 +60,19 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentMainBinding
+  private lateinit var model: MainViewModel
 
   private lateinit var paymentsAdapter: PaymentsAdapter
   private lateinit var paymentsManager: RecyclerView.LayoutManager
 
   private lateinit var notificationsAdapter: NotificationsAdapter
   private lateinit var notificationsManager: RecyclerView.LayoutManager
+
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+    if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
+      refreshIncomingFundsAmountField()
+    }
+  }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentMainBinding.inflate(inflater, container, false)
@@ -87,6 +105,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    model = ViewModelProvider(this).get(MainViewModel::class.java)
     appKit.payments.observe(viewLifecycleOwner, Observer {
       paymentsAdapter.submitList(it)
     })
@@ -97,12 +116,14 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       mBinding.balance.setAmount(it)
     })
     appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
-      if (swapIns == null || swapIns.isEmpty()) {
-        mBinding.swapInInfo.visibility = View.INVISIBLE
+      refreshIncomingFunds()
+    })
+    model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
+      if (amount.`$greater`(MilliSatoshi(0))) {
+        refreshIncomingFundsAmountField()
+        mBinding.incomingFundsNotif.visibility = View.VISIBLE
       } else {
-        val total = swapIns.values.map { s -> s.amount() }.reduce { acc, amount -> acc.`$plus`(amount) }
-        context?.let { mBinding.swapInInfo.text = getString(R.string.main_swapin_incoming, Converter.printAmountPretty(total, it, withUnit = true)) }
-        mBinding.swapInInfo.visibility = View.VISIBLE
+        mBinding.incomingFundsNotif.visibility = View.INVISIBLE
       }
     })
   }
@@ -113,6 +134,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       EventBus.getDefault().register(this)
     }
     Wallet.hideKeyboard(context, mBinding.main)
+    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(prefsListener)
 
     context?.let {
       refreshNotifications(it)
@@ -130,6 +152,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onStop() {
     super.onStop()
     EventBus.getDefault().unregister(this)
+    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(prefsListener)
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -140,6 +163,46 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   fun handleEvent(event: PaymentPending) {
     log.debug("pending payment, refreshing list...")
     appKit.refreshPayments()
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: ChannelStateChange) {
+    log.debug("channel state changed, refreshing incoming funds...")
+    refreshIncomingFunds()
+  }
+
+  private fun refreshIncomingFunds() {
+    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+      log.error("error when refreshing the incoming funds notification: ", exception)
+    }) {
+      val totalSwapIns = appKit.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
+      val totalChannelsWaitingConf = appKit.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
+        if (c.data() is HasCommitments) {
+          (c.data() as HasCommitments).commitments().availableBalanceForSend()
+        } else {
+          MilliSatoshi(0)
+        }
+      }
+      val total = totalSwapIns + totalChannelsWaitingConf
+      model.incomingFunds.postValue(if (total.isEmpty()) {
+        MilliSatoshi(0)
+      } else {
+        total.reduce { acc, amount -> acc.`$plus`(amount) }
+      })
+    }
+  }
+
+  private fun refreshIncomingFundsAmountField() {
+    model.incomingFunds.value?.let { amount ->
+      context?.let { ctx ->
+        mBinding.incomingFundsNotif.text = getString(R.string.main_swapin_incoming,
+          if (Prefs.getShowAmountInFiat(ctx)) {
+            Converter.printFiatPretty(ctx, amount, withUnit = true)
+          } else {
+            Converter.printAmountPretty(amount, ctx, withUnit = true)
+          })
+      }
+    }
   }
 
   private fun refreshNotifications(context: Context) {
@@ -189,3 +252,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
 }
+
+class MainViewModel : ViewModel() {
+  val incomingFunds = MutableLiveData(MilliSatoshi(0))
+}
+

@@ -179,13 +179,12 @@
       app:text_size="@dimen/text_sm" />
 
     <TextView
-      android:id="@+id/swap_in_info"
+      android:id="@+id/incoming_funds_notif"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:drawableStart="@drawable/ic_chain"
       android:drawablePadding="@dimen/space_xxs"
       android:drawableTint="?attr/colorPrimary"
-      android:padding="@dimen/space_xs"
       android:text="@string/main_swapin_incoming"
       android:textColor="?attr/onMutedBgTextColor"
       android:textSize="@dimen/text_sm" />
