@@ -61,7 +61,7 @@ object Prefs {
   }
 
   fun setLastVersionUsed(context: Context, version: Int) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, 0).apply()
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
   }
 
   fun isFirstTime(context: Context): Boolean {
