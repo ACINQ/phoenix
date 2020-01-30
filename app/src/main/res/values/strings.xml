@@ -270,6 +270,8 @@
   <string name="listallchannels_copy">Copy</string>
   <string name="listallchannels_share_all">Share all channels…</string>
   <string name="listallchannels_share">Share</string>
+  <string name="listallchannels_funding_tx">Tx</string>
+  <string name="listallchannels_funding_tx_desc">See funding transaction</string>
   <string name="listallchannels_close">Close</string>
   <string name="listallchannels_share_subject">Channels data</string>
   <string name="listallchannels_share_title">Share channel data</string>
@@ -278,7 +280,7 @@
   <!-- //////////////// channel details //////////////// -->
 
   <string name="channel_loading">Retrieving channel data…</string>
-  <string name="channel_error">Could not retrieve channel data</string>
+  <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
 
   <!-- //////////////// menu //////////////// -->
 
