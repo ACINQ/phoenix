@@ -60,6 +60,11 @@ class EclairSupervisor : UntypedActor() {
             EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId()))
           }
         }
+        // dispatch UI event if a channel reaches or leaves the WAIT FOR FUNDING CONFIRMED state
+        if (event.currentState() == `WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$` || event.previousState() == `WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`) {
+          log.debug("channel ${event.channel()} in state ${event.currentState()} from ${event.previousState()}")
+          EventBus.getDefault().post(ChannelStateChange())
+        }
       }
       is ChannelSignatureSent -> {
         EventBus.getDefault().post(PaymentPending())

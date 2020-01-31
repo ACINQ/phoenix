@@ -27,6 +27,9 @@ import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.phoenix.R
 
 object Prefs {
+
+  private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
+
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
 
@@ -44,7 +47,6 @@ object Prefs {
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
 
   // -- background channels watcher
-  private const val PREFS_WATCHER_LAST_ATTEMPT_TIMESTAMP: String = "PREFS_WATCHER_LAST_ATTEMPT_TIMESTAMP"
   private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME"
   private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME_TIMESTAMP"
 
@@ -53,6 +55,14 @@ object Prefs {
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
+
+  fun getLastVersionUsed(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
+  }
+
+  fun setLastVersionUsed(context: Context, version: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
+  }
 
   fun isFirstTime(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)

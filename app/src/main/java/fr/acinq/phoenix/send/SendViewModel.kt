@@ -35,7 +35,7 @@ enum class SendState {
 }
 
 enum class SwapState {
-  NO_SWAP, SWAP_REQUIRED, SWAP_IN_PROGRESS, SWAP_COMPLETE
+  NO_SWAP, SWAP_REQUIRED, SWAP_IN_PROGRESS, SWAP_COMPLETE, SWAP_EXCEEDS_BALANCE
 }
 
 class SendViewModel : ViewModel() {
@@ -46,7 +46,6 @@ class SendViewModel : ViewModel() {
   val isAmountFieldPristine = MutableLiveData(true) // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
-  val swapMessageEvent = SingleLiveEvent<Int>()
   val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request

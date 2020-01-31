@@ -12,8 +12,6 @@ This wallet is available for Android, and will hopefully be available for iOS in
 
 You can download the binary from the [Release page](https://github.com/ACINQ/phoenix/releases), or from our [Google Play page](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet).
 
-For testing purposes, we also provide a Testnet build [here](https://acinq.co/phoenix/phoenix-testnet-latest.apk).
-
 # Build the project
 
 Detailed instructions on how to setup your development environment and build Phoenix are provided in [BUILD.md](https://github.com/ACINQ/eclair-phoenix/blob/master/BUILD.md)

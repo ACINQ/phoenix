@@ -29,7 +29,7 @@ android {
     applicationId "fr.acinq.phoenix.mainnet.dev"
     minSdkVersion 24
     targetSdkVersion 29
-    versionCode 3
+    versionCode 4
     versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -94,7 +94,7 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.1.0"
 
   // ANDROIDX - material
-  def material_version = "1.2.0-alpha03"
+  def material_version = "1.2.0-alpha04"
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
@@ -132,7 +132,7 @@ dependencies {
 
   // eclair core
   def libsecp256k1_version = "1.3"
-  def eclair_version = "0.3.5-android-phoenix"
+  def eclair_version = "0.3.7-android-phoenix-SNAPSHOT"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
     exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'

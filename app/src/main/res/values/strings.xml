@@ -129,9 +129,9 @@
   <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
   <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
   <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accept (expires in %1$ds)</string>
+  <string name="receive_with_open_accept">Accept (expires in %1$ss)</string>
   <string name="receive_with_open_decline">Decline</string>
-  <string name="receive_with_open_expired">Request has expired!</string>
+  <string name="receive_with_open_expired">This payment has expired!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -155,8 +155,9 @@
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
   <string name="send_swap_required_button">Request a swap</string>
   <string name="send_swap_complete_recap_amount">Amount</string>
-  <string name="send_swap_complete_recap_fee">Fee</string>
+  <string name="send_swap_complete_recap_fee">Miner Fee</string>
   <string name="send_swap_complete_recap_total">Total</string>
+  <string name="send_swap_complete_cannot_afford">Total exceeds your balance.\n\nLower the amount, or try again later when fees have decreased.</string>
 
   <!-- //////////////// scan //////////////// -->
 
@@ -165,6 +166,7 @@
   <string name="scan_state_reading">Reading payment request</string>
 
   <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
+  <string name="scan_error_expired">Payment has expired.</string>
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
@@ -268,6 +270,8 @@
   <string name="listallchannels_copy">Copy</string>
   <string name="listallchannels_share_all">Share all channels…</string>
   <string name="listallchannels_share">Share</string>
+  <string name="listallchannels_funding_tx">Tx</string>
+  <string name="listallchannels_funding_tx_desc">See funding transaction</string>
   <string name="listallchannels_close">Close</string>
   <string name="listallchannels_share_subject">Channels data</string>
   <string name="listallchannels_share_title">Share channel data</string>
@@ -276,7 +280,7 @@
   <!-- //////////////// channel details //////////////// -->
 
   <string name="channel_loading">Retrieving channel data…</string>
-  <string name="channel_error">Could not retrieve channel data</string>
+  <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -307,7 +311,7 @@
   <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
-  <string name="inappnotif_upgrade">A new version of the wallet is available.</string>
+  <string name="inappnotif_upgrade">An update for this app is available.</string>
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
 
   <!-- //////////////// display seed //////////////// -->

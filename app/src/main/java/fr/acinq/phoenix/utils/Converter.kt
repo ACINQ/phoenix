@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory
 import scala.Option
 import scala.math.`BigDecimal$`
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
@@ -43,7 +44,7 @@ object Converter {
 
   init {
     FIAT_FORMAT.minimumFractionDigits = 2
-    FIAT_FORMAT.maximumFractionDigits = 2
+    FIAT_FORMAT.maximumFractionDigits = 3
   }
 
   fun refreshCoinPattern(context: Context) {
@@ -53,6 +54,7 @@ object Converter {
       `MBtcUnit$`.`MODULE$` -> CoinUtils.setCoinPattern("###,###,###,##0.#####")
       else -> CoinUtils.setCoinPattern("###,###,###,##0.###########")
     }
+    CoinUtils.COIN_FORMAT().roundingMode = RoundingMode.DOWN
   }
 
   fun printAmountRaw(amount: BtcAmount, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()

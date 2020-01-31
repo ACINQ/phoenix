@@ -18,7 +18,6 @@ package fr.acinq.phoenix.receive
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -38,6 +38,8 @@ import fr.acinq.phoenix.databinding.FragmentReceiveWithOpenBinding
 import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
+import kotlin.math.max
 
 
 open class ReceiveWithOpenDialogFragment : DialogFragment() {
@@ -64,6 +66,14 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
       mBinding.model = model
 
+      model.timeToExpiry.observe(viewLifecycleOwner, Observer {
+        mBinding.acceptButton.setText(getString(R.string.receive_with_open_accept, max(it / 1000, 0).toString()))
+        if (it <= 0) {
+          log.info("pay to open with payment_hash=${args.paymentHash} has expired and is declined")
+          appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+        }
+      })
+
       activity?.onBackPressedDispatcher?.addCallback(this) {
         log.debug("back pressed disabled here")
       }
@@ -72,18 +82,6 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    object : CountDownTimer(30000, 1000) {
-      override fun onTick(millisUntilFinished: Long) {
-        mBinding.acceptButton.setText(getString(R.string.receive_with_open_accept, millisUntilFinished / 1000))
-      }
-
-      override fun onFinish() {
-        log.info("pay to open with payment_hash=${args.paymentHash} has expired and is declined")
-        model.hasExpired.value = true
-        appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
-      }
-    }.start()
-
     context?.let {
       mBinding.amountValue.text = Converter.printAmountPretty(MilliSatoshi(args.amountMsat), it, withUnit = true)
       mBinding.amountFiat.text = Converter.html(getString(R.string.utils_converted_amount, Converter.printFiatPretty(it, MilliSatoshi(args.amountMsat), withUnit = true)))
@@ -117,15 +115,32 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
     appKit.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
     super.onCancel(dialog)
   }
-
-  override fun onDismiss(dialog: DialogInterface) {
-    super.onDismiss(dialog)
-  }
 }
 
 class ReceiveWithOpenViewModel : ViewModel() {
-  private val log = LoggerFactory.getLogger(ReceiveWithOpenViewModel::class.java)
+  companion object {
+    private const val DEFAULT_TIMEOUT_MILLIS = 30000
+  }
 
+  private val log = LoggerFactory.getLogger(ReceiveWithOpenViewModel::class.java)
+  private val timer: Timer = Timer()
   val showHelp = MutableLiveData(false)
-  val hasExpired = MutableLiveData(false)
+
+  // FIXME: this value should be initialized using an absolute / server defined timestamp in the PayToOpenRequest (not implemented yet).
+  val timeToExpiry = MutableLiveData(DEFAULT_TIMEOUT_MILLIS)
+
+  init {
+    timer.schedule(object : TimerTask() {
+      override fun run() {
+        timeToExpiry.value?.let {
+          timeToExpiry.postValue(max(0, it - 1000))
+        }
+      }
+    }, 0, 1000)
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    timer.cancel()
+  }
 }
