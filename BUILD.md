@@ -18,3 +18,11 @@
 
 Note that if you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above). 
 You can check that the corresponding `.jar` file is present in your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`).
+
+## Alternative build (deterministic)
+
+1. Clone the phoenix project from https://github.com/ACINQ/phoenix
+2. Install docker-ce for your platform
+3. Run `docker build -t phoenix_build .` to create the build environment
+4. Run `docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble` to build phoenix
+5. Built artifacts are in $(pwd)/outputs/apk/release
