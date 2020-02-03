@@ -19,10 +19,21 @@
 Note that if you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above). 
 You can check that the corresponding `.jar` file is present in your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`).
 
-## Alternative build (deterministic)
+## Deterministic build of Phoenix
+
+Phoenix supports deterministic builds on Linux OSs, this allows anyone to recreate from the sources the exact same APK that was published in the release page.
+The deterministic build uses a dockerized build environment and require you to have previously built (and published locally) the artifact for the `eclair-core` 
+dependency, follow the instructions to build it.
+
+### Prerequisites
+
+1. A linux machine running on x64 CPU.
+2. docker-ce installed
+3. Eclair-core published in your local maven repo, check out the instructions to build it.
+
+### How to build phoenix deterministically
 
 1. Clone the phoenix project from https://github.com/ACINQ/phoenix
-2. Install docker-ce for your platform
 3. Run `docker build -t phoenix_build .` to create the build environment
-4. Run `docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble` to build phoenix
+4. Run `docker run --rm -v $HOME/.m2:/root/.m2 -v $(pwd):/home/ubuntu/phoenix/app/build -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble`
 5. Built artifacts are in $(pwd)/outputs/apk/release

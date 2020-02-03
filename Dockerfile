@@ -31,9 +31,5 @@ RUN echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.3" "cmake;3.6.
 # copy project over to docker image
 COPY . /home/ubuntu/phoenix
 
-# copy local maven repo
-RUN  mkdir -p /root/.m2/repository && \
-     cp -R /home/ubuntu/phoenix/libs/fr /root/.m2/repository
-
 # make gradle wrapper executable
 RUN chmod +x /home/ubuntu/phoenix/gradlew
