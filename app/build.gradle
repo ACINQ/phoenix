@@ -29,8 +29,8 @@ android {
     applicationId "fr.acinq.phoenix.mainnet"
     minSdkVersion 24
     targetSdkVersion 29
-    versionCode 3
-    versionName "1.1.0"
+    versionCode 4
+    versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -98,7 +98,7 @@ dependencies {
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
-  def nav_version = "2.2.0-rc04"
+  def nav_version = "2.2.0"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -107,7 +107,7 @@ dependencies {
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
-  def lifecycle_version = "2.2.0-rc03"
+  def lifecycle_version = "2.2.0"
   implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
@@ -132,7 +132,7 @@ dependencies {
 
   // eclair core
   def libsecp256k1_version = "1.3"
-  def eclair_version = "0.3.6-android-phoenix"
+  def eclair_version = "0.3.7-android-phoenix"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
     exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'

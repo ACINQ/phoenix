@@ -366,7 +366,7 @@
           <TextView
             android:id="@+id/swap_recap_amount_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
+            android:layout_width="90dp"
             android:text="@string/send_swap_complete_recap_amount"
             android:textAlignment="viewEnd"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_amount_value"
@@ -387,7 +387,7 @@
           <TextView
             android:id="@+id/swap_recap_fee_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
+            android:layout_width="90dp"
             android:text="@string/send_swap_complete_recap_fee"
             android:textAlignment="viewEnd"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
@@ -409,7 +409,7 @@
           <TextView
             android:id="@+id/swap_recap_total_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
+            android:layout_width="90dp"
             android:text="@string/send_swap_complete_recap_total"
             android:textAlignment="viewEnd"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_total_value"
@@ -429,6 +429,22 @@
             app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+          android:id="@+id/swap_recap_exceed_balance"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:drawableStart="@drawable/ic_alert_triangle"
+          android:drawableTint="?attr/negativeColor"
+          android:maxWidth="260dp"
+          android:text="@string/send_swap_complete_cannot_afford"
+          android:visibility="@{model.swapState == SwapState.SWAP_EXCEEDS_BALANCE}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/send_button"

@@ -20,6 +20,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +31,9 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.`JsonSerializers$`
-import fr.acinq.eclair.channel.RES_GETINFO
+import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsChannelDetailsBinding
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -98,6 +100,11 @@ class ChannelDetailsDialog : DialogFragment() {
       }
     }
 
+    mBinding.fundingTxButton.setOnClickListener {
+      val uri = "https://blockstream.info/${if (BuildConfig.CHAIN == "testnet") "testnet/" else ""}tx/${model.fundingTxId.value}"
+      startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+    }
+
     mBinding.closeButton.setOnClickListener {
       dismiss()
     }
@@ -111,6 +118,10 @@ class ChannelDetailsDialog : DialogFragment() {
       model.state.value = ChannelDetailsState.IN_PROGRESS
       withContext(this.coroutineContext + Dispatchers.Default) {
         val channel = appKit.getChannel(ByteVector32.fromValidHex(args.channelId))
+        val data = channel!!.data()
+        if (data is HasCommitments) {
+          model.fundingTxId.postValue(data.commitments().commitInput().outPoint().txid().toString())
+        }
         val json = `default$`.`MODULE$`.write(channel, 1, `JsonSerializers$`.`MODULE$`.cmdResGetinfoReadWriter())
         model.rawData.postValue(json)
         model.state.postValue(ChannelDetailsState.DONE)
@@ -128,4 +139,5 @@ class ChannelDetailsViewModel : ViewModel() {
 
   val state = MutableLiveData(ChannelDetailsState.INIT)
   val rawData = MutableLiveData("")
+  val fundingTxId = MutableLiveData<String>()
 }
