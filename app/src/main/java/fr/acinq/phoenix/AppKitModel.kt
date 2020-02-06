@@ -37,10 +37,7 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.OutgoingPaymentStatus
-import fr.acinq.eclair.db.PlainPayment
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
@@ -67,6 +64,7 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
+import scala.Tuple2
 import scala.collection.JavaConverters
 import scala.concurrent.Await
 import scala.concurrent.Future
@@ -209,18 +207,23 @@ class AppKitModel : ViewModel() {
       val preimage = `package$`.`MODULE$`.randomBytes32()
       val paymentHash = Crypto.hash256(preimage.bytes())
       val date = System.currentTimeMillis()
+      val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
       val paymentCounterpart = OutgoingPayment(
         /* id and parent id */ id, id,
         /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
         /* placeholder payment hash */ paymentHash,
+        /* type of payment */ "ClosingChannel",
         /* balance */ event.balance,
-        /* target node id */ `package$`.`MODULE$`.randomKey().publicKey(), /* creation date */ date,
+        /* recipient amount */ event.balance,
+        /* fake recipient id */ fakeRecipientId,
+        /* creation date */ date,
         /* payment request */ Option.empty(),
         /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
       kit.nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
 
       val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
+        ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
       kit.nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
     }
   }
@@ -337,14 +340,17 @@ class AppKitModel : ViewModel() {
           }
           val amountFinal = if (deductFeeFromAmount) amount.`$minus`(fee) else amount
 
+
           val sendRequest: Any = if (isTrampoline) {
+
+            val trampolineExpiry = CltvExpiryDelta(trampolineSettings.value!!.cltvExpiry * trampolineSettings.value!!.hopsCount)
+            val trampolineAttempts = ScalaList.empty<Tuple2<MilliSatoshi, CltvExpiryDelta>>().`$colon$colon`(Tuple2(fee, trampolineExpiry))
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
-              /* trampoline fees */ fee,
               /* payment request */ paymentRequest,
               /* trampoline node public key */ Wallet.ACINQ.nodeId(),
+              /* fees and expiry delta for the trampoline node */ trampolineAttempts,
               /* final cltv expiry delta */ cltvExpiryDelta,
-              /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(trampolineSettings.value!!.cltvExpiry * trampolineSettings.value!!.hopsCount),
               /* route params */ Option.apply(null))
           } else {
             PaymentInitiator.SendPaymentRequest(
@@ -355,7 +361,6 @@ class AppKitModel : ViewModel() {
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),
-              /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
               /* assisted routes */ paymentRequest.routingInfo(),
               /* route params */ Option.apply(null))
           }

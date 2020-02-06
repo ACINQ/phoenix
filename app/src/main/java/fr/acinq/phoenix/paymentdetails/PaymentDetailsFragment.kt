@@ -247,7 +247,7 @@ class PaymentDetailsViewModel : ViewModel() {
   val destination: LiveData<String> = Transformations.map(payment) {
     it?.let {
       when {
-        it.isLeft && it.left().get().isNotEmpty() -> it.left().get().first().targetNodeId().toString()
+        it.isLeft && it.left().get().isNotEmpty() -> it.left().get().first().recipientNodeId().toString()
         else -> ""
       }
     } ?: ""
