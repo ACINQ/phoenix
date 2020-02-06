@@ -443,14 +443,13 @@
   <string name="lnurl_withdraw_confirm_button">Withdraw</string>
   <string name="lnurl_withdraw_wait">Requesting funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
-  <string name="lnurl_withdraw_error_unreadable">Invoice is invalid. Please try again.</string>
+  <string name="lnurl_withdraw_error_internal">Could not process this withdrawal request. Please try again.</string>
+  <string name="lnurl_withdraw_error_invalid">This withdrawal request is invalid. Please try again.</string>
   <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
   <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
-  <string name="lnurl_withdraw_error_internal">There was an error. Please try again.</string>
-  <string name="lnurl_withdraw_error_callback_remote">Error from %1$s (%2$s).\n\nTry again or contact their support.</string>
-  <string name="lnurl_withdraw_error_json">Invalid data</string>
-  <string name="lnurl_withdraw_error_generic">General failure</string>
+  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
+  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

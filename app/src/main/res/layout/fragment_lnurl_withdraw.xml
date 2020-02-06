@@ -43,8 +43,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
       <TextView
         android:id="@+id/service_host"
@@ -88,7 +88,7 @@
         android:singleLine="true"
         android:textAlignment="viewEnd"
         android:textSize="48sp"
-        app:enableOrFade="@{model.state == LNUrlWithdrawState.INIT &amp;&amp; model.editableAmount}"
+        app:enableOrFade="@{model.state instanceof LNUrlWithdrawState.Init &amp;&amp; model.editableAmount}"
         app:layout_constrainedHeight="true"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@id/amount_unit"
@@ -103,7 +103,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_xxs"
-        app:enableOrFade="@{model.state == LNUrlWithdrawState.INIT}"
+        app:enableOrFade="@{model.state instanceof LNUrlWithdrawState.Init}"
         app:layout_constraintBaseline_toBaselineOf="@id/amount_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/amount_value"
@@ -158,7 +158,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg_p"
         android:backgroundTint="?attr/colorPrimary"
-        android:visibility="@{model.state == LNUrlWithdrawState.INIT}"
+        android:visibility="@{model.state instanceof LNUrlWithdrawState.Init}"
         app:icon="@drawable/ic_check_circle"
         app:icon_tint="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
@@ -173,7 +173,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg_p"
         android:padding="@dimen/space_sm"
-        android:visibility="@{model.state == LNUrlWithdrawState.IN_PROGRESS}"
+        android:visibility="@{model.state instanceof LNUrlWithdrawState.InProgress}"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
         app:text="@string/lnurl_withdraw_wait" />
 
@@ -181,11 +181,14 @@
         android:id="@+id/error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg_p"
+        android:layout_marginEnd="@dimen/space_lg"
         android:drawableStart="@drawable/ic_alert_triangle"
         android:drawableTint="?attr/negativeColor"
         android:padding="@dimen/space_sm"
-        android:visibility="@{model.state == LNUrlWithdrawState.ERROR}"
+        android:visibility="@{model.state instanceof LNUrlWithdrawState.Error}"
+        app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
@@ -194,11 +197,14 @@
         android:id="@+id/success"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg_p"
+        android:layout_marginEnd="@dimen/space_lg"
         android:padding="@dimen/space_md"
         android:text="@string/lnurl_withdraw_success"
         android:textAlignment="center"
-        android:visibility="@{model.state == LNUrlWithdrawState.DONE}"
+        android:visibility="@{model.state instanceof LNUrlWithdrawState.Done}"
+        app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
