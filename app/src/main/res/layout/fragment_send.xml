@@ -462,6 +462,21 @@
           app:text="@string/send_pay_button"
           app:text_color="?attr/altTextColor" />
 
+        <TextView
+          android:id="@+id/error_sending"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:textAlignment="center"
+          android:padding="@dimen/space_sm"
+          android:text="@string/send_error_sending"
+          android:visibility="@{model.state == SendState.ERROR_SENDING}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap" />
+
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

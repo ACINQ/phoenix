@@ -37,7 +37,10 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.*
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.OutgoingPayment
+import fr.acinq.eclair.db.OutgoingPaymentStatus
+import fr.acinq.eclair.db.PlainPayment
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
@@ -81,7 +84,7 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
-data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
+data class TrampolineFeeSetting(var feeBase: MilliSatoshi, var feePercent: Double, var cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(var feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
@@ -108,7 +111,7 @@ class AppKitModel : ViewModel() {
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
-  val trampolineSettings = MutableLiveData<TrampolineSettings>()
+  val trampolineFeeSettings = MutableLiveData<List<TrampolineFeeSetting>>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
   val balance = MutableLiveData<MilliSatoshi>()
   private val _kit = MutableLiveData<AppKit>()
@@ -120,7 +123,7 @@ class AppKitModel : ViewModel() {
     startupState.value = StartupState.OFF
     networkInfo.value = Constants.DEFAULT_NETWORK_INFO
     balance.value = MilliSatoshi(0)
-    trampolineSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
+    trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
@@ -325,36 +328,62 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
+  /**
+   * Extracts the route with the highest aggregate (fee, cltv expiry) from a list of routing hints. The cltv
+   * expiry has priority over the fee.
+   */
+  private fun getMostExpensiveRouteFromHint(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<MilliSatoshi, CltvExpiryDelta> {
+    return JavaConverters.asJavaCollectionConverter(paymentRequest.routingInfo()).asJavaCollection().toList()
+      .map {
+        // get the aggregate (fee, expiry) for this route
+        JavaConverters.asJavaCollectionConverter(it).asJavaCollection().toList()
+          .map { h -> Pair(`package$`.`MODULE$`.nodeFee(h.feeBase(), h.feeProportionalMillionths(), amount), h.cltvExpiryDelta()) }
+          .fold(Pair(MilliSatoshi(0), CltvExpiryDelta(0))) { a, b -> Pair(a.first.`$plus`(b.first), a.second.`$plus`(b.second)) }
+      }
+      // get the max aggregated (fee, expiry)
+      .maxWith(Comparator { p1, p2 ->
+        when {
+          p1.second > p2.second -> 1
+          p1.second == p2.second -> (p1.first.toLong() - p2.first.toLong()).toInt()
+          else -> -1
+        }
+      }) ?: Pair(MilliSatoshi(0), CltvExpiryDelta(0))
+  }
+
   @UiThread
-  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, deductFeeFromAmount: Boolean, checkFees: Boolean = false) {
+  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, deductFeeFromAmount: Boolean) {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
           val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
-          val fee = if (isTrampoline) {
-            trampolineSettings.value!!.feeBase.`$times`(trampolineSettings.value!!.hopsCount.toLong()) // base fee per hop
-              .`$plus`(amount.`$times`(trampolineSettings.value!!.feePercent))  // proportional fee, defaults to 0.1 % of payment amount
-          } else {
-            MilliSatoshi(0)
-          }
-          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(fee) else amount
-
 
           val sendRequest: Any = if (isTrampoline) {
+            val routeFromHints = getMostExpensiveRouteFromHint(amount, paymentRequest)
+            log.info("most expensive fee/expiry from payment request hints=$routeFromHints")
+            val feesTrampoline = JavaConverters.asScalaBufferConverter(trampolineFeeSettings.value!!
+              // if we have to deduct the fee from the amount, use the most expensive fee option to make sure that the payment will go through
+              .apply { if (deductFeeFromAmount) listOf(this.last()) else this }
+              .map {
+                // fee = trampoline_base + trampoline_percent * amount + fee_from_hint
+                Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent).`$plus`(routeFromHints.first)), it.cltvExpiry.`$plus`(routeFromHints.second))
+              })
+              .asScala().toList()
 
-            val trampolineExpiry = CltvExpiryDelta(trampolineSettings.value!!.cltvExpiry * trampolineSettings.value!!.hopsCount)
-            val trampolineAttempts = ScalaList.empty<Tuple2<MilliSatoshi, CltvExpiryDelta>>().`$colon$colon`(Tuple2(fee, trampolineExpiry))
+            val amountFinal = if (deductFeeFromAmount) amount.`$minus`(feesTrampoline.head()._1) else amount
+
+            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$feesTrampoline, deductFee=$deductFeeFromAmount ] for pr=$paymentRequest")
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
               /* payment request */ paymentRequest,
               /* trampoline node public key */ Wallet.ACINQ.nodeId(),
-              /* fees and expiry delta for the trampoline node */ trampolineAttempts,
+              /* fees and expiry delta for the trampoline node */ feesTrampoline,
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* route params */ Option.apply(null))
           } else {
+            log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
             PaymentInitiator.SendPaymentRequest(
-              /* amount to send */ amountFinal,
+              /* amount to send */ amount,
               /* paymentHash */ paymentRequest.paymentHash(),
               /* payment target */ paymentRequest.nodeId(),
               /* max attempts */ 5,
@@ -365,8 +394,13 @@ class AppKitModel : ViewModel() {
               /* route params */ Option.apply(null))
           }
 
-          log.info("sending payment [ amount=$amountFinal, fee=$fee, isTrampoline=$isTrampoline, deductFee=$deductFeeFromAmount ] for pr=$paymentRequest with trampolineSettings=${trampolineSettings.value}")
-          this.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
+          val res = Await.result(Patterns.ask(this.kit.paymentInitiator(), sendRequest, timeout), awaitDuration)
+          if (res is PaymentFailed) {
+            val failure = res.failures().mkString(", ")
+            log.error("payment has failed: [ $failure ])")
+            throw RuntimeException("Payment failure: $failure")
+          }
+
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -424,7 +458,7 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         delay(500)
         kit.value?.let {
-          val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+          val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
@@ -711,13 +745,17 @@ class AppKitModel : ViewModel() {
             }
 
             // -- trampoline settings
-            val trampolineJson = json.getJSONObject("trampoline").getJSONObject("v1")
-            val remoteTrampoline = TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(trampolineJson.getLong("fee_base_sat"))),
-              feePercent = trampolineJson.getDouble("fee_percent"),
-              hopsCount = trampolineJson.getInt("hops_count"),
-              cltvExpiry = trampolineJson.getInt("cltv_expiry"))
-            trampolineSettings.postValue(remoteTrampoline)
-            log.info("trampoline settings set to $remoteTrampoline")
+            val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
+            val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
+            for (i in 0 until trampolineArray.length()) {
+              val setting: JSONObject = trampolineArray.get(i) as JSONObject
+              trampolineSettingsList += TrampolineFeeSetting(
+                feeBase = Converter.any2Msat(Satoshi(setting.getLong("fee_base_sat"))),
+                feePercent = setting.getDouble("fee_percent"),
+                cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
+            }
+            trampolineFeeSettings.postValue(trampolineSettingsList)
+            log.info("trampoline settings set to $trampolineSettingsList")
 
             // -- swap-in settings
             val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))

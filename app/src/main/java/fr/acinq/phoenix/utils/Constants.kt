@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import android.text.format.DateUtils
+import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.*
 import okhttp3.MediaType
@@ -45,6 +46,8 @@ object Constants {
 
   // -- default wallet values
   val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = true)
-  val DEFAULT_TRAMPOLINE_SETTINGS = TrampolineSettings(MilliSatoshi(5000), 0.001, 5, 144)
+  // default trampoline fee setting is quite expensive (5 sat + 0.001 %) but guarantee a good success rate
+  // will be overridden by remote setting with up-to-date values
+  val DEFAULT_TRAMPOLINE_SETTINGS = listOf(TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(144)))
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
 }

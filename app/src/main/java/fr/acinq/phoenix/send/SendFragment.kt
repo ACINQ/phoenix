@@ -258,10 +258,10 @@ class SendFragment : BaseFragment() {
   private fun sendPaymentFinal(amount: MilliSatoshi, pr: PaymentRequest) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when sending payment: ", exception)
-      model.state.value = SendState.VALID_INVOICE
+      model.state.value = SendState.ERROR_SENDING
     }) {
       model.state.value = SendState.SENDING
-      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, deductFeeFromAmount = model.useMaxBalance.value ?: false, checkFees = false)
+      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, deductFeeFromAmount = model.useMaxBalance.value ?: false)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }

@@ -147,6 +147,7 @@
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="send_pay_button">Pay</string>
   <string name="send_cancel_button">Decline</string>
   <string name="send_pay_button_for_swap">Next</string>

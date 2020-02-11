@@ -31,7 +31,7 @@ import scala.util.Left
 import scala.util.Right
 
 enum class SendState {
-  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, SENDING
+  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, SENDING, ERROR_SENDING
 }
 
 enum class SwapState {
@@ -76,7 +76,7 @@ class SendViewModel : ViewModel() {
   }
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
-    state == SendState.VALID_INVOICE || state == SendState.SENDING
+    state == SendState.VALID_INVOICE || state == SendState.SENDING || state == SendState.ERROR_SENDING
   }
 
   init {
