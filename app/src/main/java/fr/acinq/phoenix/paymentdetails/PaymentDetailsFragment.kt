@@ -204,20 +204,22 @@ class PaymentDetailsFragment : BaseFragment() {
       if (isSentPayment) {
         val payments: List<OutgoingPayment> = appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
         if (payments.isEmpty()) {
+          log.warn("could not find any outgoing payments for id=$identifier")
           model.payment.value = null
-          model.state.value = PaymentDetailsState.NONE
+          model.state.value = PaymentDetailsState.ERROR
         } else {
           model.payment.value = Left.apply(payments)
           model.state.value = PaymentDetailsState.DONE
         }
       } else {
         val p = appKit.getReceivedPayment(ByteVector32.fromValidHex(identifier))
-        if (p.isDefined) {
+        if (p.isEmpty) {
+          log.warn("could not find any incoming payments for id=$identifier")
+          model.payment.value = null
+          model.state.value = PaymentDetailsState.ERROR
+        } else {
           model.payment.value = Right.apply(p.get())
           model.state.value = PaymentDetailsState.DONE
-        } else {
-          model.payment.value = null
-          model.state.value = PaymentDetailsState.NONE
         }
       }
     }
