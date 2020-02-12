@@ -72,6 +72,7 @@ class EclairSupervisor : UntypedActor() {
       is Relayer.OutgoingChannels -> {
         val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
         val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())
+        log.info("receive Relayer.OutgoingChannels event with ${event.channels().size()} channels holding $total")
         EventBus.getDefault().post(BalanceEvent(total))
       }
 

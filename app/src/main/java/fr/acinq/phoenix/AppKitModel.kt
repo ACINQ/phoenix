@@ -97,10 +97,8 @@ enum class StartupState {
 class AppKitModel : ViewModel() {
   private val log = LoggerFactory.getLogger(AppKitModel::class.java)
 
-  private val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
+  private val shortTimeout = Timeout(Duration.create(10, TimeUnit.SECONDS))
   private val longTimeout = Timeout(Duration.create(30, TimeUnit.SECONDS))
-  private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
-  private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
@@ -176,8 +174,14 @@ class AppKitModel : ViewModel() {
     // a confirmed swap-in means that a channel was opened ; this event is stored as an incoming payment in payment database.
     kit.value?.run {
       try {
-        val pr = doGeneratePaymentRequest("On-chain payment to ${event.bitcoinAddress()}", Option.apply(event.amount()), ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>())
+        log.info("saving successful swap-in=$event as incoming payment")
+        val pr = doGeneratePaymentRequest(
+          description = "On-chain payment to ${event.bitcoinAddress()}",
+          amount_opt = Option.apply(event.amount()),
+          routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
+          timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)))
         kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
+        log.info("successful swap-in=$event as been saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
         pendingSwapIns.value?.remove(event.bitcoinAddress())
         navigationEvent.postValue(PaymentReceived(pr.paymentHash(),
           ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
@@ -291,7 +295,7 @@ class AppKitModel : ViewModel() {
   }
 
   @WorkerThread
-  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>): PaymentRequest {
+  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>, timeout: Timeout = shortTimeout): PaymentRequest {
     return _kit.value?.let {
       val f = Patterns.ask(it.kit.paymentHandler(),
         MultiPartHandler.ReceivePayment(
@@ -301,7 +305,7 @@ class AppKitModel : ViewModel() {
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
           /* payment preimage */ Option.empty()), timeout)
-      Await.result(f, awaitDuration) as PaymentRequest
+      Await.result(f, Duration.Inf()) as PaymentRequest
     } ?: throw KitNotInitialized()
   }
 
@@ -394,7 +398,7 @@ class AppKitModel : ViewModel() {
               /* route params */ Option.apply(null))
           }
 
-          val res = Await.result(Patterns.ask(this.kit.paymentInitiator(), sendRequest, timeout), awaitDuration)
+          val res = Await.result(Patterns.ask(this.kit.paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
           if (res is PaymentFailed) {
             val failure = res.failures().mkString(", ")
             log.error("payment has failed: [ $failure ])")
@@ -427,7 +431,7 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit.value?.api?.let {
-          val res = Await.result(it.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
+          val res = Await.result(it.channelsInfo(Option.apply(null), shortTimeout), Duration.Inf()) as scala.collection.Iterable<RES_GETINFO>
           val channels = JavaConverters.asJavaIterableConverter(res).asJava()
           state?.let {
             channels.filter { c -> c.state() == state }
@@ -445,7 +449,7 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit.value?.api?.let {
-          val res = Await.result(it.channelInfo(Left.apply(channelId), timeout), awaitDuration) as RES_GETINFO
+          val res = Await.result(it.channelInfo(Left.apply(channelId), shortTimeout), Duration.Inf()) as RES_GETINFO
           res
         }
       }
@@ -465,7 +469,7 @@ class AppKitModel : ViewModel() {
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
             closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -483,7 +487,7 @@ class AppKitModel : ViewModel() {
             log.info("attempting to force close channel=$channelId")
             closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -625,7 +629,8 @@ class AppKitModel : ViewModel() {
 
     val xpubPath = Wallet.getXpubKeyPath()
     val pubkey = DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, xpubPath))
-    val xpub = Xpub(DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()), DeterministicWallet.KeyPath(xpubPath.path()).toString())
+    val xpub = Xpub(xpub = DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()),
+      path = DeterministicWallet.KeyPath(xpubPath.path()).toString())
 
     Class.forName("org.sqlite.JDBC")
     val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
