@@ -309,7 +309,7 @@ class AppKitModel : ViewModel() {
     } ?: throw KitNotInitialized()
   }
 
-  suspend fun sendSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
+  suspend fun requestSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {

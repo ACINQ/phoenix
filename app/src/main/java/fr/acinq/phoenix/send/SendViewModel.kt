@@ -18,6 +18,7 @@ package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.SingleLiveEvent
@@ -26,61 +27,72 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import scala.util.Either
-import scala.util.Left
-import scala.util.Right
 
-enum class SendState {
-  VALIDATING_INVOICE, INVALID_INVOICE, VALID_INVOICE, SENDING, ERROR_SENDING
-}
+sealed class SendState {
+  object CheckingInvoice : SendState()
+  object InvalidInvoice : SendState()
 
-enum class SwapState {
-  NO_SWAP, SWAP_REQUIRED, SWAP_IN_PROGRESS, SWAP_COMPLETE, SWAP_EXCEEDS_BALANCE
+  sealed class Lightning : SendState() {
+    abstract val pr: PaymentRequest
+
+    data class Ready(override val pr: PaymentRequest) : Lightning()
+    data class Sending(override val pr: PaymentRequest) : Lightning()
+    sealed class Error : Lightning() {
+      data class SendingFailure(override val pr: PaymentRequest) : Error()
+    }
+  }
+
+  sealed class Onchain : SendState() {
+    abstract val uri: BitcoinURI
+
+    data class SwapRequired(override val uri: BitcoinURI) : Onchain()
+    data class Swapping(override val uri: BitcoinURI) : Onchain()
+    data class Ready(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain()
+    data class Sending(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain()
+    sealed class Error : Onchain() {
+      data class ExceedsBalance(override val uri: BitcoinURI) : Error()
+      data class SendingFailure(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain.Error()
+    }
+  }
 }
 
 class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
-  val state = MutableLiveData<SendState>(SendState.VALIDATING_INVOICE)
-  val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
-  val isAmountFieldPristine = MutableLiveData(true) // to prevent early validation error message if amount is not set in invoice
+  val state = MutableLiveData<SendState>()
+  //  val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
+  val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
-  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
+  //  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request
 
-  val description: LiveData<String> = Transformations.map(invoice) {
-    it?.let {
-      when {
-        it.isLeft -> it.left().get().first.label
-        it.isRight && it.right().get().description().isLeft -> it.right().get().description().left().get()
-        it.isRight && it.right().get().description().isRight -> it.right().get().description().right().get().toString()
-        else -> ""
-      }
-    } ?: ""
+  val description: LiveData<String> = Transformations.map(state) {
+    when {
+      it is SendState.Lightning && it.pr.description().isLeft -> it.pr.description().left().get()
+      it is SendState.Lightning && it.pr.description().isRight -> it.pr.description().right().get().toString()
+      else -> ""
+    }
   }
 
-  val destination: LiveData<String> = Transformations.map(invoice) {
-    it?.let {
-      when {
-        it.isLeft -> it.left().get().first.address
-        it.isRight -> it.right().get().nodeId().toString()
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val isLightning: LiveData<Boolean> = Transformations.map(invoice) {
-    it != null && it.isRight
+  val destination: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is SendState.Lightning -> it.pr.nodeId().toString()
+      is SendState.Onchain -> it.uri.address
+      else -> ""
+    }
   }
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
-    state == SendState.VALID_INVOICE || state == SendState.SENDING || state == SendState.ERROR_SENDING
+    state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice
   }
 
   init {
+    state.value = SendState.CheckingInvoice
     useMaxBalance.value = false
+    isAmountFieldPristine.value = true
+    amountErrorMessage.value = 0
   }
 
   // ---- end of computed values
@@ -93,15 +105,13 @@ class SendViewModel : ViewModel() {
         try {
           val extract = Wallet.extractInvoice(input)
           when (extract) {
-            is BitcoinURI -> invoice.postValue(Left.apply(Pair(extract, null)))
-            is PaymentRequest -> invoice.postValue(Right.apply(extract))
+            is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
+            is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
             else -> throw RuntimeException("unhandled invoice type")
           }
-          state.postValue(SendState.VALID_INVOICE)
         } catch (e: Exception) {
-          log.error("invalid payment request $input: ${e.message}")
-          invoice.postValue(null)
-          state.postValue(SendState.INVALID_INVOICE)
+          log.error("invalid invoice for input=$input: ${e.message}")
+          state.postValue(SendState.InvalidInvoice)
         }
       }
     }

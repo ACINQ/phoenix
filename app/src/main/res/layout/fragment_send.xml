@@ -22,8 +22,6 @@
 
     <import type="fr.acinq.phoenix.send.SendState" />
 
-    <import type="fr.acinq.phoenix.send.SwapState" />
-
     <variable
       name="model"
       type="fr.acinq.phoenix.send.SendViewModel" />
@@ -123,7 +121,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_md"
         android:layout_marginTop="@dimen/space_lg"
-        android:visibility="@{model.state == SendState.VALIDATING_INVOICE}"
+        android:visibility="@{model.state instanceof SendState.CheckingInvoice}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
         app:text="@string/send_loading"
@@ -135,7 +133,7 @@
         android:layout_marginTop="@dimen/space_md"
         android:padding="@dimen/space_md"
         android:text="@string/send_invalid_pr_generic"
-        android:visibility="@{model.state == SendState.INVALID_INVOICE}"
+        android:visibility="@{model.state instanceof SendState.InvalidInvoice}"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section" />
 
@@ -163,7 +161,7 @@
           android:text=""
           android:textAlignment="viewEnd"
           android:textSize="48sp"
-          app:enableOrFade="@{model.swapState != SwapState.SWAP_IN_PROGRESS &amp;&amp; !model.useMaxBalance}"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
           app:layout_constrainedHeight="true"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toStartOf="@id/unit"
@@ -177,7 +175,7 @@
           style="@style/default_spinnerStyle"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:enableOrFade="@{model.swapState != SwapState.SWAP_IN_PROGRESS &amp;&amp; !model.useMaxBalance}"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
           app:layout_constraintBaseline_toBaselineOf="@+id/amount"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/amount"
@@ -237,7 +235,7 @@
           android:checked="@={model.useMaxBalance}"
           android:text="@string/send_use_all_balance"
           android:textSize="@dimen/text_sm"
-          android:visibility="@{model.isLightning()}"
+          android:visibility="@{model.state instanceof SendState.Lightning}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -260,7 +258,7 @@
           android:layout_marginStart="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_lg_p"
-          android:drawableStart="@{model.isLightning() ? @drawable/ic_zap : @drawable/ic_chain}"
+          android:drawableStart="@{model.state instanceof SendState.Lightning ? @drawable/ic_zap : @drawable/ic_chain}"
           android:drawablePadding="@dimen/space_xxs"
           android:drawableTint="?attr/colorPrimary"
           android:ellipsize="none"
@@ -310,7 +308,7 @@
           android:paddingEnd="@dimen/space_lg"
           android:paddingBottom="@dimen/space_md"
           android:text="@string/send_swap_required_desc"
-          android:visibility="@{model.swapState == SwapState.SWAP_REQUIRED || model.swapState == SwapState.SWAP_IN_PROGRESS}"
+          android:visibility="@{model.state instanceof SendState.Onchain.SwapRequired || model.state instanceof SendState.Onchain.Swapping}"
           app:layout_constrainedWidth="true"
           app:layout_constraintTop_toBottomOf="@id/description_value" />
 
@@ -330,8 +328,8 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_primary_border"
-          android:visibility="@{model.swapState == SwapState.SWAP_REQUIRED || model.swapState == SwapState.SWAP_COMPLETE}"
-          app:enableOrFade="@{model.swapState == SwapState.SWAP_REQUIRED}"
+          android:visibility="@{model.state instanceof SendState.Onchain.SwapRequired || model.state instanceof SendState.Onchain.Ready}"
+          app:enableOrFade="@{model.state instanceof SendState.Onchain.SwapRequired}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"
           app:layout_constraintEnd_toEndOf="parent"
@@ -344,7 +342,7 @@
           android:layout_height="wrap_content"
           android:background="@drawable/rounded_border"
           android:padding="@dimen/text_md"
-          android:visibility="@{model.swapState == SwapState.SWAP_IN_PROGRESS}"
+          android:visibility="@{model.state instanceof SendState.Onchain.Swapping}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
@@ -359,7 +357,7 @@
           android:layout_marginEnd="@dimen/space_lg"
           android:paddingTop="@dimen/space_lg"
           android:paddingBottom="@dimen/space_lg"
-          android:visibility="@{model.swapState == SwapState.SWAP_COMPLETE}"
+          android:visibility="@{model.state instanceof SendState.Onchain.Ready}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_button">
@@ -441,7 +439,7 @@
           android:drawableTint="?attr/negativeColor"
           android:maxWidth="260dp"
           android:text="@string/send_swap_complete_cannot_afford"
-          android:visibility="@{model.swapState == SwapState.SWAP_EXCEEDS_BALANCE}"
+          android:visibility="@{model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -452,8 +450,8 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:backgroundTint="?attr/colorPrimary"
-          android:visibility="@{model.swapState == SwapState.NO_SWAP || model.swapState == SwapState.SWAP_COMPLETE}"
-          app:enableOrFade="@{model.state == SendState.VALID_INVOICE}"
+          android:visibility="@{model.state instanceof SendState.Lightning || model.state instanceof SendState.Onchain.Ready}"
+          app:enableOrFade="@{model.state instanceof SendState.Lightning.Ready || model.state instanceof SendState.Onchain.Ready}"
           app:icon="@drawable/ic_send"
           app:icon_tint="?attr/altTextColor"
           app:layout_constraintEnd_toEndOf="parent"
@@ -471,7 +469,7 @@
           android:textAlignment="center"
           android:padding="@dimen/space_sm"
           android:text="@string/send_error_sending"
-          android:visibility="@{model.state == SendState.ERROR_SENDING}"
+          android:visibility="@{model.state instanceof SendState.Lightning.Error.SendingFailure || model.state instanceof SendState.Onchain.Error.SendingFailure}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
