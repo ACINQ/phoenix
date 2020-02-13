@@ -46,6 +46,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters
 import scala.util.Either
 import scala.util.Left
 import scala.util.Right
@@ -83,41 +84,41 @@ class PaymentDetailsFragment : BaseFragment() {
           when {
             // OUTGOING PAYMENT
             it.isLeft && it.left().get().isNotEmpty() -> {
-              val payments = it.left().get()
-              val p = it.left().get().first()
-              when (p.status()) {
-                is OutgoingPaymentStatus.Failed -> {
-                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
-                  showStatusIconAndDetails(ctx, R.drawable.ic_cross, ThemeHelper.color(ctx, R.attr.negativeColor))
-                  val status = p.status() as OutgoingPaymentStatus.Failed
-                  val errorMessages = ArrayList<String>()
-                  val iterator = status.failures().iterator()
-                  while (iterator.hasNext()) {
-                    errorMessages += iterator.next().failureMessage()
-                  }
-                  mBinding.errorValue.text = errorMessages.joinToString(", ")
-                }
-                is OutgoingPaymentStatus.`Pending$` -> {
+              val paymentsMap = it.left().get().groupBy({ p -> p.status()::class.java.simpleName}) { p -> p }
+              log.info("payment details map=$paymentsMap")
+              when {
+                // some payments are still pending
+                paymentsMap.getOrDefault(OutgoingPaymentStatus.`Pending$`.`MODULE$`::class.java.simpleName, emptyList()).isNotEmpty() -> {
                   mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
                   showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
                 }
-                is OutgoingPaymentStatus.Succeeded -> {
-                  val status = p.status() as OutgoingPaymentStatus.Succeeded
-                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
-                  val statuses: List<OutgoingPaymentStatus.Succeeded> =
-                    payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
+                // there are some successful outgoing payments, and no pending
+                paymentsMap.getOrDefault(OutgoingPaymentStatus.Succeeded::class.java.simpleName, emptyList()).isNotEmpty() -> {
+                  val payments = paymentsMap.getOrDefault(OutgoingPaymentStatus.Succeeded::class.java.simpleName, emptyList())
+                  val statuses: List<OutgoingPaymentStatus.Succeeded> = payments.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }
+                  val completionDate = statuses.map { s -> s.completedAt() }.max()!!
                   val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
-
-                  if (p.paymentRequest().isDefined) {
+                  val head = payments.first()
+                  if (head.paymentRequest().isDefined) {
                     mBinding.feesValue.setAmount(fees)
-                  } else if (p.externalId().isDefined && p.externalId().get().startsWith("closing-")) {
+                  } else if (head.externalId().isDefined && head.externalId().get().startsWith("closing-")) {
                     // special case: this outgoing payment represents a channel closing/closed
-                    mBinding.closingDescValue.text = getString(R.string.paymentdetails_closing_mock_desc, p.externalId().get().split("-").last())
+                    mBinding.closingDescValue.text = getString(R.string.paymentdetails_closing_mock_desc, head.externalId().get().split("-").last())
                   }
+                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, completionDate)))
+                  mBinding.amountValue.setAmount(MilliSatoshi(payments.map { o -> o.amount().toLong() }.sum()))
                   showStatusIconAndDetails(ctx, if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, ThemeHelper.color(ctx, R.attr.positiveColor))
                 }
+                // there are only failed payments
+                paymentsMap.getOrDefault(OutgoingPaymentStatus.Failed::class.java.simpleName, emptyList()).isNotEmpty() -> {
+                  // take the last element, as the last error if probably the most pertinent
+                  val last = paymentsMap.getOrDefault(OutgoingPaymentStatus.Failed::class.java.simpleName, emptyList()).first()
+                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
+                  mBinding.errorValue.text = (last.status() as OutgoingPaymentStatus.Failed).failures().mkString(", ")
+                  mBinding.amountValue.setAmount(last.recipientAmount())
+                  showStatusIconAndDetails(ctx, R.drawable.ic_cross, ThemeHelper.color(ctx, R.attr.negativeColor))
+                }
               }
-              mBinding.amountValue.setAmount(MilliSatoshi(payments.map { o -> o.amount().toLong() }.sum()))
             }
             // INCOMING PAYMENT
             it.isRight -> {
