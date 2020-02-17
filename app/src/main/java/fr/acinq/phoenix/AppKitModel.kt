@@ -84,8 +84,8 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
-data class TrampolineFeeSetting(var feeBase: MilliSatoshi, var feePercent: Double, var cltvExpiry: CltvExpiryDelta)
-data class SwapInSettings(var feePercent: Double)
+data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
+data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
@@ -355,7 +355,7 @@ class AppKitModel : ViewModel() {
   }
 
   @UiThread
-  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, deductFeeFromAmount: Boolean) {
+  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean) {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
@@ -363,25 +363,26 @@ class AppKitModel : ViewModel() {
           val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
 
           val sendRequest: Any = if (isTrampoline) {
+            val trampolineSettings = trampolineFeeSettings.value!!
             val routeFromHints = getMostExpensiveRouteFromHint(amount, paymentRequest)
             log.info("most expensive fee/expiry from payment request hints=$routeFromHints")
-            val feesTrampoline = JavaConverters.asScalaBufferConverter(trampolineFeeSettings.value!!
-              // if we have to deduct the fee from the amount, use the most expensive fee option to make sure that the payment will go through
-              .apply { if (deductFeeFromAmount) listOf(this.last()) else this }
+            val fees = JavaConverters.asScalaBufferConverter(trampolineSettings
+              // if we have to subtract the fee from the amount, use the most expensive fee option to make sure that the payment will go through
+              .apply { if (subtractFee) listOf(this.last()) else this }
               .map {
                 // fee = trampoline_base + trampoline_percent * amount + fee_from_hint
                 Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent).`$plus`(routeFromHints.first)), it.cltvExpiry.`$plus`(routeFromHints.second))
               })
               .asScala().toList()
 
-            val amountFinal = if (deductFeeFromAmount) amount.`$minus`(feesTrampoline.head()._1) else amount
+            val amountFinal = if (subtractFee) amount.`$minus`(fees.head()._1) else amount
 
-            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$feesTrampoline, deductFee=$deductFeeFromAmount ] for pr=$paymentRequest")
+            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$fees, subtractFee=$subtractFee ] for pr=$paymentRequest")
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
               /* payment request */ paymentRequest,
               /* trampoline node public key */ Wallet.ACINQ.nodeId(),
-              /* fees and expiry delta for the trampoline node */ feesTrampoline,
+              /* fees and expiry delta for the trampoline node */ fees,
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* route params */ Option.apply(null))
           } else {
@@ -636,7 +637,7 @@ class AppKitModel : ViewModel() {
     val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
-    log.info("node setup ready")
+    log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
@@ -759,6 +760,8 @@ class AppKitModel : ViewModel() {
                 feePercent = setting.getDouble("fee_percent"),
                 cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
             }
+
+            trampolineSettingsList.sortedWith(compareBy({ it.feePercent }, { it.feeBase }))
             trampolineFeeSettings.postValue(trampolineSettingsList)
             log.info("trampoline settings set to $trampolineSettingsList")
 
@@ -766,8 +769,9 @@ class AppKitModel : ViewModel() {
             val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
             swapInSettings.postValue(remoteSwapInSettings)
             log.info("swap_in settings set to $remoteSwapInSettings")
-          } catch (e: JSONException) {
-            log.error("could not read wallet context body: ", e)
+          } catch (e: Exception) {
+            log.warn("wallet context body: ${body.string()}")
+            log.error("error when reading wallet context body: ", e)
           }
         } else {
           log.warn("could not retrieve wallet context from remote, code=${response.code()}")

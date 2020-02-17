@@ -51,5 +51,6 @@ class SettingsFragment : BaseFragment() {
     mBinding.seedSecurityButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_seed_security) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
+//    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
   }
 }

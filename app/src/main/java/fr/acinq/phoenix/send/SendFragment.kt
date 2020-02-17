@@ -241,7 +241,7 @@ class SendFragment : BaseFragment() {
         is SendState.Onchain -> SendState.Onchain.Sending(state.uri, pr)
         else -> throw RuntimeException("unhandled state=$state when sending payment")
       }
-      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, deductFeeFromAmount = model.useMaxBalance.value ?: false)
+      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }
