@@ -97,14 +97,14 @@ class MainActivity : AppCompatActivity() {
       handleNetworkAlert()
     })
     appKit.navigationEvent.observe(this, Observer {
-      log.info("navigation event @ $it")
       when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
             amountMsat = it.payToOpenRequest().amountMsat().toLong(),
             fundingSat = it.payToOpenRequest().fundingSatoshis().toLong(),
             feeSat = it.payToOpenRequest().feeSatoshis().toLong(),
-            paymentHash = it.payToOpenRequest().paymentHash().toString())
+            paymentHash = it.payToOpenRequest().paymentHash().toString(),
+            expireAt = it.payToOpenRequest().expireAt())
           findNavController(R.id.nav_host_main).navigate(action)
         }
         is PaymentSent -> {

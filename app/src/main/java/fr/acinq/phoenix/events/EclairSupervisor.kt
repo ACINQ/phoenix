@@ -84,7 +84,7 @@ class EclairSupervisor : UntypedActor() {
       is AcceptPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(true)) {
+          if (it.decision().trySuccess(true)) {
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")
@@ -94,7 +94,7 @@ class EclairSupervisor : UntypedActor() {
       is RejectPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(false)) {
+          if (it.decision().trySuccess(false)) {
             log.info("payToOpen event has been rejected by user")
           } else {
             log.warn("success promise for $event has failed")

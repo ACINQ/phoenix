@@ -229,6 +229,9 @@
     <action
       android:id="@+id/action_receive_with_open_to_main"
       app:destination="@+id/main_fragment" />
+    <argument
+      android:name="expireAt"
+      app:argType="long" />
   </dialog>
 
   <!-- send money -->
