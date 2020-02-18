@@ -37,10 +37,7 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.OutgoingPaymentStatus
-import fr.acinq.eclair.db.PlainPayment
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
@@ -178,7 +175,8 @@ class AppKitModel : ViewModel() {
           description = "On-chain payment to ${event.bitcoinAddress()}",
           amount_opt = Option.apply(event.amount()),
           routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
-          timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)))
+          timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)),
+          paymentType = PaymentType.SwapIn())
         kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
         log.info("successful swap-in=$event as been saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
         pendingSwapIns.value?.remove(event.bitcoinAddress())
@@ -288,13 +286,13 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
         val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-        doGeneratePaymentRequest(description, amount_opt, routes)
+        doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard())
       }
     }.await()
   }
 
   @WorkerThread
-  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>, timeout: Timeout = shortTimeout): PaymentRequest {
+  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>, timeout: Timeout = shortTimeout, paymentType: String): PaymentRequest {
     return _kit.value?.let {
       val f = Patterns.ask(it.kit.paymentHandler(),
         MultiPartHandler.ReceivePayment(
@@ -303,7 +301,8 @@ class AppKitModel : ViewModel() {
           /* expiry seconds */ Option.empty(),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
-          /* payment preimage */ Option.empty()), timeout)
+          /* payment preimage */ Option.empty(),
+          /* Standard, SwapIn,... */ paymentType), timeout)
       Await.result(f, Duration.Inf()) as PaymentRequest
     } ?: throw KitNotInitialized()
   }
