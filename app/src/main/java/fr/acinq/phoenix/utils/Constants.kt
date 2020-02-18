@@ -47,9 +47,10 @@ object Constants {
   val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = true)
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
-    TrampolineFeeSetting(MilliSatoshi(3000), 0.0001, CltvExpiryDelta(144)), // 3 sat + 0.01 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.0005, CltvExpiryDelta(144)), // 5 sat + 0.05 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(144)), // 5 sat + 0.1 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(144))) // 5 sat + 0.12 %
+    TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %
+    TrampolineFeeSetting(MilliSatoshi(3000), 0.0001, CltvExpiryDelta(576)), // 3 sat + 0.01 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.0005, CltvExpiryDelta(576)), // 5 sat + 0.05 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(576)), // 5 sat + 0.1 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(576))) // 5 sat + 0.12 %
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
 }
