@@ -770,7 +770,6 @@ class AppKitModel : ViewModel() {
             swapInSettings.postValue(remoteSwapInSettings)
             log.info("swap_in settings set to $remoteSwapInSettings")
           } catch (e: Exception) {
-            log.warn("wallet context body: ${body.string()}")
             log.error("error when reading wallet context body: ", e)
           }
         } else {
