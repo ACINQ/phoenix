@@ -62,7 +62,6 @@ import okhttp3.Response
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
@@ -333,25 +332,19 @@ class AppKitModel : ViewModel() {
   }
 
   /**
-   * Extracts the route with the highest aggregate (fee, cltv expiry) from a list of routing hints. The cltv
-   * expiry has priority over the fee.
+   * Extracts the worst case (fee, ctlv expiry delta) scenario from the routing hints in a payment request. If the payment request has no routing hints, return (0, 0).
    */
-  private fun getMostExpensiveRouteFromHint(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<MilliSatoshi, CltvExpiryDelta> {
-    return JavaConverters.asJavaCollectionConverter(paymentRequest.routingInfo()).asJavaCollection().toList()
+  private fun getPessimisticRouteSettingsFromHint(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<MilliSatoshi, CltvExpiryDelta> {
+    val aggregateByRoutes = JavaConverters.asJavaCollectionConverter(paymentRequest.routingInfo()).asJavaCollection().toList()
       .map {
         // get the aggregate (fee, expiry) for this route
         JavaConverters.asJavaCollectionConverter(it).asJavaCollection().toList()
           .map { h -> Pair(`package$`.`MODULE$`.nodeFee(h.feeBase(), h.feeProportionalMillionths(), amount), h.cltvExpiryDelta()) }
           .fold(Pair(MilliSatoshi(0), CltvExpiryDelta(0))) { a, b -> Pair(a.first.`$plus`(b.first), a.second.`$plus`(b.second)) }
       }
-      // get the max aggregated (fee, expiry)
-      .maxWith(Comparator { p1, p2 ->
-        when {
-          p1.second > p2.second -> 1
-          p1.second == p2.second -> (p1.first.toLong() - p2.first.toLong()).toInt()
-          else -> -1
-        }
-      }) ?: Pair(MilliSatoshi(0), CltvExpiryDelta(0))
+    // return (max of fee, max of cltv expiry delta)
+    return Pair(MilliSatoshi(aggregateByRoutes.map { p -> p.first.toLong() }.max() ?: 0),
+      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.max() ?: 0))
   }
 
   @UiThread
@@ -363,26 +356,28 @@ class AppKitModel : ViewModel() {
           val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
 
           val sendRequest: Any = if (isTrampoline) {
-            val trampolineSettings = trampolineFeeSettings.value!!
-            val routeFromHints = getMostExpensiveRouteFromHint(amount, paymentRequest)
-            log.info("most expensive fee/expiry from payment request hints=$routeFromHints")
-            val fees = JavaConverters.asScalaBufferConverter(trampolineSettings
-              // if we have to subtract the fee from the amount, use the most expensive fee option to make sure that the payment will go through
-              .apply { if (subtractFee) listOf(this.last()) else this }
+            // 1 - compute trampoline fee settings for this payment
+            // note that if we have to subtract the fee from the amount, use ONLY the most expensive trampoline setting option, to make sure that the payment will go through
+            val feeSettingsDefault = if (subtractFee) listOf(trampolineFeeSettings.value!!.last()) else trampolineFeeSettings.value!!
+            val feeSettingsFromHints = getPessimisticRouteSettingsFromHint(amount, paymentRequest)
+            log.info("most expensive fee/expiry from payment request hints=$feeSettingsFromHints")
+            val finalTrampolineFeesList = JavaConverters.asScalaBufferConverter(feeSettingsDefault
               .map {
                 // fee = trampoline_base + trampoline_percent * amount + fee_from_hint
-                Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent).`$plus`(routeFromHints.first)), it.cltvExpiry.`$plus`(routeFromHints.second))
+                Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent)).`$plus`(feeSettingsFromHints.first), it.cltvExpiry.`$plus`(feeSettingsFromHints.second))
               })
               .asScala().toList()
 
-            val amountFinal = if (subtractFee) amount.`$minus`(fees.head()._1) else amount
+            // 2 - compute amount to send, which changes if fees must be subtracted from it (empty wallet)
+            val amountFinal = if (subtractFee) amount.`$minus`(finalTrampolineFeesList.head()._1) else amount
 
-            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$fees, subtractFee=$subtractFee ] for pr=$paymentRequest")
+            // 3 - build trampoline payment object
+            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$finalTrampolineFeesList, subtractFee=$subtractFee ] for pr=$paymentRequest")
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
               /* payment request */ paymentRequest,
               /* trampoline node public key */ Wallet.ACINQ.nodeId(),
-              /* fees and expiry delta for the trampoline node */ fees,
+              /* fees and expiry delta for the trampoline node */ finalTrampolineFeesList,
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* route params */ Option.apply(null))
           } else {
