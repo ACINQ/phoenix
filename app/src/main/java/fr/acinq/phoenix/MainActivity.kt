@@ -122,8 +122,14 @@ class MainActivity : AppCompatActivity() {
         else -> log.info("unhandled navigation event $it")
       }
     })
+    appKit.startupState.observe(this, Observer {
+      handleUriIntent()
+    })
+    appKit.currentURIIntent.observe(this, Observer {
+      handleUriIntent()
+    })
     // app may be started with a payment request intent
-    intent?.let { readURIIntent(intent) }
+    intent?.let { saveURIIntent(intent) }
   }
 
   override fun onStart() {
@@ -135,17 +141,15 @@ class MainActivity : AppCompatActivity() {
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    readURIIntent(intent)
+    saveURIIntent(intent)
   }
 
-  private fun readURIIntent(intent: Intent) {
+  private fun saveURIIntent(intent: Intent) {
     val data = intent.data
+    log.debug("reading URI intent=$intent with data=$data")
     if (data != null && data.scheme != null) {
       when (data.scheme) {
-        "bitcoin", "lightning" -> if (appKit.startupState.value == StartupState.DONE) {
-          findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(data.toString()))
-          appKit.currentURIIntent.value = null
-        } else {
+        "bitcoin", "lightning" -> {
           appKit.currentURIIntent.value = data.toString()
         }
         else -> log.info("unhandled payment scheme $data")
@@ -176,6 +180,14 @@ class MainActivity : AppCompatActivity() {
       }
     } else {
       mBinding.alertBlocking.visibility = View.GONE
+    }
+  }
+
+  private fun handleUriIntent() {
+    log.debug("handle intent=${appKit.currentURIIntent.value} in state=${appKit.startupState.value}")
+    if (appKit.startupState.value == StartupState.DONE && appKit.currentURIIntent.value != null) {
+      findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(appKit.currentURIIntent.value!!))
+      appKit.currentURIIntent.value = null
     }
   }
 
