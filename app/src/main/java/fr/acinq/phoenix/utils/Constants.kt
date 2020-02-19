@@ -52,5 +52,5 @@ object Constants {
     TrampolineFeeSetting(MilliSatoshi(5000), 0.0005, CltvExpiryDelta(576)), // 5 sat + 0.05 %
     TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(576)), // 5 sat + 0.1 %
     TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(576))) // 5 sat + 0.12 %
-  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
+  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
 }
