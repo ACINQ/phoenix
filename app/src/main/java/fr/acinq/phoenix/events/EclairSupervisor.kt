@@ -72,6 +72,7 @@ class EclairSupervisor : UntypedActor() {
       is Relayer.OutgoingChannels -> {
         val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
         val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())
+        log.info("receive Relayer.OutgoingChannels event with ${event.channels().size()} channels holding $total")
         EventBus.getDefault().post(BalanceEvent(total))
       }
 
@@ -83,7 +84,7 @@ class EclairSupervisor : UntypedActor() {
       is AcceptPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(true)) {
+          if (it.decision().trySuccess(true)) {
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")
@@ -93,7 +94,7 @@ class EclairSupervisor : UntypedActor() {
       is RejectPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(false)) {
+          if (it.decision().trySuccess(false)) {
             log.info("payToOpen event has been rejected by user")
           } else {
             log.warn("success promise for $event has failed")

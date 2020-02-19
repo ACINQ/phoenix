@@ -103,6 +103,16 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/seed_security_button" />
 
+<!--        <fr.acinq.phoenix.utils.customviews.ButtonView-->
+<!--          android:id="@+id/fees_button"-->
+<!--          android:layout_width="match_parent"-->
+<!--          android:layout_height="wrap_content"-->
+<!--          android:background="@drawable/button_bg_square_border"-->
+<!--          android:padding="@dimen/space_md"-->
+<!--          app:hz_bias="0"-->
+<!--          app:layout_constraintTop_toBottomOf="@id/advanced_title"-->
+<!--          app:text="@string/settings_fees" />-->
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/list_all_channels_button"
           android:layout_width="match_parent"

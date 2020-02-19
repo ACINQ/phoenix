@@ -147,6 +147,7 @@
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="send_pay_button">Pay</string>
   <string name="send_cancel_button">Decline</string>
   <string name="send_pay_button_for_swap">Next</string>
@@ -211,6 +212,7 @@
   <string name="settings_display_seed">Recovery phrase</string>
   <string name="settings_seed_security">App access settings</string>
   <string name="settings_advanced_title">Advanced</string>
+  <string name="settings_fees">Fees Settings</string>
   <string name="settings_list_channels">Channels list</string>
   <string name="settings_logs">Logs</string>
   <string name="settings_electrum">Electrum server</string>
@@ -343,10 +345,8 @@
 
   <!-- //////////////// payment details //////////////// -->
 
-  <string name="paymentdetails_title"></string>
   <string name="paymentdetails_loading">Retrieving payment details…</string>
-  <string name="paymentdetails_error">This payment could not be found…</string>
-  <string name="paymentdetails_none">No payment found…</string>
+  <string name="paymentdetails_error">There was an error when retrieving the details for this payment.\n\nPlease try again.</string>
 
   <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Sent</b> %1$s]]></string>
   <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pending…</b>]]></string>
@@ -366,8 +366,8 @@
   <string name="paymentdetails_destination_label">Sent to</string>
   <string name="paymentdetails_fees_label">Fees</string>
   <string name="paymentdetails_error_label">Error</string>
-  <string name="paymentdetails_multipart">This is an atomic multipart payment</string>
-  <string name="paymentdetails_closing_mock_desc">Payment for closing channel #%1$s</string>
+  <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
+  <string name="paymentdetails_no_description">No description</string>
 
   <string name="paymentdetails_technicals_button">Show technical data</string>
 
@@ -443,14 +443,13 @@
   <string name="lnurl_withdraw_confirm_button">Withdraw</string>
   <string name="lnurl_withdraw_wait">Requesting funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
-  <string name="lnurl_withdraw_error_unreadable">Invoice is invalid. Please try again.</string>
+  <string name="lnurl_withdraw_error_internal">Could not process this withdrawal request. Please try again.</string>
+  <string name="lnurl_withdraw_error_invalid">This withdrawal request is invalid. Please try again.</string>
   <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
   <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
-  <string name="lnurl_withdraw_error_internal">There was an error. Please try again.</string>
-  <string name="lnurl_withdraw_error_callback_remote">Error from %1$s (%2$s).\n\nTry again or contact their support.</string>
-  <string name="lnurl_withdraw_error_json">Invalid data</string>
-  <string name="lnurl_withdraw_error_generic">General failure</string>
+  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
+  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
@@ -480,5 +479,18 @@
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
+
+  <!-- //////////////// fees settings //////////////// -->
+
+  <string name="fees_settings_title">Fees Settings</string>
+  <string name="fees_settings_subtitle">These are the fees used for sending or receiving money with Phoenix.</string>
+
+  <string name="fees_settings_trampoline_title">Lightning payment</string>
+  <string name="fees_settings_trampoline_desc">The app will try to use the cheapest fee possible.</string>
+  <string name="fees_settings_trampoline_value">Lorem ipsum</string>
+  <string name="fees_settings_trampoline_spinner_label">At most %1$s + %2$s%%</string>
+
+  <string name="fees_settings_swap_in_title">Onchain → Lightning</string>
+  <string name="fees_settings_swap_in_desc">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
 
 </resources>

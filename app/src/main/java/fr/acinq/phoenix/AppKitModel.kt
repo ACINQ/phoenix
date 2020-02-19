@@ -37,10 +37,7 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.OutgoingPaymentStatus
-import fr.acinq.eclair.db.PlainPayment
+import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.payment.*
@@ -62,11 +59,11 @@ import okhttp3.Response
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
 import scala.Option
+import scala.Tuple2
 import scala.collection.JavaConverters
 import scala.concurrent.Await
 import scala.concurrent.Future
@@ -83,8 +80,8 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
-data class TrampolineSettings(var feeBase: MilliSatoshi, var feePercent: Double, var hopsCount: Int, var cltvExpiry: Int)
-data class SwapInSettings(var feePercent: Double)
+data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
+data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
@@ -96,10 +93,8 @@ enum class StartupState {
 class AppKitModel : ViewModel() {
   private val log = LoggerFactory.getLogger(AppKitModel::class.java)
 
-  private val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
+  private val shortTimeout = Timeout(Duration.create(10, TimeUnit.SECONDS))
   private val longTimeout = Timeout(Duration.create(30, TimeUnit.SECONDS))
-  private val awaitDuration = Duration.create(10, TimeUnit.SECONDS)
-  private val longAwaitDuration = Duration.create(60, TimeUnit.SECONDS)
 
   val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
@@ -110,7 +105,7 @@ class AppKitModel : ViewModel() {
   val navigationEvent = SingleLiveEvent<Any>()
   val startupState = MutableLiveData<StartupState>()
   val startupErrorMessage = MutableLiveData<String>()
-  val trampolineSettings = MutableLiveData<TrampolineSettings>()
+  val trampolineFeeSettings = MutableLiveData<List<TrampolineFeeSetting>>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
   val balance = MutableLiveData<MilliSatoshi>()
   private val _kit = MutableLiveData<AppKit>()
@@ -122,7 +117,7 @@ class AppKitModel : ViewModel() {
     startupState.value = StartupState.OFF
     networkInfo.value = Constants.DEFAULT_NETWORK_INFO
     balance.value = MilliSatoshi(0)
-    trampolineSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
+    trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
@@ -175,8 +170,15 @@ class AppKitModel : ViewModel() {
     // a confirmed swap-in means that a channel was opened ; this event is stored as an incoming payment in payment database.
     kit.value?.run {
       try {
-        val pr = doGeneratePaymentRequest("On-chain payment to ${event.bitcoinAddress()}", Option.apply(event.amount()), ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>())
+        log.info("saving successful swap-in=$event as incoming payment")
+        val pr = doGeneratePaymentRequest(
+          description = "On-chain payment to ${event.bitcoinAddress()}",
+          amount_opt = Option.apply(event.amount()),
+          routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
+          timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)),
+          paymentType = PaymentType.SwapIn())
         kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
+        log.info("successful swap-in=$event as been saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
         pendingSwapIns.value?.remove(event.bitcoinAddress())
         navigationEvent.postValue(PaymentReceived(pr.paymentHash(),
           ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
@@ -209,18 +211,23 @@ class AppKitModel : ViewModel() {
       val preimage = `package$`.`MODULE$`.randomBytes32()
       val paymentHash = Crypto.hash256(preimage.bytes())
       val date = System.currentTimeMillis()
+      val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
       val paymentCounterpart = OutgoingPayment(
         /* id and parent id */ id, id,
         /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
         /* placeholder payment hash */ paymentHash,
+        /* type of payment */ "ClosingChannel",
         /* balance */ event.balance,
-        /* target node id */ `package$`.`MODULE$`.randomKey().publicKey(), /* creation date */ date,
+        /* recipient amount */ event.balance,
+        /* fake recipient id */ fakeRecipientId,
+        /* creation date */ date,
         /* payment request */ Option.empty(),
         /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
       kit.nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
 
       val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
+        ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
       kit.nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
     }
   }
@@ -279,13 +286,13 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
         val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-        doGeneratePaymentRequest(description, amount_opt, routes)
+        doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard())
       }
     }.await()
   }
 
   @WorkerThread
-  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>): PaymentRequest {
+  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>, timeout: Timeout = shortTimeout, paymentType: String): PaymentRequest {
     return _kit.value?.let {
       val f = Patterns.ask(it.kit.paymentHandler(),
         MultiPartHandler.ReceivePayment(
@@ -294,12 +301,13 @@ class AppKitModel : ViewModel() {
           /* expiry seconds */ Option.empty(),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
-          /* payment preimage */ Option.empty()), timeout)
-      Await.result(f, awaitDuration) as PaymentRequest
+          /* payment preimage */ Option.empty(),
+          /* Standard, SwapIn,... */ paymentType), timeout)
+      Await.result(f, Duration.Inf()) as PaymentRequest
     } ?: throw KitNotInitialized()
   }
 
-  suspend fun sendSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
+  suspend fun requestSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
@@ -322,46 +330,76 @@ class AppKitModel : ViewModel() {
     }.await()
   }
 
+  /**
+   * Extracts the worst case (fee, ctlv expiry delta) scenario from the routing hints in a payment request. If the payment request has no routing hints, return (0, 0).
+   */
+  private fun getPessimisticRouteSettingsFromHint(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<MilliSatoshi, CltvExpiryDelta> {
+    val aggregateByRoutes = JavaConverters.asJavaCollectionConverter(paymentRequest.routingInfo()).asJavaCollection().toList()
+      .map {
+        // get the aggregate (fee, expiry) for this route
+        JavaConverters.asJavaCollectionConverter(it).asJavaCollection().toList()
+          .map { h -> Pair(`package$`.`MODULE$`.nodeFee(h.feeBase(), h.feeProportionalMillionths(), amount), h.cltvExpiryDelta()) }
+          .fold(Pair(MilliSatoshi(0), CltvExpiryDelta(0))) { a, b -> Pair(a.first.`$plus`(b.first), a.second.`$plus`(b.second)) }
+      }
+    // return (max of fee, max of cltv expiry delta)
+    return Pair(MilliSatoshi(aggregateByRoutes.map { p -> p.first.toLong() }.max() ?: 0),
+      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.max() ?: 0))
+  }
+
   @UiThread
-  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, deductFeeFromAmount: Boolean, checkFees: Boolean = false) {
+  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean) {
     return coroutineScope {
       async(Dispatchers.Default) {
         _kit.value?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
           val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
-          val fee = if (isTrampoline) {
-            trampolineSettings.value!!.feeBase.`$times`(trampolineSettings.value!!.hopsCount.toLong()) // base fee per hop
-              .`$plus`(amount.`$times`(trampolineSettings.value!!.feePercent))  // proportional fee, defaults to 0.1 % of payment amount
-          } else {
-            MilliSatoshi(0)
-          }
-          val amountFinal = if (deductFeeFromAmount) amount.`$minus`(fee) else amount
 
           val sendRequest: Any = if (isTrampoline) {
+            // 1 - compute trampoline fee settings for this payment
+            // note that if we have to subtract the fee from the amount, use ONLY the most expensive trampoline setting option, to make sure that the payment will go through
+            val feeSettingsDefault = if (subtractFee) listOf(trampolineFeeSettings.value!!.last()) else trampolineFeeSettings.value!!
+            val feeSettingsFromHints = getPessimisticRouteSettingsFromHint(amount, paymentRequest)
+            log.info("most expensive fee/expiry from payment request hints=$feeSettingsFromHints")
+            val finalTrampolineFeesList = JavaConverters.asScalaBufferConverter(feeSettingsDefault
+              .map {
+                // fee = trampoline_base + trampoline_percent * amount + fee_from_hint
+                Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent)).`$plus`(feeSettingsFromHints.first), it.cltvExpiry.`$plus`(feeSettingsFromHints.second))
+              })
+              .asScala().toList()
+
+            // 2 - compute amount to send, which changes if fees must be subtracted from it (empty wallet)
+            val amountFinal = if (subtractFee) amount.`$minus`(finalTrampolineFeesList.head()._1) else amount
+
+            // 3 - build trampoline payment object
+            log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$finalTrampolineFeesList, subtractFee=$subtractFee ] for pr=$paymentRequest")
             PaymentInitiator.SendTrampolinePaymentRequest(
               /* amount to send */ amountFinal,
-              /* trampoline fees */ fee,
               /* payment request */ paymentRequest,
               /* trampoline node public key */ Wallet.ACINQ.nodeId(),
+              /* fees and expiry delta for the trampoline node */ finalTrampolineFeesList,
               /* final cltv expiry delta */ cltvExpiryDelta,
-              /* trampoline expiry delta, should be very large! */ CltvExpiryDelta(trampolineSettings.value!!.cltvExpiry * trampolineSettings.value!!.hopsCount),
               /* route params */ Option.apply(null))
           } else {
+            log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
             PaymentInitiator.SendPaymentRequest(
-              /* amount to send */ amountFinal,
+              /* amount to send */ amount,
               /* paymentHash */ paymentRequest.paymentHash(),
               /* payment target */ paymentRequest.nodeId(),
               /* max attempts */ 5,
               /* final cltv expiry delta */ cltvExpiryDelta,
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),
-              /* predefined route */ ScalaList.empty<Crypto.PublicKey>(),
               /* assisted routes */ paymentRequest.routingInfo(),
               /* route params */ Option.apply(null))
           }
 
-          log.info("sending payment [ amount=$amountFinal, fee=$fee, isTrampoline=$isTrampoline, deductFee=$deductFeeFromAmount ] for pr=$paymentRequest with trampolineSettings=${trampolineSettings.value}")
-          this.kit.paymentInitiator().tell(sendRequest, ActorRef.noSender())
+          val res = Await.result(Patterns.ask(this.kit.paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
+          if (res is PaymentFailed) {
+            val failure = res.failures().mkString(", ")
+            log.error("payment has failed: [ $failure ])")
+            throw RuntimeException("Payment failure: $failure")
+          }
+
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -388,7 +426,7 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit.value?.api?.let {
-          val res = Await.result(it.channelsInfo(Option.apply(null), timeout), awaitDuration) as scala.collection.Iterable<RES_GETINFO>
+          val res = Await.result(it.channelsInfo(Option.apply(null), shortTimeout), Duration.Inf()) as scala.collection.Iterable<RES_GETINFO>
           val channels = JavaConverters.asJavaIterableConverter(res).asJava()
           state?.let {
             channels.filter { c -> c.state() == state }
@@ -406,7 +444,7 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit.value?.api?.let {
-          val res = Await.result(it.channelInfo(Left.apply(channelId), timeout), awaitDuration) as RES_GETINFO
+          val res = Await.result(it.channelInfo(Left.apply(channelId), shortTimeout), Duration.Inf()) as RES_GETINFO
           res
         }
       }
@@ -419,14 +457,14 @@ class AppKitModel : ViewModel() {
       async(Dispatchers.Default) {
         delay(500)
         kit.value?.let {
-          val closeScriptPubKey = Option.apply(Script.write(fr.acinq.eclair.`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+          val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
             closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -444,7 +482,7 @@ class AppKitModel : ViewModel() {
             log.info("attempting to force close channel=$channelId")
             closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), longAwaitDuration)
+          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -586,13 +624,14 @@ class AppKitModel : ViewModel() {
 
     val xpubPath = Wallet.getXpubKeyPath()
     val pubkey = DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, xpubPath))
-    val xpub = Xpub(DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()), DeterministicWallet.KeyPath(xpubPath.path()).toString())
+    val xpub = Xpub(xpub = DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()),
+      path = DeterministicWallet.KeyPath(xpubPath.path()).toString())
 
     Class.forName("org.sqlite.JDBC")
     val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
     val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
-    log.info("node setup ready")
+    log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
@@ -706,20 +745,26 @@ class AppKitModel : ViewModel() {
             }
 
             // -- trampoline settings
-            val trampolineJson = json.getJSONObject("trampoline").getJSONObject("v1")
-            val remoteTrampoline = TrampolineSettings(feeBase = Converter.any2Msat(Satoshi(trampolineJson.getLong("fee_base_sat"))),
-              feePercent = trampolineJson.getDouble("fee_percent"),
-              hopsCount = trampolineJson.getInt("hops_count"),
-              cltvExpiry = trampolineJson.getInt("cltv_expiry"))
-            trampolineSettings.postValue(remoteTrampoline)
-            log.info("trampoline settings set to $remoteTrampoline")
+            val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
+            val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
+            for (i in 0 until trampolineArray.length()) {
+              val setting: JSONObject = trampolineArray.get(i) as JSONObject
+              trampolineSettingsList += TrampolineFeeSetting(
+                feeBase = Converter.any2Msat(Satoshi(setting.getLong("fee_base_sat"))),
+                feePercent = setting.getDouble("fee_percent"),
+                cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
+            }
+
+            trampolineSettingsList.sortedWith(compareBy({ it.feePercent }, { it.feeBase }))
+            trampolineFeeSettings.postValue(trampolineSettingsList)
+            log.info("trampoline settings set to $trampolineSettingsList")
 
             // -- swap-in settings
             val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
             swapInSettings.postValue(remoteSwapInSettings)
             log.info("swap_in settings set to $remoteSwapInSettings")
-          } catch (e: JSONException) {
-            log.error("could not read wallet context body: ", e)
+          } catch (e: Exception) {
+            log.error("error when reading wallet context body: ", e)
           }
         } else {
           log.warn("could not retrieve wallet context from remote, code=${response.code()}")

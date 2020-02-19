@@ -46,7 +46,6 @@
       android:background="?attr/bgColor"
       android:fillViewport="true"
       android:overScrollMode="never"
-      android:visibility="@{model.state == PaymentDetailsState.DONE}"
       app:layout_constrainedHeight="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
@@ -125,19 +124,16 @@
           <TextView
             android:id="@+id/expired_at_label"
             style="@style/TechnicalsLabelView"
-            android:text="@string/paymentdetails_expire_at_label"
-            android:visibility="@{!model.isSent()}" />
+            android:text="@string/paymentdetails_expire_at_label" />
 
           <TextView
             android:id="@+id/expired_at_value"
             style="@style/TechnicalsValueView"
-            android:text="@{model.expiredAt}"
-            android:visibility="@{!model.isSent()}" />
+            android:text="@{model.expiredAt}" />
 
           <View
             style="@style/HLineSeparator"
-            android:layout_columnSpan="2"
-            android:visibility="@{!model.isSent()}" />
+            android:layout_columnSpan="2" />
 
           <TextView
             android:id="@+id/completed_at_label"

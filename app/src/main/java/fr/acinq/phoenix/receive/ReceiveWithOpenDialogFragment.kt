@@ -38,6 +38,7 @@ import fr.acinq.phoenix.databinding.FragmentReceiveWithOpenBinding
 import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.DateFormat
 import java.util.*
 import kotlin.math.max
 
@@ -51,6 +52,8 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   private lateinit var appKit: AppKitModel
   private lateinit var model: ReceiveWithOpenViewModel
 
+  private val SAFETY_MARGIN = 20 * 1000L
+
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     mBinding = FragmentReceiveWithOpenBinding.inflate(inflater, container, true)
     mBinding.lifecycleOwner = this
@@ -62,8 +65,10 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
     if (activity == null) {
       dismiss()
     } else {
+      val timeRemaining = (args.expireAt * 1000) - System.currentTimeMillis() - SAFETY_MARGIN
+      log.info("display popup for payToOpen request [ payment_hash=${args.paymentHash} amount_msat=${args.amountMsat} fee_sat=${args.feeSat} funding_sat=${args.fundingSat} expire_at=${DateFormat.getDateTimeInstance().format(args.expireAt * 1000)} time_remaining=${timeRemaining}ms]")
       appKit = ViewModelProvider(activity!!).get(AppKitModel::class.java)
-      model = ViewModelProvider(this).get(ReceiveWithOpenViewModel::class.java)
+      model = ViewModelProvider(this, ReceiveWithOpenViewModelFactory(timeRemaining)).get(ReceiveWithOpenViewModel::class.java)
       mBinding.model = model
 
       model.timeToExpiry.observe(viewLifecycleOwner, Observer {
@@ -117,23 +122,25 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   }
 }
 
-class ReceiveWithOpenViewModel : ViewModel() {
-  companion object {
-    private const val DEFAULT_TIMEOUT_MILLIS = 30000
-  }
+private class ReceiveWithOpenViewModelFactory(private val timeRemainingMs: Long): ViewModelProvider.Factory {
+  override fun <T : ViewModel> create(modelClass: Class<T>): T = ReceiveWithOpenViewModel(timeRemainingMs) as T
+}
 
+class ReceiveWithOpenViewModel(timeRemainingMs: Long) : ViewModel() {
   private val log = LoggerFactory.getLogger(ReceiveWithOpenViewModel::class.java)
   private val timer: Timer = Timer()
   val showHelp = MutableLiveData(false)
-
-  // FIXME: this value should be initialized using an absolute / server defined timestamp in the PayToOpenRequest (not implemented yet).
-  val timeToExpiry = MutableLiveData(DEFAULT_TIMEOUT_MILLIS)
+  val timeToExpiry = MutableLiveData(timeRemainingMs)
 
   init {
     timer.schedule(object : TimerTask() {
       override fun run() {
         timeToExpiry.value?.let {
+          val countdown = max(0, it - 1000)
           timeToExpiry.postValue(max(0, it - 1000))
+          if (countdown <= 0) {
+            timer.cancel()
+          }
         }
       }
     }, 0, 1000)

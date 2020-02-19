@@ -25,6 +25,8 @@ import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.TrampolineFeeSetting
+import java.lang.Integer.min
 
 object Prefs {
 
@@ -52,6 +54,7 @@ object Prefs {
 
   // -- node configuration
   const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
+  const val PREFS_TRAMPOLINE_MAX_FEE_INDEX = "PREFS_TRAMPOLINE_MAX_FEE_INDEX"
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
@@ -193,6 +196,14 @@ object Prefs {
 
   fun saveElectrumServer(context: Context, address: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ELECTRUM_ADDRESS, address.trim()).apply()
+  }
+
+  fun getTrampolineMaxFeeIndex(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, -1)
+  }
+
+  fun saveTrampolineMaxFeeIndex(context: Context, index: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, index).apply()
   }
 
 }

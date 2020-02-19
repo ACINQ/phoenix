@@ -29,7 +29,6 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.StartupState
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
-import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.KeystoreHelper
 import fr.acinq.phoenix.utils.Prefs
@@ -91,12 +90,7 @@ class StartupFragment : BaseFragment() {
   override fun appCheckup() {
     if (appKit.isKitReady()) {
       log.debug("kit is ready, redirecting to main page")
-      if (appKit.currentURIIntent.value != null) {
-        findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(appKit.currentURIIntent.value!!))
-        appKit.currentURIIntent.value = null
-      } else {
-        findNavController().navigate(R.id.action_startup_to_main)
-      }
+      findNavController().navigate(R.id.action_startup_to_main)
     } else if (context != null && !appKit.hasWalletBeenSetup(context!!)) {
       log.debug("kit is not ready and wallet is not setup, redirecting to init wallet")
       findNavController().navigate(R.id.global_action_any_to_init_wallet)
