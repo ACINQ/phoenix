@@ -149,8 +149,6 @@
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="send_pay_button">Pay</string>
-  <string name="send_cancel_button">Decline</string>
-  <string name="send_pay_button_for_swap">Next</string>
   <string name="send_swap_in_progress">Swap in progress…</string>
   <string name="send_swap_error">Swap has failed. Please try again.</string>
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
@@ -171,7 +169,6 @@
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
-  <string name="scan_error_lnurl_pay_failed">There was an error when retrieving the invoice from this merchant.\n\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -195,7 +192,6 @@
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>
-  <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>
@@ -302,7 +298,6 @@
   <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
   <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
-  <string name="main_notification_summary">You have %1$d notifications…</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_stores_button">Stores</string>
 
