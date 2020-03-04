@@ -229,7 +229,7 @@ class ReceiveFragment : BaseFragment() {
       val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
-      Toast.makeText(activity!!.applicationContext, R.string.copied, Toast.LENGTH_SHORT).show()
+      Toast.makeText(activity!!.applicationContext, R.string.utils_copied, Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       log.error("failed to copy: ${e.localizedMessage}")
     }

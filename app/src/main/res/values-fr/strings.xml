@@ -50,7 +50,7 @@
 
   <string name="biometricprompt_title">Le portefeuille est verrouillé</string>
   <string name="biometricprompt_negative">Déverrouiller avec le PIN</string>
-  
+
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Chargement…</string>
@@ -172,14 +172,12 @@
   <string name="utils_cancel">Annuler</string>
   <string name="utils_date_just_now">à l\'instant</string>
   <string name="utils_unknown">N/A</string>
-  <string name="utils_copied">Copié dans le presse-papier!</string>
+  <string name="utils_copied">Copié dans le presse-papiers!</string>
   <string name="btn_back">Retourner en arrière</string>
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirmer</string>
   <string name="btn_cancel">Annuler</string>
   <string name="btn_close">Fermer</string>
-
-  <string name="copied">Copied to clipboard!</string>
 
   <!-- //////////////// settings //////////////// -->
 
