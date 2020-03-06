@@ -4,7 +4,7 @@ Phoenix is designed to easily support multiple localisations. The process is - f
 
 ## What to translate
 
-Every phrases shown to the user in the application is in a `strings.xml` file. The default file, in english, can be found [here](https://github.com/ACINQ/phoenix/blob/master/app/src/main/res/values/strings.xml).
+String resources are contained in a `strings.xml` file. The default file, in english, can be found [here](https://github.com/ACINQ/phoenix/blob/master/app/src/main/res/values/strings.xml).
 
 ## How to add a new language
 
