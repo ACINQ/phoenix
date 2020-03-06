@@ -57,7 +57,7 @@
   <string name="startup_error">Echec du démarrage!</string>
   <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuilles. Veuillez redémarrer l\'application.</string>
-  <string name="startup_error_network">Votre connexion internet ne fonctionne pas. Veuillez vérifier votre connection cellulaire ou WiFi.</string>
+  <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer, veuillez réessayer.</string>
   <string name="startup_error_auth">Echec de l\'authentification.</string>
 
@@ -83,7 +83,7 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Créer la requête</string>
 
-  <string name="receive_share_subject">Please pay this payment</string>
+  <string name="receive_share_subject">Paiement demandé</string>
   <string name="receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="receive_share_button">Partager…</string>
 
@@ -273,9 +273,9 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connection à electrum…</string>
+  <string name="main_alert_electrum_connecting">Connexion à electrum…</string>
   <string name="main_alert_network_lost">Vous êtes hors ligne. Merci de vérifier l\'état de votre connexion…</string>
-  <string name="main_alert_lightning_connection_lost">Echec de la connection au réseau Lightning…</string>
+  <string name="main_alert_lightning_connection_lost">Echec de la connexion au réseau Lightning…</string>
   <string name="main_alert_settings_button">Configuration</string>
   <string name="main_swapin_incoming">+%1$s entrant</string>
   <string name="main_faq_button">FAQ</string>
@@ -316,5 +316,122 @@
   <string name="logs_share_button">Partager les logs…</string>
   <string name="logs_share_subject">Logs de Phoenix</string>
   <string name="logs_share_title">Partager les logs Phoenix avec…</string>
+
+  <!-- //////////////// payment details //////////////// -->
+
+  <string name="paymentdetails_loading">Récupération des détails du paiement…</string>
+  <string name="paymentdetails_error">Une erreur est survenue lors de la récupération des détails de ce paiement.\n\nVeuillez réessayer.</string>
+
+  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Envoyé</b> %1$s]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>En cours…</b>]]></string>
+  <string name="paymentdetails_status_sent_failed"><![CDATA[Paiement <b>échoué</b>.<br />Aucun fonds n\'a été envoyé.]]></string>
+
+  <string name="paymentdetails_status_received_pending">Le paiement n\'a pas encoré été reçu.</string>
+  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Reçu</b> %1$s]]></string>
+
+  <string name="paymentdetails_desc_label">Desc.</string>
+  <string name="paymentdetails_destination_label">Envoyé à</string>
+  <string name="paymentdetails_fees_label">Frais</string>
+  <string name="paymentdetails_error_label">Erreur</string>
+  <string name="paymentdetails_closing_desc">Paiement pour clôture du channel #%1$s</string>
+  <string name="paymentdetails_no_description">Pas de description</string>
+
+  <string name="paymentdetails_technicals_button">Afficher les détails techniques</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="paymentdetails_technicals_title">Détails du paiement</string>
+  <string name="paymentdetails_payment_hash_label">Payment Hash</string>
+  <string name="paymentdetails_payment_request_label">Requête de paiement</string>
+  <string name="paymentdetails_preimage_label">Preimage</string>
+  <string name="paymentdetails_created_at_label">Date de création</string>
+  <string name="paymentdetails_expire_at_label">Date d\'expiration</string>
+  <string name="paymentdetails_completed_at_label">Date de complétion</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="state_wait_confirmed">Transaction en attente de confirmationtx</string>
+  <string name="state_closing">Channel en clôture</string>
+  <string name="state_closed">Channel clôturé</string>
+  <string name="state_normal">Opérationnel</string>
+  <string name="state_sync">En synchronisation</string>
+  <string name="state_offline">Le pair est hors-ligne</string>
+  <string name="state_shutdown">Le channel est en arrêt</string>
+
+  <!-- //////////////// seed security //////////////// -->
+
+  <string name="seedsec_title">Sécurité</string>
+  <string name="seedsec_subtitle">Nous recommendons fortement de configurer un code PIN pour protéger votre portefeuille. Si votre téléphone le permet, vous pourrez aussi utiliser un système biométrique (empreinte digitale…).</string>
+  <string name="seedsec_pin_switch">Verrouillage avec code PIN</string>
+  <string name="seedsec_biometrics_switch">Verrouillage biométrique</string>
+  <string name="seedsec_change_pin">Changer mon code PIN…</string>
+  <string name="seedsec_biometric_enrollment_error">L\'enregistrement biométrique n\'a pas abouti. Merci de réessayer.</string>
+  <string name="seedsec_pindialog_title_unlock">Veuillez saisir votre code PIN pour continuer</string>
+  <string name="seedsec_pindialog_title_set_new"><![CDATA[Veuillez saisir votre <b>nouveau code PIN</b>]]></string>
+  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Veuillez <b>confirmer</b> votre nouveau code PIN]]></string>
+
+  <string name="seedsec_pin_update_success">Le code PIN a été mis à jour!</string>
+  <string name="seedsec_biometric_enabled">L\'authentification biométrique a été activée</string>
+  <string name="seedsec_biometric_disabled">L\'authentification biométrique a été désactivée</string>
+
+  <string name="seedsec_biometric_support_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
+  <string name="seedsec_biometric_support_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
+  <string name="seedsec_biometric_support_none_enrolled">Vous devez d\'abord enregistrer une identité biométrique dans Android.</string>
+
+  <string name="seedsec_error_wrong_pin">Le code PIN est invalide</string>
+  <string name="seedsec_error_pins_match">Les code PINs ne correspondent pas. Veuillez réessayer.</string>
+  <string name="seedsec_error_generic">Une erreur est survenue, le portefeuille n\'a pas été encrypté.\n\nVeuillez réessayer.</string>
+
+  <string name="seedsec_disable_bio_prompt_title">Désactiver la protection biométrique</string>
+  <string name="seedsec_disable_bio_prompt_desc">Vous devrez désormais utiliser votre code PIN</string>
+  <string name="seedsec_disable_bio_prompt_negative">Annuler</string>
+
+  <string name="seedsec_bio_prompt_title">Activer la protection biométrique</string>
+  <string name="seedsec_bio_prompt_negative">Annuler</string>
+
+  <!-- //////////////// ln url withdraw //////////////// -->
+
+  <string name="lnurl_withdraw_amount_label">Montant à recevoir</string>
+  <string name="lnurl_withdraw_description_label">Détails</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirer des fonds depuis <br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Retirer</string>
+  <string name="lnurl_withdraw_wait">Demande de fonds en cours…</string>
+  <string name="lnurl_withdraw_success">Veuillez patienter pendant que %1$s est en train d\'envoyer les fonds.\n\nGardez bien l\'application en ligne.</string>
+  <string name="lnurl_withdraw_error_internal">Cette demande de retrait n\'a pas pu être traitée. Veuillez réessayer.</string>
+  <string name="lnurl_withdraw_error_invalid">Cette demande de retrait n\'est pas valide. Veuillez réessayer.</string>
+  <string name="lnurl_withdraw_error_amount">Ce montant n\'est pas valide.</string>
+  <string name="lnurl_withdraw_error_amount_min">Le montant doit être au moins %1$s.</string>
+  <string name="lnurl_withdraw_error_amount_max">Le montant ne doit pas excéder %1$s.</string>
+  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
+  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+
+  <!-- //////////////// display preferences //////////////// -->
+
+  <string name="prefs_display_title">Display options</string>
+  <string name="prefs_display_coin_label">Bitcoin unit</string>
+  <string name="prefs_display_fiat_label">Fiat currency</string>
+  <string name="prefs_display_theme_label">Application theme</string>
+
+  <!-- //////////////// electrum server //////////////// -->
+
+  <string name="electrum_title">Serveur Electrum</string>
+  <string name="electrum_subtitle">Pour accéder à la blockchain Bitcoin, Phoenix utilise Electrum et se connecte à une liste de serveur par défaut. Vous pouvez aussi choisir de ne vous connecter qu\'à un serveur Electrum en particulier.</string>
+  <string name="electrum_change_button">Définir un serveur…</string>
+
+  <string name="electrum_block_height_label">Hauteur de block</string>
+  <string name="electrum_tip_label">Timestamp du dernier bloc</string>
+  <string name="electrum_fee_rate_label">Frais de transaction</string>
+  <string name="electrum_xpub_label">Clé publique maître</string>
+  <string name="electrum_xpub_value">%1$s\n\Chemin de dérivation: %2$s</string>
+  <string name="electrum_fee_rate">%1$s sat/byte</string>
+  <string name="electrum_connection_label">Serveur</string>
+  <string name="electrum_connecting">Etablissement de la connexion…</string>
+  <string name="electrum_connecting_to_custom"><![CDATA[Etablissement de la connexion avec <b>%1$s…</b>]]></string>
+  <string name="electrum_connected"><![CDATA[Connecté à: <b>%1$s</b>]]></string>
+
+  <string name="electrum_dialog_checkbox">Utiliser un serveur Electrum particulier</string>
+  <string name="electrum_dialog_ssl">Le serveur doit avoir un certificat valide</string>
+  <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
+  <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
 
 </resources>

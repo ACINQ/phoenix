@@ -38,15 +38,6 @@
   <string name="restore_import_button">Importa</string>
   <string name="restore_error">Seed invalido.\n\nPer favore prova di nuovo</string>
 
-  <!-- //////////////// init wallet / create seed //////////////// -->
-
-  <string name="newseed_instructions">Questa lista di parole è la chiave del tuo wallet. Salvala in un luogo sicuro (non su questo telefono).</string>
-  <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="newseed_generating_seed">Generazione del seed in corso</string>
-  <string name="newseed_seed_saved_checkbox">Ho fatto il backup di questa lista di parole.</string>
-  <string name="newseed_words_sole_recourse_checkbox">Ho capito che questa lista è la chiave dei miei fondi.\nSono l\'unico possessore.</string>
-  <string name="newseed_next">Avanti</string>
-
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Per favore inserisci il PIN</string>
@@ -339,13 +330,6 @@
   <string name="paymentdetails_status_received_pending">Il pagamento non è ancora stato ricevuto.</string>
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Ricevuto</b> %1$s]]></string>
 
-  <string name="paymentdetails_amount_sent_pending_label">Invio in corso</string>
-  <string name="paymentdetails_amount_sent_failed_label">Invio fallito</string>
-  <string name="paymentdetails_amount_sent_successful_label">Inviato</string>
-
-  <string name="paymentdetails_amount_received_pending_label">Ricezione in corso</string>
-  <string name="paymentdetails_amount_received_successful_label">Ricevuto</string>
-
   <string name="paymentdetails_desc_label">Desc.</string>
   <string name="paymentdetails_destination_label">Invia a</string>
   <string name="paymentdetails_fees_label">Commissioni</string>
@@ -463,18 +447,5 @@
   <string name="electrum_dialog_ssl">Il server deve avere un certificato valido</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Per favore inserisci l\'indirizzo di un eletrum server</string>
-
-  <!-- //////////////// fees settings //////////////// -->
-
-  <string name="fees_settings_title">Impostazioni commissioni</string>
-  <string name="fees_settings_subtitle">Queste sono le commissioni usate per inviare e ricevere fondi con Phoenix.</string>
-
-  <string name="fees_settings_trampoline_title">Pagamento Lightning</string>
-  <string name="fees_settings_trampoline_desc">L\'app proverà ad usare le commissioni minime.</string>
-  <string name="fees_settings_trampoline_value">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label">Al massimo %1$s + %2$s%%</string>
-
-  <string name="fees_settings_swap_in_title">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc">Questa commissione copre i costi di apertura del canale Lightning, che comporta una transazione on-chain.</string>
 
 </resources>

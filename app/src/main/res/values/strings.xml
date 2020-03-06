@@ -93,7 +93,7 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Create invoice</string>
 
-  <string name="receive_share_subject">Please pay this payment</string>
+  <string name="receive_share_subject">Payment requested</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
@@ -341,13 +341,6 @@
   <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s]]></string>
 
-  <string name="paymentdetails_amount_sent_pending_label">Sending</string>
-  <string name="paymentdetails_amount_sent_failed_label">Tried to send</string>
-  <string name="paymentdetails_amount_sent_successful_label">Sent</string>
-
-  <string name="paymentdetails_amount_received_pending_label">Receiving</string>
-  <string name="paymentdetails_amount_received_successful_label">Received</string>
-
   <string name="paymentdetails_desc_label">Desc.</string>
   <string name="paymentdetails_destination_label">Sent to</string>
   <string name="paymentdetails_fees_label">Fees</string>
@@ -410,16 +403,16 @@
 
   <!-- //////////////// ln url login //////////////// -->
 
-  <string name="lnurl_login_instructions">Log in to %1$s</string>
-  <string name="lnurl_login_button">Log in</string>
-  <string name="lnurl_login_in_progress">Logging in, please wait…</string>
+  <string name="lnurl_login_instructions" translatable="false">Log in to %1$s</string>
+  <string name="lnurl_login_button" translatable="false">Log in</string>
+  <string name="lnurl_login_in_progress" translatable="false">Logging in, please wait…</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 
-  <string name="lnurl_pay_wait">Retrieving payment details…</string>
-  <string name="lnurl_pay_error_remote">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_remote_code">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_missing_callback">There was an error when handling this invoice. Please try again later.</string>
+  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
+  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -468,15 +461,15 @@
 
   <!-- //////////////// fees settings //////////////// -->
 
-  <string name="fees_settings_title">Fees Settings</string>
-  <string name="fees_settings_subtitle">These are the fees used for sending or receiving money with Phoenix.</string>
+  <string name="fees_settings_title" translatable="false">Fees Settings</string>
+  <string name="fees_settings_subtitle" translatable="false">These are the fees used for sending or receiving money with Phoenix.</string>
 
-  <string name="fees_settings_trampoline_title">Lightning payment</string>
-  <string name="fees_settings_trampoline_desc">The app will try to use the cheapest fee possible.</string>
-  <string name="fees_settings_trampoline_value">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label">At most %1$s + %2$s%%</string>
+  <string name="fees_settings_trampoline_title" translatable="false">Lightning payment</string>
+  <string name="fees_settings_trampoline_desc" translatable="false">The app will try to use the cheapest fee possible.</string>
+  <string name="fees_settings_trampoline_value" translatable="false">Lorem ipsum</string>
+  <string name="fees_settings_trampoline_spinner_label" translatable="false">At most %1$s + %2$s%%</string>
 
-  <string name="fees_settings_swap_in_title">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
+  <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
+  <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
 
 </resources>
