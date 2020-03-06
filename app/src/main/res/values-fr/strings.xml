@@ -30,7 +30,7 @@
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
-  <string name="restore_disclaimer_message">N\'importez pas ici une seed qui n\'aurait pas été créée avec une application Phoenix.\n\nPar ailleurs, assurez vous que vous n\'avez une autre application Phoenix qui tournerait sur un autre téléphone, et qui utiliseraitla même seed.</string>
+  <string name="restore_disclaimer_message">N\'importez pas ici une seed qui n\'aurait pas été créée avec une application Phoenix.\n\nPar ailleurs, pour éviter tout conflit, assurez vous que vous n\'avez une autre application Phoenix sur un autre téléphone qui utiliserait la même seed.</string>
   <string name="restore_disclaimer_checkbox">Je comprends.</string>
   <string name="restore_disclaimer_next">Suivant</string>
   <string name="restore_instructions">La seed de votre portefeuille est une liste de 12 mots anglais. Notez que les passphrase additionnelles ne sont pas supportées.</string>
