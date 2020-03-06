@@ -15,32 +15,31 @@
   -->
 
 <resources>
-  <string name="key_a">a</string>
-  <string name="key_b">b</string>
-  <string name="key_c">c</string>
-  <string name="key_d">d</string>
-  <string name="key_e">e</string>
-  <string name="key_f">f</string>
-  <string name="key_g">g</string>
-  <string name="key_h">h</string>
-  <string name="key_i">i</string>
-  <string name="key_j">j</string>
-  <string name="key_k">k</string>
-  <string name="key_l">l</string>
-  <string name="key_m">m</string>
-  <string name="key_n">n</string>
-  <string name="key_o">o</string>
-  <string name="key_p">p</string>
-  <string name="key_q">q</string>
-  <string name="key_r">r</string>
-  <string name="key_s">s</string>
-  <string name="key_t">t</string>
-  <string name="key_u">u</string>
-  <string name="key_v">v</string>
-  <string name="key_w">w</string>
-  <string name="key_x">x</string>
-  <string name="key_y">y</string>
-  <string name="key_z">z</string>
-  <string name="key_space_desc">Add whitespace</string>
-  <string name="key_delete_desc">Delete last character</string>
+  <string translatable="false" name="key_a">a</string>
+  <string translatable="false" name="key_b">b</string>
+  <string translatable="false" name="key_c">c</string>
+  <string translatable="false" name="key_d">d</string>
+  <string translatable="false" name="key_e">e</string>
+  <string translatable="false" name="key_f">f</string>
+  <string translatable="false" name="key_g">g</string>
+  <string translatable="false" name="key_h">h</string>
+  <string translatable="false" name="key_i">i</string>
+  <string translatable="false" name="key_j">j</string>
+  <string translatable="false" name="key_k">k</string>
+  <string translatable="false" name="key_l">l</string>
+  <string translatable="false" name="key_m">m</string>
+  <string translatable="false" name="key_n">n</string>
+  <string translatable="false" name="key_o">o</string>
+  <string translatable="false" name="key_p">p</string>
+  <string translatable="false" name="key_q">q</string>
+  <string translatable="false" name="key_r">r</string>
+  <string translatable="false" name="key_s">s</string>
+  <string translatable="false" name="key_t">t</string>
+  <string translatable="false" name="key_u">u</string>
+  <string translatable="false" name="key_v">v</string>
+  <string translatable="false" name="key_w">w</string>
+  <string translatable="false" name="key_x">x</string>
+  <string translatable="false" name="key_y">y</string>
+  <string translatable="false" name="key_z">z</string>
+
 </resources>

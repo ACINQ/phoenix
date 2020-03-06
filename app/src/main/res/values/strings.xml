@@ -52,9 +52,9 @@
 
   <!-- //////////////// placeholders ////////////////-->
 
-  <string name="lipsum_short">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
-  <string name="lipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
-  <string name="lipsum_long">
+  <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+  <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+  <string name="lipsum_long" translatable="false">
     Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
     \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
     \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
@@ -93,7 +93,7 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Create invoice</string>
 
-  <string name="receive_share_subject">Please pay this payment</string>
+  <string name="receive_share_subject">Payment requested</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
@@ -140,8 +140,6 @@
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="send_pay_button">Pay</string>
-  <string name="send_cancel_button">Decline</string>
-  <string name="send_pay_button_for_swap">Next</string>
   <string name="send_swap_in_progress">Swap in progress…</string>
   <string name="send_swap_error">Swap has failed. Please try again.</string>
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
@@ -162,7 +160,6 @@
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
-  <string name="scan_error_lnurl_pay_failed">There was an error when retrieving the invoice from this merchant.\n\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -186,14 +183,11 @@
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copied to clipboard!</string>
-  <string name="utils_default_coin_view_hint">Enter amount in %1$s</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
   <string name="btn_close">Close</string>
-
-  <string name="copied">Copied to clipboard!</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -293,7 +287,6 @@
   <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
   <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
-  <string name="main_notification_summary">You have %1$d notifications…</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_stores_button">Stores</string>
 
@@ -345,13 +338,6 @@
 
   <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s]]></string>
-
-  <string name="paymentdetails_amount_sent_pending_label">Sending</string>
-  <string name="paymentdetails_amount_sent_failed_label">Tried to send</string>
-  <string name="paymentdetails_amount_sent_successful_label">Sent</string>
-
-  <string name="paymentdetails_amount_received_pending_label">Receiving</string>
-  <string name="paymentdetails_amount_received_successful_label">Received</string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
   <string name="paymentdetails_destination_label">Sent to</string>
@@ -415,16 +401,16 @@
 
   <!-- //////////////// ln url login //////////////// -->
 
-  <string name="lnurl_login_instructions">Log in to %1$s</string>
-  <string name="lnurl_login_button">Log in</string>
-  <string name="lnurl_login_in_progress">Logging in, please wait…</string>
+  <string name="lnurl_login_instructions" translatable="false">Log in to %1$s</string>
+  <string name="lnurl_login_button" translatable="false">Log in</string>
+  <string name="lnurl_login_in_progress" translatable="false">Logging in, please wait…</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 
-  <string name="lnurl_pay_wait">Retrieving payment details…</string>
-  <string name="lnurl_pay_error_remote">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_remote_code">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_missing_callback">There was an error when handling this invoice. Please try again later.</string>
+  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
+  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -473,15 +459,20 @@
 
   <!-- //////////////// fees settings //////////////// -->
 
-  <string name="fees_settings_title">Fees Settings</string>
-  <string name="fees_settings_subtitle">These are the fees used for sending or receiving money with Phoenix.</string>
+  <string name="fees_settings_title" translatable="false">Fees Settings</string>
+  <string name="fees_settings_subtitle" translatable="false">These are the fees used for sending or receiving money with Phoenix.</string>
 
-  <string name="fees_settings_trampoline_title">Lightning payment</string>
-  <string name="fees_settings_trampoline_desc">The app will try to use the cheapest fee possible.</string>
-  <string name="fees_settings_trampoline_value">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label">At most %1$s + %2$s%%</string>
+  <string name="fees_settings_trampoline_title" translatable="false">Lightning payment</string>
+  <string name="fees_settings_trampoline_desc" translatable="false">The app will try to use the cheapest fee possible.</string>
+  <string name="fees_settings_trampoline_value" translatable="false">Lorem ipsum</string>
+  <string name="fees_settings_trampoline_spinner_label" translatable="false">At most %1$s + %2$s%%</string>
 
-  <string name="fees_settings_swap_in_title">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
+  <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
+  <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
+
+  <!-- ////////////// virtual keyboard hints //////////////// -->
+
+  <string name="key_space_desc">Add whitespace</string>
+  <string name="key_delete_desc">Delete last character</string>
 
 </resources>
