@@ -177,8 +177,6 @@
   <string name="btn_cancel">Annulla</string>
   <string name="btn_close">Chiudi</string>
 
-  <string name="copied">Copiato negli appunti!</string>
-
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_general_title">Generale</string>

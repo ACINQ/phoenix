@@ -189,8 +189,6 @@
   <string name="btn_cancel">Cancel</string>
   <string name="btn_close">Close</string>
 
-  <string name="copied">Copied to clipboard!</string>
-
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_general_title">General</string>
@@ -471,5 +469,10 @@
 
   <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
   <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
+
+  <!-- ////////////// virtual keyboard hints //////////////// -->
+
+  <string name="key_space_desc">Add whitespace</string>
+  <string name="key_delete_desc">Delete last character</string>
 
 </resources>

@@ -434,4 +434,9 @@
   <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
   <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
 
+  <!-- ////////////// virtual keyboard hints //////////////// -->
+
+  <string name="key_space_desc">Ajoute un espace</string>
+  <string name="key_delete_desc">Efface la dernière lettre saisie</string>
+
 </resources>
