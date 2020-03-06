@@ -38,15 +38,6 @@
   <string name="restore_import_button">Import</string>
   <string name="restore_error">This seed is invalid and cannot be imported.\n\nPlease try again</string>
 
-  <!-- //////////////// init wallet / create seed //////////////// -->
-
-  <string name="newseed_instructions">This word list is the key to your wallet. Save it somewhere safe (not on this phone).</string>
-  <string name="newseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="newseed_generating_seed">Generating seed…</string>
-  <string name="newseed_seed_saved_checkbox">I have made a backup of this list of words.</string>
-  <string name="newseed_words_sole_recourse_checkbox">I understand that this list is the key to my funds.\nOnly I possess it.</string>
-  <string name="newseed_next">Next</string>
-
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Please enter your PIN</string>

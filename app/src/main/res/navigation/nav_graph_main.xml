@@ -114,11 +114,6 @@
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left" />
     <action
-      android:id="@+id/action_init_wallet_to_create"
-      app:destination="@id/create_seed_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left" />
-    <action
       android:id="@+id/action_init_wallet_to_auto_create"
       app:destination="@id/auto_create_fragment"
       app:enterAnim="@anim/slide_in_right"
@@ -129,56 +124,13 @@
   <fragment
     android:id="@+id/restore_seed_fragment"
     android:name="fr.acinq.phoenix.initwallet.RestoreSeedFragment"
-    android:label="RestoreSeedFragment">
-    <action
-      android:id="@+id/action_restore_seed_to_setup_pin"
-      app:destination="@id/setup_pin_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left"
-      app:popUpTo="@id/init_wallet_fragment" />
-  </fragment>
-
-  <!-- init wallet: create seed manually -->
-  <fragment
-    android:id="@+id/create_seed_fragment"
-    android:name="fr.acinq.phoenix.initwallet.CreateSeedFragment"
-    android:label="CreateSeedFragment">
-    <action
-      android:id="@+id/action_create_seed_to_setup_pin"
-      app:destination="@id/setup_pin_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left"
-      app:popUpTo="@id/init_wallet_fragment" />
-  </fragment>
-
-  <!-- init wallet: setup pin -->
-  <fragment
-    android:id="@+id/setup_pin_fragment"
-    android:name="fr.acinq.phoenix.initwallet.SetupPinFragment"
-    android:label="SetupPinFragment">
-    <argument
-      android:name="serialized_seed"
-      app:argType="string[]" />
-    <action
-      android:id="@+id/action_setup_pin_to_main"
-      app:destination="@id/main_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left" />
-  </fragment>
+    android:label="RestoreSeedFragment" />
 
   <!-- init wallet: automated seed creation -->
   <fragment
     android:id="@+id/auto_create_fragment"
     android:name="fr.acinq.phoenix.initwallet.AutoCreateFragment"
-    android:label="AutoCreateFragment">
-    <action
-      android:id="@+id/action_auto_create_to_startup"
-      app:destination="@+id/main_fragment"
-      app:enterAnim="@anim/fade_in"
-      app:exitAnim="@anim/fade_out"
-      app:launchSingleTop="true"
-      app:popUpTo="@id/main_fragment" />
-  </fragment>
+    android:label="AutoCreateFragment" />
 
   <!-- startup node -->
   <fragment

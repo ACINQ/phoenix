@@ -164,7 +164,7 @@ class DisplaySeedFragment : BaseFragment() {
     val rightPadding = if (hasRightPadding) resources.getDimensionPixelSize(R.dimen.space_lg) else 0
     val textView = TextView(context)
     textView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-    textView.text = Converter.html(getString(R.string.newseed_words_td, i + 1, word))
+    textView.text = Converter.html(getString(R.string.displayseed_words_td, i + 1, word))
     textView.setPadding(0, 0, rightPadding, bottomPadding)
     return textView
   }
