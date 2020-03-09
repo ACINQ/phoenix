@@ -28,7 +28,7 @@ If you're interested in contributing to Lightning in general, take a look at the
 
 ## Translate the app
 
-If you want to contribute to the translation effort, consult the guidelines provided in [TRANSLATION.md](https://github.com/ACINQ/phoenix/blob/master/TRANSLATIONS.md)
+If you want to contribute to the translation effort, consult the guidelines provided in [TRANSLATION.md](https://github.com/ACINQ/phoenix/blob/master/TRANSLATION.md)
 
 # Support
 
