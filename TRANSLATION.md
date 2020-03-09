@@ -10,7 +10,7 @@ String resources are contained in a `strings.xml` file. The default file, in eng
 
 1. Fork and clone this project ([How-to](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project))
 1. Create a new branch, for example `translate_mylanguagecode`, where my `mylanguagecode` could be `fr` or `it`.
-2. Create a new folder for this language, named `values-mylanguagecode`, in `app/src/main/res`. For example, for french you would create a `value-fr` folder.
+2. Create a new folder for this language, named `values-mylanguagecode`, in `app/src/main/res`. For example, for french you would create a `values-fr` folder.
 3. Copy the `app/src/main/res/values/strings.xml` file into this new folder, and in this new file, remove all the lines marked with `translatable="false"`
 4. You can now start the translation work proper.
 
