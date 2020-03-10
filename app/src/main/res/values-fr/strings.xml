@@ -54,12 +54,13 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Chargement…</string>
-  <string name="startup_error">Echec du démarrage!</string>
-  <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
-  <string name="startup_error_unreadable">Echec de la lecture des données du portefeuilles. Veuillez redémarrer l\'application.</string>
+  <string name="startup_start_button">Redémarrer</string>
+  <string name="startup_logs_button">Logs</string>
+  <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
+  <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
-  <string name="startup_error_generic">L\'application n\'a pas pu démarrer, veuillez réessayer.</string>
-  <string name="startup_error_auth">Echec de l\'authentification.</string>
+  <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
+  <string name="startup_error_biometrics">L\'authentification biométrique a échoué.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 

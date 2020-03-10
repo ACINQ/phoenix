@@ -28,8 +28,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.common.base.Strings
@@ -72,7 +70,7 @@ class ReadInputFragment : BaseFragment() {
             // check payment request chain
             val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
             // additional controls
-            if (appKit.kit.value != null && appKit.kit.value!!.kit.nodeParams().nodeId() == it.nodeId()) {
+            if (app.kit?.nodeParams()?.nodeId() == it.nodeId()) {
               log.debug("abort payment to self")
               model.readingState.postValue(ReadingState.ERROR)
               model.errorMessage.postValue(R.string.scan_error_pay_to_self)

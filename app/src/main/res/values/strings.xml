@@ -64,12 +64,13 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Loading…</string>
-  <string name="startup_error">Could not start!</string>
-  <string name="startup_error_wrong_pwd">PIN is incorrect</string>
+  <string name="startup_start_button">Restart</string>
+  <string name="startup_logs_button">Logs</string>
+  <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
-  <string name="startup_error_generic">The application could not start, please try later</string>
-  <string name="startup_error_auth">Could not authenticate user.</string>
+  <string name="startup_error_wrong_pwd">PIN is incorrect</string>
+  <string name="startup_error_biometrics">Biometric authentication has failed.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 

@@ -20,18 +20,14 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import fr.acinq.eclair.CoinUtils
-import fr.acinq.eclair.`MBtcUnit$`
-import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Logging
-import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.LoggerFactory
 
-class App : Application() {
+class Application : Application() {
 
-  val log = LoggerFactory.getLogger(App::class.java)
+  val log = LoggerFactory.getLogger(Application::class.java)
 
   override fun onCreate() {
     super.onCreate()

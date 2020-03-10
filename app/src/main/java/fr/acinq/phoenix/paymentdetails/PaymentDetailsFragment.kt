@@ -37,7 +37,6 @@ import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentPaymentDetailsBinding
@@ -48,7 +47,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scala.Option
 import scala.collection.JavaConverters
 import java.text.DateFormat
 import java.util.*
@@ -225,7 +223,7 @@ class PaymentDetailsFragment : BaseFragment() {
     }) {
       model.state.value = PaymentDetailsState.RetrievingDetails
       if (isSentPayment) {
-        val payments: List<OutgoingPayment> = appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
+        val payments: List<OutgoingPayment> = app.getSentPaymentsFromParentId(UUID.fromString(identifier))
         when {
           payments.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
             payments.filter { p -> p.status() is OutgoingPaymentStatus.`Pending$` }.also {
@@ -248,7 +246,7 @@ class PaymentDetailsFragment : BaseFragment() {
           }
         }
       } else {
-        val payment = appKit.getReceivedPayment(ByteVector32.fromValidHex(identifier))
+        val payment = app.getReceivedPayment(ByteVector32.fromValidHex(identifier))
         if (payment.isEmpty) {
           log.warn("could not find any incoming payments for id=$identifier")
           model.state.value = PaymentDetailsState.Error("No details found for this incoming payment")

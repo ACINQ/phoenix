@@ -52,12 +52,13 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Caricamento…</string>
-  <string name="startup_error">Avvio fallito!</string>
-  <string name="startup_error_wrong_pwd">PIN errato</string>
+  <string name="startup_start_button">Inizia</string>
+  <string name="startup_logs_button">Logs</string>
+  <string name="startup_error_generic">Impossibile avviare l\'applicazione.\n\nDettagli: %1$s</string>
   <string name="startup_error_unreadable">Impossibile leggere i dati del wallet, per favore riavvia l\'app.</string>
   <string name="startup_error_network">Connessione ad internet assente. Per favore controlla il tuo WiFi o rete mobile.</string>
-  <string name="startup_error_generic">Impossibile avviare l\'app, per favore riprova più tardi</string>
-  <string name="startup_error_auth">Impossibile autenticare l\'utente.</string>
+  <string name="startup_error_wrong_pwd">PIN errato</string>
+  <string name="startup_error_biometrics">Impossibile autenticare l\'utente.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 

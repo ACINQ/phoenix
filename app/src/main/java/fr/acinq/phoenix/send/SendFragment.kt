@@ -103,7 +103,7 @@ class SendFragment : BaseFragment() {
                 mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.textColor))
                 mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(fee, ctx, withUnit = true)
                 mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
-                if (totalAfterSwap.`$greater`(appKit.balance.value)) {
+                if (totalAfterSwap.`$greater`(app.balance.value)) {
                   model.state.value = SendState.Onchain.Error.ExceedsBalance(state.uri)
                 }
               }
@@ -128,8 +128,8 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null && appKit.balance.value != null) {
-        appKit.balance.value!!.run {
+      if (useMax && context != null && app.balance.value != null) {
+        app.balance.value!!.run {
           val unit = Prefs.getCoinUnit(context!!)
           mBinding.unit.setSelection(unitList.indexOf(unit.code()))
           mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
@@ -174,7 +174,7 @@ class SendFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
-    appKit.balance.value?.let {
+    app.balance.value?.let {
       mBinding.balanceValue.setAmount(it)
     } ?: log.warn("balance is not available yet")
 
@@ -218,8 +218,8 @@ class SendFragment : BaseFragment() {
       val amount = checkAmount()
       if (amount.isDefined) {
         // FIXME: use feerate provided by user, like in eclair mobile
-        val feeratePerKw = appKit.kit.value?.run { kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
-        appKit.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
+        val feeratePerKw = app.kit?.run { nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
+        app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
       } else {
         model.state.postValue(SendState.Onchain.SwapRequired(uri))
       }
@@ -241,7 +241,7 @@ class SendFragment : BaseFragment() {
         is SendState.Onchain -> SendState.Onchain.Sending(state.uri, pr)
         else -> throw RuntimeException("unhandled state=$state when sending payment")
       }
-      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
+      app.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }
@@ -250,7 +250,7 @@ class SendFragment : BaseFragment() {
     return try {
       val unit = mBinding.unit.selectedItem.toString()
       val amountInput = mBinding.amount.text.toString()
-      val balance = appKit.balance.value
+      val balance = app.balance.value
       model.amountErrorMessage.value = null
       val fiat = Prefs.getFiatCurrency(context!!)
       val amount = if (unit == fiat) {

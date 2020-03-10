@@ -38,6 +38,7 @@ import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.events.ChannelStateChange
@@ -106,16 +107,16 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MainViewModel::class.java)
-    appKit.payments.observe(viewLifecycleOwner, Observer {
+    app.payments.observe(viewLifecycleOwner, Observer {
       paymentsAdapter.submitList(it)
     })
-    appKit.notifications.observe(viewLifecycleOwner, Observer {
+    app.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
     })
-    appKit.balance.observe(viewLifecycleOwner, Observer {
+    app.balance.observe(viewLifecycleOwner, Observer {
       mBinding.balance.setAmount(it)
     })
-    appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
+    app.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
       refreshIncomingFunds()
     })
     model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
@@ -146,7 +147,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.storesButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/stores"))) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
 
-    appKit.refreshPayments()
+    app.refreshPayments()
   }
 
   override fun onStop() {
@@ -162,7 +163,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
     log.debug("pending payment, refreshing list...")
-    appKit.refreshPayments()
+    app.refreshPayments()
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -175,8 +176,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when refreshing the incoming funds notification: ", exception)
     }) {
-      val totalSwapIns = appKit.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
-      val totalChannelsWaitingConf = appKit.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
+      val totalSwapIns = app.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
+      val totalChannelsWaitingConf = app.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
         if (c.data() is HasCommitments) {
           (c.data() as HasCommitments).commitments().availableBalanceForSend()
         } else {
@@ -223,31 +224,31 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
     if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > Constants.DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
-      appKit.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
-      if (appKit.isKitReady()) {
+      app.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      if (app.state.value is KitState.Started) {
         // the user has been notified once, but since the node has started he is safe anyway
         // the background watcher notification countdown can be reset so that it does not spam the user
         Prefs.saveWatcherAttemptOutcome(context, WatchListener.`Ok$`.`MODULE$`)
       }
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      app.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
   }
 
   private fun checkWalletIsSecure(context: Context) {
     if (!Prefs.getIsSeedEncrypted(context)) {
-      appKit.notifications.value?.add(InAppNotifications.NO_PIN_SET)
+      app.notifications.value?.add(InAppNotifications.NO_PIN_SET)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
+      app.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
     }
   }
 
   private fun checkMnemonics(context: Context) {
     val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
     if (timestamp == 0L) {
-      appKit.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      app.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      app.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
     }
   }
 

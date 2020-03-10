@@ -26,7 +26,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -85,13 +84,21 @@ data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
-class AppKit(val kit: Kit, val api: Eclair, val xpub: Xpub)
-enum class StartupState {
-  OFF, IN_PROGRESS, DONE, ERROR
+sealed class KitState {
+  object Off : KitState()
+  object Starting : KitState()
+  data class Started(val kit: Kit, val api: Eclair, val xpub: Xpub) : KitState()
+  sealed class Error : KitState() {
+    data class Generic(val message: String) : Error()
+    object InvalidBiometric : Error()
+    object WrongPassword : Error()
+    object NoConnectivity : Error()
+    object UnreadableData : Error()
+  }
 }
 
-class AppKitModel : ViewModel() {
-  private val log = LoggerFactory.getLogger(AppKitModel::class.java)
+class AppViewModel : ViewModel() {
+  private val log = LoggerFactory.getLogger(AppViewModel::class.java)
 
   private val shortTimeout = Timeout(Duration.create(10, TimeUnit.SECONDS))
   private val longTimeout = Timeout(Duration.create(30, TimeUnit.SECONDS))
@@ -103,18 +110,16 @@ class AppKitModel : ViewModel() {
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
   val navigationEvent = SingleLiveEvent<Any>()
-  val startupState = MutableLiveData<StartupState>()
-  val startupErrorMessage = MutableLiveData<String>()
   val trampolineFeeSettings = MutableLiveData<List<TrampolineFeeSetting>>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
   val balance = MutableLiveData<MilliSatoshi>()
-  private val _kit = MutableLiveData<AppKit>()
-  val kit: LiveData<AppKit> get() = _kit
+  val state = MutableLiveData<KitState>()
+  val kit: Kit? get() = if (state.value is KitState.Started) (state.value as KitState.Started).kit else null
+  val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
   init {
     currentNav.value = R.id.startup_fragment
-    _kit.value = null
-    startupState.value = StartupState.OFF
+    state.value = KitState.Off
     networkInfo.value = Constants.DEFAULT_NETWORK_INFO
     balance.value = MilliSatoshi(0)
     trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
@@ -168,7 +173,7 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: SwapInConfirmed) {
     // a confirmed swap-in means that a channel was opened ; this event is stored as an incoming payment in payment database.
-    kit.value?.run {
+    kit?.run {
       try {
         log.info("saving successful swap-in=$event as incoming payment")
         val pr = doGeneratePaymentRequest(
@@ -177,7 +182,7 @@ class AppKitModel : ViewModel() {
           routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
           timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)),
           paymentType = PaymentType.SwapIn())
-        kit.nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
+        nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
         log.info("successful swap-in=$event as been saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
         pendingSwapIns.value?.remove(event.bitcoinAddress())
         navigationEvent.postValue(PaymentReceived(pr.paymentHash(),
@@ -206,7 +211,7 @@ class AppKitModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: ChannelClosingEvent) {
     // store channel closing event as an outgoing payment in database.
-    kit.value?.run {
+    kit?.run {
       val id = UUID.randomUUID()
       val preimage = `package$`.`MODULE$`.randomBytes32()
       val paymentHash = Crypto.hash256(preimage.bytes())
@@ -223,25 +228,22 @@ class AppKitModel : ViewModel() {
         /* creation date */ date,
         /* payment request */ Option.empty(),
         /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
-      kit.nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+      nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
 
       val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
       val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
         ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
-      kit.nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+      nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
     }
   }
-
-  @UiThread
-  fun isKitReady(): Boolean = kit.value != null
 
   fun refreshPayments() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
-        _kit.value?.let {
+        kit?.let {
           var p: List<PlainPayment>? = ArrayList()
           val t = measureTimeMillis {
-            p = JavaConverters.seqAsJavaListConverter(it.kit.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
+            p = JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
           }
           log.debug("list payments in ${t}ms")
           payments.postValue(p)
@@ -253,10 +255,10 @@ class AppKitModel : ViewModel() {
   suspend fun getSentPaymentsFromParentId(parentId: UUID): List<OutgoingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.run {
+        kit?.run {
           var payments: List<OutgoingPayment> = ArrayList()
           val t = measureTimeMillis {
-            payments = JavaConverters.seqAsJavaListConverter(kit.nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
+            payments = JavaConverters.seqAsJavaListConverter(nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
           }
           log.debug("get sent payment details in ${t}ms")
           payments
@@ -268,10 +270,10 @@ class AppKitModel : ViewModel() {
   suspend fun getReceivedPayment(paymentHash: ByteVector32): Option<IncomingPayment> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.run {
+        kit?.run {
           var payment: Option<IncomingPayment> = Option.empty()
           val t = measureTimeMillis {
-            payment = this.kit.nodeParams().db().payments().getIncomingPayment(paymentHash)
+            payment = nodeParams().db().payments().getIncomingPayment(paymentHash)
           }
           log.debug("get received payment details in ${t}ms")
           payment
@@ -284,17 +286,23 @@ class AppKitModel : ViewModel() {
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest {
     return coroutineScope {
       async(Dispatchers.Default) {
-        val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(_kit.value?.kit?.nodeParams()?.nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
-        val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-        doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard())
+        kit?.run {
+          val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(nodeParams().nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
+          val routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
+          doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard())
+        } ?: throw KitNotInitialized()
       }
     }.await()
   }
 
   @WorkerThread
-  private fun doGeneratePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>, timeout: Timeout = shortTimeout, paymentType: String): PaymentRequest {
-    return _kit.value?.let {
-      val f = Patterns.ask(it.kit.paymentHandler(),
+  private fun doGeneratePaymentRequest(description: String,
+    amount_opt: Option<MilliSatoshi>,
+    routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>,
+    timeout: Timeout = shortTimeout,
+    paymentType: String): PaymentRequest {
+    return kit?.run {
+      val f = Patterns.ask(paymentHandler(),
         MultiPartHandler.ReceivePayment(
           /* amount */ amount_opt,
           /* description */ description,
@@ -310,9 +318,9 @@ class AppKitModel : ViewModel() {
   suspend fun requestSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.run {
+        kit?.run {
           log.info("sending swap-out request to switchboard for address=$address with amount=$amount")
-          this.kit.switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
+          switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -322,8 +330,8 @@ class AppKitModel : ViewModel() {
   suspend fun sendSwapIn() {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.run {
-          this.kit.switchboard().tell(Peer.SendSwapInRequest(Wallet.ACINQ.nodeId()), ActorRef.noSender())
+        kit?.run {
+          switchboard().tell(Peer.SendSwapInRequest(Wallet.ACINQ.nodeId()), ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
       }
@@ -350,7 +358,7 @@ class AppKitModel : ViewModel() {
   suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean) {
     return coroutineScope {
       async(Dispatchers.Default) {
-        _kit.value?.run {
+        kit?.run {
           val cltvExpiryDelta = if (paymentRequest.minFinalCltvExpiryDelta().isDefined) paymentRequest.minFinalCltvExpiryDelta().get() else Channel.MIN_CLTV_EXPIRY_DELTA()
           val isTrampoline = paymentRequest.nodeId() != Wallet.ACINQ.nodeId()
 
@@ -393,7 +401,7 @@ class AppKitModel : ViewModel() {
               /* route params */ Option.apply(null))
           }
 
-          val res = Await.result(Patterns.ask(this.kit.paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
+          val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
           if (res is PaymentFailed) {
             val failure = res.failures().mkString(", ")
             log.error("payment has failed: [ $failure ])")
@@ -408,12 +416,12 @@ class AppKitModel : ViewModel() {
 
   @UiThread
   fun acceptPayToOpen(paymentHash: ByteVector32) {
-    _kit.value?.kit?.system()?.eventStream()?.publish(AcceptPayToOpen(paymentHash))
+    kit?.system()?.eventStream()?.publish(AcceptPayToOpen(paymentHash))
   }
 
   @UiThread
   fun rejectPayToOpen(paymentHash: ByteVector32) {
-    _kit.value?.kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
+    kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
   }
 
   suspend fun getChannels(): Iterable<RES_GETINFO> = getChannels(null)
@@ -425,8 +433,8 @@ class AppKitModel : ViewModel() {
   suspend fun getChannels(state: State?): Iterable<RES_GETINFO> {
     return coroutineScope {
       async(Dispatchers.Default) {
-        kit.value?.api?.let {
-          val res = Await.result(it.channelsInfo(Option.apply(null), shortTimeout), Duration.Inf()) as scala.collection.Iterable<RES_GETINFO>
+        api?.run {
+          val res = Await.result(channelsInfo(Option.apply(null), shortTimeout), Duration.Inf()) as scala.collection.Iterable<RES_GETINFO>
           val channels = JavaConverters.asJavaIterableConverter(res).asJava()
           state?.let {
             channels.filter { c -> c.state() == state }
@@ -443,9 +451,8 @@ class AppKitModel : ViewModel() {
   suspend fun getChannel(channelId: ByteVector32): RES_GETINFO? {
     return coroutineScope {
       async(Dispatchers.Default) {
-        kit.value?.api?.let {
-          val res = Await.result(it.channelInfo(Left.apply(channelId), shortTimeout), Duration.Inf()) as RES_GETINFO
-          res
+        api?.run {
+          Await.result(channelInfo(Left.apply(channelId), shortTimeout), Duration.Inf()) as RES_GETINFO
         }
       }
     }.await()
@@ -456,17 +463,17 @@ class AppKitModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         delay(500)
-        kit.value?.let {
+        if (api != null && kit != null) {
           val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
           val closingFutures = ArrayList<Future<String>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
-            closingFutures.add(it.api.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
+            closingFutures.add(api!!.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
+          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
           Unit
-        } ?: throw KitNotInitialized()
+        } else throw KitNotInitialized()
       }
     }.await()
   }
@@ -475,16 +482,16 @@ class AppKitModel : ViewModel() {
   suspend fun forceCloseAllChannels() {
     return coroutineScope {
       async(Dispatchers.Default) {
-        kit.value?.let {
+        if (api != null && kit != null) {
           val closingFutures = ArrayList<Future<String>>()
           getChannels().map { res ->
             val channelId = res.channelId()
             log.info("attempting to force close channel=$channelId")
-            closingFutures.add(it.api.forceClose(Left.apply(channelId), longTimeout))
+            closingFutures.add(api!!.forceClose(Left.apply(channelId), longTimeout))
           }
-          Await.result(Futures.sequence(closingFutures, it.kit.system().dispatcher()), Duration.Inf())
+          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
           Unit
-        } ?: throw KitNotInitialized()
+        } else throw KitNotInitialized()
       }
     }.await()
   }
@@ -496,9 +503,9 @@ class AppKitModel : ViewModel() {
   fun reconnect() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
-        kit.value?.run {
+        kit?.run {
           log.info("sending connect to ACINQ actor")
-          kit.switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+          switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
         } ?: log.debug("appkit not ready yet")
       }
     }
@@ -508,44 +515,38 @@ class AppKitModel : ViewModel() {
    * This method launches the node startup process.
    */
   @UiThread
-  fun startAppKit(context: Context, pin: String) {
-    when {
-      isKitReady() -> log.info("silently ignoring attempt to start node because kit is already started")
-      startupState.value == StartupState.ERROR -> log.info("silently ignoring attempt to start node because startup is in error")
-      startupState.value == StartupState.IN_PROGRESS -> log.info("silently ignoring attempt to start node because startup is already in progress")
-      startupState.value == StartupState.DONE -> log.info("silently ignoring attempt to start node because startup is done")
+  fun startKit(context: Context, pin: String) {
+    when (state.value) {
+      is KitState.Error, is KitState.Starting, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
       else -> {
-        startupState.value = StartupState.IN_PROGRESS
+        state.value = KitState.Starting
         viewModelScope.launch {
           withContext(Dispatchers.Default) {
             try {
               val res = startNode(context, pin)
-              Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
+              state.postValue(res)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-              _kit.postValue(res)
               ChannelsWatcher.schedule(context)
-              startupState.postValue(StartupState.DONE)
+              Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
             } catch (t: Throwable) {
-              log.info("aborted node startup")
-              startupState.postValue(StartupState.ERROR)
+              log.warn("aborted node startup!")
               closeConnections()
-              _kit.postValue(null)
               when (t) {
                 is GeneralSecurityException -> {
-                  log.info("user entered wrong PIN")
-                  startupErrorMessage.postValue(context.getString(R.string.startup_error_wrong_pwd))
+                  log.debug("user entered wrong PIN")
+                  state.postValue(KitState.Error.WrongPassword)
                 }
                 is NetworkException, is UnknownHostException -> {
                   log.info("network error: ", t)
-                  startupErrorMessage.postValue(context.getString(R.string.startup_error_network))
+                  state.postValue(KitState.Error.NoConnectivity)
                 }
                 is IOException, is IllegalAccessException -> {
                   log.error("seed file not readable: ", t)
-                  startupErrorMessage.postValue(context.getString(R.string.startup_error_unreadable))
+                  state.postValue(KitState.Error.UnreadableData)
                 }
                 else -> {
                   log.error("error when starting node: ", t)
-                  startupErrorMessage.postValue(context.getString(R.string.startup_error_generic))
+                  state.postValue(KitState.Error.Generic(t.localizedMessage ?: t.javaClass.simpleName))
                 }
               }
             }
@@ -556,22 +557,21 @@ class AppKitModel : ViewModel() {
   }
 
   private fun closeConnections() {
-    _kit.value?.let {
-      it.kit.system().shutdown()
-      it.kit.nodeParams().db().audit().close()
-      it.kit.nodeParams().db().channels().close()
-      it.kit.nodeParams().db().network().close()
-      it.kit.nodeParams().db().peers().close()
-      it.kit.nodeParams().db().pendingRelay().close()
-    } ?: log.warn("could not shutdown system because kit is not initialized!")
+    kit?.run {
+      system().shutdown()
+      nodeParams().db().audit().close()
+      nodeParams().db().channels().close()
+      nodeParams().db().network().close()
+      nodeParams().db().peers().close()
+      nodeParams().db().pendingRelay().close()
+    } ?: log.warn("could not close kit connections because kit is not initialized!")
   }
 
   public fun shutdown() {
     closeConnections()
     balance.postValue(MilliSatoshi(0))
     networkInfo.postValue(Constants.DEFAULT_NETWORK_INFO)
-    _kit.postValue(null)
-    startupState.postValue(StartupState.OFF)
+    state.postValue(KitState.Off)
   }
 
   @WorkerThread
@@ -603,7 +603,7 @@ class AppKitModel : ViewModel() {
   }
 
   @WorkerThread
-  private fun startNode(context: Context, pin: String): AppKit {
+  private fun startNode(context: Context, pin: String): KitState.Started {
     log.info("starting up node...")
 
     val system = ActorSystem.create("system")
@@ -651,8 +651,7 @@ class AppKitModel : ViewModel() {
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
-    val eclair = EclairImpl(kit)
-    return AppKit(kit, eclair, xpub)
+    return KitState.Started(kit, EclairImpl(kit), xpub)
   }
 
   private fun getExchangeRateHandler(context: Context): Callback {

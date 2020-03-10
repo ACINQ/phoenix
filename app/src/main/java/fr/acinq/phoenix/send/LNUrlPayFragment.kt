@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.AppViewModel
 import fr.acinq.phoenix.databinding.FragmentLnurlPayBinding
 import okhttp3.HttpUrl
 import org.slf4j.Logger
@@ -36,7 +36,7 @@ class LNUrlPayFragment : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentLnurlPayBinding
-  private lateinit var appKit: AppKitModel
+  private lateinit var app: AppViewModel
   private lateinit var model: LNUrlPayViewModel
   private val args: LNUrlPayFragmentArgs by navArgs()
 
@@ -49,7 +49,7 @@ class LNUrlPayFragment : DialogFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     activity?.let {
-      appKit = ViewModelProvider(it).get(AppKitModel::class.java)
+      app = ViewModelProvider(it).get(AppViewModel::class.java)
       model = ViewModelProvider(this).get(LNUrlPayViewModel::class.java)
       mBinding.model = model
       model.baseUrl.value = HttpUrl.get(args.url)

@@ -34,6 +34,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.phoenix.utils.BindingHelpers
@@ -60,19 +61,22 @@ class ElectrumServerFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
-    appKit.kit.observe(viewLifecycleOwner, Observer {
-      // -- xpub / feerate from appkit
-      if (appKit.kit.value == null) {
-        mBinding.feeRate.text = getString(R.string.utils_unknown)
-        mBinding.xpub.text = getString(R.string.utils_unknown)
-      } else {
-        mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
-        val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
-        mBinding.feeRate.visibility = View.VISIBLE
-        mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+    app.state.observe(viewLifecycleOwner, Observer {
+      when (it) {
+        is KitState.Started -> {
+          // -- xpub / feerate from appkit
+          mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
+          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(it.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
+          mBinding.feeRate.visibility = View.VISIBLE
+          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+        }
+        else -> {
+          mBinding.feeRate.text = getString(R.string.utils_unknown)
+          mBinding.xpub.text = getString(R.string.utils_unknown)
+        }
       }
     })
-    appKit.networkInfo.observe(viewLifecycleOwner, Observer {
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
         val electrumServer = it.electrumServer
         if (electrumServer == null) {
@@ -144,7 +148,7 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
           dialog.dismiss()
-          appKit.shutdown()
+          app.shutdown()
         }
       }
     }
