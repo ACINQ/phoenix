@@ -45,16 +45,36 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
     setCancelable(cancelable)
 
     val mButtonsList = ArrayList<View>()
-    mButtonsList.add(mBinding.pinNum1)
-    mButtonsList.add(mBinding.pinNum2)
-    mButtonsList.add(mBinding.pinNum3)
-    mButtonsList.add(mBinding.pinNum4)
-    mButtonsList.add(mBinding.pinNum5)
-    mButtonsList.add(mBinding.pinNum6)
-    mButtonsList.add(mBinding.pinNum7)
-    mButtonsList.add(mBinding.pinNum8)
-    mButtonsList.add(mBinding.pinNum9)
-    mButtonsList.add(mBinding.pinNum0)
+    // randomly sorted pin buttons
+    val pinButtons = listOf(
+      mBinding.pinNum0,
+      mBinding.pinNum1,
+      mBinding.pinNum2,
+      mBinding.pinNum3,
+      mBinding.pinNum4,
+      mBinding.pinNum5,
+      mBinding.pinNum6,
+      mBinding.pinNum7,
+      mBinding.pinNum8,
+      mBinding.pinNum9,
+      mBinding.pinNum0
+    ).shuffled()
+
+    // for each button remove it from the view and re-add it
+    pinButtons.withIndex().forEach { indexedBtn ->
+      mButtonsList.add(indexedBtn.value)
+      if (indexedBtn.index == pinButtons.size) { // special case to handle the backspace/num_clear buttons
+        mBinding.pinGrid.removeView(mBinding.pinNumClear)
+        mBinding.pinGrid.removeView(indexedBtn.value)
+        mBinding.pinGrid.removeView(mBinding.pinBackspace)
+        mBinding.pinGrid.addView(mBinding.pinNumClear)
+        mBinding.pinGrid.addView(indexedBtn.value)
+        mBinding.pinGrid.addView(mBinding.pinBackspace)
+      } else {
+        mBinding.pinGrid.removeView(indexedBtn.value)
+        mBinding.pinGrid.addView(indexedBtn.value)
+      }
+    }
 
     mBinding.pinDisplay.addTextChangedListener(object : TextWatcher {
       override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
