@@ -30,6 +30,7 @@
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
+    android:extractNativeLibs="true"
     android:supportsRtl="true"
     android:theme="@style/default_theme">
 
@@ -76,5 +77,8 @@
       </intent-filter>
     </receiver>
 
+    <!-- services -->
+    <service android:name=".background.TorBackgroundService"/>
+    <service android:name=".background.TorBackgroundService2"/>
   </application>
 </manifest>

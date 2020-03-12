@@ -30,6 +30,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.msopentech.thali.toronionproxy.OnionProxyManager
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
@@ -45,6 +46,7 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.background.ChannelsWatcher
+import fr.acinq.phoenix.utils.tor.TorHelper
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
@@ -114,6 +116,7 @@ class AppViewModel : ViewModel() {
   val swapInSettings = MutableLiveData<SwapInSettings>()
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
+  val torManager = MutableLiveData<OnionProxyManager>()
   val kit: Kit? get() = if (state.value is KitState.Started) (state.value as KitState.Started).kit else null
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
@@ -502,12 +505,31 @@ class AppViewModel : ViewModel() {
   @UiThread
   fun reconnect() {
     viewModelScope.launch {
-      withContext(Dispatchers.Default) {
+      withContext(Dispatchers.IO) {
         kit?.run {
           log.info("sending connect to ACINQ actor")
           switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+          restartTor()
         } ?: log.debug("appkit not ready yet")
       }
+    }
+  }
+
+  @WorkerThread
+  fun restartTor(): Boolean {
+    return try {
+      torManager.value?.let {
+        if (it.isRunning) {
+          log.info("TOR is already running, ignore restart")
+        } else {
+          log.info("TOR is not running, restarting!")
+          it.start()
+        }
+      } ?: throw TorSetupException("TOR has not been setup")
+      true
+    } catch (e: Exception) {
+      log.error("failed to start TOR: ", e)
+      false
     }
   }
 
@@ -613,6 +635,9 @@ class AppViewModel : ViewModel() {
 
     checkConnectivity(context)
     cancelBackgroundJobs(context)
+
+    torManager.postValue(TorHelper.bootstrap(context))
+    log.info("TOR has been booted")
 
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
