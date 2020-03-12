@@ -204,6 +204,7 @@
   <string name="settings_electrum">Electrum server</string>
   <string name="settings_mutual_close">Close all channels</string>
   <string name="settings_force_close">Danger zone</string>
+  <string name="settings_tor">Tor</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -475,5 +476,11 @@
 
   <string name="key_space_desc">Add whitespace</string>
   <string name="key_delete_desc">Delete last character</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Tor Settings</string>
+  <string name="tor_settings_subtitle">You can improve your privacy by connecting only over Tor. This will apply to every connections (Lightning, Electrum, various APIs).</string>
+  <string name="tor_settings_enable">Enable Tor</string>
 
 </resources>

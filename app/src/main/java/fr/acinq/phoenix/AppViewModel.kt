@@ -636,8 +636,13 @@ class AppViewModel : ViewModel() {
     checkConnectivity(context)
     cancelBackgroundJobs(context)
 
-    torManager.postValue(TorHelper.bootstrap(context))
-    log.info("TOR has been booted")
+    if (Prefs.isTorEnabled(context)) {
+      log.info("using TOR...")
+      torManager.postValue(TorHelper.bootstrap(context))
+      log.info("TOR has been booted")
+    } else {
+      log.info("using clear connection...")
+    }
 
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")

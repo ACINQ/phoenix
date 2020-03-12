@@ -58,6 +58,7 @@ object Prefs {
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
+  const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
 
   fun getLastVersionUsed(context: Context): Int {
     return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
@@ -204,6 +205,14 @@ object Prefs {
 
   fun saveTrampolineMaxFeeIndex(context: Context, index: Int) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, index).apply()
+  }
+
+  fun isTorEnabled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_TOR_ENABLED, false)
+  }
+
+  fun saveTorEnabled(context: Context, enabled: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_TOR_ENABLED, enabled).apply()
   }
 
 }

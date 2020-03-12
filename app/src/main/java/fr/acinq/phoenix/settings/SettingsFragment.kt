@@ -52,5 +52,6 @@ class SettingsFragment : BaseFragment() {
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
+    mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
   }
 }

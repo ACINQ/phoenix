@@ -327,6 +327,9 @@
     <action
       android:id="@+id/action_settings_to_fees"
       app:destination="@id/fees_fragment" />
+    <action
+      android:id="@+id/action_settings_to_tor"
+      app:destination="@id/tor_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -396,5 +399,11 @@
     android:id="@+id/fees_fragment"
     android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
     android:label="FeesSettingsFragment" />
+
+  <!-- settings: TOR -->
+  <fragment
+    android:id="@+id/tor_fragment"
+    android:name="fr.acinq.phoenix.settings.TorSettingFragment"
+    android:label="TorSettingFragment" />
 
 </navigation>

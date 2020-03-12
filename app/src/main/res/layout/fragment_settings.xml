@@ -69,12 +69,22 @@
           app:layout_constraintTop_toBottomOf="@id/prefs_display_button"
           app:text="@string/settings_electrum" />
 
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/tor_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/electrum_button"
+          app:text="@string/settings_tor" />
+
         <TextView
           android:id="@+id/security_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_security_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/electrum_button" />
+          app:layout_constraintTop_toBottomOf="@id/tor_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/display_seed_button"
