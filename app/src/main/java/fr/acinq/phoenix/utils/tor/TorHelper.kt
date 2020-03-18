@@ -18,43 +18,48 @@ package fr.acinq.phoenix.utils.tor
 
 import android.content.Context
 import com.msopentech.thali.android.toronionproxy.AndroidOnionProxyManager
-import com.msopentech.thali.android.toronionproxy.AndroidTorConfig
+import com.msopentech.thali.toronionproxy.EventBroadcaster
+import com.msopentech.thali.toronionproxy.TorConfig
 import com.msopentech.thali.toronionproxy.TorInstaller
 import com.msopentech.thali.toronionproxy.android.R
 import fr.acinq.phoenix.utils.TorSetupException
+import net.freehaven.tor.control.EventHandler
 import org.slf4j.LoggerFactory
 import org.torproject.android.binary.TorResourceInstaller
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.lang.Exception
 import kotlin.system.measureTimeMillis
 
 
 object TorHelper {
   private val log = LoggerFactory.getLogger(this::class.java)
-  const val STARTUP_TIMEOUT_SEC: Int = 10
-  const val STARTUP_TRIES: Int = 5
+
+  const val STARTUP_TIMEOUT_SEC: Int = 30
+  const val STARTUP_TRIES: Int = 2
   const val PORT: Int = 10462
 
-  fun bootstrap(context: Context): AndroidOnionProxyManager {
+  fun bootstrap(context: Context, eventHandler: EventHandler): AndroidOnionProxyManager {
     try {
-      val torRoot = File(context.filesDir, "tor")
-      if (!torRoot.exists()) torRoot.mkdir()
-      val torConfig = AndroidTorConfig.createConfig(torRoot, torRoot, context)
-      val torInstaller = TorInstaller(context, torRoot)
-      val onionProxyManager = AndroidOnionProxyManager(context, torConfig, torInstaller, null, null, null)
-      val timeToSetup = measureTimeMillis {
-        onionProxyManager.setup()
-      }
-      log.info("onion proxy manager setup in ${timeToSetup}ms")
+      // configuration files
+      val nativeDir = File(context.applicationInfo.nativeLibraryDir)
+      val configDir = File(context.filesDir, "tor")
+      if (!configDir.exists()) configDir.mkdir()
+      val torConfig = TorConfig.Builder(nativeDir, configDir).fileCreationTimeout(STARTUP_TIMEOUT_SEC).build()
+      val torInstaller = TorInstaller(context, configDir)
+
+      // setup manager
+      val onionProxyManager = AndroidOnionProxyManager(context, torConfig, torInstaller, null, null, eventHandler)
+      onionProxyManager.setup()
       onionProxyManager.torInstaller.updateTorConfigCustom("ControlPort auto" +
         "\nControlPortWriteToFile " + onionProxyManager.context.config.controlPortFile +
         "\nCookieAuthFile " + onionProxyManager.context.config.cookieAuthFile +
         "\nCookieAuthentication 1" +
         "\nSocksPort $PORT")
+
+      // start tor
       if (!onionProxyManager.startWithRepeat(STARTUP_TIMEOUT_SEC, STARTUP_TRIES, true)) {
-        throw RuntimeException("could not start TOR after $STARTUP_TRIES with ${STARTUP_TIMEOUT_SEC}s timeout")
+        throw TorSetupException("could not start TOR after $STARTUP_TRIES with ${STARTUP_TIMEOUT_SEC}s timeout")
       } else {
         log.info("successfully started TOR")
       }
@@ -71,10 +76,10 @@ object TorHelper {
  * file. The tor executable will be located in the Android native library directory for the app.
  */
 private class TorInstaller(val context: Context, rootInstallFolder: File) : TorInstaller() {
-  private val resourceInstaller: TorResourceInstaller = TorResourceInstaller(context, rootInstallFolder)
+  protected val resourceInstaller: TorResourceInstaller = TorResourceInstaller(context, rootInstallFolder)
 
   override fun setup() {
-    resourceInstaller.installResources() ?: throw IOException("no tor executable has been installed")
+    resourceInstaller.installResources()
   }
 
   override fun openBridgesStream(): InputStream {

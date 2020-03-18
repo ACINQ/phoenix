@@ -149,13 +149,13 @@ object Wallet {
 
     // TOR config
     if (Prefs.isTorEnabled(context)) {
-      conf["socks5.enabled"] = true
-      conf["socks5.host"] = "127.0.0.1"
-      conf["socks5.port"] = TorHelper.PORT
-      conf["socks5.use-for-ipv4"] = true
-      conf["socks5.use-for-ipv6"] = true
-      conf["socks5.use-for-tor"] = true
-      conf["socks5.randomize-credentials"] = false // this allows tor stream isolation
+      conf["eclair.socks5.enabled"] = true
+      conf["eclair.socks5.host"] = "127.0.0.1"
+      conf["eclair.socks5.port"] = TorHelper.PORT
+      conf["eclair.socks5.use-for-ipv4"] = true
+      conf["eclair.socks5.use-for-ipv6"] = true
+      conf["eclair.socks5.use-for-tor"] = true
+      conf["eclair.socks5.randomize-credentials"] = false // this allows tor stream isolation
     }
 
     return ConfigFactory.parseMap(conf)

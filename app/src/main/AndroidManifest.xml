@@ -77,8 +77,5 @@
       </intent-filter>
     </receiver>
 
-    <!-- services -->
-    <service android:name=".background.TorBackgroundService"/>
-    <service android:name=".background.TorBackgroundService2"/>
   </application>
 </manifest>

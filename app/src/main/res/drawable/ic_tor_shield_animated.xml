@@ -1,0 +1,105 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:aapt="http://schemas.android.com/aapt">
+  <aapt:attr name="android:drawable">
+    <vector
+      android:name="vector"
+      android:width="24dp"
+      android:height="24dp"
+      android:viewportWidth="24"
+      android:viewportHeight="24">
+      <path
+        android:name="path"
+        android:fillColor="#00000000"
+        android:pathData="M 12 22 C 12 22 20 18 20 12 L 20 5 L 12 2 L 4 5 L 4 12 C 4 18 12 22 12 22 Z"
+        android:strokeWidth="2"
+        android:strokeColor="?attr/textColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:trimPathStart="0.97"
+        android:trimPathOffset="0.9" />
+      <path
+        android:name="path_1"
+        android:fillColor="#00000000"
+        android:pathData="M 12 17 C 12 17 16 15 16 12 L 16 8.5 L 12 7 L 8 8.5 L 8 12 C 8 15 12 17 12 17 Z"
+        android:strokeWidth="1"
+        android:strokeColor="?attr/textColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+      <path
+        android:name="path_2"
+        android:fillColor="#FF000000"
+        android:pathData="M 12 12.7 C 12 12.7 12.6 12.4 12.6 12 L 12.6 11.5 L 12 11.3 L 11.4 11.5 L 11.4 12 C 11.4 12.4 12 12.7 12 12.7 Z"
+        android:strokeWidth="0.5"
+        android:strokeColor="?attr/textColor"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    </vector>
+  </aapt:attr>
+  <target android:name="path">
+    <aapt:attr name="android:animation">
+      <set>
+        <objectAnimator
+          android:duration="500"
+          android:interpolator="@android:anim/linear_interpolator"
+          android:propertyName="trimPathStart"
+          android:startOffset="500"
+          android:valueFrom="0.25"
+          android:valueTo="0.15"
+          android:valueType="floatType" />
+        <objectAnimator
+          android:duration="500"
+          android:interpolator="@android:anim/linear_interpolator"
+          android:propertyName="trimPathEnd"
+          android:startOffset="500"
+          android:valueFrom="1"
+          android:valueTo="0.25"
+          android:valueType="floatType" />
+        <objectAnimator
+          android:duration="500"
+          android:interpolator="@android:anim/linear_interpolator"
+          android:propertyName="trimPathStart"
+          android:valueFrom="0.9"
+          android:valueTo="0.25"
+          android:valueType="floatType" />
+        <objectAnimator
+          android:duration="1000"
+          android:interpolator="@android:interpolator/fast_out_slow_in"
+          android:propertyName="trimPathOffset"
+          android:valueFrom="1"
+          android:valueTo="0.75"
+          android:valueType="floatType" />
+        <objectAnimator
+          android:duration="500"
+          android:interpolator="@android:interpolator/fast_out_slow_in"
+          android:propertyName="strokeWidth"
+          android:valueFrom="1.75"
+          android:valueTo="1.25"
+          android:valueType="floatType" />
+        <objectAnimator
+          android:duration="500"
+          android:interpolator="@android:interpolator/fast_out_slow_in"
+          android:propertyName="strokeWidth"
+          android:startOffset="500"
+          android:valueFrom="1.25"
+          android:valueTo="1.75"
+          android:valueType="floatType" />
+      </set>
+    </aapt:attr>
+  </target>
+</animated-vector>

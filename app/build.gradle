@@ -154,9 +154,7 @@ dependencies {
 
   // tor
   def tor_ctl_version = "0.2"
-  def tor_binary_version = "0.4.1.5"
   def tor_wrapper_version = "0.0.3"
-  implementation "org.torproject:tor-android-binary:$tor_binary_version" // contains the actual tor binary
   implementation "net.freehaven.tor.control:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
   implementation "com.msopentech.thali:universal:$tor_wrapper_version" // core library for the tor wrapper
   implementation "com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar"

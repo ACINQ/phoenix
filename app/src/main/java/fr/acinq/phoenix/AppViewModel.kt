@@ -46,12 +46,14 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.background.ChannelsWatcher
-import fr.acinq.phoenix.utils.tor.TorHelper
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.tor.TorConnectionStatus
+import fr.acinq.phoenix.utils.tor.TorEventHandler
+import fr.acinq.phoenix.utils.tor.TorHelper
 import kotlinx.coroutines.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -86,12 +88,18 @@ data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
+
 sealed class KitState {
   object Off : KitState()
-  object Starting : KitState()
+  sealed class Bootstrap : KitState() {
+    object Init: Bootstrap()
+    object Tor: Bootstrap()
+    object Node: Bootstrap()
+  }
   data class Started(val kit: Kit, val api: Eclair, val xpub: Xpub) : KitState()
   sealed class Error : KitState() {
     data class Generic(val message: String) : Error()
+    data class Tor(val message: String) : Error()
     object InvalidBiometric : Error()
     object WrongPassword : Error()
     object NoConnectivity : Error()
@@ -117,6 +125,7 @@ class AppViewModel : ViewModel() {
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
   val torManager = MutableLiveData<OnionProxyManager>()
+  val torConnections = MutableLiveData<HashMap<String, TorConnectionStatus>>()
   val kit: Kit? get() = if (state.value is KitState.Started) (state.value as KitState.Started).kit else null
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
@@ -503,34 +512,20 @@ class AppViewModel : ViewModel() {
    * Send a reconnect event to the ACINQ node.
    */
   @UiThread
-  fun reconnect() {
+  fun reconnectToPeer() {
     viewModelScope.launch {
       withContext(Dispatchers.IO) {
         kit?.run {
           log.info("sending connect to ACINQ actor")
           switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
-          restartTor()
         } ?: log.debug("appkit not ready yet")
       }
     }
   }
 
   @WorkerThread
-  fun restartTor(): Boolean {
-    return try {
-      torManager.value?.let {
-        if (it.isRunning) {
-          log.info("TOR is already running, ignore restart")
-        } else {
-          log.info("TOR is not running, restarting!")
-          it.start()
-        }
-      } ?: throw TorSetupException("TOR has not been setup")
-      true
-    } catch (e: Exception) {
-      log.error("failed to start TOR: ", e)
-      false
-    }
+  fun reconnectTor() {
+    torManager.value?.run { enableNetwork(true) }
   }
 
   /**
@@ -539,9 +534,9 @@ class AppViewModel : ViewModel() {
   @UiThread
   fun startKit(context: Context, pin: String) {
     when (state.value) {
-      is KitState.Error, is KitState.Starting, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
+      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
       else -> {
-        state.value = KitState.Starting
+        state.value = KitState.Bootstrap.Init
         viewModelScope.launch {
           withContext(Dispatchers.Default) {
             try {
@@ -565,6 +560,10 @@ class AppViewModel : ViewModel() {
                 is IOException, is IllegalAccessException -> {
                   log.error("seed file not readable: ", t)
                   state.postValue(KitState.Error.UnreadableData)
+                }
+                is TorSetupException -> {
+                  log.error("error when bootstrapping TOR: ", t)
+                  state.postValue(KitState.Error.Tor(t.localizedMessage ?: t.javaClass.simpleName))
                 }
                 else -> {
                   log.error("error when starting node: ", t)
@@ -638,12 +637,21 @@ class AppViewModel : ViewModel() {
 
     if (Prefs.isTorEnabled(context)) {
       log.info("using TOR...")
-      torManager.postValue(TorHelper.bootstrap(context))
-      log.info("TOR has been booted")
+      state.postValue(KitState.Bootstrap.Tor)
+      torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
+        override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
+          torConnections.value?.run {
+            put(name, status)
+            torConnections.postValue(this)
+          }
+        }
+      }))
+      log.info("TOR has been bootstrapped")
     } else {
       log.info("using clear connection...")
     }
 
+    state.postValue(KitState.Bootstrap.Node)
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())

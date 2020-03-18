@@ -56,8 +56,11 @@ class MainActivity : AppCompatActivity() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
       log.info("network available")
+      if (Prefs.isTorEnabled(applicationContext)) {
+        app.reconnectTor()
+      }
       app.networkInfo.postValue(app.networkInfo.value?.copy(networkConnected = true))
-      app.reconnect()
+      app.reconnectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {

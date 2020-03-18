@@ -78,9 +78,4 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
 
 class TorSettingViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
-//  val torEnabled = MutableLiveData<Boolean>()
-//
-//  init {
-//    torEnabled.value = false
-//  }
 }

@@ -17,23 +17,30 @@
 package fr.acinq.phoenix.startup
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.drawable.Animatable2
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager
+import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.KeystoreHelper
+import fr.acinq.phoenix.utils.Logging
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 
 class StartupFragment : BaseFragment() {
 
@@ -50,6 +57,18 @@ class StartupFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     mBinding.appModel = app
+    context?.let { ctx ->
+      val torAnim = ctx.getDrawable(R.drawable.ic_tor_shield_animated)
+      mBinding.startingTorAnimation.setImageDrawable(torAnim)
+      if (torAnim is Animatable2) {
+        torAnim.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+          override fun onAnimationEnd(drawable: Drawable) {
+            torAnim.start()
+          }
+        })
+        torAnim.start()
+      }
+    }
   }
 
   override fun onStart() {
@@ -68,6 +87,21 @@ class StartupFragment : BaseFragment() {
     }
     mBinding.errorRestartButton.setOnClickListener {
       if (app.state.value is KitState.Error) app.state.value = KitState.Off
+    }
+    mBinding.errorShareLogsButton.setOnClickListener {
+      context?.let {
+        try {
+          val logFile = Logging.getLastLogFile(it)
+          val uri = FileProvider.getUriForFile(it, BuildConfig.APPLICATION_ID + ".provider", logFile)
+          val shareIntent = Intent(Intent.ACTION_SEND)
+          shareIntent.type = "text/plain"
+          shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+          shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.logs_share_subject))
+          startActivity(Intent.createChooser(shareIntent, getString(R.string.logs_share_title)))
+        } catch (e: Exception) {
+          log.error("could not share log file: ", e)
+        }
+      }
     }
     // required because PIN/biometric dialogs are dismissed if user alt-tab (state observer will not fire anymore)
     app.state.value?.let { handleKitState(it) }
@@ -94,6 +128,7 @@ class StartupFragment : BaseFragment() {
         }
       }
       state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
+      state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
       state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
       state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
       state is KitState.Error.WrongPassword -> {
