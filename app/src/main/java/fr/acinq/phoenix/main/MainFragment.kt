@@ -25,6 +25,8 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -69,6 +71,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private lateinit var notificationsAdapter: NotificationsAdapter
   private lateinit var notificationsManager: RecyclerView.LayoutManager
 
+  private lateinit var blinkingAnimation: Animation
+
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       refreshIncomingFundsAmountField()
@@ -100,7 +104,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = notificationsManager
       adapter = notificationsAdapter
     }
-
+    blinkingAnimation = AnimationUtils.loadAnimation(context, R.anim.blinking)
     return mBinding.root
   }
 
@@ -121,17 +125,21 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     })
     app.networkInfo.observe(viewLifecycleOwner, Observer {
       if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
+        mBinding.connectivityButton.startAnimation(blinkingAnimation)
         mBinding.connectivityButton.visibility = View.VISIBLE
         mBinding.torConnectedButton.visibility = View.GONE
       } else if (context != null && Prefs.isTorEnabled(context!!)) {
         if (it.torConnections.isNullOrEmpty()) {
+          mBinding.connectivityButton.startAnimation(blinkingAnimation)
           mBinding.connectivityButton.visibility = View.VISIBLE
           mBinding.torConnectedButton.visibility = View.GONE
         } else {
+          if (mBinding.connectivityButton.animation != null) mBinding.connectivityButton.animation.cancel()
           mBinding.connectivityButton.visibility = View.GONE
           mBinding.torConnectedButton.visibility = View.VISIBLE
         }
       } else {
+        if (mBinding.connectivityButton.animation != null) mBinding.connectivityButton.animation.cancel()
         mBinding.connectivityButton.visibility = View.GONE
         mBinding.torConnectedButton.visibility = View.GONE
       }
