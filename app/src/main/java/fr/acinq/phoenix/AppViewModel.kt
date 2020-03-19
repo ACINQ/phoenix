@@ -86,16 +86,17 @@ import scala.collection.immutable.List as ScalaList
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
-data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
+data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
 
 sealed class KitState {
   object Off : KitState()
   sealed class Bootstrap : KitState() {
-    object Init: Bootstrap()
-    object Tor: Bootstrap()
-    object Node: Bootstrap()
+    object Init : Bootstrap()
+    object Tor : Bootstrap()
+    object Node : Bootstrap()
   }
+
   data class Started(val kit: Kit, val api: Eclair, val xpub: Xpub) : KitState()
   sealed class Error : KitState() {
     data class Generic(val message: String) : Error()
@@ -125,7 +126,6 @@ class AppViewModel : ViewModel() {
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
   val torManager = MutableLiveData<OnionProxyManager>()
-  val torConnections = MutableLiveData<HashMap<String, TorConnectionStatus>>()
   val kit: Kit? get() = if (state.value is KitState.Started) (state.value as KitState.Started).kit else null
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
@@ -528,6 +528,15 @@ class AppViewModel : ViewModel() {
     torManager.value?.run { enableNetwork(true) }
   }
 
+  @UiThread
+  suspend fun getTorInfo(cmd: String): String {
+    return coroutineScope {
+      async(Dispatchers.IO) {
+        torManager.value?.run { getInfo(cmd /*"status/bootstrap-phase"*/) } ?: throw RuntimeException("onion proxy manager not available")
+      }
+    }.await()
+  }
+
   /**
    * This method launches the node startup process.
    */
@@ -640,9 +649,9 @@ class AppViewModel : ViewModel() {
       state.postValue(KitState.Bootstrap.Tor)
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-          torConnections.value?.run {
-            put(name, status)
-            torConnections.postValue(this)
+          networkInfo.value?.run {
+            torConnections[name] = status
+            networkInfo.postValue(this)
           }
         }
       }))

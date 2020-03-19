@@ -292,6 +292,8 @@
   <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
   <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Connecting…</string>
+  <string name="main_tor_connected_button">TOR</string>
   <string name="main_stores_button">Stores</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -483,6 +485,20 @@
 
   <string name="tor_settings_title">Tor Settings</string>
   <string name="tor_settings_subtitle">You can improve your privacy by connecting only over Tor. This will apply to every connections (Lightning, Electrum, various APIs).</string>
-  <string name="tor_settings_enable">Enable Tor</string>
+  <string name="tor_settings_enabled">Tor is enabled</string>
+  <string name="tor_settings_disabled">Tor is disabled</string>
+  <string name="tor_settings_confirm_disable_title">Are you sure you want to disable TOR? This could affect your privacy.</string>
+  <string name="tor_settings_confirm_enable_title">Are you sure you want to enable TOR? Note that for best result, it\'s recommended to start a new wallet as well.\n\nNote: In some countries where TOR usage is low, using TOR may actually compromise you.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Connections status</string>
+  <string name="conndialog_summary_not_ok">You have some connection issue(s). The app will not function properly.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">TOR</string>
+  <string name="conndialog_lightning">Lightning Peer</string>
+  <string name="conndialog_ok">Connected</string>
+  <string name="conndialog_not_ok">Connecting…</string>
 
 </resources>

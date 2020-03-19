@@ -54,8 +54,33 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:layout_constraintTop_toTopOf="parent"
-          app:text="@string/tor_settings_enable" />
+          app:text="@string/tor_settings_disabled" />
 
+        <View
+          android:id="@+id/switch_sep"
+          style="@style/HSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/tor_switch" />
+
+        <HorizontalScrollView
+          android:id="@+id/getinfo_scroll"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/switch_sep">
+
+          <TextView
+            android:id="@+id/getinfo_value"
+            style="@style/MonospaceView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_md" />
+        </HorizontalScrollView>
+
+        <View
+          android:id="@+id/getinfo_sep"
+          style="@style/HSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/getinfo_scroll" />
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
   </androidx.constraintlayout.widget.ConstraintLayout>
