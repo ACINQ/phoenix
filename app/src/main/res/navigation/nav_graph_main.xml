@@ -83,6 +83,12 @@
     app:destination="@id/tor_fragment"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
+  <!-- global to global settings -->
+  <action
+    android:id="@+id/global_action_any_to_settings"
+    app:destination="@id/settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
 
   <!-- main fragment -->
   <fragment

@@ -66,7 +66,7 @@
   <string name="startup_wait">Loading…</string>
   <string name="startup_wait_tor">Starting Tor…</string>
   <string name="startup_start_button">Restart</string>
-  <string name="startup_logs_button">Logs</string>
+  <string name="startup_settings_button">Settings</string>
   <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
   <string name="startup_error_tor">The TOR service could not start. Check that your connection is working and try again.\n\nError details: %1$s</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
@@ -283,6 +283,7 @@
 
   <string name="initwallet_create">New Wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
+  <string name="initwallet_options">Settings</string>
 
   <!-- //////////////// main //////////////////// -->
 
@@ -454,6 +455,8 @@
   <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Server</string>
+  <string name="electrum_not_connected">Not connected</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[You will connect to <b>%1$s</b>]]></string>
   <string name="electrum_connecting">Establishing connection…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>

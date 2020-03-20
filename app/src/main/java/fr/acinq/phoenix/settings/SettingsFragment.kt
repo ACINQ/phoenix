@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsBinding
 import org.slf4j.Logger
@@ -54,4 +55,6 @@ class SettingsFragment : BaseFragment() {
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
   }
+
+  override fun handleKitState(state: KitState) {}
 }

@@ -82,11 +82,20 @@ class ElectrumServerFragment : BaseFragment() {
         if (electrumServer == null) {
           // -- no connection to electrum server yet
           val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-          mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-            resources.getString(R.string.electrum_connecting)
-          } else {
-            resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-          })
+          mBinding.connectionStateValue.text = Converter.html(
+            if (app.state.value is KitState.Started) {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_connecting)
+              } else {
+                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+              }
+            } else {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_not_connected)
+              } else {
+                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+              }
+            })
         } else {
           // -- successfully connected to electrum
           mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
@@ -107,6 +116,8 @@ class ElectrumServerFragment : BaseFragment() {
       }
     }
   }
+
+  override fun handleKitState(state: KitState) {}
 
   private fun getElectrumDialog(context: Context): AlertDialog {
     val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
@@ -148,7 +159,11 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
           dialog.dismiss()
-          app.shutdown()
+          if (app.kit != null) {
+            app.shutdown()
+          } else {
+            findNavController().popBackStack()
+          }
         }
       }
     }

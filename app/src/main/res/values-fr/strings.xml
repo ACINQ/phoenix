@@ -55,7 +55,7 @@
 
   <string name="startup_wait">Chargement…</string>
   <string name="startup_start_button">Redémarrer</string>
-  <string name="startup_logs_button">Logs</string>
+  <string name="startup_settings_button">Options</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
@@ -423,7 +423,7 @@
   <string name="electrum_tip_label">Timestamp du dernier bloc</string>
   <string name="electrum_fee_rate_label">Frais de transaction</string>
   <string name="electrum_xpub_label">Clé publique maître</string>
-  <string name="electrum_xpub_value">%1$s\n\Chemin de dérivation: %2$s</string>
+  <string name="electrum_xpub_value">%1$s\n\nChemin de dérivation: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Serveur</string>
   <string name="electrum_connecting">Etablissement de la connexion…</string>

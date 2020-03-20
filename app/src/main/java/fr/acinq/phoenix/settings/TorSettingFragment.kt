@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsTorBinding
 import fr.acinq.phoenix.utils.AlertHelper
@@ -56,7 +57,6 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(TorSettingViewModel::class.java)
     mBinding.model = model
-
     app.networkInfo.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
   }
 
@@ -72,13 +72,17 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
         .setPositiveButton(R.string.utils_proceed) { _, _ ->
           context?.let {
             Prefs.saveTorEnabled(it, !isChecked)
-            app.shutdown()
+            if (app.kit != null) {
+              app.shutdown()
+            }
           }
         }
         .setNegativeButton(R.string.btn_cancel, null)
         .show()
     }
   }
+
+  override fun handleKitState(state: KitState) {}
 
   override fun onStop() {
     super.onStop()
@@ -95,13 +99,15 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
     val isTorEnabled = Prefs.isTorEnabled(context)
     mBinding.torSwitch.setChecked(isTorEnabled)
     mBinding.torSwitch.setText(context.getString(if (isTorEnabled) R.string.tor_settings_enabled else R.string.tor_settings_disabled))
-    if (isTorEnabled) {
-      getInfo()
-      mBinding.getinfoScroll.visibility = View.VISIBLE
-      mBinding.getinfoSep.visibility = View.VISIBLE
-    } else {
-      mBinding.getinfoScroll.visibility = View.GONE
-      mBinding.getinfoSep.visibility = View.GONE
+    if (app.state.value is KitState.Started) {
+      if (isTorEnabled) {
+        getInfo()
+        mBinding.getinfoScroll.visibility = View.VISIBLE
+        mBinding.getinfoSep.visibility = View.VISIBLE
+      } else {
+        mBinding.getinfoScroll.visibility = View.GONE
+        mBinding.getinfoSep.visibility = View.GONE
+      }
     }
   }
 
