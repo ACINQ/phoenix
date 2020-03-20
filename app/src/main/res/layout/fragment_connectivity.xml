@@ -67,6 +67,7 @@
         app:hz_bias="0"
         app:icon="@drawable/ic_bullet"
         app:icon_size="@dimen/space_xs"
+        app:icon_tint="?attr/negativeColor"
         app:layout_constraintTop_toBottomOf="@id/grid_separator"
         app:text="@string/conndialog_network" />
 
@@ -85,34 +86,6 @@
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/network_conn_label" />
 
-      <!-- electrum -->
-      <fr.acinq.phoenix.utils.customviews.ButtonView
-        android:id="@+id/electrum_conn_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_square"
-        android:padding="@dimen/space_md"
-        app:hz_bias="0"
-        app:icon="@drawable/ic_bullet"
-        app:icon_size="@dimen/space_xs"
-        app:layout_constraintTop_toBottomOf="@id/network_conn_label"
-        app:text="@string/conndialog_electrum" />
-
-      <TextView
-        android:id="@+id/electrum_conn_state"
-        style="@style/MonospaceView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
-        app:layout_constraintBottom_toBottomOf="@id/electrum_conn_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/electrum_conn_label" />
-
-      <View
-        style="@style/HLineSeparator"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/electrum_conn_label" />
-
       <!-- tor -->
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/tor_conn_label"
@@ -123,7 +96,8 @@
         app:hz_bias="0"
         app:icon="@drawable/ic_bullet"
         app:icon_size="@dimen/space_xs"
-        app:layout_constraintTop_toBottomOf="@id/electrum_conn_label"
+        app:icon_tint="?attr/negativeColor"
+        app:layout_constraintTop_toBottomOf="@id/network_conn_label"
         app:text="@string/conndialog_tor" />
 
       <TextView
@@ -141,6 +115,35 @@
         style="@style/HLineSeparator"
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/tor_conn_label" />
+
+      <!-- electrum -->
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/electrum_conn_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg_square"
+        android:padding="@dimen/space_md"
+        app:hz_bias="0"
+        app:icon="@drawable/ic_bullet"
+        app:icon_size="@dimen/space_xs"
+        app:icon_tint="?attr/negativeColor"
+        app:layout_constraintTop_toBottomOf="@id/tor_conn_label"
+        app:text="@string/conndialog_electrum" />
+
+      <TextView
+        android:id="@+id/electrum_conn_state"
+        style="@style/MonospaceView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/space_md"
+        app:layout_constraintBottom_toBottomOf="@id/electrum_conn_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/electrum_conn_label" />
+
+      <View
+        style="@style/HLineSeparator"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/electrum_conn_label" />
 
       <!--      &lt;!&ndash; lightning &ndash;&gt;-->
       <!--      <fr.acinq.phoenix.utils.customviews.ButtonView-->
@@ -178,7 +181,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="@string/btn_ok"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tor_conn_sep" />
+        app:layout_constraintTop_toBottomOf="@id/electrum_conn_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>

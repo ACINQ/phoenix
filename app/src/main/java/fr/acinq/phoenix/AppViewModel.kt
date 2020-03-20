@@ -86,7 +86,7 @@ import scala.collection.immutable.List as ScalaList
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
-data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
+data class NetworkInfo(var networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
 
 sealed class KitState {
@@ -650,6 +650,7 @@ class AppViewModel : ViewModel() {
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
           networkInfo.value?.run {
+            if (status == TorConnectionStatus.CONNECTED) networkConnected = true
             torConnections[name] = status
             networkInfo.postValue(this)
           }

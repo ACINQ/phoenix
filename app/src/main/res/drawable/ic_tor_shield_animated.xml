@@ -43,7 +43,7 @@
         android:strokeLineJoin="round" />
       <path
         android:name="path_2"
-        android:fillColor="#FF000000"
+        android:fillColor="?attr/textColor"
         android:pathData="M 12 12.7 C 12 12.7 12.6 12.4 12.6 12 L 12.6 11.5 L 12 11.3 L 11.4 11.5 L 11.4 12 C 11.4 12.4 12 12.7 12 12.7 Z"
         android:strokeWidth="0.5"
         android:strokeColor="?attr/textColor"

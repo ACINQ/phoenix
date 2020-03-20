@@ -125,21 +125,25 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     })
     app.networkInfo.observe(viewLifecycleOwner, Observer {
       if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
-        mBinding.connectivityButton.startAnimation(blinkingAnimation)
+        if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+          mBinding.connectivityButton.startAnimation(blinkingAnimation)
+        }
         mBinding.connectivityButton.visibility = View.VISIBLE
         mBinding.torConnectedButton.visibility = View.GONE
       } else if (context != null && Prefs.isTorEnabled(context!!)) {
         if (it.torConnections.isNullOrEmpty()) {
-          mBinding.connectivityButton.startAnimation(blinkingAnimation)
+          if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+            mBinding.connectivityButton.startAnimation(blinkingAnimation)
+          }
           mBinding.connectivityButton.visibility = View.VISIBLE
           mBinding.torConnectedButton.visibility = View.GONE
         } else {
-          if (mBinding.connectivityButton.animation != null) mBinding.connectivityButton.animation.cancel()
+          mBinding.connectivityButton.clearAnimation()
           mBinding.connectivityButton.visibility = View.GONE
           mBinding.torConnectedButton.visibility = View.VISIBLE
         }
       } else {
-        if (mBinding.connectivityButton.animation != null) mBinding.connectivityButton.animation.cancel()
+        mBinding.connectivityButton.clearAnimation()
         mBinding.connectivityButton.visibility = View.GONE
         mBinding.torConnectedButton.visibility = View.GONE
       }
