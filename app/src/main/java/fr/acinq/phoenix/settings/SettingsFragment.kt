@@ -41,6 +41,11 @@ class SettingsFragment : BaseFragment() {
     return mBinding.root
   }
 
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    mBinding.appModel = app
+  }
+
   override fun onStart() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })

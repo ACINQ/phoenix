@@ -159,8 +159,9 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
           dialog.dismiss()
-          if (app.kit != null) {
+          if (app.state.value is KitState.Started) {
             app.shutdown()
+            findNavController().navigate(R.id.global_action_any_to_startup)
           } else {
             findNavController().popBackStack()
           }

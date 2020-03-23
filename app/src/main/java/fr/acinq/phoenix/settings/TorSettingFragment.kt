@@ -72,8 +72,9 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
         .setPositiveButton(R.string.utils_proceed) { _, _ ->
           context?.let {
             Prefs.saveTorEnabled(it, !isChecked)
-            if (app.kit != null) {
+            if (app.state.value is KitState.Started) {
               app.shutdown()
+              findNavController().navigate(R.id.global_action_any_to_startup)
             }
           }
         }
