@@ -42,7 +42,6 @@
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Veuillez saisir votre PIN</string>
-  <string name="pindialog_pwd_placeholder">●●●●●●</string>
   <string name="pindialog_error">Le code PIN doit être un numéro à 6 chiffres.</string>
   <string name="pindialog_error_donotmatch">Le code PIN de confirmation ne correspond pas à la saisie.</string>
 
@@ -54,9 +53,11 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Chargement…</string>
+  <string name="startup_wait_tor">Démarrage de Tor…</string>
   <string name="startup_start_button">Redémarrer</string>
   <string name="startup_settings_button">Options</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
+  <string name="startup_error_tor">Le service TOR n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
   <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
@@ -194,6 +195,7 @@
   <string name="settings_electrum">Serveur Electrum</string>
   <string name="settings_mutual_close">Fermer tous mes canaux de paiement</string>
   <string name="settings_force_close">Zone à risque</string>
+  <string name="settings_tor">Tor</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -280,6 +282,8 @@
   <string name="main_alert_settings_button">Configuration</string>
   <string name="main_swapin_incoming">+%1$s entrant</string>
   <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Connexion…</string>
+  <string name="main_tor_connected_button">TOR actif</string>
   <string name="main_stores_button">Stores</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -439,5 +443,25 @@
 
   <string name="key_space_desc">Ajoute un espace</string>
   <string name="key_delete_desc">Efface la dernière lettre saisie</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Configuration de Tor</string>
+  <string name="tor_settings_subtitle">Vous pouvez améliorer la protection de votre vie privée en ne vous connectant à Electrum et à votre pair Lightning que via TOR. Cela aura un léger impact sur le démarrage de l\'application.</string>
+  <string name="tor_settings_enabled">Tor est activé</string>
+  <string name="tor_settings_disabled">Tor n\'est pas activé disabled</string>
+  <string name="tor_settings_confirm_disable_title">Êtes-vous sûr de vouloir désactiver TOR ?</string>
+  <string name="tor_settings_confirm_enable_title">Êtes-vous sûr de vouloir activer TOR ? Pour une protection optimale, il est également recommandé de créer un nouveau portefeuille.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">État des connexions</string>
+  <string name="conndialog_summary_not_ok">Certaines connexions ne sont pas encore prêtes. L\'application ne fonctionnera pas correctement.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">TOR</string>
+  <string name="conndialog_lightning">Pair Lightning</string>
+  <string name="conndialog_ok">Connecté</string>
+  <string name="conndialog_not_ok">En connexion…</string>
 
 </resources>

@@ -41,7 +41,7 @@
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Please enter your PIN</string>
-  <string name="pindialog_pwd_placeholder">●●●●●●</string>
+  <string name="pindialog_pwd_placeholder" translatable="false">●●●●●●</string>
   <string name="pindialog_error">PIN code must be a 6 digits number.</string>
   <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
 
@@ -487,11 +487,11 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">Tor Settings</string>
-  <string name="tor_settings_subtitle">You can improve your privacy by connecting only over Tor. This will apply to every connections (Lightning, Electrum, various APIs).</string>
+  <string name="tor_settings_subtitle">You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down the application startup.</string>
   <string name="tor_settings_enabled">Tor is enabled</string>
   <string name="tor_settings_disabled">Tor is disabled</string>
-  <string name="tor_settings_confirm_disable_title">Are you sure you want to disable TOR? This could affect your privacy.</string>
-  <string name="tor_settings_confirm_enable_title">Are you sure you want to enable TOR? Note that for best result, it\'s recommended to start a new wallet as well.\n\nNote: In some countries where TOR usage is low, using TOR may actually compromise you.</string>
+  <string name="tor_settings_confirm_disable_title">Are you sure you want to disable TOR?</string>
+  <string name="tor_settings_confirm_enable_title">Are you sure you want to enable TOR? Note that for best result, it\'s recommended to start a new wallet as well.</string>
 
   <!-- ////////////// connection issues dialog //////////////// -->
 
