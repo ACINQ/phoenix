@@ -57,7 +57,7 @@
   <string name="startup_start_button">Redémarrer</string>
   <string name="startup_settings_button">Options</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
-  <string name="startup_error_tor">Le service TOR n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
+  <string name="startup_error_tor">Le service Tor n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
   <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
@@ -283,7 +283,7 @@
   <string name="main_swapin_incoming">+%1$s entrant</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Connexion…</string>
-  <string name="main_tor_connected_button">TOR actif</string>
+  <string name="main_tor_connected_button">Tor actif</string>
   <string name="main_stores_button">Stores</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -447,11 +447,11 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">Configuration de Tor</string>
-  <string name="tor_settings_subtitle">Vous pouvez améliorer la protection de votre vie privée en ne vous connectant à Electrum et à votre pair Lightning que via TOR. Cela aura un léger impact sur le démarrage de l\'application.</string>
+  <string name="tor_settings_subtitle">Vous pouvez améliorer la protection de votre vie privée en ne vous connectant à Electrum et à votre pair Lightning que par Tor uniquement. Cela aura un léger impact sur le démarrage de l\'application.</string>
   <string name="tor_settings_enabled">Tor est activé</string>
   <string name="tor_settings_disabled">Tor n\'est pas activé disabled</string>
-  <string name="tor_settings_confirm_disable_title">Êtes-vous sûr de vouloir désactiver TOR ?</string>
-  <string name="tor_settings_confirm_enable_title">Êtes-vous sûr de vouloir activer TOR ? Pour une protection optimale, il est également recommandé de créer un nouveau portefeuille.</string>
+  <string name="tor_settings_confirm_disable_title">Êtes-vous sûr de vouloir désactiver Tor ?</string>
+  <string name="tor_settings_confirm_enable_title">Êtes-vous sûr de vouloir activer Tor ? Pour une protection optimale, il est également recommandé de créer un nouveau portefeuille.</string>
 
   <!-- ////////////// connection issues dialog //////////////// -->
 
@@ -459,7 +459,7 @@
   <string name="conndialog_summary_not_ok">Certaines connexions ne sont pas encore prêtes. L\'application ne fonctionnera pas correctement.</string>
   <string name="conndialog_network">Internet</string>
   <string name="conndialog_electrum">Electrum</string>
-  <string name="conndialog_tor">TOR</string>
+  <string name="conndialog_tor">Tor</string>
   <string name="conndialog_lightning">Pair Lightning</string>
   <string name="conndialog_ok">Connecté</string>
   <string name="conndialog_not_ok">En connexion…</string>
