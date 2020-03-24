@@ -18,6 +18,15 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
+  <data>
+
+    <import type="fr.acinq.phoenix.KitState" />
+
+    <variable
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
+  </data>
+
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -69,12 +78,23 @@
           app:layout_constraintTop_toBottomOf="@id/prefs_display_button"
           app:text="@string/settings_electrum" />
 
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/tor_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/electrum_button"
+          app:text="@string/settings_tor" />
+
         <TextView
           android:id="@+id/security_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_security_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/electrum_button" />
+          app:layout_constraintTop_toBottomOf="@id/tor_button"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/display_seed_button"
@@ -84,7 +104,8 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/security_title"
-          app:text="@string/settings_display_seed" />
+          app:text="@string/settings_display_seed"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/seed_security_button"
@@ -94,7 +115,8 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/display_seed_button"
-          app:text="@string/settings_seed_security" />
+          app:text="@string/settings_seed_security"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
         <TextView
           android:id="@+id/advanced_title"
@@ -103,15 +125,15 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/seed_security_button" />
 
-<!--        <fr.acinq.phoenix.utils.customviews.ButtonView-->
-<!--          android:id="@+id/fees_button"-->
-<!--          android:layout_width="match_parent"-->
-<!--          android:layout_height="wrap_content"-->
-<!--          android:background="@drawable/button_bg_square_border"-->
-<!--          android:padding="@dimen/space_md"-->
-<!--          app:hz_bias="0"-->
-<!--          app:layout_constraintTop_toBottomOf="@id/advanced_title"-->
-<!--          app:text="@string/settings_fees" />-->
+        <!--        <fr.acinq.phoenix.utils.customviews.ButtonView-->
+        <!--          android:id="@+id/fees_button"-->
+        <!--          android:layout_width="match_parent"-->
+        <!--          android:layout_height="wrap_content"-->
+        <!--          android:background="@drawable/button_bg_square_border"-->
+        <!--          android:padding="@dimen/space_md"-->
+        <!--          app:hz_bias="0"-->
+        <!--          app:layout_constraintTop_toBottomOf="@id/advanced_title"-->
+        <!--          app:text="@string/settings_fees" />-->
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/list_all_channels_button"
@@ -121,7 +143,8 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/advanced_title"
-          app:text="@string/settings_list_channels" />
+          app:text="@string/settings_list_channels"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/logs_button"
@@ -141,7 +164,8 @@
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/logs_button"
-          app:text="@string/settings_mutual_close" />
+          app:text="@string/settings_mutual_close"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/force_close_button"
@@ -150,9 +174,10 @@
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
-          app:text_color="?attr/negativeColor"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_button"
-          app:text="@string/settings_force_close" />
+          app:text="@string/settings_force_close"
+          app:text_color="?attr/negativeColor"
+          app:visibility="@{appModel.state instanceof KitState.Started}" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

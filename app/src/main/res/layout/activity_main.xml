@@ -39,38 +39,5 @@
       app:layout_constraintTop_toTopOf="parent"
       app:navGraph="@navigation/nav_graph_main" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:id="@+id/alert_blocking"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="?attr/altBgColor"
-      android:clickable="true"
-      android:focusable="true"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="parent">
-
-      <TextView
-        android:id="@+id/alert_blocking_message"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
-        android:text="@string/main_alert_network_lost"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toStartOf="@+id/alert_blocking_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-      <Button
-        android:id="@+id/alert_blocking_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/space_md"
-        android:text="@string/main_alert_settings_button"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

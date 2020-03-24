@@ -150,33 +150,55 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <fr.acinq.phoenix.utils.customviews.ButtonView
-      android:id="@+id/help_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:backgroundTint="?attr/mutedBgColor"
-      android:padding="@dimen/space_xs"
-      app:icon="@drawable/ic_help_circle"
-      app:icon_size="16dp"
-      app:spacer_size="@dimen/space_xs"
-      app:text="@string/main_faq_button"
-      app:text_size="@dimen/text_sm" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/top_notification_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
 
-    <fr.acinq.phoenix.utils.customviews.ButtonView
-      android:id="@+id/stores_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_md"
-      android:layout_marginEnd="@dimen/space_md"
-      android:background="@drawable/button_bg_no_border"
-      android:padding="@dimen/space_xs"
-      app:icon="@drawable/ic_cart"
-      app:icon_size="14dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/help_button"
-      app:spacer_size="@dimen/space_xs"
-      app:text="@string/main_stores_button"
-      app:text_size="@dimen/text_sm" />
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/help_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/mutedBgColor"
+        android:padding="@dimen/space_xs"
+        app:icon="@drawable/ic_help_circle"
+        app:icon_size="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:spacer_size="@dimen/space_xs"
+        app:text="@string/main_faq_button"
+        app:text_size="@dimen/text_sm" />
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/tor_connected_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/mutedBgColor"
+        android:padding="@dimen/space_xs"
+        app:icon="@drawable/ic_tor_shield_ok"
+        app:icon_tint="?attr/positiveColor"
+        app:icon_size="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_button"
+        app:spacer_size="@dimen/space_xxs"
+        app:text="@string/main_tor_connected_button"
+        app:text_size="@dimen/text_sm" />
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/connectivity_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/mutedBgColor"
+        android:padding="@dimen/space_xs"
+        app:icon="@drawable/ic_connection_lost"
+        app:icon_size="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/help_button"
+        app:spacer_size="@dimen/space_xs"
+        app:text="@string/main_connectivity_button"
+        app:text_size="@dimen/text_sm" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
       android:id="@+id/incoming_funds_notif"

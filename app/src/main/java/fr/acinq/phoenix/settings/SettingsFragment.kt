@@ -22,6 +22,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsBinding
 import org.slf4j.Logger
@@ -40,6 +41,11 @@ class SettingsFragment : BaseFragment() {
     return mBinding.root
   }
 
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    mBinding.appModel = app
+  }
+
   override fun onStart() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
@@ -52,5 +58,8 @@ class SettingsFragment : BaseFragment() {
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
+    mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
   }
+
+  override fun handleKitState(state: KitState) {}
 }

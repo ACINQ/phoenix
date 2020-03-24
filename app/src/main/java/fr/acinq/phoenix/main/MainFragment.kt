@@ -25,6 +25,8 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -69,6 +71,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   private lateinit var notificationsAdapter: NotificationsAdapter
   private lateinit var notificationsManager: RecyclerView.LayoutManager
 
+  private lateinit var blinkingAnimation: Animation
+
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
       refreshIncomingFundsAmountField()
@@ -100,7 +104,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = notificationsManager
       adapter = notificationsAdapter
     }
-
+    blinkingAnimation = AnimationUtils.loadAnimation(context, R.anim.blinking)
     return mBinding.root
   }
 
@@ -116,8 +120,33 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     app.balance.observe(viewLifecycleOwner, Observer {
       mBinding.balance.setAmount(it)
     })
-    app.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
+    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
       refreshIncomingFunds()
+    })
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
+      if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
+        if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+          mBinding.connectivityButton.startAnimation(blinkingAnimation)
+        }
+        mBinding.connectivityButton.visibility = View.VISIBLE
+        mBinding.torConnectedButton.visibility = View.GONE
+      } else if (context != null && Prefs.isTorEnabled(context!!)) {
+        if (it.torConnections.isNullOrEmpty()) {
+          if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+            mBinding.connectivityButton.startAnimation(blinkingAnimation)
+          }
+          mBinding.connectivityButton.visibility = View.VISIBLE
+          mBinding.torConnectedButton.visibility = View.GONE
+        } else {
+          mBinding.connectivityButton.clearAnimation()
+          mBinding.connectivityButton.visibility = View.GONE
+          mBinding.torConnectedButton.visibility = View.VISIBLE
+        }
+      } else {
+        mBinding.connectivityButton.clearAnimation()
+        mBinding.connectivityButton.visibility = View.GONE
+        mBinding.torConnectedButton.visibility = View.GONE
+      }
     })
     model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
       if (amount.`$greater`(MilliSatoshi(0))) {
@@ -144,8 +173,9 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
-    mBinding.storesButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/stores"))) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
+    mBinding.torConnectedButton.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_tor) }
+    mBinding.connectivityButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_connectivity) }
 
     app.refreshPayments()
   }

@@ -53,7 +53,7 @@
 
   <string name="startup_wait">Caricamento…</string>
   <string name="startup_start_button">Inizia</string>
-  <string name="startup_logs_button">Logs</string>
+  <string name="startup_settings_button">Impostazioni</string>
   <string name="startup_error_generic">Impossibile avviare l\'applicazione.\n\nDettagli: %1$s</string>
   <string name="startup_error_unreadable">Impossibile leggere i dati del wallet, per favore riavvia l\'app.</string>
   <string name="startup_error_network">Connessione ad internet assente. Per favore controlla il tuo WiFi o rete mobile.</string>
