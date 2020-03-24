@@ -160,7 +160,7 @@
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
   <string name="utils_ok">Ok</string>
-  <string name="utils_proceed"> Continuar</string>
+  <string name="utils_proceed">Continuar</string>
   <string name="utils_cancel">Cancelar</string>
   <string name="utils_date_just_now">ahora mismo</string>
   <string name="utils_unknown">N/A</string>
@@ -189,21 +189,21 @@
   <!-- //////////////// notification - watcher //////////////// -->
 
   <string name="notif_watcher_cheating_title">Por favor, inicie Phoenix </string>
-  <string name="notif_watcher_cheating_message"> Se ha detectado un intento de engaño.</string>
+  <string name="notif_watcher_cheating_message">Se ha detectado un intento de engaño.</string>
   <string name="notif_watcher_connection_title">Phoenix necesita acceso a la red</string>
-  <string name="notif_watcher_connection_message"> El observador de segundo plano necesita internet para funcionar correctamente.</string>
+  <string name="notif_watcher_connection_message">El observador de segundo plano necesita internet para funcionar correctamente.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
   <string name="closechannels_title">Cerrar canales</string>
-  <string name="closechannels_checking_channels"> Comprobando canales, por favor espere…</string>
+  <string name="closechannels_checking_channels">Comprobando canales, por favor espere…</string>
   <string name="closechannels_channels_recap">Actualmente tiene %1$d canales Lightning con un saldo agregado de %2$s.</string>
-  <string name="closechannels_channels_none"> Actualmente no tiene ningún canal que pudiera vaciarse.\n\nVaya a la página de \'Lista de canales\' para ver el estado de sus canales.</string>
+  <string name="closechannels_channels_none">Actualmente no tiene ningún canal que pudiera vaciarse.\n\nVaya a la página de \'Lista de canales\' para ver el estado de sus canales.</string>
   <string name="closechannels_mutual_title">Wallet vacío</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
     Utilice esta página para vaciar su wallet a una dirección Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions"> Los fondos se pueden enviar a un wallet Bitcoin. Asegúrese de que la dirección sea correcta antes de enviar.</string>
+  <string name="closechannels_mutual_input_instructions">Los fondos se pueden enviar a un wallet Bitcoin. Asegúrese de que la dirección sea correcta antes de enviar.</string>
   <string name="closechannels_mutual_input_hint">Introduzca la dirección Bitcoin</string>
   <string name="closechannels_mutual_button">Vaciar mi wallet</string>
   <string name="closechannels_force_title">Forzar cierre</string>
@@ -212,11 +212,11 @@
     <br/><br/>
     Esta característica no es un &quot;botón mágico de arreglos&quot;; está aquí como medida de seguridad y <b>solo debe usarse en escenarios extremos </b>. Por ejemplo, si su compañero (ACINQ) desaparece de forma permanente, impidiendo que gaste su dinero. En cualquier otro caso, <b> si tiene problemas con Phoenix, debe contactar al equipo de soporte</b>.
     <br/><br/>
-    Forzar el cierre de canales le costará dinero (para cubrir las tarifas en-cadena) y hará que sus fondos estén bloqueados durante días. <b> No desinstale la aplicación hasta que sus canales no estén completamente cerrados o perderá dinero.</b>
+    Forzar el cierre de canales le costará dinero (para cubrir las tarifas en-cadena) y hará que sus fondos estén bloqueados durante días. <b>No desinstale la aplicación hasta que sus canales no estén completamente cerrados o perderá dinero.</b>
     <br/><br/>
     Los fondos eventualmente se enviarán a: %1$s
     <br/><br/>
-    <b> No use esta función si no entiende exactamente lo que hace.</b>
+    <b>No use esta función si no entiende exactamente lo que hace.</b>
   ]]></string>
   <string name="closechannels_force_button">Forzar el cierre de canales</string>
   <string name="closechannels_confirm_dialog_message">¿Está seguro de que quiere proceder??</string>
@@ -352,7 +352,7 @@
   <string name="seedsec_pin_switch">Autenticación de PIN</string>
   <string name="seedsec_biometrics_switch">Autenticación biométrica</string>
   <string name="seedsec_change_pin">Cambiar mi PIN…</string>
-  <string name="seedsec_biometric_enrollment_error"> La inscripción biométrica ha fallado. Por favor inténtelo de nuevo.</string>
+  <string name="seedsec_biometric_enrollment_error">La inscripción biométrica ha fallado. Por favor inténtelo de nuevo.</string>
   <string name="seedsec_pindialog_title_unlock">Por favor ingrese su PIN actual para continuar</string>
   <string name="seedsec_pindialog_title_set_new"><![CDATA[Por favor introduzca <b>su nuevo PIN</b>]]></string>
   <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Por favor <b>confirme</b> su nuevo PIN]]></string>
@@ -360,10 +360,10 @@
   <string name="seedsec_biometric_enabled">Autenticación biométrica activada</string>
   <string name="seedsec_biometric_disabled">Autenticación biométrica deshabilitada</string>
   <string name="seedsec_biometric_support_no_hw">Su dispositivo no admite autenticación biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable"> El hardware biométrico no está disponible. Inténtelo nuevamente más tarde.</string>
+  <string name="seedsec_biometric_support_hw_unavailable">El hardware biométrico no está disponible. Inténtelo nuevamente más tarde.</string>
   <string name="seedsec_biometric_support_none_enrolled">Por favor inscriba biométrico primero.</string>
   <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match"> Los PIN no coinciden. Inténtelo de nuevo.</string>
+  <string name="seedsec_error_pins_match">Los PIN no coinciden. Inténtelo de nuevo.</string>
   <string name="seedsec_error_generic">Ha habido un error, el wallet no ha sido encriptada.\n\nPor favor inténtelo de nuevo.</string>
   <string name="seedsec_disable_bio_prompt_title">Deshabilitar bloqueo biométrico</string>
   <string name="seedsec_disable_bio_prompt_desc">Deberá usar su código PIN a partir de ahora</string>
