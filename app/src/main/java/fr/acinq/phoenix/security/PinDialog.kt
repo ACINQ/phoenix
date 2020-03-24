@@ -29,6 +29,7 @@ import com.google.common.base.Strings
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.DialogPinBinding
 import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Prefs
 
 class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback,
   titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) : Dialog(context, themeResId) {
@@ -68,14 +69,16 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
       }
     }
 
-    mBinding.pinGrid.removeAllViews()
-    pinButtons.shuffled().withIndex().forEach { indexedBtn ->
-      if (indexedBtn.index == pinButtons.size - 1) {
-        mBinding.pinGrid.addView(mBinding.pinNumClear)
-        mBinding.pinGrid.addView(indexedBtn.value)
-        mBinding.pinGrid.addView(mBinding.pinBackspace)
-      } else {
-        mBinding.pinGrid.addView(indexedBtn.value)
+    if (Prefs.isPinScrambled(context)) {
+      mBinding.pinGrid.removeAllViews()
+      pinButtons.shuffled().withIndex().forEach { indexedBtn ->
+        if (indexedBtn.index == pinButtons.size - 1) {
+          mBinding.pinGrid.addView(mBinding.pinNumClear)
+          mBinding.pinGrid.addView(indexedBtn.value)
+          mBinding.pinGrid.addView(mBinding.pinBackspace)
+        } else {
+          mBinding.pinGrid.addView(indexedBtn.value)
+        }
       }
     }
 

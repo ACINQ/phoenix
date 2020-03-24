@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.settings
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,11 +28,15 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsSeedSecurityBinding
 import fr.acinq.phoenix.security.PinDialog
-import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.KeystoreHelper
+import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.SingleLiveEvent
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.*
 import org.slf4j.Logger
@@ -48,6 +53,16 @@ class SeedSecurityFragment : BaseFragment() {
   private var newPin: PinDialog? = null
   private var confirmPin: PinDialog? = null
   private var biometricPrompt: BiometricPrompt? = null
+
+  private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
+    log.info("pin scramble => $key with scramble=${Prefs.isPinScrambled(context!!)}")
+    when (key) {
+      Prefs.PREFS_SCRAMBLE_PIN -> context?.let {
+        val isPinScrambled = Prefs.isPinScrambled(it)
+        mBinding.pinScramble.setChecked(isPinScrambled)
+      }
+    }
+  }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsSeedSecurityBinding.inflate(inflater, container, false)
@@ -88,10 +103,20 @@ class SeedSecurityFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
+    context?.let {
+      val isPinScrambled = Prefs.isPinScrambled(it)
+      mBinding.pinScramble.setChecked(isPinScrambled)
+      PreferenceManager.getDefaultSharedPreferences(it).registerOnSharedPreferenceChangeListener(prefsListener)
+    }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.pinSwitch.setOnClickListener {
       model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
       model.readSeed(context, Constants.DEFAULT_PIN)
+    }
+    mBinding.pinScramble.setOnClickListener {
+      context?.let {
+        Prefs.savePinScrambled(it, !mBinding.pinScramble.isChecked())
+      }
     }
     mBinding.updatePinButton.setOnClickListener {
       model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
@@ -129,6 +154,7 @@ class SeedSecurityFragment : BaseFragment() {
     newPin?.dismiss()
     confirmPin?.dismiss()
     model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.IDLE
+    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(prefsListener)
   }
 
   private fun checkState() {
