@@ -23,17 +23,15 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.DialogPinBinding
 import fr.acinq.phoenix.utils.Converter
-import java.util.*
 
-class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) :
-  Dialog(context, themeResId) {
+class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback,
+  titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) : Dialog(context, themeResId) {
 
   private val mBinding: DialogPinBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
   private var mPinValue: String = ""
@@ -44,7 +42,6 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
     mBinding.pinTitle.text = Converter.html(getContext().getString(titleResId))
     setCancelable(cancelable)
 
-    val mButtonsList = ArrayList<View>()
     // randomly sorted pin buttons
     val pinButtons = listOf(
       mBinding.pinNum0,
@@ -56,22 +53,28 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
       mBinding.pinNum6,
       mBinding.pinNum7,
       mBinding.pinNum8,
-      mBinding.pinNum9,
-      mBinding.pinNum0
-    ).shuffled()
+      mBinding.pinNum9
+    )
 
-    // for each button remove it from the view and re-add it
-    pinButtons.withIndex().forEach { indexedBtn ->
-      mButtonsList.add(indexedBtn.value)
-      if (indexedBtn.index == pinButtons.size) { // special case to handle the backspace/num_clear buttons
-        mBinding.pinGrid.removeView(mBinding.pinNumClear)
-        mBinding.pinGrid.removeView(indexedBtn.value)
-        mBinding.pinGrid.removeView(mBinding.pinBackspace)
+    for (v in pinButtons) {
+      v.setOnClickListener { view ->
+        view.isHapticFeedbackEnabled = true
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
+        if (mPinValue == "" || mPinValue.length != PIN_LENGTH) {
+          val digit = (view as Button).text.toString()
+          mPinValue += digit
+          mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
+        }
+      }
+    }
+
+    mBinding.pinGrid.removeAllViews()
+    pinButtons.shuffled().withIndex().forEach { indexedBtn ->
+      if (indexedBtn.index == pinButtons.size - 1) {
         mBinding.pinGrid.addView(mBinding.pinNumClear)
         mBinding.pinGrid.addView(indexedBtn.value)
         mBinding.pinGrid.addView(mBinding.pinBackspace)
       } else {
-        mBinding.pinGrid.removeView(indexedBtn.value)
         mBinding.pinGrid.addView(indexedBtn.value)
       }
     }
@@ -88,18 +91,6 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
 
       override fun afterTextChanged(s: Editable) {}
     })
-
-    for (v in mButtonsList) {
-      v.setOnClickListener { view ->
-        view.isHapticFeedbackEnabled = true
-        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
-        if (mPinValue == "" || mPinValue.length != PIN_LENGTH) {
-          val digit = (view as Button).text.toString()
-          mPinValue += digit
-          mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
-        }
-      }
-    }
 
     mBinding.pinNumClear.setOnClickListener {
       mPinValue = ""
