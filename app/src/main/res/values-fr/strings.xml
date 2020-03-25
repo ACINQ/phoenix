@@ -368,6 +368,7 @@
   <string name="seedsec_title">Sécurité</string>
   <string name="seedsec_subtitle">Nous recommendons fortement de configurer un code PIN pour protéger votre portefeuille. Si votre téléphone le permet, vous pourrez aussi utiliser un système biométrique (empreinte digitale…).</string>
   <string name="seedsec_pin_switch">Verrouillage avec code PIN</string>
+  <string name="seedsec_pin_scramble">Mélanger les touches du PIN</string>
   <string name="seedsec_biometrics_switch">Verrouillage biométrique</string>
   <string name="seedsec_change_pin">Changer mon code PIN…</string>
   <string name="seedsec_biometric_enrollment_error">L\'enregistrement biométrique n\'a pas abouti. Merci de réessayer.</string>

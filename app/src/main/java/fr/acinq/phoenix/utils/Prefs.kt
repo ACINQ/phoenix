@@ -24,9 +24,6 @@ import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
-import fr.acinq.phoenix.R
-import fr.acinq.phoenix.TrampolineFeeSetting
-import java.lang.Integer.min
 
 object Prefs {
 
@@ -59,6 +56,7 @@ object Prefs {
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
+  const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
 
   fun getLastVersionUsed(context: Context): Int {
     return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
@@ -215,4 +213,11 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_TOR_ENABLED, enabled).apply()
   }
 
+  fun isPinScrambled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCRAMBLE_PIN, false)
+  }
+
+  fun savePinScrambled(context: Context, isScrambled: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
+  }
 }

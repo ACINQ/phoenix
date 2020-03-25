@@ -380,6 +380,7 @@
   <string name="seedsec_title">Security</string>
   <string name="seedsec_subtitle">We highly recommend setting a PIN to protect your wallet. If your device supports it, you can use biometric authentication.</string>
   <string name="seedsec_pin_switch">PIN authentication</string>
+  <string name="seedsec_pin_scramble">Scramble PIN keyboard</string>
   <string name="seedsec_biometrics_switch">Biometric authentication</string>
   <string name="seedsec_change_pin">Change my PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Biometric enrollment failed. Please try again.</string>

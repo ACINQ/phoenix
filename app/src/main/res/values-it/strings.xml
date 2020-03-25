@@ -363,6 +363,7 @@
   <string name="seedsec_title">Sicurezza</string>
   <string name="seedsec_subtitle">Consigliamo vivamente di impostare un PIN per proteggere il tuo wallet. Se il tuo dispositivo lo supporta, puoi usare l\'autenticazione biometrica.</string>
   <string name="seedsec_pin_switch">Autenticazione PIN</string>
+  <string name="seedsec_pin_scramble">Tasti PIN ordinati casualmente</string>
   <string name="seedsec_biometrics_switch">Autenticazione biometrica</string>
   <string name="seedsec_change_pin">Cambia il mio PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Impossibile fare la registrazione biometrica. Riprova in seguito.</string>
@@ -446,5 +447,28 @@
   <string name="electrum_dialog_ssl">Il server deve avere un certificato valido</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Per favore inserisci l\'indirizzo di un eletrum server</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Configurazione Tor</string>
+  <string name="tor_settings_subtitle">Puoi migliorare la tua privacy usanto Tor per connetterti ad un Electrum server o nodo Lightning. Questo rallenterà leggermente il tempo di avvio dell\'applicazione.</string>
+  <string name="tor_settings_enabled">Tor è attivo</string>
+  <string name="tor_settings_disabled">Tor non è attivo</string>
+  <string name="tor_settings_confirm_disable_title">Sei sicuro di disattivare Tor?</string>
+  <string name="tor_settings_confirm_enable_title">Sei sicuro di attivare Tor? Per avere risultati ottimali è raccomandato creare un nuovo wallet.</string>
+  <string name="startup_wait_tor">Inizializzando Tor..</string>
+  <string name="startup_error_tor">Impossibile avviare Tor, controlla la tua connessione internet e riprova. Dettagli: %1$s</string>
+  <string name="settings_tor">Tor</string>
+  <string name="main_connectivity_button">Connessione…</string>
+  <string name="main_tor_connected_button">Tor attivo</string>
+  <string name="conndialog_title">Stato connessione</string>
+
+  <string name="conndialog_summary_not_ok">Hai dei problemi di connessione. L\'applicazione non funzionerà correttamente.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_ok">Connesso</string>
+  <string name="conndialog_not_ok">Connessione in corso..</string>
+  <string name="conndialog_lightning">Peer Lightning</string>
 
 </resources>
