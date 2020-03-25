@@ -122,7 +122,7 @@ dependencies {
   implementation "androidx.preference:preference-ktx:$preference_version"
 
   // ANDROIDX - work manager
-  def work_version = "2.2.0"
+  def work_version = "2.3.4"
   implementation("androidx.work:work-runtime-ktx:$work_version") {
     exclude group: 'com.google.guava', module: 'listenablefuture'
   }
