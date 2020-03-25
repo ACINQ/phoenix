@@ -10,7 +10,7 @@
 
 Phoenix uses a library to manage the communication with the tor binary. This library must be built locally
 
-1. Clone the library from https://github.com/thaliproject/Tor_Onion_Proxy_Library
+1. Clone the library from https://github.com/ACINQ/Tor_Onion_Proxy_Library
 2. At the root of this project, run:
 ```shell
 ./gradlew install
