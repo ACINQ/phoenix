@@ -355,7 +355,7 @@
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
-  <string name="state_wait_confirmed">Transaction en attente de confirmationtx</string>
+  <string name="state_wait_confirmed">Transaction en attente de confirmation</string>
   <string name="state_closing">Channel en clôture</string>
   <string name="state_closed">Channel clôturé</string>
   <string name="state_normal">Opérationnel</string>
