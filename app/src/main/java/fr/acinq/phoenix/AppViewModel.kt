@@ -30,6 +30,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.msopentech.thali.toronionproxy.OnionProxyManager
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
@@ -50,6 +51,9 @@ import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.tor.TorConnectionStatus
+import fr.acinq.phoenix.utils.tor.TorEventHandler
+import fr.acinq.phoenix.utils.tor.TorHelper
 import kotlinx.coroutines.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -82,14 +86,21 @@ import scala.collection.immutable.List as ScalaList
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
-data class NetworkInfo(val networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean)
+data class NetworkInfo(var networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
+
 sealed class KitState {
   object Off : KitState()
-  object Starting : KitState()
+  sealed class Bootstrap : KitState() {
+    object Init : Bootstrap()
+    object Tor : Bootstrap()
+    object Node : Bootstrap()
+  }
+
   data class Started(val kit: Kit, val api: Eclair, val xpub: Xpub) : KitState()
   sealed class Error : KitState() {
     data class Generic(val message: String) : Error()
+    data class Tor(val message: String) : Error()
     object InvalidBiometric : Error()
     object WrongPassword : Error()
     object NoConnectivity : Error()
@@ -114,6 +125,7 @@ class AppViewModel : ViewModel() {
   val swapInSettings = MutableLiveData<SwapInSettings>()
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
+  val torManager = MutableLiveData<OnionProxyManager>()
   val kit: Kit? get() = if (state.value is KitState.Started) (state.value as KitState.Started).kit else null
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
@@ -500,9 +512,9 @@ class AppViewModel : ViewModel() {
    * Send a reconnect event to the ACINQ node.
    */
   @UiThread
-  fun reconnect() {
+  fun reconnectToPeer() {
     viewModelScope.launch {
-      withContext(Dispatchers.Default) {
+      withContext(Dispatchers.IO) {
         kit?.run {
           log.info("sending connect to ACINQ actor")
           switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
@@ -511,15 +523,29 @@ class AppViewModel : ViewModel() {
     }
   }
 
+  @WorkerThread
+  fun reconnectTor() {
+    torManager.value?.run { enableNetwork(true) }
+  }
+
+  @UiThread
+  suspend fun getTorInfo(cmd: String): String {
+    return coroutineScope {
+      async(Dispatchers.IO) {
+        torManager.value?.run { getInfo(cmd /*"status/bootstrap-phase"*/) } ?: throw RuntimeException("onion proxy manager not available")
+      }
+    }.await()
+  }
+
   /**
    * This method launches the node startup process.
    */
   @UiThread
   fun startKit(context: Context, pin: String) {
     when (state.value) {
-      is KitState.Error, is KitState.Starting, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
+      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
       else -> {
-        state.value = KitState.Starting
+        state.value = KitState.Bootstrap.Init
         viewModelScope.launch {
           withContext(Dispatchers.Default) {
             try {
@@ -543,6 +569,10 @@ class AppViewModel : ViewModel() {
                 is IOException, is IllegalAccessException -> {
                   log.error("seed file not readable: ", t)
                   state.postValue(KitState.Error.UnreadableData)
+                }
+                is TorSetupException -> {
+                  log.error("error when bootstrapping TOR: ", t)
+                  state.postValue(KitState.Error.Tor(t.localizedMessage ?: t.javaClass.simpleName))
                 }
                 else -> {
                   log.error("error when starting node: ", t)
@@ -614,6 +644,24 @@ class AppViewModel : ViewModel() {
     checkConnectivity(context)
     cancelBackgroundJobs(context)
 
+    if (Prefs.isTorEnabled(context)) {
+      log.info("using TOR...")
+      state.postValue(KitState.Bootstrap.Tor)
+      torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
+        override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
+          networkInfo.value?.run {
+            if (status == TorConnectionStatus.CONNECTED) networkConnected = true
+            torConnections[name] = status
+            networkInfo.postValue(this)
+          }
+        }
+      }))
+      log.info("TOR has been bootstrapped")
+    } else {
+      log.info("using clear connection...")
+    }
+
+    state.postValue(KitState.Bootstrap.Node)
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())

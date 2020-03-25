@@ -55,6 +55,7 @@ object Prefs {
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
+  const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
 
   fun getLastVersionUsed(context: Context): Int {
@@ -204,6 +205,14 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, index).apply()
   }
 
+  fun isTorEnabled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_TOR_ENABLED, false)
+  }
+
+  fun saveTorEnabled(context: Context, enabled: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_TOR_ENABLED, enabled).apply()
+  }
+
   fun isPinScrambled(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCRAMBLE_PIN, false)
   }
@@ -211,5 +220,4 @@ object Prefs {
   fun savePinScrambled(context: Context, isScrambled: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
   }
-
 }

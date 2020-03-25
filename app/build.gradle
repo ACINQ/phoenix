@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.application'
-
+apply plugin: 'maven'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
@@ -151,4 +151,11 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'androidx.test:runner:1.2.0'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+  // tor
+  def tor_ctl_version = "0.2"
+  def tor_wrapper_version = "0.0.3"
+  implementation "net.freehaven.tor.control:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
+  implementation "com.msopentech.thali:universal:$tor_wrapper_version" // core library for the tor wrapper
+  implementation "com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar"
 }

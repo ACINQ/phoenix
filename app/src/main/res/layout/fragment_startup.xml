@@ -96,18 +96,18 @@
           app:text="@string/startup_start_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/error_share_logs_button"
+          android:id="@+id/error_settings_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData}"
-          app:icon="@drawable/ic_share"
+          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData || appModel.state instanceof KitState.Error.Tor}"
+          app:icon="@drawable/ic_settings"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_restart_button"
-          app:text="@string/logs_share_button" />
+          app:text="@string/startup_settings_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -115,11 +115,34 @@
         android:id="@+id/starting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="@{appModel.state instanceof KitState.Starting}"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Init || appModel.state instanceof KitState.Bootstrap.Node}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
         app:text="@string/startup_wait" />
+
+      <ImageView
+        android:id="@+id/starting_tor_animation"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
+        app:layout_constraintBottom_toBottomOf="@id/starting_tor"
+        app:layout_constraintEnd_toStartOf="@id/starting_tor"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/starting_tor" />
+
+      <TextView
+        android:id="@+id/starting_tor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xs"
+        android:text="@string/startup_wait_tor"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/starting_tor_animation"
+        app:layout_constraintTop_toBottomOf="@id/icon" />
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

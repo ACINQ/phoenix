@@ -77,6 +77,18 @@
     app:destination="@id/electrum_fragment"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
+  <!-- global to tor settings -->
+  <action
+    android:id="@+id/global_action_any_to_tor"
+    app:destination="@id/tor_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
+  <!-- global to global settings -->
+  <action
+    android:id="@+id/global_action_any_to_settings"
+    app:destination="@id/settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
 
   <!-- main fragment -->
   <fragment
@@ -101,6 +113,9 @@
     <action
       android:id="@+id/action_main_to_seed_security"
       app:destination="@id/seed_security" />
+    <action
+      android:id="@+id/action_main_to_connectivity"
+      app:destination="@id/connectivity_dialog" />
   </fragment>
 
   <!-- init wallet -->
@@ -327,6 +342,9 @@
     <action
       android:id="@+id/action_settings_to_fees"
       app:destination="@id/fees_fragment" />
+    <action
+      android:id="@+id/action_settings_to_tor"
+      app:destination="@id/tor_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -396,5 +414,17 @@
     android:id="@+id/fees_fragment"
     android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
     android:label="FeesSettingsFragment" />
+
+  <!-- settings: TOR -->
+  <fragment
+    android:id="@+id/tor_fragment"
+    android:name="fr.acinq.phoenix.settings.TorSettingFragment"
+    android:label="TorSettingFragment" />
+
+  <!-- main: connectivity feedback dialog -->
+  <dialog
+    android:id="@+id/connectivity_dialog"
+    android:name="fr.acinq.phoenix.main.ConnectivityFragmentDialog"
+    android:label="connectivity_dialog" />
 
 </navigation>

@@ -56,8 +56,11 @@ class MainActivity : AppCompatActivity() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
       log.info("network available")
-      app.networkInfo.postValue(app.networkInfo.value?.copy(networkConnected = true))
-      app.reconnect()
+      if (Prefs.isTorEnabled(applicationContext)) {
+        app.reconnectTor()
+      }
+      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = true ; this })
+      app.reconnectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      app.networkInfo.postValue(app.networkInfo.value?.copy(networkConnected = false))
+      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = false ; this })
     }
   }
 
@@ -90,12 +93,6 @@ class MainActivity : AppCompatActivity() {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     app = ViewModelProvider(this).get(AppViewModel::class.java)
-    app.currentNav.observe(this, Observer {
-      handleNetworkAlert()
-    })
-    app.networkInfo.observe(this, Observer {
-      handleNetworkAlert()
-    })
     app.navigationEvent.observe(this, Observer {
       when (it) {
         is PayToOpenRequestEvent -> {
@@ -154,32 +151,6 @@ class MainActivity : AppCompatActivity() {
         }
         else -> log.info("unhandled payment scheme $data")
       }
-    }
-  }
-
-  // list pages where the connectivity alert will be shown
-  private val networkAlertScreens = setOf(R.id.main_fragment, R.id.receive_fragment, R.id.send_fragment, R.id.channels_list_fragment, R.id.mutual_close_fragment, R.id.force_close_fragment)
-
-  private fun handleNetworkAlert() {
-    val currentNav = app.currentNav.value
-    val networkInfo = app.networkInfo.value
-    if (networkAlertScreens.contains(currentNav) && networkInfo != null) {
-      if (!networkInfo.networkConnected) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_network_lost)
-        mBinding.alertBlockingButton.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else if (networkInfo.electrumServer == null) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_electrum_connecting)
-        mBinding.alertBlockingButton.setOnClickListener { findNavController(R.id.nav_host_main).navigate(R.id.global_action_any_to_electrum) }
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else if (!networkInfo.lightningConnected) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_lightning_connection_lost)
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else {
-        mBinding.alertBlocking.visibility = View.GONE
-      }
-    } else {
-      mBinding.alertBlocking.visibility = View.GONE
     }
   }
 

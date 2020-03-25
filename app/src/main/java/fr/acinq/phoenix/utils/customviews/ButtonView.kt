@@ -88,4 +88,8 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
   fun setIcon(icon: Drawable) {
     mBinding.image.setImageDrawable(icon)
   }
+
+  fun setIconColor(color: Int) {
+    mBinding.image.imageTintList = ColorStateList.valueOf(color)
+  }
 }

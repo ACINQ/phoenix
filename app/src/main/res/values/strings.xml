@@ -41,7 +41,7 @@
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Please enter your PIN</string>
-  <string name="pindialog_pwd_placeholder">●●●●●●</string>
+  <string name="pindialog_pwd_placeholder" translatable="false">●●●●●●</string>
   <string name="pindialog_error">PIN code must be a 6 digits number.</string>
   <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
 
@@ -64,9 +64,11 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Loading…</string>
+  <string name="startup_wait_tor">Starting Tor…</string>
   <string name="startup_start_button">Restart</string>
-  <string name="startup_logs_button">Logs</string>
+  <string name="startup_settings_button">Settings</string>
   <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
+  <string name="startup_error_tor">The Tor service could not start. Check that your connection is working and try again.\n\nError details: %1$s</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
   <string name="startup_error_wrong_pwd">PIN is incorrect</string>
@@ -204,6 +206,7 @@
   <string name="settings_electrum">Electrum server</string>
   <string name="settings_mutual_close">Close all channels</string>
   <string name="settings_force_close">Danger zone</string>
+  <string name="settings_tor">Tor</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -280,6 +283,7 @@
 
   <string name="initwallet_create">New Wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
+  <string name="initwallet_options">Settings</string>
 
   <!-- //////////////// main //////////////////// -->
 
@@ -289,6 +293,8 @@
   <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
   <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Connecting…</string>
+  <string name="main_tor_connected_button">Tor enabled</string>
   <string name="main_stores_button">Stores</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -450,6 +456,8 @@
   <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Server</string>
+  <string name="electrum_not_connected">Not connected</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[You will connect to <b>%1$s</b>]]></string>
   <string name="electrum_connecting">Establishing connection…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>
@@ -476,5 +484,25 @@
 
   <string name="key_space_desc">Add whitespace</string>
   <string name="key_delete_desc">Delete last character</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Tor Settings</string>
+  <string name="tor_settings_subtitle">You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down the application startup.</string>
+  <string name="tor_settings_enabled">Tor is enabled</string>
+  <string name="tor_settings_disabled">Tor is disabled</string>
+  <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>
+  <string name="tor_settings_confirm_enable_title">Are you sure you want to enable Tor? Note that for best result, it\'s recommended to start a new wallet as well.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Connections status</string>
+  <string name="conndialog_summary_not_ok">You have some connection issue(s). The app will not function properly.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_lightning">Lightning Peer</string>
+  <string name="conndialog_ok">Connected</string>
+  <string name="conndialog_not_ok">Connecting…</string>
 
 </resources>

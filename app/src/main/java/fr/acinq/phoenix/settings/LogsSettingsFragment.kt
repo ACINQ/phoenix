@@ -25,6 +25,7 @@ import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.BuildConfig
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsLogsBinding
 import fr.acinq.phoenix.utils.Logging
@@ -42,6 +43,8 @@ class LogsSettingsFragment : BaseFragment() {
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
+
+  override fun handleKitState(state: KitState) {}
 
   override fun onStart() {
     super.onStart()
