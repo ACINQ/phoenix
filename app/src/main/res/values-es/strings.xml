@@ -53,7 +53,6 @@
 
   <string name="startup_wait">Cargando…</string>
   <string name="startup_start_button">Reiniciar</string>
-  <string name="startup_logs_button">Registros</string>
   <string name="startup_error_generic">La aplicación no ha podido iniciarse.\n\nDetalles del error: %1$s</string>
   <string name="startup_error_unreadable">No se han podido leer los datos del wallet, por favor reinicie la aplicación</string>
   <string name="startup_error_network">Su conexión a internet no funciona. Por favor, compruebe su conexión Wi-Fi o red móvil.</string>

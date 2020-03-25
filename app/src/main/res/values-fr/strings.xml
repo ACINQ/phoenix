@@ -431,6 +431,8 @@
   <string name="electrum_xpub_value">%1$s\n\nChemin de dérivation: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Serveur</string>
+  <string name="electrum_not_connected">Pas encore connecté</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[Vous vous connecterez à <b>%1$s</b>]]></string>
   <string name="electrum_connecting">Etablissement de la connexion…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Etablissement de la connexion avec <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Connecté à: <b>%1$s</b>]]></string>
