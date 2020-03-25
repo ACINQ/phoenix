@@ -95,7 +95,7 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.1.0"
 
   // ANDROIDX - material
-  def material_version = "1.2.0-alpha04"
+  def material_version = "1.2.0-alpha05"
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
