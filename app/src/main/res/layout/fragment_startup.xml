@@ -19,49 +19,130 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.StartupState" />
+    <import type="fr.acinq.phoenix.KitState" />
 
     <variable
-      name="appKitModel"
-      type="fr.acinq.phoenix.AppKitModel" />
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
   </data>
 
-  <androidx.constraintlayout.widget.ConstraintLayout
+  <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/space_lg"
+    android:fillViewport="true"
     tools:context=".startup.StartupFragment">
 
-    <ImageView
-      android:id="@+id/icon"
-      android:layout_width="120dp"
-      android:layout_height="120dp"
-      android:contentDescription="@null"
-      android:src="@drawable/ic_phoenix"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-      android:id="@+id/error"
-      android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:drawableStart="@drawable/ic_alert_triangle"
-      android:text="@{appKitModel.startupErrorMessage}"
-      android:visibility="@{appKitModel.startupState == StartupState.ERROR}"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/icon" />
+      android:padding="@dimen/space_lg">
 
-    <fr.acinq.phoenix.utils.customviews.ProgressTextView
-      android:id="@+id/starting"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:visibility="@{appKitModel.startupState == StartupState.IN_PROGRESS}"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/icon"
-      app:text="@string/startup_wait" />
-  </androidx.constraintlayout.widget.ConstraintLayout>
+      <ImageView
+        android:id="@+id/icon"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_phoenix"
+        android:visibility="@{!(appModel.state instanceof KitState.Error)}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_md_p"
+        android:visibility="@{appModel.state instanceof KitState.Error}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+          android:id="@+id/error_message"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:maxWidth="400dp"
+          android:text="@string/lipsum_short"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+          android:id="@+id/error_separator"
+          style="@style/HSeparator"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:visibility="@{!(appModel.state instanceof KitState.Error.WrongPassword)}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/error_message" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/error_restart_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          android:background="@drawable/button_bg_primary_border"
+          android:visibility="@{!(appModel.state instanceof KitState.Error.WrongPassword)}"
+          app:icon="@drawable/ic_refresh"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="1"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/error_separator"
+          app:text="@string/startup_start_button" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/error_settings_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData || appModel.state instanceof KitState.Error.Tor}"
+          app:icon="@drawable/ic_settings"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="1"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/error_restart_button"
+          app:text="@string/startup_settings_button" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
+        android:id="@+id/starting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Init || appModel.state instanceof KitState.Bootstrap.Node}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon"
+        app:text="@string/startup_wait" />
+
+      <ImageView
+        android:id="@+id/starting_tor_animation"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
+        app:layout_constraintBottom_toBottomOf="@id/starting_tor"
+        app:layout_constraintEnd_toStartOf="@id/starting_tor"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/starting_tor" />
+
+      <TextView
+        android:id="@+id/starting_tor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xs"
+        android:text="@string/startup_wait_tor"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/starting_tor_animation"
+        app:layout_constraintTop_toBottomOf="@id/icon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
 </layout>

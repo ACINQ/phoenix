@@ -15,7 +15,7 @@
  */
 
 apply plugin: 'com.android.application'
-
+apply plugin: 'maven'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
@@ -25,12 +25,13 @@ def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 
 android {
   compileSdkVersion 29
+  ndkVersion '21.0.6113669'
   defaultConfig {
     applicationId "fr.acinq.phoenix.mainnet"
     minSdkVersion 24
     targetSdkVersion 29
-    versionCode 6
-    versionName "1.2.0"
+    versionCode 7
+    versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -94,7 +95,7 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.1.0"
 
   // ANDROIDX - material
-  def material_version = "1.2.0-alpha04"
+  def material_version = "1.2.0-alpha05"
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
@@ -121,7 +122,7 @@ dependencies {
   implementation "androidx.preference:preference-ktx:$preference_version"
 
   // ANDROIDX - work manager
-  def work_version = "2.2.0"
+  def work_version = "2.3.4"
   implementation("androidx.work:work-runtime-ktx:$work_version") {
     exclude group: 'com.google.guava', module: 'listenablefuture'
   }
@@ -151,4 +152,11 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'androidx.test:runner:1.2.0'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+  // tor
+  def tor_ctl_version = "0.2"
+  def tor_wrapper_version = "0.0.3"
+  implementation "net.freehaven.tor.control:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
+  implementation "com.msopentech.thali:universal:$tor_wrapper_version" // core library for the tor wrapper
+  implementation "com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar"
 }

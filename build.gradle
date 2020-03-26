@@ -24,7 +24,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.5.3'
+    classpath 'com.android.tools.build:gradle:3.6.1'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safeargs_version"
   }
@@ -37,6 +37,9 @@ allprojects {
     mavenLocal()
     maven {
       url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+    maven {
+      url "https://raw.githubusercontent.com/guardianproject/gpmaven/master"
     }
   }
 }

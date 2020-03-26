@@ -55,22 +55,16 @@
       app:layout_constraintTop_toTopOf="@id/top_section" />
 
     <Constraint
-      android:id="@+id/help_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_md"
-      android:layout_marginEnd="@dimen/space_md"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <Constraint
-      android:id="@+id/stores_button"
-      android:layout_width="wrap_content"
+      android:id="@+id/top_notification_bar"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginStart="@dimen/space_md"
-      android:visibility="gone"
+      android:layout_marginTop="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/help_button" />
+      app:layout_constraintTop_toTopOf="parent" />
 
     <Constraint
       android:id="@id/incoming_funds_notif"
@@ -109,22 +103,16 @@
       app:layout_constraintStart_toStartOf="parent" />
 
     <Constraint
-      android:id="@+id/help_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/space_xs"
-      android:layout_marginEnd="@dimen/space_xs"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <Constraint
-      android:id="@+id/stores_button"
-      android:layout_width="wrap_content"
+      android:id="@+id/top_notification_bar"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginStart="@dimen/space_xs"
-      android:visibility="gone"
+      android:layout_marginTop="@dimen/space_xs"
+      android:layout_marginEnd="@dimen/space_xs"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/help_button" />
+      app:layout_constraintTop_toTopOf="parent" />
 
     <Constraint
       android:id="@id/incoming_funds_notif"

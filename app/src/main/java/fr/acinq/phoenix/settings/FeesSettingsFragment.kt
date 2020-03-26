@@ -23,14 +23,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsFeesBinding
-import fr.acinq.phoenix.send.SendState
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
@@ -56,7 +54,7 @@ class FeesSettingsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(FeesSettingsViewModel::class.java)
 
-    appKit.trampolineFeeSettings.value?.let { feeSettingsList ->
+    app.trampolineFeeSettings.value?.let { feeSettingsList ->
       context?.let { ctx ->
         feeSettingsLabelList = feeSettingsList.map {
           ctx.getString(R.string.fees_settings_trampoline_spinner_label,
@@ -81,7 +79,7 @@ class FeesSettingsFragment : BaseFragment() {
       override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (context != null && position < appKit.trampolineFeeSettings.value?.size ?: 0) {
+        if (context != null && position < app.trampolineFeeSettings.value?.size ?: 0) {
           Prefs.saveTrampolineMaxFeeIndex(context!!, position)
         }
       }

@@ -34,6 +34,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.phoenix.utils.BindingHelpers
@@ -60,29 +61,41 @@ class ElectrumServerFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
-    appKit.kit.observe(viewLifecycleOwner, Observer {
-      // -- xpub / feerate from appkit
-      if (appKit.kit.value == null) {
-        mBinding.feeRate.text = getString(R.string.utils_unknown)
-        mBinding.xpub.text = getString(R.string.utils_unknown)
-      } else {
-        mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
-        val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
-        mBinding.feeRate.visibility = View.VISIBLE
-        mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+    app.state.observe(viewLifecycleOwner, Observer {
+      when (it) {
+        is KitState.Started -> {
+          // -- xpub / feerate from appkit
+          mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
+          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(it.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
+          mBinding.feeRate.visibility = View.VISIBLE
+          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+        }
+        else -> {
+          mBinding.feeRate.text = getString(R.string.utils_unknown)
+          mBinding.xpub.text = getString(R.string.utils_unknown)
+        }
       }
     })
-    appKit.networkInfo.observe(viewLifecycleOwner, Observer {
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
         val electrumServer = it.electrumServer
         if (electrumServer == null) {
           // -- no connection to electrum server yet
           val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-          mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-            resources.getString(R.string.electrum_connecting)
-          } else {
-            resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-          })
+          mBinding.connectionStateValue.text = Converter.html(
+            if (app.state.value is KitState.Started) {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_connecting)
+              } else {
+                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+              }
+            } else {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_not_connected)
+              } else {
+                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+              }
+            })
         } else {
           // -- successfully connected to electrum
           mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
@@ -103,6 +116,8 @@ class ElectrumServerFragment : BaseFragment() {
       }
     }
   }
+
+  override fun handleKitState(state: KitState) {}
 
   private fun getElectrumDialog(context: Context): AlertDialog {
     val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
@@ -144,7 +159,12 @@ class ElectrumServerFragment : BaseFragment() {
         } else {
           Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
           dialog.dismiss()
-          appKit.shutdown()
+          if (app.state.value is KitState.Started) {
+            app.shutdown()
+            findNavController().navigate(R.id.global_action_any_to_startup)
+          } else {
+            findNavController().popBackStack()
+          }
         }
       }
     }

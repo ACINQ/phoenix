@@ -29,7 +29,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.AppViewModel
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentLnurlWithdrawBinding
@@ -61,7 +61,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     activity?.let {
-      appKit = ViewModelProvider(it).get(AppKitModel::class.java)
+      app = ViewModelProvider(it).get(AppViewModel::class.java)
       model = ViewModelProvider(this).get(LNUrlWithdrawViewModel::class.java)
       mBinding.model = model
 
@@ -176,7 +176,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         val amount = checkAmount()
         if (!amount.isEmpty) {
           model.state.value = LNUrlWithdrawState.InProgress
-          val pr = appKit.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
+          val pr = app.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
           Wallet.httpClient.newCall(Request.Builder().url(url).build()).enqueue(object : Callback {

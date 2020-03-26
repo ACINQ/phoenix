@@ -14,7 +14,7 @@ You can download the binary from the [Release page](https://github.com/ACINQ/pho
 
 # Build the project
 
-Detailed instructions on how to setup your development environment and build Phoenix are provided in [BUILD.md](https://github.com/ACINQ/eclair-phoenix/blob/master/BUILD.md)
+Detailed instructions on how to setup your development environment and build Phoenix are provided in [BUILD.md](https://github.com/ACINQ/phoenix/blob/master/BUILD.md)
 
 # Contribute
 
@@ -25,6 +25,10 @@ https://github.com/ACINQ/phoenix/issues
 You can also contribute to the project by submitting pull requests to improve the codebase or bring new features. Pull request will be reviewed by members of the ACINQ team.
 
 If you're interested in contributing to Lightning in general, take a look at the [Eclair repository](https://github.com/ACINQ/eclair) or head to our [Gitter chat](https://gitter.im/ACINQ/eclair)
+
+## Translate the app
+
+If you want to contribute to the translation effort, consult the guidelines provided in [TRANSLATION.md](https://github.com/ACINQ/phoenix/blob/master/TRANSLATION.md)
 
 # Support
 

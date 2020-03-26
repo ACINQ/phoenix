@@ -25,6 +25,8 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -38,6 +40,7 @@ import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.events.ChannelStateChange
@@ -67,6 +70,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
   private lateinit var notificationsAdapter: NotificationsAdapter
   private lateinit var notificationsManager: RecyclerView.LayoutManager
+
+  private lateinit var blinkingAnimation: Animation
 
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_SHOW_AMOUNT_IN_FIAT) {
@@ -99,24 +104,49 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       layoutManager = notificationsManager
       adapter = notificationsAdapter
     }
-
+    blinkingAnimation = AnimationUtils.loadAnimation(context, R.anim.blinking)
     return mBinding.root
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MainViewModel::class.java)
-    appKit.payments.observe(viewLifecycleOwner, Observer {
+    app.payments.observe(viewLifecycleOwner, Observer {
       paymentsAdapter.submitList(it)
     })
-    appKit.notifications.observe(viewLifecycleOwner, Observer {
+    app.notifications.observe(viewLifecycleOwner, Observer {
       notificationsAdapter.update(it)
     })
-    appKit.balance.observe(viewLifecycleOwner, Observer {
+    app.balance.observe(viewLifecycleOwner, Observer {
       mBinding.balance.setAmount(it)
     })
-    appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer { swapIns ->
+    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
       refreshIncomingFunds()
+    })
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
+      if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
+        if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+          mBinding.connectivityButton.startAnimation(blinkingAnimation)
+        }
+        mBinding.connectivityButton.visibility = View.VISIBLE
+        mBinding.torConnectedButton.visibility = View.GONE
+      } else if (context != null && Prefs.isTorEnabled(context!!)) {
+        if (it.torConnections.isNullOrEmpty()) {
+          if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+            mBinding.connectivityButton.startAnimation(blinkingAnimation)
+          }
+          mBinding.connectivityButton.visibility = View.VISIBLE
+          mBinding.torConnectedButton.visibility = View.GONE
+        } else {
+          mBinding.connectivityButton.clearAnimation()
+          mBinding.connectivityButton.visibility = View.GONE
+          mBinding.torConnectedButton.visibility = View.VISIBLE
+        }
+      } else {
+        mBinding.connectivityButton.clearAnimation()
+        mBinding.connectivityButton.visibility = View.GONE
+        mBinding.torConnectedButton.visibility = View.GONE
+      }
     })
     model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
       if (amount.`$greater`(MilliSatoshi(0))) {
@@ -143,10 +173,11 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
     mBinding.receiveButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_receive) }
     mBinding.sendButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_read_input) }
-    mBinding.storesButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/stores"))) }
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
+    mBinding.torConnectedButton.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_tor) }
+    mBinding.connectivityButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_connectivity) }
 
-    appKit.refreshPayments()
+    app.refreshPayments()
   }
 
   override fun onStop() {
@@ -162,7 +193,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PaymentPending) {
     log.debug("pending payment, refreshing list...")
-    appKit.refreshPayments()
+    app.refreshPayments()
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -175,8 +206,8 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when refreshing the incoming funds notification: ", exception)
     }) {
-      val totalSwapIns = appKit.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
-      val totalChannelsWaitingConf = appKit.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
+      val totalSwapIns = app.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
+      val totalChannelsWaitingConf = app.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
         if (c.data() is HasCommitments) {
           (c.data() as HasCommitments).commitments().availableBalanceForSend()
         } else {
@@ -223,31 +254,31 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
     if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > Constants.DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
-      appKit.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
-      if (appKit.isKitReady()) {
+      app.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      if (app.state.value is KitState.Started) {
         // the user has been notified once, but since the node has started he is safe anyway
         // the background watcher notification countdown can be reset so that it does not spam the user
         Prefs.saveWatcherAttemptOutcome(context, WatchListener.`Ok$`.`MODULE$`)
       }
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      app.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
   }
 
   private fun checkWalletIsSecure(context: Context) {
     if (!Prefs.getIsSeedEncrypted(context)) {
-      appKit.notifications.value?.add(InAppNotifications.NO_PIN_SET)
+      app.notifications.value?.add(InAppNotifications.NO_PIN_SET)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
+      app.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
     }
   }
 
   private fun checkMnemonics(context: Context) {
     val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
     if (timestamp == 0L) {
-      appKit.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      app.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
-      appKit.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      app.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
     }
   }
 

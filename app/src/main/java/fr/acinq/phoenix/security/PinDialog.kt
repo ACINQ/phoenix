@@ -23,17 +23,16 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.DialogPinBinding
 import fr.acinq.phoenix.utils.Converter
-import java.util.*
+import fr.acinq.phoenix.utils.Prefs
 
-class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback, titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) :
-  Dialog(context, themeResId) {
+class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, private val pinCallback: PinDialogCallback,
+  titleResId: Int = R.string.pindialog_title_default, cancelable: Boolean = true) : Dialog(context, themeResId) {
 
   private val mBinding: DialogPinBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.dialog_pin, null, false)
   private var mPinValue: String = ""
@@ -44,17 +43,44 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
     mBinding.pinTitle.text = Converter.html(getContext().getString(titleResId))
     setCancelable(cancelable)
 
-    val mButtonsList = ArrayList<View>()
-    mButtonsList.add(mBinding.pinNum1)
-    mButtonsList.add(mBinding.pinNum2)
-    mButtonsList.add(mBinding.pinNum3)
-    mButtonsList.add(mBinding.pinNum4)
-    mButtonsList.add(mBinding.pinNum5)
-    mButtonsList.add(mBinding.pinNum6)
-    mButtonsList.add(mBinding.pinNum7)
-    mButtonsList.add(mBinding.pinNum8)
-    mButtonsList.add(mBinding.pinNum9)
-    mButtonsList.add(mBinding.pinNum0)
+    // randomly sorted pin buttons
+    val pinButtons = listOf(
+      mBinding.pinNum0,
+      mBinding.pinNum1,
+      mBinding.pinNum2,
+      mBinding.pinNum3,
+      mBinding.pinNum4,
+      mBinding.pinNum5,
+      mBinding.pinNum6,
+      mBinding.pinNum7,
+      mBinding.pinNum8,
+      mBinding.pinNum9
+    )
+
+    for (v in pinButtons) {
+      v.setOnClickListener { view ->
+        view.isHapticFeedbackEnabled = true
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
+        if (mPinValue == "" || mPinValue.length != PIN_LENGTH) {
+          val digit = (view as Button).text.toString()
+          mPinValue += digit
+          mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
+        }
+      }
+    }
+
+    if (Prefs.isPinScrambled(context)) {
+      mBinding.pinGrid.removeAllViews()
+      pinButtons.shuffled().withIndex().forEach { indexedBtn ->
+        if (indexedBtn.index == pinButtons.size - 1) {
+          mBinding.pinGrid.addView(mBinding.pinNumClear)
+          mBinding.pinGrid.addView(indexedBtn.value)
+          mBinding.pinGrid.addView(mBinding.pinBackspace)
+        } else {
+          mBinding.pinGrid.addView(indexedBtn.value)
+        }
+      }
+    }
 
     mBinding.pinDisplay.addTextChangedListener(object : TextWatcher {
       override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -68,18 +94,6 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
 
       override fun afterTextChanged(s: Editable) {}
     })
-
-    for (v in mButtonsList) {
-      v.setOnClickListener { view ->
-        view.isHapticFeedbackEnabled = true
-        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
-        if (mPinValue == "" || mPinValue.length != PIN_LENGTH) {
-          val digit = (view as Button).text.toString()
-          mPinValue += digit
-          mBinding.pinDisplay.text = Strings.repeat(PIN_PLACEHOLDER, mPinValue.length)
-        }
-      }
-    }
 
     mBinding.pinNumClear.setOnClickListener {
       mPinValue = ""

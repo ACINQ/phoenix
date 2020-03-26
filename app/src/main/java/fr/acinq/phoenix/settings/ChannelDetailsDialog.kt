@@ -32,7 +32,7 @@ import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.HasCommitments
-import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.AppViewModel
 import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsChannelDetailsBinding
@@ -49,7 +49,7 @@ class ChannelDetailsDialog : DialogFragment() {
   val log: Logger = LoggerFactory.getLogger(ChannelDetailsDialog::class.java)
 
   lateinit var mBinding: FragmentSettingsChannelDetailsBinding
-  private lateinit var appKit: AppKitModel
+  private lateinit var app: AppViewModel
   private lateinit var model: ChannelDetailsViewModel
 
   private val args: ChannelDetailsDialogArgs by navArgs()
@@ -63,7 +63,7 @@ class ChannelDetailsDialog : DialogFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     activity?.let {
-      appKit = ViewModelProvider(it).get(AppKitModel::class.java)
+      app = ViewModelProvider(it).get(AppViewModel::class.java)
       model = ViewModelProvider(this).get(ChannelDetailsViewModel::class.java)
       mBinding.model = model
     } ?: dismiss()
@@ -117,7 +117,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }) {
       model.state.value = ChannelDetailsState.IN_PROGRESS
       withContext(this.coroutineContext + Dispatchers.Default) {
-        val channel = appKit.getChannel(ByteVector32.fromValidHex(args.channelId))
+        val channel = app.getChannel(ByteVector32.fromValidHex(args.channelId))
         val data = channel!!.data()
         if (data is HasCommitments) {
           model.fundingTxId.postValue(data.commitments().commitInput().outPoint().txid().toString())

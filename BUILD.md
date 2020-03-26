@@ -6,6 +6,19 @@
 2. Checkout the `android-phoenix` branch
 3. Follow the instructions provided in the [BUILD.md](https://github.com/ACINQ/eclair/blob/master/BUILD.md) file of the eclair project
 
+## Building the TOR proxy library
+
+Phoenix uses a library to manage the communication with the tor binary. This library must be built locally
+
+1. Clone the library from https://github.com/ACINQ/Tor_Onion_Proxy_Library
+2. At the root of this project, run:
+```shell
+./gradlew install
+./gradlew :universal:build
+./gradlew :android:build
+./gradlew :android:publishToMaven
+```
+
 ## Building Phoenix
 
 [Android Studio](https://developer.android.com/studio) is the recommended development environment.
@@ -16,13 +29,13 @@
 4. Open Android Studio, and click on `File` > `Open...`, and open the cloned folder
 5. Project initialization will proceed.
 
-Note that if you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above). 
+Note that if you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above).
 You can check that the corresponding `.jar` file is present in your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`).
 
 ## Deterministic build of Phoenix
 
 Phoenix supports deterministic builds on Linux OSs, this allows anyone to recreate from the sources the exact same APK that was published in the release page.
-The deterministic build uses a dockerized build environment and require you to have previously built (and published locally) the artifact for the `eclair-core` 
+The deterministic build uses a dockerized build environment and require you to have previously built (and published locally) the artifact for the `eclair-core`
 dependency, follow the instructions to build it.
 
 ### Prerequisites

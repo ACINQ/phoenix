@@ -76,12 +76,12 @@ class MutualCloseFragment : BaseFragment() {
       model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
       model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
-      val channels = appKit.getChannels(`NORMAL$`.`MODULE$`)
+      val channels = app.getChannels(`NORMAL$`.`MODULE$`)
       if (channels.count() == 0) {
         model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
         context?.let {
-          val balance = appKit.balance.value ?: MilliSatoshi(0)
+          val balance = app.balance.value ?: MilliSatoshi(0)
           mBinding.channelsState.text = Converter.html(getString(R.string.closechannels_channels_recap, channels.count(), Converter.printAmountPretty(balance, it, withUnit = true)))
         }
         model.state.value = PreChannelsCloseState.READY
@@ -96,7 +96,7 @@ class MutualCloseFragment : BaseFragment() {
       Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
     }) {
       model.state.value = MutualCloseState.IN_PROGRESS
-      appKit.mutualCloseAllChannels(mBinding.mutualCloseAddressInput.text.toString())
+      app.mutualCloseAllChannels(mBinding.mutualCloseAddressInput.text.toString())
       model.state.value = MutualCloseState.DONE
     }
   }

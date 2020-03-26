@@ -70,10 +70,25 @@
           app:text="@string/seedsec_pin_switch" />
 
         <View
-          android:id="@+id/sep_pin_update"
+          android:id="@+id/sep_pin_scramble"
           style="@style/HLineSeparator"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/pin_switch" />
+
+        <fr.acinq.phoenix.utils.customviews.SwitchView
+          android:id="@+id/pin_scramble"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:visibility="@{model.protectionState != ProtectionState.NONE}"
+          app:layout_constraintTop_toBottomOf="@id/sep_pin_scramble"
+          app:text="@string/seedsec_pin_scramble" />
+
+        <View
+          android:id="@+id/sep_pin_update"
+          style="@style/HLineSeparator"
+          app:visibility="@{model.protectionState != ProtectionState.NONE}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/pin_scramble" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/update_pin_button"
