@@ -450,9 +450,9 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">Configuration de Tor</string>
-  <string name="tor_settings_subtitle">Vous pouvez améliorer la protection de votre vie privée en ne vous connectant à Electrum et à votre pair Lightning que par Tor uniquement. Cela aura un léger impact sur le démarrage de l\'application.</string>
+  <string name="tor_settings_subtitle">Vous pouvez améliorer la protection de votre vie privée en vous connectant à Electrum et à votre pair Lightning par Tor uniquement. Cela aura un léger impact sur le démarrage de l\'application.</string>
   <string name="tor_settings_enabled">Tor est activé</string>
-  <string name="tor_settings_disabled">Tor n\'est pas activé disabled</string>
+  <string name="tor_settings_disabled">Tor n\'est pas activé</string>
   <string name="tor_settings_confirm_disable_title">Êtes-vous sûr de vouloir désactiver Tor ?</string>
   <string name="tor_settings_confirm_enable_title">Êtes-vous sûr de vouloir activer Tor ? Pour une protection optimale, il est également recommandé de créer un nouveau portefeuille.</string>
 
