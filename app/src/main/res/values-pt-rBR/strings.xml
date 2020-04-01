@@ -43,7 +43,7 @@
   <string name="pindialog_title_default">Insira o PIN</string>
   <string name="pindialog_pwd_placeholder">●●●●●●</string>
   <string name="pindialog_error">O código PIN deve conter 6 números.</string>
-  <string name="pindialog_error_donotmatch">Os códigos PIN não coincidem.</string>
+  <string name="pindialog_error_donotmatch">Os códigos PIN não conferem.</string>
 
   <!-- //////////////// Biometric dialog //////////////////// -->
 
