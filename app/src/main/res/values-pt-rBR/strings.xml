@@ -142,7 +142,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Ler código QR com solicitação de pagamento ou endereço bitcoin</string>
+  <string name="scan_instructions">Leia um código QR com solicitação de pagamento ou endereço bitcoin</string>
   <string name="scan_state_reading">Lendo solicitação de pagamento</string>
 
   <string name="scan_error_default">Esta não é uma solicitação de pagamento válida.\n\nTente novamente.</string>
