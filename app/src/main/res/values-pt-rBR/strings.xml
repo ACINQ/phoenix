@@ -81,7 +81,7 @@
   <string name="receive_amount_label">Quantidade (opcional)</string>
   <string name="receive_desc_label">Descrição do pagamento (opcional):</string>
   <string name="receive_default_desc">Pagamento Phoenix</string>
-  <string name="receive_generate_button">Gerar cobrança</string>
+  <string name="receive_generate_button">Cobrar</string>
 
   <string name="receive_share_subject">Pagamento solicitado</string>
   <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
