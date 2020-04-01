@@ -155,7 +155,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Grant camera permission</string>
-  <string name="scan_instructions">Place a payment request QR code\ninside the rectangle to scan it</string>
+  <string name="scan_instructions">Scan a QR code containing a payment request or bitcoin address</string>
   <string name="scan_state_reading">Reading payment request</string>
 
   <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
