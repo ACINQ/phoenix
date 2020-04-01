@@ -310,7 +310,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Logs do aplicativo</string>
-  <string name="logs_subtitle">Você pode extrair e compartilhar os logs do aplicativo por esta página.</string>
+  <string name="logs_subtitle">Neste espaço você pode extrair e compartilhar os logs do aplicativo.</string>
   <string name="logs_view_button">Ver logs…</string>
   <string name="logs_view_with">Ver logs com…</string>
   <string name="logs_share_button">Compartilhar logs…</string>
