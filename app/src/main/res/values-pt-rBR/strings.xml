@@ -379,7 +379,7 @@
   <string name="seedsec_biometric_support_none_enrolled">Primeiro registre a biometria.</string>
 
   <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match">PINs não coincidem. Tente novamente.</string>
+  <string name="seedsec_error_pins_match">PINs não conferem. Tente novamente.</string>
   <string name="seedsec_error_generic">Ocorreu um erro, a carteira não foi criptografada.\n\nTente novamente.</string>
 
   <string name="seedsec_disable_bio_prompt_title">Desativar bloqueio biométrico</string>
