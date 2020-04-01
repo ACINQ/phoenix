@@ -300,7 +300,7 @@
 
   <string name="inappnotif_set_up_pin">Your wallet is not protected.</string>
   <string name="inappnotif_set_up_pin_action">Set a PIN</string>
-  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
+  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. It is very important to back up your wallet so you don't risk losing your bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
   <string name="inappnotif_upgrade">An update for this app is available.</string>
