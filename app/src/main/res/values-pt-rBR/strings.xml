@@ -245,7 +245,7 @@
     <item quantity="other">Você tem %1$d canais.</item>
   </plurals>
   <string name="listallchannels_copy">Copiar</string>
-  <string name="listallchannels_share_all">Compartilhar todos os canais…</string>
+  <string name="listallchannels_share_all">Compartilhar todos canais…</string>
   <string name="listallchannels_share">Compartilhar</string>
   <string name="listallchannels_funding_tx">Tx</string>
   <string name="listallchannels_funding_tx_desc">Ver transação de financiamento</string>
