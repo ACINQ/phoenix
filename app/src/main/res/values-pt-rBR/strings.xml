@@ -92,7 +92,7 @@
   <string name="receive_withdraw_button">Usar LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço bitcoin</string>
-  <string name="receive_swap_in_error_message">Ocorreu um erro ao enviar essa transação pela rede bitcoin…\n\nTente novamente.</string>
+  <string name="receive_swap_in_error_message">Ocorreu um erro no processo de transição para uma transação da rede bitcoin…\n\nTente novamente.</string>
   <string name="receive_swap_in_progress_message">Solicitando um endereço de transição…</string>
   <string name="receive_swap_in_disclaimer_title">Receber pela rede bitcoin</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
