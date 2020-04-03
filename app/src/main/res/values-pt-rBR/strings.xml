@@ -361,7 +361,7 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Segurança</string>
-  <string name="seedsec_subtitle">É altamente recomendável definir um PIN para proteger sua carteira. Se o seu dispositivo suportar, você pode usar autenticação biométrica.</string>
+  <string name="seedsec_subtitle">É muito importante definir um PIN para proteger sua carteira. Se o seu aparelho suportar, você pode usar autenticação biométrica.</string>
   <string name="seedsec_pin_switch">Autenticação por PIN</string>
   <string name="seedsec_biometrics_switch">Autenticação biométrica</string>
   <string name="seedsec_change_pin">Alterar PIN…</string>
