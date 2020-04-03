@@ -90,7 +90,7 @@
 
   <string name="receive_address_label">Endereço</string>
   <string name="receive_power_save_disclaimer">Você está no modo de economia de energia. Para receber o pagamento, verifique se o aplicativo pode ser executado em segundo plano.</string>
-  <string name="receive_withdraw_button">Usar LNURL</string>
+  <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço bitcoin</string>
   <string name="receive_swap_in_error_message">Ocorreu um erro no processo de transição para uma transação da rede bitcoin…\n\nTente novamente.</string>
