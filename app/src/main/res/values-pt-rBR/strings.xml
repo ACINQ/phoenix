@@ -130,7 +130,7 @@
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
   <string name="send_pay_button">Pagar</string>
-  <string name="send_swap_in_progress">Troca em andamento…</string>
+  <string name="send_swap_in_progress">Processando troca…</string>
   <string name="send_swap_error">A troca falhou. Tente novamente.</string>
   <string name="send_swap_required_desc">Este é um endereço de bitcoin, o pagamento será feito usando uma troca.</string>
   <string name="send_swap_required_button">Solicitar uma troca</string>
