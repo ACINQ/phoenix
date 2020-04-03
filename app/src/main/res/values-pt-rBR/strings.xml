@@ -54,7 +54,6 @@
 
   <string name="startup_wait">Carregando…</string>
   <string name="startup_start_button">Reiniciar</string>
-  <string name="startup_logs_button">Logs</string>
   <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
   <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo</string>
   <string name="startup_error_network">Sua conexão de internet não está funcionando. Favor verificar sua conexão WiFi ou rede de celular.</string>
@@ -252,7 +251,7 @@
   <string name="listallchannels_close">Fechar</string>
   <string name="listallchannels_share_subject">Dados dos canais</string>
   <string name="listallchannels_share_title">Compartilhar dados do canal</string>
-  <string name="listallchannels_serialization_error">Não foi possível recuperar os dados do canal>
+  <string name="listallchannels_serialization_error">Não foi possível recuperar os dados do canal</string>
 
   <!-- //////////////// channel details //////////////// -->
 
