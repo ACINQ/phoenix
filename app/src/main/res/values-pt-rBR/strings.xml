@@ -374,7 +374,7 @@
   <string name="seedsec_biometric_enabled">Autenticação biométrica ativada</string>
   <string name="seedsec_biometric_disabled">Autenticação biométrica desativada</string>
 
-  <string name="seedsec_biometric_support_no_hw">O seu dispositivo não suporta autenticação biométrica.</string>
+  <string name="seedsec_biometric_support_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
   <string name="seedsec_biometric_support_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
   <string name="seedsec_biometric_support_none_enrolled">Primeiro registre a biometria.</string>
 
