@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Não importe uma seed que tenha sido gerada em outro aplicativo.\n\nAlém disso, certifique-se que você não tem outra carteira Phoenix instalada com a mesma seed.</string>
   <string name="restore_disclaimer_checkbox">Eu entendo.</string>
   <string name="restore_disclaimer_next">Próximo</string>
-  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês. Please note that passphrases are not supported.</string>
+  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês. Tenha em mente que senhas comuns não funcionam.</string>
   <string name="restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
   <string name="restore_in_progress">Restaurando sua carteira…</string>
   <string name="restore_import_button">Importar</string>
