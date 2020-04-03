@@ -300,7 +300,7 @@
     Esta lista de palavras é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
     <br /><br />
     <b>Não compartilhe com ninguém.</b>
-    <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus fundos.
+    <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus bitcoins.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
