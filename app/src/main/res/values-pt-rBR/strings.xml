@@ -36,7 +36,7 @@
   <string name="restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
   <string name="restore_in_progress">Restaurando sua carteira…</string>
   <string name="restore_import_button">Importar</string>
-  <string name="restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente</string>
+  <string name="restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente.</string>
 
   <!-- //////////////// Pin dialog //////////////////// -->
 
@@ -53,9 +53,11 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Carregando…</string>
+  <string name="startup_wait_tor">Iniciando Tor…</string>
   <string name="startup_start_button">Reiniciar</string>
   <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
-  <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo</string>
+  <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
+  <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
   <string name="startup_error_network">Sua conexão de internet não está funcionando. Favor verificar sua conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
@@ -205,7 +207,7 @@
 
   <string name="closechannels_title">Fechar canais</string>
   <string name="closechannels_checking_channels">Verificando canais, aguarde…</string>
-  <string name="closechannels_channels_recap">Você atualmente possui %1$d canais lightning que somam o total de %2$s.</string>
+  <string name="closechannels_channels_recap">Você atualmente possui %1$d canais Lightning que somam o total de %2$s.</string>
   <string name="closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontra os seus canais.</string>
   <string name="closechannels_mutual_title">Esvaziar carteira</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
@@ -277,6 +279,8 @@
   <string name="main_alert_settings_button">Configurações</string>
   <string name="main_swapin_incoming">+%1$s entrada</string>
   <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Conectando…</string>
+  <string name="main_tor_connected_button">Tor ativado</string>
   <string name="main_stores_button">Lojas</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -424,6 +428,8 @@
   <string name="electrum_xpub_value">%1$s\n\nCaminho: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Servidor</string>
+  <string name="electrum_not_connected">Não conectado</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[Você se conectará a <b>%1$s</b>]]></string>
   <string name="electrum_connecting">Estabelecendo conexão…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[Estabelecendo conexão com <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Conectado a: <b>%1$s</b>]]></string>
@@ -437,5 +443,25 @@
 
   <string name="key_space_desc">Adicionar espaço em branco</string>
   <string name="key_delete_desc">Excluir último caractere</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Configurações do Tor</string>
+  <string name="tor_settings_subtitle">Você pode melhorar sua privacidade ativando o Tor ao se conectar a um servidor Electrum ou ao seu par Lightning. Isso fará com que a Phoenix demore um pouco mais para iniciar.</string>
+  <string name="tor_settings_enabled">Tor está ativado</string>
+  <string name="tor_settings_disabled">Tor está desativado</string>
+  <string name="tor_settings_confirm_disable_title">Tem certeza que deseja desativar o Tor?</string>
+  <string name="tor_settings_confirm_enable_title">Tem certeza que deseja ativar o Tor? Observe que, para obter melhores resultados, também é recomendável criar uma nova carteira.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Status da conexão</string>
+  <string name="conndialog_summary_not_ok">Você tem alguns problemas de conexão. O aplicativo não funcionará corretamente.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_lightning">Par Lightning</string>
+  <string name="conndialog_ok">Conectado</string>
+  <string name="conndialog_not_ok">Conectando…</string>
 
 </resources>
