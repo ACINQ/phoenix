@@ -354,7 +354,7 @@
   <string name="state_closing">O canal está sendo fechado</string>
   <string name="state_closed">O canal foi fechado</string>
   <string name="state_normal">Funcionando</string>
-  <string name="state_sync">Sincronizando com peers</string>
+  <string name="state_sync">Sincronizando com pares</string>
   <string name="state_offline">O peer está offline</string>
   <string name="state_shutdown">Desligar</string>
 
