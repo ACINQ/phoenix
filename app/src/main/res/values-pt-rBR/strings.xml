@@ -285,7 +285,7 @@
   <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
   <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Você já fez o backup da carteira?</string>
-  <string name="inappnotif_mnemonics_never_seen_action">Fazer backup da carteira</string>
+  <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano no seu aparelho. Verifique se o seu aparelho não "mata" este aplicativo para economizar bateria.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
   <string name="inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
