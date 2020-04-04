@@ -239,7 +239,7 @@
   <string name="listallchannels_title">Lista de Canais</string>
   <string name="listallchannels_in_progress">Aguarde…</string>
   <string name="listallchannels_error">Ocorreu um erro ao recuperar a lista de canais. Tente novamente.</string>
-  <string name="listallchannels_node_id">ID do servidor: %1$s</string>
+  <string name="listallchannels_node_id">ID da carteira: %1$s</string>
   <string name="listallchannels_no_channels">Você ainda não possui canais.</string>
   <plurals name="listallchannels_channels_header">
     <item quantity="one">Você tem %1$d canal.</item>
