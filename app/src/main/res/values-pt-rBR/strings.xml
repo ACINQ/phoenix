@@ -154,7 +154,7 @@
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem roubar seu pagamento. Para estar seguro, você deve <b>solicitar ao recebedor que específique um valor</b> na cobrança.
+    Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na cobrança.
     <br /><br />
     Tem certeza de que deseja pagar esta cobrança?
   ]]></string>
