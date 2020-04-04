@@ -104,12 +104,12 @@
   <string name="receive_power_save_disclaimer">You\'re in power save mode. To receive the payment make sure that the app is allowed to run in background.</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 
-  <string name="receive_swap_in_button">Show a bitcoin address</string>
+  <string name="receive_swap_in_button">Show a Bitcoin address</string>
   <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
-  <string name="receive_swap_in_progress_message">Requesting a swap-in bitcoin address…</string>
+  <string name="receive_swap_in_progress_message">Requesting a swap-in Bitcoin address…</string>
   <string name="receive_swap_in_disclaimer_title">Receive on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  A standard bitcoin address will be displayed next.
+  A standard Bitcoin address will be displayed next.
   <br /><br />
   Funds sent to this address will be shown on your wallet after one confirmation.
   <br /><br />
@@ -286,7 +286,7 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connecting to electrum server…</string>
+  <string name="main_alert_electrum_connecting">Connecting to Electrum server…</string>
   <string name="main_alert_network_lost">You are offline. Please check your network settings…</string>
   <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
   <string name="main_alert_settings_button">Settings</string>
@@ -445,7 +445,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">By default Phoenix connects to random electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server.</string>
+  <string name="electrum_subtitle">By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server.</string>
   <string name="electrum_change_button">Set server…</string>
 
   <string name="electrum_block_height_label">Block height</string>
@@ -461,7 +461,7 @@
   <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
   <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>
 
-  <string name="electrum_dialog_checkbox">Use a custom Electrum server</string>
+  <string name="electrum_dialog_checkbox">Use a custom server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
