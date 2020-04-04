@@ -249,7 +249,7 @@
   <string name="listallchannels_share_all">Compartilhar todos canais…</string>
   <string name="listallchannels_share">Compartilhar</string>
   <string name="listallchannels_funding_tx">Tx</string>
-  <string name="listallchannels_funding_tx_desc">Ver transação inaugural</string>
+  <string name="listallchannels_funding_tx_desc">Ver transação de abertura</string>
   <string name="listallchannels_close">Fechar</string>
   <string name="listallchannels_share_subject">Dados dos canais</string>
   <string name="listallchannels_share_title">Compartilhar dados do canal</string>
