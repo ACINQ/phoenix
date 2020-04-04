@@ -138,7 +138,7 @@
   <string name="send_swap_complete_recap_amount">Valor</string>
   <string name="send_swap_complete_recap_fee">Taxa de Mineração</string>
   <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">O total excede seu saldo.\n\nDiminua o valor,ou tente novamente quando as taxas de mineração baixarem.</string>
+  <string name="send_swap_complete_cannot_afford">O total excede seu saldo.\n\nDiminua o valor ou tente novamente quando as taxas de mineração baixarem.</string>
 
   <!-- //////////////// scan //////////////// -->
 
