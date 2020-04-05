@@ -218,7 +218,7 @@
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar fechamento</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    Fechamento forçado permite fechar unilateralmente seus canais.
+    Encerramento forçado permite fechar unilateralmente seus canais.
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; está aqui como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
