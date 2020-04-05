@@ -336,7 +336,7 @@
   <string name="paymentdetails_destination_label">Enviado para</string>
   <string name="paymentdetails_fees_label">Taxas</string>
   <string name="paymentdetails_error_label">Erro</string>
-  <string name="paymentdetails_closing_desc">Pagamento pelo fechamento do canal #%1$s</string>
+  <string name="paymentdetails_closing_desc">Pagamento pelo encerramento do canal #%1$s</string>
   <string name="paymentdetails_no_description">Sem descrição</string>
 
   <string name="paymentdetails_technicals_button">Mostrar dados técnicos</string>
