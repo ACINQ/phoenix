@@ -216,7 +216,7 @@
   <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Verifique se o endereço está correto antes de enviar.</string>
   <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
-  <string name="closechannels_force_title">Forçar fechamento</string>
+  <string name="closechannels_force_title">Forçar encerramento</string>
   <string name="closechannels_force_instructions"><![CDATA[
     Encerramento forçado permite fechar unilateralmente seus canais.
     <br/><br/>
