@@ -205,7 +205,7 @@
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closechannels_title">Fechar canais</string>
+  <string name="closechannels_title">Encerrar canais</string>
   <string name="closechannels_checking_channels">Verificando canais, aguarde…</string>
   <string name="closechannels_channels_recap">Você atualmente possui %1$d canais Lightning que somam o total de %2$s.</string>
   <string name="closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontram os seus canais.</string>
