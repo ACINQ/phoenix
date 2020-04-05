@@ -192,7 +192,7 @@
   <string name="settings_list_channels">Lista de canais</string>
   <string name="settings_logs">Logs</string>
   <string name="settings_electrum">Servidor Electrum</string>
-  <string name="settings_mutual_close">Fechar canais</string>
+  <string name="settings_mutual_close">Encerrar canais</string>
   <string name="settings_force_close">Zona de perigo</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
