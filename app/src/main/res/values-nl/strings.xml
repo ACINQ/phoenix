@@ -36,13 +36,13 @@
   <string name="restore_mnemonics_label">Gebruik je toetsenbord om de seed in te voeren:</string>
   <string name="restore_in_progress">Wallet herstellen…</string>
   <string name="restore_import_button">Importeer</string>
-  <string name="restore_error">Deze seed is ongeldig en kan niet worden geimporteerd.\n\nProbeer het opnieuw</string>
+  <string name="restore_error">Deze seed is ongeldig en kan niet worden geïmporteerd.\n\nProbeer het opnieuw</string>
 
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Voer je PIN in</string>
-  <string name="pindialog_error">PIN code moet 6 cijfers bevatten.</string>
-  <string name="pindialog_error_donotmatch">PIN codes komen niet overeen.</string>
+  <string name="pindialog_error">PIN-code moet 6 cijfers bevatten.</string>
+  <string name="pindialog_error_donotmatch">PIN-codes komen niet overeen.</string>
 
   <!-- //////////////// Biometric dialog //////////////////// -->
 
@@ -52,13 +52,13 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Laden…</string>
-  <string name="startup_wait_tor">Tor Starten…</string>
+  <string name="startup_wait_tor">Tor starten…</string>
   <string name="startup_start_button">Herstart</string>
   <string name="startup_settings_button">Instellingen</string>
-  <string name="startup_error_generic">De applicatie kan niet worden gestart.\n\nError details: %1$s</string>
-  <string name="startup_error_tor">De Tor service kan niet worden gestart. Controleer of je een werkende verbinding hebt en probeer opnieuw.\n\nError details: %1$s</string>
+  <string name="startup_error_generic">De applicatie kan niet worden gestart.\n\nFoutmelding: %1$s</string>
+  <string name="startup_error_tor">De Tor service kan niet worden gestart. Controleer of je een werkende verbinding hebt en probeer opnieuw.\n\nFoutmelding: %1$s</string>
   <string name="startup_error_unreadable">Wallet data kon niet worden gelezen, herstart de applicatie</string>
-  <string name="startup_error_network">Je internetverbinding werkt niet. Controleer je WiFi signaal of je mobiele netwerk.</string>
+  <string name="startup_error_network">Je internetverbinding werkt niet. Controleer je WiFi-signaal of je mobiele netwerk.</string>
   <string name="startup_error_wrong_pwd">PIN is onjuist</string>
   <string name="startup_error_biometrics">Biometrische authenticatie is mislukt.</string>
 
@@ -81,7 +81,7 @@
   <string name="receive_error_message">Er is een fout opgetreden tijdens het genereren van de invoice…\n\nProbeer opnieuw.</string>
   <string name="receive_amount_label">Bedrag (optioneel)</string>
   <string name="receive_desc_label">Betalingsomschrijving (optioneel):</string>
-  <string name="receive_default_desc">Phoenix betaling</string>
+  <string name="receive_default_desc">Phoenix-betaling</string>
   <string name="receive_generate_button">Genereer invoice</string>
 
   <string name="receive_share_subject">Betaling aangevraagd</string>
@@ -92,7 +92,7 @@
   <string name="receive_power_save_disclaimer">Je gebruikt de energie-stand. Om de betaling te ontvangen heeft de app toestemming nodig om op de achtergrond te draaien.</string>
   <string name="receive_withdraw_button">Gebruik LNURL link</string>
 
-  <string name="receive_swap_in_button">laat Bitcoinadres zien</string>
+  <string name="receive_swap_in_button">Laat Bitcoinadres zien</string>
   <string name="receive_swap_in_error_message">Er is een fout opgetreden tijdens het wisselen naar een on-chain transactie…\n\nProbeer opnieuw.</string>
   <string name="receive_swap_in_progress_message">Swap-in Bitcoinadres aanvragen…</string>
   <string name="receive_swap_in_disclaimer_title">Ontvang on-chain</string>
@@ -108,7 +108,7 @@
 
   <string name="receive_with_open_title">Inkomende betaling</string>
   <string name="receive_with_open_help_desc">Wat is dit?</string>
-  <string name="receive_with_open_help">Om Lightning betalingen te ontvangen heb je een kanaal nodig met voldoende inkomende liquiditeit.\n\nAls je die niet hebt, zal Phoenix automatisch indien nodig een kanaal voor je openen. De setup vergoeding dekt de kosten voor het openen van een kanaal en het toewijzen van liquiditeit.</string>
+  <string name="receive_with_open_help">Om Lightning betalingen te ontvangen heb je een kanaal nodig met voldoende inkomende liquiditeit.\n\nAls je die niet hebt, zal Phoenix indien nodig automatisch een kanaal voor je openen. De setup vergoeding dekt de kosten voor het openen van een kanaal en het toewijzen van liquiditeit.</string>
   <string name="receive_with_open_amount_label">Je hebt een hangende inkomende betaling van</string>
   <string name="receive_with_open_cost"><![CDATA[Het accepteren van deze betaling vereist een setup vergoeding van <b>%1$s</b> (%2$s).]]></string>
   <string name="receive_with_open_accept">Accepteren (expires in %1$ss)</string>
@@ -130,10 +130,10 @@
   <string name="send_description_label">Omschr.</string>
   <string name="send_error_sending">Er is een interne fout opgetreden tijdens het versturen van deze betaling. Er is geen geld verzonden.</string>
   <string name="send_pay_button">Betaal</string>
-  <string name="send_swap_in_progress">Wisseling is bezig…</string>
-  <string name="send_swap_error">Wisseling is mislukt. Probeer opnieuw.</string>
-  <string name="send_swap_required_desc">Dit is een bitcoinadres, de betaling wordt een wisseling.</string>
-  <string name="send_swap_required_button">Verzoek een wisseling</string>
+  <string name="send_swap_in_progress">Swap is bezig…</string>
+  <string name="send_swap_error">Swap is mislukt. Probeer opnieuw.</string>
+  <string name="send_swap_required_desc">Dit is een bitcoinadres, de betaling wordt een swap.</string>
+  <string name="send_swap_required_button">Verzoek een swap</string>
   <string name="send_swap_complete_recap_amount">Bedrag</string>
   <string name="send_swap_complete_recap_fee">Miner Vergoeding</string>
   <string name="send_swap_complete_recap_total">Totaal</string>
@@ -167,7 +167,7 @@
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
 
-  <string name="utils_ok">Oke</string>
+  <string name="utils_ok">Oké</string>
   <string name="utils_proceed">Doorgaan</string>
   <string name="utils_cancel">Annuleer</string>
   <string name="utils_date_just_now">zojuist</string>
@@ -198,7 +198,7 @@
   <!-- //////////////// notification - watcher //////////////// -->
 
   <string name="notif_watcher_cheating_title">Start Phoenix op</string>
-  <string name="notif_watcher_cheating_message">Een bedrog poging is gedetecteerd.</string>
+  <string name="notif_watcher_cheating_message">Een fraude poging is gedetecteerd.</string>
 
   <string name="notif_watcher_connection_title">Phoenix heeft netwerktoegang nodig</string>
   <string name="notif_watcher_connection_message">De achtergrond watcher heeft internet nodig om naar behoren te functioneren.</string>
@@ -275,7 +275,7 @@
 
   <string name="main_alert_electrum_connecting">Verbinden met Electrum server…</string>
   <string name="main_alert_network_lost">Je bent offline. Controleer je netwerkinstellingen…</string>
-  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning network…</string>
+  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning netwerk…</string>
   <string name="main_alert_settings_button">Instellingen</string>
   <string name="main_swapin_incoming">+%1$s inkomend</string>
   <string name="main_faq_button">FAQ</string>
@@ -289,7 +289,7 @@
   <string name="inappnotif_set_up_pin_action">Stel een PIN in</string>
   <string name="inappnotif_mnemonics_never_seen">Bedankt voor het gebruiken van Phoenix. Heb je een backup van je wallet gemaakt?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Maak een backup van mijn wallet</string>
-  <string name="inappnotif_background_worker_cannot_run">Phoenix moet soms op de achtergrond draaien. Zorg ervoor dat je apparaat deze app niet abrupt afsluit vanwege energie-zuinige instellingen.</string>
+  <string name="inappnotif_background_worker_cannot_run">Phoenix moet soms op de achtergrond draaien. Zorg ervoor dat je apparaat deze app niet abrupt afsluit vanwege energiebesparingsinstellingen.</string>
   <string name="inappnotif_upgrade">Er is een update beschikbaar.</string>
   <string name="inappnotif_upgrade_critical">Een kritieke update is beschikbaar. Zonder update kan er zich een storing in je wallet voordoen.</string>
 
@@ -298,7 +298,7 @@
   <string name="displayseed_title">Wallet herstelzin</string>
   <string name="displayseed_authenticate_button">Laat seed zien</string>
   <string name="displayseed_loading">Seed ontgrendelen…</string>
-  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nReason: %1$s</string>
+  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nFoutmelding: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
     Deze woordenlijst is de backup van je wallet. Bewaar het op een veilige plek (niet op deze telefoon)!
     <br /><br />
@@ -326,7 +326,7 @@
   <string name="paymentdetails_error">Er is een fout opgetreden tijdens het ophalen van de gegevens voor deze betaling.\n\nProbeer opnieuw.</string>
 
   <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Verzonden</b> %1$s]]></string>
-  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Hangende…</b>]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Verwerkend…</b>]]></string>
   <string name="paymentdetails_status_sent_failed"><![CDATA[Betaling <b>mislukt</b>.<br />Er is geen geld verstuurd.]]></string>
 
   <string name="paymentdetails_status_received_pending">Betaling is nog niet ontvangen.</string>
@@ -339,7 +339,7 @@
   <string name="paymentdetails_closing_desc">Betaling voor kanaalsluiting #%1$s</string>
   <string name="paymentdetails_no_description">Geen omschrijving</string>
 
-  <string name="paymentdetails_technicals_button">Laat technische data zijn</string>
+  <string name="paymentdetails_technicals_button">Laat technische data ziem</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
@@ -364,9 +364,9 @@
   <!-- //////////////// seed security //////////////// -->
 
   <string name="seedsec_title">Beveiliging</string>
-  <string name="seedsec_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteund, kan biometrische authenticatie gebruiken.</string>
-  <string name="seedsec_pin_switch">PIN authenticatie</string>
-  <string name="seedsec_pin_scramble">Hussel PIN toetsenbord</string>
+  <string name="seedsec_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteunt, kan biometrische authenticatie gebruiken.</string>
+  <string name="seedsec_pin_switch">PIN-authenticatie</string>
+  <string name="seedsec_pin_scramble">Hussel PIN-toetsenbord</string>
   <string name="seedsec_biometrics_switch">Biometrische authenticatie</string>
   <string name="seedsec_change_pin">Verander mijn PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Biometrische registratie mislukt. Probeer opnieuw.</string>
@@ -378,7 +378,7 @@
   <string name="seedsec_biometric_enabled">Biometrische authenticatie geactivateerd</string>
   <string name="seedsec_biometric_disabled">Biometrische authenticatie uitgeschakeld</string>
 
-  <string name="seedsec_biometric_support_no_hw">Je toestel ondersteund geen biometrische authenticatie.</string>
+  <string name="seedsec_biometric_support_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
   <string name="seedsec_biometric_support_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
   <string name="seedsec_biometric_support_none_enrolled">Registreer eerst biometrie.</string>
 
@@ -411,19 +411,19 @@
 
   <!-- //////////////// display preferences //////////////// -->
 
-  <string name="prefs_display_title">Weergave opties</string>
-  <string name="prefs_display_coin_label">Bitcoin eenheid</string>
+  <string name="prefs_display_title">Weergave-opties</string>
+  <string name="prefs_display_coin_label">Bitcoin-eenheid</string>
   <string name="prefs_display_fiat_label">Valuta</string>
-  <string name="prefs_display_theme_label">Applicatie thema</string>
+  <string name="prefs_display_theme_label">Applicatiethema</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
-  <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">Phoenix verbind standaard met willekeurige Electrum servers om toegang te krijgen tot de Bitcoin blockchain. Je kan er ook voor kiezen om verbinding te maken met je eigen Electrum server.</string>
+  <string name="electrum_title">Electrum-server</string>
+  <string name="electrum_subtitle">Phoenix verbind standaard met willekeurige Electrum-servers om toegang te krijgen tot de Bitcoin-blockchain. Je kan er ook voor kiezen om verbinding te maken met je eigen Electrum-server.</string>
   <string name="electrum_change_button">Stel server in…</string>
 
-  <string name="electrum_block_height_label">Block hoogte</string>
-  <string name="electrum_tip_label">Tip tijdstempel</string>
+  <string name="electrum_block_height_label">Blokhoogte</string>
+  <string name="electrum_tip_label">Tip-tijdstempel</string>
   <string name="electrum_fee_rate_label">Vergoedingstarief</string>
   <string name="electrum_xpub_label">Master public key</string>
   <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
@@ -438,7 +438,7 @@
   <string name="electrum_dialog_checkbox">Gebruik een aangepaste server</string>
   <string name="electrum_dialog_ssl">Server moet een geldig certificaat hebben</string>
   <string name="electrum_dialog_input">Serveradres (host:port).</string>
-  <string name="electrum_empty_custom_address">Voer een electrum serveradres in</string>
+  <string name="electrum_empty_custom_address">Voer een Electrum-serveradres in</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
@@ -448,7 +448,7 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">Tor Instellingen</string>
-  <string name="tor_settings_subtitle">Je kan je privacy verbeteren door alleen Tor te gebruiken bij het verbinden met een Electrum server of je Lightning peer. Dit zal het opstarten van de applicatie iets vertragen.</string>
+  <string name="tor_settings_subtitle">Je kan je privacy verbeteren door alleen Tor te gebruiken bij het verbinden met een Electrum-server of je Lightning-peer. Dit zal het opstarten van de applicatie iets vertragen.</string>
   <string name="tor_settings_enabled">Tor is ingeschakeld</string>
   <string name="tor_settings_disabled">Tor is uitgeschakeld</string>
   <string name="tor_settings_confirm_disable_title">Weet je zeker dat je Tor wilt uitschakelen?</string>
@@ -461,7 +461,7 @@
   <string name="conndialog_network">Internet</string>
   <string name="conndialog_electrum">Electrum</string>
   <string name="conndialog_tor">Tor</string>
-  <string name="conndialog_lightning">Lightning Peer</string>
+  <string name="conndialog_lightning">Lightning-peer</string>
   <string name="conndialog_ok">Verbonden</string>
   <string name="conndialog_not_ok">Verbinden…</string>
 
