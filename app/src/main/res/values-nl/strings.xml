@@ -213,282 +213,256 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Gebruik deze pagina om je wallet te legen naar een Bitcoinadres.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Fondsen kunnen naar een Bitcoin wallet worden verstuurd. Controleer of het adres juist is voor het verzenden.</string>
+  <string name="closechannels_mutual_input_instructions">Geld kan naar een Bitcoin wallet worden verstuurd. Controleer of het adres juist is voor het verzenden.</string>
   <string name="closechannels_mutual_input_hint">Voer Bitcoinadres in</string>
   <string name="closechannels_mutual_button">Leeg mijn wallet</string>
   <string name="closechannels_force_title">Gedwongen sluiten</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    Force close allows you to unilaterally close your channels.
+    Gedwongen sluiten laat je eenzijdig je kanalen sluiten.
     <br/><br/>
-    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
+    Deze functie is geen &quot;magische reparatie knop&quot;; het is een veiligheidsmaatregel en <b>moet alleen gebruikt worden bij extreme omstandigheden</b>. bijvoorbeeld, als een peer (ACINQ) permanent verdwijnt, waardoor je je geld niet meer kan uitgeven. In alle andere gevallen, <b>als je problemen ondervindt met Phoenix moet je contact opnemen met onze ondersteuning</b>.
     <br/><br/>
-    Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
+    Het gedwongen sluiten van kanalen kost geld (om de on-chain vergoedingen te dekken) en zal ervoor zorgen dat je geld dagenlang vergrendeld zijn. <b>Verwijder de app niet totdat je kanalen volledig gesloten zijn of je zal geld kwijtraken</b>
     <br/><br/>
-    Funds will eventually be sent to: %1$s
+    Fondsen zullen uiteindelijk verstuurd worden naar: %1$s
     <br/><br/>
-    <b>Do not use this feature if you don\'t fully understand what it does.</b>
+    <b>Gebruik deze functie niet als je niet volledig begrijpt wat het doet.</b>
   ]]></string>
-  <string name="closechannels_force_button">Force close channels</string>
-  <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
-  <string name="closechannels_message_error">There was a problem. Please try again later.</string>
-  <string name="closechannels_message_done">Funds sent.</string>
-  <string name="closechannels_message_in_progress">Please wait…</string>
+  <string name="closechannels_force_button">Kanalen gedwongen sluiten</string>
+  <string name="closechannels_confirm_dialog_message">Weet je zeker dat je wilt verdergaan?</string>
+  <string name="closechannels_message_error">Er is een probleem opgetreden. Prober het later opnieuw.</string>
+  <string name="closechannels_message_done">Geld verstuurd.</string>
+  <string name="closechannels_message_in_progress">Wachten…</string>
 
   <!-- //////////////// list all channels //////////////// -->
 
-  <string name="listallchannels_title">Channels List</string>
-  <string name="listallchannels_in_progress">Please hold…</string>
-  <string name="listallchannels_error">There was an error when retrieving the list of channels. Please try again.</string>
+  <string name="listallchannels_title">Kanaallijst</string>
+  <string name="listallchannels_in_progress">Wachten…</string>
+  <string name="listallchannels_error">Er is een probleem opgetreden bij het ophalen van de kanaallijst. Probeer het opnieuw.</string>
   <string name="listallchannels_node_id">Node id: %1$s</string>
-  <string name="listallchannels_no_channels">You don\'t have any channels yet.</string>
+  <string name="listallchannels_no_channels">Je hebt nog geen kanalen.</string>
   <plurals name="listallchannels_channels_header">
-    <item quantity="one">You have %1$d channel.</item>
-    <item quantity="other">You have %1$d channels.</item>
+    <item quantity="one">Je hebt %1$d kanaal.</item>
+    <item quantity="other">Je hebt %1$d kanalen.</item>
   </plurals>
-  <string name="listallchannels_copy">Copy</string>
-  <string name="listallchannels_share_all">Share all channels…</string>
-  <string name="listallchannels_share">Share</string>
+  <string name="listallchannels_copy">Kopieer</string>
+  <string name="listallchannels_share_all">Deel alle kanalen…</string>
+  <string name="listallchannels_share">Deel</string>
   <string name="listallchannels_funding_tx">Tx</string>
-  <string name="listallchannels_funding_tx_desc">See funding transaction</string>
-  <string name="listallchannels_close">Close</string>
-  <string name="listallchannels_share_subject">Channels data</string>
-  <string name="listallchannels_share_title">Share channel data</string>
-  <string name="listallchannels_serialization_error">Could not retrieve channel data</string>
+  <string name="listallchannels_funding_tx_desc">Bekijk financieringstransactie</string>
+  <string name="listallchannels_close">Sluit</string>
+  <string name="listallchannels_share_subject">Kanaaldata</string>
+  <string name="listallchannels_share_title">Deel kanaaldata</string>
+  <string name="listallchannels_serialization_error">Kan kanaaldata niet ophalen</string>
 
   <!-- //////////////// channel details //////////////// -->
 
-  <string name="channel_loading">Retrieving channel data…</string>
-  <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
+  <string name="channel_loading">Kanaaldata ophalen…</string>
+  <string name="channel_error">Kan de details van dit kanaal niet ophalen. Probeer het later opnieuw.</string>
 
   <!-- //////////////// menu //////////////// -->
 
-  <string name="menu_settings">Settings</string>
-  <string name="menu_send">Send</string>
-  <string name="menu_receive">Receive</string>
+  <string name="menu_settings">Instellingen</string>
+  <string name="menu_send">Verzenden</string>
+  <string name="menu_receive">Ontvangen</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">New Wallet</string>
-  <string name="initwallet_restore">Restore my wallet</string>
+  <string name="initwallet_create">Nieuwe Wallet</string>
+  <string name="initwallet_restore">Herstel mijn wallet</string>
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connecting to Electrum server…</string>
-  <string name="main_alert_network_lost">You are offline. Please check your network settings…</string>
-  <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
-  <string name="main_alert_settings_button">Settings</string>
-  <string name="main_swapin_incoming">+%1$s incoming</string>
+  <string name="main_alert_electrum_connecting">Verbinden met Electrum server…</string>
+  <string name="main_alert_network_lost">Je bent offline. Controleer je netwerkinstellingen…</string>
+  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning network…</string>
+  <string name="main_alert_settings_button">Instellingen</string>
+  <string name="main_swapin_incoming">+%1$s inkomend</string>
   <string name="main_faq_button">FAQ</string>
-  <string name="main_connectivity_button">Connecting…</string>
-  <string name="main_tor_connected_button">Tor enabled</string>
-  <string name="main_stores_button">Stores</string>
+  <string name="main_connectivity_button">Verbinden…</string>
+  <string name="main_tor_connected_button">Tor ingeschakeld</string>
+  <string name="main_stores_button">Winkels</string>
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Your wallet is not protected.</string>
-  <string name="inappnotif_set_up_pin_action">Set a PIN</string>
-  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
-  <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
-  <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
-  <string name="inappnotif_upgrade">An update for this app is available.</string>
-  <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
+  <string name="inappnotif_set_up_pin">Je wallet is niet beveiligd.</string>
+  <string name="inappnotif_set_up_pin_action">Stel een PIN in</string>
+  <string name="inappnotif_mnemonics_never_seen">Bedankt voor het gebruiken van Phoenix. Heb je een backup van je wallet gemaakt?</string>
+  <string name="inappnotif_mnemonics_never_seen_action">Maak een backup van mijn wallet</string>
+  <string name="inappnotif_background_worker_cannot_run">Phoenix moet soms op de achtergrond draaien. Zorg ervoor dat je apparaat deze app niet abrupt afsluit vanwege energie-zuinige instellingen.</string>
+  <string name="inappnotif_upgrade">Er is een update beschikbaar.</string>
+  <string name="inappnotif_upgrade_critical">Een kritieke update is beschikbaar. Zonder update kan er zich een storing in je wallet voordoen.</string>
 
   <!-- //////////////// display seed //////////////// -->
 
-  <string name="displayseed_title">Wallet recovery phrase</string>
-  <string name="displayseed_authenticate_button">Display seed</string>
-  <string name="displayseed_loading">Unlocking seed…</string>
-  <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
+  <string name="displayseed_title">Wallet herstelzin</string>
+  <string name="displayseed_authenticate_button">Laat seed zien</string>
+  <string name="displayseed_loading">Seed ontgrendelen…</string>
+  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nReason: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
-    This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
+    Deze woordenlijst is de backup van je wallet. Bewaar het op een veilige plek (niet op deze telefoon)!
     <br /><br />
-    <b>Do not share it with anyone.</b>
-    <b>Do not lose it.</b> If you lose your words list and your phone, you\'ve lost your funds.
+    <b>Deel het met niemand.</b>
+    <b>Raak het niet kwijt.</b> Als je de woordenlijst en je telefoon kwijtraakt, ben je je geld kwijt.
   ]]></string>
-  <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
+  <string name="displayseed_derivation_path">BIP39 seed met standaard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
-  <string name="displayseed_has_saved_seed_button">Confirm</string>
+  <string name="displayseed_has_saved_seed_checkbox">Ik heb een backup van mijn seed gemaakt</string>
+  <string name="displayseed_has_saved_seed_button">Bevestig</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
-  <string name="logs_title">Application logs</string>
-  <string name="logs_subtitle">You can extract and share the application logs from this page.</string>
-  <string name="logs_view_button">View logs…</string>
-  <string name="logs_view_with">View logs with…</string>
-  <string name="logs_share_button">Share logs…</string>
+  <string name="logs_title">Applicatie logs</string>
+  <string name="logs_subtitle">Je kan de applicatie logs vanaf deze pagina veiligstellen en delen.</string>
+  <string name="logs_view_button">Bekijk logs…</string>
+  <string name="logs_view_with">Bekijk logs met…</string>
+  <string name="logs_share_button">Deel logs…</string>
   <string name="logs_share_subject">Phoenix App logs</string>
-  <string name="logs_share_title">Share Phoenix logs…</string>
+  <string name="logs_share_title">Deel Phoenix logs…</string>
 
   <!-- //////////////// payment details //////////////// -->
 
-  <string name="paymentdetails_loading">Retrieving payment details…</string>
-  <string name="paymentdetails_error">There was an error when retrieving the details for this payment.\n\nPlease try again.</string>
+  <string name="paymentdetails_loading">Betalingsdetails ophalen…</string>
+  <string name="paymentdetails_error">Er is een fout opgetreden tijdens het ophalen van de gegevens voor deze betaling.\n\nProbeer opnieuw.</string>
 
-  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Sent</b> %1$s]]></string>
-  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pending…</b>]]></string>
-  <string name="paymentdetails_status_sent_failed"><![CDATA[Payment <b>failed</b>.<br />No money has been sent.]]></string>
+  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Verzonden</b> %1$s]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Hangende…</b>]]></string>
+  <string name="paymentdetails_status_sent_failed"><![CDATA[Betaling <b>mislukt</b>.<br />Er is geen geld verstuurd.]]></string>
 
-  <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
-  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s]]></string>
+  <string name="paymentdetails_status_received_pending">Betaling is nog niet ontvangen.</string>
+  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Ontvangen</b> %1$s]]></string>
 
-  <string name="paymentdetails_desc_label">Desc.</string>
-  <string name="paymentdetails_destination_label">Sent to</string>
-  <string name="paymentdetails_fees_label">Fees</string>
-  <string name="paymentdetails_error_label">Error</string>
-  <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
-  <string name="paymentdetails_no_description">No description</string>
+  <string name="paymentdetails_desc_label">Omschr.</string>
+  <string name="paymentdetails_destination_label">Verzonden naar</string>
+  <string name="paymentdetails_fees_label">Vergoedingen</string>
+  <string name="paymentdetails_error_label">Fout</string>
+  <string name="paymentdetails_closing_desc">Betaling voor kanaalsluiting #%1$s</string>
+  <string name="paymentdetails_no_description">Geen omschrijving</string>
 
-  <string name="paymentdetails_technicals_button">Show technical data</string>
-
-  <!-- //////////////// payment details: technicals data //////////////// -->
-
-  <string name="paymentdetails_technicals_title">Payment data</string>
-  <string name="paymentdetails_payment_hash_label">Payment Hash</string>
-  <string name="paymentdetails_payment_request_label">Payment Request</string>
-  <string name="paymentdetails_preimage_label">Preimage</string>
-  <string name="paymentdetails_created_at_label">Created at</string>
-  <string name="paymentdetails_expire_at_label">Expires at</string>
-  <string name="paymentdetails_completed_at_label">Completed at</string>
+  <string name="paymentdetails_technicals_button">Laat technische data zijn</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
-  <string name="state_wait_confirmed">Funding tx is being confirmed</string>
-  <string name="state_closing">Channel is closing</string>
-  <string name="state_closed">Channel has been closed</string>
-  <string name="state_normal">Up and running</string>
-  <string name="state_sync">Synchronizing with peer</string>
+  <string name="paymentdetails_technicals_title">Betalingsdata</string>
+  <string name="paymentdetails_payment_hash_label">Betalingshash</string>
+  <string name="paymentdetails_payment_request_label">Betalingsverzoek</string>
+  <string name="paymentdetails_preimage_label">Voorbeeld</string>
+  <string name="paymentdetails_created_at_label">Gemaakt op</string>
+  <string name="paymentdetails_expire_at_label">Verloopt op</string>
+  <string name="paymentdetails_completed_at_label">Voltooid om</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="state_wait_confirmed">Financieringstransactie wordt bevestigd</string>
+  <string name="state_closing">Kanaal is aan het sluiten</string>
+  <string name="state_closed">Kanaal is gesloten</string>
+  <string name="state_normal">Actief</string>
+  <string name="state_sync">Synchronizeren met peer</string>
   <string name="state_offline">Peer is offline</string>
-  <string name="state_shutdown">Shutdown</string>
+  <string name="state_shutdown">Uitgeschakeld</string>
 
   <!-- //////////////// seed security //////////////// -->
 
-  <string name="seedsec_title">Security</string>
-  <string name="seedsec_subtitle">We highly recommend setting a PIN to protect your wallet. If your device supports it, you can use biometric authentication.</string>
-  <string name="seedsec_pin_switch">PIN authentication</string>
-  <string name="seedsec_pin_scramble">Scramble PIN keyboard</string>
-  <string name="seedsec_biometrics_switch">Biometric authentication</string>
-  <string name="seedsec_change_pin">Change my PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Biometric enrollment failed. Please try again.</string>
-  <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
+  <string name="seedsec_title">Beveiliging</string>
+  <string name="seedsec_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteund, kan biometrische authenticatie gebruiken.</string>
+  <string name="seedsec_pin_switch">PIN authenticatie</string>
+  <string name="seedsec_pin_scramble">Hussel PIN toetsenbord</string>
+  <string name="seedsec_biometrics_switch">Biometrische authenticatie</string>
+  <string name="seedsec_change_pin">Verander mijn PIN…</string>
+  <string name="seedsec_biometric_enrollment_error">Biometrische registratie mislukt. Probeer opnieuw.</string>
+  <string name="seedsec_pindialog_title_unlock">Voer je huidige PIN in om door te gaan</string>
+  <string name="seedsec_pindialog_title_set_new"><![CDATA[Voer je <b>nieuwe PIN</b> in]]></string>
+  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[<b>Bevestig</b> je nieuwe PIN]]></string>
 
-  <string name="seedsec_pin_update_success">PIN successfully updated!</string>
-  <string name="seedsec_biometric_enabled">Biometric authentication activated</string>
-  <string name="seedsec_biometric_disabled">Biometric authentication disabled</string>
+  <string name="seedsec_pin_update_success">PIN succesvol geupdate!</string>
+  <string name="seedsec_biometric_enabled">Biometrische authenticatie geactivateerd</string>
+  <string name="seedsec_biometric_disabled">Biometrische authenticatie uitgeschakeld</string>
 
-  <string name="seedsec_biometric_support_no_hw">Your device does not support biometric authentication.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Biometric hardware is not available. Try again later.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Please enroll biometric first.</string>
+  <string name="seedsec_biometric_support_no_hw">Je toestel ondersteund geen biometrische authenticatie.</string>
+  <string name="seedsec_biometric_support_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
+  <string name="seedsec_biometric_support_none_enrolled">Registreer eerst biometrie.</string>
 
-  <string name="seedsec_error_wrong_pin">Invalid PIN</string>
-  <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
-  <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+  <string name="seedsec_error_wrong_pin">Ongeldige PIN</string>
+  <string name="seedsec_error_pins_match">PINs komen niet overeen. Probeer opnieuw.</string>
+  <string name="seedsec_error_generic">Er is een fout opgetreden, de wallet is niet versleuteld.\n\nProbeer opnieuw.</string>
 
-  <string name="seedsec_disable_bio_prompt_title">Disable biometric lock</string>
-  <string name="seedsec_disable_bio_prompt_desc">You will have to use your PIN code from now</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancel</string>
+  <string name="seedsec_disable_bio_prompt_title">Schakel biometrische vergrendeling uit</string>
+  <string name="seedsec_disable_bio_prompt_desc">Je zal vanaf nu je PIN moeten gebruiken</string>
+  <string name="seedsec_disable_bio_prompt_negative">Annuleer</string>
 
-  <string name="seedsec_bio_prompt_title">Enable biometric lock</string>
-  <string name="seedsec_bio_prompt_negative">Cancel</string>
-
-  <!-- //////////////// ln url login //////////////// -->
-
-  <string name="lnurl_login_instructions" translatable="false">Log in to %1$s</string>
-  <string name="lnurl_login_button" translatable="false">Log in</string>
-  <string name="lnurl_login_in_progress" translatable="false">Logging in, please wait…</string>
-
-  <!-- //////////////// ln url pay //////////////// -->
-
-  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
-  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
+  <string name="seedsec_bio_prompt_title">Schakel biometrische vergrendeling in</string>
+  <string name="seedsec_bio_prompt_negative">Annuleer</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
-  <string name="lnurl_withdraw_amount_label">Amount to receive</string>
+  <string name="lnurl_withdraw_amount_label">Te ontvangen bedrag</string>
   <string name="lnurl_withdraw_description_label">Details</string>
-  <string name="lnurl_withdraw_service_host_label"><![CDATA[Withdraw funds from<br/><b>%1$s</b>.]]></string>
-  <string name="lnurl_withdraw_confirm_button">Withdraw</string>
-  <string name="lnurl_withdraw_wait">Requesting funds…</string>
-  <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
-  <string name="lnurl_withdraw_error_internal">Could not process this withdrawal request. Please try again.</string>
-  <string name="lnurl_withdraw_error_invalid">This withdrawal request is invalid. Please try again.</string>
-  <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
-  <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
-  <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[Geld opnemen van<br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Opnemen</string>
+  <string name="lnurl_withdraw_wait">Geld aanvragen…</string>
+  <string name="lnurl_withdraw_success">Even wachten terwijl %1$s geld stuurt.\n\nHou de app online.</string>
+  <string name="lnurl_withdraw_error_internal">Kon dit opnameverzoek niet verwerken. Probeer opnieuw.</string>
+  <string name="lnurl_withdraw_error_invalid">Dit opnameverzoek is niet geldig. Probeer opnieuw.</string>
+  <string name="lnurl_withdraw_error_amount">Bedrag is ongeldig.</string>
+  <string name="lnurl_withdraw_error_amount_min">Bedrag moet minimaal %1$s zijn.</string>
+  <string name="lnurl_withdraw_error_amount_max">Bedrag kan %1$s niet overschrijden.</string>
+  <string name="lnurl_withdraw_error_remote">%1$s reageerde met een foutmelding: %2$s.\n\nProbeer opnieuw, of neem contact op met hun support.</string>
+  <string name="lnurl_withdraw_error_remote_invalid_response">Ongeldige data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
-  <string name="prefs_display_title">Display options</string>
-  <string name="prefs_display_coin_label">Bitcoin unit</string>
-  <string name="prefs_display_fiat_label">Fiat currency</string>
-  <string name="prefs_display_theme_label">Application theme</string>
+  <string name="prefs_display_title">Weergave opties</string>
+  <string name="prefs_display_coin_label">Bitcoin eenheid</string>
+  <string name="prefs_display_fiat_label">Valuta</string>
+  <string name="prefs_display_theme_label">Applicatie thema</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Electrum server</string>
-  <string name="electrum_subtitle">By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server.</string>
-  <string name="electrum_change_button">Set server…</string>
+  <string name="electrum_subtitle">Phoenix verbind standaard met willekeurige Electrum servers om toegang te krijgen tot de Bitcoin blockchain. Je kan er ook voor kiezen om verbinding te maken met je eigen Electrum server.</string>
+  <string name="electrum_change_button">Stel server in…</string>
 
-  <string name="electrum_block_height_label">Block height</string>
-  <string name="electrum_tip_label">Tip timestamp</string>
-  <string name="electrum_fee_rate_label">Fee rate</string>
+  <string name="electrum_block_height_label">Block hoogte</string>
+  <string name="electrum_tip_label">Tip tijdstempel</string>
+  <string name="electrum_fee_rate_label">Vergoedingstarief</string>
   <string name="electrum_xpub_label">Master public key</string>
   <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
   <string name="electrum_fee_rate">%1$s sat/byte</string>
   <string name="electrum_connection_label">Server</string>
-  <string name="electrum_not_connected">Not connected</string>
-  <string name="electrum_not_connected_to_custom"><![CDATA[You will connect to <b>%1$s</b>]]></string>
-  <string name="electrum_connecting">Establishing connection…</string>
-  <string name="electrum_connecting_to_custom"><![CDATA[Establishing connection with <b>%1$s…</b>]]></string>
-  <string name="electrum_connected"><![CDATA[Connected to: <b>%1$s</b>]]></string>
+  <string name="electrum_not_connected">Niet verbonden</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[Je gaat verbinden met <b>%1$s</b>]]></string>
+  <string name="electrum_connecting">Verbinding tot stand brengen…</string>
+  <string name="electrum_connecting_to_custom"><![CDATA[Verbinding tot stand brengen met <b>%1$s…</b>]]></string>
+  <string name="electrum_connected"><![CDATA[Verbonden met: <b>%1$s</b>]]></string>
 
-  <string name="electrum_dialog_checkbox">Use a custom server</string>
-  <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
-  <string name="electrum_dialog_input">Server address (host:port).</string>
-  <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
-
-  <!-- //////////////// fees settings //////////////// -->
-
-  <string name="fees_settings_title" translatable="false">Fees Settings</string>
-  <string name="fees_settings_subtitle" translatable="false">These are the fees used for sending or receiving money with Phoenix.</string>
-
-  <string name="fees_settings_trampoline_title" translatable="false">Lightning payment</string>
-  <string name="fees_settings_trampoline_desc" translatable="false">The app will try to use the cheapest fee possible.</string>
-  <string name="fees_settings_trampoline_value" translatable="false">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label" translatable="false">At most %1$s + %2$s%%</string>
-
-  <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
+  <string name="electrum_dialog_checkbox">Gebruik een aangepaste server</string>
+  <string name="electrum_dialog_ssl">Server moet een geldig certificaat hebben</string>
+  <string name="electrum_dialog_input">Serveradres (host:port).</string>
+  <string name="electrum_empty_custom_address">Voer een electrum serveradres in</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
-  <string name="key_space_desc">Add whitespace</string>
-  <string name="key_delete_desc">Delete last character</string>
+  <string name="key_space_desc">Voeg witruimte toe</string>
+  <string name="key_delete_desc">Verwijder laatste teken</string>
 
   <!-- //////////////// Tor setting //////////////// -->
 
-  <string name="tor_settings_title">Tor Settings</string>
-  <string name="tor_settings_subtitle">You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down the application startup.</string>
-  <string name="tor_settings_enabled">Tor is enabled</string>
-  <string name="tor_settings_disabled">Tor is disabled</string>
-  <string name="tor_settings_confirm_disable_title">Are you sure you want to disable Tor?</string>
-  <string name="tor_settings_confirm_enable_title">Are you sure you want to enable Tor? Note that for best result, it\'s recommended to start a new wallet as well.</string>
+  <string name="tor_settings_title">Tor Instellingen</string>
+  <string name="tor_settings_subtitle">Je kan je privacy verbeteren door alleen Tor te gebruiken bij het verbinden met een Electrum server of je Lightning peer. Dit zal het opstarten van de applicatie iets vertragen.</string>
+  <string name="tor_settings_enabled">Tor is ingeschakeld</string>
+  <string name="tor_settings_disabled">Tor is uitgeschakeld</string>
+  <string name="tor_settings_confirm_disable_title">Weet je zeker dat je Tor wilt uitschakelen?</string>
+  <string name="tor_settings_confirm_enable_title">Weet je zeker dat je Tor wilt inschakelen? Voor het beste resultaat is het aan te raden om ook een nieuwe wallet te starten.</string>
 
   <!-- ////////////// connection issues dialog //////////////// -->
 
-  <string name="conndialog_title">Connections status</string>
-  <string name="conndialog_summary_not_ok">You have some connection issue(s). The app will not function properly.</string>
+  <string name="conndialog_title">Verbindingsstatus</string>
+  <string name="conndialog_summary_not_ok">Je hebt verbindingsproblemen. De app zal niet naar behoren functioneren.</string>
   <string name="conndialog_network">Internet</string>
   <string name="conndialog_electrum">Electrum</string>
   <string name="conndialog_tor">Tor</string>
   <string name="conndialog_lightning">Lightning Peer</string>
-  <string name="conndialog_ok">Connected</string>
-  <string name="conndialog_not_ok">Connecting…</string>
+  <string name="conndialog_ok">Verbonden</string>
+  <string name="conndialog_not_ok">Verbinden…</string>
 
 </resources>
