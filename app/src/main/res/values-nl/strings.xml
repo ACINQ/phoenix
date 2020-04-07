@@ -97,11 +97,11 @@
   <string name="receive_swap_in_progress_message">Swap-in Bitcoinadres aanvragen…</string>
   <string name="receive_swap_in_disclaimer_title">Ontvang on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  A standard Bitcoin address will be displayed next.
+  Een standaard Bitcoinadres zal hierna worden getoond.
   <br /><br />
-  Funds sent to this address will be shown on your wallet after one confirmation.
+  Geld dat naar dit adres wordt gestuurd zal na 1 bevestiging in je wallet zichtbaar zijn.
   <br /><br />
-  A <b>%1$s%%</b> fee will be applied.
+  Een <b>%1$s%%</b> vergoeding zal worden toegepast.
   ]]></string>
 
   <!-- //////////////// receive with open channel //////////////// -->
