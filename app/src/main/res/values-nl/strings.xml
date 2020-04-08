@@ -25,7 +25,7 @@
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
   <string name="autocreate_generating">Wallet aanmaken…</string>
-  <string name="autocreate_error">We konden je wallet niet aanmaken.\nReason: %1$s</string>
+  <string name="autocreate_error">We konden je wallet niet aanmaken.\nFoutmelding: %1$s</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -75,14 +75,14 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Pas mijn invoice aan</string>
-  <string name="receive_edit_subtitle">Je kan het gevraagde bedrag en de omschrijving van de invoice aanpassen.</string>
+  <string name="receive_edit_title">Pas mijn betalingsverzoek aan</string>
+  <string name="receive_edit_subtitle">Je kan het gevraagde bedrag en de omschrijving van het betalingsverzoek aanpassen.</string>
   <string name="receive_in_progress_message">Wachten…</string>
-  <string name="receive_error_message">Er is een fout opgetreden tijdens het genereren van de invoice…\n\nProbeer opnieuw.</string>
+  <string name="receive_error_message">Er is een fout opgetreden tijdens het genereren van het betalingsverzoek…\n\nProbeer opnieuw.</string>
   <string name="receive_amount_label">Bedrag (optioneel)</string>
   <string name="receive_desc_label">Betalingsomschrijving (optioneel):</string>
   <string name="receive_default_desc">Phoenix-betaling</string>
-  <string name="receive_generate_button">Genereer invoice</string>
+  <string name="receive_generate_button">Genereer betalingsverzoek</string>
 
   <string name="receive_share_subject">Betaling aangevraagd</string>
   <string name="receive_share_title">Deel dit betalingsverzoek met…</string>
@@ -122,7 +122,7 @@
   <string name="send_balance_prefix">Balans:</string>
   <string name="send_use_all_balance">Verzend alles</string>
   <string name="send_loading">Betaling controleren…</string>
-  <string name="send_invalid_pr_generic">Deze betaling is niet geldig. Je hebt mogelijk een onjuiste invoice gescand.\n\nProbeer opnieuw.</string>
+  <string name="send_invalid_pr_generic">Deze betaling is niet geldig. Je hebt mogelijk een onjuist betalingsverzoek gescand.\n\nProbeer opnieuw.</string>
   <string name="send_amount_error">Voer een geldig bedrag in.</string>
   <string name="send_amount_error_balance">Bedrag overschrijdt je balans.</string>
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat voor on-chain betaling.</string>
@@ -148,14 +148,14 @@
   <string name="scan_error_default">Dit is geen geldig betalingsverzoek.\n\nProbeer opnieuw.</string>
   <string name="scan_error_expired">Betaling is verlopen.</string>
   <string name="scan_error_pay_to_self">Je kan jezelf niet betalen.</string>
-  <string name="scan_error_invalid_chain">Deze invoice gebruikt niet dezelfde blockchain als je wallet.</string>
+  <string name="scan_error_invalid_chain">Dit betalingsverzoek gebruikt niet dezelfde blockchain als je wallet.</string>
   <string name="scan_error_lnurl_unsupported">Deze LNURL is nog niet ondersteund!</string>
 
   <string name="scan_amountless_legacy_title">Waarschuwing</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Deze invoice gebruikt geen bedrag. Dit kan gevaarlijk zijn: kwaadaardige nodes kunnen je betaling stelen. Om zeker te zijn, kan je <b>de te betalen persoon om een specifiek bedrag vragen</b> in het betalingsverzoek.
+    Dit betalingsverzoek gebruikt geen bedrag. Dit kan gevaarlijk zijn: kwaadaardige nodes kunnen je betaling stelen. Om zeker te zijn, kan je <b>de te betalen persoon om een specifiek bedrag vragen</b> in het betalingsverzoek.
     <br /><br />
-    Weet je zeker dat je deze invoice wilt betalen?
+    Weet je zeker dat je dit betalingsverzoek wilt betalen?
   ]]></string>
   <string name="scan_amountless_legacy_confirm_button">Bevestig</string>
   <string name="scan_amountless_legacy_cancel_button">Annuleer</string>
