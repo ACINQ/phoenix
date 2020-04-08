@@ -352,7 +352,7 @@
   <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
   <string name="paymentdetails_no_description">No description</string>
 
-  <string name="paymentdetails_technicals_button">Show technical data</string>
+  <string name="paymentdetails_technicals_button">Show details</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
