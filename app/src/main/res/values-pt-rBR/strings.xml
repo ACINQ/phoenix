@@ -347,7 +347,7 @@
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
   <string name="paymentdetails_payment_request_label">Solicitação de pagamento</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
-  <string name="paymentdetails_created_at_label">Criado em</string>
+  <string name="paymentdetails_created_at_label">Realizado em</string>
   <string name="paymentdetails_expire_at_label">Expira em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
 
