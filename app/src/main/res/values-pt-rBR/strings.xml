@@ -339,7 +339,7 @@
   <string name="paymentdetails_closing_desc">Pagamento pelo encerramento do canal #%1$s</string>
   <string name="paymentdetails_no_description">Sem descrição</string>
 
-  <string name="paymentdetails_technicals_button">Mostrar dados técnicos</string>
+  <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
