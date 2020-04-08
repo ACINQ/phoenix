@@ -224,7 +224,7 @@
   <string name="closechannels_channels_none">You currently don\'t have any channels that could be emptied.\n\nGo to the \'List channels\' page to see the state of your channels.</string>
   <string name="closechannels_mutual_title">Empty wallet</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    Use this page to empty your wallet to a Bitcoin address.
+    Use this feature to empty your wallet to a Bitcoin address.
   ]]></string>
   <string name="closechannels_mutual_input_instructions">Funds can be sent to a Bitcoin wallet. Make sure that the address is correct before sending.</string>
   <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
