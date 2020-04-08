@@ -1,0 +1,6 @@
+[submodule "eclair"]
+	path = eclair
+	url = https://github.com/ACINQ/eclair
+[submodule "Tor_Onion_Proxy_Library"]
+	path = Tor_Onion_Proxy_Library
+	url = https://github.com/ACINQ/Tor_Onion_Proxy_Library
