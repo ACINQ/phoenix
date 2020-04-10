@@ -326,7 +326,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Application logs</string>
-  <string name="logs_subtitle">You can extract and share the application logs from this page.</string>
+  <string name="logs_subtitle">Here you can extract and share the application logs.</string>
   <string name="logs_view_button">View logs…</string>
   <string name="logs_view_with">View logs with…</string>
   <string name="logs_share_button">Share logs…</string>
