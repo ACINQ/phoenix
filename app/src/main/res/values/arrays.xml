@@ -31,6 +31,7 @@
     <item>(ISK) Icelandic Kròna</item>
     <item>(JPY) Japanese Yen</item>
     <item>(KRW) Korean Won</item>
+    <item>(MXN) Mexican Peso</item>
     <item>(NZD) New Zealand Dollar</item>
     <item>(PLN) Polish Zloty</item>
     <item>(RUB) Russian Ruble</item>
@@ -55,6 +56,7 @@
     <item>ISK</item>
     <item>JPY</item>
     <item>KRW</item>
+    <item>MXN</item>
     <item>NZD</item>
     <item>PLN</item>
     <item>RUB</item>

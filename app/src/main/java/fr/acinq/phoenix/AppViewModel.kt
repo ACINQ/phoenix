@@ -697,6 +697,9 @@ class AppViewModel : ViewModel() {
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
       Runnable { Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
 
+    system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
+      Runnable { Wallet.httpClient.newCall(Request.Builder().url(Constants.MXN_PRICE_RATE_API).build()).enqueue(getMXNRateHandler(context)) }, system.dispatcher())
+
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
     return KitState.Started(kit, EclairImpl(kit), xpub)
@@ -746,6 +749,40 @@ class AppViewModel : ViewModel() {
             }
           } else {
             log.warn("exchange rate body is null")
+          }
+        }
+      }
+    }
+  }
+
+  private fun getMXNRateHandler(context: Context): Callback {
+    return object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve MXN rates: ${e.localizedMessage}")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        if (!response.isSuccessful) {
+          log.warn("could not retrieve MXN rates, api responds with ${response.code()}")
+        } else {
+          val body = response.body()
+          if (body != null) {
+            try {
+              val json = JSONObject(body.string())
+              var rate = -1.0f
+              try {
+                rate = json.getJSONObject("payload").getDouble("last").toFloat()
+              } catch (e: Exception) {
+                log.debug("could not read {} from price api response", code)
+              }
+              Prefs.setExchangeRate(context, "MXN", rate)
+            } catch (t: Throwable) {
+              log.error("could not read MXN rates response: ", t)
+            } finally {
+              body.close()
+            }
+          } else {
+            log.warn("MXN rate body is null")
           }
         }
       }

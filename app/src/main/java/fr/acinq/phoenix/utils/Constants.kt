@@ -31,6 +31,7 @@ object Constants {
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
   const val PRICE_RATE_API = "https://blockchain.info/ticker"
+  const val MXN_PRICE_RATE_API = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
 
   // -- default values
   internal const val DEFAULT_PIN = "111111"
