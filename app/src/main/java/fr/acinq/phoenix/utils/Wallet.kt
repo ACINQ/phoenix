@@ -140,7 +140,13 @@ object Wallet {
         if (!Strings.isNullOrEmpty(address.host)) {
           conf["eclair.electrum.host"] = address.host
           conf["eclair.electrum.port"] = address.port
-          conf["eclair.electrum.ssl"] = "strict" // custom server certificate must be valid
+          if (address.host.endsWith(".onion")) {
+            // If Tor is used, we don't require TLS; Tor already adds a layer of encryption.
+            conf["eclair.electrum.ssl"] = "off"
+          } else {
+            // Otherwise we require TLS with a valid server certificate.
+            conf["eclair.electrum.ssl"] = "strict"
+          }
         }
       } catch (e: Exception) {
         log.error("invalid electrum server=$electrumServer, using empty config instead", e)
