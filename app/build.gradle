@@ -30,7 +30,7 @@ android {
     applicationId "fr.acinq.phoenix.testnet"
     minSdkVersion 24
     targetSdkVersion 29
-    versionCode 7
+    versionCode 10
     versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
