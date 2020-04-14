@@ -56,7 +56,7 @@
   <string name="startup_error_wrong_pwd">Chybný PIN kód</string>
   <string name="startup_error_unreadable">Peněženku se nepodařilo načíst, prosím, restartujte aplikaci</string>
   <string name="startup_error_network">Vaše připojení k internetu není funkční. Prosím, zkontrolujte WiFi nebo mobilní síť.</string>
-  <string name="startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu</string>
+  <string name="startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu.\n\nPodrobnosti: %1$s</string>
   <string name="startup_error_biometrics">Nepodařilo se přihlásit uživatele.</string>
 
   <!-- //////////////// payment holder //////////////// -->

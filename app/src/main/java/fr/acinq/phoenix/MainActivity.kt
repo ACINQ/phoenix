@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun handleUriIntent() {
-    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value}")
+    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value?.javaClass?.simpleName}")
     if (app.state.value is KitState.Started && app.currentURIIntent.value != null) {
       findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
       app.currentURIIntent.value = null
