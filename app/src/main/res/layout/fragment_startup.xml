@@ -65,7 +65,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:maxWidth="400dp"
-          android:text="@string/lipsum_short"
+          android:text="@string/startup_error_generic"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
