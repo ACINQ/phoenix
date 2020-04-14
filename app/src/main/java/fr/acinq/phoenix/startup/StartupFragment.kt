@@ -25,12 +25,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
+import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.KeystoreHelper
 import fr.acinq.phoenix.utils.Prefs
@@ -98,9 +100,13 @@ class StartupFragment : BaseFragment() {
 
   override fun handleKitState(state: KitState) {
     when {
-      state is KitState.Started -> {
+      state is KitState.Started && app.currentURIIntent.value == null -> {
         log.debug("kit [Started], redirect to main page")
         findNavController().navigate(R.id.action_startup_to_main)
+      }
+      state is KitState.Started && app.currentURIIntent.value != null -> {
+        findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
+        app.currentURIIntent.value = null
       }
       state is KitState.Off && context != null -> {
         if (app.hasWalletBeenSetup(context!!)) {
