@@ -429,7 +429,7 @@
 
   <string name="electrum_dialog_checkbox">Použít vlastní Electrum server</string>
   <string name="electrum_dialog_ssl">Server musí mít platný certifikát</string>
-  <string name="electrum_dialog_input">Adresa serveru (host:port).</string>
+  <string name="electrum_dialog_input">Adresa serveru ([tcp | ssl]://host:port).</string>
   <string name="electrum_empty_custom_address">Prosím, vložte adresu electrum serveru</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->

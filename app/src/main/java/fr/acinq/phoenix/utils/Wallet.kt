@@ -32,6 +32,7 @@ import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.util.*
 
 object Wallet {
@@ -133,17 +134,24 @@ object Wallet {
     val conf = HashMap<String, Any>()
 
     // electrum config
-    val electrumServer = Prefs.getElectrumServer(context)
-    if (!Strings.isNullOrEmpty(electrumServer)) {
+    val electrumServerAndProtocol = Prefs.getElectrumServer(context)
+    if (!Strings.isNullOrEmpty(electrumServerAndProtocol)) {
       try {
+        val ssl = when {
+          electrumServerAndProtocol.startsWith("ssl://") -> "strict" // custom server certificate must be valid
+          electrumServerAndProtocol.startsWith("tcp://") -> "off"
+          else -> throw IllegalArgumentException("invalid electrum uri")
+        }
+        val electrumServer = electrumServerAndProtocol.drop(6)
         val address = HostAndPort.fromString(electrumServer).withDefaultPort(50002)
+        log.info("electrum: using ssl = $ssl")
         if (!Strings.isNullOrEmpty(address.host)) {
           conf["eclair.electrum.host"] = address.host
           conf["eclair.electrum.port"] = address.port
-          conf["eclair.electrum.ssl"] = "strict" // custom server certificate must be valid
+          conf["eclair.electrum.ssl"] = ssl
         }
       } catch (e: Exception) {
-        log.error("invalid electrum server=$electrumServer, using empty config instead", e)
+        log.error("invalid electrum server=$electrumServerAndProtocol, using empty config instead", e)
       }
     }
 

@@ -445,7 +445,7 @@
 
   <string name="electrum_dialog_checkbox">Usa un electrum server personalizzato</string>
   <string name="electrum_dialog_ssl">Il server deve avere un certificato valido</string>
-  <string name="electrum_dialog_input">Server address (host:port).</string>
+  <string name="electrum_dialog_input">Server address ([tcp | ssl]://host:port).</string>
   <string name="electrum_empty_custom_address">Per favore inserisci l\'indirizzo di un eletrum server</string>
 
   <!-- //////////////// Tor setting //////////////// -->

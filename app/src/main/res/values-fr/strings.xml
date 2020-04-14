@@ -439,7 +439,7 @@
 
   <string name="electrum_dialog_checkbox">Utiliser un serveur Electrum particulier</string>
   <string name="electrum_dialog_ssl">Le serveur doit avoir un certificat valide</string>
-  <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
+  <string name="electrum_dialog_input">Addresse du serveur ([tcp | ssl]://host:port).</string>
   <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->

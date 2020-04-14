@@ -437,7 +437,7 @@
 
   <string name="electrum_dialog_checkbox">Gebruik een aangepaste server</string>
   <string name="electrum_dialog_ssl">Server moet een geldig certificaat hebben</string>
-  <string name="electrum_dialog_input">Serveradres (host:port).</string>
+  <string name="electrum_dialog_input">Serveradres ([tcp | ssl]://host:port).</string>
   <string name="electrum_empty_custom_address">Voer een Electrum-serveradres in</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->

@@ -463,7 +463,7 @@
 
   <string name="electrum_dialog_checkbox">Use a custom server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
-  <string name="electrum_dialog_input">Server address (host:port).</string>
+  <string name="electrum_dialog_input">Server address ([tcp | ssl]://host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 
   <!-- //////////////// fees settings //////////////// -->
