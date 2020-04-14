@@ -543,7 +543,7 @@ class AppViewModel : ViewModel() {
   @UiThread
   fun startKit(context: Context, pin: String) {
     when (state.value) {
-      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
+      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value?.javaClass?.simpleName}")
       else -> {
         state.value = KitState.Bootstrap.Init
         viewModelScope.launch {
