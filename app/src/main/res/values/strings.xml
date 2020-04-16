@@ -313,9 +313,10 @@
   <string name="displayseed_loading">Unlocking seed…</string>
   <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
-    This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
+    This list of words, also known as seed, is your wallet backup. Save it somewhere safe (not on this phone)!
     <br /><br />
-    <b>Do not share it with anyone.</b>
+    <b>Do not share it. Anyone who has your word list can access and steal your bitcoins.
+    <br /><br />
     <b>Do not lose it.</b> If you lose your words list and your phone, you\'ve lost your funds.
   ]]></string>
   <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
