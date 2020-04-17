@@ -171,7 +171,7 @@
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Continuar</string>
   <string name="utils_cancel">Cancelar</string>
-  <string name="utils_date_just_now">Somente desta vez</string>
+  <string name="utils_date_just_now">Agora</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copiado!</string>
   <string name="btn_back">Voltar</string>
@@ -420,7 +420,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar o blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
   <string name="electrum_change_button">Definir servidor…</string>
 
   <string name="electrum_block_height_label">Altura do bloco</string>
