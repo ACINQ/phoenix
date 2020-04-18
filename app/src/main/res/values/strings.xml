@@ -315,7 +315,7 @@
   <string name="displayseed_instructions"><![CDATA[
     This list of words, also known as seed, is your wallet backup. Save it somewhere safe (not on this phone)!
     <br /><br />
-    <b>Do not share it. Anyone who has your word list can access and steal your bitcoins.
+    <b>Do not share it. Anyone who has your words list can access and steal your bitcoins.
     <br /><br />
     <b>Do not lose it.</b> If you lose your words list and your phone, you\'ve lost your funds.
   ]]></string>
