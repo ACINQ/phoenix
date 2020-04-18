@@ -302,7 +302,7 @@
   <string name="displayseed_instructions"><![CDATA[
     Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
     <br /><br />
-    <b>Não compartilhe com ninguém. Qualquer pessoa que tenha a sua lista de palavras pode acessar e roubar seus bitcoins.
+    <b>Não compartilhe com ninguém. Qualquer pessoa que tenha acesso à sua lista de palavras pode roubar seus bitcoins.
     <br /><br />
     <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus bitcoins.
   ]]></string>
