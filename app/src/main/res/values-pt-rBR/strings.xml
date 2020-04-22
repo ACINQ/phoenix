@@ -76,7 +76,7 @@
   <!-- //////////////// receive //////////////// -->
 
   <string name="receive_edit_title">Editar cobrança</string>
-  <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição do pagamento.</string>
+  <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
   <string name="receive_in_progress_message">Favor aguardar…</string>
   <string name="receive_error_message">Ocorreu um erro ao gerar a cobrança…\n\nTente novamente.</string>
   <string name="receive_amount_label">Quantidade (opcional)</string>
