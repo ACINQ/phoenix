@@ -99,7 +99,7 @@
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
   Um endereço Bitcoin padrão será exibido a seguir.
   <br /><br />
-  Os bitcoins enviados para este endereço aparecerão na sua carteira após 1 confirmação da rede.
+  Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
   Uma taxa de <b>%1$s%%</b> será cobrada.
   ]]></string>
