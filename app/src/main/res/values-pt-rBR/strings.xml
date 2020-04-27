@@ -76,7 +76,7 @@
   <!-- //////////////// receive //////////////// -->
 
   <string name="receive_edit_title">Editar cobrança</string>
-  <string name="receive_edit_subtitle">Você pode alterar o valor solicitado e a descrição da cobrança.</string>
+  <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
   <string name="receive_in_progress_message">Favor aguardar…</string>
   <string name="receive_error_message">Ocorreu um erro ao gerar a cobrança…\n\nTente novamente.</string>
   <string name="receive_amount_label">Quantidade (opcional)</string>
@@ -99,7 +99,7 @@
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
   Um endereço Bitcoin padrão será exibido a seguir.
   <br /><br />
-  Os bitcoins enviados para este endereço aparecerão na sua carteira após uma confirmação da rede.
+  Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
   Uma taxa de <b>%1$s%%</b> será cobrada.
   ]]></string>
@@ -133,7 +133,7 @@
   <string name="send_pay_button">Pagar</string>
   <string name="send_swap_in_progress">Processando troca…</string>
   <string name="send_swap_error">A troca falhou. Tente novamente.</string>
-  <string name="send_swap_required_desc">Este é um endereço Bitcoin, o pagamento será feito usando uma troca.</string>
+  <string name="send_swap_required_desc">Este é um endereço Bitcoin, o pagamento será realizado usando uma troca.</string>
   <string name="send_swap_required_button">Solicitar uma troca</string>
   <string name="send_swap_complete_recap_amount">Valor</string>
   <string name="send_swap_complete_recap_fee">Taxa de Mineração</string>
@@ -171,7 +171,7 @@
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Continuar</string>
   <string name="utils_cancel">Cancelar</string>
-  <string name="utils_date_just_now">Somente desta vez</string>
+  <string name="utils_date_just_now">Agora</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copiado!</string>
   <string name="btn_back">Voltar</string>
@@ -220,7 +220,7 @@
   <string name="closechannels_force_instructions"><![CDATA[
     Encerramento forçado permite fechar unilateralmente seus canais.
     <br/><br/>
-    Esta função não é &quot;um botão mágico que resolve tudo&quot;; está aqui como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
+    Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
@@ -300,9 +300,10 @@
   <string name="displayseed_loading">Desbloqueando seed…</string>
   <string name="displayseed_error">A seed não pôde ser lida. Tente novamente.\n\nMotivo: %1$s</string>
   <string name="displayseed_instructions"><![CDATA[
-    Esta lista de palavras é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
+    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
     <br /><br />
-    <b>Não compartilhe com ninguém.</b>
+    <b>Não compartilhe com ninguém. Qualquer pessoa que tenha acesso à sua lista de palavras pode roubar seus bitcoins.
+    <br /><br />
     <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus bitcoins.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
@@ -366,6 +367,7 @@
   <string name="seedsec_title">Segurança</string>
   <string name="seedsec_subtitle">É muito importante criar um PIN para proteger sua carteira. Se o seu aparelho suportar, você pode usar autenticação biométrica.</string>
   <string name="seedsec_pin_switch">Autenticação por PIN</string>
+  <string name="seedsec_pin_scramble">Embaralhamento de teclado PIN</string>
   <string name="seedsec_biometrics_switch">Autenticação biométrica</string>
   <string name="seedsec_change_pin">Alterar PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Falha no registro biométrico. Tente novamente.</string>
@@ -418,7 +420,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar o blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
   <string name="electrum_change_button">Definir servidor…</string>
 
   <string name="electrum_block_height_label">Altura do bloco</string>
