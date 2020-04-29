@@ -108,9 +108,9 @@
 
   <string name="receive_with_open_title">Pagamento a receber</string>
   <string name="receive_with_open_help_desc">O que é isso?</string>
-  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa de instalação serve para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
+  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa é necessária para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
   <string name="receive_with_open_amount_label">Você tem um pagamento a receber de</string>
-  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação de <b>%1$s</b> (%2$s).]]></string>
+  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação/manutenção de <b>%1$s</b> (%2$s).]]></string>
   <string name="receive_with_open_accept">Aceitar (expira em %1$ss)</string>
   <string name="receive_with_open_decline">Recusar</string>
   <string name="receive_with_open_expired">Este pagamento expirou!</string>
@@ -213,7 +213,7 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Use este recurso para esvaziar sua carteira enviando o saldo para um endereço Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Verifique se o endereço está correto antes de enviar.</string>
+  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
   <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
