@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don\'t have another Phoenix wallet running with the same seed.</string>
   <string name="restore_disclaimer_checkbox">I understand.</string>
   <string name="restore_disclaimer_next">Next</string>
-  <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words. Please note that passphrases are not supported.</string>
+  <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words.</string>
   <string name="restore_mnemonics_label">Use the keyboard below to enter the seed:</string>
   <string name="restore_in_progress">Restoring your wallet…</string>
   <string name="restore_import_button">Import</string>
