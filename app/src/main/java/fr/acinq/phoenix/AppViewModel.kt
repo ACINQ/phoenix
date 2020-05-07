@@ -30,6 +30,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.iid.FirebaseInstanceId
 import com.msopentech.thali.toronionproxy.OnionProxyManager
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
@@ -120,6 +124,7 @@ class AppViewModel : ViewModel() {
   private val shortTimeout = Timeout(Duration.create(10, TimeUnit.SECONDS))
   private val longTimeout = Timeout(Duration.create(30, TimeUnit.SECONDS))
 
+  var fcmToken: String? = null
   val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
   val networkInfo = MutableLiveData<NetworkInfo>()
@@ -229,11 +234,20 @@ class AppViewModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: PeerConnected) {
     networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+    handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), fcmToken))
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: PeerDisconnected) {
     networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: Peer.SendFCMToken) {
+    kit?.run {
+      log.info("registering token=${event.token()} with node=${event.nodeId()}")
+      switchboard().tell(event, ActorRef.noSender())
+    } ?: log.warn("could not register fcm token because kit is not ready yet")
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -689,9 +703,10 @@ class AppViewModel : ViewModel() {
     system.registerOnTermination {
       log.info("system has been shutdown, all actors are terminated")
     }
-
     checkConnectivity(context)
     cancelBackgroundJobs(context)
+
+    fcmToken = Tasks.await(FirebaseInstanceId.getInstance().instanceId, 5, TimeUnit.SECONDS).token
 
     if (Prefs.isTorEnabled(context)) {
       log.info("using TOR...")

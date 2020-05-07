@@ -20,6 +20,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+apply plugin: 'com.google.gms.google-services'
 
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 
@@ -159,4 +160,8 @@ dependencies {
   implementation "net.freehaven.tor.control:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
   implementation "com.msopentech.thali:universal:$tor_wrapper_version" // core library for the tor wrapper
   implementation "com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar"
+
+  // firebase cloud messaging
+  def fcm_version = "20.1.5"
+  implementation "com.google.firebase:firebase-messaging:$fcm_version"
 }

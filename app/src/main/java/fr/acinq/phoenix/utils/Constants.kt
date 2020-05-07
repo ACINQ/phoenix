@@ -43,6 +43,8 @@ object Constants {
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
   const val WATCHER_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
   const val WATCHER_REQUEST_CODE = 37921816
+  const val FCM_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.FCM_NOTIF_ID"
+  const val FCM_REQUEST_CODE = 81357423
 
   // -- default wallet values
   val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())

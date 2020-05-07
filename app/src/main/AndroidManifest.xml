@@ -34,6 +34,10 @@
     android:supportsRtl="true"
     android:theme="@style/default_theme">
 
+    <meta-data
+      android:name="firebase_analytics_collection_enabled"
+      android:value="false" />
+
     <activity
       android:name=".MainActivity"
       android:launchMode="singleTask">
@@ -76,6 +80,15 @@
         <action android:name="android.intent.action.BOOT_COMPLETED" />
       </intent-filter>
     </receiver>
+
+    <!-- firebase cloud messaging -->
+    <service
+      android:name=".background.FCMService"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+      </intent-filter>
+    </service>
 
   </application>
 </manifest>

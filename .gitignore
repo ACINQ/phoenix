@@ -17,3 +17,6 @@ app/release
 app/debug
 apk
 logs
+
+## fcm config file
+google-services.json

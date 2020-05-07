@@ -41,12 +41,14 @@ class Application : Application() {
 
     // notification channels (android 8+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val channelWatcherChannel = NotificationChannel(Constants.WATCHER_NOTIFICATION_CHANNEL_ID,
-        getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH)
+      val channelWatcherChannel = NotificationChannel(Constants.WATCHER_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH)
       channelWatcherChannel.description = getString(R.string.notification_channels_watcher_desc)
 
+      val fcmNotificationChannel = NotificationChannel(Constants.FCM_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_channels_fcm_title), NotificationManager.IMPORTANCE_HIGH)
+      channelWatcherChannel.description = getString(R.string.notification_channels_fcm_desc)
+
       // Register notifications channels with the system
-      getSystemService(NotificationManager::class.java)?.createNotificationChannel(channelWatcherChannel)
+      getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(channelWatcherChannel, fcmNotificationChannel))
     }
   }
 }

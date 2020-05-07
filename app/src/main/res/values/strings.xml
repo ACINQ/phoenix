@@ -21,6 +21,8 @@
 
   <string name="notification_channels_watcher_title">Background watcher</string>
   <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
+  <string name="notification_channels_fcm_title">Incoming Payment</string>
+  <string name="notification_channels_fcm_desc">Alerts you if you have an incoming payment.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -217,6 +219,9 @@
 
   <string name="notif_watcher_connection_title">Phoenix needs network access</string>
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
+
+  <string name="notif_fcm_title">You have an incoming payment</string>
+  <string name="notif_fcm_message">Please start the app to receive the payment.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 

@@ -26,7 +26,10 @@ buildscript {
   dependencies {
     classpath 'com.android.tools.build:gradle:4.0.0'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    // plugin to generate args classes for the androidx navigation component
     classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safeargs_version"
+    // plugin for firebase cloud messaging
+    classpath "com.google.gms:google-services:4.3.3"
   }
 }
 
