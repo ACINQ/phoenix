@@ -401,7 +401,7 @@
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirar fundos de<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Retirar</string>
   <string name="lnurl_withdraw_wait">Solicitando valores…</string>
-  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo online.</string>
+  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo aberto.</string>
   <string name="lnurl_withdraw_error_internal">Não foi possível processar esta retirada. Tente novamente.</string>
   <string name="lnurl_withdraw_error_invalid">Esta solicitação de retirada é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
