@@ -47,6 +47,6 @@ which revision you need to use in the deterministic build.
 ### How to build phoenix deterministically
 
 1. Clone the phoenix project from https://github.com/ACINQ/phoenix
-3. Run `docker build -t phoenix_build . --build-arg ECLAIR_TAG=<GIT_TAG_OF_ECLAIR_CORE>` to create the build environment
+3. Run `docker build -t phoenix_build .` to create the build environment
 4. Run `docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble`
 5. Built artifacts are in `.apk/release`
