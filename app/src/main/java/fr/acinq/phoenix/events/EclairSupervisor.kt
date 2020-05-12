@@ -22,6 +22,8 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import fr.acinq.eclair.io.PeerConnected
+import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
@@ -76,7 +78,17 @@ class EclairSupervisor : UntypedActor() {
         EventBus.getDefault().post(BalanceEvent(total))
       }
 
-      // -------------- ELECTRUM -------------
+      // -------------- CONNECTION WATCHER --------------
+      is PeerConnected -> {
+        log.info("connected to ${event.nodeId()}")
+        EventBus.getDefault().post(event)
+      }
+      is PeerDisconnected -> {
+        log.info("disconnected from ${event.nodeId()}")
+        EventBus.getDefault().post(event)
+      }
+
+      // -------------- ELECTRUM --------------
       is ElectrumClient.ElectrumReady -> EventBus.getDefault().post(event)
       is ElectrumClient.`ElectrumDisconnected$` -> EventBus.getDefault().post(event)
 

@@ -40,6 +40,8 @@ import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.io.PeerConnected
+import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
@@ -220,6 +222,16 @@ class AppViewModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
     networkInfo.value = networkInfo.value?.copy(electrumServer = null)
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerConnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerDisconnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -689,6 +701,8 @@ class AppViewModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerConnected::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerDisconnected::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
