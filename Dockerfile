@@ -70,8 +70,8 @@ RUN git clone https://github.com/ACINQ/Tor_Onion_Proxy_Library && \
 # copy eclair-core dependendency
 COPY --from=ECLAIR_CORE_BUILD /root/.m2/repository/fr/acinq/eclair /root/.m2/repository/fr/acinq/eclair
 
-# copy phoenix project over to docker image
-COPY . /home/ubuntu/phoenix
+# copy phoenix project over to docker image and make sure we don't read properties the host environment
+COPY . /home/ubuntu/phoenix && rm -f /home/ubuntu/phoenix/local.properties
 
 # make gradle wrapper executable
 RUN chmod +x /home/ubuntu/phoenix/gradlew
