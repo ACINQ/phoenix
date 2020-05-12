@@ -40,7 +40,7 @@ object Constants {
 
   // -- android notifications
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
-  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
+  const val WATCHER_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
   const val WATCHER_REQUEST_CODE = 37921816
 
   // -- default wallet values

@@ -68,6 +68,8 @@ import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.Tuple2
 import scala.collection.JavaConverters
+import scala.collection.immutable.Seq
+import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -401,6 +403,7 @@ class AppViewModel : ViewModel() {
               /* route params */ Option.apply(null))
           } else {
             log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
+            val customTlvs = `Seq$`.`MODULE$`.empty<Any>() as Seq<GenericTlv>
             PaymentInitiator.SendPaymentRequest(
               /* amount to send */ amount,
               /* paymentHash */ paymentRequest.paymentHash(),
@@ -410,7 +413,8 @@ class AppViewModel : ViewModel() {
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),
               /* assisted routes */ paymentRequest.routingInfo(),
-              /* route params */ Option.apply(null))
+              /* route params */ Option.apply(null),
+              /* custom cltvs */ customTlvs)
           }
 
           val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
@@ -477,7 +481,7 @@ class AppViewModel : ViewModel() {
         delay(500)
         if (api != null && kit != null) {
           val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
@@ -495,7 +499,7 @@ class AppViewModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         if (api != null && kit != null) {
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels().map { res ->
             val channelId = res.channelId()
             log.info("attempting to force close channel=$channelId")
