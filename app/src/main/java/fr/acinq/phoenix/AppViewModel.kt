@@ -105,6 +105,7 @@ sealed class KitState {
   sealed class Error : KitState() {
     data class Generic(val message: String) : Error()
     data class Tor(val message: String) : Error()
+    data class InvalidElectrumAddress(val address: String) : Error()
     object InvalidBiometric : Error()
     object WrongPassword : Error()
     object NoConnectivity : Error()
@@ -585,6 +586,10 @@ class AppViewModel : ViewModel() {
                 is IOException, is IllegalAccessException -> {
                   log.error("seed file not readable: ", t)
                   state.postValue(KitState.Error.UnreadableData)
+                }
+                is InvalidElectrumAddress -> {
+                  log.error("cannot start with invalid electrum address: ", t)
+                  state.postValue(KitState.Error.InvalidElectrumAddress(t.address))
                 }
                 is TorSetupException -> {
                   log.error("error when bootstrapping TOR: ", t)

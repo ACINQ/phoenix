@@ -149,7 +149,7 @@ object Wallet {
           }
         }
       } catch (e: Exception) {
-        log.error("invalid electrum server=$electrumServer, using empty config instead", e)
+        throw InvalidElectrumAddress(electrumServer)
       }
     }
 
