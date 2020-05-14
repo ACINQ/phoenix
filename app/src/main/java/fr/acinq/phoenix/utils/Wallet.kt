@@ -134,13 +134,13 @@ object Wallet {
 
     // electrum config
     val electrumServer = Prefs.getElectrumServer(context)
-    if (!Strings.isNullOrEmpty(electrumServer)) {
+    if (electrumServer.isNotBlank()) {
       try {
         val address = HostAndPort.fromString(electrumServer).withDefaultPort(50002)
-        if (!Strings.isNullOrEmpty(address.host)) {
+        if (address.host.isNotBlank()) {
           conf["eclair.electrum.host"] = address.host
           conf["eclair.electrum.port"] = address.port
-          if (address.host.endsWith(".onion")) {
+          if (address.isOnion()) {
             // If Tor is used, we don't require TLS; Tor already adds a layer of encryption.
             conf["eclair.electrum.ssl"] = "off"
           } else {
@@ -166,4 +166,6 @@ object Wallet {
 
     return ConfigFactory.parseMap(conf)
   }
+
+  fun HostAndPort.isOnion() = this.host.endsWith(".onion")
 }
