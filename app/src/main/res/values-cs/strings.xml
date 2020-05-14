@@ -53,10 +53,14 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_wait">Nahrávám…</string>
+  <string name="startup_wait_tor">Spouštím Tor…</string>
+  <string name="startup_start_button">Restartovat</string>
+  <string name="startup_settings_button">Nastavení</string>
+  <string name="startup_error_tor">Nepodařilo se spustit Tor. Zkontrolujte, že je vaše připojení funkční a zkuste to znovu.\n\nDetail chyby: %1$s</string>
   <string name="startup_error_wrong_pwd">Chybný PIN kód</string>
   <string name="startup_error_unreadable">Peněženku se nepodařilo načíst, prosím, restartujte aplikaci</string>
   <string name="startup_error_network">Vaše připojení k internetu není funkční. Prosím, zkontrolujte WiFi nebo mobilní síť.</string>
-  <string name="startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu</string>
+  <string name="startup_error_generic">Aplikaci se nepodařilo spustit. Prosím, zkuste to znovu.\n\nPodrobnosti: %1$s</string>
   <string name="startup_error_biometrics">Nepodařilo se přihlásit uživatele.</string>
 
   <!-- //////////////// payment holder //////////////// -->
@@ -191,6 +195,7 @@
   <string name="settings_electrum">Electrum server</string>
   <string name="settings_mutual_close">Uzavřít všechny kanály</string>
   <string name="settings_force_close">Nebezpečná zóna</string>
+  <string name="settings_tor">Tor</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -276,6 +281,7 @@
   <string name="main_alert_settings_button">Nastavení</string>
   <string name="main_swapin_incoming">Příchozí +%1$s</string>
   <string name="main_faq_button">FAQ</string>
+  <string name="main_tor_connected_button">Tor aktivní</string>
   <string name="main_stores_button">Obchody</string>
 
   <!-- //////////////// notifications //////////////////// -->
@@ -361,6 +367,7 @@
   <string name="seedsec_title">Bezpečnost</string>
   <string name="seedsec_subtitle">Vysoce doporučujeme nastavit PIN k ochraně vaší peněženky. Pokud to vaše zařízení podporuje, můžete použít biometrické přihlášení.</string>
   <string name="seedsec_pin_switch">Přihlášení pomocí PIN</string>
+  <string name="seedsec_pin_scramble">Přeházet PIN tlačítka</string>
   <string name="seedsec_biometrics_switch">Biometrické přihlášení</string>
   <string name="seedsec_change_pin">Změnit PIN…</string>
   <string name="seedsec_biometric_enrollment_error">Přístup k biometrii selhal. Prosím, zkuste to znovu.</string>
@@ -436,5 +443,25 @@
 
   <string name="key_space_desc">Přidat mezeru</string>
   <string name="key_delete_desc">Smazat poslední znak</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Nastavení Tor</string>
+  <string name="tor_settings_subtitle">Pro ještě lepší soukromí můžete použít Tor i pro připojení k Electrum serveru nebo k vašemu Lightning uzlu. Toto drobně zpomalí start aplikace.</string>
+  <string name="tor_settings_enabled">Tor je aktivní</string>
+  <string name="tor_settings_disabled">Tor není aktivní</string>
+  <string name="tor_settings_confirm_disable_title">Jste si jist, že chcete deaktivovat Tor?</string>
+  <string name="tor_settings_confirm_enable_title">Jste si jist, že chcete aktivovat Tor? Pro nejlepší výsledky je doporučeno začít rovněž s novou peněženkou.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Stav připojení</string>
+  <string name="conndialog_summary_not_ok">Jsou problémy s vaším připojením. Aplikace nebude fungovat správně.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_lightning">Lightning Peer</string>
+  <string name="conndialog_ok">Připojen</string>
+  <string name="conndialog_not_ok">Připojuji…</string>
 
 </resources>

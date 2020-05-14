@@ -179,6 +179,7 @@
   <string name="utils_converted_amount">≈ %1$s</string>
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+  <string name="utils_unknown_amount">!?</string>
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Proceed</string>
@@ -326,7 +327,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Application logs</string>
-  <string name="logs_subtitle">You can extract and share the application logs from this page.</string>
+  <string name="logs_subtitle">Here you can extract and share the application logs.</string>
   <string name="logs_view_button">View logs…</string>
   <string name="logs_view_with">View logs with…</string>
   <string name="logs_share_button">Share logs…</string>
@@ -352,7 +353,7 @@
   <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
   <string name="paymentdetails_no_description">No description</string>
 
-  <string name="paymentdetails_technicals_button">Show technical data</string>
+  <string name="paymentdetails_technicals_button">Show details</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 

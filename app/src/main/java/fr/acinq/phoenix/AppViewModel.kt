@@ -40,6 +40,8 @@ import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.io.PeerConnected
+import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
@@ -68,6 +70,8 @@ import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.Tuple2
 import scala.collection.JavaConverters
+import scala.collection.immutable.Seq
+import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -218,6 +222,16 @@ class AppViewModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
     networkInfo.value = networkInfo.value?.copy(electrumServer = null)
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerConnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerDisconnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -401,6 +415,7 @@ class AppViewModel : ViewModel() {
               /* route params */ Option.apply(null))
           } else {
             log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
+            val customTlvs = `Seq$`.`MODULE$`.empty<Any>() as Seq<GenericTlv>
             PaymentInitiator.SendPaymentRequest(
               /* amount to send */ amount,
               /* paymentHash */ paymentRequest.paymentHash(),
@@ -410,7 +425,8 @@ class AppViewModel : ViewModel() {
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),
               /* assisted routes */ paymentRequest.routingInfo(),
-              /* route params */ Option.apply(null))
+              /* route params */ Option.apply(null),
+              /* custom cltvs */ customTlvs)
           }
 
           val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
@@ -477,7 +493,7 @@ class AppViewModel : ViewModel() {
         delay(500)
         if (api != null && kit != null) {
           val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
@@ -495,7 +511,7 @@ class AppViewModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         if (api != null && kit != null) {
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels().map { res ->
             val channelId = res.channelId()
             log.info("attempting to force close channel=$channelId")
@@ -543,7 +559,7 @@ class AppViewModel : ViewModel() {
   @UiThread
   fun startKit(context: Context, pin: String) {
     when (state.value) {
-      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
+      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value?.javaClass?.simpleName}")
       else -> {
         state.value = KitState.Bootstrap.Init
         viewModelScope.launch {
@@ -685,6 +701,8 @@ class AppViewModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerConnected::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerDisconnected::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
@@ -695,7 +713,10 @@ class AppViewModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
-      Runnable { Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
+      Runnable {
+        Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context))
+        Wallet.httpClient.newCall(Request.Builder().url(Constants.MXN_PRICE_RATE_API).build()).enqueue(getMXNRateHandler(context))
+      }, system.dispatcher())
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
@@ -712,52 +733,68 @@ class AppViewModel : ViewModel() {
         if (!response.isSuccessful) {
           log.warn("could not retrieve exchange rates, api responds with ${response.code()}")
         } else {
-          val body = response.body()
-          if (body != null) {
+          response.body()?.let {
             try {
-              val json = JSONObject(body.string())
-              getRateFromJson(context, json, "AUD")
-              getRateFromJson(context, json, "BRL")
-              getRateFromJson(context, json, "CAD")
-              getRateFromJson(context, json, "CHF")
-              getRateFromJson(context, json, "CLP")
-              getRateFromJson(context, json, "CNY")
-              getRateFromJson(context, json, "DKK")
-              getRateFromJson(context, json, "EUR")
-              getRateFromJson(context, json, "GBP")
-              getRateFromJson(context, json, "HKD")
-              getRateFromJson(context, json, "INR")
-              getRateFromJson(context, json, "ISK")
-              getRateFromJson(context, json, "JPY")
-              getRateFromJson(context, json, "KRW")
-              getRateFromJson(context, json, "NZD")
-              getRateFromJson(context, json, "PLN")
-              getRateFromJson(context, json, "RUB")
-              getRateFromJson(context, json, "SEK")
-              getRateFromJson(context, json, "SGD")
-              getRateFromJson(context, json, "THB")
-              getRateFromJson(context, json, "TWD")
-              getRateFromJson(context, json, "USD")
+              val json = JSONObject(it.string())
+              saveRate(context, "AUD") { json.getJSONObject("AUD").getDouble("last").toFloat() }
+              saveRate(context, "BRL") { json.getJSONObject("BRL").getDouble("last").toFloat() }
+              saveRate(context, "CAD") { json.getJSONObject("CAD").getDouble("last").toFloat() }
+              saveRate(context, "CHF") { json.getJSONObject("CHF").getDouble("last").toFloat() }
+              saveRate(context, "CLP") { json.getJSONObject("CLP").getDouble("last").toFloat() }
+              saveRate(context, "CNY") { json.getJSONObject("CNY").getDouble("last").toFloat() }
+              saveRate(context, "DKK") { json.getJSONObject("DKK").getDouble("last").toFloat() }
+              saveRate(context, "EUR") { json.getJSONObject("EUR").getDouble("last").toFloat() }
+              saveRate(context, "GBP") { json.getJSONObject("GBP").getDouble("last").toFloat() }
+              saveRate(context, "HKD") { json.getJSONObject("HKD").getDouble("last").toFloat() }
+              saveRate(context, "INR") { json.getJSONObject("INR").getDouble("last").toFloat() }
+              saveRate(context, "ISK") { json.getJSONObject("ISK").getDouble("last").toFloat() }
+              saveRate(context, "JPY") { json.getJSONObject("JPY").getDouble("last").toFloat() }
+              saveRate(context, "KRW") { json.getJSONObject("KRW").getDouble("last").toFloat() }
+              saveRate(context, "NZD") { json.getJSONObject("NZD").getDouble("last").toFloat() }
+              saveRate(context, "PLN") { json.getJSONObject("PLN").getDouble("last").toFloat() }
+              saveRate(context, "RUB") { json.getJSONObject("RUB").getDouble("last").toFloat() }
+              saveRate(context, "SEK") { json.getJSONObject("SEK").getDouble("last").toFloat() }
+              saveRate(context, "SGD") { json.getJSONObject("SGD").getDouble("last").toFloat() }
+              saveRate(context, "THB") { json.getJSONObject("THB").getDouble("last").toFloat() }
+              saveRate(context, "TWD") { json.getJSONObject("TWD").getDouble("last").toFloat() }
+              saveRate(context, "USD") { json.getJSONObject("USD").getDouble("last").toFloat() }
               Prefs.setExchangeRateTimestamp(context, System.currentTimeMillis())
-            } catch (t: Throwable) {
-              log.error("could not read exchange rates response: ", t)
+            } catch(e: Exception) {
+              log.error("invalid body for price rate api")
             } finally {
-              body.close()
+              it.close()
             }
-          } else {
-            log.warn("exchange rate body is null")
-          }
+          } ?: log.warn("exchange rate body is null")
         }
       }
     }
   }
 
-  fun getRateFromJson(context: Context, json: JSONObject, code: String) {
-    var rate = -1.0f
-    try {
-      rate = json.getJSONObject(code).getDouble("last").toFloat()
+  private fun getMXNRateHandler(context: Context): Callback {
+    return object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve MXN rates: ${e.localizedMessage}")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        if (!response.isSuccessful) {
+          log.warn("could not retrieve MXN rates, api responds with ${response.code()}")
+        } else {
+          response.body()?.let { body ->
+            saveRate(context, "MXN") { JSONObject(body.string()).getJSONObject("payload").getDouble("last").toFloat() }
+            body.close()
+          } ?: log.warn("MXN rate body is null")
+        }
+      }
+    }
+  }
+
+  fun saveRate(context: Context, code: String, rateBlock: () -> Float) {
+    val rate = try {
+      rateBlock.invoke()
     } catch (e: Exception) {
-      log.debug("could not read {} from price api response", code)
+      log.error("failed to read rate for $code: ", e)
+      -1.0f
     }
     Prefs.setExchangeRate(context, code, rate)
   }
