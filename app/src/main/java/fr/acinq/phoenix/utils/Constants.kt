@@ -41,11 +41,11 @@ object Constants {
 
   // -- android notifications
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
-  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
+  const val WATCHER_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
   const val WATCHER_REQUEST_CODE = 37921816
 
   // -- default wallet values
-  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = true, torConnections = HashMap())
+  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
     TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %

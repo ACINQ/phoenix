@@ -40,6 +40,8 @@ import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.io.PeerConnected
+import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
@@ -68,6 +70,8 @@ import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.Tuple2
 import scala.collection.JavaConverters
+import scala.collection.immutable.Seq
+import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -218,6 +222,16 @@ class AppViewModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
     networkInfo.value = networkInfo.value?.copy(electrumServer = null)
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerConnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PeerDisconnected) {
+    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -401,6 +415,7 @@ class AppViewModel : ViewModel() {
               /* route params */ Option.apply(null))
           } else {
             log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
+            val customTlvs = `Seq$`.`MODULE$`.empty<Any>() as Seq<GenericTlv>
             PaymentInitiator.SendPaymentRequest(
               /* amount to send */ amount,
               /* paymentHash */ paymentRequest.paymentHash(),
@@ -410,7 +425,8 @@ class AppViewModel : ViewModel() {
               /* payment request */ Option.apply(paymentRequest),
               /* external id */ Option.empty(),
               /* assisted routes */ paymentRequest.routingInfo(),
-              /* route params */ Option.apply(null))
+              /* route params */ Option.apply(null),
+              /* custom cltvs */ customTlvs)
           }
 
           val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
@@ -477,7 +493,7 @@ class AppViewModel : ViewModel() {
         delay(500)
         if (api != null && kit != null) {
           val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels(`NORMAL$`.`MODULE$`).map { res ->
             val channelId = res.channelId()
             log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
@@ -495,7 +511,7 @@ class AppViewModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         if (api != null && kit != null) {
-          val closingFutures = ArrayList<Future<String>>()
+          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
           getChannels().map { res ->
             val channelId = res.channelId()
             log.info("attempting to force close channel=$channelId")
@@ -543,7 +559,7 @@ class AppViewModel : ViewModel() {
   @UiThread
   fun startKit(context: Context, pin: String) {
     when (state.value) {
-      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value}")
+      is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value?.javaClass?.simpleName}")
       else -> {
         state.value = KitState.Bootstrap.Init
         viewModelScope.launch {
@@ -685,6 +701,8 @@ class AppViewModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerConnected::class.java)
+    system.eventStream().subscribe(nodeSupervisor, PeerDisconnected::class.java)
     system.eventStream().subscribe(nodeSupervisor, PaymentEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapOutResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, SwapInPending::class.java)
