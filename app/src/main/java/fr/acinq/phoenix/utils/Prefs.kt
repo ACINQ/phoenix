@@ -51,6 +51,7 @@ object Prefs {
 
   // -- node configuration
   const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
+  const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
   const val PREFS_TRAMPOLINE_MAX_FEE_INDEX = "PREFS_TRAMPOLINE_MAX_FEE_INDEX"
 
   // -- other
@@ -195,6 +196,14 @@ object Prefs {
 
   fun saveElectrumServer(context: Context, address: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ELECTRUM_ADDRESS, address.trim()).apply()
+  }
+
+  fun getForceElectrumSSL(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_ELECTRUM_FORCE_SSL, false)
+  }
+
+  fun saveForceElectrumSSL(context: Context, mustCheck: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_ELECTRUM_FORCE_SSL, mustCheck).apply()
   }
 
   fun getTrampolineMaxFeeIndex(context: Context): Int {

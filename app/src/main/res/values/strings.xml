@@ -464,6 +464,7 @@
 
   <string name="electrum_dialog_checkbox">Use a custom server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
+  <string name="electrum_dialog_ssl_tor">Also check certificate for this Onion address</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 

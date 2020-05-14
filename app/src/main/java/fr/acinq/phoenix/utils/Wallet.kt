@@ -19,7 +19,6 @@ package fr.acinq.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.google.common.base.Strings
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -142,7 +141,8 @@ object Wallet {
           conf["eclair.electrum.port"] = address.port
           if (address.isOnion()) {
             // If Tor is used, we don't require TLS; Tor already adds a layer of encryption.
-            conf["eclair.electrum.ssl"] = "off"
+            // However the user can still force the app to check the certificate.
+            conf["eclair.electrum.ssl"] = if (Prefs.getForceElectrumSSL(context)) "strict" else "off"
           } else {
             // Otherwise we require TLS with a valid server certificate.
             conf["eclair.electrum.ssl"] = "strict"
