@@ -50,7 +50,6 @@ class ElectrumServerFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsElectrumServerBinding
-  private lateinit var model: ElectrumServerViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsElectrumServerBinding.inflate(inflater, container, false)
@@ -60,7 +59,6 @@ class ElectrumServerFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
     app.state.observe(viewLifecycleOwner, Observer {
       when (it) {
         is KitState.Started -> {
@@ -104,7 +102,6 @@ class ElectrumServerFragment : BaseFragment() {
         }
       }
     })
-    mBinding.model = model
   }
 
   override fun onStart() {
@@ -171,19 +168,4 @@ class ElectrumServerFragment : BaseFragment() {
 
     return dialog
   }
-}
-
-enum class ElectrumServerState {
-  INIT, IN_PROGRESS, DONE, ERROR
-}
-
-class ElectrumServerViewModel : ViewModel() {
-
-  private val log = LoggerFactory.getLogger(this::class.java)
-  val state = MutableLiveData<ElectrumServerState>()
-
-  init {
-    state.value = ElectrumServerState.INIT
-  }
-
 }
