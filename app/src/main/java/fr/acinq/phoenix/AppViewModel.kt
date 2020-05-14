@@ -713,7 +713,10 @@ class AppViewModel : ViewModel() {
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
 
     system.scheduler().schedule(Duration.Zero(), FiniteDuration(10, TimeUnit.MINUTES),
-      Runnable { Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context)) }, system.dispatcher())
+      Runnable {
+        Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(context))
+        Wallet.httpClient.newCall(Request.Builder().url(Constants.MXN_PRICE_RATE_API).build()).enqueue(getMXNRateHandler(context))
+      }, system.dispatcher())
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")
@@ -730,52 +733,68 @@ class AppViewModel : ViewModel() {
         if (!response.isSuccessful) {
           log.warn("could not retrieve exchange rates, api responds with ${response.code()}")
         } else {
-          val body = response.body()
-          if (body != null) {
+          response.body()?.let {
             try {
-              val json = JSONObject(body.string())
-              getRateFromJson(context, json, "AUD")
-              getRateFromJson(context, json, "BRL")
-              getRateFromJson(context, json, "CAD")
-              getRateFromJson(context, json, "CHF")
-              getRateFromJson(context, json, "CLP")
-              getRateFromJson(context, json, "CNY")
-              getRateFromJson(context, json, "DKK")
-              getRateFromJson(context, json, "EUR")
-              getRateFromJson(context, json, "GBP")
-              getRateFromJson(context, json, "HKD")
-              getRateFromJson(context, json, "INR")
-              getRateFromJson(context, json, "ISK")
-              getRateFromJson(context, json, "JPY")
-              getRateFromJson(context, json, "KRW")
-              getRateFromJson(context, json, "NZD")
-              getRateFromJson(context, json, "PLN")
-              getRateFromJson(context, json, "RUB")
-              getRateFromJson(context, json, "SEK")
-              getRateFromJson(context, json, "SGD")
-              getRateFromJson(context, json, "THB")
-              getRateFromJson(context, json, "TWD")
-              getRateFromJson(context, json, "USD")
+              val json = JSONObject(it.string())
+              saveRate(context, "AUD") { json.getJSONObject("AUD").getDouble("last").toFloat() }
+              saveRate(context, "BRL") { json.getJSONObject("BRL").getDouble("last").toFloat() }
+              saveRate(context, "CAD") { json.getJSONObject("CAD").getDouble("last").toFloat() }
+              saveRate(context, "CHF") { json.getJSONObject("CHF").getDouble("last").toFloat() }
+              saveRate(context, "CLP") { json.getJSONObject("CLP").getDouble("last").toFloat() }
+              saveRate(context, "CNY") { json.getJSONObject("CNY").getDouble("last").toFloat() }
+              saveRate(context, "DKK") { json.getJSONObject("DKK").getDouble("last").toFloat() }
+              saveRate(context, "EUR") { json.getJSONObject("EUR").getDouble("last").toFloat() }
+              saveRate(context, "GBP") { json.getJSONObject("GBP").getDouble("last").toFloat() }
+              saveRate(context, "HKD") { json.getJSONObject("HKD").getDouble("last").toFloat() }
+              saveRate(context, "INR") { json.getJSONObject("INR").getDouble("last").toFloat() }
+              saveRate(context, "ISK") { json.getJSONObject("ISK").getDouble("last").toFloat() }
+              saveRate(context, "JPY") { json.getJSONObject("JPY").getDouble("last").toFloat() }
+              saveRate(context, "KRW") { json.getJSONObject("KRW").getDouble("last").toFloat() }
+              saveRate(context, "NZD") { json.getJSONObject("NZD").getDouble("last").toFloat() }
+              saveRate(context, "PLN") { json.getJSONObject("PLN").getDouble("last").toFloat() }
+              saveRate(context, "RUB") { json.getJSONObject("RUB").getDouble("last").toFloat() }
+              saveRate(context, "SEK") { json.getJSONObject("SEK").getDouble("last").toFloat() }
+              saveRate(context, "SGD") { json.getJSONObject("SGD").getDouble("last").toFloat() }
+              saveRate(context, "THB") { json.getJSONObject("THB").getDouble("last").toFloat() }
+              saveRate(context, "TWD") { json.getJSONObject("TWD").getDouble("last").toFloat() }
+              saveRate(context, "USD") { json.getJSONObject("USD").getDouble("last").toFloat() }
               Prefs.setExchangeRateTimestamp(context, System.currentTimeMillis())
-            } catch (t: Throwable) {
-              log.error("could not read exchange rates response: ", t)
+            } catch(e: Exception) {
+              log.error("invalid body for price rate api")
             } finally {
-              body.close()
+              it.close()
             }
-          } else {
-            log.warn("exchange rate body is null")
-          }
+          } ?: log.warn("exchange rate body is null")
         }
       }
     }
   }
 
-  fun getRateFromJson(context: Context, json: JSONObject, code: String) {
-    var rate = -1.0f
-    try {
-      rate = json.getJSONObject(code).getDouble("last").toFloat()
+  private fun getMXNRateHandler(context: Context): Callback {
+    return object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve MXN rates: ${e.localizedMessage}")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        if (!response.isSuccessful) {
+          log.warn("could not retrieve MXN rates, api responds with ${response.code()}")
+        } else {
+          response.body()?.let { body ->
+            saveRate(context, "MXN") { JSONObject(body.string()).getJSONObject("payload").getDouble("last").toFloat() }
+            body.close()
+          } ?: log.warn("MXN rate body is null")
+        }
+      }
+    }
+  }
+
+  fun saveRate(context: Context, code: String, rateBlock: () -> Float) {
+    val rate = try {
+      rateBlock.invoke()
     } catch (e: Exception) {
-      log.debug("could not read {} from price api response", code)
+      log.error("failed to read rate for $code: ", e)
+      -1.0f
     }
     Prefs.setExchangeRate(context, code, rate)
   }
