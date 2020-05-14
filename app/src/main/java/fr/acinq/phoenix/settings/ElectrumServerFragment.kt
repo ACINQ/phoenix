@@ -130,8 +130,10 @@ class ElectrumServerFragment : BaseFragment() {
       BindingHelpers.enableOrFade(sslLayout, isChecked)
     }
 
+    fun isOnion(address: String) = address.split(":").first().endsWith(".onion")
+
     fun updateSSLLayout(input: String) {
-      val isOnion = input.endsWith(".onion")
+      val isOnion = isOnion(input)
       BindingHelpers.show(sslInfoText, !isOnion)
       BindingHelpers.show(sslForceCheckbox, isOnion)
     }
@@ -165,7 +167,7 @@ class ElectrumServerFragment : BaseFragment() {
           Toast.makeText(context, R.string.electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
         } else {
           Prefs.saveElectrumServer(context, if (useCustomElectrumBox.isChecked) address else "")
-          if (address.endsWith(".onion")) {
+          if (isOnion(address)) {
             Prefs.saveForceElectrumSSL(context, sslForceCheckbox.isChecked)
           }
           dialog.dismiss()
