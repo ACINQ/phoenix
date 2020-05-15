@@ -22,10 +22,13 @@ import android.view.inputmethod.InputMethodManager
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
+import fr.acinq.phoenix.send.LNUrl
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
@@ -75,6 +78,7 @@ object Wallet {
   fun getXpubKeyPath(): DeterministicWallet.KeyPath {
     return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
   }
+
   fun getNodeKeyPath(): DeterministicWallet.KeyPath {
     return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
   }
@@ -90,7 +94,17 @@ object Wallet {
     }
   }
 
-  fun extractInvoice(input: String): Any {
+  /**
+   * This methods reads arbitrary strings and deserializes it to a Lightning/Bitcoin object, if possible.
+   * <p>
+   * Object can be of type:
+   * - Lightning payment request (BOLT 11)
+   * - BitcoinURI
+   * - LNURL
+   *
+   * If the string cannot be read, throws an exception.
+   */
+  fun parseLNObject(input: String): Any {
     val invoice = cleanUpInvoice(input)
     return try {
       PaymentRequest.read(invoice)
@@ -99,13 +113,14 @@ object Wallet {
         BitcoinURI(invoice)
       } catch (e2: Exception) {
         try {
+          // this can take some time since a HTTP request may be done
           LNUrl.extractLNUrl(invoice)
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
           log.debug("invalid as BitcoinURI: ${e2.localizedMessage}")
           log.debug("invalid as LNURL: ", e3)
-          throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
+          throw UnreadableLightningObject("not a readable lightning object: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
         }
       }
     }

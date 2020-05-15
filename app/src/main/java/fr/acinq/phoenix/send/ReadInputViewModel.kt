@@ -18,47 +18,58 @@ package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
-enum class ReadingState {
-  SCANNING, READING, DONE, ERROR
+sealed class ReadInputState {
+  object Scanning : ReadInputState()
+  data class Reading(val input: String) : ReadInputState()
+  sealed class Done : ReadInputState() {
+    data class Lightning(val pr: PaymentRequest) : Done()
+    data class Onchain(val bitcoinUri: BitcoinURI) : Done()
+    data class Url(val url: LNUrl) : Done()
+  }
+  sealed class Error : ReadInputState() {
+    data class Generic(val message: String) : Error()
+    object UnhandledInput : Error()
+  }
 }
 
 class ReadInputViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReadInputViewModel::class.java)
 
   val hasCameraAccess = MutableLiveData<Boolean>()
-  val invoice = MutableLiveData<Any>()
-  val readingState = MutableLiveData<ReadingState>()
-  val errorMessage = MutableLiveData<Int>()
+  val inputState = MutableLiveData<ReadInputState>()
 
   init {
     hasCameraAccess.value = false
-    invoice.value = null
-    readingState.value = ReadingState.SCANNING
-    errorMessage.value = R.string.scan_error_default
+    inputState.value = ReadInputState.Scanning
   }
 
   @UiThread
-  fun checkAndSetPaymentRequest(input: String) {
-    log.debug("checking input=$input")
-    if (readingState.value == ReadingState.SCANNING) {
-      readingState.value = ReadingState.READING
+  fun readInput(input: String) {
+    log.debug("reading input=$input")
+    if (inputState.value is ReadInputState.Scanning) {
+      inputState.value = ReadInputState.Reading(input)
       viewModelScope.launch {
         withContext(Dispatchers.Default) {
           try {
-            invoice.postValue(Wallet.extractInvoice(input))
-            readingState.postValue(ReadingState.DONE)
+            val res = Wallet.parseLNObject(input)
+            inputState.postValue(when (res) {
+              is PaymentRequest -> ReadInputState.Done.Lightning(res)
+              is BitcoinURI -> ReadInputState.Done.Onchain(res)
+              is LNUrl -> ReadInputState.Done.Url(res)
+              else -> ReadInputState.Error.UnhandledInput
+            })
           } catch (e: Exception) {
-            log.info("invalid invoice: ${e.localizedMessage}")
-            invoice.postValue(null)
-            readingState.postValue(ReadingState.ERROR)
-            errorMessage.postValue(R.string.scan_error_default)
+            log.info("invalid lightning object: ${e.localizedMessage}")
+            inputState.postValue(ReadInputState.Error.UnhandledInput)
           }
         }
       }

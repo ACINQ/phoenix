@@ -163,7 +163,7 @@
   <string name="scan_error_expired">Payment has expired.</string>
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
-  <string name="scan_error_lnurl_unsupported">This LNURL is not supported yet!</string>
+  <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
   <string name="scan_amountless_legacy_message"><![CDATA[

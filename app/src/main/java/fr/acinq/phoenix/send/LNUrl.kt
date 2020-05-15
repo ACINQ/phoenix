@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.send
 
 import android.os.Parcelable
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.phoenix.utils.Wallet
 import kotlinx.android.parcel.Parcelize
 import okhttp3.HttpUrl
 import okhttp3.Request
@@ -26,6 +27,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 class LNUrlUnhandledTag(tag: String) : RuntimeException("unhandled LNURL tag=$tag")
@@ -83,10 +85,17 @@ interface LNUrl {
 
     private fun getMetadataFromBaseUrl(url: HttpUrl): JSONObject {
       log.info("retrieving metadata from LNURL=$url")
-      return handleLNUrlRemoteResponse(Wallet.httpClient.newCall(Request.Builder().url(url).build()).execute())
+      val request = Request.Builder().url(url).build()
+      return Wallet.httpClient
+        .newBuilder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .writeTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .build()
+        .newCall(request).execute().use { handleLNUrlRemoteResponse(it) }
     }
 
-    public fun handleLNUrlRemoteResponse(response: Response): JSONObject {
+    fun handleLNUrlRemoteResponse(response: Response): JSONObject {
       val body = response.body()
       if (response.isSuccessful && body != null) {
         val json = JSONObject(body.string())
