@@ -95,16 +95,16 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.1.0"
 
   // ANDROIDX - material
-  def material_version = "1.2.0-alpha05"
+  def material_version = "1.2.0-alpha06"
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
-  def nav_version = "2.2.1"
+  def nav_version = "2.2.2"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ANDROIDX - constraint layout
-  def constraint_version = "2.0.0-beta4"
+  def constraint_version = "2.0.0-beta5"
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
@@ -118,7 +118,7 @@ dependencies {
   implementation "androidx.biometric:biometric:$biometric_version"
 
   // ANDROIDX - preferences
-  def preference_version = "1.1.0"
+  def preference_version = "1.1.1"
   implementation "androidx.preference:preference-ktx:$preference_version"
 
   // ANDROIDX - work manager
@@ -128,7 +128,7 @@ dependencies {
   }
 
   // logging
-  implementation 'org.slf4j:slf4j-api:1.7.25'
+  implementation 'org.slf4j:slf4j-api:1.7.29'
   implementation 'com.github.tony19:logback-android:2.0.0'
 
   // eclair core
