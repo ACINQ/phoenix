@@ -45,13 +45,6 @@ class PaymentDetailsTechnicalsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-
-    model.payment.observe(viewLifecycleOwner, Observer {
-      if (it == null) {
-        findNavController().popBackStack()
-      }
-    })
-
     mBinding.model = model
   }
 

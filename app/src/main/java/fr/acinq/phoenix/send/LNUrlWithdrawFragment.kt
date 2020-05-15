@@ -24,15 +24,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.phoenix.AppKitModel
+import fr.acinq.phoenix.AppViewModel
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentLnurlWithdrawBinding
@@ -64,9 +61,23 @@ class LNUrlWithdrawFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     activity?.let {
-      appKit = ViewModelProvider(it).get(AppKitModel::class.java)
+      app = ViewModelProvider(it).get(AppViewModel::class.java)
       model = ViewModelProvider(this).get(LNUrlWithdrawViewModel::class.java)
       mBinding.model = model
+
+      model.state.observe(viewLifecycleOwner, Observer { state ->
+        context?.let { _ ->
+          when (state) {
+            is LNUrlWithdrawState.Error.Internal -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_internal)
+            is LNUrlWithdrawState.Error.InvalidRequest -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_invalid)
+            is LNUrlWithdrawState.Error.RemoteGeneric -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, getString(R.string.utils_unknown))
+            is LNUrlWithdrawState.Error.RemoteUnreadable -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, getString(R.string.lnurl_withdraw_error_remote_invalid_response))
+            is LNUrlWithdrawState.Error.RemoteWithDetails -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, state.details)
+            is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.topDomain.value)
+            else -> {}
+          }
+        }
+      })
 
       unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
       ArrayAdapter(it, android.R.layout.simple_spinner_item, unitList).also { adapter ->
@@ -78,6 +89,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
 
     } ?: findNavController().navigate(R.id.action_lnurl_withdraw_to_main)
     model.url.value = args.url
+    model.topDomain.value = HttpUrl.get(args.url.callback).topPrivateDomain()
   }
 
   override fun onStart() {
@@ -105,13 +117,12 @@ class LNUrlWithdrawFragment : BaseFragment() {
       try {
         val url = HttpUrl.get(it.callback)
         mBinding.confirmButton.setOnClickListener { _ -> sendWithdrawToRemote(url.newBuilder().addEncodedQueryParameter("k1", it.walletIdentifier), it.description) }
-        mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, url.topPrivateDomain()))
+        mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, model.topDomain.value))
         context?.let { ctx -> mBinding.amountValue.setText(Converter.printAmountRaw(it.maxWithdrawable, ctx)) }
         model.editableAmount.value = it.maxWithdrawable.toLong() != it.minWithdrawable.toLong()
       } catch (e: Exception) {
         log.error("error when reading lnurl-withdraw=$it")
-        model.state.value = LNUrlWithdrawState.ERROR
-        mBinding.error.text = getString(R.string.lnurl_withdraw_error_unreadable)
+        model.state.value = LNUrlWithdrawState.Error.InvalidRequest
       }
     }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_lnurl_withdraw_to_main) })
@@ -155,47 +166,37 @@ class LNUrlWithdrawFragment : BaseFragment() {
     }
   }
 
-  private fun handleRemoteError(message: String) {
-    model.state.postValue(LNUrlWithdrawState.ERROR)
-    mBinding.error.text = message
-  }
-
   private fun sendWithdrawToRemote(urlBuilder: HttpUrl.Builder, description: String) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when sending callback call: ", exception)
-      model.state.value = LNUrlWithdrawState.ERROR
-      mBinding.error.text = getString(R.string.lnurl_withdraw_error_internal)
+      model.state.postValue(LNUrlWithdrawState.Error.Internal)
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
-      if (model.state.value == LNUrlWithdrawState.INIT) {
+      if (model.state.value == LNUrlWithdrawState.Init) {
         val amount = checkAmount()
         if (!amount.isEmpty) {
-          model.state.value = LNUrlWithdrawState.IN_PROGRESS
-          val pr = appKit.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
-          val url = urlBuilder
-            .addEncodedQueryParameter("pr", PaymentRequest.write(pr))
-            .build()
+          model.state.value = LNUrlWithdrawState.InProgress
+          val pr = app.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
+          val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
           Wallet.httpClient.newCall(Request.Builder().url(url).build()).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
               log.error("remote error when sending lnurl-withdraw callback: ", e)
-              handleRemoteError(getString(R.string.lnurl_withdraw_error_callback_remote, url.topPrivateDomain(), e.localizedMessage))
+              model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
             }
 
             override fun onResponse(call: Call, response: Response) {
               try {
                 val json = LNUrl.handleLNUrlRemoteResponse(response)
                 log.debug("lnurl-withdraw remote responds with {}", json.toString(2))
-                model.state.postValue(LNUrlWithdrawState.DONE)
-                mBinding.success.text = getString(R.string.lnurl_withdraw_success, url.topPrivateDomain())
+                model.state.postValue(LNUrlWithdrawState.Done)
               } catch (e: Exception) {
                 log.error("error in LNURL-withdraw callback remote: ", e)
-                handleRemoteError(getString(R.string.lnurl_withdraw_error_callback_remote, url.topPrivateDomain(),
-                  when (e) {
-                    is JSONException -> getString(R.string.lnurl_withdraw_error_json)
-                    is LNUrlRemoteError, is LNUrlRemoteFailure -> e.localizedMessage
-                    else -> getString(R.string.lnurl_withdraw_error_generic)
-                  }))
+                when (e) {
+                  is JSONException -> model.state.postValue(LNUrlWithdrawState.Error.RemoteUnreadable)
+                  is LNUrlRemoteError, is LNUrlRemoteFailure -> model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
+                  else -> model.state.postValue(LNUrlWithdrawState.Error.RemoteGeneric)
+                }
               }
             }
           })
@@ -205,14 +206,24 @@ class LNUrlWithdrawFragment : BaseFragment() {
   }
 }
 
-enum class LNUrlWithdrawState {
-  INIT, IN_PROGRESS, DONE, ERROR
+sealed class LNUrlWithdrawState {
+  object Init : LNUrlWithdrawState()
+  object InProgress : LNUrlWithdrawState()
+  object Done : LNUrlWithdrawState()
+  sealed class Error : LNUrlWithdrawState() {
+    object Internal : Error()
+    object InvalidRequest : Error()
+    object RemoteGeneric : Error()
+    object RemoteUnreadable : Error()
+    data class RemoteWithDetails(val details: String?) : Error()
+  }
 }
 
 class LNUrlWithdrawViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  val state = MutableLiveData(LNUrlWithdrawState.INIT)
+  val state = MutableLiveData<LNUrlWithdrawState>(LNUrlWithdrawState.Init)
   val url = MutableLiveData<LNUrlWithdraw>()
+  val topDomain = MutableLiveData<String>("")
   val editableAmount = MutableLiveData(true)
 }

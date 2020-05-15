@@ -19,7 +19,7 @@
   android:id="@+id/nav_graph_main"
   app:startDestination="@id/main_fragment">
 
-  <!-- global to startup -->
+  <!-- global to main -->
   <action
     android:id="@+id/global_action_any_to_main"
     app:destination="@id/main_fragment" />
@@ -77,6 +77,18 @@
     app:destination="@id/electrum_fragment"
     app:launchSingleTop="true"
     app:popUpTo="@+id/main_fragment" />
+  <!-- global to tor settings -->
+  <action
+    android:id="@+id/global_action_any_to_tor"
+    app:destination="@id/tor_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
+  <!-- global to global settings -->
+  <action
+    android:id="@+id/global_action_any_to_settings"
+    app:destination="@id/settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@+id/main_fragment" />
 
   <!-- main fragment -->
   <fragment
@@ -94,13 +106,16 @@
       app:launchSingleTop="true" />
     <action
       android:id="@+id/action_main_to_settings"
-      app:destination="@id/settings" />
+      app:destination="@id/settings_fragment" />
     <action
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
     <action
       android:id="@+id/action_main_to_seed_security"
       app:destination="@id/seed_security" />
+    <action
+      android:id="@+id/action_main_to_connectivity"
+      app:destination="@id/connectivity_dialog" />
   </fragment>
 
   <!-- init wallet -->
@@ -114,11 +129,6 @@
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left" />
     <action
-      android:id="@+id/action_init_wallet_to_create"
-      app:destination="@id/create_seed_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left" />
-    <action
       android:id="@+id/action_init_wallet_to_auto_create"
       app:destination="@id/auto_create_fragment"
       app:enterAnim="@anim/slide_in_right"
@@ -129,56 +139,13 @@
   <fragment
     android:id="@+id/restore_seed_fragment"
     android:name="fr.acinq.phoenix.initwallet.RestoreSeedFragment"
-    android:label="RestoreSeedFragment">
-    <action
-      android:id="@+id/action_restore_seed_to_setup_pin"
-      app:destination="@id/setup_pin_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left"
-      app:popUpTo="@id/init_wallet_fragment" />
-  </fragment>
-
-  <!-- init wallet: create seed manually -->
-  <fragment
-    android:id="@+id/create_seed_fragment"
-    android:name="fr.acinq.phoenix.initwallet.CreateSeedFragment"
-    android:label="CreateSeedFragment">
-    <action
-      android:id="@+id/action_create_seed_to_setup_pin"
-      app:destination="@id/setup_pin_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left"
-      app:popUpTo="@id/init_wallet_fragment" />
-  </fragment>
-
-  <!-- init wallet: setup pin -->
-  <fragment
-    android:id="@+id/setup_pin_fragment"
-    android:name="fr.acinq.phoenix.initwallet.SetupPinFragment"
-    android:label="SetupPinFragment">
-    <argument
-      android:name="serialized_seed"
-      app:argType="string[]" />
-    <action
-      android:id="@+id/action_setup_pin_to_main"
-      app:destination="@id/main_fragment"
-      app:enterAnim="@anim/slide_in_right"
-      app:exitAnim="@anim/slide_out_left" />
-  </fragment>
+    android:label="RestoreSeedFragment" />
 
   <!-- init wallet: automated seed creation -->
   <fragment
     android:id="@+id/auto_create_fragment"
     android:name="fr.acinq.phoenix.initwallet.AutoCreateFragment"
-    android:label="AutoCreateFragment">
-    <action
-      android:id="@+id/action_auto_create_to_startup"
-      app:destination="@+id/main_fragment"
-      app:enterAnim="@anim/fade_in"
-      app:exitAnim="@anim/fade_out"
-      app:launchSingleTop="true"
-      app:popUpTo="@id/main_fragment" />
-  </fragment>
+    android:label="AutoCreateFragment" />
 
   <!-- startup node -->
   <fragment
@@ -229,6 +196,9 @@
     <action
       android:id="@+id/action_receive_with_open_to_main"
       app:destination="@+id/main_fragment" />
+    <argument
+      android:name="expireAt"
+      app:argType="long" />
   </dialog>
 
   <!-- send money -->
@@ -269,83 +239,6 @@
       app:popUpTo="@+id/main_fragment" />
   </fragment>
 
-  <!-- settings/tools page -->
-  <fragment
-    android:id="@+id/settings"
-    android:name="fr.acinq.phoenix.settings.SettingsFragment"
-    android:label="SettingsFragment">
-    <action
-      android:id="@+id/action_settings_to_mutual_close"
-      app:destination="@id/mutual_close_fragment" />
-    <action
-      android:id="@+id/action_settings_to_force_close"
-      app:destination="@id/force_close_fragment" />
-    <action
-      android:id="@+id/action_settings_to_list_channels"
-      app:destination="@id/channels_list_fragment" />
-    <action
-      android:id="@+id/action_settings_to_display_seed"
-      app:destination="@id/display_seed" />
-    <action
-      android:id="@+id/action_settings_to_logs"
-      app:destination="@id/logs_fragment" />
-    <action
-      android:id="@+id/action_settings_to_seed_security"
-      app:destination="@id/seed_security" />
-    <action
-      android:id="@+id/action_settings_to_prefs_display"
-      app:destination="@id/prefs_display" />
-    <action
-      android:id="@+id/action_settings_to_electrum"
-      app:destination="@id/electrum_fragment" />
-  </fragment>
-
-  <!-- settings: mutual close all channels -->
-  <fragment
-    android:id="@+id/mutual_close_fragment"
-    android:name="fr.acinq.phoenix.settings.MutualCloseFragment"
-    android:label="MutualCloseFragment" />
-
-  <!-- settings: mutual close all channels -->
-  <fragment
-    android:id="@+id/force_close_fragment"
-    android:name="fr.acinq.phoenix.settings.ForceCloseFragment"
-    android:label="ForceCloseFragment" />
-
-  <!-- settings: list all channels -->
-  <fragment
-    android:id="@+id/channels_list_fragment"
-    android:name="fr.acinq.phoenix.settings.ListChannelsFragment"
-    android:label="ListChannelsFragment">
-    <action
-      android:id="@+id/action_list_channels_to_channel_details"
-      app:destination="@id/channel_details" />
-  </fragment>
-
-  <!-- settings: display wallet seed -->
-  <fragment
-    android:id="@+id/display_seed"
-    android:name="fr.acinq.phoenix.settings.DisplaySeedFragment"
-    android:label="DisplaySeedFragment" />
-
-  <!-- settings: share logs -->
-  <fragment
-    android:id="@+id/logs_fragment"
-    android:name="fr.acinq.phoenix.settings.LogsSettingsFragment"
-    android:label="LogsSettingsFragment" />
-
-  <!-- settings: set pin/biometric -->
-  <fragment
-    android:id="@+id/seed_security"
-    android:name="fr.acinq.phoenix.settings.SeedSecurityFragment"
-    android:label="seed_security" />
-
-  <!-- settings: change display settings (theme, currency...) -->
-  <fragment
-    android:id="@+id/prefs_display"
-    android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
-    android:label="DisplayPrefsFragment" />
-
   <!-- nested graph with shared view model for payment details -->
   <navigation
     android:id="@+id/nav_graph_payment_details"
@@ -382,16 +275,6 @@
       android:label="PaymentDetailsTechnicalsFragment" />
   </navigation>
 
-  <!-- channel details dialog -->
-  <dialog
-    android:id="@+id/channel_details"
-    android:name="fr.acinq.phoenix.settings.ChannelDetailsDialog"
-    android:label="channel_details">
-    <argument
-      android:name="channel_id"
-      app:argType="string" />
-  </dialog>
-
   <!-- LNURL: login -->
   <fragment
     android:id="@+id/lnurl_login"
@@ -401,12 +284,6 @@
       android:name="uri"
       app:argType="string" />
   </fragment>
-
-  <!-- settings: electrum server -->
-  <fragment
-    android:id="@+id/electrum_fragment"
-    android:name="fr.acinq.phoenix.settings.ElectrumServerFragment"
-    android:label="ElectrumServerFragment" />
 
   <!-- LNURL: pay -->
   <dialog
@@ -432,5 +309,122 @@
       app:popUpTo="@id/main_fragment"
       app:popUpToInclusive="true" />
   </fragment>
+
+  <!-- settings: root -->
+  <fragment
+    android:id="@+id/settings_fragment"
+    android:name="fr.acinq.phoenix.settings.SettingsFragment"
+    android:label="SettingsFragment">
+    <action
+      android:id="@+id/action_settings_to_mutual_close"
+      app:destination="@id/mutual_close_fragment" />
+    <action
+      android:id="@+id/action_settings_to_force_close"
+      app:destination="@id/force_close_fragment" />
+    <action
+      android:id="@+id/action_settings_to_list_channels"
+      app:destination="@id/channels_list_fragment" />
+    <action
+      android:id="@+id/action_settings_to_display_seed"
+      app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_settings_to_logs"
+      app:destination="@id/logs_fragment" />
+    <action
+      android:id="@+id/action_settings_to_seed_security"
+      app:destination="@id/seed_security" />
+    <action
+      android:id="@+id/action_settings_to_prefs_display"
+      app:destination="@id/prefs_display" />
+    <action
+      android:id="@+id/action_settings_to_electrum"
+      app:destination="@id/electrum_fragment" />
+    <action
+      android:id="@+id/action_settings_to_fees"
+      app:destination="@id/fees_fragment" />
+    <action
+      android:id="@+id/action_settings_to_tor"
+      app:destination="@id/tor_fragment" />
+  </fragment>
+
+  <!-- settings: mutual close all channels -->
+  <fragment
+    android:id="@+id/mutual_close_fragment"
+    android:name="fr.acinq.phoenix.settings.MutualCloseFragment"
+    android:label="MutualCloseFragment" />
+
+  <!-- settings: force close all channels -->
+  <fragment
+    android:id="@+id/force_close_fragment"
+    android:name="fr.acinq.phoenix.settings.ForceCloseFragment"
+    android:label="ForceCloseFragment" />
+
+  <!-- settings: list all channels -->
+  <fragment
+    android:id="@+id/channels_list_fragment"
+    android:name="fr.acinq.phoenix.settings.ListChannelsFragment"
+    android:label="ListChannelsFragment">
+    <action
+      android:id="@+id/action_list_channels_to_channel_details"
+      app:destination="@id/channel_details" />
+  </fragment>
+
+  <!-- settings: channel details dialog -->
+  <dialog
+    android:id="@+id/channel_details"
+    android:name="fr.acinq.phoenix.settings.ChannelDetailsDialog"
+    android:label="channel_details">
+    <argument
+      android:name="channel_id"
+      app:argType="string" />
+  </dialog>
+
+  <!-- settings: share logs -->
+  <fragment
+    android:id="@+id/logs_fragment"
+    android:name="fr.acinq.phoenix.settings.LogsSettingsFragment"
+    android:label="LogsSettingsFragment" />
+
+  <!-- settings: change electrum server -->
+  <fragment
+    android:id="@+id/electrum_fragment"
+    android:name="fr.acinq.phoenix.settings.ElectrumServerFragment"
+    android:label="ElectrumServerFragment" />
+
+  <!-- settings: display wallet seed -->
+  <fragment
+    android:id="@+id/display_seed"
+    android:name="fr.acinq.phoenix.settings.DisplaySeedFragment"
+    android:label="DisplaySeedFragment" />
+
+  <!-- settings: wallet access (pin,...) -->
+  <fragment
+    android:id="@+id/seed_security"
+    android:name="fr.acinq.phoenix.settings.SeedSecurityFragment"
+    android:label="seed_security" />
+
+  <!-- settings: change display settings (theme, currency...) -->
+  <fragment
+    android:id="@+id/prefs_display"
+    android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
+    android:label="DisplayPrefsFragment" />
+
+  <!-- settings: consult and change fees profile -->
+  <fragment
+    android:id="@+id/fees_fragment"
+    android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
+    android:label="FeesSettingsFragment" />
+
+  <!-- settings: TOR -->
+  <fragment
+    android:id="@+id/tor_fragment"
+    android:name="fr.acinq.phoenix.settings.TorSettingFragment"
+    android:label="TorSettingFragment" />
+
+  <!-- main: connectivity feedback dialog -->
+  <dialog
+    android:id="@+id/connectivity_dialog"
+    android:name="fr.acinq.phoenix.main.ConnectivityFragmentDialog"
+    android:label="connectivity_dialog" />
 
 </navigation>

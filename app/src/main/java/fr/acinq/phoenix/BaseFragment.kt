@@ -32,26 +32,26 @@ import org.slf4j.LoggerFactory
 abstract class BaseFragment : Fragment() {
 
   open val log: Logger = LoggerFactory.getLogger(BaseFragment::class.java)
-  protected lateinit var appKit: AppKitModel
+  protected lateinit var app: AppViewModel
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    appKit = ViewModelProvider(activity!!).get(AppKitModel::class.java)
-    appKit.kit.observe(viewLifecycleOwner, Observer {
-      appCheckup()
+    app = ViewModelProvider(activity!!).get(AppViewModel::class.java)
+    app.state.observe(viewLifecycleOwner, Observer {
+      handleKitState(it)
     })
   }
 
   /**
    * Checks up the app state (wallet init, app kit is started) and navigate to appropriate page if needed.
    */
-  open fun appCheckup() {
-    if (!appKit.isKitReady()) {
-      if (context != null && !appKit.hasWalletBeenSetup(context!!)) {
+  open fun handleKitState(state: KitState) {
+    if (state !is KitState.Started) {
+      if (context != null && !app.hasWalletBeenSetup(context!!)) {
         log.info("wallet has not been initialized, moving to init")
         findNavController().navigate(R.id.global_action_any_to_init_wallet)
       } else {
-        log.info("appkit is not ready, moving to startup")
+        log.info("kit is not ready, moving to startup")
         findNavController().navigate(R.id.global_action_any_to_startup)
       }
     }

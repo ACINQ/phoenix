@@ -62,6 +62,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:text="@string/initwallet_restore" />
 
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginEnd="@dimen/space_md"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:icon="@drawable/ic_settings" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

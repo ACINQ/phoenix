@@ -25,15 +25,14 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.phoenix.utils.BindingHelpers
@@ -49,7 +48,6 @@ class ElectrumServerFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsElectrumServerBinding
-  private lateinit var model: ElectrumServerViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsElectrumServerBinding.inflate(inflater, container, false)
@@ -59,30 +57,41 @@ class ElectrumServerFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
-    appKit.kit.observe(viewLifecycleOwner, Observer {
-      // -- xpub / feerate from appkit
-      if (appKit.kit.value == null) {
-        mBinding.feeRate.text = getString(R.string.utils_unknown)
-        mBinding.xpub.text = getString(R.string.utils_unknown)
-      } else {
-        mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
-        val feeRate = `package$`.`MODULE$`.feerateKw2Byte(appKit.kit.value!!.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
-        mBinding.feeRate.visibility = View.VISIBLE
-        mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+    app.state.observe(viewLifecycleOwner, Observer {
+      when (it) {
+        is KitState.Started -> {
+          // -- xpub / feerate from appkit
+          mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
+          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(it.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
+          mBinding.feeRate.visibility = View.VISIBLE
+          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
+        }
+        else -> {
+          mBinding.feeRate.text = getString(R.string.utils_unknown)
+          mBinding.xpub.text = getString(R.string.utils_unknown)
+        }
       }
     })
-    appKit.networkInfo.observe(viewLifecycleOwner, Observer {
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
         val electrumServer = it.electrumServer
         if (electrumServer == null) {
           // -- no connection to electrum server yet
           val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-          mBinding.connectionStateValue.text = Converter.html(if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-            resources.getString(R.string.electrum_connecting)
-          } else {
-            resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-          })
+          mBinding.connectionStateValue.text = Converter.html(
+            if (app.state.value is KitState.Started) {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_connecting)
+              } else {
+                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+              }
+            } else {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_not_connected)
+              } else {
+                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+              }
+            })
         } else {
           // -- successfully connected to electrum
           mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
@@ -91,7 +100,6 @@ class ElectrumServerFragment : BaseFragment() {
         }
       }
     })
-    mBinding.model = model
   }
 
   override fun onStart() {
@@ -104,30 +112,46 @@ class ElectrumServerFragment : BaseFragment() {
     }
   }
 
+  override fun handleKitState(state: KitState) {}
+
   private fun getElectrumDialog(context: Context): AlertDialog {
     val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
-    val sslWarning = view.findViewById<TextView>(R.id.elec_dialog_ssl)
-    val checkbox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
-    val inputLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
-    val inputValue = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
+    val useCustomElectrumBox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
+    val addressLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
+    val addressInput = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
+    val sslLayout = view.findViewById<View>(R.id.elec_dialog_ssl)
+    val sslInfoText = view.findViewById<TextView>(R.id.elec_dialog_ssl_info)
+    val sslForceCheckbox = view.findViewById<CheckBox>(R.id.elec_dialog_ssl_force_checkbox)
     val currentPrefsAddress = Prefs.getElectrumServer(context)
 
     fun updateState(isChecked: Boolean) {
-      BindingHelpers.enableOrFade(inputLabel, isChecked)
-      BindingHelpers.enableOrFade(inputValue, isChecked)
-      BindingHelpers.enableOrFade(sslWarning, isChecked)
+      BindingHelpers.enableOrFade(addressLabel, isChecked)
+      BindingHelpers.enableOrFade(addressInput, isChecked)
+      BindingHelpers.enableOrFade(sslLayout, isChecked)
     }
 
-    checkbox.setOnCheckedChangeListener { v, isChecked -> updateState(isChecked) }
+    fun isOnion(address: String) = address.split(":").first().endsWith(".onion")
 
-    if (Strings.isNullOrEmpty(currentPrefsAddress)) {
-      checkbox.isChecked = false
+    fun updateSSLLayout(input: String) {
+      val isOnion = isOnion(input)
+      BindingHelpers.show(sslInfoText, !isOnion)
+      BindingHelpers.show(sslForceCheckbox, isOnion)
+    }
+
+    useCustomElectrumBox.setOnCheckedChangeListener { _, isChecked -> updateState(isChecked) }
+    addressInput.addTextChangedListener { updateSSLLayout(it.toString()) }
+
+    // initial state
+    if (currentPrefsAddress.isBlank()) {
+      useCustomElectrumBox.isChecked = false
       updateState(false)
     } else {
-      checkbox.isChecked = true
-      inputValue.setText(currentPrefsAddress)
+      useCustomElectrumBox.isChecked = true
+      addressInput.setText(currentPrefsAddress)
       updateState(true)
     }
+    updateSSLLayout(currentPrefsAddress)
+    sslForceCheckbox.isChecked = Prefs.getForceElectrumSSL(context)
 
     val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
       .setView(view)
@@ -138,32 +162,25 @@ class ElectrumServerFragment : BaseFragment() {
     dialog.setOnShowListener {
       val confirmButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
       confirmButton.setOnClickListener {
-        val address = inputValue.text.toString()
-        if (checkbox.isChecked && Strings.isNullOrEmpty(address)) {
+        val address = addressInput.text.toString()
+        if (useCustomElectrumBox.isChecked && address.isBlank()) {
           Toast.makeText(context, R.string.electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
         } else {
-          Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
+          Prefs.saveElectrumServer(context, if (useCustomElectrumBox.isChecked) address else "")
+          if (isOnion(address)) {
+            Prefs.saveForceElectrumSSL(context, sslForceCheckbox.isChecked)
+          }
           dialog.dismiss()
-          appKit.shutdown()
+          if (app.state.value is KitState.Started) {
+            app.shutdown()
+            findNavController().navigate(R.id.global_action_any_to_startup)
+          } else {
+            findNavController().popBackStack()
+          }
         }
       }
     }
 
     return dialog
   }
-}
-
-enum class ElectrumServerState {
-  INIT, IN_PROGRESS, DONE, ERROR
-}
-
-class ElectrumServerViewModel : ViewModel() {
-
-  private val log = LoggerFactory.getLogger(this::class.java)
-  val state = MutableLiveData<ElectrumServerState>()
-
-  init {
-    state.value = ElectrumServerState.INIT
-  }
-
 }

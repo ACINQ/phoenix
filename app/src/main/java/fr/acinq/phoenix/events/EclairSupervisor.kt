@@ -22,6 +22,8 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
+import fr.acinq.eclair.io.PeerConnected
+import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
@@ -72,10 +74,21 @@ class EclairSupervisor : UntypedActor() {
       is Relayer.OutgoingChannels -> {
         val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
         val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())
+        log.info("receive Relayer.OutgoingChannels event with ${event.channels().size()} channels holding $total")
         EventBus.getDefault().post(BalanceEvent(total))
       }
 
-      // -------------- ELECTRUM -------------
+      // -------------- CONNECTION WATCHER --------------
+      is PeerConnected -> {
+        log.info("connected to ${event.nodeId()}")
+        EventBus.getDefault().post(event)
+      }
+      is PeerDisconnected -> {
+        log.info("disconnected from ${event.nodeId()}")
+        EventBus.getDefault().post(event)
+      }
+
+      // -------------- ELECTRUM --------------
       is ElectrumClient.ElectrumReady -> EventBus.getDefault().post(event)
       is ElectrumClient.`ElectrumDisconnected$` -> EventBus.getDefault().post(event)
 
@@ -83,7 +96,7 @@ class EclairSupervisor : UntypedActor() {
       is AcceptPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(true)) {
+          if (it.decision().trySuccess(true)) {
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")
@@ -93,7 +106,7 @@ class EclairSupervisor : UntypedActor() {
       is RejectPayToOpen -> {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
-          if (it.paymentPreimage().trySuccess(false)) {
+          if (it.decision().trySuccess(false)) {
             log.info("payToOpen event has been rejected by user")
           } else {
             log.warn("success promise for $event has failed")

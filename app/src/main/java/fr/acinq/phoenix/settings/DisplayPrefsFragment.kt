@@ -18,13 +18,14 @@ package fr.acinq.phoenix.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsPrefsDisplayBinding
 import fr.acinq.phoenix.utils.Converter
@@ -59,6 +60,8 @@ class DisplayPrefsFragment : BaseFragment(), SharedPreferences.OnSharedPreferenc
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
   }
+
+  override fun handleKitState(state: KitState) {}
 
   override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
     activity?.run {

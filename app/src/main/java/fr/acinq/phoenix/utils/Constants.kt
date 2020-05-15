@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import android.text.format.DateUtils
+import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.*
 import okhttp3.MediaType
@@ -30,6 +31,7 @@ object Constants {
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
   const val PRICE_RATE_API = "https://blockchain.info/ticker"
+  const val MXN_PRICE_RATE_API = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
 
   // -- default values
   internal const val DEFAULT_PIN = "111111"
@@ -37,14 +39,19 @@ object Constants {
   // -- intents
   const val INTENT_CAMERA_PERMISSION_REQUEST = 1
 
-  const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
-
   // -- android notifications
-  const val WATCHER_NOTIFICATION_CHANNEL_ID = "WATCHER_NOTIF_ID"
+  const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
+  const val WATCHER_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
   const val WATCHER_REQUEST_CODE = 37921816
 
   // -- default wallet values
-  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = true)
-  val DEFAULT_TRAMPOLINE_SETTINGS = TrampolineSettings(MilliSatoshi(5000), 0.001, 5, 144)
-  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.005)
+  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())
+  // these default values will be overridden by fee settings from remote, with up-to-date values
+  val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
+    TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %
+    TrampolineFeeSetting(MilliSatoshi(3000), 0.0001, CltvExpiryDelta(576)), // 3 sat + 0.01 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.0005, CltvExpiryDelta(576)), // 5 sat + 0.05 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(576)), // 5 sat + 0.1 %
+    TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(576))) // 5 sat + 0.12 %
+  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
 }

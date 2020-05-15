@@ -46,7 +46,6 @@ import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
-import scala.util.Left
 
 class SendFragment : BaseFragment() {
 
@@ -79,58 +78,39 @@ class SendFragment : BaseFragment() {
       mBinding.unit.setSelection(unitList.indexOf(unit.code()))
     }
 
-    model.swapState.observe(viewLifecycleOwner, Observer {
-      if (context != null) {
-        when (it) {
-          SwapState.SWAP_EXCEEDS_BALANCE -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(context!!, R.attr.negativeColor))
-          else -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(context!!, R.attr.textColor))
-        }
-      }
-    })
-
-    model.invoice.observe(viewLifecycleOwner, Observer {
-      it?.let {
-        context?.let { ctx ->
-          model.isAmountFieldPristine.value = true
-          when {
-            // invoice is a bitcoin uri not swapped yet
-            it.isLeft && it.left().get().second == null -> {
-              model.swapState.value = SwapState.SWAP_REQUIRED
-              it.left().get().first.amount?.let { amount -> mBinding.amount.setText(Converter.printAmountRaw(amount, ctx)) }
-            }
-            // invoice is a bitcoin uri with a swapped LN invoice
-            it.isLeft && it.left().get().second != null && it.left().get().second!!.amount().isDefined -> {
-              val amountInput = checkAmount()
-              if (amountInput.isDefined) {
-                val total = it.left().get().second!!.amount().get()
-                val fee = total.`$minus`(amountInput.get())
-                log.info("swap-out [ amount=$amountInput fee=$fee total=$total ]")
-                if (fee.toLong() < 0) {
-                  model.swapState.value = SwapState.SWAP_REQUIRED
-                } else {
-                  mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amount = amountInput.get(), context = ctx, withUnit = true)
-                  mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(amount = fee, context = ctx, withUnit = true)
-                  mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(amount = total, context = ctx, withUnit = true)
-                  if (total.`$greater`(appKit.balance.value)) {
-                    model.swapState.value = SwapState.SWAP_EXCEEDS_BALANCE
-                  } else {
-                    model.swapState.value = SwapState.SWAP_COMPLETE
-                  }
-                }
-              } else {
-                model.swapState.value = SwapState.SWAP_REQUIRED
-              }
-              Unit
-            }
-            // invoice is a payment request
-            it.isRight -> {
-              if (it.right().get().amount().isDefined) {
-                mBinding.amount.setText(Converter.printAmountRaw(it.right().get().amount().get(), ctx))
-              }
-              model.swapState.value = SwapState.NO_SWAP
-            }
-            else -> Unit
+    model.state.observe(viewLifecycleOwner, Observer { state ->
+      context?.let { ctx ->
+        model.isAmountFieldPristine.value = true
+        when {
+          state is SendState.Lightning.Ready && state.pr.amount().isDefined -> {
+            mBinding.amount.setText(Converter.printAmountRaw(state.pr.amount().get(), ctx))
           }
+          state is SendState.Onchain.SwapRequired && state.uri.amount != null -> {
+            mBinding.amount.setText(Converter.printAmountRaw(state.uri.amount, ctx))
+          }
+          state is SendState.Onchain.Ready && state.pr.amount().isDefined -> {
+            val amountEnteredByUser = checkAmount()
+            if (amountEnteredByUser.isEmpty) {
+              model.state.value = SendState.Onchain.SwapRequired(state.uri)
+            } else {
+              val totalAfterSwap = state.pr.amount().get()
+              val fee = totalAfterSwap.`$minus`(amountEnteredByUser.get())
+              log.info("swap-out [ amountEnteredByUser=$amountEnteredByUser fee=$fee totalAfterSwap=$totalAfterSwap ]")
+              if (fee.toLong() < 0) {
+                model.state.value = SendState.Onchain.SwapRequired(state.uri)
+              } else {
+                mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amountEnteredByUser.get(), ctx, withUnit = true)
+                mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.textColor))
+                mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(fee, ctx, withUnit = true)
+                mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
+                if (totalAfterSwap.`$greater`(app.balance.value)) {
+                  model.state.value = SendState.Onchain.Error.ExceedsBalance(state.uri)
+                }
+              }
+            }
+          }
+          state is SendState.Onchain.Error.ExceedsBalance -> mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.negativeColor))
+          else -> Unit
         }
       }
     })
@@ -148,8 +128,8 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null && appKit.balance.value != null) {
-        appKit.balance.value!!.run {
+      if (useMax && context != null && app.balance.value != null) {
+        app.balance.value!!.run {
           val unit = Prefs.getCoinUnit(context!!)
           mBinding.unit.setSelection(unitList.indexOf(unit.code()))
           mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
@@ -162,8 +142,9 @@ class SendFragment : BaseFragment() {
     mBinding.amount.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(s: Editable?) {
         model.isAmountFieldPristine.value = false
-        if (model.swapState.value != SwapState.NO_SWAP) {
-          model.swapState.value = SwapState.SWAP_REQUIRED
+        val state = model.state.value
+        if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
+          model.state.value = SendState.Onchain.SwapRequired(state.uri)
         }
       }
 
@@ -178,8 +159,9 @@ class SendFragment : BaseFragment() {
       override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (model.swapState.value != SwapState.NO_SWAP) {
-          model.swapState.value = SwapState.SWAP_REQUIRED
+        val state = model.state.value
+        if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
+          model.state.value = SendState.Onchain.SwapRequired(state.uri)
         }
         checkAmount()
       }
@@ -192,37 +174,30 @@ class SendFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
-    appKit.balance.value?.let {
+    app.balance.value?.let {
       mBinding.balanceValue.setAmount(it)
     } ?: log.warn("balance is not available yet")
 
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
 
-    mBinding.sendButton.setOnClickListener { _ ->
+    mBinding.sendButton.setOnClickListener {
       model.isAmountFieldPristine.value = false
-      model.invoice.value?.let {
-        Wallet.hideKeyboard(context, mBinding.amount)
-        val amount_opt = checkAmount()
-        if (amount_opt.isDefined) {
-          val amount = amount_opt.get()
-          when {
-            it.isLeft && model.swapState.value != SwapState.SWAP_REQUIRED -> {
-              it.left()?.get()?.second?.let { pr ->
-                if (pr.amount().isDefined) {
-                  sendPaymentFinal(pr.amount().get(), pr)
-                }
-              } ?: log.warn("invoice=$it in model is not valid for swap")
-            }
-            it.isRight -> {
-              sendPaymentFinal(amount, it.right().get())
-            }
-          }
+      Wallet.hideKeyboard(context, mBinding.amount)
+      val amount = checkAmount()
+      if (amount.isDefined) {
+        when (val state = model.state.value) {
+          is SendState.Onchain.Ready -> sendPaymentFinal(state.pr.amount().get(), state.pr)
+          is SendState.Lightning.Ready -> sendPaymentFinal(amount.get(), state.pr)
         }
       }
     }
 
     mBinding.swapButton.setOnClickListener {
-      sendSwapOut()
+      model.state.value?.let {
+        if (it is SendState.Onchain) {
+          requestSwapOut(it.uri)
+        }
+      }
     }
   }
 
@@ -231,37 +206,42 @@ class SendFragment : BaseFragment() {
     EventBus.getDefault().unregister(this)
   }
 
-  private fun sendSwapOut() {
+  private fun requestSwapOut(uri: BitcoinURI) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when sending SwapOut: ", exception)
-      model.swapState.postValue(SwapState.SWAP_REQUIRED)
+      model.state.postValue(SendState.Onchain.SwapRequired(uri))
       Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
       model.isAmountFieldPristine.value = false
+      model.state.value = SendState.Onchain.Swapping(uri)
       Wallet.hideKeyboard(context, mBinding.amount)
-      model.invoice.value?.let {
-        val amount_opt = checkAmount()
-        if (amount_opt.isDefined) {
-          val amount = amount_opt.get()
-          if (it.isLeft) {
-            val rawAmount = Converter.msat2sat(amount)
-            // FIXME: use feerate provided by user, like in eclair mobile
-            val feeratePerKw = appKit.kit.value?.run { kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: 0L
-            model.swapState.postValue(SwapState.SWAP_IN_PROGRESS)
-            appKit.sendSwapOut(amount = rawAmount, address = it.left().get().first.address, feeratePerKw = feeratePerKw)
-          }
-        }
+      val amount = checkAmount()
+      if (amount.isDefined) {
+        // FIXME: use feerate provided by user, like in eclair mobile
+        val feeratePerKw = app.kit?.run { nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
+        app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
+      } else {
+        model.state.postValue(SendState.Onchain.SwapRequired(uri))
       }
     }
   }
 
   private fun sendPaymentFinal(amount: MilliSatoshi, pr: PaymentRequest) {
+    val state = model.state.value
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when sending payment: ", exception)
-      model.state.value = SendState.VALID_INVOICE
+      model.state.value = when (state) {
+        is SendState.Lightning -> SendState.Lightning.Error.SendingFailure(pr)
+        is SendState.Onchain -> SendState.Onchain.Error.SendingFailure(state.uri, pr)
+        else -> SendState.CheckingInvoice
+      }
     }) {
-      model.state.value = SendState.SENDING
-      appKit.sendPaymentRequest(amount = amount, paymentRequest = pr, deductFeeFromAmount = model.useMaxBalance.value ?: false, checkFees = false)
+      model.state.value = when (state) {
+        is SendState.Lightning -> SendState.Lightning.Sending(pr)
+        is SendState.Onchain -> SendState.Onchain.Sending(state.uri, pr)
+        else -> throw RuntimeException("unhandled state=$state when sending payment")
+      }
+      app.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }
@@ -270,7 +250,7 @@ class SendFragment : BaseFragment() {
     return try {
       val unit = mBinding.unit.selectedItem.toString()
       val amountInput = mBinding.amount.text.toString()
-      val balance = appKit.balance.value
+      val balance = app.balance.value
       model.amountErrorMessage.value = null
       val fiat = Prefs.getFiatCurrency(context!!)
       val amount = if (unit == fiat) {
@@ -287,36 +267,32 @@ class SendFragment : BaseFragment() {
         if (balance != null && amount.get().`$greater`(balance)) {
           throw InsufficientBalance()
         }
-        val isSwapOut = model.invoice.value?.isLeft ?: false
-        if (isSwapOut && amount.get().`$less`(Satoshi(10000))) {
+        if (model.state.value is SendState.Onchain && amount.get().`$less`(Satoshi(10000))) {
           throw SwapOutInsufficientAmount()
         }
       } else {
         throw RuntimeException("amount is undefined")
       }
       amount
-    } catch (e: SwapOutInsufficientAmount) {
-      model.amountErrorMessage.value = R.string.send_amount_error_swap_out_too_small
-      Option.empty()
-    } catch (e: InsufficientBalance) {
-      model.amountErrorMessage.value = R.string.send_amount_error_balance
-      Option.empty()
     } catch (e: Exception) {
       log.info("could not check amount: ${e.message}")
-      model.amountErrorMessage.value = R.string.send_amount_error
+      mBinding.amountConverted.text = ""
+      model.amountErrorMessage.value = when (e) {
+        is SwapOutInsufficientAmount -> R.string.send_amount_error_swap_out_too_small
+        is InsufficientBalance -> R.string.send_amount_error_balance
+        else -> R.string.send_amount_error
+      }
       Option.empty()
     }
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: SwapOutResponse) {
-    model.invoice.value?.run {
-      if (isLeft) {
-        val bitcoinURI = left().get().first
-        val paymentRequest = PaymentRequest.read(event.paymentRequest())
-        log.info("swapped $bitcoinURI -> $paymentRequest")
-        model.invoice.postValue(Left.apply(Pair(bitcoinURI, paymentRequest)))
-      }
+    val state = model.state.value
+    if (state is SendState.Onchain.Swapping) {
+      val paymentRequest = PaymentRequest.read(event.paymentRequest())
+      log.info("swapped ${state.uri} -> $paymentRequest")
+      model.state.postValue(SendState.Onchain.Ready(state.uri, paymentRequest))
     }
   }
 }

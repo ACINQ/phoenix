@@ -110,7 +110,7 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    appKit.pendingSwapIns.observe(viewLifecycleOwner, Observer {
+    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
       model.invoice.value?.let { invoice ->
         // if user is swapping in and a payment is incoming on this address, move to main
         if (invoice.second != null && invoice.second != null && model.state.value == SwapInState.DONE) {
@@ -175,7 +175,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      val swapInFee = 100 * (appKit.swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+      val swapInFee = 100 * (app.swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
       AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
         Converter.html(getString(R.string.receive_swap_in_disclaimer_message, String.format("%.2f", swapInFee))))
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
@@ -229,13 +229,13 @@ class ReceiveFragment : BaseFragment() {
       val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
-      Toast.makeText(activity!!.applicationContext, R.string.copied, Toast.LENGTH_SHORT).show()
+      Toast.makeText(activity!!.applicationContext, R.string.utils_copied, Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
       log.error("failed to copy: ${e.localizedMessage}")
     }
   }
 
-  // payment request is generated in appkit view model and updates the receive view model
+  // payment request is generated in app view model and updates the receive view model
   private fun generatePaymentRequest() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when generating payment request: ", exception)
@@ -244,7 +244,7 @@ class ReceiveFragment : BaseFragment() {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
       val desc = mBinding.descValue.text.toString()
-      model.invoice.value = Pair(appKit.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount()), null)
+      model.invoice.value = Pair(app.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount()), null)
     }
   }
 
@@ -255,7 +255,7 @@ class ReceiveFragment : BaseFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = SwapInState.IN_PROGRESS
-      appKit.sendSwapIn()
+      app.sendSwapIn()
     }
   }
 

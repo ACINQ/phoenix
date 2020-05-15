@@ -18,13 +18,12 @@ package fr.acinq.phoenix.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.util.Base64
+import androidx.preference.PreferenceManager
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
-import fr.acinq.phoenix.R
 
 object Prefs {
 
@@ -52,9 +51,13 @@ object Prefs {
 
   // -- node configuration
   const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
+  const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
+  const val PREFS_TRAMPOLINE_MAX_FEE_INDEX = "PREFS_TRAMPOLINE_MAX_FEE_INDEX"
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
+  const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
+  const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
 
   fun getLastVersionUsed(context: Context): Int {
     return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
@@ -195,4 +198,35 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ELECTRUM_ADDRESS, address.trim()).apply()
   }
 
+  fun getForceElectrumSSL(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_ELECTRUM_FORCE_SSL, false)
+  }
+
+  fun saveForceElectrumSSL(context: Context, mustCheck: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_ELECTRUM_FORCE_SSL, mustCheck).apply()
+  }
+
+  fun getTrampolineMaxFeeIndex(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, -1)
+  }
+
+  fun saveTrampolineMaxFeeIndex(context: Context, index: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_TRAMPOLINE_MAX_FEE_INDEX, index).apply()
+  }
+
+  fun isTorEnabled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_TOR_ENABLED, false)
+  }
+
+  fun saveTorEnabled(context: Context, enabled: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_TOR_ENABLED, enabled).apply()
+  }
+
+  fun isPinScrambled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCRAMBLE_PIN, false)
+  }
+
+  fun savePinScrambled(context: Context, isScrambled: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
+  }
 }

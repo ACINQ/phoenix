@@ -18,6 +18,7 @@ package fr.acinq.phoenix.paymentdetails
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -46,9 +47,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scala.util.Either
-import scala.util.Left
-import scala.util.Right
+import scala.collection.JavaConverters
 import java.text.DateFormat
 import java.util.*
 
@@ -77,61 +76,83 @@ class PaymentDetailsFragment : BaseFragment() {
     if (args.fromEvent) {
       mBinding.mainLayout.layoutTransition = null
     }
-    model.payment.observe(viewLifecycleOwner, Observer {
-      it?.let {
-        context?.let { ctx ->
-          when {
-            // OUTGOING PAYMENT
-            it.isLeft && it.left().get().isNotEmpty() -> {
-              val payments = it.left().get()
-              val p = it.left().get().first()
-              when (p.status()) {
-                is OutgoingPaymentStatus.Failed -> {
-                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
-                  showStatusIconAndDetails(ctx, R.drawable.ic_cross, ThemeHelper.color(ctx, R.attr.negativeColor))
-                  val status = p.status() as OutgoingPaymentStatus.Failed
-                  val errorMessages = ArrayList<String>()
-                  val iterator = status.failures().iterator()
-                  while (iterator.hasNext()) {
-                    errorMessages += iterator.next().failureMessage()
-                  }
-                  mBinding.errorValue.text = errorMessages.joinToString(", ")
-                }
-                is OutgoingPaymentStatus.`Pending$` -> {
-                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
-                  showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
-                }
-                is OutgoingPaymentStatus.Succeeded -> {
-                  val status = p.status() as OutgoingPaymentStatus.Succeeded
-                  mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, status.completedAt())))
-                  val statuses: List<OutgoingPaymentStatus.Succeeded> =
-                    payments.filter { o -> o.status() is OutgoingPaymentStatus.Succeeded }.map { o -> o.status() as OutgoingPaymentStatus.Succeeded }
-                  val fees = MilliSatoshi(statuses.map { o -> o.feesPaid().toLong() }.sum())
-
-                  if (p.paymentRequest().isDefined) {
-                    mBinding.feesValue.setAmount(fees)
-                  } else if (p.externalId().isDefined && p.externalId().get().startsWith("closing-")) {
-                    // special case: this outgoing payment represents a channel closing/closed
-                    mBinding.closingDescValue.text = getString(R.string.paymentdetails_closing_mock_desc, p.externalId().get().split("-").last())
-                  }
-                  showStatusIconAndDetails(ctx, if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, ThemeHelper.color(ctx, R.attr.positiveColor))
+    model.state.observe(viewLifecycleOwner, Observer { state ->
+      context?.let { ctx ->
+        when (state) {
+          is PaymentDetailsState.Outgoing.Pending -> {
+            mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
+            showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
+          }
+          is PaymentDetailsState.Outgoing.Failed -> {
+            mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
+            // use error of the last subpayment as it's probably the most pertinent
+            val failures = JavaConverters.asJavaCollectionConverter((state.parts.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList()
+            mBinding.errorValue.text = failures.joinToString("\n") { e -> e.failureMessage() }
+            mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
+            showStatusIconAndDetails(ctx, R.drawable.ic_cross, ThemeHelper.color(ctx, R.attr.negativeColor))
+          }
+          is PaymentDetailsState.Outgoing.Succeeded -> {
+            val statuses: List<OutgoingPaymentStatus.Succeeded> = state.parts.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }
+            // handle special case where payment is a placeholder for a channel closing: no fee, no destination, special description
+            val head = state.parts.first()
+            if (head.paymentRequest().isDefined) {
+              val totalSent = MilliSatoshi(state.parts.map { p -> p.amount().`$plus`((p.status() as OutgoingPaymentStatus.Succeeded).feesPaid()).toLong() }.sum())
+              val fees = totalSent.`$minus`(head.recipientAmount())
+              val description = head.paymentRequest().get().description().let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
+              mBinding.run {
+                feesLabel.visibility = View.VISIBLE
+                feesValue.visibility = View.VISIBLE
+                destinationLabel.visibility = View.VISIBLE
+                destinationValue.visibility = View.VISIBLE
+                showTechnicalsButton.visibility = View.VISIBLE
+                feesValue.setAmount(fees)
+                if (description.isBlank()) {
+                  descValue.setTypeface(Typeface.DEFAULT, Typeface.ITALIC)
+                  descValue.text = ctx.getString(R.string.paymentdetails_no_description)
+                } else {
+                  descValue.text = description
                 }
               }
-              mBinding.amountValue.setAmount(MilliSatoshi(payments.map { o -> o.amount().toLong() }.sum()))
+            } else if (head.externalId().isDefined && head.externalId().get().startsWith("closing-")) {
+              mBinding.run {
+                feesLabel.visibility = View.GONE
+                feesValue.visibility = View.GONE
+                destinationLabel.visibility = View.GONE
+                destinationValue.visibility = View.GONE
+                showTechnicalsButton.visibility = View.GONE
+                descValue.text = ctx.getString(R.string.paymentdetails_closing_desc, head.externalId().get().split("-").last())
+              }
             }
-            // INCOMING PAYMENT
-            it.isRight -> {
-              val p = it.right().get()
-              if (p.status() is IncomingPaymentStatus.Received) {
-                val status = p.status() as IncomingPaymentStatus.Received
-                mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, status.receivedAt())))
-                mBinding.amountValue.setAmount(status.amount())
-                showStatusIconAndDetails(ctx, if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, ThemeHelper.color(ctx, R.attr.positiveColor))
-              } else {
-                mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_pending))
-                mBinding.amountValue.setAmount(MilliSatoshi(0))
-                showStatusIconAndDetails(ctx, R.drawable.ic_clock, ThemeHelper.color(ctx, R.attr.positiveColor))
+            mBinding.amountValue.setAmount(state.parts.first().recipientAmount())
+            mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(ctx, statuses.map { s -> s.completedAt() }.max()!!)))
+            showStatusIconAndDetails(ctx, if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, ThemeHelper.color(ctx, R.attr.positiveColor))
+          }
+          is PaymentDetailsState.Incoming -> {
+            mBinding.run {
+              feesLabel.visibility = View.GONE
+              feesValue.visibility = View.GONE
+              destinationLabel.visibility = View.GONE
+              destinationValue.visibility = View.GONE
+              showTechnicalsButton.visibility = View.VISIBLE
+            }
+            if (state.payment.status() is IncomingPaymentStatus.Received) {
+              val status = state.payment.status() as IncomingPaymentStatus.Received
+              val description = state.payment.paymentRequest().description().let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
+              mBinding.run {
+                if (description.isBlank()) {
+                  descValue.setTypeface(Typeface.DEFAULT, Typeface.ITALIC)
+                  descValue.text = ctx.getString(R.string.paymentdetails_no_description)
+                } else {
+                  descValue.text = description
+                }
+                statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_successful, Transcriber.relativeTime(ctx, status.receivedAt())))
+                amountValue.setAmount(status.amount())
               }
+              showStatusIconAndDetails(ctx, if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, ThemeHelper.color(ctx, R.attr.positiveColor))
+            } else {
+              mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_received_pending))
+              mBinding.amountValue.setAmount(MilliSatoshi(0))
+              showStatusIconAndDetails(ctx, R.drawable.ic_clock, ThemeHelper.color(ctx, R.attr.positiveColor))
             }
           }
         }
@@ -198,155 +219,139 @@ class PaymentDetailsFragment : BaseFragment() {
   private fun getPayment(isSentPayment: Boolean, identifier: String) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when retrieving payment from DB: ", exception)
-      model.state.value = PaymentDetailsState.ERROR
+      model.state.value = PaymentDetailsState.Error(exception.localizedMessage ?: "")
     }) {
-      model.state.value = PaymentDetailsState.RETRIEVING_PAYMENT_DATA
+      model.state.value = PaymentDetailsState.RetrievingDetails
       if (isSentPayment) {
-        val payments: List<OutgoingPayment> = appKit.getSentPaymentsFromParentId(UUID.fromString(identifier))
-        if (payments.isEmpty()) {
-          model.payment.value = null
-          model.state.value = PaymentDetailsState.NONE
-        } else {
-          model.payment.value = Left.apply(payments)
-          model.state.value = PaymentDetailsState.DONE
+        val payments: List<OutgoingPayment> = app.getSentPaymentsFromParentId(UUID.fromString(identifier))
+        when {
+          payments.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
+            payments.filter { p -> p.status() is OutgoingPaymentStatus.`Pending$` }.also {
+              model.state.value = PaymentDetailsState.Outgoing.Pending(it.first().paymentType(), it)
+            }
+          }
+          payments.any { p -> p.status() is OutgoingPaymentStatus.Succeeded } -> {
+            payments.filter { p -> p.status() is OutgoingPaymentStatus.Succeeded }.also {
+              model.state.value = PaymentDetailsState.Outgoing.Succeeded(it.first().paymentType(), it)
+            }
+          }
+          payments.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
+            payments.filter { p -> p.status() is OutgoingPaymentStatus.Failed }.also {
+              model.state.value = PaymentDetailsState.Outgoing.Failed(it.first().paymentType(), it)
+            }
+          }
+          else -> {
+            log.warn("could not find any outgoing payments for id=$identifier, with result=$payments")
+            model.state.value = PaymentDetailsState.Error("No details found for this outgoing payment")
+          }
         }
       } else {
-        val p = appKit.getReceivedPayment(ByteVector32.fromValidHex(identifier))
-        if (p.isDefined) {
-          model.payment.value = Right.apply(p.get())
-          model.state.value = PaymentDetailsState.DONE
+        val payment = app.getReceivedPayment(ByteVector32.fromValidHex(identifier))
+        if (payment.isEmpty) {
+          log.warn("could not find any incoming payments for id=$identifier")
+          model.state.value = PaymentDetailsState.Error("No details found for this incoming payment")
         } else {
-          model.payment.value = null
-          model.state.value = PaymentDetailsState.NONE
+          model.state.value = PaymentDetailsState.Incoming(payment.get())
         }
       }
     }
   }
 }
 
-enum class PaymentDetailsState {
-  INIT, RETRIEVING_PAYMENT_DATA, DONE, ERROR, NONE
+sealed class PaymentDetailsState {
+  object Init : PaymentDetailsState()
+  object RetrievingDetails : PaymentDetailsState()
+
+  sealed class Outgoing : PaymentDetailsState() {
+    abstract val paymentType: String
+    abstract val parts: List<OutgoingPayment>
+
+    data class Succeeded(override val paymentType: String, override val parts: List<OutgoingPayment>) : Outgoing()
+    data class Failed(override val paymentType: String, override val parts: List<OutgoingPayment>) : Outgoing()
+    data class Pending(override val paymentType: String, override val parts: List<OutgoingPayment>) : Outgoing()
+  }
+
+  class Incoming(val payment: IncomingPayment) : PaymentDetailsState()
+  class Error(val cause: String) : PaymentDetailsState()
 }
 
 class PaymentDetailsViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(PaymentDetailsViewModel::class.java)
+  val state = MutableLiveData<PaymentDetailsState>()
 
-  val payment = MutableLiveData<Either<List<OutgoingPayment>, IncomingPayment>>(null)
-  val state = MutableLiveData(PaymentDetailsState.INIT)
-
-  val description: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().paymentRequest().isDefined -> it.left().get().first().paymentRequest().get().description().left().get()
-        it.isRight -> it.right().get().paymentRequest().description().left().get()
-        else -> ""
-      }
-    } ?: ""
+  init {
+    state.value = PaymentDetailsState.Init
   }
 
-  val destination: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() -> it.left().get().first().targetNodeId().toString()
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val paymentHash: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() -> it.left().get().first().paymentHash().toString()
-        else -> it.right().get().paymentRequest().paymentHash().toString()
-      }
-    } ?: ""
-  }
-
-  val paymentRequest: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().paymentRequest().isDefined -> PaymentRequest.write(it.left().get().first().paymentRequest().get())
-        it.isRight -> PaymentRequest.write(it.right().get().paymentRequest())
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val preimage: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() && it.left().get()[0].status() is OutgoingPaymentStatus.Succeeded -> (it.left().get()[0].status() as OutgoingPaymentStatus.Succeeded).paymentPreimage().toString()
-        it.isRight -> it.right().get().paymentPreimage().toString()
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val createdAt: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() -> DateFormat.getDateTimeInstance().format(it.left().get().first().createdAt())
-        it.isRight -> DateFormat.getDateTimeInstance().format(it.right().get().createdAt())
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val completedAt: LiveData<String> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().status() is OutgoingPaymentStatus.Succeeded -> {
-          val status = it.left().get().first().status() as OutgoingPaymentStatus.Succeeded
-          DateFormat.getDateTimeInstance().format(status.completedAt())
-        }
-        it.isLeft && it.left().get().isNotEmpty() && it.isLeft && it.left().get().first().status() is OutgoingPaymentStatus.Failed -> {
-          val status = it.left().get().first().status() as OutgoingPaymentStatus.Failed
-          DateFormat.getDateTimeInstance().format(status.completedAt())
-        }
-        it.isLeft && it.left().get().isNotEmpty() -> DateFormat.getDateTimeInstance().format(it.left().get().first().createdAt())
-        it.isRight && it.right().get().status() is IncomingPaymentStatus.Received -> {
-          val status = it.right().get().status() as IncomingPaymentStatus.Received
-          DateFormat.getDateTimeInstance().format(status.receivedAt())
-        }
-        else -> ""
-      }
-    } ?: ""
-  }
-
-  val expiredAt: LiveData<String> = Transformations.map(payment) {
-    if (it != null && it.isRight && it.right().get().paymentRequest().expiry().isDefined) {
-      val expiry = it.right().get().paymentRequest().expiry().get() as Long
-      val timestamp = it.right().get().paymentRequest().timestamp()
-      DateFormat.getDateTimeInstance().format(1000 * (timestamp + expiry))
-    } else {
-      ""
+  val destination: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is PaymentDetailsState.Outgoing -> it.parts.first().recipientNodeId().toString()
+      else -> ""
     }
   }
 
-  val isFeeVisible: LiveData<Boolean> = Transformations.map(payment) {
-    it != null && it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().status() is OutgoingPaymentStatus.Succeeded
+  val paymentHash: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is PaymentDetailsState.Outgoing -> it.parts.first().paymentHash().toString()
+      is PaymentDetailsState.Incoming -> it.payment.paymentRequest().paymentHash().toString()
+      else -> ""
+    }
   }
 
-  val isErrorVisible: LiveData<Boolean> = Transformations.map(payment) {
-    it != null && it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().status() is OutgoingPaymentStatus.Failed
+  val paymentRequest: LiveData<String> = Transformations.map(state) {
+    when {
+      it is PaymentDetailsState.Outgoing && it.parts.first().paymentRequest().isDefined -> PaymentRequest.write(it.parts.first().paymentRequest().get())
+      it is PaymentDetailsState.Incoming -> PaymentRequest.write(it.payment.paymentRequest())
+      else -> ""
+    }
   }
 
-  val multiPartCount: LiveData<Int> = Transformations.map(payment) {
-    it?.let {
-      when {
-        it.isLeft -> it.left().get().size
-        else -> 1
+  val preimage: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is PaymentDetailsState.Outgoing.Succeeded -> (it.parts.first().status() as OutgoingPaymentStatus.Succeeded).paymentPreimage().toString()
+      is PaymentDetailsState.Incoming -> it.payment.paymentPreimage().toString()
+      else -> ""
+    }
+  }
+
+  val createdAt: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is PaymentDetailsState.Outgoing -> DateFormat.getDateTimeInstance().format(it.parts.first().createdAt())
+      is PaymentDetailsState.Incoming -> DateFormat.getDateTimeInstance().format(it.payment.createdAt())
+      else -> ""
+    }
+  }
+
+  val completedAt: LiveData<String> = Transformations.map(state) {
+    when (it) {
+      is PaymentDetailsState.Outgoing.Succeeded -> (it.parts.first().status() as OutgoingPaymentStatus.Succeeded).completedAt()
+      is PaymentDetailsState.Outgoing.Failed -> (it.parts.first().status() as OutgoingPaymentStatus.Failed).completedAt()
+      is PaymentDetailsState.Outgoing.Pending -> it.parts.first().createdAt()
+      is PaymentDetailsState.Incoming ->
+        if (it.payment.status() is IncomingPaymentStatus.Received) {
+          (it.payment.status() as IncomingPaymentStatus.Received).receivedAt()
+        } else {
+          null
+        }
+      else -> null
+    }?.let { t -> DateFormat.getDateTimeInstance().format(t) } ?: ""
+  }
+
+  val expiredAt: LiveData<String> = Transformations.map(state) {
+    when {
+      it is PaymentDetailsState.Outgoing && it.parts.first().paymentRequest().isDefined -> {
+        val pr = it.parts.first().paymentRequest().get()
+        val expiry = (if (pr.expiry().isDefined) pr.expiry().get() else PaymentRequest.DEFAULT_EXPIRY_SECONDS().toLong()) as Long
+        val timestamp = pr.timestamp()
+        DateFormat.getDateTimeInstance().format(1000 * (timestamp + expiry))
       }
-    } ?: 0
-  }
-
-  val isSent: LiveData<Boolean> = Transformations.map(payment) { it?.isLeft ?: false }
-
-  val isClosingChannelMock: LiveData<Boolean> = Transformations.map(payment) {
-    it?.let {
-      it.isLeft && it.left().get().isNotEmpty() && it.left().get().first().paymentRequest().isEmpty
-        && it.left().get().first().externalId().isDefined && it.left().get().first().externalId().get().startsWith("closing-")
-    } ?: false
+      it is PaymentDetailsState.Incoming -> {
+        val expiry = (if (it.payment.paymentRequest().expiry().isDefined) it.payment.paymentRequest().expiry().get() else PaymentRequest.DEFAULT_EXPIRY_SECONDS().toLong()) as Long
+        val timestamp = it.payment.paymentRequest().timestamp()
+        DateFormat.getDateTimeInstance().format(1000 * (timestamp + expiry))
+      }
+      else -> ""
+    }
   }
 
 }

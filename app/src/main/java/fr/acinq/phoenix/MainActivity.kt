@@ -50,14 +50,17 @@ class MainActivity : AppCompatActivity() {
 
   val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
   private lateinit var mBinding: ActivityMainBinding
-  private lateinit var appKit: AppKitModel
+  private lateinit var app: AppViewModel
 
   private val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
       log.info("network available")
-      appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = true))
-      appKit.reconnect()
+      if (Prefs.isTorEnabled(applicationContext)) {
+        app.reconnectTor()
+      }
+      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = true ; this })
+      app.reconnectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -73,13 +76,13 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      appKit.networkInfo.postValue(appKit.networkInfo.value?.copy(networkConnected = false))
+      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = false ; this })
     }
   }
 
   private val navigationCallback = NavController.OnDestinationChangedListener { _, destination, args ->
     log.debug("destination=${destination.id}, args=$args")
-    appKit.currentNav.postValue(destination.id)
+    app.currentNav.postValue(destination.id)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,22 +92,16 @@ class MainActivity : AppCompatActivity() {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-    appKit = ViewModelProvider(this).get(AppKitModel::class.java)
-    appKit.currentNav.observe(this, Observer {
-      handleNetworkAlert()
-    })
-    appKit.networkInfo.observe(this, Observer {
-      handleNetworkAlert()
-    })
-    appKit.navigationEvent.observe(this, Observer {
-      log.info("navigation event @ $it")
+    app = ViewModelProvider(this).get(AppViewModel::class.java)
+    app.navigationEvent.observe(this, Observer {
       when (it) {
         is PayToOpenRequestEvent -> {
           val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
             amountMsat = it.payToOpenRequest().amountMsat().toLong(),
             fundingSat = it.payToOpenRequest().fundingSatoshis().toLong(),
             feeSat = it.payToOpenRequest().feeSatoshis().toLong(),
-            paymentHash = it.payToOpenRequest().paymentHash().toString())
+            paymentHash = it.payToOpenRequest().paymentHash().toString(),
+            expireAt = it.payToOpenRequest().expireAt())
           findNavController(R.id.nav_host_main).navigate(action)
         }
         is PaymentSent -> {
@@ -122,8 +119,14 @@ class MainActivity : AppCompatActivity() {
         else -> log.info("unhandled navigation event $it")
       }
     })
+    app.state.observe(this, Observer {
+      handleUriIntent()
+    })
+    app.currentURIIntent.observe(this, Observer {
+      handleUriIntent()
+    })
     // app may be started with a payment request intent
-    intent?.let { readURIIntent(intent) }
+    intent?.let { saveURIIntent(intent) }
   }
 
   override fun onStart() {
@@ -135,47 +138,27 @@ class MainActivity : AppCompatActivity() {
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    readURIIntent(intent)
+    saveURIIntent(intent)
   }
 
-  private fun readURIIntent(intent: Intent) {
+  private fun saveURIIntent(intent: Intent) {
     val data = intent.data
+    log.debug("reading URI intent=$intent with data=$data")
     if (data != null && data.scheme != null) {
       when (data.scheme) {
-        "bitcoin", "lightning" -> if (appKit.startupState.value == StartupState.DONE) {
-          findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(data.toString()))
-          appKit.currentURIIntent.value = null
-        } else {
-          appKit.currentURIIntent.value = data.toString()
+        "bitcoin", "lightning" -> {
+          app.currentURIIntent.value = data.toString()
         }
         else -> log.info("unhandled payment scheme $data")
       }
     }
   }
 
-  // list pages where the connectivity alert will be shown
-  private val networkAlertScreens = setOf(R.id.main_fragment, R.id.receive_fragment, R.id.send_fragment, R.id.channels_list_fragment, R.id.mutual_close_fragment, R.id.force_close_fragment)
-
-  private fun handleNetworkAlert() {
-    val currentNav = appKit.currentNav.value
-    val networkInfo = appKit.networkInfo.value
-    if (networkAlertScreens.contains(currentNav) && networkInfo != null) {
-      if (!networkInfo.networkConnected) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_network_lost)
-        mBinding.alertBlockingButton.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else if (networkInfo.electrumServer == null) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_electrum_connecting)
-        mBinding.alertBlockingButton.setOnClickListener { findNavController(R.id.nav_host_main).navigate(R.id.global_action_any_to_electrum) }
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else if (!networkInfo.lightningConnected) {
-        mBinding.alertBlockingMessage.text = getString(R.string.main_alert_lightning_connection_lost)
-        mBinding.alertBlocking.visibility = View.VISIBLE
-      } else {
-        mBinding.alertBlocking.visibility = View.GONE
-      }
-    } else {
-      mBinding.alertBlocking.visibility = View.GONE
+  private fun handleUriIntent() {
+    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value?.javaClass?.simpleName}")
+    if (app.state.value is KitState.Started && app.currentURIIntent.value != null && app.currentNav.value != R.id.startup_fragment) {
+      findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
+      app.currentURIIntent.value = null
     }
   }
 

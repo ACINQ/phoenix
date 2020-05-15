@@ -275,6 +275,12 @@
     <item name="android:layout_gravity">fill_horizontal</item>
   </style>
 
+  <style name="MonospaceView" parent="default_textAppearance">
+    <item name="android:textIsSelectable">true</item>
+    <item name="android:textSize">@dimen/text_sm</item>
+    <item name="android:fontFamily">monospace</item>
+  </style>
+
   <style name="PinButtonStyle" parent="@style/roundMaterial_buttonStyle">
     <item name="android:fontFamily">sans-serif-light</item>
     <item name="android:layout_width">@dimen/pin_button_size</item>

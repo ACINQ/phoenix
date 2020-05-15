@@ -15,3 +15,5 @@
 /.idea
 app/release
 app/debug
+apk
+logs

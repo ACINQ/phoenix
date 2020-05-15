@@ -19,7 +19,6 @@ package fr.acinq.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.google.common.base.Strings
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -27,6 +26,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
+import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -129,22 +129,43 @@ object Wallet {
    * Builds a TypeSafe configuration for the node. Returns an empty config if there are no valid user's prefs.
    */
   fun getOverrideConfig(context: Context): Config {
+    val conf = HashMap<String, Any>()
+
+    // electrum config
     val electrumServer = Prefs.getElectrumServer(context)
-    if (!Strings.isNullOrEmpty(electrumServer)) {
+    if (electrumServer.isNotBlank()) {
       try {
         val address = HostAndPort.fromString(electrumServer).withDefaultPort(50002)
-        val conf = HashMap<String, Any>()
-        if (!Strings.isNullOrEmpty(address.host)) {
+        if (address.host.isNotBlank()) {
           conf["eclair.electrum.host"] = address.host
           conf["eclair.electrum.port"] = address.port
-          // custom server certificate must be valid
-          conf["eclair.electrum.ssl"] = "strict"
-          return ConfigFactory.parseMap(conf)
+          if (address.isOnion()) {
+            // If Tor is used, we don't require TLS; Tor already adds a layer of encryption.
+            // However the user can still force the app to check the certificate.
+            conf["eclair.electrum.ssl"] = if (Prefs.getForceElectrumSSL(context)) "strict" else "off"
+          } else {
+            // Otherwise we require TLS with a valid server certificate.
+            conf["eclair.electrum.ssl"] = "strict"
+          }
         }
       } catch (e: Exception) {
-        log.error("invalid electrum server=$electrumServer, using empty config instead", e)
+        throw InvalidElectrumAddress(electrumServer)
       }
     }
-    return ConfigFactory.empty()
+
+    // TOR config
+    if (Prefs.isTorEnabled(context)) {
+      conf["eclair.socks5.enabled"] = true
+      conf["eclair.socks5.host"] = "127.0.0.1"
+      conf["eclair.socks5.port"] = TorHelper.PORT
+      conf["eclair.socks5.use-for-ipv4"] = true
+      conf["eclair.socks5.use-for-ipv6"] = true
+      conf["eclair.socks5.use-for-tor"] = true
+      conf["eclair.socks5.randomize-credentials"] = false // this allows tor stream isolation
+    }
+
+    return ConfigFactory.parseMap(conf)
   }
+
+  fun HostAndPort.isOnion() = this.host.endsWith(".onion")
 }

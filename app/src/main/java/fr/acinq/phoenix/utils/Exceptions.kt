@@ -16,6 +16,8 @@
 
 package fr.acinq.phoenix.utils
 
+class InvalidElectrumAddress(val address: String) : Exception(address)
+class TorSetupException(val s: String) : Exception(s)
 class NetworkException : RuntimeException()
 class KitNotInitialized : RuntimeException("kit is not initialized")
 class InsufficientBalance : RuntimeException()
