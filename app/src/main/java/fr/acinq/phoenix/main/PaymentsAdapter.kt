@@ -16,9 +16,9 @@
 package fr.acinq.phoenix.main
 
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView

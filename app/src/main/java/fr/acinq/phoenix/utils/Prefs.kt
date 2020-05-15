@@ -18,8 +18,8 @@ package fr.acinq.phoenix.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import android.util.Base64
+import androidx.preference.PreferenceManager
 import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
