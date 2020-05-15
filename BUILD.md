@@ -57,23 +57,32 @@ Note: on Windows at least, it is strongly recommended to bump the resources allo
 ### Build the APK
 
 1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
+
 2. Open a terminal at the root of the cloned project ;
+
 3. Checkout the tag you want to build, for example:
+
 ```shell
 git checkout v1.4.0
 ```
+
 4. Build the docker image mirroring the release environment (this typically takes ~20min):
+
 ```shell
 docker build -t phoenix_build .
 ```
+
 5. Build the APKs using the docker image (takes typically ~10min):
+
 If you're on linux:
 ```shell
 docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble
 ```
+
 If you're on Windows:
 
 ```shell
 docker run --rm -v ${pwd}:/home/ubuntu/phoenix/app/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew assemble
 ```
+
 6. Built artifacts are in `.apk/release`.
