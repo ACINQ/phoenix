@@ -54,7 +54,7 @@ Notes:
 
 Note: on Windows at least, it is strongly recommended to bump the resources allocation settings from the default values, especially for Memory.
 
-## How to build phoenix deterministically
+### Build the APK
 
 1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
 2. Open a terminal at the root of the cloned project ;
