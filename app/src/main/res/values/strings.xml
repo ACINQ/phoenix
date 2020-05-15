@@ -68,6 +68,7 @@
   <string name="startup_start_button">Restart</string>
   <string name="startup_settings_button">Settings</string>
   <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
+  <string name="startup_error_electrum_address">The application could not start. The address of the custom Electrum server is not valid.\n\nGo to Settings > Electrum to fix your settings.</string>
   <string name="startup_error_tor">The Tor service could not start. Check that your connection is working and try again.\n\nError details: %1$s</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
@@ -464,6 +465,7 @@
 
   <string name="electrum_dialog_checkbox">Use a custom server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
+  <string name="electrum_dialog_ssl_tor">Also check certificate for this Onion address</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 

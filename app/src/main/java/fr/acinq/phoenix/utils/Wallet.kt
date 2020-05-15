@@ -19,7 +19,6 @@ package fr.acinq.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.google.common.base.Strings
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -134,16 +133,23 @@ object Wallet {
 
     // electrum config
     val electrumServer = Prefs.getElectrumServer(context)
-    if (!Strings.isNullOrEmpty(electrumServer)) {
+    if (electrumServer.isNotBlank()) {
       try {
         val address = HostAndPort.fromString(electrumServer).withDefaultPort(50002)
-        if (!Strings.isNullOrEmpty(address.host)) {
+        if (address.host.isNotBlank()) {
           conf["eclair.electrum.host"] = address.host
           conf["eclair.electrum.port"] = address.port
-          conf["eclair.electrum.ssl"] = "strict" // custom server certificate must be valid
+          if (address.isOnion()) {
+            // If Tor is used, we don't require TLS; Tor already adds a layer of encryption.
+            // However the user can still force the app to check the certificate.
+            conf["eclair.electrum.ssl"] = if (Prefs.getForceElectrumSSL(context)) "strict" else "off"
+          } else {
+            // Otherwise we require TLS with a valid server certificate.
+            conf["eclair.electrum.ssl"] = "strict"
+          }
         }
       } catch (e: Exception) {
-        log.error("invalid electrum server=$electrumServer, using empty config instead", e)
+        throw InvalidElectrumAddress(electrumServer)
       }
     }
 
@@ -160,4 +166,6 @@ object Wallet {
 
     return ConfigFactory.parseMap(conf)
   }
+
+  fun HostAndPort.isOnion() = this.host.endsWith(".onion")
 }

@@ -121,6 +121,7 @@ class StartupFragment : BaseFragment() {
           }
         }
         state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
+        state is KitState.Error.InvalidElectrumAddress -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address) }
         state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
         state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
         state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
