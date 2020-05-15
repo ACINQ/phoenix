@@ -40,7 +40,10 @@ Note:
 
 # Release Phoenix
 
-Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public).
+Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public). 
+Notes:
+- This tool works on Linux and Windows.
+- Following instructions only work for releases after v.1.3.1 (excluded).
 
 ### Prerequisites
 
@@ -56,7 +59,7 @@ Note: on Windows at least, it is strongly recommended to bump the resources allo
 2. Open a terminal at the root of the cloned project ;
 3. Checkout the tag you want to build, for example:
 ```shell
-git checkout v1.3.1
+git checkout v1.4.0
 ```
 4. Build the docker image mirroring the release environment (this typically takes ~20min):
 ```shell
