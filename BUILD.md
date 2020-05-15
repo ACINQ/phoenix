@@ -74,14 +74,11 @@ docker build -t phoenix_build .
 
 5. Build the APKs using the docker image (takes typically ~10min):
 
-If you're on linux:
 ```shell
+# If you're on linux:
 docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble
-```
 
-If you're on Windows:
-
-```shell
+# If you're on Windows:
 docker run --rm -v ${pwd}:/home/ubuntu/phoenix/app/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew assemble
 ```
 
