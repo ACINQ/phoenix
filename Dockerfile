@@ -50,7 +50,7 @@ RUN apt-get update -y && \
     apt-get install -y software-properties-common locales && \
     apt-get update -y && \
     locale-gen en_US.UTF-8 && \
-    apt-get install -y openjdk-8-jdk wget git unzip
+    apt-get install -y openjdk-8-jdk wget git unzip dos2unix
 
 # fetch and unpack the android sdk
 RUN mkdir /usr/local/android-sdk && \
@@ -76,5 +76,7 @@ COPY --from=ECLAIR_CORE_BUILD /root/.m2/repository/fr/acinq/eclair /root/.m2/rep
 COPY . /home/ubuntu/phoenix
 # make sure we don't read properties the host environment
 RUN rm -f /home/ubuntu/phoenix/local.properties
+# make sure we use unix EOL files
+RUN find /home/ubuntu/phoenix -type f -print0 | xargs -0 dos2unix --
 # make gradle wrapper executable
 RUN chmod +x /home/ubuntu/phoenix/gradlew
