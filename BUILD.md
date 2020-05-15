@@ -40,7 +40,8 @@ Note:
 
 # Release Phoenix
 
-Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public). 
+Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public).
+
 Notes:
 - This tool works on Linux and Windows.
 - Following instructions only work for releases after v.1.3.1 (excluded).
