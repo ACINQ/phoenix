@@ -1,4 +1,8 @@
-# Building Phoenix
+# How-to build Phoenix
+
+This section explains how to install a development environment for Phoenix. If you simply want to build the Phoenix APK, check the [Release section below](#release-phoenix).
+
+First you'll have to build the various dependencies for the application.
 
 ## Building eclair-core for Phoenix
 
@@ -19,7 +23,7 @@ Phoenix uses a library to manage the communication with the tor binary. This lib
 ./gradlew :android:publishToMaven
 ```
 
-## Building Phoenix
+## Building the app proper
 
 [Android Studio](https://developer.android.com/studio) is the recommended development environment.
 
@@ -29,24 +33,43 @@ Phoenix uses a library to manage the communication with the tor binary. This lib
 4. Open Android Studio, and click on `File` > `Open...`, and open the cloned folder
 5. Project initialization will proceed.
 
-Note that if you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above).
-You can check that the corresponding `.jar` file is present in your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`).
+Note:
+- If you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above).
+- The version of eclair-core used by Phoenix often changes; tagged version of the app (aka releases) always depends on a tagged version of eclair-core. The current `android-phoenix` branch may be a SNAPSHOT version which does not correspond to what the current Phoenix `master` depends on.
+- You can check what eclair-core `.jar` file you have built by checking your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`). Default repository is `~/.m2`.
 
-## Deterministic build of Phoenix
+# Release Phoenix
 
-Phoenix supports deterministic builds on Linux OSs, this allows anyone to recreate from the sources the exact same APK that was published in the release page.
-The deterministic build uses a self-contained dockerized environment, to run the build you must supply via docker build args the branch of eclair-core
-that is going to be used for the build. Each release of Phoenix is built against a specific revision of eclair-core, checkout the release notes to know
-which revision you need to use in the deterministic build.
+Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public).
 
 ### Prerequisites
 
-1. A linux machine running on x64 CPU.
-2. docker-ce installed
+ You don't have to worry about installing any development tool, except:
 
-### How to build phoenix deterministically
+1. Docker (Community Edition)
 
-1. Clone the phoenix project from https://github.com/ACINQ/phoenix
-3. Run `docker build -t phoenix_build .` to create the build environment
-4. Run `docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble`
-5. Built artifacts are in `.apk/release`
+Note: on Windows at least, it is strongly recommended to bump the resources allocation settings from the default values, especially for Memory.
+
+## How to build phoenix deterministically
+
+1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
+2. Open a terminal at the root of the cloned project ;
+3. Checkout the tag you want to build, for example:
+```shell
+git checkout v1.3.1
+```
+4. Build the docker image mirroring the release environment (this typically takes ~20min):
+```shell
+docker build -t phoenix_build .
+```
+5. Build the APKs using the docker image (takes typically ~10min):
+If you're on linux:
+```shell
+docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble
+```
+If you're on Windows:
+
+```shell
+docker run --rm -v ${pwd}:/home/ubuntu/phoenix/app/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew assemble
+```
+6. Built artifacts are in `.apk/release`.
