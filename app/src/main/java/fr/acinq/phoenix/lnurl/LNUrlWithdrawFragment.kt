@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.send
+package fr.acinq.phoenix.lnurl
 
 import android.os.Bundle
 import android.text.Editable
@@ -194,7 +194,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
                 log.error("error in LNURL-withdraw callback remote: ", e)
                 when (e) {
                   is JSONException -> model.state.postValue(LNUrlWithdrawState.Error.RemoteUnreadable)
-                  is LNUrlRemoteError, is LNUrlRemoteFailure -> model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
+                  is LNUrlRemoteFailure -> model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
                   else -> model.state.postValue(LNUrlWithdrawState.Error.RemoteGeneric)
                 }
               }
@@ -224,6 +224,6 @@ class LNUrlWithdrawViewModel : ViewModel() {
 
   val state = MutableLiveData<LNUrlWithdrawState>(LNUrlWithdrawState.Init)
   val url = MutableLiveData<LNUrlWithdraw>()
-  val topDomain = MutableLiveData<String>("")
+  val topDomain = MutableLiveData("")
   val editableAmount = MutableLiveData(true)
 }

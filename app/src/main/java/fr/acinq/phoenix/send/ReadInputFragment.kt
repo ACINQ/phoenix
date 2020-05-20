@@ -40,6 +40,8 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
+import fr.acinq.phoenix.lnurl.LNUrlAuth
+import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -69,7 +71,11 @@ class ReadInputFragment : BaseFragment() {
         is ReadInputState.Reading -> mBinding.scanView.pause()
         is ReadInputState.Error -> {
           mBinding.scanView.pause()
-          Handler().postDelayed({ if (model.inputState.value is ReadInputState.Error) model.inputState.value = ReadInputState.Scanning }, 1750)
+          Handler().postDelayed({
+            if (model.inputState.value is ReadInputState.Error) {
+              model.inputState.value = ReadInputState.Scanning
+            }
+          }, 1750)
         }
         is ReadInputState.Done.Lightning -> {
           // check payment request chain
@@ -100,7 +106,7 @@ class ReadInputFragment : BaseFragment() {
         is ReadInputState.Done.Url -> {
           when (it.url) {
             is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))
-            is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlLogin(it.url.toString()))
+            is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlAuth(it.url))
             else -> model.inputState.value = ReadInputState.Error.Generic(getString(R.string.scan_error_lnurl_unsupported))
           }
         }
@@ -129,12 +135,11 @@ class ReadInputFragment : BaseFragment() {
     }
 
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
-    context?.let {
-      if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+    activity?.let { activity ->
+      if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
         model.hasCameraAccess.value = false
-        activity?.let { act ->
-          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST)
-        }
+        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST)
       }
     }
   }

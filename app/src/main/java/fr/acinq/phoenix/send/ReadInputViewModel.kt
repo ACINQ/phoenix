@@ -20,6 +20,7 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers

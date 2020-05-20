@@ -395,6 +395,16 @@
   <string name="seedsec_bio_prompt_title">Activer la protection biométrique</string>
   <string name="seedsec_bio_prompt_negative">Annuler</string>
 
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions"><![CDATA[Vous pouvez utiliser votre wallet pour signer et autoriser de façon anonyme une action sur le service suivant:<br/><br/><b>%1$s</b><br/><br/>Aucune information personnelle ne sera partagée avec ce service.]]></string>
+  <string name="lnurl_auth_button">Autoriser</string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Autorisation en cours avec <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_success">Autorisation réussie.</string>
+  <string name="lnurl_auth_failure">Échec de l\'autorisation.\n\nDétails de l\'erreur: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">La connexion au service %1$s a échoué.</string>
+  <string name="lnurl_auth_failure_remote_details">Le service a renvoyé l\'erreur suivante: %1$s</string>
+
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">Montant à recevoir</string>

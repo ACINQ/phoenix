@@ -25,10 +25,12 @@ import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.DeterministicWallet
+import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
-import fr.acinq.phoenix.send.LNUrl
+import fr.acinq.phoenix.Xpub
+import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
@@ -71,19 +73,33 @@ object Wallet {
     return File(getChainDatadir(context), NETWORK_DB_FILE)
   }
 
+  fun isMainnet(): Boolean = "mainnet" == BuildConfig.CHAIN
+
   fun getChainHash(): ByteVector32 {
-    return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
+    return if (isMainnet()) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
 
-  fun getXpubKeyPath(): DeterministicWallet.KeyPath {
-    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
+  fun buildAddress(master: DeterministicWallet.ExtendedPrivateKey): SingleAddressEclairWallet {
+    val path = if (isMainnet()) {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0")
+    } else {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
+    }
+    return SingleAddressEclairWallet(fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash()))
   }
 
-  fun getNodeKeyPath(): DeterministicWallet.KeyPath {
-    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
+  fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {
+    val path = if (isMainnet()) {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'")
+    } else {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
+    }
+    val xpub = DeterministicWallet.encode(DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, path)),
+      if (isMainnet()) DeterministicWallet.zpub() else DeterministicWallet.vpub())
+    return Xpub(xpub = xpub, path = path.toString())
   }
 
-  fun cleanUpInvoice(input: String): String {
+  private fun cleanUpInvoice(input: String): String {
     val trimmed = input.replace("\\u00A0", "").trim()
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)

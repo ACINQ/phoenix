@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ACINQ SAS
+ * Copyright 2020 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.send
+package fr.acinq.phoenix.lnurl
 
 import android.os.Parcelable
 import fr.acinq.bitcoin.Bech32
@@ -24,6 +24,7 @@ import kotlinx.android.parcel.Parcelize
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
+import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,8 +32,15 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 class LNUrlUnhandledTag(tag: String) : RuntimeException("unhandled LNURL tag=$tag")
-class LNUrlRemoteFailure(message: String) : RuntimeException(message)
-class LNUrlRemoteError(message: String) : RuntimeException(message)
+
+sealed class LNUrlRemoteFailure : java.lang.RuntimeException() {
+  object Generic : LNUrlRemoteFailure()
+  object CouldNotConnect: LNUrlRemoteFailure()
+  object Unreadable : LNUrlRemoteFailure()
+  data class Detailed(val reason: String) : LNUrlRemoteFailure()
+  data class Code(val code: Int) : LNUrlRemoteFailure()
+}
+
 class LNUrlAuthMissingK1 : RuntimeException("missing parameter k1 in LNURL-auth url")
 class LNUrlWithdrawAtLeastMinSat(val min: MilliSatoshi) : RuntimeException()
 class LNUrlWithdrawAtMostMaxSat(val max: MilliSatoshi) : RuntimeException()
@@ -41,6 +49,12 @@ interface LNUrl {
 
   companion object Util {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
+
+    val httpClient = Wallet.httpClient.newBuilder()
+      .connectTimeout(5, TimeUnit.SECONDS)
+      .writeTimeout(5, TimeUnit.SECONDS)
+      .readTimeout(5, TimeUnit.SECONDS)
+      .build()
 
     /**
      * Decodes a Bech32 string and transform it into a https request.
@@ -62,11 +76,11 @@ interface LNUrl {
         if (k1 == null) {
           throw LNUrlAuthMissingK1()
         } else {
-          LNUrlAuth(url.toString(), k1)
+          LNUrlAuth(url.topPrivateDomain()!!, url.toString(), k1)
         }
       } else {
         // otherwise execute GET to url to retrieve details from remote server
-        val json = getMetadataFromBaseUrl(url)
+        val json = executeMetadataQuery(url)
         val tag = json.getString("tag")
         val callback = HttpUrl.get(json.getString("callback"))
         require(callback.isHttps) { "invalid callback=${url}, should be https" }
@@ -83,39 +97,40 @@ interface LNUrl {
       }
     }
 
-    private fun getMetadataFromBaseUrl(url: HttpUrl): JSONObject {
+    private fun executeMetadataQuery(url: HttpUrl): JSONObject {
       log.info("retrieving metadata from LNURL=$url")
       val request = Request.Builder().url(url).build()
-      return Wallet.httpClient
-        .newBuilder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .writeTimeout(5, TimeUnit.SECONDS)
-        .readTimeout(5, TimeUnit.SECONDS)
-        .build()
-        .newCall(request).execute().use { handleLNUrlRemoteResponse(it) }
+      return httpClient.newCall(request).execute().use { handleLNUrlRemoteResponse(it) }
     }
 
     fun handleLNUrlRemoteResponse(response: Response): JSONObject {
       val body = response.body()
-      if (response.isSuccessful && body != null) {
-        val json = JSONObject(body.string())
-        if (json.has("status") && json.getString("status").trim().equals("error", true)) {
-          val message = if (json.has("reason")) json.getString("reason") else "N/A"
-          throw LNUrlRemoteError(message)
-        } else {
-          return json
+      return if (response.isSuccessful && body != null) {
+        try {
+          val json = JSONObject(body.string())
+          log.debug("remote lnurl service responded with: $json")
+          if (json.has("status") && json.getString("status").trim().equals("error", true)) {
+            log.error("lnurl service responded with error: $json")
+            val message = if (json.has("reason")) json.getString("reason") else "N/A"
+            throw LNUrlRemoteFailure.Detailed(message)
+          } else {
+            json
+          }
+        } catch (e: JSONException) {
+          log.error("failed to read LNUrl response: ", e)
+          throw LNUrlRemoteFailure.Unreadable
         }
       } else if (!response.isSuccessful) {
-        throw LNUrlRemoteFailure(response.code().toString())
+        throw LNUrlRemoteFailure.Code(response.code())
       } else {
-        throw LNUrlRemoteFailure("empty body")
+        throw LNUrlRemoteFailure.Generic
       }
     }
   }
 }
 
 @Parcelize
-class LNUrlAuth(val callback: String, val k1: String) : LNUrl, Parcelable
+class LNUrlAuth(val topDomain: String, val authEndpoint: String, val k1: String) : LNUrl, Parcelable
 
 @Parcelize
 class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,
