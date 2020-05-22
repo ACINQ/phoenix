@@ -263,8 +263,8 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Instellingen</string>
-  <string name="menu_send">Verzenden</string>
-  <string name="menu_receive">Ontvangen</string>
+  <string name="menu_send">Verzend</string>
+  <string name="menu_receive">Ontvang</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
