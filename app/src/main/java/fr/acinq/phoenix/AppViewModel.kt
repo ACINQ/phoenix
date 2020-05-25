@@ -30,8 +30,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.iid.FirebaseInstanceId
 import com.msopentech.thali.toronionproxy.OnionProxyManager
@@ -56,7 +54,7 @@ import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.seed.EncryptedSeed
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import fr.acinq.phoenix.utils.tor.TorEventHandler
 import fr.acinq.phoenix.utils.tor.TorHelper
@@ -597,7 +595,7 @@ class AppViewModel : ViewModel() {
    * This method launches the node startup process.
    */
   @UiThread
-  fun startKit(context: Context, pin: String) {
+  fun startKit(context: Context, pin: String?) {
     when (state.value) {
       is KitState.Error, is KitState.Bootstrap, is KitState.Started -> log.info("ignore startup attempt in state=${state.value?.javaClass?.simpleName}")
       else -> {
@@ -605,11 +603,11 @@ class AppViewModel : ViewModel() {
         viewModelScope.launch {
           withContext(Dispatchers.Default) {
             try {
+              Migration.doMigration(context)
               val res = startNode(context, pin)
               state.postValue(res)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
               ChannelsWatcher.schedule(context)
-              Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
             } catch (t: Throwable) {
               log.warn("aborted node startup!")
               closeConnections()
@@ -693,7 +691,7 @@ class AppViewModel : ViewModel() {
   }
 
   @WorkerThread
-  private fun startNode(context: Context, pin: String): KitState.Started {
+  private fun startNode(context: Context, pin: String?): KitState.Started {
     log.info("starting up node...")
 
     // load config from libs + application.conf in resources
@@ -726,7 +724,7 @@ class AppViewModel : ViewModel() {
     }
 
     state.postValue(KitState.Bootstrap.Node)
-    val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
+    val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFromDir(Wallet.getDatadir(context), pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
 

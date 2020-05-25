@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.utils.encrypt
+package fr.acinq.phoenix.utils.seed
 
 import com.tozny.crypto.android.AesCbcWithIntegrity
 import fr.acinq.bitcoin.ByteVector32

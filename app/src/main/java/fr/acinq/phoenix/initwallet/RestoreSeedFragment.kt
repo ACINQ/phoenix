@@ -37,10 +37,9 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.`MnemonicCode$`
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletRestoreBinding
-import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Wallet
 import fr.acinq.phoenix.utils.customviews.VirtualKeyboardView
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.seed.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -257,7 +256,7 @@ class RestoreSeedViewModel : ViewModel() {
           MnemonicCode.validate(mnemonics)
           val seed: ByteArray = Hex.encode(mnemonics.toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, Constants.DEFAULT_PIN)
+          EncryptedSeed.writeSeedToDir(Wallet.getDatadir(context), seed, null)
           log.info("seed written to file")
           state.postValue(RestoreSeedState.DONE)
         } catch (t: Throwable) {

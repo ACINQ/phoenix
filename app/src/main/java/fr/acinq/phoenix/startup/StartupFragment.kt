@@ -32,7 +32,6 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
-import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.KeystoreHelper
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
@@ -158,12 +157,12 @@ class StartupFragment : BaseFragment() {
             }
           })
         // wallet is encrypted and we don't use biometrics
-        Prefs.getIsSeedEncrypted(context) -> {
+        Prefs.isSeedEncrypted(context) -> {
           mPinDialog?.reset()
           mPinDialog?.show()
         }
         // wallet is not encrypted
-        else -> app.startKit(context, Constants.DEFAULT_PIN)
+        else -> app.startKit(context, null)
       }
     }
   }

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.utils.encrypt
+package fr.acinq.phoenix.utils.seed
 
-import android.content.Context
 import com.google.common.io.Files
 import com.tozny.crypto.android.AesCbcWithIntegrity
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.NoSeedYet
+import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 
 import java.io.ByteArrayInputStream
@@ -98,25 +100,30 @@ class EncryptedSeed private constructor(version: Int, salt: ByteArray, civ: AesC
       }
     }
 
-    fun writeSeedToFile(context: Context, seed: ByteArray, password: String) {
+    fun writeSeedToDir(datadir: File, seed: ByteArray, password: String?) {
       try {
         // 1 - create datadir
-        val datadir = Wallet.getDatadir(context)
         if (!datadir.exists()) {
           datadir.mkdirs()
         }
 
-        // 2 - encrypt and write in a temporary file
-        val temp = File(datadir, "temporary_seed.dat")
-        val encryptedSeed = encrypt(seed, password, EncryptedSeed.SEED_FILE_VERSION_1.toInt())
-        Files.write(encryptedSeed.write(), temp)
-
-        // 3 - decrypt temp file and check validity; if correct, move temp file to final file
-        val checkSeed = readSeedFile(temp, password)
-        if (!AesCbcWithIntegrity.constantTimeEq(checkSeed, seed)) {
-          throw GeneralSecurityException()
+        val seedFile = File(datadir, Wallet.SEED_FILE)
+        if (password == null) {
+          // 2a - if there is no password, directly write the seed to file
+          Files.write(seed, seedFile)
         } else {
-          Files.move(temp, Wallet.getSeedFile(context))
+          // 2b - encrypt and write in a temporary file
+          val temp = File(datadir, "temporary_seed.dat")
+          val encryptedSeed = encrypt(seed, password, SEED_FILE_VERSION_1.toInt())
+          Files.write(encryptedSeed.write(), temp)
+
+          // 3 - decrypt temp file and check validity; if correct, move temp file to final file
+          val checkSeed = readSeedFromFile(temp, password)
+          if (!AesCbcWithIntegrity.constantTimeEq(checkSeed, seed)) {
+            throw GeneralSecurityException()
+          } else {
+            Files.move(temp, seedFile)
+          }
         }
       } catch (e: GeneralSecurityException) {
         throw RuntimeException("encryption failure when writing seed")
@@ -124,19 +131,23 @@ class EncryptedSeed private constructor(version: Int, salt: ByteArray, civ: AesC
     }
 
     @Throws(IOException::class, IllegalAccessException::class, GeneralSecurityException::class)
-    fun readSeedFile(context: Context, password: String): ByteArray {
-      return readSeedFile(Wallet.getSeedFile(context), password)
-    }
-
-    @Throws(IOException::class, IllegalAccessException::class, GeneralSecurityException::class)
-    private fun readSeedFile(seedFile: File, password: String): ByteArray {
+    fun readSeedFromDir(datadir: File, password: String?): ByteArray {
+      val seedFile = File(datadir, Wallet.SEED_FILE)
       if (!seedFile.exists() || !seedFile.canRead() || !seedFile.isFile) {
-        throw RuntimeException("seed file does not exist or can not be read")
+        throw NoSeedYet
       }
-      val fileContent = Files.toByteArray(seedFile)
-      val encryptedSeed = read(fileContent)
-      return encryptedSeed.decrypt(password)
+      return readSeedFromFile(seedFile, password)
     }
 
+    private fun readSeedFromFile(seedFile: File, password: String?): ByteArray {
+      val content = Files.toByteArray(seedFile)
+      return if (password == null) {
+        content
+      } else {
+        Files.toByteArray(seedFile)
+        val encryptedSeed = read(content)
+        return encryptedSeed.decrypt(password)
+      }
+    }
   }
 }

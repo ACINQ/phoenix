@@ -41,6 +41,7 @@ object Prefs {
 
   // -- authentication with PIN/biometrics
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+  private const val PREFS_IS_WALLET_PROTECTED_WITH_PIN: String = "PREFS_IS_WALLET_PROTECTED_WITH_PIN"
   private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
   private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
@@ -79,12 +80,20 @@ object Prefs {
   // -- authentication with PIN/biometrics
   // -- ==================================
 
-  fun getIsSeedEncrypted(context: Context): Boolean {
+  fun isSeedEncrypted(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
   }
 
-  fun setIsSeedEncrypted(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, true).apply()
+  fun setIsSeedEncrypted(context: Context, isEncrypted: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, isEncrypted).apply()
+  }
+
+  fun isWalletBehindPin(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_WALLET_PROTECTED_WITH_PIN, false)
+  }
+
+  fun setIsWalletBehindPin(context: Context, isBehindPin: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_WALLET_PROTECTED_WITH_PIN, isBehindPin).apply()
   }
 
   fun useBiometrics(context: Context): Boolean {

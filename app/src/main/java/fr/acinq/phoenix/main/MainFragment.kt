@@ -266,7 +266,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   private fun checkWalletIsSecure(context: Context) {
-    if (!Prefs.getIsSeedEncrypted(context)) {
+    if (!Prefs.isSeedEncrypted(context)) {
       app.notifications.value?.add(InAppNotifications.NO_PIN_SET)
     } else {
       app.notifications.value?.remove(InAppNotifications.NO_PIN_SET)

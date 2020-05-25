@@ -19,6 +19,7 @@ package fr.acinq.phoenix.utils
 import java.lang.IllegalArgumentException
 
 // -- startup exception
+object NoSeedYet : Exception()
 class InvalidElectrumAddress(val address: String) : Exception(address)
 class TorSetupException(val s: String) : Exception(s)
 class NetworkException : RuntimeException()

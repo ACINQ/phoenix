@@ -48,7 +48,7 @@ object Wallet {
   // ------------------------ DATADIR & FILES
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
-  private const val SEED_FILE = "seed.dat"
+  internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
   private const val NETWORK_DB_FILE = "network.sqlite"
   private const val WALLET_DB_FILE = "wallet.sqlite"

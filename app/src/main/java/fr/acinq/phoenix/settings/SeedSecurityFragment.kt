@@ -33,11 +33,8 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsSeedSecurityBinding
 import fr.acinq.phoenix.security.PinDialog
-import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.KeystoreHelper
-import fr.acinq.phoenix.utils.Prefs
-import fr.acinq.phoenix.utils.SingleLiveEvent
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.seed.EncryptedSeed
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,7 +52,6 @@ class SeedSecurityFragment : BaseFragment() {
   private var biometricPrompt: BiometricPrompt? = null
 
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
-    log.info("pin scramble => $key with scramble=${Prefs.isPinScrambled(context!!)}")
     when (key) {
       Prefs.PREFS_SCRAMBLE_PIN -> context?.let {
         val isPinScrambled = Prefs.isPinScrambled(it)
@@ -111,7 +107,7 @@ class SeedSecurityFragment : BaseFragment() {
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.pinSwitch.setOnClickListener {
       model.protectionUpdateState.value = SeedSecurityViewModel.ProtectionUpdateState.ENTER_PIN
-      model.readSeed(context, Constants.DEFAULT_PIN)
+      model.readSeed(context, null)
     }
     mBinding.pinScramble.setOnClickListener {
       context?.let {
@@ -158,7 +154,7 @@ class SeedSecurityFragment : BaseFragment() {
   }
 
   private fun checkState() {
-    val isSeedEncrypted = context?.let { ctx -> Prefs.getIsSeedEncrypted(ctx) } ?: true
+    val isSeedEncrypted = context?.let { ctx -> Prefs.isSeedEncrypted(ctx) } ?: true
     val useBiometrics = context?.let { ctx -> Prefs.useBiometrics(ctx) } ?: false
     model.protectionState.value = if (isSeedEncrypted) {
       if (useBiometrics) {
@@ -288,15 +284,12 @@ class SeedSecurityViewModel : ViewModel() {
   val protectionUpdateState = MutableLiveData(ProtectionUpdateState.IDLE)
   val messageEvent = SingleLiveEvent<Int>()
 
-  /**
-   * Check if the PIN is correct
-   */
   @UiThread
   suspend fun checkPIN(context: Context, pin: String): Boolean {
     return coroutineScope {
-      async(Dispatchers.Default) {
+      async(Dispatchers.IO) {
         try {
-          EncryptedSeed.readSeedFile(context, pin)
+          EncryptedSeed.readSeedFromDir(Wallet.getDatadir(context), pin)
           true
         } catch (e: Exception) {
           log.error("pin is not valid: ", e)
@@ -306,55 +299,45 @@ class SeedSecurityViewModel : ViewModel() {
     }.await()
   }
 
-  /**
-   * Reads the seed from file and update state
-   */
   @UiThread
-  fun readSeed(context: Context?, pin: String) {
+  fun readSeed(context: Context?, pin: String?) {
     if (context != null) {
-      viewModelScope.launch {
-        withContext(Dispatchers.Default) {
-          try {
-            seed.postValue(EncryptedSeed.readSeedFile(context, pin))
-            protectionUpdateState.postValue(ProtectionUpdateState.SET_NEW_PIN)
-          } catch (e: Exception) {
-            log.error("could not read seed: ", e)
-            if (pin == Constants.DEFAULT_PIN) {
-              // preference pin status is probably obsolete
-              Prefs.setIsSeedEncrypted(context)
-            }
-            messageEvent.postValue(R.string.seedsec_error_wrong_pin)
-            protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
+      viewModelScope.launch(Dispatchers.IO) {
+        try {
+          seed.postValue(EncryptedSeed.readSeedFromDir(Wallet.getDatadir(context), pin))
+          protectionUpdateState.postValue(ProtectionUpdateState.SET_NEW_PIN)
+        } catch (e: Exception) {
+          log.error("could not read seed: ", e)
+          if (pin == null) {
+            // preference encryption state is not in sync
+            Prefs.setIsSeedEncrypted(context, true)
           }
+          messageEvent.postValue(R.string.seedsec_error_wrong_pin)
+          protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
         }
       }
     }
   }
 
-  /**
-   * Write a seed to file with a synchronous coroutine
-   */
   @UiThread
-  fun encryptSeed(context: Context?, pin: String) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          if (protectionUpdateState.value != ProtectionUpdateState.SET_NEW_PIN) {
-            throw java.lang.RuntimeException("cannot encrypt seed in state ${protectionUpdateState.value}")
-          }
-          protectionUpdateState.postValue(ProtectionUpdateState.ENCRYPTING)
-          EncryptedSeed.writeSeedToFile(context!!, seed.value ?: throw RuntimeException("empty seed"), pin)
-          protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
-          protectionState.postValue(ProtectionState.PIN_ONLY)
-          KeystoreHelper.deleteKeyForPin()
-          Prefs.setIsSeedEncrypted(context)
-          Prefs.useBiometrics(context, false)
-          messageEvent.postValue(R.string.seedsec_pin_update_success)
-        } catch (e: java.lang.Exception) {
-          log.error("could not encrypt seed: ", e)
-          messageEvent.postValue(R.string.seedsec_error_generic)
-          protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
+  fun encryptSeed(context: Context?, pin: String?) {
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        if (protectionUpdateState.value != ProtectionUpdateState.SET_NEW_PIN) {
+          throw java.lang.RuntimeException("cannot encrypt seed in state ${protectionUpdateState.value}")
         }
+        protectionUpdateState.postValue(ProtectionUpdateState.ENCRYPTING)
+        EncryptedSeed.writeSeedToDir(Wallet.getDatadir(context!!), seed.value!!, pin)
+        protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
+        protectionState.postValue(ProtectionState.PIN_ONLY)
+        KeystoreHelper.deleteKeyForPin()
+        Prefs.setIsSeedEncrypted(context, true)
+        Prefs.useBiometrics(context, false)
+        messageEvent.postValue(R.string.seedsec_pin_update_success)
+      } catch (e: java.lang.Exception) {
+        log.error("could not encrypt seed: ", e)
+        messageEvent.postValue(R.string.seedsec_error_generic)
+        protectionUpdateState.postValue(ProtectionUpdateState.IDLE)
       }
     }
   }

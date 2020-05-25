@@ -30,13 +30,11 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletAutoCreateBinding
-import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Wallet
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.seed.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
@@ -98,22 +96,19 @@ class AutoCreateViewModel : ViewModel() {
 
   @UiThread
   fun createAndSaveSeed(context: Context) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          state.postValue(AutoCreateState.IN_PROGRESS)
-          log.info("creating words...")
-          val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
-          val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
-          delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, Constants.DEFAULT_PIN)
-          log.info("words written to file")
-          state.postValue(AutoCreateState.DONE)
-        } catch (t: Throwable) {
-          log.error("cannot create seed: ", t)
-          errorCause.postValue(t.localizedMessage)
-          state.postValue(AutoCreateState.ERROR)
-        }
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        state.postValue(AutoCreateState.IN_PROGRESS)
+        val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
+        val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
+        delay(500)
+        EncryptedSeed.writeSeedToDir(Wallet.getDatadir(context), seed, null)
+        log.info("seed written to file")
+        state.postValue(AutoCreateState.DONE)
+      } catch (t: Throwable) {
+        log.error("cannot create seed: ", t)
+        errorCause.postValue(t.localizedMessage)
+        state.postValue(AutoCreateState.ERROR)
       }
     }
   }

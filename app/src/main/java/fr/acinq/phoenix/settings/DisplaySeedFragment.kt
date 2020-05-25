@@ -32,11 +32,13 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsDisplaySeedBinding
 import fr.acinq.phoenix.security.PinDialog
-import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.KeystoreHelper
+import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.seed.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
@@ -126,13 +128,13 @@ class DisplaySeedFragment : BaseFragment() {
                 model.errorMessage.value = getString(R.string.displayseed_error)
               }
             })
-          Prefs.getIsSeedEncrypted(ctx) -> {
+          Prefs.isSeedEncrypted(ctx) -> {
             mPinDialog?.reset()
             mPinDialog?.show()
           }
           else -> {
             model.state.value = DisplaySeedState.UNLOCKING
-            model.getSeed(ctx, Constants.DEFAULT_PIN)
+            model.getSeed(ctx, null)
           }
         }
       }
@@ -185,17 +187,15 @@ class DisplaySeedViewModel : ViewModel() {
   val userHasSavedSeed = MutableLiveData(false)
 
   @UiThread
-  fun getSeed(context: Context, pin: String) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          words.postValue(String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8).split(" "))
-          state.postValue(DisplaySeedState.DONE)
-        } catch (t: Throwable) {
-          log.error("could not read seed: ", t)
-          state.postValue(DisplaySeedState.ERROR)
-          errorMessage.postValue(t.message)
-        }
+  fun getSeed(context: Context, pin: String?) {
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        words.postValue(String(Hex.decode(EncryptedSeed.readSeedFromDir(Wallet.getDatadir(context), pin)), Charsets.UTF_8).split(" "))
+        state.postValue(DisplaySeedState.DONE)
+      } catch (t: Throwable) {
+        log.error("could not read seed: ", t)
+        state.postValue(DisplaySeedState.ERROR)
+        errorMessage.postValue(t.message)
       }
     }
   }
