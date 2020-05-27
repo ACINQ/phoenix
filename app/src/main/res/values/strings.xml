@@ -65,6 +65,7 @@
 
   <!-- //////////////// Startup //////////////////// -->
 
+  <string name="startup_binding_service">Binding service…</string>
   <string name="startup_wait">Loading…</string>
   <string name="startup_wait_tor">Starting Tor…</string>
   <string name="startup_start_button">Restart</string>
@@ -220,8 +221,11 @@
   <string name="notif_watcher_connection_title">Phoenix needs network access</string>
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
-  <string name="notif_fcm_title">You have an incoming payment</string>
-  <string name="notif_fcm_message">Please start the app to receive the payment.</string>
+  <string name="notif_fcm_title">Incoming payment</string>
+  <string name="notif_fcm_message_manual_start_app">Please start the app to receive the payment.</string>
+  <string name="notif_fcm_message_starting_up">Starting up wallet…</string>
+  <string name="notif_fcm_message_receive_in_progress">Receiving payment…</string>
+  <string name="notif_fcm_message_received">Received payment!</string>
 
   <!-- //////////////// close all channels //////////////// -->
 

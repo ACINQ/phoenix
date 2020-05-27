@@ -62,12 +62,11 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    if (activity == null) {
-      dismiss()
-    } else {
+    activity?.run {
       val timeRemaining = (args.expireAt * 1000) - System.currentTimeMillis() - SAFETY_MARGIN
       log.info("display popup for payToOpen request [ payment_hash=${args.paymentHash} amount_msat=${args.amountMsat} fee_sat=${args.feeSat} funding_sat=${args.fundingSat} expire_at=${DateFormat.getDateTimeInstance().format(args.expireAt * 1000)} time_remaining=${timeRemaining}ms]")
-      app = ViewModelProvider(activity!!).get(AppViewModel::class.java)
+
+      app = ViewModelProvider(this).get(AppViewModel::class.java)
       model = ViewModelProvider(this, ReceiveWithOpenViewModelFactory(timeRemaining)).get(ReceiveWithOpenViewModel::class.java)
       mBinding.model = model
 
@@ -75,14 +74,14 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
         mBinding.acceptButton.setText(getString(R.string.receive_with_open_accept, max(it / 1000, 0).toString()))
         if (it <= 0) {
           log.info("pay to open with payment_hash=${args.paymentHash} has expired and is declined")
-          app.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+          app.service?.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
         }
       })
 
-      activity?.onBackPressedDispatcher?.addCallback(this) {
+      this.onBackPressedDispatcher.addCallback(this) {
         log.debug("back pressed disabled here")
       }
-    }
+    } ?: dismiss()
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,14 +98,18 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.acceptButton.setOnClickListener {
-      log.info("accepting pay-to-open with fee=${args.feeSat}")
-      app.acceptPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
-      dismiss()
+      app.service?.apply {
+        log.info("accepting pay-to-open with payment_hash=${args.paymentHash} fee=${args.feeSat}")
+        acceptPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+        dismiss()
+      }
     }
     mBinding.declineButton.setOnClickListener {
-      log.info("pay to open with payment_hash=${args.paymentHash} has been declined")
-      app.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
-      dismiss()
+      log.info("declining pay-to-open with payment_hash=${args.paymentHash}")
+      app.service?.apply {
+        rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+        dismiss()
+      }
     }
     mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.helpButton.setOnClickListener {
@@ -117,7 +120,7 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
   }
 
   override fun onCancel(dialog: DialogInterface) {
-    app.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
+    app.service?.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))
     super.onCancel(dialog)
   }
 }

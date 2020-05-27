@@ -71,16 +71,13 @@ class AutoCreateFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    if (context != null && Wallet.getSeedFile(context!!).exists()) {
-      findNavController().navigate(R.id.global_action_any_to_startup)
-    } else {
-      if (model.state.value == AutoCreateState.START) {
-        context?.let {
-          model.createAndSaveSeed(it.applicationContext)
-        }
+    context?.let {
+      if (Wallet.getSeedFile(it).exists()) {
+        findNavController().navigate(R.id.global_action_any_to_startup)
+      } else if (model.state.value == AutoCreateState.START) {
+        model.createAndSaveSeed(it)
       }
     }
-
   }
 }
 

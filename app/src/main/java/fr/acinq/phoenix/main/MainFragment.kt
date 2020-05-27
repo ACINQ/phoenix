@@ -40,8 +40,8 @@ import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.events.ChannelStateChange
 import fr.acinq.phoenix.events.PaymentPending
@@ -111,42 +111,45 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MainViewModel::class.java)
-    app.payments.observe(viewLifecycleOwner, Observer {
-      paymentsAdapter.submitList(it)
-    })
-    app.notifications.observe(viewLifecycleOwner, Observer {
-      notificationsAdapter.update(it)
-    })
-    app.balance.observe(viewLifecycleOwner, Observer {
-      mBinding.balance.setAmount(it)
-    })
-    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
-      refreshIncomingFunds()
-    })
-    app.networkInfo.observe(viewLifecycleOwner, Observer {
-      if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
-        if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
-          mBinding.connectivityButton.startAnimation(blinkingAnimation)
-        }
-        mBinding.connectivityButton.visibility = View.VISIBLE
-        mBinding.torConnectedButton.visibility = View.GONE
-      } else if (context != null && Prefs.isTorEnabled(context!!)) {
-        if (it.torConnections.isNullOrEmpty()) {
+    context?.let { ctx ->
+      appContext(ctx).notifications.observe(viewLifecycleOwner, Observer {
+        notificationsAdapter.update(it)
+      })
+      appContext(ctx).networkInfo.observe(viewLifecycleOwner, Observer {
+        log.info("update network info=$it")
+        if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
           if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
             mBinding.connectivityButton.startAnimation(blinkingAnimation)
           }
           mBinding.connectivityButton.visibility = View.VISIBLE
           mBinding.torConnectedButton.visibility = View.GONE
+        } else if (Prefs.isTorEnabled(ctx)) {
+          if (it.torConnections.isNullOrEmpty()) {
+            if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
+              mBinding.connectivityButton.startAnimation(blinkingAnimation)
+            }
+            mBinding.connectivityButton.visibility = View.VISIBLE
+            mBinding.torConnectedButton.visibility = View.GONE
+          } else {
+            mBinding.connectivityButton.clearAnimation()
+            mBinding.connectivityButton.visibility = View.GONE
+            mBinding.torConnectedButton.visibility = View.VISIBLE
+          }
         } else {
           mBinding.connectivityButton.clearAnimation()
           mBinding.connectivityButton.visibility = View.GONE
-          mBinding.torConnectedButton.visibility = View.VISIBLE
+          mBinding.torConnectedButton.visibility = View.GONE
         }
-      } else {
-        mBinding.connectivityButton.clearAnimation()
-        mBinding.connectivityButton.visibility = View.GONE
-        mBinding.torConnectedButton.visibility = View.GONE
-      }
+      })
+      appContext(ctx).balance.observe(viewLifecycleOwner, Observer {
+        mBinding.balance.setAmount(it)
+      })
+    }
+    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
+      refreshIncomingFunds()
+    })
+    app.payments.observe(viewLifecycleOwner, Observer {
+      paymentsAdapter.submitList(it)
     })
     model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
       if (amount.`$greater`(MilliSatoshi(0))) {
@@ -207,13 +210,13 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       log.error("error when refreshing the incoming funds notification: ", exception)
     }) {
       val totalSwapIns = app.pendingSwapIns.value?.values?.map { s -> Converter.any2Msat(s.amount()) } ?: emptyList()
-      val totalChannelsWaitingConf = app.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`).map { c ->
+      val totalChannelsWaitingConf = app.service?.getChannels(`WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`)?.map { c ->
         if (c.data() is HasCommitments) {
           (c.data() as HasCommitments).commitments().availableBalanceForSend()
         } else {
           MilliSatoshi(0)
         }
-      }
+      } ?: emptyList()
       val total = totalSwapIns + totalChannelsWaitingConf
       model.incomingFunds.postValue(if (total.isEmpty()) {
         MilliSatoshi(0)
@@ -254,31 +257,31 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     val channelsWatchOutcome = Prefs.getWatcherLastAttemptOutcome(context)
     if (channelsWatchOutcome.second > 0 && System.currentTimeMillis() - channelsWatchOutcome.second > Constants.DELAY_BEFORE_BACKGROUND_WARNING) {
       log.warn("watcher has not run since {}", DateFormat.getDateTimeInstance().format(Date(channelsWatchOutcome.second)))
-      app.notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      appContext(context).notifications.value?.add(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
       if (app.state.value is KitState.Started) {
         // the user has been notified once, but since the node has started he is safe anyway
         // the background watcher notification countdown can be reset so that it does not spam the user
         Prefs.saveWatcherAttemptOutcome(context, WatchListener.`Ok$`.`MODULE$`)
       }
     } else {
-      app.notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
+      appContext(context).notifications?.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
   }
 
   private fun checkWalletIsSecure(context: Context) {
     if (!Prefs.isSeedEncrypted(context)) {
-      app.notifications.value?.add(InAppNotifications.NO_PIN_SET)
+      appContext(context).notifications.value?.add(InAppNotifications.NO_PIN_SET)
     } else {
-      app.notifications.value?.remove(InAppNotifications.NO_PIN_SET)
+      appContext(context).notifications.value?.remove(InAppNotifications.NO_PIN_SET)
     }
   }
 
   private fun checkMnemonics(context: Context) {
     val timestamp = Prefs.getMnemonicsSeenTimestamp(context)
     if (timestamp == 0L) {
-      app.notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      appContext(context).notifications.value?.add(InAppNotifications.MNEMONICS_NEVER_SEEN)
     } else {
-      app.notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
+      appContext(context).notifications.value?.remove(InAppNotifications.MNEMONICS_NEVER_SEEN)
     }
   }
 

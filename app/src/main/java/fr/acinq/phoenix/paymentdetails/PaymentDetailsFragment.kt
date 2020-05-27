@@ -47,6 +47,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scala.Option
 import scala.collection.JavaConverters
 import java.text.DateFormat
 import java.util.*
@@ -223,7 +224,7 @@ class PaymentDetailsFragment : BaseFragment() {
     }) {
       model.state.value = PaymentDetailsState.RetrievingDetails
       if (isSentPayment) {
-        val payments: List<OutgoingPayment> = app.getSentPaymentsFromParentId(UUID.fromString(identifier))
+        val payments: List<OutgoingPayment> = app.service?.getSentPaymentsFromParentId(UUID.fromString(identifier)) ?: emptyList()
         when {
           payments.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
             payments.filter { p -> p.status() is OutgoingPaymentStatus.`Pending$` }.also {
@@ -246,7 +247,7 @@ class PaymentDetailsFragment : BaseFragment() {
           }
         }
       } else {
-        val payment = app.getReceivedPayment(ByteVector32.fromValidHex(identifier))
+        val payment = app.service?.getReceivedPayment(ByteVector32.fromValidHex(identifier)) ?: Option.empty()
         if (payment.isEmpty) {
           log.warn("could not find any incoming payments for id=$identifier")
           model.state.value = PaymentDetailsState.Error("No details found for this incoming payment")

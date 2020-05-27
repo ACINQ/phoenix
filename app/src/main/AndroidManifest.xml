@@ -22,9 +22,10 @@
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
   <uses-permission android:name="android.permission.CAMERA" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
   <application
-    android:name=".Application"
+    android:name=".AppContext"
     android:allowBackup="false"
     android:fullBackupContent="false"
     android:icon="@mipmap/ic_launcher"
@@ -89,6 +90,12 @@
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
       </intent-filter>
     </service>
+
+    <!-- node service -->
+    <service
+      android:name=".background.EclairNodeService"
+      android:stopWithTask="false"
+      android:exported="false" />
 
   </application>
 </manifest>

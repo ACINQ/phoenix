@@ -117,7 +117,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }) {
       model.state.value = ChannelDetailsState.IN_PROGRESS
       withContext(this.coroutineContext + Dispatchers.Default) {
-        val channel = app.getChannel(ByteVector32.fromValidHex(args.channelId))
+        val channel = app.requireService.getChannel(ByteVector32.fromValidHex(args.channelId))
         val data = channel!!.data()
         if (data is HasCommitments) {
           model.fundingTxId.postValue(data.commitments().commitInput().outPoint().txid().toString())

@@ -105,7 +105,7 @@ dependencies {
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ANDROIDX - constraint layout
-  def constraint_version = "2.0.0-beta5"
+  def constraint_version = "2.0.0-beta4"
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
@@ -113,6 +113,7 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+  implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
   // ANDROIDX - biometric
   def biometric_version = "1.0.1"

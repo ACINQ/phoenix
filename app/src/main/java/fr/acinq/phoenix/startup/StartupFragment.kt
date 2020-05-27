@@ -25,13 +25,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
+import fr.acinq.phoenix.utils.BindingHelpers
 import fr.acinq.phoenix.utils.KeystoreHelper
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
@@ -52,7 +54,6 @@ class StartupFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    mBinding.appModel = app
     context?.let { ctx ->
       val torAnim = ctx.getDrawable(R.drawable.ic_tor_shield_animated)
       mBinding.startingTorAnimation.setImageDrawable(torAnim)
@@ -72,9 +73,7 @@ class StartupFragment : BaseFragment() {
     if (mPinDialog == null) {
       mPinDialog = getPinDialog(object : PinDialog.PinDialogCallback {
         override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
-          if (context != null) {
-            app.startKit(context!!, pinCode)
-          }
+          app.service?.startKit(pinCode)
           dialog.dismiss()
         }
 
@@ -82,13 +81,15 @@ class StartupFragment : BaseFragment() {
       }, cancelable = false)
     }
     mBinding.errorRestartButton.setOnClickListener {
-      if (app.state.value is KitState.Error) app.state.value = KitState.Off
+      if (app.state.value is KitState.Error) {
+        app.service?.shutdown()
+      }
     }
     mBinding.errorSettingsButton.setOnClickListener {
       findNavController().navigate(R.id.global_action_any_to_settings)
     }
     // required because PIN/biometric dialogs are dismissed if user alt-tab (state observer will not fire anymore)
-    app.state.value?.let { handleKitState(it) }
+    app.state.value?.let { handleAppState(it) }
   }
 
   override fun onStop() {
@@ -96,47 +97,66 @@ class StartupFragment : BaseFragment() {
     mPinDialog?.dismiss()
   }
 
-  override fun handleKitState(state: KitState) {
+  override fun handleAppState(state: KitState) {
     // check current nav in controller - there can be race conditions between handleKitState started from onStart and from the observer
     val currentNav = findNavController().currentDestination
-    if (currentNav != null && currentNav.id == R.id.startup_fragment) {
-      log.debug("nav=${currentNav.label} in state=${state.javaClass.canonicalName} with intent=${app.currentURIIntent.value}")
-      when {
-        state is KitState.Started && app.currentURIIntent.value == null -> {
-          log.info("kit [Started], redirect to main page")
-          findNavController().navigate(R.id.action_startup_to_main)
-        }
-        state is KitState.Started && app.currentURIIntent.value != null -> {
-          findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
-          app.currentURIIntent.value = null
-        }
-        state is KitState.Off && context != null -> {
-          if (app.hasWalletBeenSetup(context!!)) {
-            log.info("kit [OFF] with ready wallet, starting kit")
-            unlockAndStart(context!!)
-          } else {
-            log.info("kit [OFF] with empty wallet, redirect to wallet initialization")
-            findNavController().navigate(R.id.global_action_any_to_init_wallet)
+    refreshUIVisibility(state)
+    context?.let { ctx ->
+      if (currentNav != null && currentNav.id == R.id.startup_fragment) {
+        log.debug("nav=${currentNav.label} in state=${state.getName()} with intent=${app.currentURIIntent.value}")
+        when {
+          state is KitState.Started && app.currentURIIntent.value == null -> {
+            log.info("kit [Started], redirect to main page")
+            findNavController().navigate(R.id.action_startup_to_main)
           }
-        }
-        state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
-        state is KitState.Error.InvalidElectrumAddress -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address) }
-        state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
-        state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
-        state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
-        state is KitState.Error.WrongPassword -> {
-          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd) }
-          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-        }
-        state is KitState.Error.InvalidBiometric -> {
-          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_biometrics) }
-          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-        }
-        else -> {
-          log.debug("kit [$state] with context=$context, standing by...")
+          state is KitState.Started && app.currentURIIntent.value != null -> {
+            findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
+            app.currentURIIntent.value = null
+          }
+          state is KitState.Off -> {
+            if (app.hasWalletBeenSetup(ctx)) {
+              log.info("kit [OFF] with ready wallet, starting kit")
+              unlockAndStart(ctx)
+            } else {
+              log.info("kit [OFF] with empty wallet, redirect to wallet initialization")
+              findNavController().navigate(R.id.global_action_any_to_init_wallet)
+            }
+          }
+          state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
+          state is KitState.Error.InvalidElectrumAddress -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address) }
+          state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
+          state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
+          state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
+          state is KitState.Error.WrongPassword -> {
+            context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd) }
+            Handler().postDelayed({ app.service?.resetToOff() }, 2500)
+          }
+          state is KitState.Error.InvalidBiometric -> {
+            context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_biometrics) }
+            Handler().postDelayed({ app.service?.resetToOff() }, 2500)
+          }
+          else -> {
+            log.debug("kit [$state] with context=$context, standing by...")
+          }
         }
       }
     }
+  }
+
+  private fun refreshUIVisibility(state: KitState) {
+    // show an icon when the app is not started
+    BindingHelpers.show(mBinding.icon, state !is KitState.Started)
+    // errors...
+    BindingHelpers.show(mBinding.errorBox, state is KitState.Error)
+    BindingHelpers.show(mBinding.errorSeparator, state !is KitState.Error.WrongPassword)
+    BindingHelpers.show(mBinding.errorRestartButton, state !is KitState.Error.WrongPassword)
+    BindingHelpers.show(mBinding.errorSettingsButton, state is KitState.Error.Generic || state is KitState.Error.UnreadableData
+      || state is KitState.Error.Tor || state is KitState.Error.InvalidElectrumAddress)
+    // wait while starting...
+    BindingHelpers.show(mBinding.bindingService, state is KitState.Disconnected)
+    BindingHelpers.show(mBinding.starting, state is KitState.Bootstrap.Init || state is KitState.Bootstrap.Node)
+    BindingHelpers.show(mBinding.startingTor, state is KitState.Bootstrap.Tor)
+    BindingHelpers.show(mBinding.startingTorAnimation, state is KitState.Bootstrap.Tor)
   }
 
   private fun unlockAndStart(context: Context) {
@@ -150,7 +170,7 @@ class StartupFragment : BaseFragment() {
           }, successCallback = {
             try {
               val pin = KeystoreHelper.decryptPin(context)?.toString(Charsets.UTF_8)
-              app.startKit(context, pin!!)
+              app.service?.startKit(pin!!)
             } catch (e: Exception) {
               log.error("could not decrypt pin: ", e)
               app.state.value = KitState.Error.InvalidBiometric
@@ -162,7 +182,7 @@ class StartupFragment : BaseFragment() {
           mPinDialog?.show()
         }
         // wallet is not encrypted
-        else -> app.startKit(context, null)
+        else -> app.service?.startKit(null)
       }
     }
   }

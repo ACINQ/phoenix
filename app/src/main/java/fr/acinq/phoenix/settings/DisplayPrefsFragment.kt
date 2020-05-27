@@ -25,7 +25,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsPrefsDisplayBinding
 import fr.acinq.phoenix.utils.Converter
@@ -33,7 +32,7 @@ import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class DisplayPrefsFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class DisplayPrefsFragment : BaseFragment(stayIfNotStarted = true), SharedPreferences.OnSharedPreferenceChangeListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -60,8 +59,6 @@ class DisplayPrefsFragment : BaseFragment(), SharedPreferences.OnSharedPreferenc
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
   }
-
-  override fun handleKitState(state: KitState) {}
 
   override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
     activity?.run {

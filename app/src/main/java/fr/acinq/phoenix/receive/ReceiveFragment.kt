@@ -175,7 +175,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      val swapInFee = 100 * (app.swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+      val swapInFee = 100 * (appContext(it.context).swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
       AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
         Converter.html(getString(R.string.receive_swap_in_disclaimer_message, String.format("%.2f", swapInFee))))
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
@@ -225,13 +225,11 @@ class ReceiveFragment : BaseFragment() {
   }
 
   private fun copyInvoice() {
-    try {
-      val clipboard = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    context?.run {
+      val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
-      Toast.makeText(activity!!.applicationContext, R.string.utils_copied, Toast.LENGTH_SHORT).show()
-    } catch (e: Exception) {
-      log.error("failed to copy: ${e.localizedMessage}")
+      Toast.makeText(this, R.string.utils_copied, Toast.LENGTH_SHORT).show()
     }
   }
 
@@ -244,7 +242,8 @@ class ReceiveFragment : BaseFragment() {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
       val desc = mBinding.descValue.text.toString()
-      model.invoice.value = Pair(app.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount()), null)
+      val invoice = app.requireService.generatePaymentRequest(if (desc.isBlank()) getString(R.string.receive_default_desc) else desc, extractAmount())
+      model.invoice.value = Pair(invoice, null)
     }
   }
 
@@ -255,7 +254,7 @@ class ReceiveFragment : BaseFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = SwapInState.IN_PROGRESS
-      app.sendSwapIn()
+      app.requireService.sendSwapIn()
     }
   }
 
@@ -278,16 +277,14 @@ class ReceiveFragment : BaseFragment() {
 
   private fun extractAmount(): Option<MilliSatoshi> {
     val unit = mBinding.amountUnit.selectedItem
-    return if (unit == null || context == null) {
-      Option.empty()
-    } else {
-      val amount = mBinding.amountValue.text.toString()
-      if (unit == Prefs.getFiatCurrency(context!!)) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amount))
-      } else {
-        Converter.string2Msat_opt(amount, unit.toString())
+    val amount = mBinding.amountValue.text.toString()
+    return context?.run {
+      when (unit) {
+        null -> Option.empty()
+        Prefs.getFiatCurrency(this) -> Option.apply(Converter.convertFiatToMsat(this, amount))
+        else -> Converter.string2Msat_opt(amount, unit.toString())
       }
-    }
+    } ?: Option.empty()
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)

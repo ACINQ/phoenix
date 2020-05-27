@@ -42,7 +42,7 @@ import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 
 /**
- * Watches the node channels to detect cheating attempts in background.
+ * Background job watching the node's channels to detect cheating attempts. A notification will be shown in that case.
  */
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 

@@ -54,12 +54,8 @@ class ForceCloseFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ForceCloseViewModel::class.java)
     mBinding.model = model
-    val finalAddress = try {
-      app.kit!!.wallet().receiveAddress.value().get().get()
-    } catch (e: Exception) {
-      getString(R.string.utils_unknown)
-    }
-    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.closechannels_force_instructions, finalAddress)))
+    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.closechannels_force_instructions,
+      app.state.value?.getFinalAddress() ?: getString(R.string.utils_unknown))))
   }
 
   override fun onStart() {
@@ -80,7 +76,7 @@ class ForceCloseFragment : BaseFragment() {
       model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
       model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
-      val channels = app.getChannels(`NORMAL$`.`MODULE$`)
+      val channels = app.requireService.getChannels(`NORMAL$`.`MODULE$`)
       if (channels.count() == 0) {
         model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
@@ -96,7 +92,7 @@ class ForceCloseFragment : BaseFragment() {
       Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
     }) {
       model.state.value = ForceCloseState.IN_PROGRESS
-      app.forceCloseAllChannels()
+      app.requireService.forceCloseAllChannels()
       model.state.value = ForceCloseState.DONE
     }
   }

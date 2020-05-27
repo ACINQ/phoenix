@@ -88,7 +88,7 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
     super.onStart()
     getChannels()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
-    mBinding.actionBar.setSubtitle(getString(R.string.listallchannels_node_id, app.kit?.nodeParams()?.nodeId()?.toString() ?: getString(R.string.utils_unknown)))
+    mBinding.actionBar.setSubtitle(getString(R.string.listallchannels_node_id, app.state.value?.getNodeId()?.toString() ?: getString(R.string.utils_unknown)))
     mBinding.shareButton.setOnClickListener {
       model.channels.value?.let { list ->
         shareChannelsData(list)
@@ -118,7 +118,7 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
       model.state.value = ListChannelsState.ERROR
     }) {
       model.state.value = ListChannelsState.IN_PROGRESS
-      val channels = app.getChannels(null).toMutableList()
+      val channels = app.requireService.getChannels(null).toMutableList()
       channelsAdapter.update(channels)
       model.channels.value = channels
       model.state.value = ListChannelsState.DONE

@@ -17,15 +17,6 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
-  <data>
-
-    <import type="fr.acinq.phoenix.KitState" />
-
-    <variable
-      name="appModel"
-      type="fr.acinq.phoenix.AppViewModel" />
-  </data>
-
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -43,18 +34,17 @@
         android:layout_height="120dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_phoenix"
-        android:visibility="@{!(appModel.state instanceof KitState.Error)}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/error_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded"
         android:padding="@dimen/space_md_p"
-        android:visibility="@{appModel.state instanceof KitState.Error}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +65,6 @@
           android:id="@+id/error_separator"
           style="@style/HSeparator"
           android:layout_marginTop="@dimen/space_md_p"
-          android:visibility="@{!(appModel.state instanceof KitState.Error.WrongPassword)}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_message" />
@@ -86,7 +75,6 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_lg"
           android:background="@drawable/button_bg_primary_border"
-          android:visibility="@{!(appModel.state instanceof KitState.Error.WrongPassword)}"
           app:icon="@drawable/ic_refresh"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
@@ -100,7 +88,6 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData || appModel.state instanceof KitState.Error.Tor || appModel.state instanceof KitState.Error.InvalidElectrumAddress}"
           app:icon="@drawable/ic_settings"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
@@ -112,10 +99,18 @@
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <fr.acinq.phoenix.utils.customviews.ProgressTextView
+        android:id="@+id/binding_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon"
+        app:text="@string/startup_binding_service" />
+
+      <fr.acinq.phoenix.utils.customviews.ProgressTextView
         android:id="@+id/starting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Init || appModel.state instanceof KitState.Bootstrap.Node}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
@@ -126,7 +121,6 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@null"
-        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
         app:layout_constraintBottom_toBottomOf="@id/starting_tor"
         app:layout_constraintEnd_toStartOf="@id/starting_tor"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -139,7 +133,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_xs"
         android:text="@string/startup_wait_tor"
-        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/starting_tor_animation"
         app:layout_constraintTop_toBottomOf="@id/icon" />

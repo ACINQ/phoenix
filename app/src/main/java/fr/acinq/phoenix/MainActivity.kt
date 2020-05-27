@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -24,8 +25,6 @@ import android.net.Network
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -36,6 +35,8 @@ import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
+import fr.acinq.phoenix.background.KitState
+import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
@@ -44,6 +45,7 @@ import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.ThemeHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -56,11 +58,13 @@ class MainActivity : AppCompatActivity() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
       log.info("network available")
-      if (Prefs.isTorEnabled(applicationContext)) {
-        app.reconnectTor()
+      AppContext.getInstance(applicationContext).apply {
+        if (Prefs.isTorEnabled(applicationContext)) {
+          reconnectTor()
+        }
+        networkInfo.postValue(networkInfo.value?.run { networkConnected = true ; this })
       }
-      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = true ; this })
-      app.reconnectToPeer()
+      app.service?.reconnectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -76,7 +80,9 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = false ; this })
+      AppContext.getInstance(applicationContext).apply {
+        networkInfo.postValue(networkInfo.value?.run { networkConnected = false ; this })
+      }
     }
   }
 
@@ -85,6 +91,7 @@ class MainActivity : AppCompatActivity() {
     app.currentNav.postValue(destination.id)
   }
 
+  @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
@@ -131,6 +138,11 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
+    Intent(this, EclairNodeService::class.java).also { intent ->
+      //startService(intent)
+      val bound = applicationContext.bindService(intent, app.serviceConnection, Context.BIND_AUTO_CREATE)
+      log.info("service binding=$bound")
+    }
     findNavController(R.id.nav_host_main).addOnDestinationChangedListener(navigationCallback)
     val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
     connectivityManager?.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback)
@@ -155,8 +167,9 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun handleUriIntent() {
-    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value?.javaClass?.simpleName}")
-    if (app.state.value is KitState.Started && app.currentURIIntent.value != null && app.currentNav.value != R.id.startup_fragment) {
+    val state = app.state.value
+    log.debug("handle intent=${app.currentURIIntent.value} in state=$state")
+    if (state is KitState.Started && app.currentURIIntent.value != null && app.currentNav.value != R.id.startup_fragment) {
       findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
       app.currentURIIntent.value = null
     }
@@ -171,6 +184,11 @@ class MainActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     super.onDestroy()
+    try {
+      unbindService(app.serviceConnection)
+    } catch (e: Exception) {
+      log.error("failed to unbind activity from node service: ", e)
+    }
     log.info("main activity destroyed")
   }
 

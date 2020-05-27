@@ -32,8 +32,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentSettingsElectrumServerBinding
 import fr.acinq.phoenix.utils.BindingHelpers
 import fr.acinq.phoenix.utils.Converter
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory
 import java.text.NumberFormat
 
 
-class ElectrumServerFragment : BaseFragment() {
+class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsElectrumServerBinding
@@ -57,49 +57,46 @@ class ElectrumServerFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    app.state.observe(viewLifecycleOwner, Observer {
-      when (it) {
-        is KitState.Started -> {
-          // -- xpub / feerate from appkit
-          mBinding.xpub.text = getString(R.string.electrum_xpub_value, it.xpub.xpub, it.xpub.path)
-          val feeRate = `package$`.`MODULE$`.feerateKw2Byte(it.kit.nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(1))
-          mBinding.feeRate.visibility = View.VISIBLE
-          mBinding.feeRate.text = getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(feeRate))
-        }
-        else -> {
-          mBinding.feeRate.text = getString(R.string.utils_unknown)
-          mBinding.xpub.text = getString(R.string.utils_unknown)
-        }
-      }
-    })
-    app.networkInfo.observe(viewLifecycleOwner, Observer {
-      context?.let { ctx ->
-        val electrumServer = it.electrumServer
-        if (electrumServer == null) {
-          // -- no connection to electrum server yet
-          val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-          mBinding.connectionStateValue.text = Converter.html(
-            if (app.state.value is KitState.Started) {
-              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                resources.getString(R.string.electrum_connecting)
+    context?.let { ctx ->
+      // xpub
+      mBinding.xpub.text = app.state.value?.getXpub()?.let { xpub ->
+        getString(R.string.electrum_xpub_value, xpub.xpub, xpub.path)
+      } ?: getString(R.string.utils_unknown)
+
+      // feerate
+      mBinding.feeRate.text = app.state.value?.getFeeratePerKw(1)?.let { feerate ->
+        getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(`package$`.`MODULE$`.feerateKw2Byte(feerate)))
+      } ?: getString(R.string.utils_unknown)
+
+      appContext(ctx).networkInfo.observe(viewLifecycleOwner, Observer {
+        context?.let { ctx ->
+          val electrumServer = it.electrumServer
+          if (electrumServer == null) {
+            // -- no connection to electrum server yet
+            val prefElectrumAddress = Prefs.getElectrumServer(ctx)
+            mBinding.connectionStateValue.text = Converter.html(
+              if (app.state.value is KitState.Started) {
+                if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                  resources.getString(R.string.electrum_connecting)
+                } else {
+                  resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+                }
               } else {
-                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-              }
-            } else {
-              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                resources.getString(R.string.electrum_not_connected)
-              } else {
-                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
-              }
-            })
-        } else {
-          // -- successfully connected to electrum
-          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
-          mBinding.tipTime.text = Transcriber.plainTime(it.electrumServer.tipTime * 1000L)
-          mBinding.blockHeight.text = NumberFormat.getInstance().format(it.electrumServer.blockHeight)
+                if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                  resources.getString(R.string.electrum_not_connected)
+                } else {
+                  resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+                }
+              })
+          } else {
+            // -- successfully connected to electrum
+            mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
+            mBinding.tipTime.text = Transcriber.plainTime(it.electrumServer.tipTime * 1000L)
+            mBinding.blockHeight.text = NumberFormat.getInstance().format(it.electrumServer.blockHeight)
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   override fun onStart() {
@@ -111,8 +108,6 @@ class ElectrumServerFragment : BaseFragment() {
       }
     }
   }
-
-  override fun handleKitState(state: KitState) {}
 
   private fun getElectrumDialog(context: Context): AlertDialog {
     val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
@@ -172,7 +167,7 @@ class ElectrumServerFragment : BaseFragment() {
           }
           dialog.dismiss()
           if (app.state.value is KitState.Started) {
-            app.shutdown()
+            app.service?.shutdown()
             findNavController().navigate(R.id.global_action_any_to_startup)
           } else {
             findNavController().popBackStack()

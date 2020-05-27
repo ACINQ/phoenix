@@ -25,17 +25,15 @@ import androidx.core.content.FileProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.BuildConfig
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsLogsBinding
 import fr.acinq.phoenix.utils.Logging
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class LogsSettingsFragment : BaseFragment() {
+class LogsSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
-
   private lateinit var mBinding: FragmentSettingsLogsBinding
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -43,8 +41,6 @@ class LogsSettingsFragment : BaseFragment() {
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
-
-  override fun handleKitState(state: KitState) {}
 
   override fun onStart() {
     super.onStart()

@@ -59,6 +59,7 @@ object Prefs {
   const val PREFS_THEME: String = "PREFS_THEME"
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
+  const val PREFS_FCM_TOKEN: String = "PREFS_FCM_TOKEN"
 
   fun getLastVersionUsed(context: Context): Int {
     return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
@@ -237,5 +238,13 @@ object Prefs {
 
   fun savePinScrambled(context: Context, isScrambled: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
+  }
+
+  fun getFCMToken(context: Context): String? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_FCM_TOKEN, null)
+  }
+
+  fun saveFCMToken(context: Context, token: String) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FCM_TOKEN, token).apply()
   }
 }

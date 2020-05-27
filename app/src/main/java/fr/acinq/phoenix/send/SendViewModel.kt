@@ -59,11 +59,11 @@ class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
   val state = MutableLiveData<SendState>()
-  //  val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
-  val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
+  /** Prevents early validation error message if amount is not set in invoice. */
+  val isAmountFieldPristine = MutableLiveData<Boolean>()
   val useMaxBalance = MutableLiveData<Boolean>()
+  /** Contains strings resource id for amount error message. Not contained in the fragment Error state because a incorrect amount is not a fatal error. */
   val amountErrorMessage = SingleLiveEvent<Int>()
-  //  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request
 

@@ -88,7 +88,7 @@ class ReadInputFragment : BaseFragment() {
           // check payment request chain
           val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
           // additional controls
-          if (app.kit?.nodeParams()?.nodeId() == it.pr.nodeId()) {
+          if (app.state.value?.getNodeId() == it.pr.nodeId()) {
             log.debug("abort payment to self")
             model.inputState.value = ReadInputState.Error.PayToSelf
           } else if (it.pr.isExpired) {

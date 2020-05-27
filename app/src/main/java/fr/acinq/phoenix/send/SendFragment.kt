@@ -103,7 +103,7 @@ class SendFragment : BaseFragment() {
                 mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.textColor))
                 mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(fee, ctx, withUnit = true)
                 mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
-                if (totalAfterSwap.`$greater`(app.balance.value)) {
+                if (totalAfterSwap.`$greater`(appContext(ctx).balance.value)) {
                   model.state.value = SendState.Onchain.Error.ExceedsBalance(state.uri)
                 }
               }
@@ -128,11 +128,13 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null && app.balance.value != null) {
-        app.balance.value!!.run {
-          val unit = Prefs.getCoinUnit(context!!)
-          mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-          mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
+      if (useMax) {
+        context?.let { ctx ->
+          appContext(ctx).balance.value?.let {
+            val unit = Prefs.getCoinUnit(ctx)
+            mBinding.unit.setSelection(unitList.indexOf(unit.code()))
+            mBinding.amount.setText(Converter.printAmountRaw(it, ctx))
+          }
         }
       }
     })
@@ -174,7 +176,7 @@ class SendFragment : BaseFragment() {
       EventBus.getDefault().register(this)
     }
 
-    app.balance.value?.let {
+    appContext()?.balance?.value?.let {
       mBinding.balanceValue.setAmount(it)
     } ?: log.warn("balance is not available yet")
 
@@ -218,8 +220,7 @@ class SendFragment : BaseFragment() {
       val amount = checkAmount()
       if (amount.isDefined) {
         // FIXME: use feerate provided by user, like in eclair mobile
-        val feeratePerKw = app.kit?.run { nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
-        app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
+        app.requireService.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address)
       } else {
         model.state.postValue(SendState.Onchain.SwapRequired(uri))
       }
@@ -241,7 +242,7 @@ class SendFragment : BaseFragment() {
         is SendState.Onchain -> SendState.Onchain.Sending(state.uri, pr)
         else -> throw RuntimeException("unhandled state=$state when sending payment")
       }
-      app.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
+      app.requireService.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }
@@ -250,19 +251,19 @@ class SendFragment : BaseFragment() {
     return try {
       val unit = mBinding.unit.selectedItem.toString()
       val amountInput = mBinding.amount.text.toString()
-      val balance = app.balance.value
+      val balance = appContext(requireContext()).balance.value
       model.amountErrorMessage.value = null
-      val fiat = Prefs.getFiatCurrency(context!!)
+      val fiat = Prefs.getFiatCurrency(requireContext())
       val amount = if (unit == fiat) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
+        Option.apply(Converter.convertFiatToMsat(requireContext(), amountInput))
       } else {
         Converter.string2Msat_opt(amountInput, unit)
       }
       if (amount.isDefined) {
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), context!!, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), requireContext(), withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount.get(), withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(requireContext(), amount.get(), withUnit = true))
         }
         if (balance != null && amount.get().`$greater`(balance)) {
           throw InsufficientBalance()
