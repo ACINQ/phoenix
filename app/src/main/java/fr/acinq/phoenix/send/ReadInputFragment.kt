@@ -70,6 +70,13 @@ class ReadInputFragment : BaseFragment() {
         is ReadInputState.Scanning -> mBinding.scanView.resume()
         is ReadInputState.Reading -> mBinding.scanView.pause()
         is ReadInputState.Error -> {
+          mBinding.errorMessage.text = getString(when (it) {
+            is ReadInputState.Error.PayToSelf -> R.string.scan_error_pay_to_self
+            is ReadInputState.Error.InvalidChain -> R.string.scan_error_invalid_chain
+            is ReadInputState.Error.PaymentExpired -> R.string.scan_error_expired
+            is ReadInputState.Error.UnhandledLNURL -> R.string.scan_error_lnurl_unsupported
+            is ReadInputState.Error.UnhandledInput -> R.string.scan_error_invalid_scan
+          })
           mBinding.scanView.pause()
           Handler().postDelayed({
             if (model.inputState.value is ReadInputState.Error) {
@@ -83,11 +90,11 @@ class ReadInputFragment : BaseFragment() {
           // additional controls
           if (app.kit?.nodeParams()?.nodeId() == it.pr.nodeId()) {
             log.debug("abort payment to self")
-            model.inputState.value = ReadInputState.Error.Generic(getString(R.string.scan_error_pay_to_self))
+            model.inputState.value = ReadInputState.Error.PayToSelf
           } else if (it.pr.isExpired) {
-            model.inputState.value = ReadInputState.Error.Generic(getString(R.string.scan_error_expired))
+            model.inputState.value = ReadInputState.Error.PaymentExpired
           } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.pr.prefix()) {
-            model.inputState.value = ReadInputState.Error.Generic(getString(R.string.scan_error_invalid_chain))
+            model.inputState.value = ReadInputState.Error.InvalidChain
           } else if (it.pr.amount().isEmpty && !it.pr.features().allowTrampoline()) {
             // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
             AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
@@ -107,7 +114,7 @@ class ReadInputFragment : BaseFragment() {
           when (it.url) {
             is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))
             is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlAuth(it.url))
-            else -> model.inputState.value = ReadInputState.Error.Generic(getString(R.string.scan_error_lnurl_unsupported))
+            else -> model.inputState.value = ReadInputState.Error.UnhandledLNURL
           }
         }
       }

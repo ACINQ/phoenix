@@ -130,7 +130,7 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Paste payment request</string>
+  <string name="send_init_paste">Paste data from clipboard</string>
   <string name="send_init_reading">Reading scan…</string>
 
   <string name="send_balance_prefix">Balance:</string>
@@ -156,14 +156,14 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Grant camera permission</string>
-  <string name="scan_instructions">Scan a QR code containing a payment request or bitcoin address</string>
-  <string name="scan_state_reading">Reading payment request</string>
+  <string name="scan_instructions">Scan a QR code containing a payment request, a bitcoin address or a LNURL</string>
+  <string name="scan_state_reading">Reading data</string>
 
-  <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
   <string name="scan_error_expired">Payment has expired.</string>
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
-  <string name="scan_error_invalid_chain">This invoice does not use the same blockchain as your wallet.</string>
+  <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
+  <string name="scan_error_invalid_scan">Invalid data.\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -278,7 +278,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Settings</string>
-  <string name="menu_send">Send</string>
+  <string name="menu_send">Scan</string>
   <string name="menu_receive">Receive</string>
 
   <!-- //////////////// init wallet //////////////// -->

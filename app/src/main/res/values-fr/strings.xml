@@ -118,7 +118,7 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Coller une requête de paiement</string>
+  <string name="send_init_paste">Coller les données du presse-papier</string>
   <string name="send_init_reading">Lecture de la requête…</string>
 
   <string name="send_balance_prefix">Solde:</string>
@@ -144,14 +144,14 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Donner accès à la caméra du téléphone</string>
-  <string name="scan_instructions">Placer le QR code de la requête de paiement\ndans le rectangle pour la scanner</string>
+  <string name="scan_instructions">Placer le QR code\ndans le rectangle pour le scanner</string>
   <string name="scan_state_reading">Lecture de la requête</string>
 
-  <string name="scan_error_default">Cette requête de paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
   <string name="scan_error_expired">Ce paiement a expiré.</string>
   <string name="scan_error_pay_to_self">Vous ne pouvez pas vous payer vous-même.</string>
   <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que vous.</string>
-  <string name="scan_error_lnurl_unsupported">Cet LNURL n\'est pas encore supporté!</string>
+  <string name="scan_error_lnurl_unsupported">Ce type de LNURL n\'est pas encore supporté!</string>
+  <string name="scan_error_invalid_scan">Cette donnée n\'est pas valide.\nVeuillez réessayer.</string>
 
   <string name="scan_amountless_legacy_title">Attention</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -265,14 +265,13 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configuration</string>
-  <string name="menu_send">Envoyer</string>
+  <string name="menu_send">Scanner</string>
   <string name="menu_receive">Recevoir</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
   <string name="initwallet_create">Créer un nouveau portefeuille</string>
   <string name="initwallet_restore">Restaurer un portefeuille existant</string>
-
 
   <!-- //////////////// main //////////////////// -->
 

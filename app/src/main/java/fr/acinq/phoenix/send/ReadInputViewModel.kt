@@ -37,7 +37,10 @@ sealed class ReadInputState {
     data class Url(val url: LNUrl) : Done()
   }
   sealed class Error : ReadInputState() {
-    data class Generic(val message: String) : Error()
+    object PayToSelf : Error()
+    object PaymentExpired : Error()
+    object InvalidChain : Error()
+    object UnhandledLNURL : Error()
     object UnhandledInput : Error()
   }
 }
