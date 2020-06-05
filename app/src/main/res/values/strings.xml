@@ -68,6 +68,7 @@
   <string name="startup_start_button">Restart</string>
   <string name="startup_settings_button">Settings</string>
   <string name="startup_error_generic">The application could not start.\n\nError details: %1$s</string>
+  <string name="startup_error_electrum_address">The application could not start. The address of the custom Electrum server is not valid.\n\nGo to Settings > Electrum to fix your settings.</string>
   <string name="startup_error_tor">The Tor service could not start. Check that your connection is working and try again.\n\nError details: %1$s</string>
   <string name="startup_error_unreadable">Wallet data could not be read, please restart the application</string>
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
@@ -155,7 +156,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Grant camera permission</string>
-  <string name="scan_instructions">Place a payment request QR code\ninside the rectangle to scan it</string>
+  <string name="scan_instructions">Scan a QR code containing a payment request or bitcoin address</string>
   <string name="scan_state_reading">Reading payment request</string>
 
   <string name="scan_error_default">This is not a valid payment request.\n\nPlease try again.</string>
@@ -179,6 +180,7 @@
   <string name="utils_converted_amount">≈ %1$s</string>
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+  <string name="utils_unknown_amount">!?</string>
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Proceed</string>
@@ -326,7 +328,7 @@
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">Application logs</string>
-  <string name="logs_subtitle">You can extract and share the application logs from this page.</string>
+  <string name="logs_subtitle">Here you can extract and share the application logs.</string>
   <string name="logs_view_button">View logs…</string>
   <string name="logs_view_with">View logs with…</string>
   <string name="logs_share_button">Share logs…</string>
@@ -352,7 +354,7 @@
   <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
   <string name="paymentdetails_no_description">No description</string>
 
-  <string name="paymentdetails_technicals_button">Show technical data</string>
+  <string name="paymentdetails_technicals_button">Show details</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
@@ -463,6 +465,7 @@
 
   <string name="electrum_dialog_checkbox">Use a custom server</string>
   <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
+  <string name="electrum_dialog_ssl_tor">Also check certificate for this Onion address</string>
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 

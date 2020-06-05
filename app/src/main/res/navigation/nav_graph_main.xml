@@ -19,7 +19,7 @@
   android:id="@+id/nav_graph_main"
   app:startDestination="@id/main_fragment">
 
-  <!-- global to startup -->
+  <!-- global to main -->
   <action
     android:id="@+id/global_action_any_to_main"
     app:destination="@id/main_fragment" />

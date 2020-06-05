@@ -31,6 +31,7 @@ import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
+import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.KeystoreHelper
 import fr.acinq.phoenix.utils.Prefs
@@ -97,34 +98,44 @@ class StartupFragment : BaseFragment() {
   }
 
   override fun handleKitState(state: KitState) {
-    when {
-      state is KitState.Started -> {
-        log.debug("kit [Started], redirect to main page")
-        findNavController().navigate(R.id.action_startup_to_main)
-      }
-      state is KitState.Off && context != null -> {
-        if (app.hasWalletBeenSetup(context!!)) {
-          log.debug("kit [OFF] with ready wallet, starting kit")
-          unlockAndStart(context!!)
-        } else {
-          log.debug("kit [OFF] with empty wallet, redirect to wallet initialization")
-          findNavController().navigate(R.id.global_action_any_to_init_wallet)
+    // check current nav in controller - there can be race conditions between handleKitState started from onStart and from the observer
+    val currentNav = findNavController().currentDestination
+    if (currentNav != null && currentNav.id == R.id.startup_fragment) {
+      log.debug("nav=${currentNav.label} in state=${state.javaClass.canonicalName} with intent=${app.currentURIIntent.value}")
+      when {
+        state is KitState.Started && app.currentURIIntent.value == null -> {
+          log.info("kit [Started], redirect to main page")
+          findNavController().navigate(R.id.action_startup_to_main)
         }
-      }
-      state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
-      state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
-      state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
-      state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
-      state is KitState.Error.WrongPassword -> {
-        context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd) }
-        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-      }
-      state is KitState.Error.InvalidBiometric -> {
-        context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_biometrics) }
-        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-      }
-      else -> {
-        log.debug("kit [$state] with context=$context, standing by...")
+        state is KitState.Started && app.currentURIIntent.value != null -> {
+          findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
+          app.currentURIIntent.value = null
+        }
+        state is KitState.Off && context != null -> {
+          if (app.hasWalletBeenSetup(context!!)) {
+            log.info("kit [OFF] with ready wallet, starting kit")
+            unlockAndStart(context!!)
+          } else {
+            log.info("kit [OFF] with empty wallet, redirect to wallet initialization")
+            findNavController().navigate(R.id.global_action_any_to_init_wallet)
+          }
+        }
+        state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
+        state is KitState.Error.InvalidElectrumAddress -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address) }
+        state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
+        state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
+        state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
+        state is KitState.Error.WrongPassword -> {
+          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd) }
+          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+        }
+        state is KitState.Error.InvalidBiometric -> {
+          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_biometrics) }
+          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+        }
+        else -> {
+          log.debug("kit [$state] with context=$context, standing by...")
+        }
       }
     }
   }

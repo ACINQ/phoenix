@@ -34,4 +34,9 @@ object BindingHelpers {
   fun booleanToVisibility(isVisible: Boolean): Int {
     return if (isVisible) View.VISIBLE else View.GONE
   }
+
+  @JvmStatic
+  fun show(view: View, isVisible: Boolean) {
+    view.visibility = if (isVisible) View.VISIBLE else View.GONE
+  }
 }

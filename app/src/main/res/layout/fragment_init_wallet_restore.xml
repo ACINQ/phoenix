@@ -40,19 +40,13 @@
       android:paddingTop="@dimen/space_lg"
       android:paddingBottom="@dimen/space_lg">
 
-      <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_disclaimer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="@{model.state == RestoreSeedState.INIT}"
-        app:constraint_referenced_ids="disclaimer_message,disclaimer_checkbox,disclaimer_button" />
-
       <TextView
         android:id="@+id/disclaimer_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
+        android:visibility="@{model.state == RestoreSeedState.INIT}"
         android:text="@string/restore_disclaimer_message"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,6 +57,7 @@
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_md"
         android:text="@string/restore_disclaimer_checkbox"
+        android:visibility="@{model.state == RestoreSeedState.INIT}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,6 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
+        android:visibility="@{model.state == RestoreSeedState.INIT}"
         app:enableOrFade="@{model.userHasCheckedDisclaimer}"
         app:icon="@drawable/ic_arrow_next"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,19 +76,13 @@
         app:layout_constraintTop_toBottomOf="@id/disclaimer_checkbox"
         app:text="@string/restore_disclaimer_next" />
 
-      <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="@{model.state != RestoreSeedState.INIT}"
-        app:constraint_referenced_ids="instructions,mnemonics_layout,keyboard" />
-
       <TextView
         android:id="@+id/instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/space_lg"
         android:paddingEnd="@dimen/space_lg"
+        android:visibility="@{model.state != RestoreSeedState.INIT}"
         android:text="@string/restore_instructions"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="parent" />
@@ -104,6 +94,7 @@
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
+        android:visibility="@{model.state != RestoreSeedState.INIT}"
         android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/mutedBgColor"
         app:layout_constraintEnd_toEndOf="parent"
@@ -159,6 +150,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
+        android:visibility="@{model.state != RestoreSeedState.INIT}"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 

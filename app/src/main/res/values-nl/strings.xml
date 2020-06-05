@@ -338,7 +338,6 @@
   <string name="paymentdetails_error_label">Fout</string>
   <string name="paymentdetails_closing_desc">Betaling voor kanaalsluiting #%1$s</string>
   <string name="paymentdetails_no_description">Geen omschrijving</string>
-
   <string name="paymentdetails_technicals_button">Laat technische data zien</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
