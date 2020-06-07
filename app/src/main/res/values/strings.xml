@@ -427,7 +427,7 @@
   <string name="lnurl_withdraw_description_label">Details</string>
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Redeeming funds from<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Confirm</string>
-  <string name="lnurl_withdraw_wait">Receiving funds…</string>
+  <string name="lnurl_withdraw_wait">Redeeming funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
   <string name="lnurl_withdraw_error_internal">Could not receive the payment. Please try again.</string>
   <string name="lnurl_withdraw_error_invalid">This request to redeem payment is invalid. Please try again.</string>
