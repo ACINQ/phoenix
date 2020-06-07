@@ -430,7 +430,7 @@
   <string name="lnurl_withdraw_wait">Receiving funds…</string>
   <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
   <string name="lnurl_withdraw_error_internal">Could not receive the payment. Please try again.</string>
-  <string name="lnurl_withdraw_error_invalid">This payment request is invalid. Please try again.</string>
+  <string name="lnurl_withdraw_error_invalid">This request to redeem payment is invalid. Please try again.</string>
   <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
   <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
