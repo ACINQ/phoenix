@@ -397,7 +397,7 @@
   
   <!-- //////////////// ln url login //////////////// -->
 
-  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para logar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhum dado pessoal será compartilhado com este serviço.]]></string>
+  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhum dado pessoal será compartilhado com este serviço.]]></string>
   <string name="lnurl_auth_button">Entrar</string>
   <string name="lnurl_auth_in_progress"><![CDATA[Fazendo login em <b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
