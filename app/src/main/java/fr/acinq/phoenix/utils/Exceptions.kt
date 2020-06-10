@@ -24,6 +24,9 @@ class TorSetupException(val s: String) : Exception(s)
 class NetworkException : RuntimeException()
 class KitNotInitialized : RuntimeException("kit is not initialized")
 
+// -- Channels errors
+class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
+
 // -- payment exceptions
 class InsufficientBalance : RuntimeException()
 class SwapOutInsufficientAmount : RuntimeException()

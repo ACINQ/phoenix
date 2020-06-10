@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.msopentech.thali.toronionproxy.OnionProxyManager
+import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
@@ -75,6 +76,7 @@ import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Either
 import scala.util.Left
 import scodec.bits.`ByteVector$`
 import java.io.IOException
@@ -487,41 +489,65 @@ class AppViewModel : ViewModel() {
   }
 
   @UiThread
-  suspend fun mutualCloseAllChannels(address: String) {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        delay(500)
-        if (api != null && kit != null) {
-          val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
-          getChannels(`NORMAL$`.`MODULE$`).map { res ->
-            val channelId = res.channelId()
-            log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
-            closingFutures.add(api!!.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
-          }
-          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
-          Unit
-        } else throw KitNotInitialized()
+  suspend fun mutualCloseAllChannels(address: String) = withContext(viewModelScope.coroutineContext + Dispatchers.Default) {
+    if (api != null && kit != null) {
+      delay(500)
+      val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+      val channelIds = prepareClosing()
+      log.info("requesting to *force* close channels=$channelIds")
+      val closingResult = Await.result(api!!.close(channelIds, closeScriptPubKey, longTimeout), Duration.Inf())
+      val successfullyClosed = handleClosingResult(closingResult)
+      if (successfullyClosed == channelIds.size()) {
+        Unit
+      } else {
+        throw ChannelsNotClosed(channelIds.size() - successfullyClosed)
       }
-    }.await()
+    } else throw KitNotInitialized()
   }
 
   @UiThread
-  suspend fun forceCloseAllChannels() {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        if (api != null && kit != null) {
-          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
-          getChannels().map { res ->
-            val channelId = res.channelId()
-            log.info("attempting to force close channel=$channelId")
-            closingFutures.add(api!!.forceClose(Left.apply(channelId), longTimeout))
-          }
-          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
-          Unit
-        } else throw KitNotInitialized()
+  suspend fun forceCloseAllChannels() = withContext(viewModelScope.coroutineContext + Dispatchers.Default) {
+    if (api != null && kit != null) {
+      delay(500)
+      val channelIds = prepareClosing()
+      log.info("requesting to *force* close channels=$channelIds")
+      val closingResult = Await.result(api!!.forceClose(channelIds, longTimeout), Duration.Inf())
+      val successfullyClosed = handleClosingResult(closingResult)
+      if (successfullyClosed == channelIds.size()) {
+        Unit
+      } else {
+        throw ChannelsNotClosed(channelIds.size() - successfullyClosed)
       }
-    }.await()
+    } else throw KitNotInitialized()
+  }
+
+  @WorkerThread
+  private suspend fun prepareClosing(): ScalaList<Either<ByteVector32, ShortChannelId>> {
+    // build list of channel ids
+    val channelIds = ScalaList.empty<Either<ByteVector32, ShortChannelId>>()
+    getChannels().forEach {
+      val id: Either<ByteVector32, ShortChannelId> = Left.apply(it.channelId())
+      channelIds.`$colon$colon`(id)
+    }
+    return channelIds
+  }
+
+  @WorkerThread
+  private fun handleClosingResult(result: scala.collection.immutable.Map<Either<ByteVector32, ShortChannelId>, Either<Throwable, ChannelCommandResponse>>): Int {
+    // read the result
+    val iterator = result.iterator()
+    var successfullyClosed = 0
+    while (iterator.hasNext()) {
+      val res = iterator.next()
+      val outcome = res._2
+      if (outcome.isRight) {
+        log.info("successfully forced closed channel=${res._1}")
+        successfullyClosed++
+      } else {
+        log.info("failed to force close channel=${res._1}: ", outcome.left() as Throwable)
+      }
+    }
+    return successfullyClosed
   }
 
   /**
@@ -656,7 +682,10 @@ class AppViewModel : ViewModel() {
   private fun startNode(context: Context, pin: String): KitState.Started {
     log.info("starting up node...")
 
-    val system = ActorSystem.create("system")
+    // load config from libs + application.conf in resources
+    val defaultConfig = ConfigFactory.load()
+    val config = Wallet.getOverrideConfig(context).withFallback(defaultConfig)
+    val system = ActorSystem.create("system", config)
     system.registerOnTermination {
       log.info("system has been shutdown, all actors are terminated")
     }
@@ -692,7 +721,8 @@ class AppViewModel : ViewModel() {
     val xpub = Wallet.buildXpub(master)
 
     Class.forName("org.sqlite.JDBC")
-    val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
+    Wallet.getOverrideConfig(context)
+    val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
@@ -758,7 +788,7 @@ class AppViewModel : ViewModel() {
               saveRate(context, "TWD") { json.getJSONObject("TWD").getDouble("last").toFloat() }
               saveRate(context, "USD") { json.getJSONObject("USD").getDouble("last").toFloat() }
               Prefs.setExchangeRateTimestamp(context, System.currentTimeMillis())
-            } catch(e: Exception) {
+            } catch (e: Exception) {
               log.error("invalid body for price rate api")
             } finally {
               it.close()
