@@ -22,10 +22,15 @@ import android.view.inputmethod.InputMethodManager
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.DeterministicWallet
+import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
+import fr.acinq.phoenix.Xpub
+import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
@@ -68,18 +73,33 @@ object Wallet {
     return File(getChainDatadir(context), NETWORK_DB_FILE)
   }
 
+  fun isMainnet(): Boolean = "mainnet" == BuildConfig.CHAIN
+
   fun getChainHash(): ByteVector32 {
-    return if ("mainnet" == BuildConfig.CHAIN) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
+    return if (isMainnet()) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
 
-  fun getXpubKeyPath(): DeterministicWallet.KeyPath {
-    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
-  }
-  fun getNodeKeyPath(): DeterministicWallet.KeyPath {
-    return if ("mainnet" == BuildConfig.CHAIN) DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0") else DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
+  fun buildAddress(master: DeterministicWallet.ExtendedPrivateKey): SingleAddressEclairWallet {
+    val path = if (isMainnet()) {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'/0/0")
+    } else {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
+    }
+    return SingleAddressEclairWallet(fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash()))
   }
 
-  fun cleanUpInvoice(input: String): String {
+  fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {
+    val path = if (isMainnet()) {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/0'/0'")
+    } else {
+      DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'")
+    }
+    val xpub = DeterministicWallet.encode(DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, path)),
+      if (isMainnet()) DeterministicWallet.zpub() else DeterministicWallet.vpub())
+    return Xpub(xpub = xpub, path = path.toString())
+  }
+
+  private fun cleanUpInvoice(input: String): String {
     val trimmed = input.replace("\\u00A0", "").trim()
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
@@ -90,7 +110,17 @@ object Wallet {
     }
   }
 
-  fun extractInvoice(input: String): Any {
+  /**
+   * This methods reads arbitrary strings and deserializes it to a Lightning/Bitcoin object, if possible.
+   * <p>
+   * Object can be of type:
+   * - Lightning payment request (BOLT 11)
+   * - BitcoinURI
+   * - LNURL
+   *
+   * If the string cannot be read, throws an exception.
+   */
+  fun parseLNObject(input: String): Any {
     val invoice = cleanUpInvoice(input)
     return try {
       PaymentRequest.read(invoice)
@@ -99,13 +129,14 @@ object Wallet {
         BitcoinURI(invoice)
       } catch (e2: Exception) {
         try {
+          // this can take some time since a HTTP request may be done
           LNUrl.extractLNUrl(invoice)
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
           log.debug("invalid as BitcoinURI: ${e2.localizedMessage}")
           log.debug("invalid as LNURL: ", e3)
-          throw RuntimeException("not a valid invoice: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
+          throw UnreadableLightningObject("not a readable lightning object: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
         }
       }
     }

@@ -18,7 +18,6 @@ package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.SingleLiveEvent
@@ -103,7 +102,7 @@ class SendViewModel : ViewModel() {
     viewModelScope.launch {
       withContext(Dispatchers.Default) {
         try {
-          val extract = Wallet.extractInvoice(input)
+          val extract = Wallet.parseLNObject(input)
           when (extract) {
             is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
             is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
