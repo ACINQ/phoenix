@@ -393,6 +393,16 @@
 
   <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
   <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para logar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhum dado pessoal será compartilhado com este serviço.]]></string>
+  <string name="lnurl_auth_button">Entrar</string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Fazendo login em <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
+  <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetails: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
+  <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
