@@ -150,7 +150,7 @@
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
   <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
-  <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportado!</string>
+  <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportada!</string>
   <string name="scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
 
   <string name="scan_amountless_legacy_title">Advertência</string>
