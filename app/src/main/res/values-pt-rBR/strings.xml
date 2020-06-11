@@ -56,6 +56,7 @@
   <string name="startup_wait_tor">Iniciando Tor…</string>
   <string name="startup_start_button">Reiniciar</string>
   <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
+  <string name="startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
   <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
   <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
   <string name="startup_error_network">Sua conexão de internet não está funcionando. Favor verificar sua conexão WiFi ou rede de celular.</string>
@@ -438,6 +439,7 @@
 
   <string name="electrum_dialog_checkbox">Usar um servidor Electrum personalizado</string>
   <string name="electrum_dialog_ssl">O servidor deve possuir um certificado válido</string>
+  <string name="electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
   <string name="electrum_dialog_input">Endereço do servidor (host:port).</string>
   <string name="electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
 
