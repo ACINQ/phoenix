@@ -493,8 +493,8 @@ class AppViewModel : ViewModel() {
     if (api != null && kit != null) {
       delay(500)
       val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-      val channelIds = prepareClosing()
-      log.info("requesting to *force* close channels=$channelIds")
+      val channelIds = prepareClosing(`NORMAL$`.`MODULE$`)
+      log.info("requesting to mutually close channels=$channelIds")
       val closingResult = Await.result(api!!.close(channelIds, closeScriptPubKey, longTimeout), Duration.Inf())
       val successfullyClosed = handleClosingResult(closingResult)
       if (successfullyClosed == channelIds.size()) {
@@ -521,15 +521,15 @@ class AppViewModel : ViewModel() {
     } else throw KitNotInitialized()
   }
 
+  /** Create a (scala) list of ids of channels to be closed. */
   @WorkerThread
-  private suspend fun prepareClosing(): ScalaList<Either<ByteVector32, ShortChannelId>> {
-    // build list of channel ids
-    val channelIds = ScalaList.empty<Either<ByteVector32, ShortChannelId>>()
-    getChannels().forEach {
+  private suspend fun prepareClosing(state: State? = null): ScalaList<Either<ByteVector32, ShortChannelId>> {
+    return getChannels(state).map {
       val id: Either<ByteVector32, ShortChannelId> = Left.apply(it.channelId())
-      channelIds.`$colon$colon`(id)
+      id
+    }.run {
+      JavaConverters.asScalaIteratorConverter(iterator()).asScala().toList()
     }
-    return channelIds
   }
 
   @WorkerThread
