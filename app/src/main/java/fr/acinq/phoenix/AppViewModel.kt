@@ -218,22 +218,26 @@ class AppViewModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
+    log.debug("received electrum ready=$event")
     networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
+    log.debug("received electrum disconnected $event")
     networkInfo.value = networkInfo.value?.copy(electrumServer = null)
   }
 
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerConnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+    log.debug("received peer connected $event")
+    networkInfo.value = networkInfo.value?.copy(lightningConnected = true)
   }
 
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerDisconnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
+    log.debug("received peer disconnected $event")
+    networkInfo.value = networkInfo.value?.copy(lightningConnected = false)
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -698,10 +702,11 @@ class AppViewModel : ViewModel() {
       state.postValue(KitState.Bootstrap.Tor)
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-          networkInfo.value?.run {
-            if (status == TorConnectionStatus.CONNECTED) networkConnected = true
-            torConnections[name] = status
-            networkInfo.postValue(this)
+          networkInfo.value?.apply {
+            networkInfo.postValue(copy(
+              networkConnected = (status == TorConnectionStatus.CONNECTED),
+              torConnections = torConnections.apply { this[name] = status }
+            ))
           }
         }
       }))
