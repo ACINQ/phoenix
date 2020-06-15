@@ -128,7 +128,7 @@
   <string name="send_amount_error">Veuillez saisir un montant validate.</string>
   <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
-  <string name="send_destination_label">Envoyer à</string>
+  <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">Il y a eu une erreur interne lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>

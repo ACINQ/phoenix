@@ -60,4 +60,7 @@
   <!-- data row label width -->
   <dimen name="data_row_label_width">120dp</dimen>
 
+  <!-- send fragment -->
+  <dimen name="send_label_width">90dp</dimen>
+
 </resources>

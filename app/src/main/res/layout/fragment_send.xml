@@ -244,7 +244,7 @@
         <TextView
           android:id="@+id/destination_label"
           style="@style/MutedLabelView"
-          android:layout_width="60dp"
+          android:layout_width="@dimen/send_label_width"
           android:layout_marginStart="@dimen/space_lg_p"
           android:text="@string/send_destination_label"
           android:textAlignment="viewEnd"
@@ -274,7 +274,7 @@
         <TextView
           android:id="@+id/description_label"
           style="@style/MutedLabelView"
-          android:layout_width="60dp"
+          android:layout_width="@dimen/send_label_width"
           android:layout_marginStart="@dimen/space_lg_p"
           android:text="@string/send_description_label"
           android:textAlignment="viewEnd"
