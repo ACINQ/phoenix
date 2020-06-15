@@ -59,11 +59,9 @@ class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
   val state = MutableLiveData<SendState>()
-  //  val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
   val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
-  //  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
 
   // ---- computed values from payment request
 
@@ -91,7 +89,7 @@ class SendViewModel : ViewModel() {
     state.value = SendState.CheckingInvoice
     useMaxBalance.value = false
     isAmountFieldPristine.value = true
-    amountErrorMessage.value = 0
+    amountErrorMessage.value = null
   }
 
   // ---- end of computed values

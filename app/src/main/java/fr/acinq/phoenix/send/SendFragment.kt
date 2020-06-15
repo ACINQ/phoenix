@@ -128,11 +128,13 @@ class SendFragment : BaseFragment() {
     })
 
     model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
-      if (useMax && context != null && app.balance.value != null) {
-        app.balance.value!!.run {
-          val unit = Prefs.getCoinUnit(context!!)
-          mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-          mBinding.amount.setText(Converter.printAmountRaw(this, context!!))
+      if (useMax) {
+        context?.let { ctx ->
+          app.balance.value?.let { balance ->
+            val unit = Prefs.getCoinUnit(ctx)
+            mBinding.unit.setSelection(unitList.indexOf(unit.code()))
+            mBinding.amount.setText(Converter.printAmountRaw(balance, ctx))
+          }
         }
       }
     })
@@ -213,15 +215,13 @@ class SendFragment : BaseFragment() {
       Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
       model.isAmountFieldPristine.value = false
-      model.state.value = SendState.Onchain.Swapping(uri)
-      Wallet.hideKeyboard(context, mBinding.amount)
       val amount = checkAmount()
+      Wallet.hideKeyboard(context, mBinding.amount)
       if (amount.isDefined) {
+        model.state.value = SendState.Onchain.Swapping(uri)
         // FIXME: use feerate provided by user, like in eclair mobile
         val feeratePerKw = app.kit?.run { nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
         app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
-      } else {
-        model.state.postValue(SendState.Onchain.SwapRequired(uri))
       }
     }
   }
@@ -248,21 +248,22 @@ class SendFragment : BaseFragment() {
 
   private fun checkAmount(): Option<MilliSatoshi> {
     return try {
+      val ctx = requireContext()
       val unit = mBinding.unit.selectedItem.toString()
       val amountInput = mBinding.amount.text.toString()
       val balance = app.balance.value
       model.amountErrorMessage.value = null
-      val fiat = Prefs.getFiatCurrency(context!!)
+      val fiat = Prefs.getFiatCurrency(ctx)
       val amount = if (unit == fiat) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
+        Option.apply(Converter.convertFiatToMsat(ctx, amountInput))
       } else {
         Converter.string2Msat_opt(amountInput, unit)
       }
       if (amount.isDefined) {
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), context!!, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount.get(), ctx, withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount.get(), withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
         }
         if (balance != null && amount.get().`$greater`(balance)) {
           throw InsufficientBalance()
