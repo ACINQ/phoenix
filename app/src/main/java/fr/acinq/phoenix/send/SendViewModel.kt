@@ -98,20 +98,17 @@ class SendViewModel : ViewModel() {
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
-    log.debug("checking input=$input")
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          val extract = Wallet.parseLNObject(input)
-          when (extract) {
-            is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
-            is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
-            else -> throw RuntimeException("unhandled invoice type")
-          }
-        } catch (e: Exception) {
-          log.error("invalid invoice for input=$input: ${e.message}")
-          state.postValue(SendState.InvalidInvoice)
+    viewModelScope.launch((Dispatchers.Default)) {
+      try {
+        val extract = Wallet.parseLNObject(input)
+        when (extract) {
+          is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
+          is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
+          else -> throw RuntimeException("unhandled invoice type")
         }
+      } catch (e: Exception) {
+        log.error("invalid invoice for input=$input: ${e.message}")
+        state.postValue(SendState.InvalidInvoice)
       }
     }
   }
