@@ -35,6 +35,7 @@ object BindingHelpers {
     return if (isVisible) View.VISIBLE else View.GONE
   }
 
+  @BindingAdapter("app:visible")
   @JvmStatic
   fun show(view: View, isVisible: Boolean) {
     view.visibility = if (isVisible) View.VISIBLE else View.GONE

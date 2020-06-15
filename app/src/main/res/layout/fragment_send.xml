@@ -45,7 +45,7 @@
         android:contentDescription="@null"
         android:scaleType="fitXY"
         android:src="@drawable/ic_bg1"
-        android:visibility="@{model.isFormVisible()}"
+        app:visible="@{model.isFormVisible()}"
         app:layout_constrainedHeight="true"
         app:layout_constraintTop_toTopOf="@id/buttons_section" />
 
@@ -67,7 +67,7 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_send_lg"
         android:tint="?attr/mutedTextColor"
-        android:visibility="@{model.isFormVisible()}"
+        app:visible="@{model.isFormVisible()}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section" />
@@ -142,7 +142,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xl"
-        android:visibility="@{model.isFormVisible()}"
+        app:visible="@{model.isFormVisible()}"
         app:layout_constraintTop_toBottomOf="@id/balance_section">
 
         <EditText
@@ -320,7 +320,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="38dp"
         android:paddingBottom="@dimen/space_xl"
-        android:visibility="@{model.isFormVisible()}"
+        app:visible="@{model.isFormVisible()}"
         app:layout_constraintTop_toBottomOf="@id/payment_section">
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
@@ -473,7 +473,7 @@
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/swap_recap" />
+          app:layout_constraintTop_toBottomOf="@id/send_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
