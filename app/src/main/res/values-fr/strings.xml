@@ -125,7 +125,7 @@
   <string name="send_use_all_balance">Tout envoyer</string>
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
-  <string name="send_amount_error">Veuillez saisir un montant validate.</string>
+  <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
@@ -135,7 +135,7 @@
   <string name="send_swap_in_progress">Echange en cours…</string>
   <string name="send_swap_error">L\'échange a échoué. Veuillez réessayer.</string>
   <string name="send_swap_required_desc">Le destinataire de ce paiement est une adresse Bitcoin, il faut d\'abord faire un échange.</string>
-  <string name="send_swap_required_button">Demander l\'échange</string>
+  <string name="send_swap_required_button">Préparer l\'échange</string>
   <string name="send_swap_complete_recap_amount">Montant</string>
   <string name="send_swap_complete_recap_fee">Frais de minage</string>
   <string name="send_swap_complete_recap_total">Total</string>
