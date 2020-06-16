@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
+import androidx.databinding.Bindable
 import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
@@ -62,6 +63,15 @@ class SendViewModel : ViewModel() {
   val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
+  val chainFeesSatBytes = MutableLiveData<Long>()
+
+  init {
+    state.value = SendState.CheckingInvoice
+    useMaxBalance.value = false
+    isAmountFieldPristine.value = true
+    amountErrorMessage.value = null
+    chainFeesSatBytes.value = 3 // base fee in sat/bytes
+  }
 
   // ---- computed values from payment request
 
@@ -83,13 +93,6 @@ class SendViewModel : ViewModel() {
 
   val isFormVisible: LiveData<Boolean> = Transformations.map(state) { state ->
     state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice
-  }
-
-  init {
-    state.value = SendState.CheckingInvoice
-    useMaxBalance.value = false
-    isAmountFieldPristine.value = true
-    amountErrorMessage.value = null
   }
 
   // ---- end of computed values

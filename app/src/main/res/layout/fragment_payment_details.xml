@@ -35,6 +35,15 @@
     android:layout_height="match_parent"
     tools:context=".paymentdetails.PaymentDetailsFragment">
 
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/transparent"
+      android:backgroundTint="@color/transparent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
@@ -288,16 +297,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
-      android:id="@+id/action_bar"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:background="@color/transparent"
-      android:backgroundTint="@color/transparent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
 

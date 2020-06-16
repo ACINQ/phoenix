@@ -35,6 +35,7 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.FeerateEstimationPerKb
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSendBinding
 import fr.acinq.phoenix.utils.*
@@ -67,6 +68,15 @@ class SendFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(SendViewModel::class.java)
     mBinding.model = model
+
+    app.kit?.run {
+      val feerate = nodeParams().onChainFeeConf().feeEstimator().run {
+        FeerateEstimationPerKb(getFeeratePerKb(2), getFeeratePerKb(6), getFeeratePerKb(72))
+      }
+      log.info("feerates base estimation=$feerate")
+      app.feerateEstimation.value = feerate
+      model.chainFeesSatBytes.value = feerate.rate60min
+    }
 
     context?.let {
       unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
@@ -137,6 +147,25 @@ class SendFragment : BaseFragment() {
           }
         }
       }
+    })
+
+    model.chainFeesSatBytes.observe(viewLifecycleOwner, Observer { feerate ->
+
+      val state = model.state.value
+      if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
+        model.state.value = SendState.Onchain.SwapRequired(state.uri)
+      }
+
+      app.feerateEstimation.value?.let { feerateEstimation ->
+        mBinding.chainFeesFeedback.text = getString(when {
+          feerate < 1 -> R.string.send_chain_fees_feedback_invalid
+          feerate < feerateEstimation.rate12hours -> R.string.send_chain_fees_feedback_inf
+          feerate < feerateEstimation.rate60min -> R.string.send_chain_fees_feedback_12h
+          feerate < feerateEstimation.rate20min -> R.string.send_chain_fees_feedback_1h
+          else -> R.string.send_chain_fees_feedback_20min
+        })
+      }
+
     })
 
     model.checkAndSetPaymentRequest(args.payload)
@@ -210,18 +239,17 @@ class SendFragment : BaseFragment() {
 
   private fun requestSwapOut(uri: BitcoinURI) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when sending SwapOut: ", exception)
+      log.error("error when requesting swap-out: ", exception)
       model.state.postValue(SendState.Onchain.SwapRequired(uri))
       Toast.makeText(context, getString(R.string.send_swap_error), Toast.LENGTH_SHORT).show()
     }) {
       model.isAmountFieldPristine.value = false
       val amount = checkAmount()
-      Wallet.hideKeyboard(context, mBinding.amount)
-      if (amount.isDefined) {
+      val feerate = model.chainFeesSatBytes.value!!
+      if (amount.isDefined && feerate > 0 ) {
+        Wallet.hideKeyboard(context, mBinding.amount)
         model.state.value = SendState.Onchain.Swapping(uri)
-        // FIXME: use feerate provided by user, like in eclair mobile
-        val feeratePerKw = app.kit?.run { nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6) } ?: throw KitNotInitialized()
-        app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = feeratePerKw)
+        app.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = `package$`.`MODULE$`.feerateByte2Kw(feerate))
       }
     }
   }

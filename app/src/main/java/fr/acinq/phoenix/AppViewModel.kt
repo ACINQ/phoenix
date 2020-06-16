@@ -88,6 +88,7 @@ import kotlin.collections.ArrayList
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
+data class FeerateEstimationPerKb(val rate20min: Long, val rate60min: Long, val rate12hours: Long)
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
@@ -129,6 +130,7 @@ class AppViewModel : ViewModel() {
   val navigationEvent = SingleLiveEvent<Any>()
   val trampolineFeeSettings = MutableLiveData<List<TrampolineFeeSetting>>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
+  val feerateEstimation = MutableLiveData<FeerateEstimationPerKb>()
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
   val torManager = MutableLiveData<OnionProxyManager>()
@@ -142,6 +144,7 @@ class AppViewModel : ViewModel() {
     balance.value = MilliSatoshi(0)
     trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
+    feerateEstimation.value = Constants.DEFAULT_FEERATE
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -351,7 +354,7 @@ class AppViewModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit?.run {
-          log.info("sending swap-out request to switchboard for address=$address with amount=$amount")
+          log.info("requesting swap-out to address=$address with amount=$amount and fee=$feeratePerKw")
           switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
@@ -598,6 +601,9 @@ class AppViewModel : ViewModel() {
               val res = startNode(context, pin)
               state.postValue(res)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+              feerateEstimation.postValue(res.kit.nodeParams().onChainFeeConf().feeEstimator().run {
+                FeerateEstimationPerKb(getFeeratePerKb(2), getFeeratePerKb(6), getFeeratePerKb(72))
+              })
               ChannelsWatcher.schedule(context)
               Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
             } catch (t: Throwable) {

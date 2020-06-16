@@ -142,16 +142,24 @@
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_chain_fees_label">Feerate</string>
+  <string name="send_chain_fees_unit">sat/byte</string>
+  <string name="send_chain_fees_description">This payment is an on-chain transaction, which is slower and usually more expensive. A mining fee will apply.</string>
+  <string name="send_chain_fees_feedback_invalid">Please use a valid feerate.</string>
+  <string name="send_chain_fees_feedback_20min">With this feerate, the transaction should be received within 30 minutes.</string>
+  <string name="send_chain_fees_feedback_1h">With this feerate, the transaction should be received within the hour.</string>
+  <string name="send_chain_fees_feedback_12h">With this feerate, the transaction should be received within 12 hours.</string>
+  <string name="send_chain_fees_feedback_inf">With this feerate, the transaction will not be received before 12 hours or more.</string>
   <string name="send_error_sending">There was an internal error when trying to send this payment. No money was sent.</string>
   <string name="send_pay_button">Pay</string>
-  <string name="send_swap_in_progress">Swap in progress…</string>
-  <string name="send_swap_error">Swap has failed. Please try again.</string>
+  <string name="send_swap_in_progress">Preparing transaction</string>
+  <string name="send_swap_error">Swap to chain has failed. Please try again.</string>
   <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
-  <string name="send_swap_required_button">Request a swap</string>
+  <string name="send_swap_required_button">Prepare transaction</string>
   <string name="send_swap_complete_recap_amount">Amount</string>
   <string name="send_swap_complete_recap_fee">Miner Fee</string>
   <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">Total exceeds your balance.\n\nLower the amount, or try again later when fees have decreased.</string>
+  <string name="send_swap_complete_cannot_afford">Total after fees exceeds your balance.</string>
 
   <!-- //////////////// scan //////////////// -->
 
