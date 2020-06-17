@@ -133,7 +133,7 @@
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Este pagamento é uma transação pela rede bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
   <string name="send_chain_fees_feedback_invalid">Por favor use uma taxa válida.</string>
-  <string name="send_chain_fees_feedback_20min">Com esta taxa,a transação deve ser recebida no prazo de 30 minutos.</string>
+  <string name="send_chain_fees_feedback_20min">Com esta taxa,a transação deve ser concluída no prazo de 30 minutos.</string>
   <string name="send_chain_fees_feedback_1h">Com esta taxa, a transação deve ser recebida no prazo de uma hora.</string>
   <string name="send_chain_fees_feedback_12h">Com esta taxa, a transação deve ser recebida no prazo de 12 horas.</string>
   <string name="send_chain_fees_feedback_inf">Com esta taxa, a transação deve ser recebida após um período de 12 horas.</string>
