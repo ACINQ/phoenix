@@ -135,7 +135,7 @@
   <string name="send_chain_fees_feedback_invalid">Por favor use uma taxa válida.</string>
   <string name="send_chain_fees_feedback_20min">Com esta taxa,a transação deve ser concluída no prazo de 30 minutos.</string>
   <string name="send_chain_fees_feedback_1h">Com esta taxa, a transação deve ser concluída no prazo de uma hora.</string>
-  <string name="send_chain_fees_feedback_12h">Com esta taxa, a transação deve ser recebida no prazo de 12 horas.</string>
+  <string name="send_chain_fees_feedback_12h">Com esta taxa, a transação deve ser concluída no prazo de 12 horas.</string>
   <string name="send_chain_fees_feedback_inf">Com esta taxa, a transação deve ser recebida após um período de 12 horas.</string>
   <string name="send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
   <string name="send_pay_button">Pagar</string>
