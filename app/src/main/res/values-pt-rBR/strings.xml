@@ -141,7 +141,7 @@
   <string name="send_pay_button">Pagar</string>
   <string name="send_swap_in_progress">Preparando transação…</string>
   <string name="send_swap_error">A troca para rede bitcoin falhou. Tente novamente.</string>
-  <string name="send_swap_required_desc">Este é um endereço Bitcoin, o pagamento será realizado usando uma troca.</string>
+  <string name="send_swap_required_desc">Este é um endereço bitcoin, o pagamento será realizado usando uma troca.</string>
   <string name="send_swap_required_button">Preparar transação</string>
   <string name="send_swap_complete_recap_amount">Valor</string>
   <string name="send_swap_complete_recap_fee">Taxa de mineração</string>
