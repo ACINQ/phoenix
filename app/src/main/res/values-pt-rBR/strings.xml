@@ -129,7 +129,7 @@
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_chain_fees_label">Feerate</string>
+  <string name="send_chain_fees_label">Taxa</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Este pagamento é uma transação pela rede bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
   <string name="send_chain_fees_feedback_invalid">Por favor use uma taxa válida.</string>
