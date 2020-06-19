@@ -91,7 +91,7 @@
 
   <string name="receive_address_label">Addresse</string>
   <string name="receive_power_save_disclaimer">Vous êtes en mode d\'économie d\'énergie. Pour recevoir le paiement, assurez vous que l\'application est démarrée et a accès à Internet</string>
-  <string name="receive_withdraw_button">Utilise un lien LNURL</string>
+  <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
   <string name="receive_swap_in_button">Afficher une adresse Bitcoin</string>
   <string name="receive_swap_in_error_message">Il y a eu une erreur dans la permutation avec une adresse Bitcoin on-chain…\n\nVeuillez réessayer.</string>

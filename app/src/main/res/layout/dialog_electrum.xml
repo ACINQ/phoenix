@@ -71,12 +71,13 @@
       android:padding="@dimen/space_md_p"
       android:text="@string/electrum_dialog_ssl"
       android:textColor="?attr/onMutedBgTextColor"
-      android:textSize="@dimen/text_md"/>
+      android:textSize="@dimen/text_md" />
 
     <CheckBox
       android:id="@+id/elec_dialog_ssl_force_checkbox"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:drawablePadding="@dimen/space_md"
       android:text="@string/electrum_dialog_ssl_tor"
       android:minHeight="0dp"
       android:layout_marginStart="@dimen/space_md"
