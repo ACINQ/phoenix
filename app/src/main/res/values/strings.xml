@@ -217,6 +217,7 @@
   <string name="settings_mutual_close">Close all channels</string>
   <string name="settings_force_close">Danger zone</string>
   <string name="settings_tor">Tor</string>
+  <string name="settings_about">About</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -518,5 +519,19 @@
   <string name="conndialog_lightning">Lightning Peer</string>
   <string name="conndialog_ok">Connected</string>
   <string name="conndialog_not_ok">Connecting…</string>
+
+  <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">About</string>
+  <string name="about_version">Version: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.
+  <br/><br/>
+  It is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.
+  <br/><br/>
+  Note that this wallet is non-custodial: <strong>you have sole custody of the wallet\'s 12-words seed</strong>. Do not give this seed to anyone, and beware of phishing.
+  <br/><br/>
+  If you have questions, consult the <a href="https://phoenix.acinq.co/faq">FAQ</a>. You can also contact <a href="https://phoenix.acinq.co/support">support</a> for help.
+  ]]></string>
 
 </resources>

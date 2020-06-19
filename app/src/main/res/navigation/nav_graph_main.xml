@@ -352,6 +352,9 @@
     <action
       android:id="@+id/action_settings_to_tor"
       app:destination="@id/tor_fragment" />
+    <action
+      android:id="@+id/action_settings_to_about"
+      app:destination="@id/about_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -433,5 +436,11 @@
     android:id="@+id/connectivity_dialog"
     android:name="fr.acinq.phoenix.main.ConnectivityFragmentDialog"
     android:label="connectivity_dialog" />
+
+  <!-- settings: about -->
+  <fragment
+    android:id="@+id/about_fragment"
+    android:name="fr.acinq.phoenix.settings.AboutFragment"
+    android:label="AboutFragment" />
 
 </navigation>
