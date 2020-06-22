@@ -325,7 +325,7 @@
   <string name="displayseed_error_generic">Could not unlock seed.\nPlease try again.</string>
   <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
-    The seed of the wallet is a list of 12 english words. It is your wallet backup. It gives full access to the funds in the wallet.
+    The seed of the wallet is a list of 12 english words. It is your wallet backup and gives full access to the funds in the wallet.
     <br /><br />
     <strong>Only you alone possess this seed. Keep it private.</strong>
     <br /><br />
