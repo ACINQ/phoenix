@@ -340,7 +340,6 @@
   <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed, for example on a piece of paper.</string>
-  <string name="displayseed_has_saved_seed_button">Confirm</string>
   <string name="displayseed_dialog_header">KEEP THIS SEED SAFE.\nDO NOT SHARE.</string>
 
   <!-- //////////////// logs settings //////////////// -->

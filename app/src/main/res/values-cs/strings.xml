@@ -309,7 +309,6 @@
   <string name="displayseed_derivation_path">BIP39 seed se standardní BIP84 cestou derivace</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">Udělal jsem zálohu svého seedu</string>
-  <string name="displayseed_has_saved_seed_button">Potvrdit</string>
 
   <!-- //////////////// logs settings //////////////// -->
 

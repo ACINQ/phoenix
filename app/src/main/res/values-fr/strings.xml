@@ -327,7 +327,6 @@
   <string name="displayseed_derivation_path">Seed BIP39 avec chemin de dérivation standard BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">J\'ai bien sauvegardé ma seed dans un endroit sûr.</string>
-  <string name="displayseed_has_saved_seed_button">Confirmer</string>
   <string name="displayseed_dialog_header">NE PAS PARTAGER.</string>
 
   <!-- //////////////// logs settings //////////////// -->
