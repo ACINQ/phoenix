@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Não importe uma seed que tenha sido gerada em outro aplicativo.\n\nAlém disso, certifique-se que você não tem outra carteira Phoenix instalada com a mesma seed.</string>
   <string name="restore_disclaimer_checkbox">Eu entendo.</string>
   <string name="restore_disclaimer_next">Próximo</string>
-  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês. Tenha em mente que senhas comuns não funcionam.</string>
+  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês.</string>
   <string name="restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
   <string name="restore_in_progress">Restaurando sua carteira…</string>
   <string name="restore_import_button">Importar</string>
@@ -59,7 +59,7 @@
   <string name="startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
   <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
   <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
-  <string name="startup_error_network">Sua conexão de internet não está funcionando. Favor verificar sua conexão WiFi ou rede de celular.</string>
+  <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
 
@@ -109,9 +109,9 @@
 
   <string name="receive_with_open_title">Pagamento a receber</string>
   <string name="receive_with_open_help_desc">O que é isso?</string>
-  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa de instalação serve para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
+  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa é necessária para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
   <string name="receive_with_open_amount_label">Você tem um pagamento a receber de</string>
-  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação de <b>%1$s</b> (%2$s).]]></string>
+  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação/manutenção de <b>%1$s</b> (%2$s).]]></string>
   <string name="receive_with_open_accept">Aceitar (expira em %1$ss)</string>
   <string name="receive_with_open_decline">Recusar</string>
   <string name="receive_with_open_expired">Este pagamento expirou!</string>
@@ -222,7 +222,7 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Use este recurso para esvaziar sua carteira enviando o saldo para um endereço Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Verifique se o endereço está correto antes de enviar.</string>
+  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
   <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
@@ -277,7 +277,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">Nova carteira</string>
+  <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
 
   <!-- //////////////// main //////////////////// -->
@@ -407,12 +407,12 @@
 
   <string name="lnurl_withdraw_amount_label">Valor a receber</string>
   <string name="lnurl_withdraw_description_label">Detalhes</string>
-  <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirar fundos de<br/><b>%1$s</b>.]]></string>
-  <string name="lnurl_withdraw_confirm_button">Retirar</string>
-  <string name="lnurl_withdraw_wait">Solicitando valores…</string>
-  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo online.</string>
-  <string name="lnurl_withdraw_error_internal">Não foi possível processar esta retirada. Tente novamente.</string>
-  <string name="lnurl_withdraw_error_invalid">Esta solicitação de retirada é inválida. Tente novamente.</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Receber</string>
+  <string name="lnurl_withdraw_wait">Resgatando valores…</string>
+  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo aberto.</string>
+  <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
+  <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
   <string name="lnurl_withdraw_error_amount_min">O valor não pode ser menor que %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">O valor não pode ser maior que %1$s.</string>
