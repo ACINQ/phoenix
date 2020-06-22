@@ -44,7 +44,8 @@ object Converter {
 
   init {
     FIAT_FORMAT.minimumFractionDigits = 2
-    FIAT_FORMAT.maximumFractionDigits = 3
+    FIAT_FORMAT.maximumFractionDigits = 2
+    FIAT_FORMAT.roundingMode = RoundingMode.CEILING // prevent converting very small bitcoin amounts to 0 in fiat
   }
 
   fun refreshCoinPattern(context: Context) {
@@ -72,8 +73,8 @@ object Converter {
     return formatAnyAmount(context, formatted, unit.code(), withUnit, withSign, isOutgoing)
   }
 
-  fun printFiatRaw(context: Context, amount: MilliSatoshi): String {
-    return FIAT_FORMAT.format(convertMsatToFiat(context, amount))
+  private fun printFiatRaw(context: Context, amount: MilliSatoshi): String {
+    return convertMsatToFiat(context, amount)?.let { return FIAT_FORMAT.format(it) } ?: context.getString(R.string.utils_unknown_amount)
   }
 
   fun printFiatPretty(context: Context, amount: MilliSatoshi, withUnit: Boolean = false, withSign: Boolean = false, isOutgoing: Boolean = true): Spanned {
@@ -116,11 +117,14 @@ object Converter {
    * @param fiatCode   fiat currency code (USD, EUR, RUB, JPY, ...)
    * @return localized formatted string of the converted amount
    */
-  fun convertMsatToFiat(context: Context, amount: MilliSatoshi): BigDecimal {
+  private fun convertMsatToFiat(context: Context, amount: MilliSatoshi): BigDecimal? {
     val fiat = Prefs.getFiatCurrency(context)
     val rate = Prefs.getExchangeRate(context, fiat)
-
-    return `package$`.`MODULE$`.satoshi2btc(amount.truncateToSatoshi()).toBigDecimal().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
+    return if (rate < 0) {
+      null
+    } else {
+      `package$`.`MODULE$`.satoshi2btc(amount.truncateToSatoshi()).toBigDecimal().`$times`(scala.math.BigDecimal.decimal(rate)).bigDecimal()
+    }
   }
 
   /**
@@ -133,7 +137,11 @@ object Converter {
   fun convertFiatToMsat(context: Context, amount: String): MilliSatoshi {
     val fiat = Prefs.getFiatCurrency(context)
     val rate = Prefs.getExchangeRate(context, fiat)
-    return any2Msat(Btc(`BigDecimal$`.`MODULE$`.apply(amount).`$div`(scala.math.BigDecimal.decimal(rate))))
+    return if (rate < 0) {
+      MilliSatoshi(0)
+    } else {
+      any2Msat(Btc(`BigDecimal$`.`MODULE$`.apply(amount).`$div`(scala.math.BigDecimal.decimal(rate))))
+    }
   }
 
   /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.send
+package fr.acinq.phoenix.lnurl
 
 import android.os.Bundle
 import android.view.LayoutInflater

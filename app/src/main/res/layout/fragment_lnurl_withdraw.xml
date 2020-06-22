@@ -20,18 +20,18 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.send.LNUrlWithdrawState" />
+    <import type="fr.acinq.phoenix.lnurl.LNUrlWithdrawState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.send.LNUrlWithdrawViewModel" />
+      type="fr.acinq.phoenix.lnurl.LNUrlWithdrawViewModel" />
   </data>
 
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".send.LNUrlWithdrawFragment">
+    tools:context=".lnurl.LNUrlWithdrawFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"

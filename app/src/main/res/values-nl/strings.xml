@@ -1,0 +1,467 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+  <string name="app_name">Phoenix (Testnet)</string>
+
+  <!-- //////////////// system notification channels //////////////// -->
+
+  <string name="notification_channels_watcher_title">Achtergrond watcher</string>
+  <string name="notification_channels_watcher_desc">Waarschuwt je als je de app moet opstarten. Moet hoge prioriteit hebben.</string>
+
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+
+  <string name="autocreate_generating">Wallet aanmaken…</string>
+  <string name="autocreate_error">We konden je wallet niet aanmaken.\nFoutmelding: %1$s</string>
+
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+
+  <string name="restore_disclaimer_message">Importeer geen seed die NIET door deze applicatie is aangemaakt.\n\nZorg er ook voor dat je geen andere Phoenix wallet hebt met dezelfde seed.</string>
+  <string name="restore_disclaimer_checkbox">Ik begrijp het.</string>
+  <string name="restore_disclaimer_next">Volgende</string>
+  <string name="restore_instructions">De seed van je wallet is een lijst met 12 Engelse woorden. Passphrases zijn niet ondersteund.</string>
+  <string name="restore_mnemonics_label">Gebruik je toetsenbord om de seed in te voeren:</string>
+  <string name="restore_in_progress">Wallet herstellen…</string>
+  <string name="restore_import_button">Importeer</string>
+  <string name="restore_error">Deze seed is ongeldig en kan niet worden geïmporteerd.\n\nProbeer het opnieuw</string>
+
+  <!-- //////////////// Pin dialog //////////////////// -->
+
+  <string name="pindialog_title_default">Voer je PIN in</string>
+  <string name="pindialog_error">PIN-code moet 6 cijfers bevatten.</string>
+  <string name="pindialog_error_donotmatch">PIN-codes komen niet overeen.</string>
+
+  <!-- //////////////// Biometric dialog //////////////////// -->
+
+  <string name="biometricprompt_title">Wallet is vergrendeld</string>
+  <string name="biometricprompt_negative">Ontgrendel met PIN</string>
+
+  <!-- //////////////// Startup //////////////////// -->
+
+  <string name="startup_wait">Laden…</string>
+  <string name="startup_wait_tor">Tor starten…</string>
+  <string name="startup_start_button">Herstart</string>
+  <string name="startup_settings_button">Instellingen</string>
+  <string name="startup_error_generic">De applicatie kan niet worden gestart.\n\nFoutmelding: %1$s</string>
+  <string name="startup_error_tor">De Tor service kan niet worden gestart. Controleer of je een werkende verbinding hebt en probeer opnieuw.\n\nFoutmelding: %1$s</string>
+  <string name="startup_error_unreadable">Wallet data kon niet worden gelezen, herstart de applicatie</string>
+  <string name="startup_error_network">Je internetverbinding werkt niet. Controleer je WiFi-signaal of je mobiele netwerk.</string>
+  <string name="startup_error_wrong_pwd">PIN is onjuist</string>
+  <string name="startup_error_biometrics">Biometrische authenticatie is mislukt.</string>
+
+  <!-- //////////////// payment holder //////////////// -->
+
+  <string name="paymentholder_sending">Verzenden…</string>
+  <string name="paymentholder_processing">Verwerken…</string>
+  <string name="paymentholder_waiting">Wachten…</string>
+  <string name="paymentholder_failed">Mislukt</string>
+  <string name="paymentholder_sent_prefix">-</string>
+  <string name="paymentholder_received_prefix">+</string>
+  <string name="paymentholder_no_desc">Geen beschrijving</string>
+  <string name="paymentholder_closing_desc">Afsluiten #%1$s</string>
+
+  <!-- //////////////// receive //////////////// -->
+
+  <string name="receive_edit_title">Pas mijn betalingsverzoek aan</string>
+  <string name="receive_edit_subtitle">Je kan het gevraagde bedrag en de omschrijving van het betalingsverzoek aanpassen.</string>
+  <string name="receive_in_progress_message">Wachten…</string>
+  <string name="receive_error_message">Er is een fout opgetreden tijdens het genereren van het betalingsverzoek…\n\nProbeer opnieuw.</string>
+  <string name="receive_amount_label">Bedrag (optioneel)</string>
+  <string name="receive_desc_label">Betalingsomschrijving (optioneel):</string>
+  <string name="receive_default_desc">Phoenix-betaling</string>
+  <string name="receive_generate_button">Genereer betalingsverzoek</string>
+
+  <string name="receive_share_subject">Betaling aangevraagd</string>
+  <string name="receive_share_title">Deel dit betalingsverzoek met…</string>
+  <string name="receive_share_button">Delen…</string>
+
+  <string name="receive_address_label">Adres</string>
+  <string name="receive_power_save_disclaimer">Je gebruikt de energie-stand. Om de betaling te ontvangen heeft de app toestemming nodig om op de achtergrond te draaien.</string>
+  <string name="receive_withdraw_button">Gebruik LNURL link</string>
+
+  <string name="receive_swap_in_button">Laat Bitcoinadres zien</string>
+  <string name="receive_swap_in_error_message">Er is een fout opgetreden tijdens het wisselen naar een on-chain transactie…\n\nProbeer opnieuw.</string>
+  <string name="receive_swap_in_progress_message">Swap-in Bitcoinadres aanvragen…</string>
+  <string name="receive_swap_in_disclaimer_title">Ontvang on-chain</string>
+  <string name="receive_swap_in_disclaimer_message"><![CDATA[
+  Een standaard Bitcoinadres zal hierna worden getoond.
+  <br /><br />
+  Geld dat naar dit adres wordt gestuurd zal na 1 bevestiging in je wallet zichtbaar zijn.
+  <br /><br />
+  Een <b>%1$s%%</b> vergoeding zal worden toegepast.
+  ]]></string>
+
+  <!-- //////////////// receive with open channel //////////////// -->
+
+  <string name="receive_with_open_title">Inkomende betaling</string>
+  <string name="receive_with_open_help_desc">Wat is dit?</string>
+  <string name="receive_with_open_help">Om Lightning betalingen te ontvangen heb je een kanaal nodig met voldoende inkomende liquiditeit.\n\nAls je die niet hebt, zal Phoenix indien nodig automatisch een kanaal voor je openen. De setup vergoeding dekt de kosten voor het openen van een kanaal en het toewijzen van liquiditeit.</string>
+  <string name="receive_with_open_amount_label">Je hebt een hangende inkomende betaling van</string>
+  <string name="receive_with_open_cost"><![CDATA[Het accepteren van deze betaling vereist een setup vergoeding van <b>%1$s</b> (%2$s).]]></string>
+  <string name="receive_with_open_accept">Accepteren (expires in %1$ss)</string>
+  <string name="receive_with_open_decline">Afwijzen</string>
+  <string name="receive_with_open_expired">Deze betaling is verlopen!</string>
+
+  <!-- //////////////// send //////////////// -->
+
+  <string name="send_init_paste">Plak betalingsverzoek</string>
+  <string name="send_init_reading">Scan lezen…</string>
+  <string name="send_balance_prefix">Balans:</string>
+  <string name="send_use_all_balance">Verzend alles</string>
+  <string name="send_loading">Betaling controleren…</string>
+  <string name="send_invalid_pr_generic">Deze betaling is niet geldig. Je hebt mogelijk een onjuist betalingsverzoek gescand.\n\nProbeer opnieuw.</string>
+  <string name="send_amount_error">Voer een geldig bedrag in.</string>
+  <string name="send_amount_error_balance">Bedrag overschrijdt je balans.</string>
+  <string name="send_amount_error_swap_out_too_small">Min. 10000 sat voor on-chain betaling.</string>
+  <string name="send_destination_label">Verzend naar</string>
+  <string name="send_description_label">Omschr.</string>
+  <string name="send_error_sending">Er is een interne fout opgetreden tijdens het versturen van deze betaling. Er is geen geld verzonden.</string>
+  <string name="send_pay_button">Betaal</string>
+  <string name="send_swap_in_progress">Swap is bezig…</string>
+  <string name="send_swap_error">Swap is mislukt. Probeer opnieuw.</string>
+  <string name="send_swap_required_desc">Dit is een bitcoinadres, de betaling wordt een swap.</string>
+  <string name="send_swap_required_button">Verzoek een swap</string>
+  <string name="send_swap_complete_recap_amount">Bedrag</string>
+  <string name="send_swap_complete_recap_fee">Miner Vergoeding</string>
+  <string name="send_swap_complete_recap_total">Totaal</string>
+  <string name="send_swap_complete_cannot_afford">Het totale bedrag overschrijdt je balans.\n\nVerlaag het bedrag of probeer het later als de vergoedingen lager zijn.</string>
+
+  <!-- //////////////// scan //////////////// -->
+
+  <string name="scan_request_camera_access">Geef camera toestemming</string>
+  <string name="scan_instructions">Plaats een betalingsverzoek QR code\nin de rechthoek het om te scannen</string>
+  <string name="scan_state_reading">Betalingsverzoek lezen</string>
+
+  <string name="scan_error_default">Dit is geen geldig betalingsverzoek.\n\nProbeer opnieuw.</string>
+  <string name="scan_error_expired">Betaling is verlopen.</string>
+  <string name="scan_error_pay_to_self">Je kan jezelf niet betalen.</string>
+  <string name="scan_error_invalid_chain">Dit betalingsverzoek gebruikt niet dezelfde blockchain als je wallet.</string>
+  <string name="scan_error_lnurl_unsupported">Deze LNURL is nog niet ondersteund!</string>
+
+  <string name="scan_amountless_legacy_title">Waarschuwing</string>
+  <string name="scan_amountless_legacy_message"><![CDATA[
+    Dit betalingsverzoek gebruikt geen bedrag. Dit kan gevaarlijk zijn: kwaadaardige nodes kunnen je betaling stelen. Om zeker te zijn, kan je <b>de te betalen persoon om een specifiek bedrag vragen</b> in het betalingsverzoek.
+    <br /><br />
+    Weet je zeker dat je dit betalingsverzoek wilt betalen?
+  ]]></string>
+  <string name="scan_amountless_legacy_confirm_button">Bevestig</string>
+  <string name="scan_amountless_legacy_cancel_button">Annuleer</string>
+
+  <!-- //////////////// utilities strings //////////////// -->
+
+  <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
+  <string name="utils_converted_amount">≈ %1$s</string>
+  <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
+  <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+
+  <string name="utils_ok">Oké</string>
+  <string name="utils_proceed">Doorgaan</string>
+  <string name="utils_cancel">Annuleer</string>
+  <string name="utils_date_just_now">zojuist</string>
+  <string name="utils_unknown">N/A</string>
+  <string name="utils_copied">Gekopieerd naar klembord!</string>
+  <string name="btn_back">Ga terug</string>
+  <string name="btn_ok">OKE</string>
+  <string name="btn_confirm">Bevestig</string>
+  <string name="btn_cancel">Annuleer</string>
+  <string name="btn_close">Sluiten</string>
+
+  <!-- //////////////// settings //////////////// -->
+
+  <string name="settings_general_title">Algemeen</string>
+  <string name="settings_display_prefs">Weergave</string>
+  <string name="settings_security_title">Beveiling</string>
+  <string name="settings_display_seed">Herstelzin</string>
+  <string name="settings_seed_security">Toegangsinstellingen</string>
+  <string name="settings_advanced_title">Geavanceerd</string>
+  <string name="settings_fees">Vergoedingsinstellingen</string>
+  <string name="settings_list_channels">Kanaallijst</string>
+  <string name="settings_logs">Logs</string>
+  <string name="settings_electrum">Electrum server</string>
+  <string name="settings_mutual_close">Sluit alle kanalen</string>
+  <string name="settings_force_close">Gevarenzone</string>
+  <string name="settings_tor">Tor</string>
+
+  <!-- //////////////// notification - watcher //////////////// -->
+
+  <string name="notif_watcher_cheating_title">Start Phoenix op</string>
+  <string name="notif_watcher_cheating_message">Een fraude poging is gedetecteerd.</string>
+
+  <string name="notif_watcher_connection_title">Phoenix heeft netwerktoegang nodig</string>
+  <string name="notif_watcher_connection_message">De achtergrond watcher heeft internet nodig om naar behoren te functioneren.</string>
+
+  <!-- //////////////// close all channels //////////////// -->
+
+  <string name="closechannels_title">Sluit kanalen</string>
+  <string name="closechannels_checking_channels">Kanalen controleren, even wachten…</string>
+  <string name="closechannels_channels_recap">Je hebt %1$d Lightning kanalen met een totale waarde van %2$s.</string>
+  <string name="closechannels_channels_none">Je hebt geen kanalen die geleegd kunnen worden.\n\nGa naar de \'Kanaallijst\' pagina om de status van je kanalen te zien.</string>
+  <string name="closechannels_mutual_title">Lege wallet</string>
+  <string name="closechannels_mutual_instructions"><![CDATA[
+    Gebruik deze pagina om je wallet te legen naar een Bitcoinadres.
+  ]]></string>
+  <string name="closechannels_mutual_input_instructions">Geld kan naar een Bitcoin wallet worden verstuurd. Controleer of het adres juist is voor het verzenden.</string>
+  <string name="closechannels_mutual_input_hint">Voer Bitcoinadres in</string>
+  <string name="closechannels_mutual_button">Leeg mijn wallet</string>
+  <string name="closechannels_force_title">Gedwongen sluiten</string>
+  <string name="closechannels_force_instructions"><![CDATA[
+    Gedwongen sluiten laat je eenzijdig je kanalen sluiten.
+    <br/><br/>
+    Deze functie is geen &quot;magische reparatie knop&quot;; het is een veiligheidsmaatregel en <b>moet alleen gebruikt worden bij extreme omstandigheden</b>. bijvoorbeeld, als een peer (ACINQ) permanent verdwijnt, waardoor je je geld niet meer kan uitgeven. In alle andere gevallen, <b>als je problemen ondervindt met Phoenix moet je contact opnemen met onze ondersteuning</b>.
+    <br/><br/>
+    Het gedwongen sluiten van kanalen kost geld (om de on-chain vergoedingen te dekken) en zal ervoor zorgen dat je geld dagenlang vergrendeld zijn. <b>Verwijder de app niet totdat je kanalen volledig gesloten zijn of je zal geld kwijtraken</b>
+    <br/><br/>
+    Fondsen zullen uiteindelijk verstuurd worden naar: %1$s
+    <br/><br/>
+    <b>Gebruik deze functie niet als je niet volledig begrijpt wat het doet.</b>
+  ]]></string>
+  <string name="closechannels_force_button">Kanalen gedwongen sluiten</string>
+  <string name="closechannels_confirm_dialog_message">Weet je zeker dat je wilt verdergaan?</string>
+  <string name="closechannels_message_error">Er is een probleem opgetreden. Prober het later opnieuw.</string>
+  <string name="closechannels_message_done">Geld verstuurd.</string>
+  <string name="closechannels_message_in_progress">Wachten…</string>
+
+  <!-- //////////////// list all channels //////////////// -->
+
+  <string name="listallchannels_title">Kanaallijst</string>
+  <string name="listallchannels_in_progress">Wachten…</string>
+  <string name="listallchannels_error">Er is een probleem opgetreden bij het ophalen van de kanaallijst. Probeer het opnieuw.</string>
+  <string name="listallchannels_node_id">Node id: %1$s</string>
+  <string name="listallchannels_no_channels">Je hebt nog geen kanalen.</string>
+  <plurals name="listallchannels_channels_header">
+    <item quantity="one">Je hebt %1$d kanaal.</item>
+    <item quantity="other">Je hebt %1$d kanalen.</item>
+  </plurals>
+  <string name="listallchannels_copy">Kopieer</string>
+  <string name="listallchannels_share_all">Deel alle kanalen…</string>
+  <string name="listallchannels_share">Deel</string>
+  <string name="listallchannels_funding_tx">Tx</string>
+  <string name="listallchannels_funding_tx_desc">Bekijk financieringstransactie</string>
+  <string name="listallchannels_close">Sluit</string>
+  <string name="listallchannels_share_subject">Kanaaldata</string>
+  <string name="listallchannels_share_title">Deel kanaaldata</string>
+  <string name="listallchannels_serialization_error">Kan kanaaldata niet ophalen</string>
+
+  <!-- //////////////// channel details //////////////// -->
+
+  <string name="channel_loading">Kanaaldata ophalen…</string>
+  <string name="channel_error">Kan de details van dit kanaal niet ophalen. Probeer het later opnieuw.</string>
+
+  <!-- //////////////// menu //////////////// -->
+
+  <string name="menu_settings">Instellingen</string>
+  <string name="menu_send">Verzenden</string>
+  <string name="menu_receive">Ontvangen</string>
+
+  <!-- //////////////// init wallet //////////////// -->
+
+  <string name="initwallet_create">Nieuwe Wallet</string>
+  <string name="initwallet_restore">Herstel mijn wallet</string>
+
+  <!-- //////////////// main //////////////////// -->
+
+  <string name="main_alert_electrum_connecting">Verbinden met Electrum server…</string>
+  <string name="main_alert_network_lost">Je bent offline. Controleer je netwerkinstellingen…</string>
+  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning netwerk…</string>
+  <string name="main_alert_settings_button">Instellingen</string>
+  <string name="main_swapin_incoming">+%1$s inkomend</string>
+  <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Verbinden…</string>
+  <string name="main_tor_connected_button">Tor ingeschakeld</string>
+  <string name="main_stores_button">Winkels</string>
+
+  <!-- //////////////// notifications //////////////////// -->
+
+  <string name="inappnotif_set_up_pin">Je wallet is niet beveiligd.</string>
+  <string name="inappnotif_set_up_pin_action">Stel een PIN in</string>
+  <string name="inappnotif_mnemonics_never_seen">Bedankt voor het gebruiken van Phoenix. Heb je een backup van je wallet gemaakt?</string>
+  <string name="inappnotif_mnemonics_never_seen_action">Maak een backup van mijn wallet</string>
+  <string name="inappnotif_background_worker_cannot_run">Phoenix moet soms op de achtergrond draaien. Zorg ervoor dat je apparaat deze app niet abrupt afsluit vanwege energiebesparingsinstellingen.</string>
+  <string name="inappnotif_upgrade">Er is een update beschikbaar.</string>
+  <string name="inappnotif_upgrade_critical">Een kritieke update is beschikbaar. Zonder update kan er zich een storing in je wallet voordoen.</string>
+
+  <!-- //////////////// display seed //////////////// -->
+
+  <string name="displayseed_title">Wallet herstelzin</string>
+  <string name="displayseed_authenticate_button">Laat seed zien</string>
+  <string name="displayseed_loading">Seed ontgrendelen…</string>
+  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nFoutmelding: %1$s</string>
+  <string name="displayseed_instructions"><![CDATA[
+    Deze woordenlijst is de backup van je wallet. Bewaar het op een veilige plek (niet op deze telefoon)!
+    <br /><br />
+    <b>Deel het met niemand.</b>
+    <b>Raak het niet kwijt.</b> Als je de woordenlijst en je telefoon kwijtraakt, ben je je geld kwijt.
+  ]]></string>
+  <string name="displayseed_derivation_path">BIP39 seed met standaard BIP84 derivation path</string>
+  <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
+  <string name="displayseed_has_saved_seed_checkbox">Ik heb een backup van mijn seed gemaakt</string>
+  <string name="displayseed_has_saved_seed_button">Bevestig</string>
+
+  <!-- //////////////// logs settings //////////////// -->
+
+  <string name="logs_title">Applicatie logs</string>
+  <string name="logs_subtitle">Je kan de applicatie logs vanaf deze pagina veiligstellen en delen.</string>
+  <string name="logs_view_button">Bekijk logs…</string>
+  <string name="logs_view_with">Bekijk logs met…</string>
+  <string name="logs_share_button">Deel logs…</string>
+  <string name="logs_share_subject">Phoenix App logs</string>
+  <string name="logs_share_title">Deel Phoenix logs…</string>
+
+  <!-- //////////////// payment details //////////////// -->
+
+  <string name="paymentdetails_loading">Betalingsdetails ophalen…</string>
+  <string name="paymentdetails_error">Er is een fout opgetreden tijdens het ophalen van de gegevens voor deze betaling.\n\nProbeer opnieuw.</string>
+
+  <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Verzonden</b> %1$s]]></string>
+  <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Verwerkend…</b>]]></string>
+  <string name="paymentdetails_status_sent_failed"><![CDATA[Betaling <b>mislukt</b>.<br />Er is geen geld verstuurd.]]></string>
+
+  <string name="paymentdetails_status_received_pending">Betaling is nog niet ontvangen.</string>
+  <string name="paymentdetails_status_received_successful"><![CDATA[<b>Ontvangen</b> %1$s]]></string>
+
+  <string name="paymentdetails_desc_label">Omschr.</string>
+  <string name="paymentdetails_destination_label">Verzonden naar</string>
+  <string name="paymentdetails_fees_label">Vergoedingen</string>
+  <string name="paymentdetails_error_label">Fout</string>
+  <string name="paymentdetails_closing_desc">Betaling voor kanaalsluiting #%1$s</string>
+  <string name="paymentdetails_no_description">Geen omschrijving</string>
+  <string name="paymentdetails_technicals_button">Laat technische data zien</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="paymentdetails_technicals_title">Betalingsdata</string>
+  <string name="paymentdetails_payment_hash_label">Betalingshash</string>
+  <string name="paymentdetails_payment_request_label">Betalingsverzoek</string>
+  <string name="paymentdetails_preimage_label">Voorbeeld</string>
+  <string name="paymentdetails_created_at_label">Gemaakt op</string>
+  <string name="paymentdetails_expire_at_label">Verloopt op</string>
+  <string name="paymentdetails_completed_at_label">Voltooid om</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="state_wait_confirmed">Financieringstransactie wordt bevestigd</string>
+  <string name="state_closing">Kanaal is aan het sluiten</string>
+  <string name="state_closed">Kanaal is gesloten</string>
+  <string name="state_normal">Actief</string>
+  <string name="state_sync">Synchronizeren met peer</string>
+  <string name="state_offline">Peer is offline</string>
+  <string name="state_shutdown">Uitgeschakeld</string>
+
+  <!-- //////////////// seed security //////////////// -->
+
+  <string name="seedsec_title">Beveiliging</string>
+  <string name="seedsec_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteunt, kan biometrische authenticatie gebruiken.</string>
+  <string name="seedsec_pin_switch">PIN-authenticatie</string>
+  <string name="seedsec_pin_scramble">Hussel PIN-toetsenbord</string>
+  <string name="seedsec_biometrics_switch">Biometrische authenticatie</string>
+  <string name="seedsec_change_pin">Verander mijn PIN…</string>
+  <string name="seedsec_biometric_enrollment_error">Biometrische registratie mislukt. Probeer opnieuw.</string>
+  <string name="seedsec_pindialog_title_unlock">Voer je huidige PIN in om door te gaan</string>
+  <string name="seedsec_pindialog_title_set_new"><![CDATA[Voer je <b>nieuwe PIN</b> in]]></string>
+  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[<b>Bevestig</b> je nieuwe PIN]]></string>
+
+  <string name="seedsec_pin_update_success">PIN succesvol geupdate!</string>
+  <string name="seedsec_biometric_enabled">Biometrische authenticatie geactivateerd</string>
+  <string name="seedsec_biometric_disabled">Biometrische authenticatie uitgeschakeld</string>
+
+  <string name="seedsec_biometric_support_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
+  <string name="seedsec_biometric_support_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
+  <string name="seedsec_biometric_support_none_enrolled">Registreer eerst biometrie.</string>
+
+  <string name="seedsec_error_wrong_pin">Ongeldige PIN</string>
+  <string name="seedsec_error_pins_match">PINs komen niet overeen. Probeer opnieuw.</string>
+  <string name="seedsec_error_generic">Er is een fout opgetreden, de wallet is niet versleuteld.\n\nProbeer opnieuw.</string>
+
+  <string name="seedsec_disable_bio_prompt_title">Schakel biometrische vergrendeling uit</string>
+  <string name="seedsec_disable_bio_prompt_desc">Je zal vanaf nu je PIN moeten gebruiken</string>
+  <string name="seedsec_disable_bio_prompt_negative">Annuleer</string>
+
+  <string name="seedsec_bio_prompt_title">Schakel biometrische vergrendeling in</string>
+  <string name="seedsec_bio_prompt_negative">Annuleer</string>
+
+  <!-- //////////////// ln url withdraw //////////////// -->
+
+  <string name="lnurl_withdraw_amount_label">Te ontvangen bedrag</string>
+  <string name="lnurl_withdraw_description_label">Details</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[Geld opnemen van<br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Opnemen</string>
+  <string name="lnurl_withdraw_wait">Geld aanvragen…</string>
+  <string name="lnurl_withdraw_success">Even wachten terwijl %1$s geld stuurt.\n\nHou de app online.</string>
+  <string name="lnurl_withdraw_error_internal">Kon dit opnameverzoek niet verwerken. Probeer opnieuw.</string>
+  <string name="lnurl_withdraw_error_invalid">Dit opnameverzoek is niet geldig. Probeer opnieuw.</string>
+  <string name="lnurl_withdraw_error_amount">Bedrag is ongeldig.</string>
+  <string name="lnurl_withdraw_error_amount_min">Bedrag moet minimaal %1$s zijn.</string>
+  <string name="lnurl_withdraw_error_amount_max">Bedrag kan %1$s niet overschrijden.</string>
+  <string name="lnurl_withdraw_error_remote">%1$s reageerde met een foutmelding: %2$s.\n\nProbeer opnieuw, of neem contact op met hun support.</string>
+  <string name="lnurl_withdraw_error_remote_invalid_response">Ongeldige data</string>
+
+  <!-- //////////////// display preferences //////////////// -->
+
+  <string name="prefs_display_title">Weergave-opties</string>
+  <string name="prefs_display_coin_label">Bitcoin-eenheid</string>
+  <string name="prefs_display_fiat_label">Valuta</string>
+  <string name="prefs_display_theme_label">Applicatiethema</string>
+
+  <!-- //////////////// electrum server //////////////// -->
+
+  <string name="electrum_title">Electrum-server</string>
+  <string name="electrum_subtitle">Phoenix verbind standaard met willekeurige Electrum-servers om toegang te krijgen tot de Bitcoin-blockchain. Je kan er ook voor kiezen om verbinding te maken met je eigen Electrum-server.</string>
+  <string name="electrum_change_button">Stel server in…</string>
+
+  <string name="electrum_block_height_label">Blokhoogte</string>
+  <string name="electrum_tip_label">Tip-tijdstempel</string>
+  <string name="electrum_fee_rate_label">Vergoedingstarief</string>
+  <string name="electrum_xpub_label">Master public key</string>
+  <string name="electrum_xpub_value">%1$s\n\nPath: %2$s</string>
+  <string name="electrum_fee_rate">%1$s sat/byte</string>
+  <string name="electrum_connection_label">Server</string>
+  <string name="electrum_not_connected">Niet verbonden</string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[Je gaat verbinden met <b>%1$s</b>]]></string>
+  <string name="electrum_connecting">Verbinding tot stand brengen…</string>
+  <string name="electrum_connecting_to_custom"><![CDATA[Verbinding tot stand brengen met <b>%1$s…</b>]]></string>
+  <string name="electrum_connected"><![CDATA[Verbonden met: <b>%1$s</b>]]></string>
+
+  <string name="electrum_dialog_checkbox">Gebruik een aangepaste server</string>
+  <string name="electrum_dialog_ssl">Server moet een geldig certificaat hebben</string>
+  <string name="electrum_dialog_input">Serveradres (host:port).</string>
+  <string name="electrum_empty_custom_address">Voer een Electrum-serveradres in</string>
+
+  <!-- ////////////// virtual keyboard hints //////////////// -->
+
+  <string name="key_space_desc">Voeg witruimte toe</string>
+  <string name="key_delete_desc">Verwijder laatste teken</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Tor Instellingen</string>
+  <string name="tor_settings_subtitle">Je kan je privacy verbeteren door alleen Tor te gebruiken bij het verbinden met een Electrum-server of je Lightning-peer. Dit zal het opstarten van de applicatie iets vertragen.</string>
+  <string name="tor_settings_enabled">Tor is ingeschakeld</string>
+  <string name="tor_settings_disabled">Tor is uitgeschakeld</string>
+  <string name="tor_settings_confirm_disable_title">Weet je zeker dat je Tor wilt uitschakelen?</string>
+  <string name="tor_settings_confirm_enable_title">Weet je zeker dat je Tor wilt inschakelen? Voor het beste resultaat is het aan te raden om ook een nieuwe wallet te starten.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Verbindingsstatus</string>
+  <string name="conndialog_summary_not_ok">Je hebt verbindingsproblemen. De app zal niet naar behoren functioneren.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_lightning">Lightning-peer</string>
+  <string name="conndialog_ok">Verbonden</string>
+  <string name="conndialog_not_ok">Verbinden…</string>
+
+</resources>

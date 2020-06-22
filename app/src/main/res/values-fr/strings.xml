@@ -91,7 +91,7 @@
 
   <string name="receive_address_label">Addresse</string>
   <string name="receive_power_save_disclaimer">Vous êtes en mode d\'économie d\'énergie. Pour recevoir le paiement, assurez vous que l\'application est démarrée et a accès à Internet</string>
-  <string name="receive_withdraw_button">Utilise un lien LNURL</string>
+  <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
   <string name="receive_swap_in_button">Afficher une adresse Bitcoin</string>
   <string name="receive_swap_in_error_message">Il y a eu une erreur dans la permutation avec une adresse Bitcoin on-chain…\n\nVeuillez réessayer.</string>
@@ -118,40 +118,48 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Coller une requête de paiement</string>
+  <string name="send_init_paste">Coller les données du presse-papier</string>
   <string name="send_init_reading">Lecture de la requête…</string>
 
   <string name="send_balance_prefix">Solde:</string>
   <string name="send_use_all_balance">Tout envoyer</string>
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
-  <string name="send_amount_error">Veuillez saisir un montant validate.</string>
+  <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
-  <string name="send_destination_label">Envoyer à</string>
+  <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_error_sending">Il y a eu une erreur interne lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
+  <string name="send_chain_fees_label">Fee rate</string>
+  <string name="send_chain_fees_unit">sat/byte</string>
+  <string name="send_chain_fees_description">Ce paiement est une transaction on-chain, plus lente et généralement plus chère. Des frais de minage vont être appliqués.</string>
+  <string name="send_chain_fees_feedback_invalid">Veuillez utiliser un fee-rate valide.</string>
+  <string name="send_chain_fees_feedback_20min">Avec ce fee rate, le paiement devrait être reçu d\'ici 30 minutes.</string>
+  <string name="send_chain_fees_feedback_1h">Avec ce fee rate, le paiement devrait être reçu d\'ici une heure.</string>
+  <string name="send_chain_fees_feedback_12h">Avec ce fee rate, le paiement devrait être reçu d\'ici douze heures.</string>
+  <string name="send_chain_fees_feedback_inf">Avec ce fee rate, le paiement ne devrait être reçu que dans au moins 12 heures.</string>
+  <string name="send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>
   <string name="send_swap_in_progress">Echange en cours…</string>
   <string name="send_swap_error">L\'échange a échoué. Veuillez réessayer.</string>
   <string name="send_swap_required_desc">Le destinataire de ce paiement est une adresse Bitcoin, il faut d\'abord faire un échange.</string>
-  <string name="send_swap_required_button">Demander l\'échange</string>
+  <string name="send_swap_required_button">Préparer transaction</string>
   <string name="send_swap_complete_recap_amount">Montant</string>
   <string name="send_swap_complete_recap_fee">Frais de minage</string>
   <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">Le montant total après échange dépasse votre solde.\n\nDiminuez le montant à envoyer, ou bien essayer plus tard lorsque les frais de minage sur le réseau Bitcoin auront diminué.</string>
+  <string name="send_swap_complete_cannot_afford">Le total après application des frais de minage dépasse votre solde.</string>
 
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Donner accès à la caméra du téléphone</string>
-  <string name="scan_instructions">Placer le QR code de la requête de paiement\ndans le rectangle pour la scanner</string>
+  <string name="scan_instructions">Placer le QR code\ndans le rectangle pour le scanner</string>
   <string name="scan_state_reading">Lecture de la requête</string>
 
-  <string name="scan_error_default">Cette requête de paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
   <string name="scan_error_expired">Ce paiement a expiré.</string>
   <string name="scan_error_pay_to_self">Vous ne pouvez pas vous payer vous-même.</string>
   <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que vous.</string>
-  <string name="scan_error_lnurl_unsupported">Cet LNURL n\'est pas encore supporté!</string>
+  <string name="scan_error_lnurl_unsupported">Ce type de LNURL n\'est pas encore supporté!</string>
+  <string name="scan_error_invalid_scan">Cette donnée n\'est pas valide.\nVeuillez réessayer.</string>
 
   <string name="scan_amountless_legacy_title">Attention</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -265,14 +273,13 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configuration</string>
-  <string name="menu_send">Envoyer</string>
+  <string name="menu_send">Scanner</string>
   <string name="menu_receive">Recevoir</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
   <string name="initwallet_create">Créer un nouveau portefeuille</string>
   <string name="initwallet_restore">Restaurer un portefeuille existant</string>
-
 
   <!-- //////////////// main //////////////////// -->
 
@@ -394,6 +401,16 @@
 
   <string name="seedsec_bio_prompt_title">Activer la protection biométrique</string>
   <string name="seedsec_bio_prompt_negative">Annuler</string>
+
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions"><![CDATA[Vous pouvez utiliser votre wallet pour signer et autoriser de façon anonyme une action sur le service suivant:<br/><br/><b>%1$s</b><br/><br/>Aucune information personnelle ne sera partagée avec ce service.]]></string>
+  <string name="lnurl_auth_button">Autoriser</string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Autorisation en cours avec <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_success">Autorisation réussie.</string>
+  <string name="lnurl_auth_failure">Échec de l\'autorisation.\n\nDétails de l\'erreur: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">La connexion au service %1$s a échoué.</string>
+  <string name="lnurl_auth_failure_remote_details">Le service a renvoyé l\'erreur suivante: %1$s</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

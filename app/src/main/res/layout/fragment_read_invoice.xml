@@ -20,7 +20,7 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.send.ReadingState" />
+    <import type="fr.acinq.phoenix.send.ReadInputState" />
 
     <variable
       name="model"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_square"
         android:padding="@dimen/space_md_p"
-        app:enableOrFade="@{model.readingState == ReadingState.SCANNING}"
+        app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_clipboard"
         app:layout_constraintTop_toTopOf="parent"
         app:text="@string/send_init_paste" />
@@ -119,6 +119,7 @@
       app:text_size="@dimen/text_lg" />
 
     <TextView
+      android:id="@+id/error_message"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="@dimen/space_lg"
@@ -126,8 +127,7 @@
       android:drawableStart="@drawable/ic_alert_triangle"
       android:drawableTint="?attr/negativeColor"
       android:padding="@dimen/space_md_p"
-      android:text="@{model.errorMessage}"
-      android:visibility="@{model.readingState == ReadingState.ERROR}"
+      android:visibility="@{model.inputState instanceof ReadInputState.Error}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintEnd_toEndOf="parent"
@@ -139,7 +139,7 @@
       android:layout_height="wrap_content"
       android:background="@drawable/rounded"
       android:padding="@dimen/space_md"
-      android:visibility="@{model.readingState == ReadingState.READING}"
+      android:visibility="@{model.inputState instanceof ReadInputState.Reading}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintEnd_toEndOf="parent"

@@ -25,10 +25,8 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.common.base.Strings
@@ -50,7 +48,6 @@ class ElectrumServerFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsElectrumServerBinding
-  private lateinit var model: ElectrumServerViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsElectrumServerBinding.inflate(inflater, container, false)
@@ -60,7 +57,6 @@ class ElectrumServerFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(ElectrumServerViewModel::class.java)
     app.state.observe(viewLifecycleOwner, Observer {
       when (it) {
         is KitState.Started -> {
@@ -104,7 +100,6 @@ class ElectrumServerFragment : BaseFragment() {
         }
       }
     })
-    mBinding.model = model
   }
 
   override fun onStart() {
@@ -121,28 +116,42 @@ class ElectrumServerFragment : BaseFragment() {
 
   private fun getElectrumDialog(context: Context): AlertDialog {
     val view = layoutInflater.inflate(R.layout.dialog_electrum, null)
-    val sslWarning = view.findViewById<TextView>(R.id.elec_dialog_ssl)
-    val checkbox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
-    val inputLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
-    val inputValue = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
+    val useCustomElectrumBox = view.findViewById<CheckBox>(R.id.elec_dialog_checkbox)
+    val addressLabel = view.findViewById<TextView>(R.id.elec_dialog_input_label)
+    val addressInput = view.findViewById<TextInputEditText>(R.id.elec_dialog_input_value)
+    val sslLayout = view.findViewById<View>(R.id.elec_dialog_ssl)
+    val sslInfoText = view.findViewById<TextView>(R.id.elec_dialog_ssl_info)
+    val sslForceCheckbox = view.findViewById<CheckBox>(R.id.elec_dialog_ssl_force_checkbox)
     val currentPrefsAddress = Prefs.getElectrumServer(context)
 
     fun updateState(isChecked: Boolean) {
-      BindingHelpers.enableOrFade(inputLabel, isChecked)
-      BindingHelpers.enableOrFade(inputValue, isChecked)
-      BindingHelpers.enableOrFade(sslWarning, isChecked)
+      BindingHelpers.enableOrFade(addressLabel, isChecked)
+      BindingHelpers.enableOrFade(addressInput, isChecked)
+      BindingHelpers.enableOrFade(sslLayout, isChecked)
     }
 
-    checkbox.setOnCheckedChangeListener { v, isChecked -> updateState(isChecked) }
+    fun isOnion(address: String) = address.split(":").first().endsWith(".onion")
 
-    if (Strings.isNullOrEmpty(currentPrefsAddress)) {
-      checkbox.isChecked = false
+    fun updateSSLLayout(input: String) {
+      val isOnion = isOnion(input)
+      BindingHelpers.show(sslInfoText, !isOnion)
+      BindingHelpers.show(sslForceCheckbox, isOnion)
+    }
+
+    useCustomElectrumBox.setOnCheckedChangeListener { _, isChecked -> updateState(isChecked) }
+    addressInput.addTextChangedListener { updateSSLLayout(it.toString()) }
+
+    // initial state
+    if (currentPrefsAddress.isBlank()) {
+      useCustomElectrumBox.isChecked = false
       updateState(false)
     } else {
-      checkbox.isChecked = true
-      inputValue.setText(currentPrefsAddress)
+      useCustomElectrumBox.isChecked = true
+      addressInput.setText(currentPrefsAddress)
       updateState(true)
     }
+    updateSSLLayout(currentPrefsAddress)
+    sslForceCheckbox.isChecked = Prefs.getForceElectrumSSL(context)
 
     val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
       .setView(view)
@@ -153,11 +162,14 @@ class ElectrumServerFragment : BaseFragment() {
     dialog.setOnShowListener {
       val confirmButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
       confirmButton.setOnClickListener {
-        val address = inputValue.text.toString()
-        if (checkbox.isChecked && Strings.isNullOrEmpty(address)) {
+        val address = addressInput.text.toString()
+        if (useCustomElectrumBox.isChecked && address.isBlank()) {
           Toast.makeText(context, R.string.electrum_empty_custom_address, Toast.LENGTH_SHORT).show()
         } else {
-          Prefs.saveElectrumServer(context, if (checkbox.isChecked) inputValue.text.toString() else "")
+          Prefs.saveElectrumServer(context, if (useCustomElectrumBox.isChecked) address else "")
+          if (isOnion(address)) {
+            Prefs.saveForceElectrumSSL(context, sslForceCheckbox.isChecked)
+          }
           dialog.dismiss()
           if (app.state.value is KitState.Started) {
             app.shutdown()
@@ -171,19 +183,4 @@ class ElectrumServerFragment : BaseFragment() {
 
     return dialog
   }
-}
-
-enum class ElectrumServerState {
-  INIT, IN_PROGRESS, DONE, ERROR
-}
-
-class ElectrumServerViewModel : ViewModel() {
-
-  private val log = LoggerFactory.getLogger(this::class.java)
-  val state = MutableLiveData<ElectrumServerState>()
-
-  init {
-    state.value = ElectrumServerState.INIT
-  }
-
 }

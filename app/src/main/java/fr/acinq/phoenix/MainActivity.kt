@@ -59,7 +59,9 @@ class MainActivity : AppCompatActivity() {
       if (Prefs.isTorEnabled(applicationContext)) {
         app.reconnectTor()
       }
-      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = true ; this })
+      app.networkInfo.value?.apply {
+        app.networkInfo.postValue(copy(networkConnected = true))
+      }
       app.reconnectToPeer()
     }
 
@@ -76,7 +78,9 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      app.networkInfo.postValue(app.networkInfo.value?.run { networkConnected = false ; this })
+      app.networkInfo.value?.apply {
+        app.networkInfo.postValue(copy(networkConnected = false))
+      }
     }
   }
 
@@ -155,8 +159,8 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun handleUriIntent() {
-    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value}")
-    if (app.state.value is KitState.Started && app.currentURIIntent.value != null) {
+    log.debug("handle intent=${app.currentURIIntent.value} in state=${app.state.value?.javaClass?.simpleName}")
+    if (app.state.value is KitState.Started && app.currentURIIntent.value != null && app.currentNav.value != R.id.startup_fragment) {
       findNavController(R.id.nav_host_main).navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
       app.currentURIIntent.value = null
     }

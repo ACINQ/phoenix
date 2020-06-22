@@ -55,7 +55,7 @@ class ForceCloseFragment : BaseFragment() {
     model = ViewModelProvider(this).get(ForceCloseViewModel::class.java)
     mBinding.model = model
     val finalAddress = try {
-      app.kit!!.wallet().finalAddress.value().get().get()
+      app.kit!!.wallet().receiveAddress.value().get().get()
     } catch (e: Exception) {
       getString(R.string.utils_unknown)
     }

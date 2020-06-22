@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils.customviews
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.Spanned
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -27,8 +28,9 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.CustomProgressTextViewBinding
 
 class ProgressTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = R.style.default_theme) : ConstraintLayout(context, attrs, defStyle) {
+  val mBinding = DataBindingUtil.inflate<CustomProgressTextViewBinding>(LayoutInflater.from(getContext()), R.layout.custom_progress_text_view, this, true)
+
   init {
-    val mBinding = DataBindingUtil.inflate<CustomProgressTextViewBinding>(LayoutInflater.from(getContext()), R.layout.custom_progress_text_view, this, true)
     attrs?.let {
       val arr = context.obtainStyledAttributes(it, R.styleable.ProgressTextView, 0, defStyle)
       mBinding.label.text = arr.getString(R.styleable.ProgressTextView_text)
@@ -46,5 +48,9 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
       }
       arr.recycle()
     }
+  }
+
+  fun setText(s: Spanned) {
+    mBinding.label.text = s
   }
 }

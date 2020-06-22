@@ -16,11 +16,23 @@
 
 package fr.acinq.phoenix.utils
 
+import java.lang.IllegalArgumentException
+
+// -- startup exception
+class InvalidElectrumAddress(val address: String) : Exception(address)
 class TorSetupException(val s: String) : Exception(s)
 class NetworkException : RuntimeException()
 class KitNotInitialized : RuntimeException("kit is not initialized")
+
+// -- Channels errors
+class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
+
+// -- payment exceptions
 class InsufficientBalance : RuntimeException()
 class SwapOutInsufficientAmount : RuntimeException()
+
+// -- parsing exceptions
+class UnreadableLightningObject(message: String): IllegalArgumentException(message)
 class BitcoinURIParseException : Exception {
   constructor(s: String) : super(s)
 

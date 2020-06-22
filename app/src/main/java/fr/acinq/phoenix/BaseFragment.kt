@@ -36,7 +36,9 @@ abstract class BaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    app = ViewModelProvider(activity!!).get(AppViewModel::class.java)
+    activity?.let {
+      app = ViewModelProvider(it).get(AppViewModel::class.java)
+    } ?: log.error("app model could not be set because of missing activity")
     app.state.observe(viewLifecycleOwner, Observer {
       handleKitState(it)
     })
@@ -47,7 +49,7 @@ abstract class BaseFragment : Fragment() {
    */
   open fun handleKitState(state: KitState) {
     if (state !is KitState.Started) {
-      if (context != null && !app.hasWalletBeenSetup(context!!)) {
+      if (context != null && !app.hasWalletBeenSetup(requireContext())) {
         log.info("wallet has not been initialized, moving to init")
         findNavController().navigate(R.id.global_action_any_to_init_wallet)
       } else {
