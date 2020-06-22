@@ -203,6 +203,7 @@
   <string name="settings_electrum">Servidor Electrum</string>
   <string name="settings_mutual_close">Encerrar canais</string>
   <string name="settings_force_close">Zona de perigo</string>
+  <string name="settings_about">Sobre</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -475,5 +476,19 @@
   <string name="conndialog_lightning">Par Lightning</string>
   <string name="conndialog_ok">Conectado</string>
   <string name="conndialog_not_ok">Conectando…</string>
+  
+   <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">Sobre</string>
+  <string name="about_version">Versão: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  A Phoenix é uma carteira Bitcoin que usa a rede Lightning para enviar e receber pagamentos.
+  <br/><br/>
+  É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
+  <br/><br/>
+  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com phishing.
+  <br/><br/>
+  Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
+  ]]></string>
 
 </resources>
