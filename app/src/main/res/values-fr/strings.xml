@@ -57,6 +57,7 @@
   <string name="startup_start_button">Redémarrer</string>
   <string name="startup_settings_button">Options</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
+  <string name="startup_error_electrum_address">L\'application n\'a pas pu démarrer. L\'adresse de votre serveur Electrum n\'est pas valide.\n\nVous pouvez corriger cela dans Configuration > Electrum.</string>
   <string name="startup_error_tor">Le service Tor n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
@@ -466,6 +467,7 @@
 
   <string name="electrum_dialog_checkbox">Utiliser un serveur Electrum particulier</string>
   <string name="electrum_dialog_ssl">Le serveur doit avoir un certificat valide</string>
+  <string name="electrum_dialog_ssl_tor">Également vérifier le certificat pour cette adresse en .onion</string>
   <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
   <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
 
