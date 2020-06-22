@@ -106,9 +106,9 @@
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
-  <string name="receive_swap_in_error_message">There was an error when swapping to an on-chain transaction…\n\nPlease try again.</string>
-  <string name="receive_swap_in_progress_message">Requesting a swap-in Bitcoin address…</string>
-  <string name="receive_swap_in_disclaimer_title">Receive on-chain</string>
+  <string name="receive_swap_in_error_message">There was an error when swapping to Bitcoin address…\n\nPlease try again.</string>
+  <string name="receive_swap_in_progress_message">Requesting a Bitcoin address…</string>
+  <string name="receive_swap_in_disclaimer_title">Receive with a Bitcoin address</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
   A standard Bitcoin address will be displayed next.
   <br /><br />
@@ -154,7 +154,7 @@
   <string name="send_pay_button">Pay</string>
   <string name="send_swap_in_progress">Preparing transaction</string>
   <string name="send_swap_error">Swap to chain has failed. Please try again.</string>
-  <string name="send_swap_required_desc">This is a bitcoin address, the payment will be a swap.</string>
+  <string name="send_swap_required_desc">This is a Bitcoin address, the payment will be a swap.</string>
   <string name="send_swap_required_button">Prepare transaction</string>
   <string name="send_swap_complete_recap_amount">Amount</string>
   <string name="send_swap_complete_recap_fee">Miner Fee</string>
@@ -164,7 +164,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Grant camera permission</string>
-  <string name="scan_instructions">Scan a QR code containing a payment request, a bitcoin address or a LNURL</string>
+  <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
   <string name="scan_state_reading">Reading data</string>
 
   <string name="scan_error_expired">Payment has expired.</string>
