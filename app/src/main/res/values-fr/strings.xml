@@ -298,7 +298,7 @@
 
   <string name="inappnotif_set_up_pin">Votre portefeuille n\'est pas protégé.</string>
   <string name="inappnotif_set_up_pin_action">Définir un code d\'accès</string>
-  <string name="inappnotif_mnemonics_never_seen">Merci d\'utiliser Phoenix. Avez-vous sauvegardé votre portefeuille?</string>
+  <string name="inappnotif_mnemonics_never_seen">Merci d\'utiliser Phoenix. Veuillez sauvegarder votre portefeuille pour ne pas perdre vos bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Sauvegarder mon portefeuille</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix a besoin de pouvoir travailler en tâche de fond de temps en temps. Assurez vous que votre système ne tue pas cette appli à des finds d\'économie de batterie.</string>
   <string name="inappnotif_upgrade">Une mise à jour pour cette application est disponible.</string>
