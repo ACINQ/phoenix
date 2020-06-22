@@ -309,7 +309,7 @@
   <string name="displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
   <string name="displayseed_error_wrong_password">PIN incorreto.</string>
   <string name="displayseed_instructions"><![CDATA[
-    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
+    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira e permite o acesso total aos fundos contidos nela.
     <br /><br />
     <b>Não compartilhe com ninguém. Qualquer pessoa que tenha acesso à sua lista de palavras pode roubar seus bitcoins.
     <br /><br />
