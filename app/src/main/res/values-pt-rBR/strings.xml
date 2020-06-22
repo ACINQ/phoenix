@@ -118,7 +118,7 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Colar solicitação de pagamento</string>
+  <string name="send_init_paste">Colar dados da área de transferência</string>
   <string name="send_init_reading">Lendo…</string>
 
   <string name="send_balance_prefix">Saldo:</string>
@@ -152,14 +152,15 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Leia um código QR com solicitação de pagamento ou endereço Bitcoin</string>
-  <string name="scan_state_reading">Lendo solicitação de pagamento</string>
+  <string name="scan_instructions">Leia um código QR com solicitação de pagamento, endereço bitcoin ou uma LNURL</string>
+  <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_default">Esta não é uma solicitação de pagamento válida.\n\nTente novamente.</string>
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
-  <string name="scan_error_invalid_chain">Esta cobrança não usa o mesmo blockchain da sua carteira.</string>
-  <string name="scan_error_lnurl_unsupported">Esta LNURL ainda não é suportada!</string>
+  <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
+  <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportada!</string>
+  <string name="scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -273,7 +274,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Enviar</string>
+  <string name="menu_send">Ler</string>
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
@@ -403,6 +404,16 @@
 
   <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
   <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
+  <string name="lnurl_auth_button">Entrar</string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Acessando <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
+  <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
+  <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
