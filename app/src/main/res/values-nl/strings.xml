@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Importeer geen seed die NIET door deze applicatie is aangemaakt.\n\nZorg er ook voor dat je geen andere Phoenix wallet hebt met dezelfde seed.</string>
   <string name="restore_disclaimer_checkbox">Ik begrijp het.</string>
   <string name="restore_disclaimer_next">Volgende</string>
-  <string name="restore_instructions">De seed van je wallet is een lijst met 12 Engelse woorden. Passphrases zijn niet ondersteund.</string>
+  <string name="restore_instructions">De seed van je wallet is een lijst met 12 Engelse woorden.</string>
   <string name="restore_mnemonics_label">Gebruik je toetsenbord om de seed in te voeren:</string>
   <string name="restore_in_progress">Wallet herstellen…</string>
   <string name="restore_import_button">Importeer</string>

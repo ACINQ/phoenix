@@ -33,7 +33,7 @@
   <string name="restore_disclaimer_message">N\'importez pas ici une seed qui n\'aurait pas été créée avec une application Phoenix.\n\nPar ailleurs, pour éviter tout conflit, assurez vous que vous n\'avez une autre application Phoenix sur un autre téléphone qui utiliserait la même seed.</string>
   <string name="restore_disclaimer_checkbox">Je comprends.</string>
   <string name="restore_disclaimer_next">Suivant</string>
-  <string name="restore_instructions">La seed de votre portefeuille est une liste de 12 mots anglais. Notez que les passphrase additionnelles ne sont pas supportées.</string>
+  <string name="restore_instructions">La seed de votre portefeuille est une liste de 12 mots anglais.</string>
   <string name="restore_mnemonics_label">Utilisez le clavier virtuel ci-dessous pour entrer votre liste de mots, séparés par un espace:</string>
   <string name="restore_in_progress">Restauration du portefeuille…</string>
   <string name="restore_import_button">Restaurer</string>

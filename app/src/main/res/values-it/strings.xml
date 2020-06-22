@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Non importare un seed che non è stato creato da quest\'app.\n\nInoltre, assicurati di non avere un altra app Phoenix aperta con lo stesso seed.</string>
   <string name="restore_disclaimer_checkbox">Ho capito.</string>
   <string name="restore_disclaimer_next">Avanti</string>
-  <string name="restore_instructions">Il seed del tuo wallet è una lista di 12 parole inglesi. Nota bene che l\'uso di una passphrase non è supportato.</string>
+  <string name="restore_instructions">Il seed del tuo wallet è una lista di 12 parole inglesi.</string>
   <string name="restore_mnemonics_label">Usa la seguente tastiera per inserire il tuo seed:</string>
   <string name="restore_in_progress">Ripristino del wallet…</string>
   <string name="restore_import_button">Importa</string>

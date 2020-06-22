@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Neimportujte seed, který NEBYL vytvořen v této aplikaci. \n\nZároveň se ujistěte že nemáte spuštěnou jinou Phoenix peněženku se stejným seedem.</string>
   <string name="restore_disclaimer_checkbox">Ano, rozumím.</string>
   <string name="restore_disclaimer_next">Další</string>
-  <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov. Heslo peněženky není podporováno.</string>
+  <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov.</string>
   <string name="restore_mnemonics_label">Použijte klávesnici k zadání seedu:</string>
   <string name="restore_in_progress">Obnovování peněženky…</string>
   <string name="restore_import_button">Importovat</string>
