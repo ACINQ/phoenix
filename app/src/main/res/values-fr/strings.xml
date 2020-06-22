@@ -195,7 +195,7 @@
   <string name="settings_display_prefs">Affichage</string>
   <string name="settings_security_title">Sécurité</string>
   <string name="settings_display_seed">Phrase de sauvegarde</string>
-  <string name="settings_seed_security">Accès à l\'application</string>
+  <string name="settings_seed_security">Contrôle d\'accès</string>
   <string name="settings_advanced_title">Avancé</string>
   <string name="settings_fees">Configuration des frais de transaction</string>
   <string name="settings_list_channels">Mes canaux de paiement</string>
@@ -306,18 +306,28 @@
   <!-- //////////////// display seed //////////////// -->
 
   <string name="displayseed_title">Phrase de récupération du portefeuille</string>
-  <string name="displayseed_authenticate_button">Afficher la seed du portefeuille.</string>
+  <string name="displayseed_authenticate_button">Afficher ma seed</string>
   <string name="displayseed_loading">Déverrouillage de la seed…</string>
-  <string name="displayseed_error">La seed n\'a pas pu être lue. Veuillez réessayer.\n\nCause: %1$s</string>
+  <string name="displayseed_error_generic">Échec du déverrouillage.\nVeuillez réessayer.</string>
+  <string name="displayseed_error_wrong_password">Le code PIN est incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
-  Cette liste de 12 mots anglais est la graine (ou seed) de votre portefeuille. Vous devez la sauvegarder dans un endroit sûr (pas sur ce téléphone) !
-  <br /><br />
-  <b>Cette liste est personnelle et donne accès à vos fonds, ne la partagez avec personne. Ne la perdez pas.</b> Si vous perdez votre liste de mots et votre téléphone, vous ne pourrez plus accéder à vos fonds.
+    La seed (ou graine) est une liste de 12 mots anglais. C\'est la sauvegarde du portefeuille. Elle donne accès à vos fonds.
+    <br /><br />
+    <strong>Vous seul possédez cette seed. Elle doit rester personnelle.</strong>
+    <br /><br />
+    <strong>Ne la donnez à personne</strong>.
+    <br />
+    Prenez garde au hameçonnage. Les développeurs de Phoenix ne vous demanderont jamais votre seed.
+    <br /><br />
+    <strong>Ne la perdez pas</strong>.
+    <br />
+    Sauvegardez votre seed dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre seed et votre téléphone, vous ne pourrez plus accéder à vos fonds.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 avec chemin de dérivation standard BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">J\'ai bien sauvegardé ma seed dans un endroit sûr.</string>
   <string name="displayseed_has_saved_seed_button">Confirmer</string>
+  <string name="displayseed_dialog_header">NE PAS PARTAGER.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 

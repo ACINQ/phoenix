@@ -147,7 +147,6 @@
   <string name="scan_instructions">Umístěte QR kód platebního požadavku dovnitř obdélníčku, aby mohl být přečten</string>
   <string name="scan_state_reading">Čtení platebního požadavku</string>
 
-  <string name="scan_error_default">Toto není platná žádost o platbu.\n\nProsím, zkuste to znovu.</string>
   <string name="scan_error_expired">Platba vypršela.</string>
   <string name="scan_error_pay_to_self">Nemůžete platit sám sobě.</string>
   <string name="scan_error_invalid_chain">Tento požadavek nepoužívá stejný blockchain jako vaše peněženka.</string>
@@ -299,7 +298,8 @@
   <string name="displayseed_title">Seznam slov k obnovení peněženky</string>
   <string name="displayseed_authenticate_button">Zobrazit seed</string>
   <string name="displayseed_loading">Odemykám seed…</string>
-  <string name="displayseed_error">Seed nemohl být načten. Prosím, zkuste to znovu.\n\nDůvod: %1$s</string>
+  <string name="displayseed_error_generic">Seed nemohl být načten. Prosím, zkuste to znovu.</string>
+  <string name="displayseed_error_wrong_password">Chybný PIN kód.</string>
   <string name="displayseed_instructions"><![CDATA[
     Tento seznam slov je záloha vaší peněženky. Uložte je někam bezpečně (ne do tohoto telefonu)!
     <br /><br />

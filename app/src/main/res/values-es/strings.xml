@@ -138,7 +138,6 @@
   <string name="scan_request_camera_access">Permitir acceso a la cámara</string>
   <string name="scan_instructions">Coloca un código QR de solicitud de pago\ndentro del rectángulo para escanearlo</string>
   <string name="scan_state_reading">Leyendo solicitud de pago</string>
-  <string name="scan_error_default">Esta no es una solicitud de pago válida.\n\nPor favor inténtalo de nuevo.</string>
   <string name="scan_error_expired">El pago ha expirado.</string>
   <string name="scan_error_pay_to_self">No puedes auto enviarte un pago.</string>
   <string name="scan_error_invalid_chain">Esta factura no usa la misma blockchain que tu wallet.</string>
@@ -285,7 +284,8 @@
   <string name="displayseed_title">Frase de recuperación de la wallet</string>
   <string name="displayseed_authenticate_button">Mostrar seed</string>
   <string name="displayseed_loading">Desbloquear seed…</string>
-  <string name="displayseed_error">Error al leer la seed. Por favor inténtalo de nuevo.\n\nRazón: %1$s</string>
+  <string name="displayseed_error_generic">Error al leer la seed. Por favor inténtalo de nuevo.</string>
+  <string name="displayseed_error_wrong_password">PIN incorrecto.</string>
   <string name="displayseed_instructions"><![CDATA[
     Esta lista de palabras es la copia de seguridad de tu wallet. ¡Guárdala en un lugar seguro (no en este teléfono)!
     <br /><br />

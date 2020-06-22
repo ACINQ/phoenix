@@ -144,7 +144,6 @@
   <string name="scan_instructions">Inquadta il QR di una richiesta di pagamento\nall\'interno del rettangolo.</string>
   <string name="scan_state_reading">Leggendo la richiesta di pagamento</string>
 
-  <string name="scan_error_default">Questa non è una richiesta di pagamento valida.\n\nPer favore prova di nuovo.</string>
   <string name="scan_error_expired">Il pagamento è scaduto.</string>
   <string name="scan_error_pay_to_self">Non puoi pagare te stesso.</string>
   <string name="scan_error_invalid_chain">Questa richesta di pagamento non usa la stessa blockchain del tuo wallet.</string>
@@ -295,7 +294,8 @@
   <string name="displayseed_title">Frase di recupero wallet</string>
   <string name="displayseed_authenticate_button">Mostra seed</string>
   <string name="displayseed_loading">Sbloccando il seed…</string>
-  <string name="displayseed_error">Impossibile leggere il seed. Per favore riprova.\n\nMotivo: %1$s</string>
+  <string name="displayseed_error_generic">Impossibile leggere il seed. Per favore riprova.</string>
+  <string name="displayseed_error_wrong_password">PIN errato.</string>
   <string name="displayseed_instructions"><![CDATA[
     Questa lista di parole è il backup del tuo wallet. Salvala in un luogo sicuro (non su questo telefono)!
     <br /><br />

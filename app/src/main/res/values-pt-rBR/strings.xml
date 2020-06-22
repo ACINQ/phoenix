@@ -155,7 +155,6 @@
   <string name="scan_instructions">Leia um código QR com solicitação de pagamento ou endereço Bitcoin</string>
   <string name="scan_state_reading">Lendo solicitação de pagamento</string>
 
-  <string name="scan_error_default">Esta não é uma solicitação de pagamento válida.\n\nTente novamente.</string>
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
   <string name="scan_error_invalid_chain">Esta cobrança não usa o mesmo blockchain da sua carteira.</string>
@@ -307,7 +306,8 @@
   <string name="displayseed_title">Frase de recuperação da carteira</string>
   <string name="displayseed_authenticate_button">Mostrar seed</string>
   <string name="displayseed_loading">Desbloqueando seed…</string>
-  <string name="displayseed_error">A seed não pôde ser lida. Tente novamente.\n\nMotivo: %1$s</string>
+  <string name="displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
+  <string name="displayseed_error_wrong_password">PIN incorreto.</string>
   <string name="displayseed_instructions"><![CDATA[
     Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
     <br /><br />

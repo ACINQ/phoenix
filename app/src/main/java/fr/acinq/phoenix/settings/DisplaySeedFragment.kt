@@ -16,12 +16,12 @@
 
 package fr.acinq.phoenix.settings
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.CheckBox
+import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.UiThread
@@ -36,10 +36,10 @@ import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
+import java.security.GeneralSecurityException
 
 class DisplaySeedFragment : BaseFragment() {
 
@@ -62,42 +62,23 @@ class DisplaySeedFragment : BaseFragment() {
     model = ViewModelProvider(this).get(DisplaySeedViewModel::class.java)
     mBinding.model = model
     model.state.observe(viewLifecycleOwner, Observer { state ->
-      if (state == DisplaySeedState.INIT) {
-        unlockWallet()
+      when (state) {
+        is DisplaySeedState.Error.Generic -> {
+          mBinding.errorView.text = getString(R.string.displayseed_error_generic)
+        }
+        is DisplaySeedState.Error.WrongPassword -> {
+          mBinding.errorView.text = getString(R.string.displayseed_error_wrong_password)
+        }
+        is DisplaySeedState.Done -> {
+          context?.run { getSeedDialog(this, state.words) }?.show()
+        }
       }
-    })
-    model.words.observe(viewLifecycleOwner, Observer { words ->
-      mBinding.wordsTable.removeAllViews()
-      var i = 0
-      while (i < words.size / 2) {
-        val row = TableRow(context)
-        row.gravity = Gravity.CENTER
-        row.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT)
-        row.addView(buildWordView(i, words[i], true))
-        row.addView(buildWordView(i + words.size / 2, words[i + (words.size / 2)], false))
-        mBinding.wordsTable.addView(row)
-        i += 1
-      }
-    })
-    model.errorMessage.observe(viewLifecycleOwner, Observer {
-      mBinding.errorView.text = getString(R.string.displayseed_error, it)
     })
   }
 
   override fun onStart() {
     super.onStart()
-    refreshBackupWarning()
-    context?.let {
-      mBinding.backupWarningButton.setOnClickListener { _ ->
-        if (mBinding.backupWarningCheckbox.isChecked) {
-          Prefs.setMnemonicsSeenTimestamp(it, System.currentTimeMillis())
-          refreshBackupWarning()
-          findNavController().navigate(R.id.global_action_any_to_main)
-        }
-      }
-    }
     mBinding.unlockButton.setOnClickListener { unlockWallet() }
-    mBinding.backupWarningCheckbox.setOnCheckedChangeListener { _, isChecked -> model.userHasSavedSeed.value = isChecked }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
   }
 
@@ -107,7 +88,7 @@ class DisplaySeedFragment : BaseFragment() {
   }
 
   private fun unlockWallet() {
-    if (model.state.value == DisplaySeedState.INIT) {
+    if (model.state.value !is DisplaySeedState.Unlocking) {
       context?.let { ctx ->
         mPinDialog = getPinDialog()
         when {
@@ -117,13 +98,12 @@ class DisplaySeedFragment : BaseFragment() {
               mPinDialog?.show()
             }, successCallback = {
               try {
-                model.state.value = DisplaySeedState.UNLOCKING
+                model.state.value = DisplaySeedState.Unlocking
                 val pin = KeystoreHelper.decryptPin(ctx)?.toString(Charsets.UTF_8)
                 model.getSeed(ctx, pin!!)
               } catch (e: Exception) {
                 log.error("could not decrypt pin: ", e)
-                model.state.value = DisplaySeedState.ERROR
-                model.errorMessage.value = getString(R.string.displayseed_error)
+                model.state.value = DisplaySeedState.Error.Generic
               }
             })
           Prefs.getIsSeedEncrypted(ctx) -> {
@@ -131,7 +111,7 @@ class DisplaySeedFragment : BaseFragment() {
             mPinDialog?.show()
           }
           else -> {
-            model.state.value = DisplaySeedState.UNLOCKING
+            model.state.value = DisplaySeedState.Unlocking
             model.getSeed(ctx, Constants.DEFAULT_PIN)
           }
         }
@@ -139,17 +119,11 @@ class DisplaySeedFragment : BaseFragment() {
     }
   }
 
-  private fun refreshBackupWarning() {
-    context?.let {
-      model.showUserBackupWarning.value = Prefs.getMnemonicsSeenTimestamp(it) == 0L
-    }
-  }
-
   private fun getPinDialog(): PinDialog? {
     return mPinDialog ?: getPinDialog(object : PinDialog.PinDialogCallback {
       override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
         context?.let {
-          model.state.value = DisplaySeedState.UNLOCKING
+          model.state.value = DisplaySeedState.Unlocking
           model.getSeed(it, pinCode)
         }
         dialog.dismiss()
@@ -157,6 +131,49 @@ class DisplaySeedFragment : BaseFragment() {
 
       override fun onPinCancel(dialog: PinDialog) {}
     })
+  }
+
+  private fun getSeedDialog(context: Context, words: List<String>): AlertDialog {
+    val view = layoutInflater.inflate(R.layout.dialog_seed, null)
+    val wordsTable = view.findViewById<TableLayout>(R.id.seed_dialog_words_table)
+    val backupDoneCheckbox = view.findViewById<CheckBox>(R.id.seed_dialog_backup_done_checkbox)
+
+    // only show the backup checkbox if needed
+    BindingHelpers.show(backupDoneCheckbox, Prefs.getMnemonicsSeenTimestamp(context) == 0L)
+
+    wordsTable.removeAllViews()
+    var i = 0
+    while (i < words.size / 2) {
+      val row = TableRow(context)
+      row.gravity = Gravity.CENTER
+      row.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT)
+      row.addView(buildWordView(i, words[i], true))
+      row.addView(buildWordView(i + words.size / 2, words[i + (words.size / 2)], false))
+      wordsTable.addView(row)
+      i += 1
+    }
+
+    val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
+      .setView(view)
+      .setPositiveButton(R.string.btn_ok, null)
+      .create()
+
+    // disable screen capture
+    dialog.window?.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+
+    dialog.setOnShowListener {
+      val confirmButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+      confirmButton.setOnClickListener {
+        if (backupDoneCheckbox.isChecked) {
+          Prefs.setMnemonicsSeenTimestamp(context, System.currentTimeMillis())
+          dialog.dismiss()
+          findNavController().navigate(R.id.global_action_any_to_main)
+        } else {
+          dialog.dismiss()
+        }
+      }
+    }
+    return dialog
   }
 
   private fun buildWordView(i: Int, word: String, hasRightPadding: Boolean): TextView {
@@ -170,31 +187,35 @@ class DisplaySeedFragment : BaseFragment() {
   }
 }
 
-enum class DisplaySeedState {
-  INIT, UNLOCKING, DONE, ERROR
+sealed class DisplaySeedState {
+  object Init : DisplaySeedState()
+  object Unlocking : DisplaySeedState()
+  data class Done(val words: List<String>) : DisplaySeedState()
+  sealed class Error : DisplaySeedState() {
+    object WrongPassword : Error()
+    object Generic : Error()
+  }
 }
 
 class DisplaySeedViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(DisplaySeedViewModel::class.java)
+  val state = MutableLiveData<DisplaySeedState>()
 
-  val state = MutableLiveData(DisplaySeedState.INIT)
-  val errorMessage = MutableLiveData("")
-  val words = MutableLiveData<List<String>>()
-
-  val showUserBackupWarning = MutableLiveData(true)
-  val userHasSavedSeed = MutableLiveData(false)
+  init {
+    state.value = DisplaySeedState.Init
+  }
 
   @UiThread
   fun getSeed(context: Context, pin: String) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          words.postValue(String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8).split(" "))
-          state.postValue(DisplaySeedState.DONE)
-        } catch (t: Throwable) {
-          log.error("could not read seed: ", t)
-          state.postValue(DisplaySeedState.ERROR)
-          errorMessage.postValue(t.message)
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val words = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8).split(" ")
+        state.postValue(DisplaySeedState.Done(words))
+      } catch (t: Throwable) {
+        log.error("could not read seed: ", t)
+        when (t) {
+          is GeneralSecurityException -> state.postValue(DisplaySeedState.Error.WrongPassword)
+          else -> state.postValue(DisplaySeedState.Error.Generic)
         }
       }
     }

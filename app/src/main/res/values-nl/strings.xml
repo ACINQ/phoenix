@@ -145,7 +145,6 @@
   <string name="scan_instructions">Plaats een betalingsverzoek QR code\nin de rechthoek het om te scannen</string>
   <string name="scan_state_reading">Betalingsverzoek lezen</string>
 
-  <string name="scan_error_default">Dit is geen geldig betalingsverzoek.\n\nProbeer opnieuw.</string>
   <string name="scan_error_expired">Betaling is verlopen.</string>
   <string name="scan_error_pay_to_self">Je kan jezelf niet betalen.</string>
   <string name="scan_error_invalid_chain">Dit betalingsverzoek gebruikt niet dezelfde blockchain als je wallet.</string>
@@ -298,7 +297,8 @@
   <string name="displayseed_title">Wallet herstelzin</string>
   <string name="displayseed_authenticate_button">Laat seed zien</string>
   <string name="displayseed_loading">Seed ontgrendelen…</string>
-  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nFoutmelding: %1$s</string>
+  <string name="displayseed_error_generic">Kan seed niet lezen. Probeer opnieuw.</string>
+  <string name="displayseed_error_wrong_password">PIN is onjuist.</string>
   <string name="displayseed_instructions"><![CDATA[
     Deze woordenlijst is de backup van je wallet. Bewaar het op een veilige plek (niet op deze telefoon)!
     <br /><br />
