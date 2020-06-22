@@ -132,7 +132,7 @@
   <string name="send_pay_button">Betaal</string>
   <string name="send_swap_in_progress">Swap is bezig…</string>
   <string name="send_swap_error">Swap is mislukt. Probeer opnieuw.</string>
-  <string name="send_swap_required_desc">Dit is een bitcoinadres, de betaling wordt een swap.</string>
+  <string name="send_swap_required_desc">Dit is een Bitcoinadres, de betaling wordt een swap.</string>
   <string name="send_swap_required_button">Verzoek een swap</string>
   <string name="send_swap_complete_recap_amount">Bedrag</string>
   <string name="send_swap_complete_recap_fee">Miner Vergoeding</string>

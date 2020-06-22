@@ -90,12 +90,12 @@
   <string name="receive_power_save_disclaimer">Sei in modalità power save. Per ricevere il pagamento assicurati che l\'app possa essere eseguita in background.</string>
   <string name="receive_withdraw_button">Usa il link LNURL</string>
 
-  <string name="receive_swap_in_button">Mostra un indirizzo bitcoin</string>
+  <string name="receive_swap_in_button">Mostra un indirizzo Bitcoin</string>
   <string name="receive_swap_in_error_message">C\'è stato un errore scambiando con la transazione on-chain…\n\nPer favore riprova.</string>
   <string name="receive_swap_in_progress_message">Richiedendo un indirizzo per lo scambio…</string>
   <string name="receive_swap_in_disclaimer_title">Recevi on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  Di seguito vi verrà mostrato un indirizzo bitcoin.
+  Di seguito vi verrà mostrato un indirizzo Bitcoin.
   <br /><br />
   I fondi inviati a quest\'indirizzo saranno visibili sul tuo wallet dopo una conferma sulla chain.
   <br /><br />
@@ -131,7 +131,7 @@
   <string name="send_pay_button">Paga</string>
   <string name="send_swap_in_progress">Scambio in corso…</string>
   <string name="send_swap_error">Scambio fallito. Per favore riprova di nuovo.</string>
-  <string name="send_swap_required_desc">Questo è un indirizzo bitcoin, il pagamento sarà uno scambio.</string>
+  <string name="send_swap_required_desc">Questo è un indirizzo Bitcoin, il pagamento sarà uno scambio.</string>
   <string name="send_swap_required_button">Richiedi uno scambio</string>
   <string name="send_swap_complete_recap_amount">Ammontare</string>
   <string name="send_swap_complete_recap_fee">Commissioni miner</string>
@@ -209,10 +209,10 @@
   <string name="closechannels_channels_none">Al momento non hai canali che possono essere chiusi.\n\nVai a \'Lista canali\' per vedere lo stato dei tuoi canali.</string>
   <string name="closechannels_mutual_title">Svuota wallet</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    Usa questa pagina per svuotare il tuo wallet verso un indirizzo bitcoin.
+    Usa questa pagina per svuotare il tuo wallet verso un indirizzo Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">I fondi possono essere inviati an un wallet bitcoin. Assicurati che l\'indirizzo sia corretto prima dell\'invio.</string>
-  <string name="closechannels_mutual_input_hint">Inserisci l\'indirizzo bitcoin</string>
+  <string name="closechannels_mutual_input_instructions">I fondi possono essere inviati an un wallet Bitcoin. Assicurati che l\'indirizzo sia corretto prima dell\'invio.</string>
+  <string name="closechannels_mutual_input_hint">Inserisci l\'indirizzo Bitcoin</string>
   <string name="closechannels_mutual_button">Svuota il mio wallet</string>
   <string name="closechannels_force_title">Chiusura forzata</string>
   <string name="closechannels_force_instructions"><![CDATA[
