@@ -223,10 +223,9 @@
     <br/><br/>
     Het gedwongen sluiten van kanalen kost geld (om de on-chain vergoedingen te dekken) en zal ervoor zorgen dat je geld dagenlang vergrendeld zijn. <b>Verwijder de app niet totdat je kanalen volledig gesloten zijn of je zal geld kwijtraken</b>
     <br/><br/>
-    Fondsen zullen uiteindelijk verstuurd worden naar: %1$s
-    <br/><br/>
     <b>Gebruik deze functie niet als je niet volledig begrijpt wat het doet.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Fondsen zullen uiteindelijk verstuurd worden naar:</string>
   <string name="closechannels_force_button">Kanalen gedwongen sluiten</string>
   <string name="closechannels_confirm_dialog_message">Weet je zeker dat je wilt verdergaan?</string>
   <string name="closechannels_message_error">Er is een probleem opgetreden. Prober het later opnieuw.</string>

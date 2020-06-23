@@ -28,9 +28,9 @@
       android:paddingTop="@dimen/space_xxxs"
       android:paddingBottom="@dimen/space_xxxs"
       android:scaleType="fitCenter"
-      app:layout_constraintBottom_toBottomOf="@id/switch_button"
+      app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/switch_button"
+      app:layout_constraintTop_toTopOf="parent"
       tools:ignore="ContentDescription" />
 
     <Switch
@@ -52,10 +52,10 @@
       android:lineSpacingMultiplier="1"
       android:textSize="@dimen/text_lg"
       app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="@id/switch_button"
+      app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toStartOf="@id/switch_button"
       app:layout_constraintHorizontal_bias="0"
       app:layout_constraintStart_toEndOf="@id/icon"
-      app:layout_constraintTop_toTopOf="@id/switch_button" />
+      app:layout_constraintTop_toTopOf="parent" />
   </merge>
 </layout>

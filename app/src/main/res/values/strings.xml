@@ -248,10 +248,10 @@
     <br/><br/>
     Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
-    Funds will eventually be sent to: %1$s
-    <br/><br/>
     <b>Do not use this feature if you don\'t fully understand what it does.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Funds will eventually be sent to:</string>
+  <string name="closechannels_force_destination_desc">This address is derived from your seed and belongs to you.</string>
   <string name="closechannels_force_button">Force close channels</string>
   <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
   <string name="closechannels_message_error">There was a problem. Please try again later.</string>
@@ -322,7 +322,7 @@
   <string name="displayseed_title">Wallet recovery phrase</string>
   <string name="displayseed_authenticate_button">Display seed</string>
   <string name="displayseed_loading">Unlocking seed…</string>
-  <string name="displayseed_error_generic">Could not unlock seed.\nPlease try again.</string>
+  <string name="displayseed_error_generic">Could not unlock seed, please try again.</string>
   <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
     The seed of the wallet is a list of 12 english words. It is your wallet backup and gives full access to the funds in the wallet.

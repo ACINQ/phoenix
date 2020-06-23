@@ -30,7 +30,6 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".settings.DisplaySeedFragment">
 
     <fr.acinq.phoenix.utils.customviews.ActionBarView
@@ -43,58 +42,56 @@
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      android:fillViewport="true"
-      app:layout_constrainedHeight="true"
+      android:overScrollMode="never"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_md_p"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/square_border_hz">
 
         <TextView
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_md"
+          android:layout_marginStart="@dimen/space_md"
           android:text="@string/displayseed_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
+        <View
+          android:id="@+id/sep_1"
+          style="@style/HLineSeparator"
+          android:layout_marginTop="@dimen/space_lg"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/instructions" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/unlock_button"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_margin="@dimen/space_lg"
+          android:background="@drawable/button_bg_square"
           android:visibility="@{!(model.state instanceof DisplaySeedState.Unlocking)}"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
           app:icon="@drawable/ic_key"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/instructions"
+          app:layout_constraintTop_toBottomOf="@id/sep_1"
           app:text="@string/displayseed_authenticate_button" />
 
         <fr.acinq.phoenix.utils.customviews.ProgressTextView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_margin="@dimen/space_lg"
-          android:padding="@dimen/space_sm"
-          android:visibility="@{model.state instanceof DisplaySeedState.Unlocking}"
-          app:layout_constraintTop_toBottomOf="@id/instructions"
-          app:text="@string/displayseed_loading" />
-
-        <TextView
-          android:id="@+id/error_view"
+          android:id="@+id/unlocking"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
-          android:drawableStart="@drawable/ic_alert_triangle"
-          android:text="@string/displayseed_error_generic"
+          android:visibility="@{model.state instanceof DisplaySeedState.Unlocking}"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          android:visibility="@{model.state instanceof DisplaySeedState.Error}"
-          app:layout_constraintTop_toBottomOf="@id/unlock_button" />
+          app:layout_constraintTop_toBottomOf="@id/sep_1"
+          app:text="@string/displayseed_loading" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

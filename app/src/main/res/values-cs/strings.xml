@@ -225,10 +225,9 @@
     <br/><br/>
     Vynucené uzavření kanálů vás bude stát peníze (k zaplacení on-chain poplatků) a uzamkne vaše finance na několik dní. <b>Neodinstalovávejte tuto aplikaci, dokud nejsou vaše kanály plně uzavřené nebo přijdete o své peníze.</b>
     <br/><br/>
-    Finance budou odeslány na: %1$s
-    <br/><br/>
     <b>Nepoužívejte tuto funkci, pokud plně nechápete, jak funguje.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Finance budou odeslány na:</string>
   <string name="closechannels_force_button">Vynutit uzavření kanálů</string>
   <string name="closechannels_confirm_dialog_message">Jste si jistí, že chcete pokračovat?</string>
   <string name="closechannels_message_error">Nastala chyba. Prosím, zkuste to znovu později.</string>

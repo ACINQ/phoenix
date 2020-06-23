@@ -20,10 +20,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.CheckBox
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.UiThread
 import androidx.biometric.BiometricManager
 import androidx.lifecycle.*
@@ -64,10 +61,10 @@ class DisplaySeedFragment : BaseFragment() {
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
         is DisplaySeedState.Error.Generic -> {
-          mBinding.errorView.text = getString(R.string.displayseed_error_generic)
+          context?.let { Toast.makeText(it, getString(R.string.displayseed_error_generic), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Error.WrongPassword -> {
-          mBinding.errorView.text = getString(R.string.displayseed_error_wrong_password)
+          context?.let { Toast.makeText(it, getString(R.string.displayseed_error_wrong_password), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Done -> {
           context?.run { getSeedDialog(this, state.words) }?.show()

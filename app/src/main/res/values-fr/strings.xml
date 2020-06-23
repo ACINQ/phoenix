@@ -235,10 +235,10 @@
     <br/><br/>
     Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiements ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
     <br/><br/>
-    Les fonds seront envoyés in-fine à l\'adresse: %1$s
-    <br/><br/>
     <b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas bien ce qu\'elle fait.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Les fonds seront envoyés à:</string>
+  <string name="closechannels_force_destination_desc">Cette adresse est dérivée de votre seed et vous appartient.</string>
   <string name="closechannels_force_button">Forcer la clôture de mes canaux de paiement</string>
   <string name="closechannels_confirm_dialog_message">Etes-vous sûr de vouloir continuer?</string>
   <string name="closechannels_message_error">Un problème est survenu. Merci de réessayer plus tard.</string>
@@ -309,7 +309,7 @@
   <string name="displayseed_title">Phrase de récupération du portefeuille</string>
   <string name="displayseed_authenticate_button">Afficher ma seed</string>
   <string name="displayseed_loading">Déverrouillage de la seed…</string>
-  <string name="displayseed_error_generic">Échec du déverrouillage.\nVeuillez réessayer.</string>
+  <string name="displayseed_error_generic">Échec du déverrouillage, veuillez réessayer.</string>
   <string name="displayseed_error_wrong_password">Le code PIN est incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
     La seed (ou graine) est une liste de 12 mots anglais. C\'est la sauvegarde du portefeuille. Elle donne accès à vos fonds.

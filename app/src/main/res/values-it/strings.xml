@@ -222,10 +222,9 @@
     <br/><br/>
     La chiusura forzata dei canali comporta un costo aggiuntivo (le commissioni on-chain) e il blocco dei fondi per qualche giorno. <b> Non disinstallare l\'app finchè i tuoi canali sono completamente chiusi o perderai dei soldi.</b>
     <br/><br/>
-    I fondi verranno mandati a: %1$s
-    <br/><br/>
     <b>Non usare questa funzionalità se non comprendi appieno cosa fa.</b>
   ]]></string>
+  <string name="closechannels_force_destination">I fondi verranno mandati a:</string>
   <string name="closechannels_force_button">Chiusura forzata di tutti i canali</string>
   <string name="closechannels_confirm_dialog_message">Sei sicuro di voler procedere?</string>
   <string name="closechannels_message_error">C\'è stato un problema. Per favore riprova più tardi.</string>

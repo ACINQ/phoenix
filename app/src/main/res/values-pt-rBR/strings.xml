@@ -232,10 +232,9 @@
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
-    Os valores serão eventualmente enviados para: %1$s
-    <br/><br/>
     <b>Não use esse recurso se você não entender completamente o que ele faz.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
   <string name="closechannels_force_button">Forçar encerramento de canais</string>
   <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
   <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>

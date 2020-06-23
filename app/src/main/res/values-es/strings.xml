@@ -212,10 +212,9 @@
     <br/><br/>
     Forzar el cierre de canales te costará dinero (para cubrir las tarifas en la cadena de bloques) y hará que tus fondos estén bloqueados durante días. <b>No desinstales la aplicación hasta que tus canales estén completamente cerrados, o perderás tu dinero.</b>
     <br/><br/>
-    Los fondos eventualmente se enviarán a: %1$s
-    <br/><br/>
     <b>No uses esta función si no entiendes exactamente las consecuencias.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Los fondos eventualmente se enviarán a:</string>
   <string name="closechannels_force_button">Forzar el cierre de canales</string>
   <string name="closechannels_confirm_dialog_message">¿Aún así quieres proceder?</string>
   <string name="closechannels_message_error">Ha habido un problema. Por favor, inténtalo de nuevo más tarde.</string>
