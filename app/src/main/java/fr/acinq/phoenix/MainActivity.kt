@@ -59,9 +59,7 @@ class MainActivity : AppCompatActivity() {
       if (Prefs.isTorEnabled(applicationContext)) {
         app.reconnectTor()
       }
-      app.networkInfo.value?.apply {
-        app.networkInfo.postValue(copy(networkConnected = true))
-      }
+      app.internetConn.postValue(true)
       app.reconnectToPeer()
     }
 
@@ -78,9 +76,7 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      app.networkInfo.value?.apply {
-        app.networkInfo.postValue(copy(networkConnected = false))
-      }
+      app.internetConn.postValue(false)
     }
   }
 

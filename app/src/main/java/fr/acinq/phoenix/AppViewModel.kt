@@ -19,13 +19,13 @@ package fr.acinq.phoenix
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
-import akka.dispatch.Futures
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -73,7 +73,6 @@ import scala.collection.JavaConverters
 import scala.collection.immutable.Seq
 import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Either
@@ -85,6 +84,7 @@ import java.security.GeneralSecurityException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
@@ -94,6 +94,25 @@ data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(var networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
+
+class NetworkInfoLiveData(internetConn: MutableLiveData<Boolean>, electrumConn: MutableLiveData<ElectrumServer?>, torConn: MutableLiveData<HashMap<String, TorConnectionStatus>>, peerConn: MutableLiveData<Boolean>) : MediatorLiveData<NetworkInfo>() {
+  private fun valueOrDefault(): NetworkInfo = value ?: Constants.DEFAULT_NETWORK_INFO
+  init {
+    addSource(internetConn) {
+      value = valueOrDefault().copy(networkConnected = it)
+    }
+    addSource(electrumConn) {
+      value = valueOrDefault().copy(electrumServer = it)
+    }
+    addSource(torConn) {
+      value = valueOrDefault().copy(torConnections = it)
+    }
+    addSource(peerConn) {
+      value = valueOrDefault().copy(lightningConnected = it)
+    }
+    value = Constants.DEFAULT_NETWORK_INFO
+  }
+}
 
 sealed class KitState {
   object Off : KitState()
@@ -123,7 +142,13 @@ class AppViewModel : ViewModel() {
 
   val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
-  val networkInfo = MutableLiveData<NetworkInfo>()
+
+  val internetConn = MutableLiveData<Boolean>()
+  val electrumConn = MutableLiveData<ElectrumServer?>()
+  val torConn = MutableLiveData<HashMap<String, TorConnectionStatus>>()
+  val peerConn = MutableLiveData<Boolean>()
+  val networkInfo = NetworkInfoLiveData(internetConn, electrumConn, torConn, peerConn)
+
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
@@ -138,9 +163,14 @@ class AppViewModel : ViewModel() {
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
   init {
+    // Network info
+    internetConn.value = Constants.DEFAULT_NETWORK_INFO.networkConnected
+    peerConn.value = Constants.DEFAULT_NETWORK_INFO.lightningConnected
+    electrumConn.value = Constants.DEFAULT_NETWORK_INFO.electrumServer
+    torConn.value = Constants.DEFAULT_NETWORK_INFO.torConnections
+
     currentNav.value = R.id.startup_fragment
     state.value = KitState.Off
-    networkInfo.value = Constants.DEFAULT_NETWORK_INFO
     balance.value = MilliSatoshi(0)
     trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
@@ -222,25 +252,25 @@ class AppViewModel : ViewModel() {
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
     log.debug("received electrum ready=$event")
-    networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
+    electrumConn.value = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
     log.debug("received electrum disconnected $event")
-    networkInfo.value = networkInfo.value?.copy(electrumServer = null)
+    electrumConn.value = null
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerConnected) {
     log.debug("received peer connected $event")
-    networkInfo.value = networkInfo.value?.copy(lightningConnected = true)
+    peerConn.value = true
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerDisconnected) {
     log.debug("received peer disconnected $event")
-    networkInfo.value = networkInfo.value?.copy(lightningConnected = false)
+    peerConn.value = false
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -656,7 +686,8 @@ class AppViewModel : ViewModel() {
   public fun shutdown() {
     closeConnections()
     balance.postValue(MilliSatoshi(0))
-    networkInfo.postValue(Constants.DEFAULT_NETWORK_INFO)
+    electrumConn.value = Constants.DEFAULT_NETWORK_INFO.electrumServer
+    torConn.value = Constants.DEFAULT_NETWORK_INFO.torConnections
     state.postValue(KitState.Off)
   }
 
@@ -708,11 +739,10 @@ class AppViewModel : ViewModel() {
       state.postValue(KitState.Bootstrap.Tor)
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-          networkInfo.value?.apply {
-            networkInfo.postValue(copy(
-              networkConnected = (status == TorConnectionStatus.CONNECTED),
-              torConnections = torConnections.apply { this[name] = status }
-            ))
+          peerConn.postValue(status == TorConnectionStatus.CONNECTED)
+          torConn.value?.apply {
+            this[name] = status
+            torConn.postValue(this)
           }
         }
       }))
