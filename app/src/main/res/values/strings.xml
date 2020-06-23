@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don\'t have another Phoenix wallet running with the same seed.</string>
   <string name="restore_disclaimer_checkbox">I understand.</string>
   <string name="restore_disclaimer_next">Next</string>
-  <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words. Please note that passphrases are not supported.</string>
+  <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words.</string>
   <string name="restore_mnemonics_label">Use the keyboard below to enter the seed:</string>
   <string name="restore_in_progress">Restoring your wallet…</string>
   <string name="restore_import_button">Import</string>
@@ -248,10 +248,10 @@
     <br/><br/>
     Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
-    Funds will eventually be sent to: %1$s
-    <br/><br/>
     <b>Do not use this feature if you don\'t fully understand what it does.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Funds will eventually be sent to:</string>
+  <string name="closechannels_force_destination_desc">This address is derived from your seed and belongs to you.</string>
   <string name="closechannels_force_button">Force close channels</string>
   <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
   <string name="closechannels_message_error">There was a problem. Please try again later.</string>
@@ -292,7 +292,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">New Wallet</string>
+  <string name="initwallet_create">Create new wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
 
   <!-- //////////////// main //////////////////// -->
@@ -311,7 +311,7 @@
 
   <string name="inappnotif_set_up_pin">Your wallet is not protected.</string>
   <string name="inappnotif_set_up_pin_action">Set a PIN</string>
-  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Have you made a backup of your wallet?</string>
+  <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Please backup your wallet so that you don\'t lose your bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
   <string name="inappnotif_upgrade">An update for this app is available.</string>
@@ -322,17 +322,25 @@
   <string name="displayseed_title">Wallet recovery phrase</string>
   <string name="displayseed_authenticate_button">Display seed</string>
   <string name="displayseed_loading">Unlocking seed…</string>
-  <string name="displayseed_error">Seed could not be read. Please try again.\n\nReason: %1$s</string>
+  <string name="displayseed_error_generic">Could not unlock seed, please try again.</string>
+  <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
-    This list of words is your wallet backup. Save it somewhere safe (not on this phone)!
+    The seed of the wallet is a list of 12 english words. It is your wallet backup and gives full access to the funds in the wallet.
     <br /><br />
-    <b>Do not share it with anyone.</b>
-    <b>Do not lose it.</b> If you lose your words list and your phone, you\'ve lost your funds.
+    <strong>Only you alone possess this seed. Keep it private.</strong>
+    <br /><br />
+    <strong>Do not share this seed with anyone</strong>.
+    <br />
+    Beware of phishing. The developers of Phoenix will never ask for your seed.
+    <br /><br />
+    <strong>Do not lose this seed</strong>.
+    <br />
+    Save it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.
   ]]></string>
   <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed</string>
-  <string name="displayseed_has_saved_seed_button">Confirm</string>
+  <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed, for example on a piece of paper.</string>
+  <string name="displayseed_dialog_header">KEEP THIS SEED SAFE.\nDO NOT SHARE.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 

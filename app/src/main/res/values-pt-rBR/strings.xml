@@ -155,7 +155,6 @@
   <string name="scan_instructions">Leia um código QR com solicitação de pagamento, endereço bitcoin ou uma LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
-  <string name="scan_error_default">Esta não é uma solicitação de pagamento válida.\n\nTente novamente.</string>
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
   <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
@@ -235,10 +234,9 @@
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
-    Os valores serão eventualmente enviados para: %1$s
-    <br/><br/>
     <b>Não use esse recurso se você não entender completamente o que ele faz.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
   <string name="closechannels_force_button">Forçar encerramento de canais</string>
   <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
   <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
@@ -298,7 +296,7 @@
 
   <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
   <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
-  <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Você já fez o backup da carteira?</string>
+  <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
@@ -309,18 +307,25 @@
   <string name="displayseed_title">Frase de recuperação da carteira</string>
   <string name="displayseed_authenticate_button">Mostrar seed</string>
   <string name="displayseed_loading">Desbloqueando seed…</string>
-  <string name="displayseed_error">A seed não pôde ser lida. Tente novamente.\n\nMotivo: %1$s</string>
+  <string name="displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
+  <string name="displayseed_error_wrong_password">PIN incorreto.</string>
   <string name="displayseed_instructions"><![CDATA[
-    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
+    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira e permite o acesso total aos fundos contidos nela.
     <br /><br />
-    <b>Não compartilhe com ninguém. Qualquer pessoa que tenha acesso à sua lista de palavras pode roubar seus bitcoins.
+    <strong>Somente você possui esta seed. Mantenha-a privada.</strong>
     <br /><br />
-    <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus bitcoins.
+    <strong>Não compartilhe esta seed com ninguém</strong>.
+    <br />
+    Cuidado com ataques phishing. Os desenvolvedores da Phoenix nunca pedirão sua seed.
+    <br /><br />
+    <strong>Não perca esta seed</strong>.
+    <br />
+    Salve-a em um local seguro (não neste telefone). Se você perder sua seed e seu telefone, você perderá seus fundos.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">Eu fiz o backup da minha seed</string>
-  <string name="displayseed_has_saved_seed_button">Confirmar</string>
+  <string name="displayseed_has_saved_seed_checkbox">Fiz o backup da minha seed, por exemplo, em um folha de papel.</string>
+  <string name="displayseed_dialog_header">MANTENHA ESTA SEED SEGURA.\nNÃO COMPARTILHE.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
