@@ -388,12 +388,6 @@
   <string name="seedsec_bio_prompt_title">Abilita il blocco biometrico</string>
   <string name="seedsec_bio_prompt_negative">Annulla</string>
 
-  <!-- //////////////// ln url login //////////////// -->
-
-  <string name="lnurl_login_instructions">Log in to %1$s</string>
-  <string name="lnurl_login_button">Log in</string>
-  <string name="lnurl_login_in_progress">Logging in, per favore attendi…</string>
-
   <!-- //////////////// ln url pay //////////////// -->
 
   <string name="lnurl_pay_wait">Recuperando i dettagli del pagamento…</string>
