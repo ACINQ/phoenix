@@ -1,0 +1,22 @@
+# Build
+build/
+
+# Idea
+.idea
+*.iml
+
+# Gradle
+.gradle
+local.properties
+.gradletasknamecache
+
+# OS
+.DS_Store
+
+# XCode
+xcuserdata/
+
+*.iml
+target/
+project/target
+DeleteMe*.scala
