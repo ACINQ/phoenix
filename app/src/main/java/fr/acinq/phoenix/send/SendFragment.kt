@@ -68,6 +68,7 @@ class SendFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(SendViewModel::class.java)
     mBinding.model = model
+    mBinding.appModel = app
 
     app.kit?.run {
       val feerate = nodeParams().onChainFeeConf().feeEstimator().run {

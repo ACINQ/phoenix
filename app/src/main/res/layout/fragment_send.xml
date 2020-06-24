@@ -23,6 +23,10 @@
     <import type="fr.acinq.phoenix.send.SendState" />
 
     <variable
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
+
+    <variable
       name="model"
       type="fr.acinq.phoenix.send.SendViewModel" />
   </data>
@@ -292,9 +296,9 @@
           android:layout_marginTop="@dimen/space_xxxs"
           android:tint="?attr/colorPrimary"
           android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:contentDescription="@null"
           app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toTopOf="@id/destination_chain_description"
-          android:contentDescription="@null" />
+          app:layout_constraintTop_toTopOf="@id/destination_chain_description" />
 
         <TextView
           android:id="@+id/destination_chain_description"
@@ -395,9 +399,9 @@
           android:layerType="software"
           android:visibility="@{model.state instanceof SendState.Onchain}"
           app:layout_constrainedWidth="true"
-          app:layout_constraintTop_toBottomOf="@id/chain_fees_value"
           app:layout_constraintEnd_toEndOf="@id/chain_fees_value"
-          app:layout_constraintStart_toStartOf="@id/chain_fees_value" />
+          app:layout_constraintStart_toStartOf="@id/chain_fees_value"
+          app:layout_constraintTop_toBottomOf="@id/chain_fees_value" />
 
         <TextView
           android:id="@+id/chain_fees_feedback"
@@ -434,9 +438,11 @@
           android:visibility="@{model.state instanceof SendState.Onchain.SwapRequired}"
           app:icon="@drawable/ic_build"
           app:icon_tint="?attr/colorPrimary"
+          app:is_paused_inverse="@{appModel.peerConn}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
+          app:paused_text="@string/btn_pause_connecting"
           app:text="@string/send_swap_required_button" />
 
         <fr.acinq.phoenix.utils.customviews.ProgressTextView
@@ -584,11 +590,13 @@
           android:backgroundTint="?attr/colorPrimary"
           android:visibility="@{model.state instanceof SendState.Lightning || model.state instanceof SendState.Onchain.Ready}"
           app:enableOrFade="@{model.state instanceof SendState.Lightning.Ready || model.state instanceof SendState.Onchain.Ready}"
+          app:is_paused_inverse="@{appModel.peerConn}"
           app:icon="@drawable/ic_send"
           app:icon_tint="?attr/altTextColor"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_recap_pay_separator"
+          app:paused_text="@string/btn_pause_connecting"
           app:text="@string/send_pay_button"
           app:text_color="?attr/altTextColor" />
 

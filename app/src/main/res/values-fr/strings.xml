@@ -189,6 +189,7 @@
   <string name="btn_confirm">Confirmer</string>
   <string name="btn_cancel">Annuler</string>
   <string name="btn_close">Fermer</string>
+  <string name="btn_pause_connecting">Connexion au peer…</string>
 
   <!-- //////////////// settings //////////////// -->
 

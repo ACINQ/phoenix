@@ -25,6 +25,10 @@
     <import type="fr.acinq.phoenix.receive.SwapInState" />
 
     <variable
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
+
+    <variable
       name="model"
       type="fr.acinq.phoenix.receive.ReceiveViewModel" />
   </data>
@@ -65,8 +69,8 @@
           android:layout_height="0dp"
           android:layout_marginBottom="@dimen/space_md_p"
           android:background="@drawable/square_border_hz"
-          app:layout_constraintHeight_default="spread"
           app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintHeight_default="spread"
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -93,10 +97,10 @@
           android:singleLine="true"
           android:textSize="@dimen/text_lg"
           android:translationX="-3dp"
-          app:layout_constraintWidth_default="spread"
           app:layout_constraintEnd_toStartOf="@id/amount_unit"
           app:layout_constraintStart_toStartOf="@id/amount_label"
-          app:layout_constraintTop_toBottomOf="@id/amount_label" />
+          app:layout_constraintTop_toBottomOf="@id/amount_label"
+          app:layout_constraintWidth_default="spread" />
 
         <Spinner
           android:id="@+id/amount_unit"
@@ -321,9 +325,11 @@
           android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"
+          app:is_paused_inverse="@{appModel.peerConn}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
+          app:paused_text="@string/btn_pause_connecting"
           app:text="@string/receive_swap_in_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView

@@ -23,6 +23,7 @@ import androidx.databinding.BindingConversion
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.lifecycle.MutableLiveData
+import fr.acinq.phoenix.utils.customviews.ButtonView
 import java.lang.Exception
 
 object BindingHelpers {
@@ -66,5 +67,17 @@ object BindingHelpers {
     } catch (e: Exception) {
       0L
     }
+  }
+
+  @BindingAdapter("is_paused")
+  @JvmStatic
+  fun isButtonsPaused(button: ButtonView, observable: MutableLiveData<Boolean>) {
+    button.setIsPaused(observable.value ?: false)
+  }
+
+  @BindingAdapter("is_paused_inverse")
+  @JvmStatic
+  fun isButtonsPausedInverse(button: ButtonView, observable: MutableLiveData<Boolean>) {
+    button.setIsPaused(!(observable.value ?: false))
   }
 }

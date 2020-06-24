@@ -188,7 +188,7 @@
   <string name="utils_converted_amount">≈ %1$s</string>
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
-  <string name="utils_unknown_amount">!?</string>
+  <string name="utils_unknown_amount" translatable="false">!?</string>
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Proceed</string>
@@ -201,6 +201,7 @@
   <string name="btn_confirm">Confirm</string>
   <string name="btn_cancel">Cancel</string>
   <string name="btn_close">Close</string>
+  <string name="btn_pause_connecting">Connecting to peer…</string>
 
   <!-- //////////////// settings //////////////// -->
 
