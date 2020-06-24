@@ -110,6 +110,7 @@
         style="@style/VSeparator"
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginBottom="@dimen/space_md"
+        android:background="?attr/mutedBgColor"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/settings_button"
@@ -126,12 +127,13 @@
         app:layout_constraintStart_toEndOf="@id/settings_button"
         app:spacer_size="@dimen/space_xs"
         app:text="@string/menu_receive"
-        app:text_size="@dimen/text_lg" />
+        app:text_size="@dimen/text_md" />
 
       <View
         style="@style/VSeparator"
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginBottom="@dimen/space_md"
+        android:background="?attr/mutedBgColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/send_button"
         app:layout_constraintStart_toEndOf="@id/receive_button"
@@ -142,14 +144,14 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/main_button_height"
         android:background="@drawable/button_main_page_right"
-        app:icon="@drawable/ic_scan"
         app:hz_bias="0.5"
+        app:icon="@drawable/ic_qrcode_scan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/receive_button"
         app:layout_constraintTop_toTopOf="parent"
         app:spacer_size="@dimen/space_xs"
         app:text="@string/menu_send"
-        app:text_size="@dimen/text_lg" />
+        app:text_size="@dimen/text_md" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
