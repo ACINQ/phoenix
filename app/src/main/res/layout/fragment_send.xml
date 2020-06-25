@@ -501,6 +501,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
           <TextView
+            android:id="@+id/swap_recap_amount_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+
+          <TextView
             android:id="@+id/swap_recap_fee_label"
             style="@style/MutedLabelView"
             android:layout_width="wrap_content"
@@ -521,7 +533,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
-            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value_fiat" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
 
           <View
             android:id="@+id/swap_recap_total_separator"
@@ -530,7 +554,7 @@
             android:layout_marginTop="@dimen/space_xs"
             android:background="?attr/mutedTextColor"
             app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
-            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value_fiat" />
 
           <TextView
             android:id="@+id/swap_recap_total_label"

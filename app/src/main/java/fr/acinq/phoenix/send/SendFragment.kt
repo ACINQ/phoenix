@@ -111,8 +111,10 @@ class SendFragment : BaseFragment() {
                 model.state.value = SendState.Onchain.SwapRequired(state.uri)
               } else {
                 mBinding.swapRecapAmountValue.text = Converter.printAmountPretty(amountEnteredByUser.get(), ctx, withUnit = true)
+                mBinding.swapRecapAmountValueFiat.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amountEnteredByUser.get(), withUnit = true))
                 mBinding.swapRecapFeeValue.setTextColor(ThemeHelper.color(ctx, R.attr.textColor))
                 mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(fee, ctx, withUnit = true)
+                mBinding.swapRecapFeeValueFiat.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, fee, withUnit = true))
                 mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
                 if (totalAfterSwap.`$greater`(app.balance.value)) {
                   model.state.value = SendState.Onchain.Error.ExceedsBalance(state.uri)
