@@ -632,7 +632,7 @@ class AppViewModel : ViewModel() {
               state.postValue(res)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
               feerateEstimation.postValue(res.kit.nodeParams().onChainFeeConf().feeEstimator().run {
-                FeerateEstimationPerKb(getFeeratePerKb(2), getFeeratePerKb(6), getFeeratePerKb(72))
+                FeerateEstimationPerKb(getFeeratePerKb(2) / 1000, getFeeratePerKb(6) / 1000, getFeeratePerKb(72) / 1000)
               })
               ChannelsWatcher.schedule(context)
               Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)

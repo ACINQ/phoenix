@@ -72,7 +72,7 @@ class SendFragment : BaseFragment() {
 
     app.kit?.run {
       val feerate = nodeParams().onChainFeeConf().feeEstimator().run {
-        FeerateEstimationPerKb(getFeeratePerKb(2), getFeeratePerKb(6), getFeeratePerKb(72))
+        FeerateEstimationPerKb(getFeeratePerKb(2) / 1000, getFeeratePerKb(6) / 1000, getFeeratePerKb(72) / 1000)
       }
       log.info("feerates base estimation=$feerate")
       app.feerateEstimation.value = feerate
