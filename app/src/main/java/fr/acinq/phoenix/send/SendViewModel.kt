@@ -63,6 +63,7 @@ class SendViewModel : ViewModel() {
   val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
+  val showFeeratesForm = MutableLiveData<Boolean>()
   val chainFeesSatBytes = MutableLiveData<Long>()
 
   init {
@@ -70,6 +71,7 @@ class SendViewModel : ViewModel() {
     useMaxBalance.value = false
     isAmountFieldPristine.value = true
     amountErrorMessage.value = null
+    showFeeratesForm.value = false // by default, show a lean view without advanced stuff
     chainFeesSatBytes.value = 3 // base fee in sat/bytes
   }
 

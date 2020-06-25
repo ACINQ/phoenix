@@ -142,6 +142,7 @@
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_chain_fees_edit">Edit fees</string>
   <string name="send_chain_fees_label">Feerate</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">This payment is an on-chain transaction, which is slower and usually more expensive. A mining fee will apply.</string>

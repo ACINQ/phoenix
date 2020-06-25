@@ -233,6 +233,8 @@ class SendFragment : BaseFragment() {
         }
       }
     }
+
+    mBinding.showChainFeesButton.setOnClickListener { model.showFeeratesForm.value = true }
   }
 
   override fun onStop() {
