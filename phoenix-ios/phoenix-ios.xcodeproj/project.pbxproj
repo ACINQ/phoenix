@@ -17,8 +17,8 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* phoenix-iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* phoenix-iosTests.swift */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
-		F4AB9F8A24A3A36E00405213 /* Phoenix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4AB9F8924A3A36E00405213 /* Phoenix.framework */; };
-		F4AB9F8B24A3A36E00405213 /* Phoenix.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F4AB9F8924A3A36E00405213 /* Phoenix.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; };
+		F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,13 +39,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		F4AB9F8C24A3A36E00405213 /* Embed Frameworks */ = {
+		F43B86AD24A49FA7004C1291 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F4AB9F8B24A3A36E00405213 /* Phoenix.framework in Embed Frameworks */,
+				F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,7 +55,7 @@
 /* Begin PBXFileReference section */
 		53BEF40F48A1258070A1B91A /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
 		53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IosSocket.swift; sourceTree = "<group>"; };
-		7555FF7B242A565900829871 /* phoenix-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "phoenix-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7555FF7B242A565900829871 /* Phoenix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Phoenix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF80242A565900829871 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -69,7 +69,7 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F4AB9F8924A3A36E00405213 /* Phoenix.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Phoenix.framework; path = "../phoenix-shared/build/xcode-frameworks/Phoenix.framework"; sourceTree = "<group>"; };
+		F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhoenixShared.framework; path = "../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4AB9F8A24A3A36E00405213 /* Phoenix.framework in Frameworks */,
+				F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +112,7 @@
 		7555FF7C242A565900829871 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7555FF7B242A565900829871 /* phoenix-ios.app */,
+				7555FF7B242A565900829871 /* Phoenix.app */,
 				7555FF91242A565B00829871 /* phoenix-iosTests.xctest */,
 				7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */,
 			);
@@ -164,7 +164,7 @@
 		7555FFB0242A642200829871 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F4AB9F8924A3A36E00405213 /* Phoenix.framework */,
+				F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -180,7 +180,7 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				F4AB9F8C24A3A36E00405213 /* Embed Frameworks */,
+				F43B86AD24A49FA7004C1291 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -188,7 +188,7 @@
 			);
 			name = "phoenix-ios";
 			productName = "phoenix-ios";
-			productReference = 7555FF7B242A565900829871 /* phoenix-ios.app */;
+			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7555FF90242A565B00829871 /* phoenix-iosTests */ = {
@@ -235,7 +235,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
 				LastUpgradeCheck = 1130;
-				ORGANIZATIONNAME = orgName;
+				ORGANIZATIONNAME = Acinq;
 				TargetAttributes = {
 					7555FF7A242A565900829871 = {
 						CreatedOnToolsVersion = 11.3.1;
@@ -500,8 +500,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-ios";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.acinq.phoenix;
+				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -520,8 +520,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-ios";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.acinq.phoenix;
+				PRODUCT_NAME = Phoenix;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

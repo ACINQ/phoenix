@@ -5,7 +5,7 @@
 
 import Foundation
 import SwiftUI
-import Phoenix
+import PhoenixShared
 
 extension View {
     func withController<M, I>(_ controller: MVIController<M, I>, onModel: @escaping (M) -> Void) -> some View {

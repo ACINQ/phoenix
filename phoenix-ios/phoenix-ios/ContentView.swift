@@ -1,5 +1,5 @@
 import SwiftUI
-import Phoenix
+import PhoenixShared
 
 struct ContentView: View {
 

@@ -12,7 +12,7 @@ kotlin {
     iosX64("ios") {
         binaries {
             framework {
-                baseName = "Phoenix"
+                baseName = "PhoenixShared"
                 freeCompilerArgs = freeCompilerArgs + "-Xobjc-generics"
             }
         }
@@ -27,7 +27,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation("fr.acinq.eklair:eklair:0.1.0")
-                implementation("org.kodein.di:kodein-di:$kodeinDIVersion")
+//                implementation("org.kodein.di:kodein-di:$kodeinDIVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
         }

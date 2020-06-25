@@ -1,6 +1,6 @@
 import Foundation
 import Network
-import Phoenix
+import PhoenixShared
 
 class IosSocket: Socket {
 

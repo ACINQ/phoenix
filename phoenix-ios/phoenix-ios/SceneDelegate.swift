@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import Phoenix
+import PhoenixShared
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

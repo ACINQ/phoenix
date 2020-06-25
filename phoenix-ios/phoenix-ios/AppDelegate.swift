@@ -1,5 +1,5 @@
 import UIKit
-import Phoenix
+import PhoenixShared
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
