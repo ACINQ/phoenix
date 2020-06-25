@@ -9,11 +9,8 @@ import fr.acinq.phoenix.io.Socket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.direct
-import org.kodein.di.instance
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -136,17 +133,16 @@ private class MaintainingConnection(val session: LightningSession) : State() {
         when (event) {
             is Disconnected -> Closed to listOf(StopTimer, Restart, Show("Disconnected!"))
             is ReceivedLNMessage -> this to listOf(Show("Received: ${Hex.encode(event.payload)}"), ListenLNMessage(session))
-            is Timed -> this to listOf(SendLNMessage(Hex.decode("0012000a0004deadbeef"), session), Show("Sending ping."))
+            is Timed -> this to listOf(SendLNMessage(Hex.decode("0012000a0004deadbeef"), session), Show("Sending ping."), StartTimer(2500))
             else -> unexpectedEvent(event)
         }
 }
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class ApplicationLNProtocolActor(override val di: DI) : LNProtocolActor, DIAware {
+internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: LoggerFactory) : LNProtocolActor {
 
-    private val socketFactory: Socket.Factory by instance<Socket.Factory>()
-    private val logger = newLogger(direct.instance<LoggerFactory>())
+    private val logger = newLogger(loggerFactory)
 
     private lateinit var socket: Socket
 
@@ -169,7 +165,7 @@ internal class ApplicationLNProtocolActor(override val di: DI) : LNProtocolActor
                             is SendBytes -> socket.send(action.payload, action.flush)
                             is SendLNMessage -> action.session.send(action.payload, socket::send)
                             is ListenBytes -> launch { channel.send(ReceivedBytes(socket.receive(action.count, action.count).unpack())) }
-                            is ListenLNMessage -> launch { action.session.receive { socket.receive(it, it).unpack() } }
+                            is ListenLNMessage -> launch { channel.send(ReceivedLNMessage(action.session.receive { count -> socket.receive(count, count).unpack() })) }
                             is Show -> showChannel.send(action.message)
                             is Restart -> launch { delay(1000) ; channel.send(Start) }
                             is StartTimer -> startTimer(action.milliseconds)
@@ -177,13 +173,10 @@ internal class ApplicationLNProtocolActor(override val di: DI) : LNProtocolActor
                         }
                     } catch (ex: Exception) {
                         logger.error(ex)
+                        channel.send(Disconnected)
                     }
                 }
             }
-        }
-
-        MainScope().launch {
-            channel.send(Start)
         }
     }
 
@@ -191,7 +184,7 @@ internal class ApplicationLNProtocolActor(override val di: DI) : LNProtocolActor
         MainScope().launch {
             when (state) {
                 is Socket.State.Ready -> {
-                    this@ApplicationLNProtocolActor.socket = socket
+                    this@AppLNProtocolActor.socket = socket
                     channel.send(Connected)
                 }
                 is Socket.State.Error -> {
@@ -204,13 +197,20 @@ internal class ApplicationLNProtocolActor(override val di: DI) : LNProtocolActor
     }
 
     private fun startTimer(ms: Long) {
-        require(timerJob == null)
         timerJob = MainScope().launch {
-            while (true) {
-                delay(ms)
-                channel.send(Timed)
-            }
+            delay(ms)
+            timerJob = null
+            channel.send(Timed)
         }
     }
 
+    override fun openSubscription(): ReceiveChannel<String> = showChannel.openSubscription()
+
+    private var started = false
+    override fun start() {
+        require(!started)
+        started = true
+
+        MainScope().launch { channel.send(Start) }
+    }
 }

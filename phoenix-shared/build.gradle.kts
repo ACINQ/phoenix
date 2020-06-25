@@ -12,7 +12,8 @@ kotlin {
     iosX64("ios") {
         binaries {
             framework {
-                baseName = "phoenix-shared"
+                baseName = "Phoenix"
+                freeCompilerArgs = freeCompilerArgs + "-Xobjc-generics"
             }
         }
     }

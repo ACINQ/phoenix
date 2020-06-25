@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53BEF6522166F3557D7BC66B /* IosSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */; };
+		53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF40F48A1258070A1B91A /* MVIView.swift */; };
 		7555FF7F242A565900829871 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF7E242A565900829871 /* AppDelegate.swift */; };
 		7555FF81242A565900829871 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF80242A565900829871 /* SceneDelegate.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
@@ -15,8 +17,8 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* phoenix-iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* phoenix-iosTests.swift */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
-		7555FFB2242A642300829871 /* phoenix-shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7555FFB1242A642300829871 /* phoenix-shared.framework */; };
-		7555FFB3242A642300829871 /* phoenix-shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7555FFB1242A642300829871 /* phoenix-shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F4AB9F8A24A3A36E00405213 /* Phoenix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4AB9F8924A3A36E00405213 /* Phoenix.framework */; };
+		F4AB9F8B24A3A36E00405213 /* Phoenix.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F4AB9F8924A3A36E00405213 /* Phoenix.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,25 +27,25 @@
 			containerPortal = 7555FF73242A565900829871 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7555FF7A242A565900829871;
-			remoteInfo = phoenix-ios;
+			remoteInfo = "phoenix-ios";
 		};
 		7555FF9D242A565B00829871 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7555FF73242A565900829871 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7555FF7A242A565900829871;
-			remoteInfo = phoenix-ios;
+			remoteInfo = "phoenix-ios";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7555FFB4242A642300829871 /* Embed Frameworks */ = {
+		F4AB9F8C24A3A36E00405213 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7555FFB3242A642300829871 /* phoenix-shared.framework in Embed Frameworks */,
+				F4AB9F8B24A3A36E00405213 /* Phoenix.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,7 +53,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7555FF7B242A565900829871 /* phoenix-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = phoenix-ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53BEF40F48A1258070A1B91A /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
+		53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IosSocket.swift; sourceTree = "<group>"; };
+		7555FF7B242A565900829871 /* phoenix-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "phoenix-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF80242A565900829871 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,13 +63,13 @@
 		7555FF87242A565B00829871 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7555FF8A242A565B00829871 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7555FF91242A565B00829871 /* phoenix-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = phoenix-iosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7555FF95242A565B00829871 /* phoenix-iosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = phoenix-iosTests.swift; sourceTree = "<group>"; };
+		7555FF91242A565B00829871 /* phoenix-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7555FF95242A565B00829871 /* phoenix-iosTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosTests.swift"; sourceTree = "<group>"; };
 		7555FF97242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = phoenix-iosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = phoenix-iosUITests.swift; sourceTree = "<group>"; };
+		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7555FFB1242A642300829871 /* phoenix-shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = phoenix-shared.framework; path = "../phoenix-shared/build/xcode-frameworks/phoenix-shared.framework"; sourceTree = "<group>"; };
+		F4AB9F8924A3A36E00405213 /* Phoenix.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Phoenix.framework; path = "../phoenix-shared/build/xcode-frameworks/Phoenix.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7555FFB2242A642300829871 /* phoenix-shared.framework in Frameworks */,
+				F4AB9F8A24A3A36E00405213 /* Phoenix.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,8 +129,10 @@
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				7555FF86242A565B00829871 /* Preview Content */,
+				53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */,
+				53BEF40F48A1258070A1B91A /* MVIView.swift */,
 			);
-			path = phoenix-ios;
+			path = "phoenix-ios";
 			sourceTree = "<group>";
 		};
 		7555FF86242A565B00829871 /* Preview Content */ = {
@@ -143,7 +149,7 @@
 				7555FF95242A565B00829871 /* phoenix-iosTests.swift */,
 				7555FF97242A565B00829871 /* Info.plist */,
 			);
-			path = phoenix-iosTests;
+			path = "phoenix-iosTests";
 			sourceTree = "<group>";
 		};
 		7555FF9F242A565B00829871 /* phoenix-iosUITests */ = {
@@ -152,13 +158,13 @@
 				7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */,
 				7555FFA2242A565B00829871 /* Info.plist */,
 			);
-			path = phoenix-iosUITests;
+			path = "phoenix-iosUITests";
 			sourceTree = "<group>";
 		};
 		7555FFB0242A642200829871 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7555FFB1242A642300829871 /* phoenix-shared.framework */,
+				F4AB9F8924A3A36E00405213 /* Phoenix.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -170,18 +176,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "phoenix-ios" */;
 			buildPhases = (
+				7555FFB5242A651A00829871 /* ShellScript */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF78242A565900829871 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
-				7555FFB4242A642300829871 /* Embed Frameworks */,
-				7555FFB5242A651A00829871 /* ShellScript */,
+				F4AB9F8C24A3A36E00405213 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = phoenix-ios;
-			productName = phoenix-ios;
+			name = "phoenix-ios";
+			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* phoenix-ios.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -198,8 +204,8 @@
 			dependencies = (
 				7555FF93242A565B00829871 /* PBXTargetDependency */,
 			);
-			name = phoenix-iosTests;
-			productName = phoenix-iosTests;
+			name = "phoenix-iosTests";
+			productName = "phoenix-iosTests";
 			productReference = 7555FF91242A565B00829871 /* phoenix-iosTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -216,8 +222,8 @@
 			dependencies = (
 				7555FF9E242A565B00829871 /* PBXTargetDependency */,
 			);
-			name = phoenix-iosUITests;
-			productName = phoenix-iosUITests;
+			name = "phoenix-iosUITests";
+			productName = "phoenix-iosUITests";
 			productReference = 7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -319,6 +325,8 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				53BEF6522166F3557D7BC66B /* IosSocket.swift in Sources */,
+				53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,7 +423,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -469,7 +477,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -487,12 +495,12 @@
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../phoenix-shared/build/xcode-frameworks";
-				INFOPLIST_FILE = phoenix-ios/Info.plist;
+				INFOPLIST_FILE = "phoenix-ios/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-ios;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -507,12 +515,12 @@
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../phoenix-shared/build/xcode-frameworks";
-				INFOPLIST_FILE = phoenix-ios/Info.plist;
+				INFOPLIST_FILE = "phoenix-ios/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-ios;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -525,14 +533,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = phoenix-iosTests/Info.plist;
+				INFOPLIST_FILE = "phoenix-iosTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-iosTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -546,14 +554,14 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = phoenix-iosTests/Info.plist;
+				INFOPLIST_FILE = "phoenix-iosTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-iosTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -566,17 +574,17 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = phoenix-iosUITests/Info.plist;
+				INFOPLIST_FILE = "phoenix-iosUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-iosUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = phoenix-ios;
+				TEST_TARGET_NAME = "phoenix-ios";
 			};
 			name = Debug;
 		};
@@ -585,17 +593,17 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = phoenix-iosUITests/Info.plist;
+				INFOPLIST_FILE = "phoenix-iosUITests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.phoenix-iosUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = phoenix-ios;
+				TEST_TARGET_NAME = "phoenix-ios";
 			};
 			name = Release;
 		};
