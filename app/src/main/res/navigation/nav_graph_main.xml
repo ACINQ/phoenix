@@ -221,14 +221,16 @@
     android:id="@+id/read_input"
     android:name="fr.acinq.phoenix.send.ReadInputFragment"
     android:label="ReadInputFragment">
-    <action
-      android:id="@+id/action_read_input_to_lnurl_login"
-      app:destination="@id/lnurl_login" />
     <argument
       android:name="payload"
       android:defaultValue="@null"
       app:argType="string"
       app:nullable="true" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_auth"
+      app:launchSingleTop="true"
+      app:popUpTo="@+id/main_fragment"
+      app:destination="@id/lnurl_auth" />
     <action
       android:id="@+id/action_read_input_to_lnurl_pay"
       app:destination="@+id/lnurl_pay" />
@@ -275,20 +277,25 @@
       android:label="PaymentDetailsTechnicalsFragment" />
   </navigation>
 
-  <!-- LNURL: login -->
+  <!-- LNURL: auth -->
   <fragment
-    android:id="@+id/lnurl_login"
-    android:name="fr.acinq.phoenix.send.LNUrlLoginFragment"
-    android:label="LNUrlLogin">
+    android:id="@+id/lnurl_auth"
+    android:name="fr.acinq.phoenix.lnurl.LNUrlAuthFragment"
+    android:label="LNUrlAuth">
     <argument
-      android:name="uri"
-      app:argType="string" />
+      android:name="url"
+      app:argType="fr.acinq.phoenix.lnurl.LNUrlAuth" />
+    <action
+      android:id="@+id/action_lnurl_auth_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
   </fragment>
 
   <!-- LNURL: pay -->
   <dialog
     android:id="@+id/lnurl_pay"
-    android:name="fr.acinq.phoenix.send.LNUrlPayFragment"
+    android:name="fr.acinq.phoenix.lnurl.LNUrlPayFragment"
     android:label="LNUrlPayFragment">
     <argument
       android:name="url"
@@ -298,11 +305,11 @@
   <!-- LNURL: withdraw -->
   <fragment
     android:id="@+id/lnurl_withdraw"
-    android:name="fr.acinq.phoenix.send.LNUrlWithdrawFragment"
+    android:name="fr.acinq.phoenix.lnurl.LNUrlWithdrawFragment"
     android:label="LNUrlWithdrawFragment">
     <argument
       android:name="url"
-      app:argType="fr.acinq.phoenix.utils.LNUrlWithdraw" />
+      app:argType="fr.acinq.phoenix.lnurl.LNUrlWithdraw" />
     <action
       android:id="@+id/action_lnurl_withdraw_to_main"
       app:destination="@id/main_fragment"
@@ -345,6 +352,9 @@
     <action
       android:id="@+id/action_settings_to_tor"
       app:destination="@id/tor_fragment" />
+    <action
+      android:id="@+id/action_settings_to_about"
+      app:destination="@id/about_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -426,5 +436,11 @@
     android:id="@+id/connectivity_dialog"
     android:name="fr.acinq.phoenix.main.ConnectivityFragmentDialog"
     android:label="connectivity_dialog" />
+
+  <!-- settings: about -->
+  <fragment
+    android:id="@+id/about_fragment"
+    android:name="fr.acinq.phoenix.settings.AboutFragment"
+    android:label="AboutFragment" />
 
 </navigation>

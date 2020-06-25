@@ -45,6 +45,7 @@ object Constants {
   const val WATCHER_REQUEST_CODE = 37921816
 
   // -- default wallet values
+  val DEFAULT_FEERATE = FeerateEstimationPerKb(rate20min = 12, rate60min = 6, rate12hours = 3)
   val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(

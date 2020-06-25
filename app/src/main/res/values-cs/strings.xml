@@ -15,7 +15,7 @@
   -->
 
 <resources>
-  <string name="app_name">Phoenix (Testnet)</string>
+  <string name="app_name">Phoenix (Mainnet test)</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Neimportujte seed, který NEBYL vytvořen v této aplikaci. \n\nZároveň se ujistěte že nemáte spuštěnou jinou Phoenix peněženku se stejným seedem.</string>
   <string name="restore_disclaimer_checkbox">Ano, rozumím.</string>
   <string name="restore_disclaimer_next">Další</string>
-  <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov. Heslo peněženky není podporováno.</string>
+  <string name="restore_instructions">Seed vaší peněženky je seznam 12 anglických slov.</string>
   <string name="restore_mnemonics_label">Použijte klávesnici k zadání seedu:</string>
   <string name="restore_in_progress">Obnovování peněženky…</string>
   <string name="restore_import_button">Importovat</string>
@@ -95,10 +95,10 @@
 
   <string name="receive_swap_in_button">Zobrazit Bitcoinovou adresu</string>
   <string name="receive_swap_in_error_message">Nastala chyba při směně na on-chain transakci.…\n\nProsím, zkuste to znovu.</string>
-  <string name="receive_swap_in_progress_message">Požaduji směnu na bitcoinovou adresu…</string>
+  <string name="receive_swap_in_progress_message">Požaduji směnu na Bitcoinovou adresu…</string>
   <string name="receive_swap_in_disclaimer_title">Přijmout on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  Bude zobrazena standardní bitcoinová adresa.
+  Bude zobrazena standardní Bitcoinová adresa.
   <br /><br />
   Finance poslané na tuto adresu se zobrazí po jednom potvrzení.
   <br /><br />
@@ -134,7 +134,7 @@
   <string name="send_pay_button">Zaplatit</string>
   <string name="send_swap_in_progress">Probíhá směna…</string>
   <string name="send_swap_error">Směna selhala. Prosím, zkuste to znovu.</string>
-  <string name="send_swap_required_desc">Toto je bitcoinová adresa, platba bude vytvořena směnou.</string>
+  <string name="send_swap_required_desc">Toto je Bitcoinová adresa, platba bude vytvořena směnou.</string>
   <string name="send_swap_required_button">Vyžádat směnu</string>
   <string name="send_swap_complete_recap_amount">Množství</string>
   <string name="send_swap_complete_recap_fee">Poplatek pro težaře</string>
@@ -147,7 +147,6 @@
   <string name="scan_instructions">Umístěte QR kód platebního požadavku dovnitř obdélníčku, aby mohl být přečten</string>
   <string name="scan_state_reading">Čtení platebního požadavku</string>
 
-  <string name="scan_error_default">Toto není platná žádost o platbu.\n\nProsím, zkuste to znovu.</string>
   <string name="scan_error_expired">Platba vypršela.</string>
   <string name="scan_error_pay_to_self">Nemůžete platit sám sobě.</string>
   <string name="scan_error_invalid_chain">Tento požadavek nepoužívá stejný blockchain jako vaše peněženka.</string>
@@ -215,7 +214,7 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Použijte tuto stránku k vyprázdnění vaší peněženky na Bitcoinovou adresu.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Finance mohou být odeslány do bitcoinové peněženky. Před odesláním se ujistěte se, že je adresa správná.</string>
+  <string name="closechannels_mutual_input_instructions">Finance mohou být odeslány do Bitcoinové peněženky. Před odesláním se ujistěte se, že je adresa správná.</string>
   <string name="closechannels_mutual_input_hint">Zadejte Bitcoinovou adresu</string>
   <string name="closechannels_mutual_button">Vyprázdnit peněženku</string>
   <string name="closechannels_force_title">Vynutit uzavření</string>
@@ -226,10 +225,9 @@
     <br/><br/>
     Vynucené uzavření kanálů vás bude stát peníze (k zaplacení on-chain poplatků) a uzamkne vaše finance na několik dní. <b>Neodinstalovávejte tuto aplikaci, dokud nejsou vaše kanály plně uzavřené nebo přijdete o své peníze.</b>
     <br/><br/>
-    Finance budou odeslány na: %1$s
-    <br/><br/>
     <b>Nepoužívejte tuto funkci, pokud plně nechápete, jak funguje.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Finance budou odeslány na:</string>
   <string name="closechannels_force_button">Vynutit uzavření kanálů</string>
   <string name="closechannels_confirm_dialog_message">Jste si jistí, že chcete pokračovat?</string>
   <string name="closechannels_message_error">Nastala chyba. Prosím, zkuste to znovu později.</string>
@@ -299,7 +297,8 @@
   <string name="displayseed_title">Seznam slov k obnovení peněženky</string>
   <string name="displayseed_authenticate_button">Zobrazit seed</string>
   <string name="displayseed_loading">Odemykám seed…</string>
-  <string name="displayseed_error">Seed nemohl být načten. Prosím, zkuste to znovu.\n\nDůvod: %1$s</string>
+  <string name="displayseed_error_generic">Seed nemohl být načten. Prosím, zkuste to znovu.</string>
+  <string name="displayseed_error_wrong_password">Chybný PIN kód.</string>
   <string name="displayseed_instructions"><![CDATA[
     Tento seznam slov je záloha vaší peněženky. Uložte je někam bezpečně (ne do tohoto telefonu)!
     <br /><br />
@@ -309,7 +308,6 @@
   <string name="displayseed_derivation_path">BIP39 seed se standardní BIP84 cestou derivace</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">Udělal jsem zálohu svého seedu</string>
-  <string name="displayseed_has_saved_seed_button">Potvrdit</string>
 
   <!-- //////////////// logs settings //////////////// -->
 

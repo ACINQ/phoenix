@@ -57,7 +57,7 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(TorSettingViewModel::class.java)
     mBinding.model = model
-    app.networkInfo.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
+    app.torConn.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
   }
 
   override fun onStart() {

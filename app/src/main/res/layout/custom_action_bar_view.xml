@@ -39,7 +39,6 @@
       android:layout_marginEnd="@dimen/space_lg"
       android:ellipsize="end"
       android:singleLine="true"
-      app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/back_button"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/back_button"
@@ -55,7 +54,6 @@
       android:textColor="?attr/onMutedBgTextColor"
       android:textIsSelectable="true"
       android:textSize="@dimen/text_md"
-      app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="@id/title"
       app:layout_constraintTop_toBottomOf="@id/title" />

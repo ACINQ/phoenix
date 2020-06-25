@@ -17,8 +17,8 @@
 package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
+import androidx.databinding.Bindable
 import androidx.lifecycle.*
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.SingleLiveEvent
@@ -60,11 +60,18 @@ class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
   val state = MutableLiveData<SendState>()
-  //  val swapState = MutableLiveData<SwapState>(SwapState.NO_SWAP)
   val isAmountFieldPristine = MutableLiveData<Boolean>() // to prevent early validation error message if amount is not set in invoice
   val useMaxBalance = MutableLiveData<Boolean>()
   val amountErrorMessage = SingleLiveEvent<Int>()
-  //  val invoice = MutableLiveData<Either<Pair<BitcoinURI, PaymentRequest?>, PaymentRequest>>(null)
+  val chainFeesSatBytes = MutableLiveData<Long>()
+
+  init {
+    state.value = SendState.CheckingInvoice
+    useMaxBalance.value = false
+    isAmountFieldPristine.value = true
+    amountErrorMessage.value = null
+    chainFeesSatBytes.value = 3 // base fee in sat/bytes
+  }
 
   // ---- computed values from payment request
 
@@ -88,31 +95,21 @@ class SendViewModel : ViewModel() {
     state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice
   }
 
-  init {
-    state.value = SendState.CheckingInvoice
-    useMaxBalance.value = false
-    isAmountFieldPristine.value = true
-    amountErrorMessage.value = 0
-  }
-
   // ---- end of computed values
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
-    log.debug("checking input=$input")
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          val extract = Wallet.extractInvoice(input)
-          when (extract) {
-            is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
-            is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
-            else -> throw RuntimeException("unhandled invoice type")
-          }
-        } catch (e: Exception) {
-          log.error("invalid invoice for input=$input: ${e.message}")
-          state.postValue(SendState.InvalidInvoice)
+    viewModelScope.launch((Dispatchers.Default)) {
+      try {
+        val extract = Wallet.parseLNObject(input)
+        when (extract) {
+          is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
+          is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
+          else -> throw RuntimeException("unhandled invoice type")
         }
+      } catch (e: Exception) {
+        log.error("invalid invoice for input=$input: ${e.message}")
+        state.postValue(SendState.InvalidInvoice)
       }
     }
   }

@@ -32,12 +32,19 @@ import fr.acinq.phoenix.utils.ThemeHelper
 
 class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.buttonViewStyle) : ConstraintLayout(context, attrs, R.attr.buttonViewStyle) {
 
-  private var mBinding: CustomButtonViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
-    R.layout.custom_button_view, this, true)
+  private var mBinding: CustomButtonViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.custom_button_view, this, true)
+
+  private var isPaused: Boolean = false
+  private var defaultText: String? = null
+  private var pausedText: String? = null
+  private var hasIcon: Boolean = false
 
   init {
     attrs?.let {
       val arr = context.obtainStyledAttributes(attrs, R.styleable.ButtonView, defStyleAttr, R.style.default_buttonStyle)
+
+      defaultText = arr.getString(R.styleable.ButtonView_text)
+      pausedText = arr.getString(R.styleable.ButtonView_paused_text)
 
       // optional text
       if (arr.hasValue(R.styleable.ButtonView_text)) {
@@ -58,6 +65,7 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
       // optional image
       if (arr.hasValue(R.styleable.ButtonView_icon)) {
+        hasIcon = true
         mBinding.image.setImageDrawable(arr.getDrawable(R.styleable.ButtonView_icon))
         if (arr.hasValue(R.styleable.ButtonView_icon_tint)) {
           mBinding.image.imageTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.textColor)))
@@ -72,17 +80,48 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         mBinding.spacer.visibility = View.GONE
       }
 
+      mBinding.progress.indeterminateTintList = ColorStateList.valueOf(arr.getColor(R.styleable.ButtonView_icon_tint, ThemeHelper.color(context, R.attr.textColor)))
+
       // spacer size
       if (arr.hasValue(R.styleable.ButtonView_spacer_size)) {
         mBinding.spacer.layoutParams.width = arr.getDimensionPixelOffset(R.styleable.ButtonView_spacer_size, R.dimen.space_sm)
       }
 
+      isPaused = arr.getBoolean(R.styleable.ButtonView_is_paused, false)
+
       arr.recycle()
     }
   }
 
+  fun getIsPaused() = isPaused
+
+  fun setIsPaused(b: Boolean) {
+    isPaused = b
+    // change icon visibility only if necessary
+    if (hasIcon) {
+      mBinding.image.visibility = if (isPaused) View.INVISIBLE else View.VISIBLE
+    }
+
+    // if button is paused, show progress bar with special text
+    mBinding.progress.visibility = if (isPaused) View.VISIBLE else if (hasIcon) View.INVISIBLE else View.GONE
+    mBinding.text.text = if (isPaused) pausedText else defaultText
+
+    // spacer is shown only if the icon or the progress bar is shown
+    val shouldShowSpacer = mBinding.image.visibility == View.VISIBLE || mBinding.progress.visibility == View.VISIBLE
+    mBinding.spacer.visibility = if (shouldShowSpacer) View.VISIBLE else View.GONE
+  }
+
+  override fun setOnClickListener(l: OnClickListener?) {
+    super.setOnClickListener {
+      if (!isPaused) {
+        l?.onClick(null)
+      }
+    }
+  }
+
   fun setText(text: String) {
-    mBinding.text.text = text
+    defaultText = text
+    mBinding.text.text = if (isPaused) pausedText else defaultText
   }
 
   fun setIcon(icon: Drawable) {

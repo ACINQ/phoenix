@@ -23,6 +23,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import com.google.common.base.Strings
@@ -42,6 +43,9 @@ class PinDialog @JvmOverloads constructor(context: Context, themeResId: Int, pri
     setOnCancelListener { pinCallback.onPinCancel(this@PinDialog) }
     mBinding.pinTitle.text = Converter.html(getContext().getString(titleResId))
     setCancelable(cancelable)
+
+    // disable screen capture
+    window?.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
 
     // randomly sorted pin buttons
     val pinButtons = listOf(

@@ -19,23 +19,23 @@ package fr.acinq.phoenix
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
-import akka.dispatch.Futures
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.msopentech.thali.toronionproxy.OnionProxyManager
+import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
@@ -73,9 +73,9 @@ import scala.collection.JavaConverters
 import scala.collection.immutable.Seq
 import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Either
 import scala.util.Left
 import scodec.bits.`ByteVector$`
 import java.io.IOException
@@ -84,14 +84,35 @@ import java.security.GeneralSecurityException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.system.measureTimeMillis
 import scala.collection.immutable.List as ScalaList
 
+data class FeerateEstimationPerKb(val rate20min: Long, val rate60min: Long, val rate12hours: Long)
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
 data class Xpub(val xpub: String, val path: String)
 data class NetworkInfo(var networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
 data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
+
+class NetworkInfoLiveData(internetConn: MutableLiveData<Boolean>, electrumConn: MutableLiveData<ElectrumServer?>, torConn: MutableLiveData<HashMap<String, TorConnectionStatus>>, peerConn: MutableLiveData<Boolean>) : MediatorLiveData<NetworkInfo>() {
+  private fun valueOrDefault(): NetworkInfo = value ?: Constants.DEFAULT_NETWORK_INFO
+  init {
+    addSource(internetConn) {
+      value = valueOrDefault().copy(networkConnected = it)
+    }
+    addSource(electrumConn) {
+      value = valueOrDefault().copy(electrumServer = it)
+    }
+    addSource(torConn) {
+      value = valueOrDefault().copy(torConnections = it)
+    }
+    addSource(peerConn) {
+      value = valueOrDefault().copy(lightningConnected = it)
+    }
+    value = Constants.DEFAULT_NETWORK_INFO
+  }
+}
 
 sealed class KitState {
   object Off : KitState()
@@ -121,13 +142,20 @@ class AppViewModel : ViewModel() {
 
   val currentURIIntent = MutableLiveData<String>()
   val currentNav = MutableLiveData<Int>()
-  val networkInfo = MutableLiveData<NetworkInfo>()
+
+  val internetConn = MutableLiveData<Boolean>()
+  val electrumConn = MutableLiveData<ElectrumServer?>()
+  val torConn = MutableLiveData<HashMap<String, TorConnectionStatus>>()
+  val peerConn = MutableLiveData<Boolean>()
+  val networkInfo = NetworkInfoLiveData(internetConn, electrumConn, torConn, peerConn)
+
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
   val payments = MutableLiveData<List<PlainPayment>>()
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
   val navigationEvent = SingleLiveEvent<Any>()
   val trampolineFeeSettings = MutableLiveData<List<TrampolineFeeSetting>>()
   val swapInSettings = MutableLiveData<SwapInSettings>()
+  val feerateEstimation = MutableLiveData<FeerateEstimationPerKb>()
   val balance = MutableLiveData<MilliSatoshi>()
   val state = MutableLiveData<KitState>()
   val torManager = MutableLiveData<OnionProxyManager>()
@@ -135,12 +163,18 @@ class AppViewModel : ViewModel() {
   val api: Eclair? get() = if (state.value is KitState.Started) (state.value as KitState.Started).api else null
 
   init {
+    // Network info
+    internetConn.value = Constants.DEFAULT_NETWORK_INFO.networkConnected
+    peerConn.value = Constants.DEFAULT_NETWORK_INFO.lightningConnected
+    electrumConn.value = Constants.DEFAULT_NETWORK_INFO.electrumServer
+    torConn.value = Constants.DEFAULT_NETWORK_INFO.torConnections
+
     currentNav.value = R.id.startup_fragment
     state.value = KitState.Off
-    networkInfo.value = Constants.DEFAULT_NETWORK_INFO
     balance.value = MilliSatoshi(0)
     trampolineFeeSettings.value = Constants.DEFAULT_TRAMPOLINE_SETTINGS
     swapInSettings.value = Constants.DEFAULT_SWAP_IN_SETTINGS
+    feerateEstimation.value = Constants.DEFAULT_FEERATE
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -217,22 +251,26 @@ class AppViewModel : ViewModel() {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
+    log.debug("received electrum ready=$event")
+    electrumConn.value = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
-    networkInfo.value = networkInfo.value?.copy(electrumServer = null)
+    log.debug("received electrum disconnected $event")
+    electrumConn.value = null
   }
 
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerConnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
+    log.debug("received peer connected $event")
+    peerConn.value = true
   }
 
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: PeerDisconnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
+    log.debug("received peer disconnected $event")
+    peerConn.value = false
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -346,7 +384,7 @@ class AppViewModel : ViewModel() {
     return coroutineScope {
       async(Dispatchers.Default) {
         kit?.run {
-          log.info("sending swap-out request to switchboard for address=$address with amount=$amount")
+          log.info("requesting swap-out to address=$address with amount=$amount and fee=$feeratePerKw")
           switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
           Unit
         } ?: throw KitNotInitialized()
@@ -488,41 +526,65 @@ class AppViewModel : ViewModel() {
   }
 
   @UiThread
-  suspend fun mutualCloseAllChannels(address: String) {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        delay(500)
-        if (api != null && kit != null) {
-          val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
-          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
-          getChannels(`NORMAL$`.`MODULE$`).map { res ->
-            val channelId = res.channelId()
-            log.info("attempting to mutual close channel=$channelId to $closeScriptPubKey")
-            closingFutures.add(api!!.close(Left.apply(channelId), closeScriptPubKey, longTimeout))
-          }
-          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
-          Unit
-        } else throw KitNotInitialized()
+  suspend fun mutualCloseAllChannels(address: String) = withContext(viewModelScope.coroutineContext + Dispatchers.Default) {
+    if (api != null && kit != null) {
+      delay(500)
+      val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
+      val channelIds = prepareClosing(`NORMAL$`.`MODULE$`)
+      log.info("requesting to mutually close channels=$channelIds")
+      val closingResult = Await.result(api!!.close(channelIds, closeScriptPubKey, longTimeout), Duration.Inf())
+      val successfullyClosed = handleClosingResult(closingResult)
+      if (successfullyClosed == channelIds.size()) {
+        Unit
+      } else {
+        throw ChannelsNotClosed(channelIds.size() - successfullyClosed)
       }
-    }.await()
+    } else throw KitNotInitialized()
   }
 
   @UiThread
-  suspend fun forceCloseAllChannels() {
-    return coroutineScope {
-      async(Dispatchers.Default) {
-        if (api != null && kit != null) {
-          val closingFutures = ArrayList<Future<ChannelCommandResponse>>()
-          getChannels().map { res ->
-            val channelId = res.channelId()
-            log.info("attempting to force close channel=$channelId")
-            closingFutures.add(api!!.forceClose(Left.apply(channelId), longTimeout))
-          }
-          Await.result(Futures.sequence(closingFutures, kit!!.system().dispatcher()), Duration.Inf())
-          Unit
-        } else throw KitNotInitialized()
+  suspend fun forceCloseAllChannels() = withContext(viewModelScope.coroutineContext + Dispatchers.Default) {
+    if (api != null && kit != null) {
+      delay(500)
+      val channelIds = prepareClosing()
+      log.info("requesting to *force* close channels=$channelIds")
+      val closingResult = Await.result(api!!.forceClose(channelIds, longTimeout), Duration.Inf())
+      val successfullyClosed = handleClosingResult(closingResult)
+      if (successfullyClosed == channelIds.size()) {
+        Unit
+      } else {
+        throw ChannelsNotClosed(channelIds.size() - successfullyClosed)
       }
-    }.await()
+    } else throw KitNotInitialized()
+  }
+
+  /** Create a (scala) list of ids of channels to be closed. */
+  @WorkerThread
+  private suspend fun prepareClosing(state: State? = null): ScalaList<Either<ByteVector32, ShortChannelId>> {
+    return getChannels(state).map {
+      val id: Either<ByteVector32, ShortChannelId> = Left.apply(it.channelId())
+      id
+    }.run {
+      JavaConverters.asScalaIteratorConverter(iterator()).asScala().toList()
+    }
+  }
+
+  @WorkerThread
+  private fun handleClosingResult(result: scala.collection.immutable.Map<Either<ByteVector32, ShortChannelId>, Either<Throwable, ChannelCommandResponse>>): Int {
+    // read the result
+    val iterator = result.iterator()
+    var successfullyClosed = 0
+    while (iterator.hasNext()) {
+      val res = iterator.next()
+      val outcome = res._2
+      if (outcome.isRight) {
+        log.info("successfully forced closed channel=${res._1}")
+        successfullyClosed++
+      } else {
+        log.info("failed to force close channel=${res._1}: ", outcome.left() as Throwable)
+      }
+    }
+    return successfullyClosed
   }
 
   /**
@@ -569,6 +631,9 @@ class AppViewModel : ViewModel() {
               val res = startNode(context, pin)
               state.postValue(res)
               res.kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+              feerateEstimation.postValue(res.kit.nodeParams().onChainFeeConf().feeEstimator().run {
+                FeerateEstimationPerKb(getFeeratePerKb(2), getFeeratePerKb(6), getFeeratePerKb(72))
+              })
               ChannelsWatcher.schedule(context)
               Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
             } catch (t: Throwable) {
@@ -621,7 +686,8 @@ class AppViewModel : ViewModel() {
   public fun shutdown() {
     closeConnections()
     balance.postValue(MilliSatoshi(0))
-    networkInfo.postValue(Constants.DEFAULT_NETWORK_INFO)
+    electrumConn.value = Constants.DEFAULT_NETWORK_INFO.electrumServer
+    torConn.value = Constants.DEFAULT_NETWORK_INFO.torConnections
     state.postValue(KitState.Off)
   }
 
@@ -657,7 +723,10 @@ class AppViewModel : ViewModel() {
   private fun startNode(context: Context, pin: String): KitState.Started {
     log.info("starting up node...")
 
-    val system = ActorSystem.create("system")
+    // load config from libs + application.conf in resources
+    val defaultConfig = ConfigFactory.load()
+    val config = Wallet.getOverrideConfig(context).withFallback(defaultConfig)
+    val system = ActorSystem.create("system", config)
     system.registerOnTermination {
       log.info("system has been shutdown, all actors are terminated")
     }
@@ -670,10 +739,10 @@ class AppViewModel : ViewModel() {
       state.postValue(KitState.Bootstrap.Tor)
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-          networkInfo.value?.run {
-            if (status == TorConnectionStatus.CONNECTED) networkConnected = true
-            torConnections[name] = status
-            networkInfo.postValue(this)
+          peerConn.postValue(status == TorConnectionStatus.CONNECTED)
+          torConn.value?.apply {
+            this[name] = status
+            torConn.postValue(this)
           }
         }
       }))
@@ -686,20 +755,16 @@ class AppViewModel : ViewModel() {
     val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8)
     log.info("seed successfully read")
     val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
+
     val master = DeterministicWallet.generate(seed)
-
-    val pk = DeterministicWallet.derivePrivateKey(master, Wallet.getNodeKeyPath())
-    val bech32Address = fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(pk.publicKey(), Wallet.getChainHash())
-
-    val xpubPath = Wallet.getXpubKeyPath()
-    val pubkey = DeterministicWallet.publicKey(DeterministicWallet.derivePrivateKey(master, xpubPath))
-    val xpub = Xpub(xpub = DeterministicWallet.encode(pubkey, if ("testnet" == BuildConfig.CHAIN) DeterministicWallet.vpub() else DeterministicWallet.zpub()),
-      path = DeterministicWallet.KeyPath(xpubPath.path()).toString())
+    // we compute various things based on master
+    val address = Wallet.buildAddress(master)
+    val xpub = Wallet.buildXpub(master)
 
     Class.forName("org.sqlite.JDBC")
-    val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
-    val setup = Setup(Wallet.getDatadir(context), Wallet.getOverrideConfig(context), Option.apply(seed), Option.empty(), Option.apply(SingleAddressEclairWallet(bech32Address)), system)
-    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
+    Wallet.getOverrideConfig(context)
+    val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
+    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get())
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
     val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java), "EclairSupervisor")
@@ -764,7 +829,7 @@ class AppViewModel : ViewModel() {
               saveRate(context, "TWD") { json.getJSONObject("TWD").getDouble("last").toFloat() }
               saveRate(context, "USD") { json.getJSONObject("USD").getDouble("last").toFloat() }
               Prefs.setExchangeRateTimestamp(context, System.currentTimeMillis())
-            } catch(e: Exception) {
+            } catch (e: Exception) {
               log.error("invalid body for price rate api")
             } finally {
               it.close()

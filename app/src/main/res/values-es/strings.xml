@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 <resources>
-  <string name="app_name">Phoenix (Testnet)</string>
+  <string name="app_name">Phoenix (Mainnet test)</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
@@ -31,7 +31,7 @@
   <string name="restore_disclaimer_message">No importes una seed que NO haya sido creada por esta aplicación.\n\nAdemás, asegúrate de que no tienes otra wallet Phoenix siendo ejecutado con la misma seed.</string>
   <string name="restore_disclaimer_checkbox">Entiendo.</string>
   <string name="restore_disclaimer_next">Siguiente</string>
-  <string name="restore_instructions">La seed de tu wallet es una lista de 12 palabras en inglés. Ten en cuenta que las frases de contraseña BIP39 no son compatibles.</string>
+  <string name="restore_instructions">La seed de tu wallet es una lista de 12 palabras en inglés.</string>
   <string name="restore_mnemonics_label">Utiliza el teclado abajo para introducer la seed:</string>
   <string name="restore_in_progress">Recuperando tu wallet…</string>
   <string name="restore_import_button">Importar</string>
@@ -86,12 +86,12 @@
   <string name="receive_address_label">Dirección</string>
   <string name="receive_power_save_disclaimer">Estás en modo ahorro de energía. Para recibir el pago, asegúrate de que la aplicación pueda ejecutarse en segundo plano.</string>
   <string name="receive_withdraw_button">Utilizar enlace LNURL</string>
-  <string name="receive_swap_in_button">Mostrar una dirección bitcoin</string>
+  <string name="receive_swap_in_button">Mostrar una dirección Bitcoin</string>
   <string name="receive_swap_in_error_message">Ocurrió un error al cambiar a una transacción en cadena…\n\nPor favor inténtalo de nuevo.</string>
-  <string name="receive_swap_in_progress_message">Solicitando una dirección swap-in de bitcoin…</string>
+  <string name="receive_swap_in_progress_message">Solicitando una dirección swap-in de Bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Recibir en la cadena de bloques</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  A continuación se mostrará una dirección estándar de bitcoin.
+  A continuación se mostrará una dirección estándar de Bitcoin.
   <br /><br />
   Los fondos enviados a esta dirección se mostrarán en tu wallet después de una confirmación.
   <br /><br />
@@ -126,7 +126,7 @@
   <string name="send_pay_button">Pagar</string>
   <string name="send_swap_in_progress">Intercambio en progreso…</string>
   <string name="send_swap_error">El intercambio ha fallado. Por favor inténtalo de nuevo.</string>
-  <string name="send_swap_required_desc">Esta es una dirección de bitcoin, el pago será un intercambio.</string>
+  <string name="send_swap_required_desc">Esta es una dirección de Bitcoin, el pago será un intercambio.</string>
   <string name="send_swap_required_button">Solicitar un intercambio</string>
   <string name="send_swap_complete_recap_amount">Cantidad</string>
   <string name="send_swap_complete_recap_fee">Comisión de minería</string>
@@ -138,7 +138,6 @@
   <string name="scan_request_camera_access">Permitir acceso a la cámara</string>
   <string name="scan_instructions">Coloca un código QR de solicitud de pago\ndentro del rectángulo para escanearlo</string>
   <string name="scan_state_reading">Leyendo solicitud de pago</string>
-  <string name="scan_error_default">Esta no es una solicitud de pago válida.\n\nPor favor inténtalo de nuevo.</string>
   <string name="scan_error_expired">El pago ha expirado.</string>
   <string name="scan_error_pay_to_self">No puedes auto enviarte un pago.</string>
   <string name="scan_error_invalid_chain">Esta factura no usa la misma blockchain que tu wallet.</string>
@@ -213,10 +212,9 @@
     <br/><br/>
     Forzar el cierre de canales te costará dinero (para cubrir las tarifas en la cadena de bloques) y hará que tus fondos estén bloqueados durante días. <b>No desinstales la aplicación hasta que tus canales estén completamente cerrados, o perderás tu dinero.</b>
     <br/><br/>
-    Los fondos eventualmente se enviarán a: %1$s
-    <br/><br/>
     <b>No uses esta función si no entiendes exactamente las consecuencias.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Los fondos eventualmente se enviarán a:</string>
   <string name="closechannels_force_button">Forzar el cierre de canales</string>
   <string name="closechannels_confirm_dialog_message">¿Aún así quieres proceder?</string>
   <string name="closechannels_message_error">Ha habido un problema. Por favor, inténtalo de nuevo más tarde.</string>
@@ -285,7 +283,8 @@
   <string name="displayseed_title">Frase de recuperación de la wallet</string>
   <string name="displayseed_authenticate_button">Mostrar seed</string>
   <string name="displayseed_loading">Desbloquear seed…</string>
-  <string name="displayseed_error">Error al leer la seed. Por favor inténtalo de nuevo.\n\nRazón: %1$s</string>
+  <string name="displayseed_error_generic">Error al leer la seed. Por favor inténtalo de nuevo.</string>
+  <string name="displayseed_error_wrong_password">PIN incorrecto.</string>
   <string name="displayseed_instructions"><![CDATA[
     Esta lista de palabras es la copia de seguridad de tu wallet. ¡Guárdala en un lugar seguro (no en este teléfono)!
     <br /><br />
@@ -295,7 +294,6 @@
   <string name="displayseed_derivation_path">Seed BIP39 con ruta de derivación estándar BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">Ya hice una copia de seguridad de mi seed.</string>
-  <string name="displayseed_has_saved_seed_button">Confirmar</string>
 
   <!-- //////////////// logs settings //////////////// -->
 

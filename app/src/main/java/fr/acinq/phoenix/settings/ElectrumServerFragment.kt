@@ -72,9 +72,8 @@ class ElectrumServerFragment : BaseFragment() {
         }
       }
     })
-    app.networkInfo.observe(viewLifecycleOwner, Observer {
+    app.electrumConn.observe(viewLifecycleOwner, Observer { electrumServer ->
       context?.let { ctx ->
-        val electrumServer = it.electrumServer
         if (electrumServer == null) {
           // -- no connection to electrum server yet
           val prefElectrumAddress = Prefs.getElectrumServer(ctx)
@@ -94,9 +93,9 @@ class ElectrumServerFragment : BaseFragment() {
             })
         } else {
           // -- successfully connected to electrum
-          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
-          mBinding.tipTime.text = Transcriber.plainTime(it.electrumServer.tipTime * 1000L)
-          mBinding.blockHeight.text = NumberFormat.getInstance().format(it.electrumServer.blockHeight)
+          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, electrumServer.electrumAddress))
+          mBinding.tipTime.text = Transcriber.plainTime(electrumServer.tipTime * 1000L)
+          mBinding.blockHeight.text = NumberFormat.getInstance().format(electrumServer.blockHeight)
         }
       }
     })

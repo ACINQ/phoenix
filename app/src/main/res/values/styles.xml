@@ -209,7 +209,7 @@
   <style name="HLineSeparator">
     <item name="android:layout_width">match_parent</item>
     <item name="android:layout_height">1dp</item>
-    <item name="android:background">?attr/mutedBgColor</item>
+    <item name="android:background">?attr/borderColor</item>
   </style>
 
   <style name="VSeparator" parent="HLineSeparator">
@@ -290,7 +290,6 @@
     <item name="android:hapticFeedbackEnabled">true</item>
     <item name="android:textColor">?attr/textColor</item>
     <item name="iconTint">?attr/mutedTextColor</item>
-
     <item name="android:textSize">20sp</item>
   </style>
 

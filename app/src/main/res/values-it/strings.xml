@@ -15,7 +15,7 @@
   -->
 
 <resources>
-  <string name="app_name">Phoenix (Testnet)</string>
+  <string name="app_name">Phoenix (Mainnet test)</string>
 
   <!-- //////////////// system notification channels //////////////// -->
 
@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Non importare un seed che non è stato creato da quest\'app.\n\nInoltre, assicurati di non avere un altra app Phoenix aperta con lo stesso seed.</string>
   <string name="restore_disclaimer_checkbox">Ho capito.</string>
   <string name="restore_disclaimer_next">Avanti</string>
-  <string name="restore_instructions">Il seed del tuo wallet è una lista di 12 parole inglesi. Nota bene che l\'uso di una passphrase non è supportato.</string>
+  <string name="restore_instructions">Il seed del tuo wallet è una lista di 12 parole inglesi.</string>
   <string name="restore_mnemonics_label">Usa la seguente tastiera per inserire il tuo seed:</string>
   <string name="restore_in_progress">Ripristino del wallet…</string>
   <string name="restore_import_button">Importa</string>
@@ -90,12 +90,12 @@
   <string name="receive_power_save_disclaimer">Sei in modalità power save. Per ricevere il pagamento assicurati che l\'app possa essere eseguita in background.</string>
   <string name="receive_withdraw_button">Usa il link LNURL</string>
 
-  <string name="receive_swap_in_button">Mostra un indirizzo bitcoin</string>
+  <string name="receive_swap_in_button">Mostra un indirizzo Bitcoin</string>
   <string name="receive_swap_in_error_message">C\'è stato un errore scambiando con la transazione on-chain…\n\nPer favore riprova.</string>
   <string name="receive_swap_in_progress_message">Richiedendo un indirizzo per lo scambio…</string>
   <string name="receive_swap_in_disclaimer_title">Recevi on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  Di seguito vi verrà mostrato un indirizzo bitcoin.
+  Di seguito vi verrà mostrato un indirizzo Bitcoin.
   <br /><br />
   I fondi inviati a quest\'indirizzo saranno visibili sul tuo wallet dopo una conferma sulla chain.
   <br /><br />
@@ -131,7 +131,7 @@
   <string name="send_pay_button">Paga</string>
   <string name="send_swap_in_progress">Scambio in corso…</string>
   <string name="send_swap_error">Scambio fallito. Per favore riprova di nuovo.</string>
-  <string name="send_swap_required_desc">Questo è un indirizzo bitcoin, il pagamento sarà uno scambio.</string>
+  <string name="send_swap_required_desc">Questo è un indirizzo Bitcoin, il pagamento sarà uno scambio.</string>
   <string name="send_swap_required_button">Richiedi uno scambio</string>
   <string name="send_swap_complete_recap_amount">Ammontare</string>
   <string name="send_swap_complete_recap_fee">Commissioni miner</string>
@@ -144,7 +144,6 @@
   <string name="scan_instructions">Inquadta il QR di una richiesta di pagamento\nall\'interno del rettangolo.</string>
   <string name="scan_state_reading">Leggendo la richiesta di pagamento</string>
 
-  <string name="scan_error_default">Questa non è una richiesta di pagamento valida.\n\nPer favore prova di nuovo.</string>
   <string name="scan_error_expired">Il pagamento è scaduto.</string>
   <string name="scan_error_pay_to_self">Non puoi pagare te stesso.</string>
   <string name="scan_error_invalid_chain">Questa richesta di pagamento non usa la stessa blockchain del tuo wallet.</string>
@@ -209,10 +208,10 @@
   <string name="closechannels_channels_none">Al momento non hai canali che possono essere chiusi.\n\nVai a \'Lista canali\' per vedere lo stato dei tuoi canali.</string>
   <string name="closechannels_mutual_title">Svuota wallet</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    Usa questa pagina per svuotare il tuo wallet verso un indirizzo bitcoin.
+    Usa questa pagina per svuotare il tuo wallet verso un indirizzo Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">I fondi possono essere inviati an un wallet bitcoin. Assicurati che l\'indirizzo sia corretto prima dell\'invio.</string>
-  <string name="closechannels_mutual_input_hint">Inserisci l\'indirizzo bitcoin</string>
+  <string name="closechannels_mutual_input_instructions">I fondi possono essere inviati an un wallet Bitcoin. Assicurati che l\'indirizzo sia corretto prima dell\'invio.</string>
+  <string name="closechannels_mutual_input_hint">Inserisci l\'indirizzo Bitcoin</string>
   <string name="closechannels_mutual_button">Svuota il mio wallet</string>
   <string name="closechannels_force_title">Chiusura forzata</string>
   <string name="closechannels_force_instructions"><![CDATA[
@@ -223,10 +222,9 @@
     <br/><br/>
     La chiusura forzata dei canali comporta un costo aggiuntivo (le commissioni on-chain) e il blocco dei fondi per qualche giorno. <b> Non disinstallare l\'app finchè i tuoi canali sono completamente chiusi o perderai dei soldi.</b>
     <br/><br/>
-    I fondi verranno mandati a: %1$s
-    <br/><br/>
     <b>Non usare questa funzionalità se non comprendi appieno cosa fa.</b>
   ]]></string>
+  <string name="closechannels_force_destination">I fondi verranno mandati a:</string>
   <string name="closechannels_force_button">Chiusura forzata di tutti i canali</string>
   <string name="closechannels_confirm_dialog_message">Sei sicuro di voler procedere?</string>
   <string name="closechannels_message_error">C\'è stato un problema. Per favore riprova più tardi.</string>
@@ -295,7 +293,8 @@
   <string name="displayseed_title">Frase di recupero wallet</string>
   <string name="displayseed_authenticate_button">Mostra seed</string>
   <string name="displayseed_loading">Sbloccando il seed…</string>
-  <string name="displayseed_error">Impossibile leggere il seed. Per favore riprova.\n\nMotivo: %1$s</string>
+  <string name="displayseed_error_generic">Impossibile leggere il seed. Per favore riprova.</string>
+  <string name="displayseed_error_wrong_password">PIN errato.</string>
   <string name="displayseed_instructions"><![CDATA[
     Questa lista di parole è il backup del tuo wallet. Salvala in un luogo sicuro (non su questo telefono)!
     <br /><br />
@@ -305,7 +304,6 @@
   <string name="displayseed_derivation_path">Seed BIP39 con path derivation standard BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">Ho fatto un backup del mio seed</string>
-  <string name="displayseed_has_saved_seed_button">Conferma</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
@@ -389,12 +387,6 @@
 
   <string name="seedsec_bio_prompt_title">Abilita il blocco biometrico</string>
   <string name="seedsec_bio_prompt_negative">Annulla</string>
-
-  <!-- //////////////// ln url login //////////////// -->
-
-  <string name="lnurl_login_instructions">Log in to %1$s</string>
-  <string name="lnurl_login_button">Log in</string>
-  <string name="lnurl_login_in_progress">Logging in, per favore attendi…</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 
