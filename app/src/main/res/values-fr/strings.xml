@@ -131,6 +131,7 @@
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_chain_fees_edit">Ajuster fees</string>
   <string name="send_chain_fees_label">Fee rate</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Ce paiement est une transaction on-chain, plus lente et généralement plus chère. Des frais de minage vont être appliqués.</string>

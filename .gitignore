@@ -17,3 +17,4 @@ app/release
 app/debug
 apk
 logs
+sdk-dependencies
