@@ -223,7 +223,7 @@
   <string name="closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontram os seus canais.</string>
   <string name="closechannels_mutual_title">Esvaziar carteira</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    Use este recurso para esvaziar sua carteira enviando o saldo para um endereço bitcoin.
+    Use este recurso para esvaziar sua carteira enviando o saldo para um endereço Bitcoin.
   ]]></string>
   <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
   <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
