@@ -93,7 +93,7 @@
   <string name="receive_power_save_disclaimer">Você está no modo de economia de energia. Para receber o pagamento, verifique se o aplicativo pode ser executado em segundo plano.</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
-  <string name="receive_swap_in_button">Mostrar endereço bitcoin</string>
+  <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
   <string name="receive_swap_in_error_message">Ocorreu um erro ao trocar para uma transação da rede Bitcoin…\n\nTente novamente.</string>
   <string name="receive_swap_in_progress_message">Solicitando um endereço bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
