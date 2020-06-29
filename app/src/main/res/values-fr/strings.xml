@@ -276,7 +276,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configuration</string>
-  <string name="menu_send">Scanner</string>
+  <string name="menu_send">Envoyer</string>
   <string name="menu_receive">Recevoir</string>
 
   <!-- //////////////// init wallet //////////////// -->

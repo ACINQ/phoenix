@@ -202,6 +202,7 @@
   <string name="btn_cancel">Cancel</string>
   <string name="btn_close">Close</string>
   <string name="btn_pause_connecting">Connecting to peer…</string>
+  <string name="btn_pause_connecting_electrum">Connecting to electrum…</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -288,7 +289,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Settings</string>
-  <string name="menu_send">Scan</string>
+  <string name="menu_send">Send</string>
   <string name="menu_receive">Receive</string>
 
   <!-- //////////////// init wallet //////////////// -->

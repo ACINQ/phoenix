@@ -104,7 +104,11 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     // if button is paused, show progress bar with special text
     mBinding.progress.visibility = if (isPaused) View.VISIBLE else if (hasIcon) View.INVISIBLE else View.GONE
-    mBinding.text.text = if (isPaused) pausedText else defaultText
+    if (isPaused) {
+      if (pausedText != null) mBinding.text.text = pausedText
+    } else {
+      if (defaultText != null) mBinding.text.text = defaultText
+    }
 
     // spacer is shown only if the icon or the progress bar is shown
     val shouldShowSpacer = mBinding.image.visibility == View.VISIBLE || mBinding.progress.visibility == View.VISIBLE
@@ -119,9 +123,13 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
   }
 
-  fun setText(text: String) {
+  fun setDefaultText(text: String) {
     defaultText = text
     mBinding.text.text = if (isPaused) pausedText else defaultText
+  }
+
+  fun setText(text: String) {
+    mBinding.text.text = text
   }
 
   fun setIcon(icon: Drawable) {

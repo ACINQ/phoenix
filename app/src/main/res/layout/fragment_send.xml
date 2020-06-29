@@ -622,11 +622,9 @@
           app:enableOrFade="@{model.state instanceof SendState.Lightning.Ready || model.state instanceof SendState.Onchain.Ready}"
           app:icon="@drawable/ic_send"
           app:icon_tint="?attr/altTextColor"
-          app:is_paused_inverse="@{appModel.peerConn}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_recap_pay_separator"
-          app:paused_text="@string/btn_pause_connecting"
           app:text="@string/send_pay_button"
           app:text_color="?attr/altTextColor" />
 
