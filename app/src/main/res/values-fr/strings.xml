@@ -127,7 +127,7 @@
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
-  <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
+  <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
@@ -142,9 +142,8 @@
   <string name="send_chain_fees_feedback_inf">Avec ce fee rate, le paiement ne devrait être reçu que dans au moins 12 heures.</string>
   <string name="send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>
-  <string name="send_swap_in_progress">Echange en cours…</string>
-  <string name="send_swap_error">L\'échange a échoué. Veuillez réessayer.</string>
-  <string name="send_swap_required_desc">Le destinataire de ce paiement est une adresse Bitcoin, il faut d\'abord faire un échange.</string>
+  <string name="send_swap_in_progress">Création de la transaction…</string>
+  <string name="send_swap_error">La transaction n\'a pas pu être créée. Veuillez réessayer.</string>
   <string name="send_swap_required_button">Préparer transaction</string>
   <string name="send_swap_complete_recap_amount">Montant</string>
   <string name="send_swap_complete_recap_fee">Frais de minage</string>
@@ -207,6 +206,7 @@
   <string name="settings_mutual_close">Fermer tous mes canaux de paiement</string>
   <string name="settings_force_close">Zone à risque</string>
   <string name="settings_tor">Tor</string>
+  <string name="settings_about">À propos</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -496,5 +496,19 @@
   <string name="conndialog_lightning">Pair Lightning</string>
   <string name="conndialog_ok">Connecté</string>
   <string name="conndialog_not_ok">En connexion…</string>
+
+  <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">À propos</string>
+  <string name="about_version">Version: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  Phoenix est un portefeuille Bitcoin utilisant le réseau Lightning pour envoyer et recevoir des paiements.
+  <br/><br/>
+  C\'est un logiciel libre et open source, développé par <a href="https://phoenix.acinq.co">ACINQ</a> sous licence <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a>.
+  <br/><br/>
+  Notez que ce portefeuille est non-custodial, c\'est-à-dire que <strong>vous seul avez possession de la clé (ou seed) du portefeuille</strong>. Ne révelez cette seed à personne, et faites attention au hameçonnage.
+  <br/><br/>
+  Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
+  ]]></string>
 
 </resources>

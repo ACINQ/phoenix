@@ -89,7 +89,7 @@
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mnemonics_layout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginTop="@dimen/space_lg"
@@ -97,8 +97,6 @@
         android:visibility="@{model.state != RestoreSeedState.INIT}"
         android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/mutedBgColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/instructions">
 
         <TextView
@@ -151,7 +149,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
         android:visibility="@{model.state != RestoreSeedState.INIT}"
-        app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
@@ -173,7 +170,7 @@
         android:visibility="@{model.state == RestoreSeedState.IN_PROGRESS}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/import_button"
+        app:layout_constraintTop_toBottomOf="@id/keyboard"
         app:text="@string/restore_in_progress" />
 
       <TextView

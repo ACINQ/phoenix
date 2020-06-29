@@ -131,7 +131,6 @@
   <string name="send_pay_button">Paga</string>
   <string name="send_swap_in_progress">Scambio in corso…</string>
   <string name="send_swap_error">Scambio fallito. Per favore riprova di nuovo.</string>
-  <string name="send_swap_required_desc">Questo è un indirizzo Bitcoin, il pagamento sarà uno scambio.</string>
   <string name="send_swap_required_button">Richiedi uno scambio</string>
   <string name="send_swap_complete_recap_amount">Ammontare</string>
   <string name="send_swap_complete_recap_fee">Commissioni miner</string>
