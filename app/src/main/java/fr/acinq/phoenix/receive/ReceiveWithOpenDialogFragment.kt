@@ -72,7 +72,7 @@ open class ReceiveWithOpenDialogFragment : DialogFragment() {
       mBinding.model = model
 
       model.timeToExpiry.observe(viewLifecycleOwner, Observer {
-        mBinding.acceptButton.setText(getString(R.string.receive_with_open_accept, max(it / 1000, 0).toString()))
+        mBinding.acceptButton.setDefaultText(getString(R.string.receive_with_open_accept, max(it / 1000, 0).toString()))
         if (it <= 0) {
           log.info("pay to open with payment_hash=${args.paymentHash} has expired and is declined")
           app.rejectPayToOpen(ByteVector32.fromValidHex(args.paymentHash))

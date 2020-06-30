@@ -120,7 +120,6 @@
           android:drawableTint="?attr/positiveColor"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_done"
-          android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == MutualCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />

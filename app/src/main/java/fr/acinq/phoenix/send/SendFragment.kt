@@ -153,7 +153,6 @@ class SendFragment : BaseFragment() {
     })
 
     model.chainFeesSatBytes.observe(viewLifecycleOwner, Observer { feerate ->
-
       val state = model.state.value
       if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
         model.state.value = SendState.Onchain.SwapRequired(state.uri)
@@ -168,7 +167,19 @@ class SendFragment : BaseFragment() {
           else -> R.string.send_chain_fees_feedback_20min
         })
       }
+    })
 
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
+      if (!it.lightningConnected) {
+        mBinding.sendButton.setIsPaused(true)
+        mBinding.sendButton.setText(getString(R.string.btn_pause_connecting))
+      } else if (it.electrumServer == null) {
+        mBinding.sendButton.setIsPaused(true)
+        mBinding.sendButton.setText(getString(R.string.btn_pause_connecting_electrum))
+      } else {
+        mBinding.sendButton.setIsPaused(false)
+        mBinding.sendButton.setText(getString(R.string.send_pay_button))
+      }
     })
 
     model.checkAndSetPaymentRequest(args.payload)
