@@ -180,6 +180,11 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     app.refreshPayments()
   }
 
+  override fun onResume() {
+    super.onResume()
+    app.refreshPeerConnectionState()
+  }
+
   override fun onStop() {
     super.onStop()
     EventBus.getDefault().unregister(this)

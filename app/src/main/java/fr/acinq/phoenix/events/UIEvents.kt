@@ -26,3 +26,5 @@ class BalanceEvent(val balance: MilliSatoshi)
 class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32)
 
 class ChannelStateChange
+
+object PeerConnectionChange
