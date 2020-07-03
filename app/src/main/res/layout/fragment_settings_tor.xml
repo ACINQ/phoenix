@@ -40,20 +40,20 @@
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:overScrollMode="never"
-      app:layout_constrainedHeight="true"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/bgColor">
+        android:background="@drawable/square_border_hz">
 
         <fr.acinq.phoenix.utils.customviews.SwitchView
           android:id="@+id/tor_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           app:layout_constraintTop_toTopOf="parent"
+          app:icon="@drawable/ic_tor_shield"
           app:text="@string/tor_settings_disabled" />
 
         <View

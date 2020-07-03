@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +28,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
@@ -57,7 +57,7 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(TorSettingViewModel::class.java)
     mBinding.model = model
-    app.networkInfo.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
+    app.torConn.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
   }
 
   override fun onStart() {

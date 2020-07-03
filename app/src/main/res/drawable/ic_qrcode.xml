@@ -17,9 +17,39 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
   android:width="@dimen/button_height"
   android:height="@dimen/button_height"
-  android:viewportWidth="24"
-  android:viewportHeight="24">
+  android:viewportWidth="22"
+  android:viewportHeight="22">
+  <path
+    android:pathData="M1,1h8v8h-8z"
+    android:strokeWidth="2"
+    android:fillColor="#00000000"
+    android:strokeColor="?attr/textColor" />
+  <path
+    android:pathData="M1,13h8v8h-8z"
+    android:strokeWidth="2"
+    android:fillColor="#00000000"
+    android:strokeColor="?attr/textColor" />
+  <path
+    android:pathData="M13,1h8v8h-8z"
+    android:strokeWidth="2"
+    android:fillColor="#00000000"
+    android:strokeColor="?attr/textColor" />
   <path
     android:fillColor="?attr/textColor"
-    android:pathData="M7.683,16.319v1.727h-1.729v-1.727L7.683,16.319zM7.683,5.954v1.727h-1.729v-1.727L7.683,5.954zM18.046,5.954v1.727h-1.727v-1.727L18.046,5.954zM4.227,19.759h5.183v-5.166h-5.183L4.227,19.759zM4.227,9.407h5.183v-5.181h-5.183L4.227,9.407zM14.591,9.407h5.182v-5.181h-5.182L14.591,9.407zM11.137,12.865L11.137,21.5L2.5,21.5v-8.635L11.137,12.865zM18.046,19.773L18.046,21.5h-1.727v-1.727L18.046,19.773zM21.5,19.773L21.5,21.5h-1.727v-1.727L21.5,19.773zM21.5,12.865v5.181h-5.181v-1.727h-1.729L14.59,21.5h-1.727v-8.635h5.182v1.728h1.727v-1.728L21.5,12.865zM11.137,2.5v8.635L2.5,11.135L2.5,2.5L11.137,2.5zM21.5,2.5v8.635h-8.636L12.864,2.5L21.5,2.5z" />
+    android:pathData="M22,18l-6,0l0,-2l-2,0l0,6l-2,0l0,-10l6,0l0,2l2,0l0,-2l2,0z" />
+  <path
+    android:fillColor="?attr/textColor"
+    android:pathData="M16,20h2v2h-2z" />
+  <path
+    android:fillColor="?attr/textColor"
+    android:pathData="M20,20h2v2h-2z" />
+  <path
+    android:fillColor="?attr/textColor"
+    android:pathData="M4,4h2v2h-2z" />
+  <path
+    android:fillColor="?attr/textColor"
+    android:pathData="M16,4h2v2h-2z" />
+  <path
+    android:fillColor="?attr/textColor"
+    android:pathData="M4,16h2v2h-2z" />
 </vector>

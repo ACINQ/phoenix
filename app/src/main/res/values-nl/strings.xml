@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Importeer geen seed die NIET door deze applicatie is aangemaakt.\n\nZorg er ook voor dat je geen andere Phoenix wallet hebt met dezelfde seed.</string>
   <string name="restore_disclaimer_checkbox">Ik begrijp het.</string>
   <string name="restore_disclaimer_next">Volgende</string>
-  <string name="restore_instructions">De seed van je wallet is een lijst met 12 Engelse woorden. Passphrases zijn niet ondersteund.</string>
+  <string name="restore_instructions">De seed van je wallet is een lijst met 12 Engelse woorden.</string>
   <string name="restore_mnemonics_label">Gebruik je toetsenbord om de seed in te voeren:</string>
   <string name="restore_in_progress">Wallet herstellen…</string>
   <string name="restore_import_button">Importeer</string>
@@ -132,7 +132,6 @@
   <string name="send_pay_button">Betaal</string>
   <string name="send_swap_in_progress">Swap is bezig…</string>
   <string name="send_swap_error">Swap is mislukt. Probeer opnieuw.</string>
-  <string name="send_swap_required_desc">Dit is een bitcoinadres, de betaling wordt een swap.</string>
   <string name="send_swap_required_button">Verzoek een swap</string>
   <string name="send_swap_complete_recap_amount">Bedrag</string>
   <string name="send_swap_complete_recap_fee">Miner Vergoeding</string>
@@ -145,7 +144,6 @@
   <string name="scan_instructions">Plaats een betalingsverzoek QR code\nin de rechthoek het om te scannen</string>
   <string name="scan_state_reading">Betalingsverzoek lezen</string>
 
-  <string name="scan_error_default">Dit is geen geldig betalingsverzoek.\n\nProbeer opnieuw.</string>
   <string name="scan_error_expired">Betaling is verlopen.</string>
   <string name="scan_error_pay_to_self">Je kan jezelf niet betalen.</string>
   <string name="scan_error_invalid_chain">Dit betalingsverzoek gebruikt niet dezelfde blockchain als je wallet.</string>
@@ -224,10 +222,9 @@
     <br/><br/>
     Het gedwongen sluiten van kanalen kost geld (om de on-chain vergoedingen te dekken) en zal ervoor zorgen dat je geld dagenlang vergrendeld zijn. <b>Verwijder de app niet totdat je kanalen volledig gesloten zijn of je zal geld kwijtraken</b>
     <br/><br/>
-    Fondsen zullen uiteindelijk verstuurd worden naar: %1$s
-    <br/><br/>
     <b>Gebruik deze functie niet als je niet volledig begrijpt wat het doet.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Fondsen zullen uiteindelijk verstuurd worden naar:</string>
   <string name="closechannels_force_button">Kanalen gedwongen sluiten</string>
   <string name="closechannels_confirm_dialog_message">Weet je zeker dat je wilt verdergaan?</string>
   <string name="closechannels_message_error">Er is een probleem opgetreden. Prober het later opnieuw.</string>
@@ -298,7 +295,8 @@
   <string name="displayseed_title">Wallet herstelzin</string>
   <string name="displayseed_authenticate_button">Laat seed zien</string>
   <string name="displayseed_loading">Seed ontgrendelen…</string>
-  <string name="displayseed_error">Kan seed niet lezen. Probeer opnieuw.\n\nFoutmelding: %1$s</string>
+  <string name="displayseed_error_generic">Kan seed niet lezen. Probeer opnieuw.</string>
+  <string name="displayseed_error_wrong_password">PIN is onjuist.</string>
   <string name="displayseed_instructions"><![CDATA[
     Deze woordenlijst is de backup van je wallet. Bewaar het op een veilige plek (niet op deze telefoon)!
     <br /><br />
@@ -308,7 +306,6 @@
   <string name="displayseed_derivation_path">BIP39 seed met standaard BIP84 derivation path</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">Ik heb een backup van mijn seed gemaakt</string>
-  <string name="displayseed_has_saved_seed_button">Bevestig</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
@@ -338,8 +335,7 @@
   <string name="paymentdetails_error_label">Fout</string>
   <string name="paymentdetails_closing_desc">Betaling voor kanaalsluiting #%1$s</string>
   <string name="paymentdetails_no_description">Geen omschrijving</string>
-
-  <string name="paymentdetails_technicals_button">Laat technische data ziem</string>
+  <string name="paymentdetails_technicals_button">Laat technische data zien</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 

@@ -40,6 +40,8 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
+import fr.acinq.phoenix.lnurl.LNUrlAuth
+import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -63,61 +65,60 @@ class ReadInputFragment : BaseFragment() {
     model = ViewModelProvider(this).get(ReadInputViewModel::class.java)
     mBinding.model = model
 
-    model.invoice.observe(viewLifecycleOwner, Observer {
-      if (it != null) {
-        when (it) {
-          is PaymentRequest -> {
-            // check payment request chain
-            val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
-            // additional controls
-            if (app.kit?.nodeParams()?.nodeId() == it.nodeId()) {
-              log.debug("abort payment to self")
-              model.readingState.postValue(ReadingState.ERROR)
-              model.errorMessage.postValue(R.string.scan_error_pay_to_self)
-            } else if (it.isExpired) {
-              model.readingState.postValue(ReadingState.ERROR)
-              model.errorMessage.postValue(R.string.scan_error_expired)
-            } else if (it.amount().isEmpty && !it.features().allowTrampoline()) {
-              // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
-              AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
-                .setCancelable(false)
-                .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it))) }
-                .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
-                  mBinding.scanView.resume()
-                  model.readingState.value = ReadingState.SCANNING
-                }
-                .show()
-            } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.prefix()) {
-              model.readingState.postValue(ReadingState.ERROR)
-              model.errorMessage.postValue(R.string.scan_error_invalid_chain)
-            } else {
-              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it)))
-            }
-          }
-          is BitcoinURI -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.raw))
-          is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it))
-          is LNUrl -> {
-            log.info("unhandled LNURL=${it}")
-            model.readingState.postValue(ReadingState.ERROR)
-            model.errorMessage.postValue(R.string.scan_error_lnurl_unsupported)
-          }
-          else -> model.invoice.value = null
-        }
-      }
-    })
-    model.readingState.observe(viewLifecycleOwner, Observer {
+    model.inputState.observe(viewLifecycleOwner, Observer {
       when (it) {
-        ReadingState.ERROR -> {
+        is ReadInputState.Scanning -> mBinding.scanView.resume()
+        is ReadInputState.Reading -> mBinding.scanView.pause()
+        is ReadInputState.Error -> {
+          mBinding.errorMessage.text = getString(when (it) {
+            is ReadInputState.Error.PayToSelf -> R.string.scan_error_pay_to_self
+            is ReadInputState.Error.InvalidChain -> R.string.scan_error_invalid_chain
+            is ReadInputState.Error.PaymentExpired -> R.string.scan_error_expired
+            is ReadInputState.Error.UnhandledLNURL -> R.string.scan_error_lnurl_unsupported
+            is ReadInputState.Error.UnhandledInput -> R.string.scan_error_invalid_scan
+          })
           mBinding.scanView.pause()
-          Handler().postDelayed({ model.readingState.value = ReadingState.SCANNING }, 1750)
+          Handler().postDelayed({
+            if (model.inputState.value is ReadInputState.Error) {
+              model.inputState.value = ReadInputState.Scanning
+            }
+          }, 1750)
         }
-        ReadingState.READING -> {
-          mBinding.scanView.pause()
+        is ReadInputState.Done.Lightning -> {
+          // check payment request chain
+          val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
+          // additional controls
+          if (app.kit?.nodeParams()?.nodeId() == it.pr.nodeId()) {
+            log.debug("abort payment to self")
+            model.inputState.value = ReadInputState.Error.PayToSelf
+          } else if (it.pr.isExpired) {
+            model.inputState.value = ReadInputState.Error.PaymentExpired
+          } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.pr.prefix()) {
+            model.inputState.value = ReadInputState.Error.InvalidChain
+          } else if (it.pr.amount().isEmpty && !it.pr.features().allowTrampoline()) {
+            // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
+            AlertHelper.build(layoutInflater, Converter.html(getString(R.string.scan_amountless_legacy_title)), Converter.html(getString(R.string.scan_amountless_legacy_message)))
+              .setCancelable(false)
+              .setPositiveButton(R.string.scan_amountless_legacy_confirm_button) { _, _ -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr))) }
+              .setNegativeButton(R.string.scan_amountless_legacy_cancel_button) { _, _ ->
+                mBinding.scanView.resume()
+                model.inputState.value = ReadInputState.Scanning
+              }
+              .show()
+          } else {
+            findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr)))
+          }
         }
-        ReadingState.SCANNING -> {
-          mBinding.scanView.resume()
+        is ReadInputState.Done.Onchain -> {
+          findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.raw))
         }
-        else -> Unit
+        is ReadInputState.Done.Url -> {
+          when (it.url) {
+            is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))
+            is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlAuth(it.url))
+            else -> model.inputState.value = ReadInputState.Error.UnhandledLNURL
+          }
+        }
       }
     })
   }
@@ -131,7 +132,7 @@ class ReadInputFragment : BaseFragment() {
     mBinding.scanView.initializeFromIntent(barcodeIntent)
 
     if (!Strings.isNullOrEmpty(args.payload)) {
-      model.checkAndSetPaymentRequest(args.payload!!)
+      model.readInput(args.payload!!)
     }
 
     mBinding.cameraAccessButton.setOnClickListener {
@@ -139,16 +140,15 @@ class ReadInputFragment : BaseFragment() {
     }
 
     mBinding.pasteButton.setOnClickListener {
-      context?.let { model.checkAndSetPaymentRequest(ClipboardHelper.read(it)) }
+      context?.let { model.readInput(ClipboardHelper.read(it)) }
     }
 
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
-    context?.let {
-      if (ContextCompat.checkSelfPermission(it, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+    activity?.let { activity ->
+      if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
         model.hasCameraAccess.value = false
-        activity?.let { act ->
-          ActivityCompat.requestPermissions(act, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST)
-        }
+        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST)
       }
     }
   }
@@ -170,18 +170,14 @@ class ReadInputFragment : BaseFragment() {
   }
 
   private fun startScanning() {
-    if (model.readingState.value == ReadingState.ERROR || model.readingState.value == ReadingState.DONE) {
-      model.readingState.postValue(ReadingState.SCANNING)
+    if (model.inputState.value is ReadInputState.Error || model.inputState.value is ReadInputState.Done) {
+      model.inputState.postValue(ReadInputState.Scanning)
     }
     mBinding.scanView.decodeContinuous(object : BarcodeCallback {
-      override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) {
-      }
+      override fun possibleResultPoints(resultPoints: MutableList<ResultPoint>?) = Unit
 
       override fun barcodeResult(result: BarcodeResult?) {
-        val scannedText = result?.text
-        if (scannedText != null) {
-          model.checkAndSetPaymentRequest(scannedText)
-        }
+        result?.text?.let { model.readInput(it) }
       }
     })
   }

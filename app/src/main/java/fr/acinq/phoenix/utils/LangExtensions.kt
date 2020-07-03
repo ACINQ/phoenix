@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ACINQ SAS
+ * Copyright 2020 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.events
+package fr.acinq.phoenix.utils
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.MilliSatoshi
-
-class PaymentPending
-
-class BalanceEvent(val balance: MilliSatoshi)
-
-class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32)
-
-class ChannelStateChange
-
-object PeerConnectionChange
+/**
+ * Utility method rebinding any exceptions thrown by a method into another exception, using the origin exception as the root cause.
+ * Helps with pattern matching.
+ */
+inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
+  action.invoke()
+} catch (t: Exception) {
+  exception.initCause(t)
+  throw exception
+}

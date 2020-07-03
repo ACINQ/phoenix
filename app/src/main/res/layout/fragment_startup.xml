@@ -100,7 +100,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData || appModel.state instanceof KitState.Error.Tor}"
+          android:visibility="@{appModel.state instanceof KitState.Error.Generic || appModel.state instanceof KitState.Error.UnreadableData || appModel.state instanceof KitState.Error.Tor || appModel.state instanceof KitState.Error.InvalidElectrumAddress}"
           app:icon="@drawable/ic_settings"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"

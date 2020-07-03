@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2019 ACINQ SAS
+  ~ Copyright 2020 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,24 +20,9 @@
   android:viewportWidth="24"
   android:viewportHeight="24">
   <path
-    android:fillColor="#00000000"
-    android:pathData="M22,16v4a5,5 0,0 1,-2 2H5a5,5 0,0 1,-2 -2v-4"
-    android:strokeWidth="1.25"
-    android:strokeColor="?attr/textColor"
-    android:strokeLineCap="round"
-    android:strokeLineJoin="round" />
-  <path
-    android:fillColor="#00000000"
-    android:pathData="M7,10l5,5l5,-5"
-    android:strokeWidth="1.25"
-    android:strokeColor="?attr/textColor"
-    android:strokeLineCap="round"
-    android:strokeLineJoin="round" />
-  <path
-    android:fillColor="#00000000"
-    android:pathData="M7,3l5,5l5,-5"
-    android:strokeWidth="1.25"
-    android:strokeColor="?attr/textColor"
+    android:fillColor="?android:attr/textColor"
+    android:pathData="M23.672 19.429l-7.067-7.067c-0.438-0.438-1.153-0.438-1.591 0l-0.53 0.53-4.313-4.313 7.079-7.079h-7.5l-3.329 3.329-0.33-0.329h-1.591v1.591l0.329 0.329-4.829 4.83 3.75 3.75 4.829-4.829 4.313 4.313-0.53 0.53c-0.438 0.438-0.438 1.153 0 1.591l7.067 7.067c0.438 0.438 1.153 0.438 1.591 0l2.652-2.652c0.438-0.437 0.438-1.153 0-1.591z"
+    android:strokeWidth="1.5"
     android:strokeLineCap="round"
     android:strokeLineJoin="round" />
 </vector>

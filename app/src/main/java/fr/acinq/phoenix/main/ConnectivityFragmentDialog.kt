@@ -53,7 +53,7 @@ class ConnectivityFragmentDialog : DialogFragment() {
     } ?: dismiss()
     app.networkInfo.observe(viewLifecycleOwner, Observer {
       context?.let { ctx ->
-        val isNetworkOk = handleNetworkConnection(ctx, it).and(handleElectrumConnection(ctx, it)).and(handleTorConnection(ctx, it))
+        val isNetworkOk = handleNetworkConnection(ctx, it).and(handleElectrumConnection(ctx, it)).and(handleTorConnection(ctx, it)).and(handleLightningPeerConnection(ctx, it))
         mBinding.summary.visibility = if (isNetworkOk) View.GONE else View.VISIBLE
       }
     })
@@ -62,14 +62,21 @@ class ConnectivityFragmentDialog : DialogFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.networkConnLabel.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
-    mBinding.electrumConnLabel.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_electrum) }
     mBinding.torConnLabel.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_tor) }
+    mBinding.lightningConnLabel.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
+    mBinding.electrumConnLabel.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_electrum) }
     mBinding.close.setOnClickListener { findNavController().popBackStack() }
   }
 
   private fun handleNetworkConnection(context: Context, ni: NetworkInfo): Boolean {
     mBinding.networkConnState.text = context.getString(if (ni.networkConnected) R.string.conndialog_ok else R.string.conndialog_not_ok)
     mBinding.networkConnLabel.setIconColor(ThemeHelper.color(context, if (ni.networkConnected) R.attr.positiveColor else R.attr.negativeColor))
+    return ni.networkConnected
+  }
+
+  private fun handleLightningPeerConnection(context: Context, ni: NetworkInfo): Boolean {
+    mBinding.lightningConnState.text = context.getString(if (ni.lightningConnected) R.string.conndialog_ok else R.string.conndialog_not_ok)
+    mBinding.lightningConnLabel.setIconColor(ThemeHelper.color(context, if (ni.lightningConnected) R.attr.positiveColor else R.attr.negativeColor))
     return ni.networkConnected
   }
 

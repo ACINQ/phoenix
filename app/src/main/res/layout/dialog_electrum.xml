@@ -23,25 +23,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/space_md"
-    android:textColor="?attr/textColor"
     android:text="@string/electrum_dialog_checkbox"
+    android:textColor="?attr/textColor"
     app:layout_constraintTop_toTopOf="parent" />
-
-  <TextView
-    android:id="@+id/elec_dialog_ssl"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/space_md"
-    android:background="?attr/mutedBgColor"
-    android:paddingStart="@dimen/space_md_p"
-    android:paddingTop="@dimen/space_sm"
-    android:paddingEnd="@dimen/space_md_p"
-    android:paddingBottom="@dimen/space_sm"
-    android:text="@string/electrum_dialog_ssl"
-    android:textColor="?attr/onMutedBgTextColor"
-    android:textSize="@dimen/text_md"
-    app:layout_constrainedWidth="true"
-    app:layout_constraintTop_toBottomOf="@id/elec_dialog_checkbox" />
 
   <TextView
     android:id="@+id/elec_dialog_input_label"
@@ -53,7 +37,7 @@
     android:text="@string/electrum_dialog_input"
     android:textColor="?attr/colorPrimary"
     android:textSize="@dimen/text_md"
-    app:layout_constraintTop_toBottomOf="@id/elec_dialog_ssl" />
+    app:layout_constraintTop_toBottomOf="@id/elec_dialog_checkbox" />
 
   <com.google.android.material.textfield.TextInputEditText
     android:id="@+id/elec_dialog_input_value"
@@ -68,8 +52,41 @@
     android:textSize="@dimen/text_lg"
     android:translationX="-3dp"
     app:layout_constrainedWidth="true"
-    app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/elec_dialog_input_label" />
+
+  <FrameLayout
+    android:id="@+id/elec_dialog_ssl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/space_md"
+    android:background="?attr/mutedBgColor"
+    app:layout_constraintTop_toBottomOf="@id/elec_dialog_input_value">
+
+    <TextView
+      android:id="@+id/elec_dialog_ssl_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="@dimen/space_md_p"
+      android:text="@string/electrum_dialog_ssl"
+      android:textColor="?attr/onMutedBgTextColor"
+      android:textSize="@dimen/text_md" />
+
+    <CheckBox
+      android:id="@+id/elec_dialog_ssl_force_checkbox"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:drawablePadding="@dimen/space_md"
+      android:text="@string/electrum_dialog_ssl_tor"
+      android:minHeight="0dp"
+      android:layout_marginStart="@dimen/space_md"
+      android:layout_marginEnd="@dimen/space_md"
+      android:paddingTop="@dimen/space_md_p"
+      android:paddingBottom="@dimen/space_md_p"
+      android:textColor="?attr/onMutedBgTextColor"
+      android:textSize="@dimen/text_md" />
+
+  </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

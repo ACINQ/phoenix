@@ -59,6 +59,7 @@ class SettingsFragment : BaseFragment() {
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
+    mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
   }
 
   override fun handleKitState(state: KitState) {}

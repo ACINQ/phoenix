@@ -20,18 +20,18 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.send.LNUrlPayState" />
+    <import type="fr.acinq.phoenix.lnurl.LNUrlPayState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.send.LNUrlPayViewModel" />
+      type="fr.acinq.phoenix.lnurl.LNUrlPayViewModel" />
   </data>
 
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".send.LNUrlPayFragment">
+    tools:context=".lnurl.LNUrlPayFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
