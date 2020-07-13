@@ -1,16 +1,12 @@
 package fr.acinq.phoenix.io
 
+import kotlin.coroutines.cancellation.CancellationException
 
-interface Socket {
 
-    sealed class State {
-        object Ready: State()
-        class Error(val exception: IOException): State()
-        object Closed: State()
-        companion object
-    }
+@OptIn(ExperimentalStdlibApi::class)
+interface TCPSocket {
 
-    sealed class IOException(message: String?) : Exception(message) {
+    sealed class IOException(message: String?) : Error(message) {
         object ConnectionRefused: IOException("Connection refused")
         object ConnectionClosed: IOException("Connection closed")
         object NoNetwork: IOException("No network available")
@@ -30,13 +26,14 @@ interface Socket {
 
     fun close()
 
-    fun interface Factory {
-        fun createSocket(host: String, port: Int, onStateChange: (Socket, State) -> Unit): Socket
+    fun interface Builder {
+        @Throws(CancellationException::class, IOException::class)
+        suspend fun connect(host: String, port: Int): Result<TCPSocket>
     }
 
 }
 
-suspend fun Socket.receive(exactly: Int): Socket.Result<ByteArray> = receive(exactly, exactly)
+suspend fun TCPSocket.receive(exactly: Int): TCPSocket.Result<ByteArray> = receive(exactly, exactly)
 
-suspend fun Socket.receiveBytes(min: Int, max: Int): ByteArray = receive(min, max).unpack()
-suspend fun Socket.receiveBytes(exactly: Int): ByteArray = receive(exactly, exactly).unpack()
+suspend fun TCPSocket.receiveBytes(min: Int, max: Int): ByteArray = receive(min, max).unpack()
+suspend fun TCPSocket.receiveBytes(exactly: Int): ByteArray = receive(exactly, exactly).unpack()

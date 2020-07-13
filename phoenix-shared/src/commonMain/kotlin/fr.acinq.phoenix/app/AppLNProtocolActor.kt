@@ -1,11 +1,12 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.bitcoin.crypto.Secp256k1
-import fr.acinq.eklair.Hex
 import fr.acinq.eklair.crypto.noise.*
 import fr.acinq.eklair.io.LightningSession
 import fr.acinq.phoenix.LNProtocolActor
-import fr.acinq.phoenix.io.Socket
+import fr.acinq.phoenix.io.AppMainScope
+import fr.acinq.phoenix.io.TCPSocket
+import fr.acinq.secp256k1.Hex
+import fr.acinq.secp256k1.Secp256k1
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -59,7 +60,7 @@ private object WaitingForConnection : State() {
             is Disconnected -> Closed to listOf(Restart, Show("Disconnected!"))
             is Connected -> {
                 val priv = ByteArray(32) { 0x01.toByte() }
-                val pub = Secp256k1.computePublicKey(priv)
+                val pub = Secp256k1.pubkeyCreate(priv)
                 val keyPair = Pair(pub, priv)
                 val nodeId = Hex.decode("02413957815d05abb7fc6d885622d5cdc5b7714db1478cb05813a8474179b83c5c")
                 val prologue = "lightning".encodeToByteArray()
@@ -140,11 +141,11 @@ private class MaintainingConnection(val session: LightningSession) : State() {
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: LoggerFactory) : LNProtocolActor {
+internal class AppLNProtocolActor(private val socketFactory: TCPSocket.Builder, loggerFactory: LoggerFactory) : LNProtocolActor {
 
     private val logger = newLogger(loggerFactory)
 
-    private lateinit var socket: Socket
+    private lateinit var socket: TCPSocket
 
     private val channel = Channel<Event>(0)
     private val showChannel = BroadcastChannel<String>(Channel.BUFFERED)
@@ -152,7 +153,7 @@ internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: 
     private var timerJob: Job? = null
 
     init {
-        MainScope().launch {
+        AppMainScope().launch {
             var state: State = Closed
             channel.consumeEach { event ->
                 val (nextState, actions) = state.process(event)
@@ -161,7 +162,7 @@ internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: 
                 actions.forEach { action ->
                     try {
                         when (action) {
-                            is ConnectTo -> socket = socketFactory.createSocket(action.host, action.port, ::monitorState)
+                            is ConnectTo -> connect(action.host, action.port)
                             is SendBytes -> socket.send(action.payload, action.flush)
                             is SendLNMessage -> action.session.send(action.payload, socket::send)
                             is ListenBytes -> launch { channel.send(ReceivedBytes(socket.receive(action.count, action.count).unpack())) }
@@ -180,24 +181,20 @@ internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: 
         }
     }
 
-    private fun monitorState(socket: Socket, state: Socket.State) {
-        MainScope().launch {
-            when (state) {
-                is Socket.State.Ready -> {
-                    this@AppLNProtocolActor.socket = socket
-                    channel.send(Connected)
-                }
-                is Socket.State.Error -> {
-                    logger.error(state.exception)
-                    channel.send(Disconnected)
-                }
-                Socket.State.Closed -> channel.send(Disconnected)
+    private fun connect(host: String, port: Int) {
+        AppMainScope().launch {
+            try {
+                socket = socketFactory.connect(host, port).unpack()
+                channel.send(Connected)
+            } catch (e: Throwable) {
+                logger.warning { e.message ?: "Unknown error" }
+                channel.send(Disconnected)
             }
         }
     }
 
     private fun startTimer(ms: Long) {
-        timerJob = MainScope().launch {
+        timerJob = AppMainScope().launch {
             delay(ms)
             timerJob = null
             channel.send(Timed)
@@ -211,6 +208,6 @@ internal class AppLNProtocolActor(socketFactory: Socket.Factory, loggerFactory: 
         require(!started)
         started = true
 
-        MainScope().launch { channel.send(Start) }
+        AppMainScope().launch { channel.send(Start) }
     }
 }

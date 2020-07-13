@@ -4,7 +4,7 @@ import PhoenixShared
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    let phoenix = Phoenix(socketFactory: IosSocket.Factory())
+    let phoenix = Phoenix(socketBuilder: IosTCPSocket.Builder())
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

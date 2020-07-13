@@ -3,11 +3,20 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("kotlin-android-extensions")
 }
 
 kotlin {
-    android()
+    android {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+    }
+
+//    jvm {
+//        compilations.all {
+//            kotlinOptions.jvmTarget = "1.8"
+//        }
+//    }
 
     iosX64("ios") {
         binaries {
@@ -20,13 +29,13 @@ kotlin {
 
     sourceSets {
         val coreKtxVersion: String by project
-        val kodeinDIVersion: String by project
+//        val kodeinDIVersion: String by project
         val kotlinXCoroutinesVersion: String by project
 
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("fr.acinq.eklair:eklair:0.1.0")
+                implementation("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
 //                implementation("org.kodein.di:kodein-di:$kodeinDIVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
@@ -37,10 +46,14 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+
         val androidMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk7"))
                 implementation("androidx.core:core-ktx:$coreKtxVersion")
+                implementation("fr.acinq.secp256k1:secp256k1-jni-android:0.2.0-1.4-M3")
+                implementation("io.ktor:ktor-network:1.3.2-1.4-M3")
+                implementation("io.ktor:ktor-network-tls:1.3.2-1.4-M3")
             }
         }
         val androidTest by getting {
@@ -64,6 +77,11 @@ android {
     defaultConfig {
         minSdkVersion(androidMinSdkVersion)
         targetSdkVersion(androidTargetSdkVersion)
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 

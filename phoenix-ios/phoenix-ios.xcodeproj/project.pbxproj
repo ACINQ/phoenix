@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53BEF6522166F3557D7BC66B /* IosSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */; };
+		53BEF6522166F3557D7BC66B /* IosTCPSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF89B10F8EF96BD784BD9 /* IosTCPSocket.swift */; };
 		53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF40F48A1258070A1B91A /* MVIView.swift */; };
 		7555FF7F242A565900829871 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF7E242A565900829871 /* AppDelegate.swift */; };
 		7555FF81242A565900829871 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF80242A565900829871 /* SceneDelegate.swift */; };
@@ -54,7 +54,7 @@
 
 /* Begin PBXFileReference section */
 		53BEF40F48A1258070A1B91A /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
-		53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IosSocket.swift; sourceTree = "<group>"; };
+		53BEF89B10F8EF96BD784BD9 /* IosTCPSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IosTCPSocket.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Phoenix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Phoenix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF80242A565900829871 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				7555FF86242A565B00829871 /* Preview Content */,
-				53BEF89B10F8EF96BD784BD9 /* IosSocket.swift */,
+				53BEF89B10F8EF96BD784BD9 /* IosTCPSocket.swift */,
 				53BEF40F48A1258070A1B91A /* MVIView.swift */,
 			);
 			path = "phoenix-ios";
@@ -325,7 +325,7 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
-				53BEF6522166F3557D7BC66B /* IosSocket.swift in Sources */,
+				53BEF6522166F3557D7BC66B /* IosTCPSocket.swift in Sources */,
 				53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

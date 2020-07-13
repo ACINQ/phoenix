@@ -3,7 +3,8 @@ package fr.acinq.phoenix
 import fr.acinq.phoenix.app.AppLNProtocolActor
 import fr.acinq.phoenix.app.ctrl.AppLogController
 import fr.acinq.phoenix.ctrl.LogController
-import fr.acinq.phoenix.io.Socket
+import fr.acinq.phoenix.io.AppMainScope
+import fr.acinq.phoenix.io.TCPSocket
 import fr.acinq.phoenix.utils.Aggregator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -35,7 +36,7 @@ import org.kodein.log.newLogger
 //    val logger = newLogger(direct.instance())
 //
 //    init {
-//        MainScope().launch {
+//        AppMainScope().launch {
 //            protocolActor.subscribe().consumeEach {
 //                logger.info { it }
 //            }
@@ -45,20 +46,20 @@ import org.kodein.log.newLogger
 //}
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class Phoenix(socketFactory: Socket.Factory) {
+class Phoenix(socketBuilder: TCPSocket.Builder) {
 
     val loggerFactory = LoggerFactory.default
 
-    private val protocolActor: LNProtocolActor = AppLNProtocolActor(socketFactory, loggerFactory)
+    private val protocolActor: LNProtocolActor = AppLNProtocolActor(socketBuilder, loggerFactory)
 
-    private val protocolLogs = Aggregator(MainScope(), protocolActor.openSubscription())
+    private val protocolLogs = Aggregator(AppMainScope(), protocolActor.openSubscription())
 
     fun newLogController(): LogController = AppLogController(protocolLogs)
 
     val logger = newLogger(loggerFactory)
 
     init {
-        MainScope().launch {
+        AppMainScope().launch {
             protocolActor.openSubscription().consumeEach {
                 logger.info { it }
             }
