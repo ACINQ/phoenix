@@ -4,7 +4,8 @@ import fr.acinq.eklair.crypto.noise.*
 import fr.acinq.eklair.io.LightningSession
 import fr.acinq.phoenix.LNProtocolActor
 import fr.acinq.phoenix.io.AppMainScope
-import fr.acinq.phoenix.io.TCPSocket
+import fr.acinq.phoenix.io.TcpSocket
+import fr.acinq.phoenix.io.receiveFully
 import fr.acinq.secp256k1.Hex
 import fr.acinq.secp256k1.Secp256k1
 import kotlinx.coroutines.*
@@ -16,26 +17,27 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-private sealed class Event
+private sealed class Event { override fun toString() = this::class.simpleName ?: super.toString() }
 private object Start: Event()
 private object Connected: Event()
-private class ReceivedBytes(val payload: ByteArray): Event()
-private class ReceivedLNMessage(val payload: ByteArray): Event()
+private data class ReceivedBytes(val payload: ByteArray): Event()
+private data class ReceivedLNMessage(val payload: ByteArray): Event()
 private object Disconnected: Event()
 private object Timed: Event()
 
-private sealed class Action
-private class ConnectTo(val host: String, val port: Int): Action()
-private class SendBytes(val payload: ByteArray, val flush: Boolean = true): Action()
-private class ListenBytes(val count: Int): Action()
-private class SendLNMessage(val payload: ByteArray, val session: LightningSession): Action()
-private class ListenLNMessage(val session: LightningSession) : Action()
-private class Show(val message: String): Action()
+private sealed class Action { override fun toString() = this::class.simpleName ?: super.toString() }
+private data class ConnectTo(val host: String, val port: Int): Action()
+private data class SendBytes(val payload: ByteArray, val flush: Boolean = true): Action()
+private data class ListenBytes(val count: Int): Action()
+private data class SendLNMessage(val payload: ByteArray, val session: LightningSession): Action()
+private data class ListenLNMessage(val session: LightningSession) : Action()
+private data class Show(val message: String): Action()
 private object Restart : Action()
-private class StartTimer(val milliseconds: Long = 0L) : Action()
+private data class StartTimer(val milliseconds: Long = 0L) : Action()
 private object StopTimer : Action()
 
 private sealed class State {
+    override fun toString() = this::class.simpleName ?: super.toString()
     abstract fun process(event: Event): Pair<State, List<Action>>
 }
 
@@ -60,7 +62,7 @@ private object WaitingForConnection : State() {
             is Disconnected -> Closed to listOf(Restart, Show("Disconnected!"))
             is Connected -> {
                 val priv = ByteArray(32) { 0x01.toByte() }
-                val pub = Secp256k1.pubkeyCreate(priv)
+                val pub = Secp256k1.pubKeyCompress(Secp256k1.pubkeyCreate(priv))
                 val keyPair = Pair(pub, priv)
                 val nodeId = Hex.decode("02413957815d05abb7fc6d885622d5cdc5b7714db1478cb05813a8474179b83c5c")
                 val prologue = "lightning".encodeToByteArray()
@@ -141,11 +143,11 @@ private class MaintainingConnection(val session: LightningSession) : State() {
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class AppLNProtocolActor(private val socketFactory: TCPSocket.Builder, loggerFactory: LoggerFactory) : LNProtocolActor {
+internal class AppLNProtocolActor(private val socketFactory: TcpSocket.Builder, loggerFactory: LoggerFactory) : LNProtocolActor {
 
     private val logger = newLogger(loggerFactory)
 
-    private lateinit var socket: TCPSocket
+    private lateinit var socket: TcpSocket
 
     private val channel = Channel<Event>(0)
     private val showChannel = BroadcastChannel<String>(Channel.BUFFERED)
@@ -156,41 +158,37 @@ internal class AppLNProtocolActor(private val socketFactory: TCPSocket.Builder, 
         AppMainScope().launch {
             var state: State = Closed
             channel.consumeEach { event ->
+                logger.info { "$event on $state:" }
                 val (nextState, actions) = state.process(event)
+                logger.info { "  next state: $nextState" }
                 state = nextState
 
                 actions.forEach { action ->
+                    logger.info { "  action: $action" }
                     try {
                         when (action) {
                             is ConnectTo -> connect(action.host, action.port)
                             is SendBytes -> socket.send(action.payload, action.flush)
                             is SendLNMessage -> action.session.send(action.payload, socket::send)
-                            is ListenBytes -> launch { channel.send(ReceivedBytes(socket.receive(action.count, action.count).unpack())) }
-                            is ListenLNMessage -> launch { channel.send(ReceivedLNMessage(action.session.receive { count -> socket.receive(count, count).unpack() })) }
+                            is ListenBytes -> AppMainScope().launch { channel.send(ReceivedBytes(socket.receiveFully(action.count))) }
+                            is ListenLNMessage -> AppMainScope().launch { channel.send(ReceivedLNMessage(action.session.receive { count -> socket.receiveFully(count) })) }
                             is Show -> showChannel.send(action.message)
-                            is Restart -> launch { delay(1000) ; channel.send(Start) }
+                            is Restart -> AppMainScope().launch { delay(1000) ; channel.send(Start) }
                             is StartTimer -> startTimer(action.milliseconds)
                             is StopTimer -> timerJob!!.cancel()
                         }
                     } catch (ex: Exception) {
                         logger.error(ex)
-                        channel.send(Disconnected)
+                        AppMainScope().launch { channel.send(Disconnected) }
                     }
                 }
             }
         }
     }
 
-    private fun connect(host: String, port: Int) {
-        AppMainScope().launch {
-            try {
-                socket = socketFactory.connect(host, port).unpack()
-                channel.send(Connected)
-            } catch (e: Throwable) {
-                logger.warning { e.message ?: "Unknown error" }
-                channel.send(Disconnected)
-            }
-        }
+    private suspend fun connect(host: String, port: Int) {
+        socket = socketFactory.connect(host, port)
+        AppMainScope().launch { channel.send(Connected) }
     }
 
     private fun startTimer(ms: Long) {
