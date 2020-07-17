@@ -6,60 +6,32 @@ import fr.acinq.phoenix.ctrl.LogController
 import fr.acinq.phoenix.io.AppMainScope
 import fr.acinq.phoenix.io.TcpSocket
 import fr.acinq.phoenix.utils.Aggregator
+import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import org.kodein.di.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-//@OptIn(ExperimentalCoroutinesApi::class)
-//class Phoenix(vararg val modules: DI.Module) : DIAware {
-//
-//    companion object {
-//        fun socketFactoryModule(socketFactory: Socket.Factory): DI.Module =
-//            DI.Module("Platform sockets") {
-//                bind<Socket.Factory>() with instance(socketFactory)
-//            }
-//    }
-//
-//    override val di = DI {
-//        modules.forEach { import(it) }
-//
-//        bind<LNProtocolActor>() with singleton { ApplicationLNProtocolActor(instance(), instance()) }
-//        bind<LoggerFactory>() with instance(LoggerFactory.default)
-//    }
-//
-//    val protocolActor by instance<LNProtocolActor>()
-//
-//    val logger = newLogger(direct.instance())
-//
-//    init {
-//        AppMainScope().launch {
-//            protocolActor.subscribe().consumeEach {
-//                logger.info { it }
-//            }
-//        }
-//        protocolActor.start()
-//    }
-//}
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class Phoenix {
 
-    val loggerFactory = LoggerFactory.default
+    val di = DI {
+        bind<LoggerFactory>() with instance(LoggerFactory.default)
+        bind<TcpSocket.Builder>() with singleton { TcpSocket.Builder() }
+        bind<LNProtocolActor>() with singleton { AppLNProtocolActor(instance(), instance()) }
 
-    private val socketBuilder = TcpSocket.Builder()
+        bind(tag = "logs") from singleton { Aggregator(AppMainScope(), instance<LNProtocolActor>().openSubscription()) }
 
-    private val protocolActor: LNProtocolActor = AppLNProtocolActor(socketBuilder, loggerFactory)
+        bind<LogController>() with screenProvider { AppLogController(instance(tag = "logs")) }
+    }
 
-    val protocolLogs = Aggregator(AppMainScope(), protocolActor.openSubscription())
-
-    fun newLogController(): LogController = AppLogController(protocolLogs)
-
-    val logger = newLogger(loggerFactory)
+    private val logger = newLogger(di.direct.instance())
 
     init {
+        val protocolActor by di.instance<LNProtocolActor>()
         AppMainScope().launch {
             protocolActor.openSubscription().consumeEach {
                 logger.info { it }

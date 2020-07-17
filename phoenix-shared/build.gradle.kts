@@ -45,12 +45,13 @@ kotlin {
         val kotlinXCoroutinesVersion = "1.3.7-1.4-M3"
         val secp256k1Version = "0.3.0-1.4-M3"
         val ktorVersion = "1.3.2-1.4-M3"
+        val kodeinDiVersion = "7.1.0-kotlin-1.4-M3-76"
 
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 api("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
-//                implementation("org.kodein.di:kodein-di:$kodeinDIVersion")
+                implementation("org.kodein.di:kodein-di:$kodeinDiVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
         }
@@ -69,6 +70,7 @@ kotlin {
                 api("io.ktor:ktor-network:$ktorVersion")
                 api("io.ktor:ktor-network-tls:$ktorVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinXCoroutinesVersion")
+                api("org.kodein.di:kodein-di-framework-android-x:$kodeinDiVersion")
             }
         }
         val androidTest by getting {

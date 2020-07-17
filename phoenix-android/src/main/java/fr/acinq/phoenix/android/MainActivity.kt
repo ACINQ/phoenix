@@ -10,12 +10,18 @@ import androidx.ui.foundation.Text
 import androidx.ui.foundation.lazy.LazyColumnItems
 import androidx.ui.tooling.preview.Preview
 import fr.acinq.phoenix.android.utils.bindOnLifecycle
+import fr.acinq.phoenix.ctrl.LogController
+import org.kodein.di.DIAware
+import org.kodein.di.android.di
+import org.kodein.di.instance
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DIAware {
+    override val di by di()
+
+    private val controller: LogController by instance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val controller = (application as PhoenixApplication).phoenix.newLogController()
 
         controller
             .subscribe {

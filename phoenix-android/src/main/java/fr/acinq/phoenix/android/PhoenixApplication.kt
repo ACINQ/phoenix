@@ -2,9 +2,10 @@ package fr.acinq.phoenix.android
 
 import android.app.Application
 import fr.acinq.phoenix.Phoenix
+import org.kodein.di.DIAware
 
-class PhoenixApplication : Application() {
+class PhoenixApplication : Application(), DIAware {
 
-    val phoenix = Phoenix()
+    override val di = Phoenix().di
 
 }
