@@ -81,10 +81,13 @@ class PaymentDetailsFragment : BaseFragment() {
         when (state) {
           is PaymentDetailsState.Outgoing.Pending -> {
             mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
+            setDescription(ctx, state)
+            mBinding.amountValue.setAmount(state.parts.first().recipientAmount())
             showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
           }
           is PaymentDetailsState.Outgoing.Failed -> {
             mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
+            setDescription(ctx, state)
             // use error of the last subpayment as it's probably the most pertinent
             val failures = JavaConverters.asJavaCollectionConverter((state.parts.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList()
             mBinding.errorValue.text = failures.joinToString("\n") { e -> e.failureMessage() }
@@ -98,20 +101,11 @@ class PaymentDetailsFragment : BaseFragment() {
             if (head.paymentRequest().isDefined) {
               val totalSent = MilliSatoshi(state.parts.map { p -> p.amount().`$plus`((p.status() as OutgoingPaymentStatus.Succeeded).feesPaid()).toLong() }.sum())
               val fees = totalSent.`$minus`(head.recipientAmount())
-              val description = head.paymentRequest().get().description().let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
+              setDescription(ctx, state)
               mBinding.run {
                 feesLabel.visibility = View.VISIBLE
                 feesValue.visibility = View.VISIBLE
-                destinationLabel.visibility = View.VISIBLE
-                destinationValue.visibility = View.VISIBLE
-                showTechnicalsButton.visibility = View.VISIBLE
                 feesValue.setAmount(fees)
-                if (description.isBlank()) {
-                  descValue.setTypeface(Typeface.DEFAULT, Typeface.ITALIC)
-                  descValue.text = ctx.getString(R.string.paymentdetails_no_description)
-                } else {
-                  descValue.text = description
-                }
               }
             } else if (head.externalId().isDefined && head.externalId().get().startsWith("closing-")) {
               mBinding.run {
@@ -167,6 +161,18 @@ class PaymentDetailsFragment : BaseFragment() {
     super.onStart()
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
     mBinding.showTechnicalsButton.setOnClickListener { findNavController().navigate(R.id.action_payment_details_to_payment_details_technicals) }
+  }
+
+  private fun setDescription(context: Context, state: PaymentDetailsState.Outgoing) {
+    val description = state.parts.firstOrNull()?.paymentRequest()?.get()?.description()?.let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
+    description.let {
+      if (it.isNullOrBlank()) {
+        mBinding.descValue.setTypeface(Typeface.DEFAULT, Typeface.ITALIC)
+        mBinding.descValue.text = context.getString(R.string.paymentdetails_no_description)
+      } else {
+        mBinding.descValue.text = it
+      }
+    }
   }
 
   private fun animateBottomSection() {
