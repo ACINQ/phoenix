@@ -10,7 +10,6 @@ import platform.posix.memcpy
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.native.concurrent.AtomicReference
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class IosTcpSocket(val connection: ConnectionBridge) : TcpSocket {

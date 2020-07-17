@@ -1,7 +1,6 @@
 package fr.acinq.phoenix
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest

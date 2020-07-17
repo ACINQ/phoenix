@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.phoenix.LNProtocolActor
 import fr.acinq.phoenix.ctrl.LogController
 import fr.acinq.phoenix.io.AppMainScope
 import fr.acinq.phoenix.utils.Aggregator

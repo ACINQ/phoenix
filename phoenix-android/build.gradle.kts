@@ -1,46 +1,26 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("kotlin-android-extensions")
 }
 
-val composeVersion = "0.1.0-dev13"
-
-dependencies {
-    val coreKtxVersion: String by project
-
-    implementation(project(":phoenix-shared"))
-
-    implementation(kotlin("stdlib-jdk7"))
-
-    implementation("androidx.core:core-ktx:$coreKtxVersion")
-    implementation("androidx.appcompat:appcompat:1.1.0")
-
-    implementation("com.google.android.material:material:1.1.0")
-    implementation("androidx.ui:ui-layout:$composeVersion")
-    implementation("androidx.ui:ui-material:$composeVersion")
-    implementation("androidx.ui:ui-tooling:$composeVersion")
-}
+val composeVersion = "0.1.0-dev14"
+val composeCompilerVersion = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
 
 android {
-    val androidCompileSdkVersion: Int by project
-    val androidMinSdkVersion: Int by project
-    val androidTargetSdkVersion: Int by project
-
-    compileSdkVersion(androidCompileSdkVersion)
+    compileSdkVersion(30)
     defaultConfig {
-        applicationId = "fr.acinq.phoenix.phoenix-android"
-        minSdkVersion(androidMinSdkVersion)
-        targetSdkVersion(androidTargetSdkVersion)
-
-        versionCode = 1
-        versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        applicationId("fr.acinq.phoenix.android")
+        minSdkVersion(24)
+        targetSdkVersion(30)
+        versionCode(1)
+        versionName("1.0")
+        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
     }
+
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+        val release by getting {
+            minifyEnabled(false)
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -48,6 +28,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -55,9 +36,33 @@ android {
     buildFeatures {
         compose = true
     }
+
     composeOptions {
+        kotlinCompilerVersion = composeCompilerVersion
         kotlinCompilerExtensionVersion = composeVersion
-        kotlinCompilerVersion = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
     }
 
 }
+
+kotlin {
+    target {
+        compilations.all {
+            kotlinOptions.freeCompilerArgs += "-Xskip-metadata-version-check"
+        }
+    }
+}
+
+dependencies {
+    implementation(kotlin("stdlib"))
+    implementation(project(":phoenix-shared"))
+//    implementation("androidx.core:core-ktx:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("com.google.android.material:material:1.1.0")
+    implementation("androidx.ui:ui-layout:$composeVersion")
+    implementation("androidx.ui:ui-material:$composeVersion")
+    implementation("androidx.ui:ui-tooling:$composeVersion")
+    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test.ext:junit:1.1.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
+}
+

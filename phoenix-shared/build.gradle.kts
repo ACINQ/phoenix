@@ -1,11 +1,28 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
-    kotlin("multiplatform")
     id("com.android.library")
+    kotlin("multiplatform")
 }
 
 val currentOs = org.gradle.internal.os.OperatingSystem.current()
+
+android {
+    compileSdkVersion(30)
+    defaultConfig {
+        minSdkVersion(24)
+        targetSdkVersion(30)
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+}
 
 kotlin {
     android {
@@ -24,18 +41,17 @@ kotlin {
     }
 
     sourceSets {
-        val coreKtxVersion: String by project
-//        val kodeinDIVersion: String by project
-        val kotlinXCoroutinesVersion: String by project
 
+        val kotlinXCoroutinesVersion = "1.3.7-1.4-M3"
         val secp256k1Version = "0.3.0-1.4-M3"
+        val ktorVersion = "1.3.2-1.4-M3"
 
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
+                api("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
 //                implementation("org.kodein.di:kodein-di:$kodeinDIVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
         }
         val commonTest by getting {
@@ -48,11 +64,11 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk7"))
-                implementation("androidx.core:core-ktx:$coreKtxVersion")
-                implementation("fr.acinq.secp256k1:secp256k1-jni-android:$secp256k1Version")
-                implementation("io.ktor:ktor-network:1.3.2-1.4-M3")
-                implementation("io.ktor:ktor-network-tls:1.3.2-1.4-M3")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinXCoroutinesVersion")
+                api("androidx.core:core-ktx:1.3.0")
+                api("fr.acinq.secp256k1:secp256k1-jni-android:$secp256k1Version")
+                api("io.ktor:ktor-network:$ktorVersion")
+                api("io.ktor:ktor-network-tls:$ktorVersion")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinXCoroutinesVersion")
             }
         }
         val androidTest by getting {
@@ -79,31 +95,10 @@ kotlin {
     }
 }
 
-android {
-    val androidCompileSdkVersion: Int by project
-    val androidMinSdkVersion: Int by project
-    val androidTargetSdkVersion: Int by project
-
-    compileSdkVersion(androidCompileSdkVersion)
-    defaultConfig {
-        minSdkVersion(androidMinSdkVersion)
-        targetSdkVersion(androidTargetSdkVersion)
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
-}
-
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
     val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>("ios").binaries.getFramework(mode)
+    val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>("ios").binaries.getFramework(mode)
     inputs.property("mode", mode)
     dependsOn(framework.linkTask)
     val targetDir = File(buildDir, "xcode-frameworks")
