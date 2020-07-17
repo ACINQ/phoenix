@@ -80,18 +80,26 @@ class PaymentDetailsFragment : BaseFragment() {
       context?.let { ctx ->
         when (state) {
           is PaymentDetailsState.Outgoing.Pending -> {
-            mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
-            setDescription(ctx, state)
-            mBinding.amountValue.setAmount(state.parts.first().recipientAmount())
-            showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
+            mBinding.run {
+              mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_pending))
+              setDescription(ctx, state)
+              feesLabel.visibility = View.GONE
+              feesValue.visibility = View.GONE
+              mBinding.amountValue.setAmount(state.parts.first().recipientAmount())
+              showStatusIconAndDetails(ctx, R.drawable.ic_send_lg, ThemeHelper.color(ctx, R.attr.mutedTextColor))
+            }
           }
           is PaymentDetailsState.Outgoing.Failed -> {
-            mBinding.statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
-            setDescription(ctx, state)
-            // use error of the last subpayment as it's probably the most pertinent
-            val failures = JavaConverters.asJavaCollectionConverter((state.parts.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList()
-            mBinding.errorValue.text = failures.joinToString("\n") { e -> e.failureMessage() }
-            mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
+            mBinding.run {
+              statusText.text = Converter.html(ctx.getString(R.string.paymentdetails_status_sent_failed))
+              setDescription(ctx, state)
+              feesLabel.visibility = View.GONE
+              feesValue.visibility = View.GONE
+              // use error of the last subpayment as it's probably the most pertinent
+              val failures = JavaConverters.asJavaCollectionConverter((state.parts.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList()
+              mBinding.errorValue.text = failures.joinToString("\n") { e -> e.failureMessage() }
+              mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
+            }
             showStatusIconAndDetails(ctx, R.drawable.ic_cross, ThemeHelper.color(ctx, R.attr.negativeColor))
           }
           is PaymentDetailsState.Outgoing.Succeeded -> {
@@ -332,7 +340,7 @@ class PaymentDetailsViewModel : ViewModel() {
     when (it) {
       is PaymentDetailsState.Outgoing.Succeeded -> (it.parts.first().status() as OutgoingPaymentStatus.Succeeded).completedAt()
       is PaymentDetailsState.Outgoing.Failed -> (it.parts.first().status() as OutgoingPaymentStatus.Failed).completedAt()
-      is PaymentDetailsState.Outgoing.Pending -> it.parts.first().createdAt()
+      is PaymentDetailsState.Outgoing.Pending -> null
       is PaymentDetailsState.Incoming ->
         if (it.payment.status() is IncomingPaymentStatus.Received) {
           (it.payment.status() as IncomingPaymentStatus.Received).receivedAt()
