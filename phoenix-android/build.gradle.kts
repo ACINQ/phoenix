@@ -9,17 +9,17 @@ val composeCompilerVersion = "1.3.70-dev-withExperimentalGoogleExtensions-202004
 android {
     compileSdkVersion(30)
     defaultConfig {
-        applicationId("fr.acinq.phoenix.android")
+        applicationId = "fr.acinq.phoenix.android"
         minSdkVersion(24)
         targetSdkVersion(30)
-        versionCode(1)
-        versionName("1.0")
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        versionCode = 1
+        versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         val release by getting {
-            minifyEnabled(false)
+            isMinifyEnabled = false
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

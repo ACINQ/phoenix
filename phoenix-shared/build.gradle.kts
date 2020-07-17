@@ -51,7 +51,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 api("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
-                implementation("org.kodein.di:kodein-di:$kodeinDiVersion")
+                api("org.kodein.di:kodein-di:$kodeinDiVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
         }
@@ -88,8 +88,9 @@ kotlin {
                 implementation("fr.acinq.secp256k1:secp256k1-jni-jvm-$target:$secp256k1Version")
             }
         }
-        val iosMain by getting
-        val iosTest by getting
+
+        val iosMain by getting {}
+        val iosTest by getting {}
 
         all {
             languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
