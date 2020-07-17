@@ -577,17 +577,16 @@ class AppViewModel : ViewModel() {
 
   @WorkerThread
   private fun handleClosingResult(result: scala.collection.immutable.Map<Either<ByteVector32, ShortChannelId>, Either<Throwable, ChannelCommandResponse>>): Int {
-    // read the result
     val iterator = result.iterator()
     var successfullyClosed = 0
     while (iterator.hasNext()) {
       val res = iterator.next()
       val outcome = res._2
       if (outcome.isRight) {
-        log.info("successfully forced closed channel=${res._1}")
+        log.info("successfully closed channel=${res._1}")
         successfullyClosed++
       } else {
-        log.info("failed to force close channel=${res._1}: ", outcome.left() as Throwable)
+        log.info("failed to close channel=${res._1}: ", outcome.left().get() as Throwable)
       }
     }
     return successfullyClosed
