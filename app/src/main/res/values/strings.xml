@@ -106,7 +106,7 @@
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
-  <string name="receive_swap_in_error_message">There was an error when swapping to Bitcoin address…\n\nPlease try again.</string>
+  <string name="receive_swap_in_error_message">There was an error when swapping to a Bitcoin address…\n\nPlease try again.</string>
   <string name="receive_swap_in_progress_message">Requesting a Bitcoin address…</string>
   <string name="receive_swap_in_disclaimer_title">Receive with a Bitcoin address</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -239,8 +239,8 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Use this feature to empty your wallet to a Bitcoin address.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Funds can be sent to a Bitcoin wallet. Make sure that the address is correct before sending.</string>
-  <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
+  <string name="closechannels_mutual_input_instructions">Funds can be sent to a Bitcoin address. Make sure that the address is correct before sending.</string>
+  <string name="closechannels_mutual_input_hint">Enter a Bitcoin address</string>
   <string name="closechannels_mutual_button">Empty my wallet</string>
   <string name="closechannels_force_title">Force close</string>
   <string name="closechannels_force_instructions"><![CDATA[
