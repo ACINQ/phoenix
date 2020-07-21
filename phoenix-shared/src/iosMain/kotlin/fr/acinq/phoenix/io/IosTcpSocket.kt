@@ -19,7 +19,7 @@ class IosTcpSocket(val connection: ConnectionBridge) : TcpSocket {
         fun cancel()
 
         interface Builder {
-            fun connect(host: String, port: Int, completion: (ConnectionBridge?, TcpSocket.IOException?) -> Unit)
+            fun connect(host: String, port: Int, tls: Boolean, completion: (ConnectionBridge?, TcpSocket.IOException?) -> Unit)
 
             companion object {
                 var native: Builder by AtomicOnce()
@@ -68,9 +68,9 @@ class IosTcpSocket(val connection: ConnectionBridge) : TcpSocket {
 }
 
 internal actual object PlatformSocketBuilder : TcpSocket.Builder {
-    override suspend fun connect(host: String, port: Int): TcpSocket =
+    override suspend fun connect(host: String, port: Int, tls: Boolean): TcpSocket =
         suspendCoroutine { continuation ->
-            IosTcpSocket.ConnectionBridge.Builder.native.connect(host, port) { connection, error ->
+            IosTcpSocket.ConnectionBridge.Builder.native.connect(host, port, tls) { connection, error ->
                 when {
                     error != null -> continuation.resumeWithException(error)
                     connection != null -> continuation.resume(IosTcpSocket(connection))

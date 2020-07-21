@@ -30,7 +30,7 @@ interface TcpSocket {
     fun close()
 
     fun interface Builder {
-        suspend fun connect(host: String, port: Int): TcpSocket
+        suspend fun connect(host: String, port: Int, tls: Boolean): TcpSocket
 
         companion object {
             operator fun invoke(): Builder = PlatformSocketBuilder

@@ -2,6 +2,7 @@ package fr.acinq.phoenix.io
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
+import io.ktor.network.tls.*
 import io.ktor.util.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
@@ -45,8 +46,13 @@ class JvmTcpSocket(val socket: Socket) : TcpSocket {
 @OptIn(KtorExperimentalAPI::class)
 internal actual object PlatformSocketBuilder : TcpSocket.Builder {
     val selectorManager = ActorSelectorManager(Dispatchers.IO)
-    override suspend fun connect(host: String, port: Int): TcpSocket =
+    override suspend fun connect(host: String, port: Int, tls: Boolean): TcpSocket =
         withContext(Dispatchers.IO) {
-            JvmTcpSocket(aSocket(selectorManager).tcp().connect(host, port))
+            JvmTcpSocket(
+                aSocket(selectorManager).tcp().connect(host, port).let {
+                    if (tls) it.tls(Dispatchers.IO)
+                    else it
+                }
+            )
         }
 }

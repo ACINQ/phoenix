@@ -190,7 +190,7 @@ internal class AppLNProtocolActor(private val socketFactory: TcpSocket.Builder, 
     }
 
     private suspend fun connect(host: String, port: Int) {
-        socket = socketFactory.connect(host, port)
+        socket = socketFactory.connect(host, port, false)
         AppMainScope().launch { channel.send(Connected) }
     }
 

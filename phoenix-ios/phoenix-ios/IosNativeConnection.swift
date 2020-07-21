@@ -32,8 +32,8 @@ class IosConnectionBridge: IosTcpSocketConnectionBridge {
         static let shared = Builder()
         private init() {}
 
-        func connect(host: String, port: Int32, completion: @escaping (IosTcpSocketConnectionBridge?, TcpSocketIOException?) -> Void) {
-            let connection = NWConnection(host: .init(host), port: .init(integerLiteral: UInt16(port)), using: .tcp)
+        func connect(host: String, port: Int32, tls: Bool, completion: @escaping (IosTcpSocketConnectionBridge?, TcpSocketIOException?) -> Void) {
+            let connection = NWConnection(host: .init(host), port: .init(integerLiteral: UInt16(port)), using: tls ? .tls : .tcp)
             connection.stateUpdateHandler = {
                 switch $0 {
                 case .ready:
