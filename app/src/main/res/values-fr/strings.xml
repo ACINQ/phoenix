@@ -33,7 +33,7 @@
   <string name="restore_disclaimer_message">N\'importez pas ici une seed qui n\'aurait pas été créée avec une application Phoenix.\n\nPar ailleurs, pour éviter tout conflit, assurez vous que vous n\'avez une autre application Phoenix sur un autre téléphone qui utiliserait la même seed.</string>
   <string name="restore_disclaimer_checkbox">Je comprends.</string>
   <string name="restore_disclaimer_next">Suivant</string>
-  <string name="restore_instructions">La seed de votre portefeuille est une liste de 12 mots anglais. Notez que les passphrase additionnelles ne sont pas supportées.</string>
+  <string name="restore_instructions">La seed de votre portefeuille est une liste de 12 mots anglais.</string>
   <string name="restore_mnemonics_label">Utilisez le clavier virtuel ci-dessous pour entrer votre liste de mots, séparés par un espace:</string>
   <string name="restore_in_progress">Restauration du portefeuille…</string>
   <string name="restore_import_button">Restaurer</string>
@@ -57,6 +57,7 @@
   <string name="startup_start_button">Redémarrer</string>
   <string name="startup_settings_button">Options</string>
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
+  <string name="startup_error_electrum_address">L\'application n\'a pas pu démarrer. L\'adresse de votre serveur Electrum n\'est pas valide.\n\nVous pouvez corriger cela dans Configuration > Electrum.</string>
   <string name="startup_error_tor">Le service Tor n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
   <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
@@ -91,7 +92,7 @@
 
   <string name="receive_address_label">Addresse</string>
   <string name="receive_power_save_disclaimer">Vous êtes en mode d\'économie d\'énergie. Pour recevoir le paiement, assurez vous que l\'application est démarrée et a accès à Internet</string>
-  <string name="receive_withdraw_button">Utilise un lien LNURL</string>
+  <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
   <string name="receive_swap_in_button">Afficher une adresse Bitcoin</string>
   <string name="receive_swap_in_error_message">Il y a eu une erreur dans la permutation avec une adresse Bitcoin on-chain…\n\nVeuillez réessayer.</string>
@@ -125,21 +126,29 @@
   <string name="send_use_all_balance">Tout envoyer</string>
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
-  <string name="send_amount_error">Veuillez saisir un montant validate.</string>
-  <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
+  <string name="send_amount_error">Veuillez saisir un montant valide.</string>
+  <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
-  <string name="send_destination_label">Envoyer à</string>
+  <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_error_sending">Il y a eu une erreur interne lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
+  <string name="send_chain_fees_edit">Ajuster fees</string>
+  <string name="send_chain_fees_label">Fee rate</string>
+  <string name="send_chain_fees_unit">sat/byte</string>
+  <string name="send_chain_fees_description">Ce paiement est une transaction on-chain, plus lente et généralement plus chère. Des frais de minage vont être appliqués.</string>
+  <string name="send_chain_fees_feedback_invalid">Veuillez utiliser un fee-rate valide.</string>
+  <string name="send_chain_fees_feedback_20min">Avec ce fee rate, le paiement devrait être reçu d\'ici 30 minutes.</string>
+  <string name="send_chain_fees_feedback_1h">Avec ce fee rate, le paiement devrait être reçu d\'ici une heure.</string>
+  <string name="send_chain_fees_feedback_12h">Avec ce fee rate, le paiement devrait être reçu d\'ici douze heures.</string>
+  <string name="send_chain_fees_feedback_inf">Avec ce fee rate, le paiement ne devrait être reçu que dans au moins 12 heures.</string>
+  <string name="send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>
-  <string name="send_swap_in_progress">Echange en cours…</string>
-  <string name="send_swap_error">L\'échange a échoué. Veuillez réessayer.</string>
-  <string name="send_swap_required_desc">Le destinataire de ce paiement est une adresse Bitcoin, il faut d\'abord faire un échange.</string>
-  <string name="send_swap_required_button">Demander l\'échange</string>
+  <string name="send_swap_in_progress">Création de la transaction…</string>
+  <string name="send_swap_error">La transaction n\'a pas pu être créée. Veuillez réessayer.</string>
+  <string name="send_swap_required_button">Préparer transaction</string>
   <string name="send_swap_complete_recap_amount">Montant</string>
   <string name="send_swap_complete_recap_fee">Frais de minage</string>
   <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">Le montant total après échange dépasse votre solde.\n\nDiminuez le montant à envoyer, ou bien essayer plus tard lorsque les frais de minage sur le réseau Bitcoin auront diminué.</string>
+  <string name="send_swap_complete_cannot_afford">Le total après application des frais de minage dépasse votre solde.</string>
 
   <!-- //////////////// scan //////////////// -->
 
@@ -180,6 +189,7 @@
   <string name="btn_confirm">Confirmer</string>
   <string name="btn_cancel">Annuler</string>
   <string name="btn_close">Fermer</string>
+  <string name="btn_pause_connecting">Connexion au peer…</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -187,7 +197,7 @@
   <string name="settings_display_prefs">Affichage</string>
   <string name="settings_security_title">Sécurité</string>
   <string name="settings_display_seed">Phrase de sauvegarde</string>
-  <string name="settings_seed_security">Accès à l\'application</string>
+  <string name="settings_seed_security">Contrôle d\'accès</string>
   <string name="settings_advanced_title">Avancé</string>
   <string name="settings_fees">Configuration des frais de transaction</string>
   <string name="settings_list_channels">Mes canaux de paiement</string>
@@ -196,6 +206,7 @@
   <string name="settings_mutual_close">Fermer tous mes canaux de paiement</string>
   <string name="settings_force_close">Zone à risque</string>
   <string name="settings_tor">Tor</string>
+  <string name="settings_about">À propos</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -226,10 +237,10 @@
     <br/><br/>
     Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiements ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
     <br/><br/>
-    Les fonds seront envoyés in-fine à l\'adresse: %1$s
-    <br/><br/>
     <b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas bien ce qu\'elle fait.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Les fonds seront envoyés à:</string>
+  <string name="closechannels_force_destination_desc">Cette adresse est dérivée de votre seed et vous appartient.</string>
   <string name="closechannels_force_button">Forcer la clôture de mes canaux de paiement</string>
   <string name="closechannels_confirm_dialog_message">Etes-vous sûr de vouloir continuer?</string>
   <string name="closechannels_message_error">Un problème est survenu. Merci de réessayer plus tard.</string>
@@ -265,7 +276,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configuration</string>
-  <string name="menu_send">Scanner</string>
+  <string name="menu_send">Envoyer</string>
   <string name="menu_receive">Recevoir</string>
 
   <!-- //////////////// init wallet //////////////// -->
@@ -289,7 +300,7 @@
 
   <string name="inappnotif_set_up_pin">Votre portefeuille n\'est pas protégé.</string>
   <string name="inappnotif_set_up_pin_action">Définir un code d\'accès</string>
-  <string name="inappnotif_mnemonics_never_seen">Merci d\'utiliser Phoenix. Avez-vous sauvegardé votre portefeuille?</string>
+  <string name="inappnotif_mnemonics_never_seen">Merci d\'utiliser Phoenix. Veuillez sauvegarder votre portefeuille pour ne pas perdre vos bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Sauvegarder mon portefeuille</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix a besoin de pouvoir travailler en tâche de fond de temps en temps. Assurez vous que votre système ne tue pas cette appli à des finds d\'économie de batterie.</string>
   <string name="inappnotif_upgrade">Une mise à jour pour cette application est disponible.</string>
@@ -298,18 +309,27 @@
   <!-- //////////////// display seed //////////////// -->
 
   <string name="displayseed_title">Phrase de récupération du portefeuille</string>
-  <string name="displayseed_authenticate_button">Afficher la seed du portefeuille.</string>
+  <string name="displayseed_authenticate_button">Afficher ma seed</string>
   <string name="displayseed_loading">Déverrouillage de la seed…</string>
-  <string name="displayseed_error">La seed n\'a pas pu être lue. Veuillez réessayer.\n\nCause: %1$s</string>
+  <string name="displayseed_error_generic">Échec du déverrouillage, veuillez réessayer.</string>
+  <string name="displayseed_error_wrong_password">Le code PIN est incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
-  Cette liste de 12 mots anglais est la graine (ou seed) de votre portefeuille. Vous devez la sauvegarder dans un endroit sûr (pas sur ce téléphone) !
-  <br /><br />
-  <b>Cette liste est personnelle et donne accès à vos fonds, ne la partagez avec personne. Ne la perdez pas.</b> Si vous perdez votre liste de mots et votre téléphone, vous ne pourrez plus accéder à vos fonds.
+    La seed (ou graine) est une liste de 12 mots anglais. C\'est la sauvegarde du portefeuille. Elle donne accès à vos fonds.
+    <br /><br />
+    <strong>Vous seul possédez cette seed. Elle doit rester personnelle.</strong>
+    <br /><br />
+    <strong>Ne la donnez à personne</strong>.
+    <br />
+    Prenez garde au hameçonnage. Les développeurs de Phoenix ne vous demanderont jamais votre seed.
+    <br /><br />
+    <strong>Ne la perdez pas</strong>.
+    <br />
+    Sauvegardez votre seed dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre seed et votre téléphone, vous ne pourrez plus accéder à vos fonds.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 avec chemin de dérivation standard BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">J\'ai bien sauvegardé ma seed dans un endroit sûr.</string>
-  <string name="displayseed_has_saved_seed_button">Confirmer</string>
+  <string name="displayseed_dialog_header">NE PAS PARTAGER.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
@@ -448,6 +468,7 @@
 
   <string name="electrum_dialog_checkbox">Utiliser un serveur Electrum particulier</string>
   <string name="electrum_dialog_ssl">Le serveur doit avoir un certificat valide</string>
+  <string name="electrum_dialog_ssl_tor">Également vérifier le certificat pour cette adresse en .onion</string>
   <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
   <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
 
@@ -475,5 +496,19 @@
   <string name="conndialog_lightning">Pair Lightning</string>
   <string name="conndialog_ok">Connecté</string>
   <string name="conndialog_not_ok">En connexion…</string>
+
+  <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">À propos</string>
+  <string name="about_version">Version: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  Phoenix est un portefeuille Bitcoin utilisant le réseau Lightning pour envoyer et recevoir des paiements.
+  <br/><br/>
+  C\'est un logiciel libre et open source, développé par <a href="https://phoenix.acinq.co">ACINQ</a> sous licence <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a>.
+  <br/><br/>
+  Notez que ce portefeuille est non-custodial, c\'est-à-dire que <strong>vous seul avez possession de la clé (ou seed) du portefeuille</strong>. Ne révelez cette seed à personne, et faites attention au hameçonnage.
+  <br/><br/>
+  Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
+  ]]></string>
 
 </resources>

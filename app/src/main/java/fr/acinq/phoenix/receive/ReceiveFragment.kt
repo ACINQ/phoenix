@@ -77,6 +77,7 @@ class ReceiveFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ReceiveViewModel::class.java)
     mBinding.model = model
+    mBinding.appModel = app
 
     context?.let {
       unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))

@@ -57,7 +57,9 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(TorSettingViewModel::class.java)
     mBinding.model = model
-    appContext()?.networkInfo?.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
+      context?.let { refreshUIState(it) }
+    })
   }
 
   override fun onStart() {
@@ -113,23 +115,22 @@ class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferen
   @SuppressLint("SetTextI18n")
   private fun getInfo() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("failed to send getInfo to TOR: ", exception)
-      mBinding.getinfoValue.text = "error: failed to get info from tor\n[ ${exception.localizedMessage} ]"
+      log.error("failed to send getInfo to Tor: ", exception)
+      mBinding.getinfoValue.text = "error: failed to get info from Tor\n[ ${exception.localizedMessage} ]"
     }) {
-      val ac = appContext(requireContext())
       mBinding.getinfoValue.text = """
-version=${ac.getTorInfo("version")}
-network=${ac.getTorInfo("network-liveness")}
+version=${app.requireService.getTorInfo("version")}
+network=${app.requireService.getTorInfo("network-liveness")}
 
 ---
 or connections
 ---
-${ac.getTorInfo("orconn-status")}
+${app.requireService.getTorInfo("orconn-status")}
 
 ---
 circuits
 ---
-${ac.getTorInfo("circuit-status")}
+${app.requireService.getTorInfo("circuit-status")}
       """.trimMargin()
     }
   }

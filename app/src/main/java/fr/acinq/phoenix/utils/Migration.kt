@@ -44,17 +44,17 @@ object Migration {
 
   /**
    * ============
-   * Version < 11
+   * Version < 14
    * ============
-   * Prior to code 11 the seed is always encrypted even when user has not set a pin, using the [Constants.DEFAULT_PIN]
+   * Prior to code 14 the seed is always encrypted even when user has not set a pin, using the [Constants.DEFAULT_PIN]
    * default pin code. This does not bring any security benefits and slows down the node startup since decrypting
    * takes time. It should be removed.
    *
-   * Note: with version 11, the user can still protect access to the wallet with a PIN/biometric auth,
+   * Note: with version 14, the user can still protect access to the wallet with a PIN/biometric auth,
    * using [Prefs.PREFS_IS_WALLET_PROTECTED_WITH_PIN], without encrypting the seed.
    */
   private fun removeDefaultPin(context: Context, version: Int) {
-    if (version < 11) {
+    if (version < 14) {
       log.info("checking legacy default pin")
       val isSeedEncrypted = Prefs.isSeedEncrypted(context)
       if (isSeedEncrypted) {

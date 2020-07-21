@@ -109,7 +109,9 @@ class ReadInputFragment : BaseFragment() {
             findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(it.pr)))
           }
         }
-        is ReadInputState.Done.Onchain -> findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.toString()))
+        is ReadInputState.Done.Onchain -> {
+          findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.raw))
+        }
         is ReadInputState.Done.Url -> {
           when (it.url) {
             is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))

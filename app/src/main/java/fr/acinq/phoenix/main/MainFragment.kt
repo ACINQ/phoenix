@@ -115,9 +115,9 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
       appContext(ctx).notifications.observe(viewLifecycleOwner, Observer {
         notificationsAdapter.update(it)
       })
-      appContext(ctx).networkInfo.observe(viewLifecycleOwner, Observer {
+      app.networkInfo.observe(viewLifecycleOwner, Observer {
         log.info("update network info=$it")
-        if (!it.networkConnected || it.electrumServer == null || !it.lightningConnected) {
+        if (it.electrumServer == null || !it.lightningConnected) {
           if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
             mBinding.connectivityButton.startAnimation(blinkingAnimation)
           }
@@ -181,6 +181,11 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.connectivityButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_connectivity) }
 
     app.refreshPayments()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    app.service?.refreshPeerConnectionState()
   }
 
   override fun onStop() {

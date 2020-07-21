@@ -27,7 +27,7 @@ ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 RUN git clone https://github.com/ACINQ/eclair -b $(cat eclair-core-version.txt)
 
 # build eclair-core
-RUN cd eclair && mvn install -pl eclair-core -am -DskipTests
+RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
 
 # main build image
 FROM ubuntu:19.10

@@ -57,35 +57,6 @@
         android:layout_marginTop="@dimen/space_lg"
         app:layout_constraintTop_toBottomOf="@id/summary" />
 
-      <!-- general connectivity -->
-      <fr.acinq.phoenix.utils.customviews.ButtonView
-        android:id="@+id/network_conn_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_square"
-        android:padding="@dimen/space_md"
-        app:hz_bias="0"
-        app:icon="@drawable/ic_bullet"
-        app:icon_size="@dimen/space_xs"
-        app:icon_tint="?attr/negativeColor"
-        app:layout_constraintTop_toBottomOf="@id/grid_separator"
-        app:text="@string/conndialog_network" />
-
-      <TextView
-        android:id="@+id/network_conn_state"
-        style="@style/MonospaceView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
-        app:layout_constraintBottom_toBottomOf="@id/network_conn_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/network_conn_label" />
-
-      <View
-        style="@style/HLineSeparator"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/network_conn_label" />
-
       <!-- tor -->
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/tor_conn_label"
@@ -97,15 +68,16 @@
         app:icon="@drawable/ic_bullet"
         app:icon_size="@dimen/space_xs"
         app:icon_tint="?attr/negativeColor"
-        app:layout_constraintTop_toBottomOf="@id/network_conn_label"
+        app:layout_constraintTop_toBottomOf="@id/grid_separator"
         app:text="@string/conndialog_tor" />
 
       <TextView
         android:id="@+id/tor_conn_state"
-        style="@style/MonospaceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/space_md"
+        android:textSize="@dimen/text_sm"
+        android:fontFamily="monospace"
         app:layout_constraintBottom_toBottomOf="@id/tor_conn_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tor_conn_label" />
@@ -132,10 +104,11 @@
 
       <TextView
         android:id="@+id/lightning_conn_state"
-        style="@style/MonospaceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/space_md"
+        android:textSize="@dimen/text_sm"
+        android:fontFamily="monospace"
         app:layout_constraintBottom_toBottomOf="@id/lightning_conn_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/lightning_conn_label" />
@@ -161,10 +134,11 @@
 
       <TextView
         android:id="@+id/electrum_conn_state"
-        style="@style/MonospaceView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/space_md"
+        android:textSize="@dimen/text_sm"
+        android:fontFamily="monospace"
         app:layout_constraintBottom_toBottomOf="@id/electrum_conn_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/electrum_conn_label" />

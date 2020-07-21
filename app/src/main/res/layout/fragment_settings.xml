@@ -50,13 +50,23 @@
           app:layout_constraintTop_toTopOf="parent" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/prefs_display_button"
+          android:id="@+id/about_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/general_title"
+          app:text="@string/settings_about" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/prefs_display_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square_border"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:layout_constraintTop_toBottomOf="@id/about_button"
           app:text="@string/settings_display_prefs" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView

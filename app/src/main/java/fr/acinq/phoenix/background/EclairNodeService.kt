@@ -19,7 +19,6 @@ package fr.acinq.phoenix.background
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
-import akka.dispatch.Futures
 import akka.pattern.Patterns
 import akka.util.Timeout
 import android.app.PendingIntent
@@ -36,6 +35,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
+import com.msopentech.thali.toronionproxy.OnionProxyManager
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
@@ -52,11 +54,17 @@ import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
-import fr.acinq.phoenix.*
+import fr.acinq.phoenix.AppContext
+import fr.acinq.phoenix.BuildConfig
+import fr.acinq.phoenix.MainActivity
+import fr.acinq.phoenix.R
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.seed.EncryptedSeed
+import fr.acinq.phoenix.utils.tor.TorConnectionStatus
+import fr.acinq.phoenix.utils.tor.TorEventHandler
+import fr.acinq.phoenix.utils.tor.TorHelper
 import kotlinx.coroutines.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -69,7 +77,6 @@ import scala.collection.JavaConverters
 import scala.collection.immutable.Seq
 import scala.collection.immutable.`Seq$`
 import scala.concurrent.Await
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.util.Either
 import scala.util.Left
@@ -80,7 +87,6 @@ import java.security.GeneralSecurityException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.ArrayList
 import scala.collection.immutable.List as ScalaList
 
 /**
@@ -116,6 +122,14 @@ class EclairNodeService : Service() {
   private val kit: Kit? get() = state.value?.kit()
   private val api: Eclair? get() = state.value?.api()
 
+  /** FCM token allocated to this application. */
+  var fcmToken: String? = null
+
+  /** State of network connections (Internet, Tor, Peer, Electrum). */
+  val electrumConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.electrumServer)
+  val torConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.torConnections)
+  val peerConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.lightningConnected)
+
   // ============================================================== //
   //                  SERVICE BASE METHODS OVERRIDE                 //
   // ============================================================== //
@@ -125,6 +139,21 @@ class EclairNodeService : Service() {
     log.info("creating node service")
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
+    }
+    Prefs.getFCMToken(applicationContext)?.run {
+      fcmToken = this
+    } ?: run {
+      FirebaseInstanceId.getInstance().instanceId
+        .addOnCompleteListener(OnCompleteListener { task ->
+          if (!task.isSuccessful) {
+            log.warn("failed to retrieve fcm token", task.exception)
+            return@OnCompleteListener
+          }
+          task.result?.token?.let { token ->
+            Prefs.saveFCMToken(applicationContext, token)
+            fcmToken = token
+          }
+        })
     }
     appContext = AppContext.getInstance(applicationContext)
     notificationManager = NotificationManagerCompat.from(this)
@@ -328,7 +357,7 @@ class EclairNodeService : Service() {
     if (Prefs.isTorEnabled(context)) {
       log.info("using TOR...")
       updateState(KitState.Bootstrap.Tor)
-      appContext.startTor()
+      startTor()
       log.info("TOR has been bootstrapped")
     } else {
       log.info("using clear connection...")
@@ -387,7 +416,7 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  /** Retrieves the list of channels from the router. Can filter by state. */
+  /** Retrieve list of channels from router. Can filter by state. */
   @UiThread
   suspend fun getChannels(channelState: State? = null): Iterable<RES_GETINFO> {
     return withContext(serviceScope.coroutineContext + Dispatchers.IO) {
@@ -447,12 +476,12 @@ class EclairNodeService : Service() {
   /** Create a list of ids of channels to be closed. */
   @WorkerThread
   private suspend fun prepareClosing(): ScalaList<Either<ByteVector32, ShortChannelId>> {
-    val channelIds = ScalaList.empty<Either<ByteVector32, ShortChannelId>>()
-    getChannels().forEach {
+    return getChannels().map {
       val id: Either<ByteVector32, ShortChannelId> = Left.apply(it.channelId())
-      channelIds.`$colon$colon`(id)
+      id
+    }.run {
+      JavaConverters.asScalaIteratorConverter(iterator()).asScala().toList()
     }
-    return channelIds
   }
 
   /** Handle the response of a closing request from the API. */
@@ -562,18 +591,16 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  /** Request swap-out details. If no feerate is provided, default to a 6 blocks target using the node fee estimator. */
-  suspend fun requestSwapOut(amount: Satoshi, address: String, feeratePerKw: Long? = null) = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  /** Request swap-out details. */
+  suspend fun requestSwapOut(amount: Satoshi, address: String, feeratePerKw: Long) = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
-      log.info("sending swap-out request to switchboard for address=$address with amount=$amount")
-      switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address,
-        feeratePerKw ?: nodeParams().onChainFeeConf().feeEstimator().getFeeratePerKw(6)
-      ), ActorRef.noSender())
+      log.info("requesting swap-out request to address=$address with amount=$amount and fee=$feeratePerKw")
+      switchboard().tell(Peer.SendSwapOutRequest(Wallet.ACINQ.nodeId(), amount, address, feeratePerKw), ActorRef.noSender())
       Unit
     } ?: throw KitNotInitialized
   }
 
-  /** Request swap-out details */
+  /** Request swap-in details. */
   suspend fun sendSwapIn() = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
       switchboard().tell(Peer.SendSwapInRequest(Wallet.ACINQ.nodeId()), ActorRef.noSender())
@@ -581,7 +608,7 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  /** Generate a BOLT 11 payment request */
+  /** Generate a BOLT 11 payment request. */
   @UiThread
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
@@ -629,9 +656,54 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+
+  // =============================================================== //
+  //                     METHODS FOR TOR HANDLING                    //
+  // =============================================================== //
+
+  var torManager: OnionProxyManager? = null
+
+  fun startTor() {
+    torManager = TorHelper.bootstrap(applicationContext, object : TorEventHandler() {
+      override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
+        torConn.value?.run {
+          this[name] = status
+          torConn.postValue(this)
+        }
+      }
+    })
+  }
+
+  @WorkerThread
+  fun reconnectTor() {
+    torManager?.run { enableNetwork(true) }
+  }
+
+  @UiThread
+  suspend fun getTorInfo(cmd: String): String = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+    torManager?.run { getInfo(cmd) } ?: throw RuntimeException("onion proxy manager not available")
+  }
+
   // ================================================================== //
   //                  METHODS TO DEAL WITH CONNECTIONS                  //
   // ================================================================== //
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: ElectrumClient.ElectrumReady) {
+    log.debug("received electrum ready=$event")
+    electrumConn.value = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time())
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
+    log.debug("received electrum disconnected=$event")
+    electrumConn.value = null
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun handleEvent(event: PeerConnectionChange) {
+    refreshPeerConnectionState()
+  }
 
   /** Send a reconnect event to the ACINQ node. */
   @UiThread
@@ -641,6 +713,22 @@ class EclairNodeService : Service() {
         log.info("forcing reconnection to peer")
         switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
       }
+    }
+  }
+
+  fun refreshPeerConnectionState() {
+    serviceScope.launch(Dispatchers.Default) {
+      val isConnected = api?.run {
+        JavaConverters.asJavaIterableConverter(
+          Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+        ).asJava()
+          .any { it.state().equals("CONNECTED", true) }
+      } ?: false
+      if (isConnected) {
+        fcmToken?.let { EventBus.getDefault().post(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), fcmToken)) }
+      }
+      log.info("peer connection ? $isConnected")
+      peerConn.postValue(isConnected)
     }
   }
 
@@ -769,9 +857,9 @@ class EclairNodeService : Service() {
 
 /**
  * 4 possible states:
- * - idle, waiting for the node to be started
- * - the node is starting
- * - the node is started
+ * - idle, waiting for the node to be started ;
+ * - the node is starting ;
+ * - the node is started ;
  * - the node failed to start.
  * */
 sealed class KitState {
@@ -833,3 +921,6 @@ sealed class KitState {
   fun kit(): Kit? = if (this is Started) kit else null
   fun api(): Eclair? = if (this is Started) _api else null
 }
+
+data class Xpub(val xpub: String, val path: String)
+data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)

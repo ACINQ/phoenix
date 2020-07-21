@@ -21,15 +21,15 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.LogsSettingsFragment">
+    tools:context=".settings.DisplaySeedFragment">
 
     <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/logs_subtitle"
-      app:title="@string/logs_title" />
+      app:subtitle="@string/about_version"
+      app:title="@string/about_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -43,33 +43,13 @@
         android:layout_height="wrap_content"
         android:background="@drawable/square_border_hz">
 
-        <View
-          android:id="@+id/instructions_sep"
-          style="@style/HLineSeparator"
+        <TextView
+          android:id="@+id/general"
           android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/about_general"
+          android:padding="@dimen/space_md"
           app:layout_constraintTop_toTopOf="parent" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/view_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_eye"
-          app:layout_constraintTop_toBottomOf="@id/instructions_sep"
-          app:text="@string/logs_view_button" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/share_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square_border"
-          android:padding="@dimen/space_md"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_share"
-          app:layout_constraintTop_toBottomOf="@id/view_button"
-          app:text="@string/logs_share_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -20,11 +20,11 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
+import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.SingleLiveEvent
 import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 
 sealed class SendState {
@@ -55,6 +55,8 @@ sealed class SendState {
   }
 }
 
+data class FeerateEstimationPerKb(val rate20min: Long, val rate60min: Long, val rate12hours: Long)
+
 class SendViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(SendViewModel::class.java)
 
@@ -62,8 +64,21 @@ class SendViewModel : ViewModel() {
   /** Prevents early validation error message if amount is not set in invoice. */
   val isAmountFieldPristine = MutableLiveData<Boolean>()
   val useMaxBalance = MutableLiveData<Boolean>()
-  /** Contains strings resource id for amount error message. Not contained in the fragment Error state because a incorrect amount is not a fatal error. */
+  /** Contains strings resource id for amount error message. Not contained in the fragment Error state because an incorrect amount is not a fatal error. */
   val amountErrorMessage = SingleLiveEvent<Int>()
+  val showFeeratesForm = MutableLiveData<Boolean>()
+  val chainFeesSatBytes = MutableLiveData<Long>()
+
+  val feerateEstimation = MutableLiveData(Constants.DEFAULT_FEERATE)
+
+  init {
+    state.value = SendState.CheckingInvoice
+    useMaxBalance.value = false
+    isAmountFieldPristine.value = true
+    amountErrorMessage.value = null
+    showFeeratesForm.value = false // by default, show a lean view without advanced stuff
+    chainFeesSatBytes.value = 3 // base fee in sat/bytes
+  }
 
   // ---- computed values from payment request
 
@@ -87,31 +102,21 @@ class SendViewModel : ViewModel() {
     state !is SendState.CheckingInvoice && state !is SendState.InvalidInvoice
   }
 
-  init {
-    state.value = SendState.CheckingInvoice
-    useMaxBalance.value = false
-    isAmountFieldPristine.value = true
-    amountErrorMessage.value = 0
-  }
-
   // ---- end of computed values
 
   @UiThread
   fun checkAndSetPaymentRequest(input: String) {
-    log.debug("checking input=$input")
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          val extract = Wallet.parseLNObject(input)
-          when (extract) {
-            is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
-            is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
-            else -> throw RuntimeException("unhandled invoice type")
-          }
-        } catch (e: Exception) {
-          log.error("invalid invoice for input=$input: ${e.message}")
-          state.postValue(SendState.InvalidInvoice)
+    viewModelScope.launch((Dispatchers.Default)) {
+      try {
+        val extract = Wallet.parseLNObject(input)
+        when (extract) {
+          is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
+          is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
+          else -> throw RuntimeException("unhandled invoice type")
         }
+      } catch (e: Exception) {
+        log.error("invalid invoice for input=$input: ${e.message}")
+        state.postValue(SendState.InvalidInvoice)
       }
     }
   }

@@ -81,11 +81,11 @@ class EclairSupervisor : UntypedActor() {
       // -------------- CONNECTION WATCHER --------------
       is PeerConnected -> {
         log.info("connected to ${event.nodeId()}")
-        EventBus.getDefault().post(event)
+        EventBus.getDefault().post(PeerConnectionChange)
       }
       is PeerDisconnected -> {
         log.info("disconnected from ${event.nodeId()}")
-        EventBus.getDefault().post(event)
+        EventBus.getDefault().post(PeerConnectionChange)
       }
 
       // -------------- ELECTRUM --------------

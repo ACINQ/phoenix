@@ -27,4 +27,6 @@ class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32
 
 class ChannelStateChange
 
+object PeerConnectionChange
+
 class RemovePendingSwapIn(val address: String)

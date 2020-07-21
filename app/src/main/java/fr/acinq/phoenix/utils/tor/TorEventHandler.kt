@@ -31,19 +31,19 @@ abstract class TorEventHandler : EventHandler {
   override fun orConnStatus(status: String?, name: String?) {
     when (status) {
       "LAUNCHED" -> {
-        log.info("connection to router=$name started")
+        log.info("connection to or=$name started")
         name?.let { onConnectionUpdate(name, TorConnectionStatus.LAUNCHED) }
       }
       "CONNECTED" -> {
-        log.info("connection to router=$name successful")
+        log.info("connection to or=$name successful")
         name?.let { onConnectionUpdate(name, TorConnectionStatus.CONNECTED) }
       }
       "FAILED" -> {
-        log.info("connection router=$name failed")
+        log.info("connection or=$name failed")
         name?.let { onConnectionUpdate(name, TorConnectionStatus.FAILED) }
       }
       "CLOSED" -> {
-        log.info("connection closed with router=$name")
+        log.info("connection closed with or=$name")
         name?.let { onConnectionUpdate(name, TorConnectionStatus.CLOSED) }
       }
     }
@@ -68,7 +68,7 @@ abstract class TorEventHandler : EventHandler {
   }
 
   override fun newDescriptors(orList: MutableList<String>?) {
-    log.debug("new router list=$orList")
+    log.debug("new or list=$orList")
   }
 
   override fun unrecognized(type: String?, message: String?) {

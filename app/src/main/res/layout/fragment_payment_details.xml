@@ -47,8 +47,7 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true">
+        android:layout_height="wrap_content">
 
         <!-- curved background image -->
         <ImageView
@@ -72,7 +71,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_margin="@dimen/space_lg"
-          android:drawableStart="@drawable/ic_alert_triangle"
+          android:drawableTop="@drawable/ic_alert_triangle"
           android:text="@string/paymentdetails_error"
           android:textAlignment="center"
           android:visibility="@{model.state instanceof PaymentDetailsState.Error}"
@@ -170,8 +169,6 @@
           android:layout_height="0dp"
           android:padding="@dimen/space_lg"
           android:visibility="invisible"
-          app:layout_constrainedHeight="true"
-          app:layout_constrainedWidth="true"
           app:layout_constraintTop_toBottomOf="@id/mid_section">
 
           <TextView

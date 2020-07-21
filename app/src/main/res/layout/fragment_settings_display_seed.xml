@@ -30,7 +30,6 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".settings.DisplaySeedFragment">
 
     <fr.acinq.phoenix.utils.customviews.ActionBarView
@@ -40,105 +39,59 @@
       app:layout_constraintTop_toTopOf="parent"
       app:title="@string/displayseed_title" />
 
-    <fr.acinq.phoenix.utils.customviews.ButtonView
-      android:id="@+id/unlock_button"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_margin="@dimen/space_lg"
-      android:visibility="@{model.state == DisplaySeedState.INIT}"
-      app:icon="@drawable/ic_shield"
-      app:layout_constrainedWidth="true"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/action_bar"
-      app:text="@string/displayseed_authenticate_button" />
-
-    <fr.acinq.phoenix.utils.customviews.ProgressTextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
-      android:visibility="@{model.state == DisplaySeedState.UNLOCKING}"
-      app:layout_constraintTop_toBottomOf="@id/action_bar"
-      app:text="@string/displayseed_loading" />
-
-    <TextView
-      android:id="@+id/error_view"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:padding="@dimen/space_lg"
-      android:text="@string/displayseed_error"
-      android:visibility="@{model.state == DisplaySeedState.ERROR}"
-      app:layout_constraintTop_toBottomOf="@id/action_bar" />
-
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      android:fillViewport="true"
-      android:visibility="@{model.state == DisplaySeedState.DONE}"
-      app:layout_constrainedHeight="true"
+      android:overScrollMode="never"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_lg"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/square_border_hz">
 
         <TextView
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_md"
+          android:layout_marginStart="@dimen/space_md"
           android:text="@string/displayseed_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <TableLayout
-          android:id="@+id/words_table"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
+        <View
+          android:id="@+id/sep_1"
+          style="@style/HLineSeparator"
           android:layout_marginTop="@dimen/space_lg"
+          android:layout_width="match_parent"
           app:layout_constraintTop_toBottomOf="@id/instructions" />
 
-        <TextView
-          android:id="@+id/derivation_path"
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/unlock_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:text="@string/displayseed_derivation_path"
-          android:textAlignment="center"
-          android:textColor="?attr/mutedTextColor"
-          android:textSize="@dimen/text_sm"
-          app:layout_constraintTop_toBottomOf="@id/words_table" />
-
-        <androidx.constraintlayout.widget.Group
-          android:id="@+id/backgrup_warning_group"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:visibility="@{model.showUserBackupWarning}"
-          app:constraint_referenced_ids="backup_warning_checkbox,backup_warning_button" />
-
-        <CheckBox
-          android:id="@+id/backup_warning_checkbox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
-          android:text="@string/displayseed_has_saved_seed_checkbox"
+          android:background="@drawable/button_bg_square"
+          android:visibility="@{!(model.state instanceof DisplaySeedState.Unlocking)}"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_key"
+          app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/derivation_path" />
+          app:layout_constraintTop_toBottomOf="@id/sep_1"
+          app:text="@string/displayseed_authenticate_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/backup_warning_button"
+        <fr.acinq.phoenix.utils.customviews.ProgressTextView
+          android:id="@+id/unlocking"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
-          app:enableOrFade="@{model.userHasSavedSeed}"
-          app:icon="@drawable/ic_check_circle"
-          app:layout_constraintStart_toStartOf="@id/backup_warning_checkbox"
-          app:layout_constraintTop_toBottomOf="@id/backup_warning_checkbox"
-          app:text="@string/displayseed_has_saved_seed_button" />
+          android:padding="@dimen/space_md"
+          android:visibility="@{model.state instanceof DisplaySeedState.Unlocking}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/sep_1"
+          app:text="@string/displayseed_loading" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -44,7 +44,8 @@ object Converter {
 
   init {
     FIAT_FORMAT.minimumFractionDigits = 2
-    FIAT_FORMAT.maximumFractionDigits = 3
+    FIAT_FORMAT.maximumFractionDigits = 2
+    FIAT_FORMAT.roundingMode = RoundingMode.CEILING // prevent converting very small bitcoin amounts to 0 in fiat
   }
 
   fun refreshCoinPattern(context: Context) {

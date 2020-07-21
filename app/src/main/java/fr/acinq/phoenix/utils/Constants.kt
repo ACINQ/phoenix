@@ -20,6 +20,7 @@ import android.text.format.DateUtils
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.*
+import fr.acinq.phoenix.send.FeerateEstimationPerKb
 import okhttp3.MediaType
 
 /**
@@ -47,7 +48,8 @@ object Constants {
   const val FCM_NOTIFICATION_ID = 81357423
 
   // -- default wallet values
-  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())
+  val DEFAULT_FEERATE = FeerateEstimationPerKb(rate20min = 12, rate60min = 6, rate12hours = 3)
+  val DEFAULT_NETWORK_INFO = NetworkInfo(electrumServer = null, lightningConnected = false, torConnections = HashMap())
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
     TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %

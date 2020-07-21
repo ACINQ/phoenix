@@ -68,32 +68,30 @@ class ElectrumServerFragment : BaseFragment(stayIfNotStarted = true) {
         getString(R.string.electrum_fee_rate, NumberFormat.getInstance().format(`package$`.`MODULE$`.feerateKw2Byte(feerate)))
       } ?: getString(R.string.utils_unknown)
 
-      appContext(ctx).networkInfo.observe(viewLifecycleOwner, Observer {
-        context?.let { ctx ->
-          val electrumServer = it.electrumServer
-          if (electrumServer == null) {
-            // -- no connection to electrum server yet
-            val prefElectrumAddress = Prefs.getElectrumServer(ctx)
-            mBinding.connectionStateValue.text = Converter.html(
-              if (app.state.value is KitState.Started) {
-                if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                  resources.getString(R.string.electrum_connecting)
-                } else {
-                  resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
-                }
+      app.networkInfo.observe(viewLifecycleOwner, Observer { info ->
+        val electrumServer = info?.electrumServer
+        if (electrumServer == null) {
+          // -- no connection to electrum server yet
+          val prefElectrumAddress = Prefs.getElectrumServer(ctx)
+          mBinding.connectionStateValue.text = Converter.html(
+            if (app.state.value is KitState.Started) {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_connecting)
               } else {
-                if (Strings.isNullOrEmpty(prefElectrumAddress)) {
-                  resources.getString(R.string.electrum_not_connected)
-                } else {
-                  resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
-                }
-              })
-          } else {
-            // -- successfully connected to electrum
-            mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, it.electrumServer.electrumAddress))
-            mBinding.tipTime.text = Transcriber.plainTime(it.electrumServer.tipTime * 1000L)
-            mBinding.blockHeight.text = NumberFormat.getInstance().format(it.electrumServer.blockHeight)
-          }
+                resources.getString(R.string.electrum_connecting_to_custom, prefElectrumAddress)
+              }
+            } else {
+              if (Strings.isNullOrEmpty(prefElectrumAddress)) {
+                resources.getString(R.string.electrum_not_connected)
+              } else {
+                resources.getString(R.string.electrum_not_connected_to_custom, prefElectrumAddress)
+              }
+            })
+        } else {
+          // -- successfully connected to electrum
+          mBinding.connectionStateValue.text = Converter.html(resources.getString(R.string.electrum_connected, electrumServer.electrumAddress))
+          mBinding.tipTime.text = Transcriber.plainTime(electrumServer.tipTime * 1000L)
+          mBinding.blockHeight.text = NumberFormat.getInstance().format(electrumServer.blockHeight)
         }
       })
     }

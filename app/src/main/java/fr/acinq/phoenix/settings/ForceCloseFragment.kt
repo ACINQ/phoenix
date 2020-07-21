@@ -54,8 +54,8 @@ class ForceCloseFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(ForceCloseViewModel::class.java)
     mBinding.model = model
-    mBinding.actionBar.setSubtitle(Converter.html(getString(R.string.closechannels_force_instructions,
-      app.state.value?.getFinalAddress() ?: getString(R.string.utils_unknown))))
+    mBinding.instructions.text = Converter.html(getString(R.string.closechannels_force_instructions))
+    mBinding.destinationValue.text = app.state.value?.getFinalAddress() ?: getString(R.string.utils_unknown)
   }
 
   override fun onStart() {

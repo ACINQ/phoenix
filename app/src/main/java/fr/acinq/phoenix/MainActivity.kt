@@ -60,11 +60,9 @@ class MainActivity : AppCompatActivity() {
       log.info("network available")
       AppContext.getInstance(applicationContext).apply {
         if (Prefs.isTorEnabled(applicationContext)) {
-          reconnectTor()
+          app.service?.reconnectTor()
         }
-        networkInfo.postValue(networkInfo.value?.run { networkConnected = true ; this })
       }
-      app.service?.reconnectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -80,9 +78,6 @@ class MainActivity : AppCompatActivity() {
     override fun onLost(network: Network) {
       super.onLost(network)
       log.info("network lost")
-      AppContext.getInstance(applicationContext).apply {
-        networkInfo.postValue(networkInfo.value?.run { networkConnected = false ; this })
-      }
     }
   }
 

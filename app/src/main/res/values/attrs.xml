@@ -71,6 +71,8 @@
     <attr name="icon_size" />
     <attr name="spacer_size" format="dimension" />
     <attr name="hz_bias" format="float" />
+    <attr name="is_paused" format="boolean" />
+    <attr name="paused_text" format="string" />
   </declare-styleable>
   <declare-styleable name="SwitchView">
     <attr name="text" />

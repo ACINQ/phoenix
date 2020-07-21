@@ -27,12 +27,15 @@ import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.eclair.wire.SwapInPending
-import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.background.EclairNodeService
+import fr.acinq.phoenix.background.ElectrumServer
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.events.RemovePendingSwapIn
+import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.ServiceDisconnected
 import fr.acinq.phoenix.utils.SingleLiveEvent
 import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -79,6 +82,9 @@ class AppViewModel : ViewModel() {
 
   /** List of swap-ins waiting for confirmation. */
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
+
+  /** Aggregated state of network connections (peer, electrum, tor) mirroring and aggregating connection states from service. */
+  val networkInfo = NetworkInfoLiveData(_service)
 
   init {
     currentNav.value = R.id.startup_fragment
@@ -141,7 +147,7 @@ class AppViewModel : ViewModel() {
 }
 
 class StateLiveData(service: MutableLiveData<EclairNodeService?>): MediatorLiveData<KitState>() {
-  private val log = LoggerFactory.getLogger(AppViewModel::class.java)
+  private val log = LoggerFactory.getLogger(this::class.java)
   private var serviceState: LiveData<KitState>? = null
 
   init {
@@ -156,6 +162,32 @@ class StateLiveData(service: MutableLiveData<EclairNodeService?>): MediatorLiveD
         log.info("service connected, now mirroring service's internal state")
         addSource(s.state) {
           value = it
+        }
+      }
+    }
+  }
+}
+
+data class NetworkInfo(val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
+
+class NetworkInfoLiveData(service: MutableLiveData<EclairNodeService?>) : MediatorLiveData<NetworkInfo>() {
+  private val log = LoggerFactory.getLogger(this::class.java)
+  private fun valueOrDefault(): NetworkInfo = value ?: Constants.DEFAULT_NETWORK_INFO
+  init {
+    addSource(service) { s ->
+      if (s == null) {
+        log.info("lost service, force network info to default (disconnected)")
+        value = Constants.DEFAULT_NETWORK_INFO
+      } else {
+        log.info("service connected, now mirroring service's internal network info")
+        addSource(s.electrumConn) {
+          value = valueOrDefault().copy(electrumServer = it)
+        }
+        addSource(s.torConn) {
+          value = valueOrDefault().copy(torConnections = it)
+        }
+        addSource(s.peerConn) {
+          value = valueOrDefault().copy(lightningConnected = it)
         }
       }
     }

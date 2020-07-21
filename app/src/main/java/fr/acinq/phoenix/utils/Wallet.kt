@@ -29,7 +29,7 @@ import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
-import fr.acinq.phoenix.Xpub
+import fr.acinq.phoenix.background.Xpub
 import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient

@@ -28,46 +28,36 @@
       type="fr.acinq.phoenix.settings.MutualCloseViewModel" />
   </data>
 
-  <ScrollView
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:overScrollMode="never"
-    app:layout_constrainedHeight="true"
-    app:layout_constraintBottom_toBottomOf="parent">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:paddingBottom="@dimen/space_xxl">
+      app:layout_constraintTop_toTopOf="parent"
+      app:subtitle="@string/closechannels_mutual_instructions"
+      app:title="@string/closechannels_mutual_title" />
 
-      <fr.acinq.phoenix.utils.customviews.ActionBarView
-        android:id="@+id/action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:subtitle="@string/closechannels_mutual_instructions"
-        app:title="@string/closechannels_mutual_title" />
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:overScrollMode="never"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/action_bar">
 
       <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/bgColor"
-        app:layout_constraintTop_toBottomOf="@id/action_bar">
-
-        <View
-          android:id="@+id/top_separator"
-          style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          app:layout_constraintTop_toTopOf="parent" />
+        android:background="@drawable/square_border_hz">
 
         <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
-          app:layout_constraintTop_toBottomOf="@id/top_separator"
+          app:layout_constraintTop_toTopOf="parent"
           app:text="@string/closechannels_checking_channels" />
 
         <TextView
@@ -76,7 +66,7 @@
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
           android:text="@string/closechannels_channels_none"
-          app:layout_constraintTop_toBottomOf="@id/top_separator" />
+          app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
           android:id="@+id/instructions"
@@ -122,21 +112,14 @@
 
         <TextView
           android:id="@+id/mutual_done"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_md_p"
-          android:background="@drawable/rounded"
-          android:backgroundTint="?attr/positiveColor"
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
-          android:drawableTint="?attr/altTextColor"
-          android:paddingStart="@dimen/space_md"
-          android:paddingTop="@dimen/space_sm"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingBottom="@dimen/space_sm"
+          android:drawableTint="?attr/positiveColor"
+          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_done"
-          android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == MutualCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
@@ -145,7 +128,6 @@
           android:id="@+id/mutual_in_progress"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_md_p"
           android:padding="@dimen/space_md"
           android:visibility="@{model.state == MutualCloseState.IN_PROGRESS}"
@@ -153,33 +135,28 @@
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
           app:text="@string/closechannels_message_in_progress" />
 
+        <View
+          style="@style/HLineSeparator"
+          android:layout_width="match_parent"
+          android:visibility="@{model.state == PreChannelsCloseState.READY}"
+          app:layout_constraintBottom_toTopOf="@id/mutual_confirm_button" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
-          android:layout_width="wrap_content"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
+          android:background="@drawable/button_bg_square"
           android:layout_marginTop="@dimen/space_md_p"
+          android:padding="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:enableOrFade="@{model.addressInput.length() > 0}"
+          app:hz_bias="0"
           app:icon="@drawable/ic_empty"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
           app:text="@string/closechannels_mutual_button" />
 
-        <androidx.constraintlayout.widget.Barrier
-          android:id="@+id/action_bottom"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          app:barrierDirection="bottom"
-          app:constraint_referenced_ids="mutual_confirm_button,mutual_error,mutual_in_progress,mutual_done" />
-
-        <View
-          style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          android:layout_marginTop="@dimen/space_md"
-          app:layout_constraintTop_toBottomOf="@+id/action_bottom" />
-
       </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-  </ScrollView>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

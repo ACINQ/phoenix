@@ -32,7 +32,7 @@
   <string name="restore_disclaimer_message">Não importe uma seed que tenha sido gerada em outro aplicativo.\n\nAlém disso, certifique-se que você não tem outra carteira Phoenix instalada com a mesma seed.</string>
   <string name="restore_disclaimer_checkbox">Eu entendo.</string>
   <string name="restore_disclaimer_next">Próximo</string>
-  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês. Tenha em mente que senhas comuns não funcionam.</string>
+  <string name="restore_instructions">A seed da sua carteira é uma lista com 12 palavras escritas em inglês.</string>
   <string name="restore_mnemonics_label">Use o teclado abaixo para inserir a seed:</string>
   <string name="restore_in_progress">Restaurando sua carteira…</string>
   <string name="restore_import_button">Importar</string>
@@ -56,9 +56,10 @@
   <string name="startup_wait_tor">Iniciando Tor…</string>
   <string name="startup_start_button">Reiniciar</string>
   <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
+  <string name="startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
   <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
   <string name="startup_error_unreadable">Não foi possível ler os dados da carteira, favor reiniciar o aplicativo.</string>
-  <string name="startup_error_network">Sua conexão de internet não está funcionando. Favor verificar sua conexão WiFi ou rede de celular.</string>
+  <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
 
@@ -93,7 +94,7 @@
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
-  <string name="receive_swap_in_error_message">Ocorreu um erro ao enviar esta transação usando a rede Bitcoin…\n\nTente novamente.</string>
+  <string name="receive_swap_in_error_message">Ocorreu um erro ao trocar para uma transação da rede Bitcoin…\n\nTente novamente.</string>
   <string name="receive_swap_in_progress_message">Solicitando um endereço Bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -108,49 +109,57 @@
 
   <string name="receive_with_open_title">Pagamento a receber</string>
   <string name="receive_with_open_help_desc">O que é isso?</string>
-  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa de instalação serve para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
+  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa é necessária para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
   <string name="receive_with_open_amount_label">Você tem um pagamento a receber de</string>
-  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação de <b>%1$s</b> (%2$s).]]></string>
+  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação/manutenção de <b>%1$s</b> (%2$s).]]></string>
   <string name="receive_with_open_accept">Aceitar (expira em %1$ss)</string>
   <string name="receive_with_open_decline">Recusar</string>
   <string name="receive_with_open_expired">Este pagamento expirou!</string>
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Colar solicitação de pagamento</string>
+  <string name="send_init_paste">Colar dados da área de transferência</string>
   <string name="send_init_reading">Lendo…</string>
 
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de Bitcoins.\n\nTente novamente.</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_chain_fees_edit">Ajustar taxas</string>
+  <string name="send_chain_fees_label">Taxa</string>
+  <string name="send_chain_fees_unit">sat/byte</string>
+  <string name="send_chain_fees_description">Este pagamento é uma transação pela rede Bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
+  <string name="send_chain_fees_feedback_invalid">Por favor use uma taxa válida.</string>
+  <string name="send_chain_fees_feedback_20min">Com esta taxa,a transação deve ser concluída no prazo de 30 minutos.</string>
+  <string name="send_chain_fees_feedback_1h">Com esta taxa, a transação deve ser concluída no prazo de 1 hora.</string>
+  <string name="send_chain_fees_feedback_12h">Com esta taxa, a transação deve ser concluída no prazo de 12 horas.</string>
+  <string name="send_chain_fees_feedback_inf">Com esta taxa, a transação deve ser concluída após um período de 12 horas ou mais.</string>
   <string name="send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
   <string name="send_pay_button">Pagar</string>
-  <string name="send_swap_in_progress">Processando troca…</string>
-  <string name="send_swap_error">A troca falhou. Tente novamente.</string>
-  <string name="send_swap_required_desc">Este é um endereço Bitcoin, o pagamento será realizado usando uma troca.</string>
-  <string name="send_swap_required_button">Solicitar uma troca</string>
+  <string name="send_swap_in_progress">Preparando transação…</string>
+  <string name="send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
+  <string name="send_swap_required_button">Preparar transação</string>
   <string name="send_swap_complete_recap_amount">Valor</string>
-  <string name="send_swap_complete_recap_fee">Taxa de Mineração</string>
+  <string name="send_swap_complete_recap_fee">Taxa de mineração</string>
   <string name="send_swap_complete_recap_total">Total</string>
-  <string name="send_swap_complete_cannot_afford">O total excede seu saldo.\n\nDiminua o valor ou tente novamente quando as taxas de mineração baixarem.</string>
+  <string name="send_swap_complete_cannot_afford">O total após taxas excede seu saldo.</string>
 
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Leia um código QR com solicitação de pagamento ou endereço Bitcoin</string>
-  <string name="scan_state_reading">Lendo solicitação de pagamento</string>
+  <string name="scan_instructions">Leia um código QR com solicitação de pagamento, endereço bitcoin ou uma LNURL</string>
+  <string name="scan_state_reading">Lendo dados</string>
 
-  <string name="scan_error_default">Esta não é uma solicitação de pagamento válida.\n\nTente novamente.</string>
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
-  <string name="scan_error_invalid_chain">Esta cobrança não usa o mesmo blockchain da sua carteira.</string>
-  <string name="scan_error_lnurl_unsupported">Esta LNURL ainda não é suportada!</string>
+  <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
+  <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportada!</string>
+  <string name="scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
@@ -194,6 +203,7 @@
   <string name="settings_electrum">Servidor Electrum</string>
   <string name="settings_mutual_close">Encerrar canais</string>
   <string name="settings_force_close">Zona de perigo</string>
+  <string name="settings_about">Sobre</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -213,7 +223,7 @@
   <string name="closechannels_mutual_instructions"><![CDATA[
     Use este recurso para esvaziar sua carteira enviando o saldo para um endereço Bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Verifique se o endereço está correto antes de enviar.</string>
+  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
   <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
@@ -224,10 +234,10 @@
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
-    Os valores serão eventualmente enviados para: %1$s
-    <br/><br/>
     <b>Não use esse recurso se você não entender completamente o que ele faz.</b>
   ]]></string>
+  <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
+  <string name="closechannels_force_destination_desc">Este endereço foi originado a partir da sua seed e pertence a você.</string>
   <string name="closechannels_force_button">Forçar encerramento de canais</string>
   <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
   <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
@@ -263,12 +273,12 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Enviar</string>
+  <string name="menu_send">Ler</string>
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_create">Nova carteira</string>
+  <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
 
   <!-- //////////////// main //////////////////// -->
@@ -287,7 +297,7 @@
 
   <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
   <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
-  <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Você já fez o backup da carteira?</string>
+  <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
@@ -298,18 +308,25 @@
   <string name="displayseed_title">Frase de recuperação da carteira</string>
   <string name="displayseed_authenticate_button">Mostrar seed</string>
   <string name="displayseed_loading">Desbloqueando seed…</string>
-  <string name="displayseed_error">A seed não pôde ser lida. Tente novamente.\n\nMotivo: %1$s</string>
+  <string name="displayseed_error_generic">A seed não pôde ser lida. Tente novamente.</string>
+  <string name="displayseed_error_wrong_password">PIN incorreto.</string>
   <string name="displayseed_instructions"><![CDATA[
-    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira. Salve as palavras em um local seguro (não neste telefone)!
+    Esta lista de palavras, também conhecida como seed, é o backup da sua carteira e permite o acesso total aos fundos contidos nela.
     <br /><br />
-    <b>Não compartilhe com ninguém. Qualquer pessoa que tenha acesso à sua lista de palavras pode roubar seus bitcoins.
+    <strong>Somente você possui esta seed. Mantenha-a privada.</strong>
     <br /><br />
-    <b>Não perca elas.</b> Se você perder sua lista de palavras e seu telefone, perderá seus bitcoins.
+    <strong>Não compartilhe esta seed com ninguém</strong>.
+    <br />
+    Cuidado com ataques phishing. Os desenvolvedores da Phoenix nunca pedirão sua seed.
+    <br /><br />
+    <strong>Não perca esta seed</strong>.
+    <br />
+    Salve-a em um local seguro (não neste telefone). Se você perder sua seed e seu telefone, você perderá seus fundos.
   ]]></string>
   <string name="displayseed_derivation_path">Seed BIP39 com caminho de derivação padrão BIP84</string>
   <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
-  <string name="displayseed_has_saved_seed_checkbox">Eu fiz o backup da minha seed</string>
-  <string name="displayseed_has_saved_seed_button">Confirmar</string>
+  <string name="displayseed_has_saved_seed_checkbox">Fiz o backup da minha seed, por exemplo, em uma folha de papel.</string>
+  <string name="displayseed_dialog_header">MANTENHA ESTA SEED SEGURA.\nNÃO COMPARTILHE.</string>
 
   <!-- //////////////// logs settings //////////////// -->
 
@@ -394,16 +411,26 @@
   <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
   <string name="seedsec_bio_prompt_negative">Cancelar</string>
 
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
+  <string name="lnurl_auth_button">Entrar</string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Acessando <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
+  <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
+  <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
+
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">Valor a receber</string>
   <string name="lnurl_withdraw_description_label">Detalhes</string>
-  <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirar fundos de<br/><b>%1$s</b>.]]></string>
-  <string name="lnurl_withdraw_confirm_button">Retirar</string>
-  <string name="lnurl_withdraw_wait">Solicitando valores…</string>
-  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo online.</string>
-  <string name="lnurl_withdraw_error_internal">Não foi possível processar esta retirada. Tente novamente.</string>
-  <string name="lnurl_withdraw_error_invalid">Esta solicitação de retirada é inválida. Tente novamente.</string>
+  <string name="lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
+  <string name="lnurl_withdraw_confirm_button">Resgatar</string>
+  <string name="lnurl_withdraw_wait">Resgatando valores…</string>
+  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo aberto.</string>
+  <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
+  <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
   <string name="lnurl_withdraw_error_amount_min">O valor não pode ser menor que %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">O valor não pode ser maior que %1$s.</string>
@@ -438,6 +465,7 @@
 
   <string name="electrum_dialog_checkbox">Usar um servidor Electrum personalizado</string>
   <string name="electrum_dialog_ssl">O servidor deve possuir um certificado válido</string>
+  <string name="electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
   <string name="electrum_dialog_input">Endereço do servidor (host:port).</string>
   <string name="electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
 
@@ -465,5 +493,19 @@
   <string name="conndialog_lightning">Par Lightning</string>
   <string name="conndialog_ok">Conectado</string>
   <string name="conndialog_not_ok">Conectando…</string>
+
+   <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">Sobre</string>
+  <string name="about_version">Versão: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  A Phoenix é uma carteira Bitcoin que usa a rede Lightning para enviar e receber pagamentos.
+  <br/><br/>
+  É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
+  <br/><br/>
+  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com phishing.
+  <br/><br/>
+  Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
+  ]]></string>
 
 </resources>

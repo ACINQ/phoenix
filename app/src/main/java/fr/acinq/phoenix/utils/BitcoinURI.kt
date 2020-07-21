@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.utils
 
 import android.net.Uri
-import com.google.common.base.Strings
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.BtcUnit
 import fr.acinq.eclair.CoinUtils
@@ -26,12 +25,12 @@ import fr.acinq.eclair.payment.PaymentRequest
 
 class BitcoinURI(input: String) {
 
-  public val raw: String
-  public val address: String
-  public val message: String?
-  public val label: String?
-  public val lightning: PaymentRequest?
-  public val amount: Satoshi?
+  val raw: String
+  val address: String
+  val message: String?
+  val label: String?
+  val lightning: PaymentRequest?
+  val amount: Satoshi?
 
   init {
 
@@ -44,13 +43,13 @@ class BitcoinURI(input: String) {
 
     // -- read and validate address
     val path = uri.path
-    if (Strings.isNullOrEmpty(path)) {
+    if (path.isNullOrBlank()) {
       throw BitcoinURIParseException("address is missing")
     }
     try {
       `package$`.`MODULE$`.addressToPublicKeyScript(path, Wallet.getChainHash())
     } catch (e: IllegalArgumentException) {
-      throw BitcoinURIParseException(e.localizedMessage, e)
+      throw BitcoinURIParseException("invalid address", e)
     }
 
     this.address = path!!
@@ -61,7 +60,7 @@ class BitcoinURI(input: String) {
 
     // -- read and validate lightning payment request field
     val lightningParam = uri.getQueryParameter("lightning")
-    if (Strings.isNullOrEmpty(lightningParam)) {
+    if (lightningParam.isNullOrBlank()) {
       this.lightning = null
     } else {
       this.lightning = PaymentRequest.read(lightningParam)
@@ -69,7 +68,7 @@ class BitcoinURI(input: String) {
 
     // -- read and validate amount field parameter. Amount is in BTC in the URI, and is converted to Satoshi,
     val amountParam = uri.getQueryParameter("amount")
-    if (Strings.isNullOrEmpty(amountParam)) {
+    if (amountParam.isNullOrBlank()) {
       this.amount = null
     } else {
       this.amount = CoinUtils.convertStringAmountToSat(amountParam, BtcUnit.code())
@@ -96,12 +95,7 @@ class BitcoinURI(input: String) {
   }
 
   override fun toString(): String {
-    return javaClass.simpleName + "[ " +
-      "address=" + this.address + ", " +
-      "amount=" + this.amount + ", " +
-      "label=" + this.label + ", " +
-      "message=" + this.message + ", " +
-      "lightning=" + this.lightning + " ]"
+    return "${javaClass.simpleName} [ address=$address, amount=$amount, label=$label, message=$message, lightning=$lightning ]"
   }
 
   companion object {

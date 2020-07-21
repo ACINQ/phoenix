@@ -21,32 +21,19 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.annotation.UiThread
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
-import com.msopentech.thali.toronionproxy.OnionProxyManager
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.io.Peer
-import fr.acinq.eclair.io.PeerConnected
-import fr.acinq.eclair.io.PeerDisconnected
 import fr.acinq.phoenix.events.BalanceEvent
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.tor.TorConnectionStatus
-import fr.acinq.phoenix.utils.tor.TorEventHandler
-import fr.acinq.phoenix.utils.tor.TorHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -63,7 +50,6 @@ import kotlin.collections.ArrayList
 class AppContext : Application(), DefaultLifecycleObserver {
 
   val log = LoggerFactory.getLogger(this::class.java)
-  private val appScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
   @Volatile
   var isAppVisible = false
@@ -97,22 +83,6 @@ class AppContext : Application(), DefaultLifecycleObserver {
     Converter.refreshCoinPattern(applicationContext)
     updateWalletContext()
 
-    Prefs.getFCMToken(applicationContext)?.run {
-      fcmToken = this
-    } ?: run {
-      FirebaseInstanceId.getInstance().instanceId
-        .addOnCompleteListener(OnCompleteListener { task ->
-          if (!task.isSuccessful) {
-            log.warn("failed to retrieve fcm token", task.exception)
-            return@OnCompleteListener
-          }
-          task.result?.token?.let { token ->
-            Prefs.saveFCMToken(applicationContext, token)
-            fcmToken = token
-          }
-        })
-    }
-
     // poll exchange rate api every 120 minutes
     kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 120 * 60 * 1000) {
       Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(applicationContext))
@@ -138,17 +108,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
   }
 
-  // ========================================================================== //
-  //                 BELOW ARE VALUES SHARED BETWEEN UI/SERVICE                 //
-  // ========================================================================== //
-
-  /** FCM token allocated to this application. */
-  var fcmToken: String? = null
-
-  /** State of network connections (Internet, Tor, Peer, Electrum). */
-  val networkInfo = MutableLiveData(Constants.DEFAULT_NETWORK_INFO)
-
-  /** The settings for the fees allocated to a trampoline node. */
+  /** Settings for the fees allocated to a trampoline node. */
   val trampolineFeeSettings = MutableLiveData(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
 
   /** List of in-app notifications. */
@@ -160,68 +120,13 @@ class AppContext : Application(), DefaultLifecycleObserver {
   /** Current balance of the node. */
   val balance = MutableLiveData<MilliSatoshi>()
 
-  // ========================================================================== //
-  //                 BELOW ARE VALUES SHARED BETWEEN UI/SERVICE                 //
-  // ========================================================================== //
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: ElectrumClient.ElectrumReady) {
-    networkInfo.value = networkInfo.value?.copy(electrumServer = ElectrumServer(electrumAddress = event.serverAddress().toString(), blockHeight = event.height(), tipTime = event.tip().time()))
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: ElectrumClient.`ElectrumDisconnected$`) {
-    networkInfo.value = networkInfo.value?.copy(electrumServer = null)
-  }
-
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: PeerConnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = true))
-    fcmToken?.let {
-      EventBus.getDefault().post(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), fcmToken))
-    }
-  }
-
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: PeerDisconnected) {
-    networkInfo.postValue(networkInfo.value?.copy(lightningConnected = false))
-  }
-
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
     balance.postValue(event.balance)
   }
 
   // ========================================================================== //
-  //                     BELOW ARE METHODS FOR TOR HANDLING                     //
-  // ========================================================================== //
-
-  var torManager: OnionProxyManager? = null
-
-  fun startTor() {
-    torManager = TorHelper.bootstrap(applicationContext, object : TorEventHandler() {
-      override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-        networkInfo.value?.run {
-          if (status == TorConnectionStatus.CONNECTED) networkConnected = true
-          torConnections[name] = status
-          networkInfo.postValue(this)
-        }
-      }
-    })
-  }
-
-  @WorkerThread
-  fun reconnectTor() {
-    torManager?.run { enableNetwork(true) }
-  }
-
-  @UiThread
-  suspend fun getTorInfo(cmd: String): String = withContext(appScope.coroutineContext + Dispatchers.Default) {
-    torManager?.run { getInfo(cmd) } ?: throw RuntimeException("onion proxy manager not available")
-  }
-
-  // ========================================================================== //
-  //                  BELOW ARE METHODS FOR EXTERNAL API CALLS                  //
+  //                             EXTERNAL API CALLS                             //
   //                        TODO: move this to a service                        //
   // ========================================================================== //
 
@@ -362,6 +267,3 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
 data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
 data class SwapInSettings(val feePercent: Double)
-data class Xpub(val xpub: String, val path: String)
-data class NetworkInfo(var networkConnected: Boolean, val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)
-data class ElectrumServer(val electrumAddress: String, val blockHeight: Int, val tipTime: Long)
