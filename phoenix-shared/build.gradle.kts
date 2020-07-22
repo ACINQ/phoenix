@@ -38,6 +38,7 @@ kotlin {
                 freeCompilerArgs = freeCompilerArgs + "-Xobjc-generics"
             }
         }
+        compilations["main"].cinterops.create("ios_network")
     }
 
     sourceSets {

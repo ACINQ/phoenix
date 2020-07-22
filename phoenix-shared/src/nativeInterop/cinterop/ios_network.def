@@ -1,0 +1,11 @@
+package = fr.acinq.phoenix.io.ios_network
+---
+
+#include <Network/Network.h>
+
+nw_parameters_t create_tcp_parameters(bool withTls) {
+    return nw_parameters_create_secure_tcp(
+        withTls ? NW_PARAMETERS_DEFAULT_CONFIGURATION : NW_PARAMETERS_DISABLE_PROTOCOL,
+        NW_PARAMETERS_DEFAULT_CONFIGURATION
+    );
+}

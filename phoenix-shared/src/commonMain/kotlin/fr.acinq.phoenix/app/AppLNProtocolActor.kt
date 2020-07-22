@@ -4,6 +4,7 @@ import fr.acinq.eklair.crypto.noise.*
 import fr.acinq.eklair.io.LightningSession
 import fr.acinq.phoenix.LNProtocolActor
 import fr.acinq.phoenix.io.AppMainScope
+import fr.acinq.phoenix.io.PlatformSocketBuilder
 import fr.acinq.phoenix.io.TcpSocket
 import fr.acinq.phoenix.io.receiveFully
 import fr.acinq.secp256k1.Hex
@@ -148,67 +149,76 @@ private class MaintainingConnection(val session: LightningSession) : State() {
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class AppLNProtocolActor(private val socketFactory: TcpSocket.Builder, loggerFactory: LoggerFactory) : LNProtocolActor {
 
-    private val logger = newLogger(loggerFactory)
+//    private val logger = newLogger(loggerFactory)
 
-    private lateinit var socket: TcpSocket
-
-    private val channel = Channel<Event>(0)
+//    private lateinit var socket: TcpSocket
+//
+//    private val channel = Channel<Event>(0)
     private val showChannel = BroadcastChannel<String>(Channel.BUFFERED)
-
-    private var timerJob: Job? = null
+//
+//    private var timerJob: Job? = null
 
     init {
         AppMainScope().launch {
-            var state: State = Closed
-            channel.consumeEach { event ->
-                logger.info { "$event on $state:" }
-                val (nextState, actions) = state.process(event)
-                logger.info { "  next state: $nextState" }
-                state = nextState
+            println("Go go go!")
 
-                actions.forEach { action ->
-                    logger.info { "  action: $action" }
-                    try {
-                        when (action) {
-                            is ConnectTo -> connect(action.host, action.port)
-                            is SendBytes -> socket.send(action.payload, action.flush)
-                            is SendLNMessage -> action.session.send(action.payload, socket::send)
-                            is ListenBytes -> AppMainScope().launch { channel.send(ReceivedBytes(socket.receiveFully(action.count))) }
-                            is ListenLNMessage -> AppMainScope().launch { channel.send(ReceivedLNMessage(action.session.receive { count -> socket.receiveFully(count) })) }
-                            is Show -> showChannel.send(action.message)
-                            is Restart -> AppMainScope().launch { delay(1000) ; channel.send(Start) }
-                            is StartTimer -> startTimer(action.milliseconds)
-                            is StopTimer -> timerJob!!.cancel()
-                        }
-                    } catch (ex: Exception) {
-                        logger.error(ex)
-                        AppMainScope().launch { channel.send(Disconnected) }
-                    }
-                }
-            }
+            val socket = PlatformSocketBuilder.connect("localhost", 4242, false)
+            println("Connected")
+            socket.send("Salut le monde!\n".encodeToByteArray())
+            println("Sent")
+            socket.close()
+            println("Closed")
+
+//            var state: State = Closed
+//            channel.consumeEach { event ->
+//                logger.info { "$event on $state:" }
+//                val (nextState, actions) = state.process(event)
+//                logger.info { "  next state: $nextState" }
+//                state = nextState
+//
+//                actions.forEach { action ->
+//                    logger.info { "  action: $action" }
+//                    try {
+//                        when (action) {
+//                            is ConnectTo -> connect(action.host, action.port)
+//                            is SendBytes -> socket.send(action.payload, action.flush)
+//                            is SendLNMessage -> action.session.send(action.payload, socket::send)
+//                            is ListenBytes -> AppMainScope().launch { channel.send(ReceivedBytes(socket.receiveFully(action.count))) }
+//                            is ListenLNMessage -> AppMainScope().launch { channel.send(ReceivedLNMessage(action.session.receive { count -> socket.receiveFully(count) })) }
+//                            is Show -> showChannel.send(action.message)
+//                            is Restart -> AppMainScope().launch { delay(1000) ; channel.send(Start) }
+//                            is StartTimer -> startTimer(action.milliseconds)
+//                            is StopTimer -> timerJob!!.cancel()
+//                        }
+//                    } catch (ex: Exception) {
+//                        logger.error(ex)
+//                        AppMainScope().launch { channel.send(Disconnected) }
+//                    }
+//                }
+//            }
         }
     }
 
-    private suspend fun connect(host: String, port: Int) {
-        socket = socketFactory.connect(host, port, false)
-        AppMainScope().launch { channel.send(Connected) }
-    }
-
-    private fun startTimer(ms: Long) {
-        timerJob = AppMainScope().launch {
-            delay(ms)
-            timerJob = null
-            channel.send(Timed)
-        }
-    }
+//    private suspend fun connect(host: String, port: Int) {
+//        socket = socketFactory.connect(host, port, false)
+//        AppMainScope().launch { channel.send(Connected) }
+//    }
+//
+//    private fun startTimer(ms: Long) {
+//        timerJob = AppMainScope().launch {
+//            delay(ms)
+//            timerJob = null
+//            channel.send(Timed)
+//        }
+//    }
 
     override fun openSubscription(): ReceiveChannel<String> = showChannel.openSubscription()
 
-    private var started = false
+//    private var started = false
     override fun start() {
-        require(!started)
-        started = true
-
-        AppMainScope().launch { channel.send(Start) }
+//        require(!started)
+//        started = true
+//
+//        AppMainScope().launch { channel.send(Start) }
     }
 }

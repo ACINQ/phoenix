@@ -67,14 +67,14 @@ class IosTcpSocket(val connection: ConnectionBridge) : TcpSocket {
     }
 }
 
-internal actual object PlatformSocketBuilder : TcpSocket.Builder {
-    override suspend fun connect(host: String, port: Int, tls: Boolean): TcpSocket =
-        suspendCoroutine { continuation ->
-            IosTcpSocket.ConnectionBridge.Builder.native.connect(host, port, tls) { connection, error ->
-                when {
-                    error != null -> continuation.resumeWithException(error)
-                    connection != null -> continuation.resume(IosTcpSocket(connection))
-                }
-            }
-        }
-}
+//internal actual object PlatformSocketBuilder : TcpSocket.Builder {
+//    override suspend fun connect(host: String, port: Int, tls: Boolean): TcpSocket =
+//        suspendCoroutine { continuation ->
+//            IosTcpSocket.ConnectionBridge.Builder.native.connect(host, port, tls) { connection, error ->
+//                when {
+//                    error != null -> continuation.resumeWithException(error)
+//                    connection != null -> continuation.resume(IosTcpSocket(connection))
+//                }
+//            }
+//        }
+//}
