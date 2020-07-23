@@ -1,10 +1,10 @@
 package fr.acinq.phoenix
 
+import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.phoenix.app.AppLNProtocolActor
 import fr.acinq.phoenix.app.ctrl.AppLogController
 import fr.acinq.phoenix.ctrl.LogController
 import fr.acinq.phoenix.io.AppMainScope
-import fr.acinq.phoenix.io.TcpSocket
 import fr.acinq.phoenix.utils.Aggregator
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi

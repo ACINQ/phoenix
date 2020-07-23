@@ -7,7 +7,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let di: PhoenixIosDI
 
     override init() {
-        IosTcpSocketConnectionBridgeBuilderCompanion().native = IosConnectionBridge.Builder.shared
         di = PhoenixIosDI(phoenix: Phoenix())
     }
 
