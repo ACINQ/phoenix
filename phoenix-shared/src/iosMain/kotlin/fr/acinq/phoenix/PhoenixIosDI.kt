@@ -1,6 +1,6 @@
 package fr.acinq.phoenix
 
-import fr.acinq.phoenix.ctrl.LogController
+import fr.acinq.phoenix.ctrl.DemoController
 import org.kodein.di.direct
 import org.kodein.di.instance
 
@@ -9,5 +9,5 @@ import org.kodein.di.instance
 class PhoenixIosDI(phoenix: Phoenix) {
     private val di = phoenix.di.direct
 
-    fun logControllerInstance(): LogController = di.instance()
+    fun demoControllerInstance(): DemoController = di.instance()
 }

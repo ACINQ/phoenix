@@ -8,12 +8,12 @@ import SwiftUI
 import PhoenixShared
 
 extension View {
-    func withController<M, I>(_ controller: MVIController<M, I>, onModel: @escaping (M) -> Void) -> some View {
+    func withController<M : MVI.Model, I : MVI.Intent>(_ controller: MVIController<M, I>, onModel: @escaping (M) -> Void) -> some View {
         var unsub: (() -> Void)? = nil
 
         return self
                 .onAppear {
-                    unsub = controller.subscribe { onModel($0!) }
+                    unsub = controller.subscribe { onModel($0) }
                 }
                 .onDisappear { unsub?() }
 

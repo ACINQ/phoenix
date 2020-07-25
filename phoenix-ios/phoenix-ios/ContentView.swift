@@ -3,16 +3,35 @@ import PhoenixShared
 
 struct ContentView: View {
 
-    let controller: MVIController<LogController.Model, KotlinUnit>
-
-    @State var txt: [String] = []
+    let controller: MVIController<Demo.Model, Demo.Intent>
 
     var body: some View {
-        List(txt, id: \.self) {
-            Text($0)
+        VStack() {
+            Button(action: { self.controller.intent(intent: Demo.IntentConnect()) }) {
+                Text("Connect")
+                        .fontWeight(.bold)
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .padding()
+            }
+
+            Button(action: { }) {
+                Text("Receive 125,000 sat")
+                        .fontWeight(.bold)
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .padding()
+            }
         }
         .withController(controller) { model in
-            self.txt = model.lines
         }
     }
 }
@@ -20,8 +39,8 @@ struct ContentView: View {
 class Refresher {
     @objc class func injected() {
         UIApplication.shared.windows.first?.rootViewController =
-                UIHostingController(rootView: ContentView(controller: MVIControllerMock(
-                        model: LogController.Model(lines: ["a", "b", "c"])
+                UIHostingController(rootView: ContentView(controller: Demo.MockController(
+                        model: Demo.ModelEmpty()
                 )))
     }
 }

@@ -50,7 +50,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                api("fr.acinq.eklair:eklair:0.2.0-1.4-M3")
+                api("fr.acinq.eklair:eklair:snapshot")
                 api("org.kodein.di:kodein-di:$kodeinDiVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXCoroutinesVersion")
             }
@@ -109,3 +109,13 @@ val packForXcode by tasks.creating(Sync::class) {
     into(targetDir)
 }
 tasks.getByName("build").dependsOn(packForXcode)
+
+afterEvaluate {
+    tasks.withType<AbstractTestTask>() {
+        testLogging {
+            events("passed", "skipped", "failed", "standard_out", "standard_error")
+            showExceptions = true
+            showStackTraces = true
+        }
+    }
+}

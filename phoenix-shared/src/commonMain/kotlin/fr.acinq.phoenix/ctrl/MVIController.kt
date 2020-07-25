@@ -1,18 +1,29 @@
 package fr.acinq.phoenix.ctrl
 
-abstract class MVIController<M, I> {
 
-    abstract fun subscribe(onModel: (M) -> Unit): () -> Unit
+object MVI {
 
-    abstract fun process(intent: I)
+    abstract class Data {
+        override fun toString() = this::class.simpleName ?: super.toString()
+    }
 
+    abstract class Model : Data()
+    abstract class Intent : Data()
 
-    class Mock<M, I>(val model: M) : MVIController<M, I>() {
-        override fun subscribe(onModel: (M) -> Unit): () -> Unit {
-            onModel(model)
-            return ({})
+    abstract class Controller<M : Model, I : Intent> {
+
+        abstract fun subscribe(onModel: (M) -> Unit): () -> Unit
+
+        abstract fun intent(intent: I)
+
+        open class Mock<M : Model, I : Intent>(val model: M) : Controller<M, I>() {
+            override fun subscribe(onModel: (M) -> Unit): () -> Unit {
+                onModel(model)
+                return ({})
+            }
+            override fun intent(intent: I) {}
         }
-        override fun process(intent: I) {}
+
     }
 
 }
