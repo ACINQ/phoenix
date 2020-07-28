@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF40F48A1258070A1B91A /* MVIView.swift */; };
+		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
+		53BEFD54160278C5E393E319 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFE171C182513A5762686 /* HomeView.swift */; };
+		53BEFD96846CB72005545162 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF8AB2CC94C07E8572AFB /* MVIView.swift */; };
 		7555FF7F242A565900829871 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF7E242A565900829871 /* AppDelegate.swift */; };
 		7555FF81242A565900829871 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF80242A565900829871 /* SceneDelegate.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
@@ -52,7 +54,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		53BEF40F48A1258070A1B91A /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
+		53BEF8AB2CC94C07E8572AFB /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
+		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
+		53BEFE171C182513A5762686 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Phoenix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Phoenix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7E242A565900829871 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7555FF80242A565900829871 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -96,6 +100,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53BEFD3C3C84A395C4A66297 /* views */ = {
+			isa = PBXGroup;
+			children = (
+				53BEFE171C182513A5762686 /* HomeView.swift */,
+				53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */,
+				53BEF8AB2CC94C07E8572AFB /* MVIView.swift */,
+			);
+			path = views;
+			sourceTree = "<group>";
+		};
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
@@ -127,7 +141,7 @@
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				7555FF86242A565B00829871 /* Preview Content */,
-				53BEF40F48A1258070A1B91A /* MVIView.swift */,
+				53BEFD3C3C84A395C4A66297 /* views */,
 			);
 			path = "phoenix-ios";
 			sourceTree = "<group>";
@@ -322,7 +336,9 @@
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
-				53BEF6EC98A5FD0704842A06 /* MVIView.swift in Sources */,
+				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
+				53BEF90975122B844248569C /* ReceiveView.swift in Sources */,
+				53BEFD96846CB72005545162 /* MVIView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

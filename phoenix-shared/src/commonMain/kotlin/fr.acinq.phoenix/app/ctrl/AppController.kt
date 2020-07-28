@@ -13,13 +13,17 @@ import org.kodein.di.DIAware
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class AppController<M : MVI.Model, I : MVI.Intent> : MVI.Controller<M, I>(), DIAware, CoroutineScope {
+abstract class AppController<M : MVI.Model, I : MVI.Intent>(firstModel: M) : MVI.Controller<M, I>(firstModel), DIAware, CoroutineScope {
 
-    override val coroutineContext = AppMainScope().coroutineContext + Job()
+    private val job = Job()
+
+    override val coroutineContext = AppMainScope().coroutineContext + job
 
     protected val logger by lazy { newLogger() }
 
-    private val models = ConflatedBroadcastChannel<M>()
+    private val models = ConflatedBroadcastChannel(firstModel)
+
+    protected val lastModel get() = models.value
 
     final override fun subscribe(onModel: (M) -> Unit): () -> Unit {
         val job = launch {

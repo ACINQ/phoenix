@@ -4,10 +4,13 @@ import PhoenixShared
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    let di: PhoenixIosDI
+    let di: AppDI
 
     override init() {
-        di = PhoenixIosDI(phoenix: Phoenix())
+        di = AppDI(di: Phoenix().di)
+//        di = AppDI(di: MockKt.mockControllers(
+//                homeModel: HomeView_Previews.mockView
+//        ))
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

@@ -13,12 +13,16 @@ import fr.acinq.eklair.db.Databases
 import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
-import fr.acinq.phoenix.app.ctrl.AppDemoController
-import fr.acinq.phoenix.ctrl.DemoController
+import fr.acinq.phoenix.app.ctrl.AppHomeController
+import fr.acinq.phoenix.app.ctrl.AppReceiveController
+import fr.acinq.phoenix.ctrl.HomeController
+import fr.acinq.phoenix.ctrl.ReceiveController
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.eagerSingleton
+import org.kodein.di.instance
 import org.kodein.log.LoggerFactory
 
 
@@ -28,10 +32,6 @@ class Phoenix {
     fun buildPeer(socketBuilder: TcpSocket.Builder, databases: Databases, seed: ByteVector32) : Peer {
         // TODO: This is only valid on Salomon's computer!
         val remoteNodePubKey = PublicKey.fromHex("02d684ecbdbde1b556715a4a56186dfe045df1a0d18fe632843299254b482df7d9")
-
-        val input = Channel<PeerEvent>()
-
-        val output = Channel<ByteArray>()
 
         val PeerFeeEstimator = object : FeeEstimator {
             override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
@@ -89,9 +89,8 @@ class Phoenix {
             enableTrampolinePayment = true
         )
 
-        return Peer(socketBuilder, params, remoteNodePubKey, input, output)
+        return Peer(socketBuilder, params, remoteNodePubKey)
     }
-
 
     val di = DI {
         bind<LoggerFactory>() with instance(LoggerFactory.default)
@@ -107,7 +106,7 @@ class Phoenix {
 
         bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
 
-        bind<DemoController>() with screenProvider { AppDemoController(di) }
+        bind<HomeController>() with screenProvider { AppHomeController(di) }
+        bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
     }
-
 }

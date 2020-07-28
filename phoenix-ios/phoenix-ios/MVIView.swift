@@ -13,9 +13,13 @@ extension View {
 
         return self
                 .onAppear {
+                    print("Appear")
                     unsub = controller.subscribe { onModel($0) }
                 }
-                .onDisappear { unsub?() }
+                .onDisappear {
+                    print("Disappear")
+                    unsub?()
+                }
 
     }
 }
