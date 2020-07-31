@@ -16,12 +16,15 @@ object MVI {
 
         abstract fun intent(intent: I)
 
+        abstract fun stop()
+
         open class Mock<M : Model, I : Intent>(val model: M) : Controller<M, I>(model) {
             override fun subscribe(onModel: (M) -> Unit): () -> Unit {
                 onModel(model)
                 return ({})
             }
             override fun intent(intent: I) {}
+            override fun stop() {}
         }
 
     }

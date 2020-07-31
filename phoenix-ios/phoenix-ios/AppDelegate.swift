@@ -8,9 +8,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     override init() {
         di = AppDI(di: Phoenix().di)
-//        di = AppDI(di: MockKt.mockControllers(
-//                homeModel: HomeView_Previews.mockView
-//        ))
+//        di = AppDI(di: MockDIBuilder()
+//                .apply {
+//                    $0.homeModel = HomeView_Previews.mockModel
+//                    $0.receiveModel = ReceiveView_Previews.mockModel
+//                }
+//                .di()
+//        )
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

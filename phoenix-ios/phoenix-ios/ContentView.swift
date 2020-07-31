@@ -1,13 +1,18 @@
 import SwiftUI
 import PhoenixShared
 
-struct ContentView: View {
+class DIHolder : ObservableObject {
+    let di: AppDI
 
-    let di = (UIApplication.shared.delegate as! AppDelegate).di
+    init(_ di: AppDI) { self.di = di }
+}
+
+struct ContentView: View {
 
     var body: some View {
         NavigationView {
             HomeView()
         }
+            .environmentObject(DIHolder((UIApplication.shared.delegate as! AppDelegate).di))
     }
 }

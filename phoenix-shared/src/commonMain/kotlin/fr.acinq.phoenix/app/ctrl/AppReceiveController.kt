@@ -22,8 +22,8 @@ class AppReceiveController(override val di: DI) : AppController<Receive.Model, R
 
     init {
         launch {
-            peer.openStateSubscription().consumeEach {
-                if (!it.connected) model(Receive.Model.Disconnected)
+            peer.openConnectedSubscription().consumeEach {
+                if (!it) model(Receive.Model.Disconnected)
             }
         }
 

@@ -26,11 +26,11 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(firstModel: M) : MVI
     protected val lastModel get() = models.value
 
     final override fun subscribe(onModel: (M) -> Unit): () -> Unit {
-        val job = launch {
+        val subscription = launch {
             models.openSubscription().consumeEach { onModel(it) }
         }
 
-        return ({ job.cancel() })
+        return ({ subscription.cancel() })
     }
 
     protected fun model(model: M) {
@@ -43,6 +43,10 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(firstModel: M) : MVI
     final override fun intent(intent: I) {
         logger.info { "Intent: $intent" }
         process(intent)
+    }
+
+    final override fun stop() {
+        job.cancel()
     }
 
 }

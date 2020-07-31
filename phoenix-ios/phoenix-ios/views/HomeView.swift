@@ -39,13 +39,13 @@ struct HomeView: View {
 
 
 class HomeView_Previews: PreviewProvider {
-    static let mockView = Home.Model(connected: true, channels: [
+    static let mockModel = Home.Model(connected: true, channels: [
         Home.ModelChannel(cid: "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", local: 0, remote: 100000),
         Home.ModelChannel(cid: "FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210", local: 94290, remote: 5710)
     ])
 
     static var previews: some View {
-        HomeView()
+            mockView(HomeView()) { $0.homeModel = HomeView_Previews.mockModel }
     }
 
     #if DEBUG

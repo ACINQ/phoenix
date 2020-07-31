@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.eklair.Peer
+import fr.acinq.eklair.channel.HasCommitments
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,17 +17,26 @@ class AppHomeController(override val di: DI) : AppController<Home.Model, Home.In
 
     init {
         launch {
-            peer.openStateSubscription().consumeEach { state ->
-                model(Home.Model(
-                    state.connected,
-                    state.channels.map {
-                        Home.Model.Channel(
-                            cid = Hex.encode(it.key.toByteArray()),
-                            local = it.value.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
-                            remote = it.value.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong()
-                        )
-                    }
-                ))
+            peer.openConnectedSubscription().consumeEach {
+                model(lastModel.copy(connected = it))
+            }
+        }
+
+        launch {
+            peer.openChannelsSubscription().consumeEach { channels ->
+                model(
+                    lastModel.copy(
+                        channels = channels.mapNotNull { (id, state) ->
+                            if (state is HasCommitments) {
+                                Home.Model.Channel(
+                                    cid = id.toHex(),
+                                    local = state.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
+                                    remote =state.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong()
+                                )
+                            } else null
+                        }
+                    )
+                )
             }
         }
     }
