@@ -104,7 +104,7 @@ class LNUrlAuthFragment : BaseFragment() {
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
       val url = tryWith(InvalidAuthEndpoint) { HttpUrl.parse(args.url.authEndpoint)!! }
-      val key = getAuthLinkingKey(url.topPrivateDomain()!!)
+      val key = getAuthLinkingKey(url.host)
       val signedK1 = Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(args.url.k1).bytes(), key)).toHex()
       val request = Request.Builder().url(url.newBuilder()
         .addQueryParameter("sig", signedK1)
