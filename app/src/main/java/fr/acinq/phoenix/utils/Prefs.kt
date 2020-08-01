@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
@@ -40,11 +41,16 @@ object Prefs {
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
 
   // -- authentication with PIN/biometrics
+  const val PREFS_SCREEN_LOCK: String = "PREFS_SCREEN_LOCK_ENABLED"
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
-  private const val PREFS_IS_WALLET_PROTECTED_WITH_PIN: String = "PREFS_IS_WALLET_PROTECTED_WITH_PIN"
-  private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
-  private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
 
   // -- background channels watcher
   private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME"
@@ -81,44 +87,35 @@ object Prefs {
   // -- authentication with PIN/biometrics
   // -- ==================================
 
+  fun isScreenLocked(context: Context): Boolean = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCREEN_LOCK, false)
+
+  fun saveScreenLocked(context: Context, isLocked: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCREEN_LOCK, isLocked).apply()
+  }
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun isSeedEncrypted(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
   }
 
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun setIsSeedEncrypted(context: Context, isEncrypted: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, isEncrypted).apply()
   }
 
-  fun isWalletBehindPin(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_WALLET_PROTECTED_WITH_PIN, false)
-  }
-
-  fun setIsWalletBehindPin(context: Context, isBehindPin: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_WALLET_PROTECTED_WITH_PIN, isBehindPin).apply()
-  }
-
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun useBiometrics(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_USE_BIOMETRICS, false)
   }
 
-  fun useBiometrics(context: Context, useBiometrics: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_USE_BIOMETRICS, useBiometrics).apply()
-  }
-
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun getEncryptedPIN(context: Context): ByteArray? {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN, null)?.let { Base64.decode(it, Base64.DEFAULT) }
   }
 
-  fun saveEncryptedPIN(context: Context, encryptedPIN: ByteArray) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN, Base64.encodeToString(encryptedPIN, Base64.DEFAULT)).apply()
-  }
-
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun getEncryptedPINIV(context: Context): ByteArray? {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN_IV, null)?.let { Base64.decode(it, Base64.DEFAULT) }
-  }
-
-  fun saveEncryptedPINIV(context: Context, iv: ByteArray) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN_IV, Base64.encodeToString(iv, Base64.DEFAULT)).apply()
   }
 
   // -- ==================================

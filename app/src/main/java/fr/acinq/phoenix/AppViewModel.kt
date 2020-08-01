@@ -31,10 +31,7 @@ import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.ElectrumServer
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.events.RemovePendingSwapIn
-import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.ServiceDisconnected
-import fr.acinq.phoenix.utils.SingleLiveEvent
-import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -98,10 +95,6 @@ class AppViewModel : ViewModel() {
     service?.shutdown() // we don't want the service to run if the UI is killed.
     super.onCleared()
     log.debug("appkit has been cleared")
-  }
-
-  fun hasWalletBeenSetup(context: Context): Boolean {
-    return Wallet.getSeedFile(context).exists()
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)

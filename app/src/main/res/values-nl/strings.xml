@@ -183,7 +183,7 @@
   <string name="settings_display_prefs">Weergave</string>
   <string name="settings_security_title">Beveiling</string>
   <string name="settings_display_seed">Herstelzin</string>
-  <string name="settings_seed_security">Toegangsinstellingen</string>
+  <string name="settings_access_control">Toegangsinstellingen</string>
   <string name="settings_advanced_title">Geavanceerd</string>
   <string name="settings_fees">Vergoedingsinstellingen</string>
   <string name="settings_list_channels">Kanaallijst</string>
@@ -357,37 +357,37 @@
   <string name="state_offline">Peer is offline</string>
   <string name="state_shutdown">Uitgeschakeld</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Beveiliging</string>
-  <string name="seedsec_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteunt, kan biometrische authenticatie gebruiken.</string>
-  <string name="seedsec_pin_switch">PIN-authenticatie</string>
-  <string name="seedsec_pin_scramble">Hussel PIN-toetsenbord</string>
-  <string name="seedsec_biometrics_switch">Biometrische authenticatie</string>
-  <string name="seedsec_change_pin">Verander mijn PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Biometrische registratie mislukt. Probeer opnieuw.</string>
-  <string name="seedsec_pindialog_title_unlock">Voer je huidige PIN in om door te gaan</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Voer je <b>nieuwe PIN</b> in]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[<b>Bevestig</b> je nieuwe PIN]]></string>
+  <string name="accessctrl_title">Beveiliging</string>
+  <string name="accessctrl_subtitle">We raden het ten zeerste aan om je wallet met een PIN te beveiligen. Als je toestel het ondersteunt, kan biometrische authenticatie gebruiken.</string>
+  <string name="accessctrl_pin_switch">PIN-authenticatie</string>
+  <string name="accessctrl_pin_scramble">Hussel PIN-toetsenbord</string>
+  <string name="accessctrl_biometrics_switch">Biometrische authenticatie</string>
+  <string name="accessctrl_change_pin">Verander mijn PIN…</string>
+  <string name="accessctrl_biometric_enrollment_error">Biometrische registratie mislukt. Probeer opnieuw.</string>
+  <string name="accessctrl_pindialog_title_unlock">Voer je huidige PIN in om door te gaan</string>
+  <string name="accessctrl_pindialog_title_set_new"><![CDATA[Voer je <b>nieuwe PIN</b> in]]></string>
+  <string name="accessctrl_pindialog_title_confirm_new"><![CDATA[<b>Bevestig</b> je nieuwe PIN]]></string>
 
-  <string name="seedsec_pin_update_success">PIN succesvol geupdate!</string>
-  <string name="seedsec_biometric_enabled">Biometrische authenticatie geactivateerd</string>
-  <string name="seedsec_biometric_disabled">Biometrische authenticatie uitgeschakeld</string>
+  <string name="accessctrl_pin_update_success">PIN succesvol geupdate!</string>
+  <string name="accessctrl_biometric_enabled">Biometrische authenticatie geactivateerd</string>
+  <string name="accessctrl_biometric_disabled">Biometrische authenticatie uitgeschakeld</string>
 
-  <string name="seedsec_biometric_support_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Registreer eerst biometrie.</string>
+  <string name="accessctrl_auth_unavailable_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
+  <string name="accessctrl_auth_unavailable_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
+  <string name="accessctrl_auth_unavailable_none_enrolled">Registreer eerst biometrie.</string>
 
-  <string name="seedsec_error_wrong_pin">Ongeldige PIN</string>
-  <string name="seedsec_error_pins_match">PINs komen niet overeen. Probeer opnieuw.</string>
-  <string name="seedsec_error_generic">Er is een fout opgetreden, de wallet is niet versleuteld.\n\nProbeer opnieuw.</string>
+  <string name="accessctrl_error_wrong_pin">Ongeldige PIN</string>
+  <string name="accessctrl_error_pins_match">PINs komen niet overeen. Probeer opnieuw.</string>
+  <string name="accessctrl_error_generic">Er is een fout opgetreden, de wallet is niet versleuteld.\n\nProbeer opnieuw.</string>
 
-  <string name="seedsec_disable_bio_prompt_title">Schakel biometrische vergrendeling uit</string>
-  <string name="seedsec_disable_bio_prompt_desc">Je zal vanaf nu je PIN moeten gebruiken</string>
-  <string name="seedsec_disable_bio_prompt_negative">Annuleer</string>
+  <string name="accessctrl_disable_bio_prompt_title">Schakel biometrische vergrendeling uit</string>
+  <string name="accessctrl_disable_bio_prompt_desc">Je zal vanaf nu je PIN moeten gebruiken</string>
+  <string name="accessctrl_disable_bio_prompt_negative">Annuleer</string>
 
-  <string name="seedsec_bio_prompt_title">Schakel biometrische vergrendeling in</string>
-  <string name="seedsec_bio_prompt_negative">Annuleer</string>
+  <string name="accessctrl_bio_prompt_title">Schakel biometrische vergrendeling in</string>
+  <string name="accessctrl_bio_prompt_negative">Annuleer</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

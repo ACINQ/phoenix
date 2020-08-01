@@ -111,8 +111,8 @@
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
     <action
-      android:id="@+id/action_main_to_seed_security"
-      app:destination="@id/seed_security" />
+      android:id="@+id/action_main_to_access_control"
+      app:destination="@id/access_control" />
     <action
       android:id="@+id/action_main_to_connectivity"
       app:destination="@id/connectivity_dialog" />
@@ -338,8 +338,8 @@
       android:id="@+id/action_settings_to_logs"
       app:destination="@id/logs_fragment" />
     <action
-      android:id="@+id/action_settings_to_seed_security"
-      app:destination="@id/seed_security" />
+      android:id="@+id/action_settings_to_access_control"
+      app:destination="@id/access_control" />
     <action
       android:id="@+id/action_settings_to_prefs_display"
       app:destination="@id/prefs_display" />
@@ -409,9 +409,9 @@
 
   <!-- settings: wallet access (pin,...) -->
   <fragment
-    android:id="@+id/seed_security"
-    android:name="fr.acinq.phoenix.settings.SeedSecurityFragment"
-    android:label="seed_security" />
+    android:id="@+id/access_control"
+    android:name="fr.acinq.phoenix.settings.AccessControlFragment"
+    android:label="access_control" />
 
   <!-- settings: change display settings (theme, currency...) -->
   <fragment

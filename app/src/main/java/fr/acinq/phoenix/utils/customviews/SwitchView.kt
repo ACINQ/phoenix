@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import fr.acinq.phoenix.R
@@ -41,6 +42,13 @@ class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet
       mBinding.text.text = arr.getString(R.styleable.SwitchView_text)
       if (arr.hasValue(R.styleable.SwitchView_text_size)) {
         mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.SwitchView_text_size, R.dimen.text_lg).toFloat())
+      }
+      arr.getString(R.styleable.SwitchView_subtitle).orEmpty().let {
+        if (it.isBlank()) {
+          mBinding.subtitle.visibility = View.GONE
+        } else {
+          mBinding.subtitle.text = it
+        }
       }
       mBinding.text.setTextColor(arr.getColor(R.styleable.SwitchView_text_color, ThemeHelper.color(context, R.attr.textColor)))
 

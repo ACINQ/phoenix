@@ -42,16 +42,12 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     return mBinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-  }
-
   override fun handleAppState(state: KitState) {
     super.handleAppState(state)
     val isStarted = state is KitState.Started
     mBinding.securityTitle.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.displaySeedButton.visibility = if (isStarted) View.VISIBLE else View.GONE
-    mBinding.seedSecurityButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.accessControlButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.listAllChannelsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.mutualCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.forceCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
@@ -65,7 +61,7 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.mutualCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_mutual_close) }
     mBinding.forceCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_force_close) }
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
-    mBinding.seedSecurityButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_seed_security) }
+    mBinding.accessControlButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_access_control) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }

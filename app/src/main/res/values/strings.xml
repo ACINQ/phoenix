@@ -21,8 +21,10 @@
 
   <string name="notification_channels_watcher_title">Background watcher</string>
   <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
-  <string name="notification_channels_fcm_title">Incoming Payment</string>
-  <string name="notification_channels_fcm_desc">Alerts you if you have an incoming payment.</string>
+  <string name="notification_payment_received_title">Received payment</string>
+  <string name="notification_payment_received_desc">Pops up when you received a payment and the app is not on.</string>
+  <string name="notification_fcm_title">Incoming Payment</string>
+  <string name="notification_fcm_desc">Alerts you if you have an incoming payment.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -39,6 +41,12 @@
   <string name="restore_in_progress">Restoring your wallet…</string>
   <string name="restore_import_button">Import</string>
   <string name="restore_error">This seed is invalid and cannot be imported.\n\nPlease try again</string>
+
+  <!-- //////////////// Auth prompt (v2) //////////////////// -->
+
+  <string name="authprompt_title">Unlock to continue</string>
+  <string name="authprompt_hard_negative">Cancel</string>
+  <string name="authprompt_error_unsecure">Device is not secure (code: %1$d)</string>
 
   <!-- //////////////// Pin dialog //////////////////// -->
 
@@ -77,6 +85,7 @@
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
   <string name="startup_error_wrong_pwd">PIN is incorrect</string>
   <string name="startup_error_biometrics">Biometric authentication has failed.</string>
+  <string name="startup_error_device_unsecure">You don\'t have not setup Android Screen Lock on your device.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -213,7 +222,7 @@
   <string name="settings_display_prefs">Display</string>
   <string name="settings_security_title">Security</string>
   <string name="settings_display_seed">Recovery phrase</string>
-  <string name="settings_seed_security">App access settings</string>
+  <string name="settings_access_control">App access settings</string>
   <string name="settings_advanced_title">Advanced</string>
   <string name="settings_fees">Fees Settings</string>
   <string name="settings_list_channels">Channels list</string>
@@ -233,10 +242,11 @@
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
   <string name="notif_fcm_title">Incoming payment</string>
-  <string name="notif_fcm_message_manual_start_app">Please start the app to receive the payment.</string>
-  <string name="notif_fcm_message_starting_up">Starting up wallet…</string>
-  <string name="notif_fcm_message_receive_in_progress">Receiving payment…</string>
-  <string name="notif_fcm_message_received">Received payment!</string>
+  <string name="notif_fcm_message_manual_start_app">Start the app to receive the payment.</string>
+  <string name="notif_fcm_message_app_running_in_bg">Phoenix is running in background…</string>
+
+  <string name="notif_payment_received_title">Received payment</string>
+  <string name="notif_payment_received_message">You received %1$s.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -404,37 +414,29 @@
   <string name="state_offline">Peer is offline</string>
   <string name="state_shutdown">Shutdown</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Security</string>
-  <string name="seedsec_subtitle">We highly recommend setting a PIN to protect your wallet. If your device supports it, you can use biometric authentication.</string>
-  <string name="seedsec_pin_switch">PIN authentication</string>
-  <string name="seedsec_pin_scramble">Scramble PIN keyboard</string>
-  <string name="seedsec_biometrics_switch">Biometric authentication</string>
-  <string name="seedsec_change_pin">Change my PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Biometric enrollment failed. Please try again.</string>
-  <string name="seedsec_pindialog_title_unlock">Please enter your current PIN to proceed</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Please enter <b>your new PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Please <b>confirm</b> your new PIN]]></string>
+  <string name="accessctrl_title">Security</string>
+  <string name="accessctrl_subtitle">We recommend enabling the screen lock to prevent unintended use of your wallet.</string>
 
-  <string name="seedsec_pin_update_success">PIN successfully updated!</string>
-  <string name="seedsec_biometric_enabled">Biometric authentication activated</string>
-  <string name="seedsec_biometric_disabled">Biometric authentication disabled</string>
+  <string name="accessctrl_auth_unavailable_short">Please secure your device first.</string>
+  <string name="accessctrl_auth_unavailable">Your device is not secured with the Android\'s secure Screen Lock yet.\n\nPlease enroll a PIN/Schema/Fingerprint in Android first.</string>
+  <string name="accessctrl_auth_unavailable_no_hw">Your device does not support hardware backed user authentication.</string>
+  <string name="accessctrl_auth_unavailable_hw_unavailable">Your biometric hardware is not available.</string>
+  <string name="accessctrl_auth_unavailable_none_enrolled">Please enroll a PIN/Schema/Fingerprint in the Android Security system first.</string>
 
-  <string name="seedsec_biometric_support_no_hw">Your device does not support biometric authentication.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Biometric hardware is not available. Try again later.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Please enroll biometric first.</string>
+  <string name="accessctrl_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+  <string name="accessctrl_auth_error">Authentication failed.</string>
+  <string name="accessctrl_auth_error_with_code">Authentication failed (code: %1$d)</string>
+  <string name="accessctrl_auth_error_unsecure">Device is not secure (code: %1$d)</string>
 
-  <string name="seedsec_error_wrong_pin">Invalid PIN</string>
-  <string name="seedsec_error_pins_match">PINs do not match. Please try again.</string>
-  <string name="seedsec_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
+  <string name="accessctrl_screen_lock_switch">Screen lock</string>
+  <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android screen lock or fingerprint</string>
+  <string name="accessctrl_full_lock_switch">Full lock</string>
+  <string name="accessctrl_full_lock_switch_desc">The app cannot access its data unless you\'ve authenticated.\n\nThis setting provides additional security but prevents the app from running in background.</string>
+  <string name="accessctrl_full_lock_confirm_title">Notice</string>
+  <string name="accessctrl_full_lock_confirm_message">If you enable this feature, you will have to manually start your app when someone sends you money.</string>
 
-  <string name="seedsec_disable_bio_prompt_title">Disable biometric lock</string>
-  <string name="seedsec_disable_bio_prompt_desc">You will have to use your PIN code from now</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancel</string>
-
-  <string name="seedsec_bio_prompt_title">Enable biometric lock</string>
-  <string name="seedsec_bio_prompt_negative">Cancel</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
@@ -552,5 +554,9 @@
   <br/><br/>
   If you have questions, consult the <a href="https://phoenix.acinq.co/faq">FAQ</a>. You can also contact <a href="https://phoenix.acinq.co/support">support</a> for help.
   ]]></string>
+
+  <!-- //////////////// background node service //////////////// -->
+
+  <string name="nodeservice_desc">Service containing the wallet\'s node.</string>
 
 </resources>

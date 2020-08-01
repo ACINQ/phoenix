@@ -45,8 +45,10 @@ class InitWalletFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    if (context != null && Wallet.getSeedFile(context!!).exists()) {
-      findNavController().navigate(R.id.global_action_any_to_startup)
+    context?.let {
+      if (Wallet.hasWalletBeenSetup(it)) {
+        findNavController().navigate(R.id.global_action_any_to_startup)
+      }
     }
   }
 }

@@ -31,12 +31,14 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.background.Xpub
 import fr.acinq.phoenix.lnurl.LNUrl
+import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.*
+
 
 object Wallet {
 
@@ -45,20 +47,12 @@ object Wallet {
   val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735")
   val httpClient = OkHttpClient()
 
-  // ------------------------ DATADIR & FILES
-
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
-  private const val NETWORK_DB_FILE = "network.sqlite"
-  private const val WALLET_DB_FILE = "wallet.sqlite"
 
   fun getDatadir(context: Context): File {
     return File(context.filesDir, ECLAIR_BASE_DATADIR)
-  }
-
-  fun getSeedFile(context: Context): File {
-    return File(getDatadir(context), SEED_FILE)
   }
 
   fun getChainDatadir(context: Context): File {
@@ -69,8 +63,8 @@ object Wallet {
     return File(getChainDatadir(context), ECLAIR_DB_FILE)
   }
 
-  fun getNetworkDBFile(context: Context): File {
-    return File(getChainDatadir(context), NETWORK_DB_FILE)
+  fun hasWalletBeenSetup(context: Context): Boolean {
+    return SeedManager.getSeedFromDir(getDatadir(context)) != null
   }
 
   fun isMainnet(): Boolean = "mainnet" == BuildConfig.CHAIN

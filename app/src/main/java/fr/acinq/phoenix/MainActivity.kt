@@ -89,7 +89,6 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N) {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
@@ -134,9 +133,7 @@ class MainActivity : AppCompatActivity() {
   override fun onStart() {
     super.onStart()
     Intent(this, EclairNodeService::class.java).also { intent ->
-      //startService(intent)
-      val bound = applicationContext.bindService(intent, app.serviceConnection, Context.BIND_AUTO_CREATE)
-      log.info("service binding=$bound")
+      applicationContext.bindService(intent, app.serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_ADJUST_WITH_ACTIVITY)
     }
     findNavController(R.id.nav_host_main).addOnDestinationChangedListener(navigationCallback)
     val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?

@@ -94,6 +94,7 @@
     <!-- node service -->
     <service
       android:name=".background.EclairNodeService"
+      android:description="@string/nodeservice_desc"
       android:stopWithTask="false"
       android:exported="false" />
 

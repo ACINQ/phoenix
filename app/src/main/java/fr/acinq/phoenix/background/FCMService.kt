@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import fr.acinq.eclair.io.Peer
+import fr.acinq.phoenix.AppContext
 import fr.acinq.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory
 class FCMService : FirebaseMessagingService() {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  /** When receiving a message over FC, starts the eclair node service (in foreground).*/
+  /** When receiving a message over FCM, starts the eclair node service (in foreground). */
   override fun onMessageReceived(remoteMessage: RemoteMessage) {
     log.info("received fcm message=${remoteMessage} from ${remoteMessage.from}, starting eclair node service")
     ContextCompat.startForegroundService(

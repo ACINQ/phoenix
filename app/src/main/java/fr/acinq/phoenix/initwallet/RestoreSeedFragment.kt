@@ -37,9 +37,11 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.`MnemonicCode$`
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletRestoreBinding
+import fr.acinq.phoenix.utils.crypto.KeystoreHelper
 import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.utils.customviews.VirtualKeyboardView
-import fr.acinq.phoenix.utils.seed.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.SeedManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -97,24 +99,25 @@ class RestoreSeedFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    if (context != null && Wallet.getSeedFile(context!!).exists()) {
-      findNavController().navigate(R.id.global_action_any_to_startup)
-    } else {
-      mBinding.keyboard.setOnKeyPressedListener(getOnKeyPressedListener())
-      mBinding.error.setOnClickListener {
-        handler.removeCallbacksAndMessages(null)
+    context?.let {
+      if (Wallet.hasWalletBeenSetup(it)) {
+        findNavController().navigate(R.id.global_action_any_to_startup)
+      }
+    }
+    mBinding.keyboard.setOnKeyPressedListener(getOnKeyPressedListener())
+    mBinding.error.setOnClickListener {
+      handler.removeCallbacksAndMessages(null)
+      model.state.value = RestoreSeedState.INPUT_DATA
+    }
+    mBinding.disclaimerButton.setOnClickListener {
+      if (mBinding.disclaimerCheckbox.isChecked) {
         model.state.value = RestoreSeedState.INPUT_DATA
       }
-      mBinding.disclaimerButton.setOnClickListener {
-        if (mBinding.disclaimerCheckbox.isChecked) {
-          model.state.value = RestoreSeedState.INPUT_DATA
-        }
-      }
-      mBinding.importButton.setOnClickListener {
-        context?.let {
-          val mnemonics = mBinding.mnemonicsInput.text.toString().trim().toLowerCase()
-          model.importAndSaveSeed(it, mnemonics)
-        }
+    }
+    mBinding.importButton.setOnClickListener {
+      context?.let {
+        val mnemonics = mBinding.mnemonicsInput.text.toString().trim().toLowerCase()
+        model.importAndSaveSeed(it, mnemonics)
       }
     }
   }
@@ -256,7 +259,7 @@ class RestoreSeedViewModel : ViewModel() {
           MnemonicCode.validate(mnemonics)
           val seed: ByteArray = Hex.encode(mnemonics.toByteArray(Charsets.UTF_8))
           delay(500)
-          EncryptedSeed.writeSeedToDir(Wallet.getDatadir(context), seed, null)
+          EncryptedSeed.V2.NoAuth.encrypt(seed).let { SeedManager.writeSeedToDisk(Wallet.getDatadir(context), it) }
           log.info("seed written to file")
           state.postValue(RestoreSeedState.DONE)
         } catch (t: Throwable) {

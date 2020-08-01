@@ -107,21 +107,21 @@
           app:text="@string/settings_display_seed" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/seed_security_button"
+          android:id="@+id/access_control_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_square_border"
           android:padding="@dimen/space_md"
           app:hz_bias="0"
           app:layout_constraintTop_toBottomOf="@id/display_seed_button"
-          app:text="@string/settings_seed_security" />
+          app:text="@string/settings_access_control" />
 
         <TextView
           android:id="@+id/advanced_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_advanced_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/seed_security_button" />
+          app:layout_constraintTop_toBottomOf="@id/access_control_button" />
 
         <!--        <fr.acinq.phoenix.utils.customviews.ButtonView-->
         <!--          android:id="@+id/fees_button"-->

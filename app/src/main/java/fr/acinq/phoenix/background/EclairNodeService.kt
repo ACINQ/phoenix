@@ -27,6 +27,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
@@ -61,7 +62,8 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.seed.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import fr.acinq.phoenix.utils.tor.TorEventHandler
 import fr.acinq.phoenix.utils.tor.TorHelper
@@ -70,7 +72,6 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
 import scala.Option
 import scala.Tuple2
 import scala.collection.JavaConverters
@@ -80,8 +81,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Either
 import scala.util.Left
-import scodec.bits.`ByteVector$`
+import scodec.bits.ByteVector
 import java.io.IOException
+import java.lang.Runnable
 import java.net.UnknownHostException
 import java.security.GeneralSecurityException
 import java.util.*
@@ -110,14 +112,17 @@ class EclairNodeService : Service() {
 
   /** True if the service is running headless (that is without a GUI) and as such should show a notification. */
   @Volatile
-  private var isHeadless = false
+  private var isHeadless = true
 
   private lateinit var appContext: AppContext
   private val stateLock = ReentrantLock()
+
   /** State of the service, provides access to the kit when it's started. Private so that it's not mutated from the outside. */
   private val _state = MutableLiveData<KitState>(KitState.Off)
+
   /** Public observable state that can be used by the UI */
   val state: LiveData<KitState> get() = _state
+
   /** Shorthands methods to get the kit/api, if available */
   private val kit: Kit? get() = state.value?.kit()
   private val api: Eclair? get() = state.value?.api()
@@ -136,7 +141,7 @@ class EclairNodeService : Service() {
 
   override fun onCreate() {
     super.onCreate()
-    log.info("creating node service")
+    log.info("creating node service...")
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
@@ -161,36 +166,61 @@ class EclairNodeService : Service() {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix)
       .setAutoCancel(true)
+      .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif_fcm_title))
       .setContentIntent(PendingIntent.getActivity(this, Constants.FCM_NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT))
-    log.info("end of service creation")
+    log.info("service created")
   }
 
+  /** UI is binding to the service. The service is not headless anymore and we can call stopForeground. */
   override fun onBind(intent: Intent?): IBinder? {
     log.info("binding node service from intent=$intent")
-    if (appContext.isAppVisible) {
-      isHeadless = false
-    }
-    stopForeground(true)
+    isHeadless = false
+    stopForeground(STOP_FOREGROUND_REMOVE)
     return binder
   }
 
-  /** When unbound, the service is running headless */
+  /** When unbound, the service is running headless. */
   override fun onUnbind(intent: Intent?): Boolean {
-    if (!appContext.isAppVisible) {
-      isHeadless = true
-    }
+    isHeadless = true
     return false
   }
 
+  private val shutdownHandler = Handler()
+  private val shutdownRunnable: Runnable = Runnable {
+    if (isHeadless) {
+      log.info("reached scheduled shutdown")
+      shutdown()
+    }
+  }
+
+  /** Called when an intent is called for this service. */
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
-    log.info("on start command! [ intent=$intent, flag=$flags, startId=$startId ]")
-    if (!appContext.isAppVisible) {
-      isHeadless = true
+    log.info("starting service [ intent=$intent, flag=$flags, startId=$startId ]")
+
+    SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext)).also {
+      if (it is EncryptedSeed.V2.NoAuth) {
+        notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
+        it.decrypt()
+          .run { EncryptedSeed.byteArray2ByteVector(this) }
+          .run { startKit(this) }
+      } else {
+        // notify the user that the app must be started
+        notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
+      }
     }
-    // Start the kit with an empty password. If the seed is actually encrypted, this attempt will fail.
-    startKit(null)
+//    if (!Prefs.isSeedEncrypted(applicationContext)) {
+//      // Start the kit with an empty password. If the seed is actually encrypted, this attempt will fail.
+//      notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
+//      startKit()
+//    } else {
+//      // notify the user that the app must be started
+//      notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
+//    }
+    shutdownHandler.removeCallbacksAndMessages(null)
+    shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
+    if (!isHeadless) stopForeground(STOP_FOREGROUND_REMOVE)
     return START_NOT_STICKY
   }
 
@@ -215,99 +245,82 @@ class EclairNodeService : Service() {
     } ?: log.warn("could not close kit connections because kit is not initialized!")
   }
 
-  /** Reset the app state to Off - only if it was in error. Does nothing otherwise. */
-  fun resetToOff() {
-    if (_state.value is KitState.Error) {
-      updateState(KitState.Off)
-    }
-  }
-
   /** Shutdown the node, close connections and stop the service */
   fun shutdown() {
     closeConnections()
-    if (isHeadless) {
-      log.info("shutting down service in state=${state.value}")
-      stopForeground(true)
-      isHeadless = false
-    }
+    log.info("shutting down service in state=${state.value}")
+    stopForeground(STOP_FOREGROUND_REMOVE)
     stopSelf()
     updateState(KitState.Off)
   }
 
   /**
-   * This method launches the node startup process. A PIN code can be provided to decrypt the seed. The application
-   * state will be updated to reflect the various stages of the node startup.
+   * This method launches the node startup process. The application state will be updated to reflect the
+   * various stages of the node startup.
    *
-   * If the service is headless this method will check if the seed is expected to be encrypted to prevent a hard
-   * error, and fail gracefully with a notification.
-   *
-   * If the kit is already starting, started, or failed to start, this method will return early and not do anything.
-   *
-   * @param pin The PIN code encrypting the seed. Null if the seed is not encrypted.
+   * If the kit is already starting, started, or failed to start, this method will return early and do nothing.
    */
   @UiThread
-  fun startKit(pin: String?) {
+  fun startKit(seed: ByteVector) {
     // Check app state consistency. Use a lock because the [startKit] method can be called concurrently.
     // If the kit is already starting, started, or in error, the method returns.
-    try {
+    val canProceed = try {
       stateLock.lock()
       val state = _state.value
       if (state !is KitState.Off) {
         log.warn("ignore attempt to start kit with app state=${state}")
-        return
+        false
       } else {
         updateState(KitState.Bootstrap.Init, lazy = false)
+        true
       }
     } catch (e: Exception) {
       log.error("error in state check when starting kit: ", e)
-      return
+      false
     } finally {
       stateLock.unlock()
     }
 
-    // Seed is encrypted but no pin is provided. Alert user if service is headless.
-    if (pin == null && Prefs.isSeedEncrypted(applicationContext)) {
-      notifyIncomingPaymentWhenLocked()
-      return
-    }
-
-    // Startup can safely start
-    log.info("initiating node startup from state=${_state.value}")
-    serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.warn("aborted node startup with error=${e.javaClass.simpleName}!")
-      closeConnections()
-      when (e) {
-        is GeneralSecurityException -> {
-          log.debug("user entered wrong PIN")
-          updateState(KitState.Error.WrongPassword)
+    if (canProceed) {
+      serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+        log.info("aborted node startup with ${e.javaClass.simpleName}")
+        when (e) {
+          is GeneralSecurityException -> {
+            log.debug("user entered wrong PIN")
+            updateState(KitState.Error.WrongPassword)
+          }
+          is NetworkException, is UnknownHostException -> {
+            log.info("network error: ", e)
+            updateState(KitState.Error.NoConnectivity)
+          }
+          is IOException, is IllegalAccessException -> {
+            log.error("seed file not readable: ", e)
+            updateState(KitState.Error.UnreadableData)
+          }
+          is InvalidElectrumAddress -> {
+            log.error("cannot start with invalid electrum address: ", e)
+            updateState(KitState.Error.InvalidElectrumAddress(e.address))
+          }
+          is TorSetupException -> {
+            log.error("error when bootstrapping Tor: ", e)
+            updateState(KitState.Error.Tor(e.localizedMessage ?: e.javaClass.simpleName))
+          }
+          else -> {
+            log.error("error when starting node: ", e)
+            updateState(KitState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
+          }
         }
-        is NetworkException, is UnknownHostException -> {
-          log.info("network error: ", e)
-          updateState(KitState.Error.NoConnectivity)
+        if (isHeadless) {
+          shutdown()
         }
-        is IOException, is IllegalAccessException -> {
-          log.error("seed file not readable: ", e)
-          updateState(KitState.Error.UnreadableData)
-        }
-        is InvalidElectrumAddress -> {
-          log.error("cannot start with invalid electrum address: ", e)
-          updateState(KitState.Error.InvalidElectrumAddress(e.address))
-        }
-        is TorSetupException -> {
-          log.error("error when bootstrapping TOR: ", e)
-          updateState(KitState.Error.Tor(e.localizedMessage ?: e.javaClass.simpleName))
-        }
-        else -> {
-          log.error("error when starting node: ", e)
-          updateState(KitState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
-        }
+      }) {
+        log.debug("initiating node startup from state=${_state.value?.getName()}")
+        Migration.doMigration(applicationContext)
+        val (_kit, xpub) = doStartNode(applicationContext, seed)
+        updateState(KitState.Started(_kit, xpub))
+        _kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+        ChannelsWatcher.schedule(applicationContext)
       }
-    }) {
-      Migration.doMigration(applicationContext)
-      val (_kit, xpub) = doStartNode(applicationContext, pin)
-      updateState(KitState.Started(_kit, xpub))
-      kit?.switchboard()?.tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-      ChannelsWatcher.schedule(applicationContext)
     }
   }
 
@@ -341,7 +354,7 @@ class EclairNodeService : Service() {
   }
 
   @WorkerThread
-  private fun doStartNode(context: Context, pin: String?): Pair<Kit, Xpub> {
+  private fun doStartNode(context: Context, seed: ByteVector): Pair<Kit, Xpub> {
     log.info("starting up node...")
 
     // load config from libs + application.conf in resources
@@ -364,9 +377,21 @@ class EclairNodeService : Service() {
     }
 
     updateState(KitState.Bootstrap.Node)
-    val mnemonics = String(Hex.decode(EncryptedSeed.readSeedFromDir(Wallet.getDatadir(context), pin)), Charsets.UTF_8)
+
+//    val seed = SeedManager.readSeedFromDir(Wallet.getDatadir(context)).run {
+//      when (this) {
+//        is EncryptedSeed.EncryptedSeedV1 -> EncryptedSeed.migration_v1_v2(context)
+//      }
+//    }
+//
+
+//    val seed = SeedPrefs.getEncryptedSeedDataNoAuth(context)
+//      ?.run { CipherWrapper.read(this) }
+//      ?.run { KeystoreHelper.decrypt(KeystoreHelper.KEY_NO_AUTH, this) }
+//      ?.run {`ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(String(Hex.decode(this), Charsets.UTF_8), "").toArray()) }
+//      ?: throw NoSeedYet
+
     log.info("seed successfully read")
-    val seed = `ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(mnemonics, "").toArray())
     val master = DeterministicWallet.generate(seed)
 
     val address = Wallet.buildAddress(master)
@@ -792,7 +817,7 @@ class EclairNodeService : Service() {
   fun handleEvent(event: Peer.SendFCMToken) {
     kit?.run {
       log.info("registering token=${event.token()} with node=${event.nodeId()}")
-      switchboard().tell(event, ActorRef.noSender())
+      //switchboard().tell(event, ActorRef.noSender())
     } ?: log.warn("could not register fcm token because kit is not ready yet")
   }
 
@@ -802,51 +827,46 @@ class EclairNodeService : Service() {
 
   /**
    * Update the app mutable [_state] and show a notification if the service is headless.
-   * @param s The new state of the app.
+   * @param newState The new state of the app.
    * @param lazy `true` to update with postValue, `false` to commit the state directly. If not lazy, this method MUST be called from the main thread!
    */
   @Synchronized
-  private fun updateState(s: KitState, lazy: Boolean = true) {
-    if (_state.value != s) {
+  private fun updateState(newState: KitState, lazy: Boolean = true) {
+    log.info("updating state from {} to {} with headless={}", _state.value?.getName(), newState.getName(), isHeadless)
+    if (_state.value != newState) {
       if (lazy) {
-        _state.postValue(s)
+        _state.postValue(newState)
       } else {
-        _state.value = s
+        _state.value = newState
       }
-      if (isHeadless) {
-        when (s) {
-          is KitState.Bootstrap -> notifyForegroundService(getString(R.string.notif_fcm_message_starting_up))
-          is KitState.Started -> notifyForegroundService(getString(R.string.notif_fcm_message_receive_in_progress))
-          is KitState.Error -> {
-            log.warn("failure ${s.getName()} in startup while service is headless! Shutting down.")
-            shutdown()
-          }
-        }
-      }
+    } else {
+      log.debug("ignored attempt to update state=${_state.value} to state=$newState")
     }
   }
 
   /** Display a blocking notification and set the service as being foregrounded. */
   private fun notifyForegroundService(message: String) {
+    log.info("notifying foreground service with msg=$message")
     notificationBuilder.setContentText(message)
     val notification = notificationBuilder.build()
     notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notification)
     startForeground(Constants.FCM_NOTIFICATION_ID, notification)
   }
 
-  /** Notify the user that a payment is incoming, but the node cannot start because the seed is encrypted. Manual action is required first. */
-  private fun notifyIncomingPaymentWhenLocked() {
-    if (isHeadless) {
-      notificationBuilder.setContentText(getString(R.string.notif_fcm_message_manual_start_app))
-      notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notificationBuilder.build())
-    }
-  }
-
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: PaymentReceived) {
     if (isHeadless) {
-      notificationBuilder.setContentText(getString(R.string.notif_fcm_message_received))
-      notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notificationBuilder.build())
+      val intent = Intent(this, MainActivity::class.java)
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+      notificationManager.notify(Constants.PAYMENT_RECEIVED_NOTIFICATION_ID,
+        NotificationCompat.Builder(this, Constants.PAYMENT_RECEIVED_NOTIFICATION_CHANNEL_ID)
+          .setSmallIcon(R.drawable.ic_phoenix_shape)
+          .setAutoCancel(true)
+          .setOnlyAlertOnce(true)
+          .setContentTitle(getString(R.string.notif_payment_received_title))
+          .setContentText(getString(R.string.notif_payment_received_message, Converter.printAmountPretty(event.amount(), applicationContext, withSign = false, withUnit = true)))
+          .setContentIntent(PendingIntent.getActivity(this, Constants.FCM_NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT))
+          .build())
     }
   }
 
@@ -861,7 +881,7 @@ class EclairNodeService : Service() {
  * - the node is starting ;
  * - the node is started ;
  * - the node failed to start.
- * */
+ */
 sealed class KitState {
 
   /** Default state, the node is not started. */
@@ -889,6 +909,7 @@ sealed class KitState {
     data class Generic(val message: String) : Error()
     data class Tor(val message: String) : Error()
     data class InvalidElectrumAddress(val address: String) : Error()
+    object DeviceNotSecure : Error()
     object InvalidBiometric : Error()
     object WrongPassword : Error()
     object NoConnectivity : Error()
@@ -899,10 +920,14 @@ sealed class KitState {
   fun getName(): String = this.javaClass.simpleName
 
   /** Get the node's wallet master public key */
-  fun getXpub(): Xpub? = if (this is Started) { xpub } else null
+  fun getXpub(): Xpub? = if (this is Started) {
+    xpub
+  } else null
 
   /** Get node public key */
-  fun getNodeId(): Crypto.PublicKey? = if (this is Started) { kit.nodeParams().nodeId() } else null
+  fun getNodeId(): Crypto.PublicKey? = if (this is Started) {
+    kit.nodeParams().nodeId()
+  } else null
 
   /** Get node final address */
   fun getFinalAddress(): String? = if (this is Started) {

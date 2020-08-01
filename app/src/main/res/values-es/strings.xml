@@ -174,7 +174,7 @@
   <string name="settings_display_prefs">Mostrar</string>
   <string name="settings_security_title">Seguridad</string>
   <string name="settings_display_seed">Frase de recuperación</string>
-  <string name="settings_seed_security">Configuración de acceso a la aplicación</string>
+  <string name="settings_access_control">Configuración de acceso a la aplicación</string>
   <string name="settings_advanced_title">Avanzado</string>
   <string name="settings_fees">Configuración de tarifas</string>
   <string name="settings_list_channels">Lista de canales</string>
@@ -341,31 +341,31 @@
   <string name="state_offline">El compañero está desconectado</string>
   <string name="state_shutdown">Apagar</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Seguridad</string>
-  <string name="seedsec_subtitle">Recomendamos encarecidamente que establezcas un PIN para proteger tu wallet. Si tu dispositivo lo admite, puedes usar la autenticación biométrica.</string>
-  <string name="seedsec_pin_switch">Autenticación de PIN</string>
-  <string name="seedsec_biometrics_switch">Autenticación biométrica</string>
-  <string name="seedsec_change_pin">Cambiar mi PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">La inscripción biométrica ha fallado. Por favor inténtalo de nuevo.</string>
-  <string name="seedsec_pindialog_title_unlock">Por favor ingresa tu PIN actual para continuar</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Por favor introduce <b>un nuevo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Por favor <b>confirma</b> tu nuevo PIN]]></string>
-  <string name="seedsec_pin_update_success">¡PIN actualizado correctamente!</string>
-  <string name="seedsec_biometric_enabled">Autenticación biométrica activada</string>
-  <string name="seedsec_biometric_disabled">Autenticación biométrica deshabilitada</string>
-  <string name="seedsec_biometric_support_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
-  <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match">Los PIN no coinciden. Inténtalo de nuevo.</string>
-  <string name="seedsec_error_generic">Ocurrió un error, la wallet no ha sido cifrada.\n\nPor favor inténtalo de nuevo.</string>
-  <string name="seedsec_disable_bio_prompt_title">Deshabilitar bloqueo biométrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">Deberás usar tu código PIN a partir de ahora</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancelar</string>
-  <string name="seedsec_bio_prompt_title">Habilitar bloqueo biométrico</string>
-  <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_title">Seguridad</string>
+  <string name="accessctrl_subtitle">Recomendamos encarecidamente que establezcas un PIN para proteger tu wallet. Si tu dispositivo lo admite, puedes usar la autenticación biométrica.</string>
+  <string name="accessctrl_pin_switch">Autenticación de PIN</string>
+  <string name="accessctrl_biometrics_switch">Autenticación biométrica</string>
+  <string name="accessctrl_change_pin">Cambiar mi PIN…</string>
+  <string name="accessctrl_biometric_enrollment_error">La inscripción biométrica ha fallado. Por favor inténtalo de nuevo.</string>
+  <string name="accessctrl_pindialog_title_unlock">Por favor ingresa tu PIN actual para continuar</string>
+  <string name="accessctrl_pindialog_title_set_new"><![CDATA[Por favor introduce <b>un nuevo PIN</b>]]></string>
+  <string name="accessctrl_pindialog_title_confirm_new"><![CDATA[Por favor <b>confirma</b> tu nuevo PIN]]></string>
+  <string name="accessctrl_pin_update_success">¡PIN actualizado correctamente!</string>
+  <string name="accessctrl_biometric_enabled">Autenticación biométrica activada</string>
+  <string name="accessctrl_biometric_disabled">Autenticación biométrica deshabilitada</string>
+  <string name="accessctrl_auth_unavailable_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
+  <string name="accessctrl_auth_unavailable_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
+  <string name="accessctrl_auth_unavailable_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
+  <string name="accessctrl_error_wrong_pin">PIN inválido</string>
+  <string name="accessctrl_error_pins_match">Los PIN no coinciden. Inténtalo de nuevo.</string>
+  <string name="accessctrl_error_generic">Ocurrió un error, la wallet no ha sido cifrada.\n\nPor favor inténtalo de nuevo.</string>
+  <string name="accessctrl_disable_bio_prompt_title">Deshabilitar bloqueo biométrico</string>
+  <string name="accessctrl_disable_bio_prompt_desc">Deberás usar tu código PIN a partir de ahora</string>
+  <string name="accessctrl_disable_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_bio_prompt_title">Habilitar bloqueo biométrico</string>
+  <string name="accessctrl_bio_prompt_negative">Cancelar</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

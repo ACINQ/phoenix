@@ -197,7 +197,7 @@
   <string name="settings_display_prefs">Affichage</string>
   <string name="settings_security_title">Sécurité</string>
   <string name="settings_display_seed">Phrase de sauvegarde</string>
-  <string name="settings_seed_security">Contrôle d\'accès</string>
+  <string name="settings_access_control">Contrôle d\'accès</string>
   <string name="settings_advanced_title">Avancé</string>
   <string name="settings_fees">Configuration des frais de transaction</string>
   <string name="settings_list_channels">Mes canaux de paiement</string>
@@ -382,37 +382,37 @@
   <string name="state_offline">Le pair est hors-ligne</string>
   <string name="state_shutdown">Le channel est en arrêt</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control security //////////////// -->
 
-  <string name="seedsec_title">Sécurité</string>
-  <string name="seedsec_subtitle">Nous recommendons fortement de configurer un code PIN pour protéger votre portefeuille. Si votre téléphone le permet, vous pourrez aussi utiliser un système biométrique (empreinte digitale…).</string>
-  <string name="seedsec_pin_switch">Verrouillage avec code PIN</string>
-  <string name="seedsec_pin_scramble">Mélanger les touches du PIN</string>
-  <string name="seedsec_biometrics_switch">Verrouillage biométrique</string>
-  <string name="seedsec_change_pin">Changer mon code PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">L\'enregistrement biométrique n\'a pas abouti. Merci de réessayer.</string>
-  <string name="seedsec_pindialog_title_unlock">Veuillez saisir votre code PIN pour continuer</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Veuillez saisir votre <b>nouveau code PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Veuillez <b>confirmer</b> votre nouveau code PIN]]></string>
+  <string name="accessctrl_title">Sécurité</string>
+  <string name="accessctrl_subtitle">Nous recommendons fortement de configurer un code PIN pour protéger votre portefeuille. Si votre téléphone le permet, vous pourrez aussi utiliser un système biométrique (empreinte digitale…).</string>
+  <string name="accessctrl_pin_switch">Verrouillage avec code PIN</string>
+  <string name="accessctrl_pin_scramble">Mélanger les touches du PIN</string>
+  <string name="accessctrl_biometrics_switch">Verrouillage biométrique</string>
+  <string name="accessctrl_change_pin">Changer mon code PIN…</string>
+  <string name="accessctrl_biometric_enrollment_error">L\'enregistrement biométrique n\'a pas abouti. Merci de réessayer.</string>
+  <string name="accessctrl_pindialog_title_unlock">Veuillez saisir votre code PIN pour continuer</string>
+  <string name="accessctrl_pindialog_title_set_new"><![CDATA[Veuillez saisir votre <b>nouveau code PIN</b>]]></string>
+  <string name="accessctrl_pindialog_title_confirm_new"><![CDATA[Veuillez <b>confirmer</b> votre nouveau code PIN]]></string>
 
-  <string name="seedsec_pin_update_success">Le code PIN a été mis à jour!</string>
-  <string name="seedsec_biometric_enabled">L\'authentification biométrique a été activée</string>
-  <string name="seedsec_biometric_disabled">L\'authentification biométrique a été désactivée</string>
+  <string name="accessctrl_pin_update_success">Le code PIN a été mis à jour!</string>
+  <string name="accessctrl_biometric_enabled">L\'authentification biométrique a été activée</string>
+  <string name="accessctrl_biometric_disabled">L\'authentification biométrique a été désactivée</string>
 
-  <string name="seedsec_biometric_support_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Vous devez d\'abord enregistrer une identité biométrique dans Android.</string>
+  <string name="accessctrl_auth_unavailable_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
+  <string name="accessctrl_auth_unavailable_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
+  <string name="accessctrl_auth_unavailable_none_enrolled">Vous devez d\'abord enregistrer une identité biométrique dans Android.</string>
 
-  <string name="seedsec_error_wrong_pin">Le code PIN est invalide</string>
-  <string name="seedsec_error_pins_match">Les code PINs ne correspondent pas. Veuillez réessayer.</string>
-  <string name="seedsec_error_generic">Une erreur est survenue, le portefeuille n\'a pas été encrypté.\n\nVeuillez réessayer.</string>
+  <string name="accessctrl_error_wrong_pin">Le code PIN est invalide</string>
+  <string name="accessctrl_error_pins_match">Les code PINs ne correspondent pas. Veuillez réessayer.</string>
+  <string name="accessctrl_error_generic">Une erreur est survenue, le portefeuille n\'a pas été encrypté.\n\nVeuillez réessayer.</string>
 
-  <string name="seedsec_disable_bio_prompt_title">Désactiver la protection biométrique</string>
-  <string name="seedsec_disable_bio_prompt_desc">Vous devrez désormais utiliser votre code PIN</string>
-  <string name="seedsec_disable_bio_prompt_negative">Annuler</string>
+  <string name="accessctrl_disable_bio_prompt_title">Désactiver la protection biométrique</string>
+  <string name="accessctrl_disable_bio_prompt_desc">Vous devrez désormais utiliser votre code PIN</string>
+  <string name="accessctrl_disable_bio_prompt_negative">Annuler</string>
 
-  <string name="seedsec_bio_prompt_title">Activer la protection biométrique</string>
-  <string name="seedsec_bio_prompt_negative">Annuler</string>
+  <string name="accessctrl_bio_prompt_title">Activer la protection biométrique</string>
+  <string name="accessctrl_bio_prompt_negative">Annuler</string>
 
   <!-- //////////////// ln url login //////////////// -->
 

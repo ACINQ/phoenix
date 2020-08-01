@@ -78,6 +78,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
   }
 
   private fun init() {
+    ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
     Logging.setupLogger(applicationContext)
     ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     Converter.refreshCoinPattern(applicationContext)
@@ -94,11 +95,15 @@ class AppContext : Application(), DefaultLifecycleObserver {
       val channelWatcherChannel = NotificationChannel(Constants.WATCHER_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH)
       channelWatcherChannel.description = getString(R.string.notification_channels_watcher_desc)
 
-      val fcmNotificationChannel = NotificationChannel(Constants.FCM_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_channels_fcm_title), NotificationManager.IMPORTANCE_DEFAULT)
-      channelWatcherChannel.description = getString(R.string.notification_channels_fcm_desc)
+      val paymentReceivedNotificationChannel = NotificationChannel(Constants.PAYMENT_RECEIVED_NOTIFICATION_CHANNEL_ID,
+        getString(R.string.notification_payment_received_title), NotificationManager.IMPORTANCE_DEFAULT)
+      paymentReceivedNotificationChannel.description = getString(R.string.notification_payment_received_desc)
+
+      val fcmNotificationChannel = NotificationChannel(Constants.FCM_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_fcm_title), NotificationManager.IMPORTANCE_DEFAULT)
+      fcmNotificationChannel.description = getString(R.string.notification_fcm_desc)
 
       // Register notifications channels with the system
-      getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(channelWatcherChannel, fcmNotificationChannel))
+      getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(channelWatcherChannel, paymentReceivedNotificationChannel, fcmNotificationChannel))
     }
   }
 
@@ -118,7 +123,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
   val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
 
   /** Current balance of the node. */
-  val balance = MutableLiveData<MilliSatoshi>()
+  val balance = MutableLiveData<MilliSatoshi>(MilliSatoshi(0))
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
