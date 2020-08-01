@@ -275,7 +275,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Ler</string>
+  <string name="menu_send">Enviar</string>
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
