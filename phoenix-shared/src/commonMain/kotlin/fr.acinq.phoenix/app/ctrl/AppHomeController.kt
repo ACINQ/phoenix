@@ -26,14 +26,16 @@ class AppHomeController(override val di: DI) : AppController<Home.Model, Home.In
             peer.openChannelsSubscription().consumeEach { channels ->
                 model(
                     lastModel.copy(
-                        channels = channels.mapNotNull { (id, state) ->
-                            if (state is HasCommitments) {
+                        channels = channels
+                            .mapNotNull { (id, state) ->
+                            (state as? HasCommitments)?.let {
                                 Home.Model.Channel(
                                     cid = id.toHex(),
-                                    local = state.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
-                                    remote =state.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong()
+                                    local = it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
+                                    remote = it.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong(),
+                                    state = it::class.simpleName ?: "[Unknown]"
                                 )
-                            } else null
+                            }
                         }
                     )
                 )

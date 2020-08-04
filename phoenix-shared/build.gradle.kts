@@ -35,17 +35,17 @@ kotlin {
         binaries {
             framework {
                 baseName = "PhoenixShared"
-                freeCompilerArgs = freeCompilerArgs + "-Xobjc-generics"
+//                freeCompilerArgs = freeCompilerArgs + "-Xobjc-generics"
             }
         }
     }
 
     sourceSets {
 
-        val kotlinXCoroutinesVersion = "1.3.7-1.4-M3"
-        val secp256k1Version = "0.3.0-1.4-M3"
-        val ktorVersion = "1.3.2-1.4-M3"
-        val kodeinDiVersion = "7.1.0-kotlin-1.4-M3-76"
+        val kotlinXCoroutinesVersion = "1.3.8-native-mt-1.4.0-rc"
+        val secp256k1Version = "0.3.0-1.4-rc"
+        val ktorVersion = "1.3.2-1.4.0-rc"
+        val kodeinDiVersion = "7.1.0-kotlin-1.4-rc-85"
 
         val commonMain by getting {
             dependencies {
@@ -65,7 +65,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-jdk7"))
-                api("androidx.core:core-ktx:1.3.0")
+                api("androidx.core:core-ktx:1.3.1")
                 api("fr.acinq.secp256k1:secp256k1-jni-android:$secp256k1Version")
                 api("io.ktor:ktor-network:$ktorVersion")
                 api("io.ktor:ktor-network-tls:$ktorVersion")

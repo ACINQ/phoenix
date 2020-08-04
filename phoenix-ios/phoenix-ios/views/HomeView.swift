@@ -9,7 +9,7 @@ struct HomeView: View {
         MVIView({ $0.homeControllerInstance() }) { model, controller in
             VStack() {
                 List(model.channels, id: \.cid) { channel in
-                    Text("\(String(channel.cid.prefix(5))): \(channel.local) / \(channel.local + channel.remote)")
+                    Text("\(String(channel.cid.prefix(5))): \(channel.local) / \(channel.local + channel.remote) (\(channel.state))")
                 }
                 HStack {
                     Spacer()
@@ -40,8 +40,8 @@ struct HomeView: View {
 
 class HomeView_Previews: PreviewProvider {
     static let mockModel = Home.Model(connected: true, channels: [
-        Home.ModelChannel(cid: "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", local: 0, remote: 100000),
-        Home.ModelChannel(cid: "FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210", local: 94290, remote: 5710)
+        Home.ModelChannel(cid: "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", local: 0, remote: 100000, state: "Normal"),
+        Home.ModelChannel(cid: "FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210FEDCBA9876543210", local: 94290, remote: 5710, state: "Normal")
     ])
 
     static var previews: some View {

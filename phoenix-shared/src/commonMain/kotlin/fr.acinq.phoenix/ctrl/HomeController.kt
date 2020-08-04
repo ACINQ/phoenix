@@ -9,7 +9,7 @@ object Home {
         val connected: Boolean,
         val channels: List<Channel>
     ) : MVI.Model() {
-        data class Channel(val cid: String, val local: Long, val remote: Long)
+        data class Channel(val cid: String, val local: Long, val remote: Long, val state: String)
     }
 
     val emptyModel = Model(false, emptyList())

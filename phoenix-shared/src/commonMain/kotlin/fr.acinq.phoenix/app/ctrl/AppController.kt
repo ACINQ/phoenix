@@ -1,14 +1,10 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.phoenix.ctrl.MVI
-import fr.acinq.phoenix.io.AppMainScope
 import fr.acinq.phoenix.utils.newLogger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
 import org.kodein.di.DIAware
 
 
@@ -17,7 +13,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(firstModel: M) : MVI
 
     private val job = Job()
 
-    override val coroutineContext = AppMainScope().coroutineContext + job
+    override val coroutineContext = MainScope().coroutineContext + job
 
     protected val logger by lazy { newLogger() }
 
