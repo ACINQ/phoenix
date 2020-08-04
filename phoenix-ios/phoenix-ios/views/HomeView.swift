@@ -32,7 +32,7 @@ struct HomeView: View {
                 NavigationLink(destination: ReceiveView(), isActive: self.$showReceive) { EmptyView() }
             }
                     .navigationBarTitle("Channels")
-                    .navigationBarItems(trailing: Text(model.connected ? "Connected" : "Disconnected"))
+                    .navigationBarItems(trailing: Text(model.connected ? "Connected_" : "Disconnected"))
         }
     }
 }
@@ -45,7 +45,7 @@ class HomeView_Previews: PreviewProvider {
     ])
 
     static var previews: some View {
-            mockView(HomeView()) { $0.homeModel = HomeView_Previews.mockModel }
+        mockView(HomeView()) { $0.homeModel = HomeView_Previews.mockModel }
     }
 
     #if DEBUG

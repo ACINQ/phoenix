@@ -1,16 +1,17 @@
 import SwiftUI
 import PhoenixShared
 
+import UIKit
 
 struct ReceiveView: View {
 
     var body: some View {
         MVIView({ $0.receiveControllerInstance() }) { model, controller in
-            ReceiveView.view(model: model, controller: controller)
+            self.view(model: model, controller: controller)
         }
     }
 
-    static func view(model: Receive.Model, controller: MVIController<Receive.Model, Receive.Intent>) -> some View {
+    func view(model: Receive.Model, controller: MVIController<Receive.Model, Receive.Intent>) -> some View {
         var view: AnyView
         switch model {
         case _ as Receive.ModelAwaiting:
@@ -18,7 +19,12 @@ struct ReceiveView: View {
         case _ as Receive.ModelGenerating:
             view = AnyView(Text("Generating payment request..."))
         case let m as Receive.ModelGenerated:
-            view = AnyView(Text(m.request))
+            let image = qrCode(request: m.request)
+            if let image = image {
+                view = AnyView(image.resizable().scaledToFit())
+            } else {
+                view = AnyView(Text("Could not generate QR Code"))
+            }
         case let m as Receive.ModelReceived:
             view = AnyView(Text("Received \(m.amountMsat / 1000) Satoshis!"))
         case _ as Receive.ModelDisconnected:
@@ -28,10 +34,20 @@ struct ReceiveView: View {
         }
 
         return view
-                .navigationBarTitle("Receive", displayMode: .inline)
+                .navigationBarTitle("Receive ", displayMode: .inline)
                 .onAppear {
                     controller.intent(intent: Receive.IntentAsk(amountMsat: 125000000))
                 }
+    }
+
+    func qrCode(request: String) -> Image? {
+        let data = request.data(using: .ascii)
+        guard let qrFilter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
+        qrFilter.setValue(data, forKey: "inputMessage")
+        let cgTransform = CGAffineTransform(scaleX: 8, y: 8)
+        guard let ciImage = qrFilter.outputImage?.transformed(by: cgTransform) else { return nil }
+        guard let cgImg = CIContext().createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return Image(decorative: cgImg, scale: 1.0)
     }
 
 }
@@ -39,15 +55,15 @@ struct ReceiveView: View {
 
 class ReceiveView_Previews: PreviewProvider {
 
-    static let mockModel = Receive.ModelGenerating()
+    static let mockModel = Receive.ModelGenerated(request: "lngehrsiufehywajgiorghwjkbeslfmhfjqhlefiowahfaewhgopesuhiotopfgeaiowhwaejiofaulgjahgbvlpsehgjfaglwfaelwhekwhewahfjkoaewhyerjfowahgiajrowagraewhgfaewkljgprstghaefwkgfalwhfdklghersjfopewhhvweijlkaln3frhjqbdghqjvhwaejiofaulgjahgbvlpsehgjfaglwfaelwhekwhewahfjkoaewhyerjfowahgiajrowagraewh")
 
     static var previews: some View {
-        ReceiveView()
+        mockView(ReceiveView()) { $0.receiveModel = ReceiveView_Previews.mockModel }
     }
 
     #if DEBUG
     @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: ReceiveView())
+        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
     }
     #endif
 }
