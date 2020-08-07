@@ -15,6 +15,7 @@ struct ReceiveView: MVIView {
                         controller.intent(intent: Receive.IntentAsk(amountMsat: 125000000))
                     }
         }
+                .navigationBarTitle("", displayMode: .inline)
     }
 
     func view(model: Receive.Model, controller: MVIController<Receive.Model, Receive.Intent>) -> some View {

@@ -46,10 +46,3 @@ struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
     }
 
 }
-
-func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) -> some View {
-    NavigationView {
-        content
-    }
-            .environmentObject(ObservableDI(DI(MockDIBuilder().apply(block: block).di())))
-}

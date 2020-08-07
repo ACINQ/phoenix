@@ -5,7 +5,7 @@ struct HomeView: MVIView {
     typealias Model = Home.Model
     typealias Intent = Home.Intent
 
-    @State var showReceive = false
+    @State var barHidden: Bool = true
 
     var body: some View {
         mvi { model, controller in
@@ -21,21 +21,22 @@ struct HomeView: MVIView {
                                 .font(.title)
                     }
                     Spacer()
-                    Button(action: { self.showReceive = true }) {
+                    NavigationLink(
+                            destination: ReceiveView()
+                                    .onAppear { self.barHidden = false }
+                    ) {
                         Text("Receive")
                                 .fontWeight(.bold)
                                 .font(.title)
                     }
                             .disabled(!model.connected)
                     Spacer()
-                    NavigationLink(destination: Text("Test")) { Text("Test") }
                 }
-
-                NavigationLink(destination: ReceiveView(), isActive: self.$showReceive) { EmptyView() }
             }
-                    .navigationBarTitle("Channels")
-                    .navigationBarItems(trailing: Text(model.connected ? "Connected_" : "Disconnected"))
         }
+                .navigationBarTitle("", displayMode: .inline)
+                .navigationBarHidden(barHidden)
+                .onAppear { self.barHidden = true }
     }
 }
 

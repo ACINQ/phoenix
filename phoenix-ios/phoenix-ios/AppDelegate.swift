@@ -4,15 +4,19 @@ import PhoenixShared
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    let di = DI(
+    let mocks = MockDIBuilder().apply {
+        $0.homeModel = HomeView_Previews.mockModel
+        $0.receiveModel = ReceiveView_Previews.mockModel
+    }
+
+    let di: DI
+
+    override init() {
+        di = DI(
             Phoenix().di
-//            MockDIBuilder()
-//                    .apply {
-//                        $0.homeModel = HomeView_Previews.mockModel
-//                        $0.receiveModel = ReceiveView_Previews.mockModel
-//                    }
-//                    .di()
-    )
+//                mocks.di()
+        )
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
