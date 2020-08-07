@@ -3,41 +3,40 @@ import PhoenixShared
 
 import UIKit
 
-struct ReceiveView: View {
+struct ReceiveView: MVIView {
+    typealias Model = Receive.Model
+    typealias Intent = Receive.Intent
 
     var body: some View {
-        MVIView({ $0.receiveControllerInstance() }) { model, controller in
+        mvi { model, controller in
             self.view(model: model, controller: controller)
+                    .navigationBarTitle("Receive ", displayMode: .inline)
+                    .onAppear {
+                        controller.intent(intent: Receive.IntentAsk(amountMsat: 125000000))
+                    }
         }
     }
 
     func view(model: Receive.Model, controller: MVIController<Receive.Model, Receive.Intent>) -> some View {
-        var view: AnyView
         switch model {
         case _ as Receive.ModelAwaiting:
-            view = AnyView(Text("..."))
+            return AnyView(Text("..."))
         case _ as Receive.ModelGenerating:
-            view = AnyView(Text("Generating payment request..."))
+            return AnyView(Text("Generating payment request..."))
         case let m as Receive.ModelGenerated:
             let image = qrCode(request: m.request)
             if let image = image {
-                view = AnyView(image.resizable().scaledToFit())
+                return AnyView(image.resizable().scaledToFit())
             } else {
-                view = AnyView(Text("Could not generate QR Code"))
+                return AnyView(Text("Could not generate QR Code"))
             }
         case let m as Receive.ModelReceived:
-            view = AnyView(Text("Received \(m.amountMsat / 1000) Satoshis!"))
+            return AnyView(Text("Received \(m.amountMsat / 1000) Satoshis!"))
         case _ as Receive.ModelDisconnected:
-            view = AnyView(Text("Disconnected!"))
+            return AnyView(Text("Disconnected!"))
         default:
             fatalError("Unknown model \(model)")
         }
-
-        return view
-                .navigationBarTitle("Receive ", displayMode: .inline)
-                .onAppear {
-                    controller.intent(intent: Receive.IntentAsk(amountMsat: 125000000))
-                }
     }
 
     func qrCode(request: String) -> Image? {

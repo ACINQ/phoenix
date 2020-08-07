@@ -1,9 +1,8 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.eklair.Peer
 import fr.acinq.eklair.channel.HasCommitments
+import fr.acinq.eklair.io.Peer
 import fr.acinq.phoenix.ctrl.Home
-import fr.acinq.secp256k1.Hex
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch

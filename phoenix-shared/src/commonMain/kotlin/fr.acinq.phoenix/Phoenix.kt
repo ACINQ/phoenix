@@ -10,6 +10,7 @@ import fr.acinq.eklair.blockchain.fee.OnChainFeeConf
 import fr.acinq.eklair.crypto.LocalKeyManager
 import fr.acinq.eklair.db.ChannelsDb
 import fr.acinq.eklair.db.Databases
+import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
@@ -29,7 +30,7 @@ import org.kodein.log.LoggerFactory
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class Phoenix {
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, databases: Databases, seed: ByteVector32) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, seed: ByteVector32) : Peer {
         // TODO: This is only valid on Salomon's computer!
         val remoteNodePubKey = PublicKey.fromHex("02d684ecbdbde1b556715a4a56186dfe045df1a0d18fe632843299254b482df7d9")
 
@@ -57,7 +58,7 @@ class Phoenix {
                 closeOnOfflineMismatch = true,
                 updateFeeMinDiffRatio = 0.1
             ),
-            maxHtlcValueInFlightMsat = 150000000uL,
+            maxHtlcValueInFlightMsat = 150000000L,
             maxAcceptedHtlcs = 100,
             expiryDeltaBlocks = CltvExpiryDelta(144),
             fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
@@ -69,7 +70,6 @@ class Phoenix {
             feeProportionalMillionth = 10,
             reserveToFundingRatio = 0.01, // note: not used (overridden below)
             maxReserveToFundingRatio = 0.05,
-            db = databases,
             revocationTimeout = 20,
             authTimeout = 10,
             initTimeout = 10,
@@ -98,13 +98,7 @@ class Phoenix {
 
         bind(tag = "seed") from instance(ByteVector32("0101010101010101010101010101010101010101010101010101010101010101"))
 
-        bind<Databases>() with instance(
-            object : Databases {
-                override val channels: ChannelsDb get() = TODO("Not yet implemented")
-            }
-        )
-
-        bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
+        bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(tag = "seed")) }
 
         bind<HomeController>() with screenProvider { AppHomeController(di) }
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }

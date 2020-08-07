@@ -1,12 +1,14 @@
 import SwiftUI
 import PhoenixShared
 
-struct HomeView: View {
+struct HomeView: MVIView {
+    typealias Model = Home.Model
+    typealias Intent = Home.Intent
 
     @State var showReceive = false
 
     var body: some View {
-        MVIView({ $0.homeControllerInstance() }) { model, controller in
+        mvi { model, controller in
             VStack() {
                 List(model.channels, id: \.cid) { channel in
                     Text("\(String(channel.cid.prefix(5))): \(channel.local) / \(channel.local + channel.remote) (\(channel.state))")

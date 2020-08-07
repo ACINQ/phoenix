@@ -1,10 +1,10 @@
 import SwiftUI
 import PhoenixShared
 
-class DIHolder : ObservableObject {
-    let di: AppDI
+class ObservableDI: ObservableObject {
+    let di: DI
 
-    init(_ di: AppDI) { self.di = di }
+    init(_ di: DI) { self.di = di }
 }
 
 struct ContentView: View {
@@ -13,6 +13,6 @@ struct ContentView: View {
         NavigationView {
             HomeView()
         }
-            .environmentObject(DIHolder((UIApplication.shared.delegate as! AppDelegate).di))
+            .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
     }
 }
