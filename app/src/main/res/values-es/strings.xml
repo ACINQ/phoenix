@@ -175,12 +175,12 @@
 
   <string name="scan_amountless_legacy_title">Atención</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Esta solicitud de pago no incluye una cantidad. Esto puede ser peligroso: nodos maliciosos podrían ser capaces de robar tu pago. Por tu seguridad, deberías <b>pedir al beneficiario que especifique una cantidad</b> en la solicitud de pago.
+    Esta solicitud de pago no incluye una cantidad. Esto puede ser peligroso: nodos maliciosos podrían ser capaces de robar tu pago. Por tu seguridad, deberías <b>pedir a quien la ha emitido que especifique una cantidad</b> en la solicitud de pago.
     <br /><br />
-    ¿Seguro que quieres pagar esta solicitud?
+    ¿Aún así quieres pagar esta solicitud?
   ]]></string>
-  <string name="scan_amountless_legacy_confirm_button">Confirm</string>
-  <string name="scan_amountless_legacy_cancel_button">Cancel</string>
+  <string name="scan_amountless_legacy_confirm_button">Confirmar</string>
+  <string name="scan_amountless_legacy_cancel_button">Cancelar</string>
 
   <!-- //////////////// utilities strings //////////////// -->
 
@@ -250,12 +250,12 @@
     <br/><br/>
     Forzar el cierre de canales te costará dinero (para cubrir las comisiones de la cadena de bloques) y hará que tus fondos estén bloqueados durante días. <b>No desinstales la aplicación hasta que tus canales estén completamente cerrados, o perderás dinero.</b>
     <br/><br/>
-    <b>No uses esta función si no entiendes copmletamente como funciona.</b>
+    <b>No uses esta función si no entiendes completamente cómo funciona.</b>
   ]]></string>
   <string name="closechannels_force_destination">Los fondos eventualmente se enviarán a:</string>
   <string name="closechannels_force_destination_desc">Esta dirección se deriva de tu semilla y te pertenece.</string>
   <string name="closechannels_force_button">Forzar el cierre de canales</string>
-  <string name="closechannels_confirm_dialog_message">¿Seguro que quieres proceder?</string>
+  <string name="closechannels_confirm_dialog_message">¿Aún así quieres proceder?</string>
   <string name="closechannels_message_error">Ha habido un problema. Por favor, inténtalo de nuevo más tarde.</string>
   <string name="closechannels_message_done">Fondos enviados.</string>
   <string name="closechannels_message_in_progress">Por favor, espera…</string>
@@ -275,7 +275,7 @@
   <string name="listallchannels_share_all">Compartir todos los canales…</string>
   <string name="listallchannels_share">Compartir</string>
   <string name="listallchannels_funding_tx">Transacción</string>
-  <string name="listallchannels_funding_tx_desc">Ver transacción de financiación</string>
+  <string name="listallchannels_funding_tx_desc">Ver transacción de apertura del canal</string>
   <string name="listallchannels_close">Cerrar</string>
   <string name="listallchannels_share_subject">Datos de canales</string>
   <string name="listallchannels_share_title">Compartir datos del canal</string>
@@ -288,9 +288,9 @@
 
   <!-- //////////////// menu //////////////// -->
 
-  <string name="menu_settings">Settings</string>
-  <string name="menu_send">Send</string>
-  <string name="menu_receive">Receive</string>
+  <string name="menu_settings">Ajustes</string>
+  <string name="menu_send">Enviar</string>
+  <string name="menu_receive">Recibir</string>
 
   <!-- //////////////// init wallet //////////////// -->
 
@@ -302,7 +302,7 @@
   <string name="main_alert_electrum_connecting">Conectando al servidor Electrum…</string>
   <string name="main_alert_network_lost">No hay conexión. Por favor verifica la configuración de tu red…</string>
   <string name="main_alert_lightning_connection_lost">No se ha podido conectar a la red Lightning…</string>
-  <string name="main_alert_settings_button">Settings</string>
+  <string name="main_alert_settings_button">Ajustes</string>
   <string name="main_swapin_incoming">+%1$s entrante</string>
   <string name="main_faq_button">Preguntas frecuentes</string>
   <string name="main_connectivity_button">Conectando…</string>
@@ -317,7 +317,7 @@
   <string name="inappnotif_mnemonics_never_seen_action">Crear copia de seguridad de mi cartera</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix necesita poder ejecutarse en segundo plano de vez en cuando. Asegúrate de que tu dispositivo no fuerce el cierre de esta aplicación para ahorrar batería.</string>
   <string name="inappnotif_upgrade">Hay una actualización disponible para esta aplicación.</string>
-  <string name="inappnotif_upgrade_critical">Una actualización crítica está disponible. La cartera puede funcionar mal si se actualiza.</string>
+  <string name="inappnotif_upgrade_critical">Una actualización crítica está disponible. La aplicación puede funcionar mal si no se actualiza.</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -367,7 +367,7 @@
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Recibido</b> %1$s]]></string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
-  <string name="paymentdetails_destination_label">Enviado a</string>
+  <string name="paymentdetails_destination_label">Destino</string>
   <string name="paymentdetails_fees_label">Comisiones</string>
   <string name="paymentdetails_error_label">Error</string>
   <string name="paymentdetails_closing_desc">Pago por cerrar el canal #%1$s</string>
