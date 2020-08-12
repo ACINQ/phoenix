@@ -14,12 +14,17 @@ import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
+import fr.acinq.phoenix.app.Daemon
 import fr.acinq.phoenix.app.ctrl.AppHomeController
 import fr.acinq.phoenix.app.ctrl.AppReceiveController
+import fr.acinq.phoenix.app.ctrl.AppScanController
 import fr.acinq.phoenix.ctrl.HomeController
 import fr.acinq.phoenix.ctrl.ReceiveController
+import fr.acinq.phoenix.ctrl.ScanController
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.eagerSingleton
@@ -28,11 +33,12 @@ import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
-class Phoenix {
+class PhoenixBusiness {
 
     fun buildPeer(socketBuilder: TcpSocket.Builder, seed: ByteVector32) : Peer {
         // TODO: This is only valid on Salomon's computer!
-        val remoteNodePubKey = PublicKey.fromHex("02d684ecbdbde1b556715a4a56186dfe045df1a0d18fe632843299254b482df7d9")
+//        val remoteNodePubKey = PublicKey.fromHex("02d684ecbdbde1b556715a4a56186dfe045df1a0d18fe632843299254b482df7d9")
+        val remoteNodePubKey = PublicKey.fromHex("033ca4b9a17f9bf9f6824a7accf921c9003f6fc7b00e564c6b8d287f57be87c66e")
 
         val PeerFeeEstimator = object : FeeEstimator {
             override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
@@ -102,5 +108,8 @@ class Phoenix {
 
         bind<HomeController>() with screenProvider { AppHomeController(di) }
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
+        bind<ScanController>() with screenProvider { AppScanController(di) }
+
+        bind() from eagerSingleton { Daemon(di) }
     }
 }

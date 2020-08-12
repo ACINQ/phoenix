@@ -11,7 +11,7 @@ import org.kodein.di.instance
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppHomeController(override val di: DI) : AppController<Home.Model, Home.Intent>(Home.emptyModel) {
+class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Home.emptyModel) {
     private val peer: Peer by instance()
 
     init {

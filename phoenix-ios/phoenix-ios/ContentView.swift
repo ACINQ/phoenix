@@ -24,9 +24,7 @@ struct ContentView: View {
 }
 
 func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) -> some View {
-    NavigationView {
-        content
-    }
+    NavigationView { content }
             .environmentObject(
                     ObservableDI(
                             DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())

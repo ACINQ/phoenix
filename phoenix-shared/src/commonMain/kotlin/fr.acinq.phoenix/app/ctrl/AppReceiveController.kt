@@ -18,19 +18,13 @@ import kotlin.random.Random
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppReceiveController(override val di: DI) : AppController<Receive.Model, Receive.Intent>(Receive.Model.Awaiting) {
+class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent>(di, Receive.Model.Awaiting) {
 
     val preimage = ByteVector32(Random.secure().nextBytes(32))
 
     val peer: Peer by instance()
 
     init {
-        launch {
-            peer.openConnectedSubscription().consumeEach {
-                if (!it) model(Receive.Model.Disconnected)
-            }
-        }
-
         launch {
             peer.openListenerEventSubscription().consumeEach {
                 when (it) {
@@ -53,6 +47,7 @@ class AppReceiveController(override val di: DI) : AppController<Receive.Model, R
         when (intent) {
             is Receive.Intent.Ask -> {
                 require(lastModel == Receive.Model.Awaiting)
+                model(Receive.Model.Generating)
                 launch {
                     peer.send(ReceivePayment(preimage, intent.amountMsat.msat, CltvExpiry(100)))
                 }

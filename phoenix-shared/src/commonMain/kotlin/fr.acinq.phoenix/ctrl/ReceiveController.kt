@@ -6,7 +6,6 @@ typealias ReceiveController = MVI.Controller<Receive.Model, Receive.Intent>
 object Receive {
 
     sealed class Model : MVI.Model() {
-        object Disconnected: Model()
         object Awaiting : Model()
         object Generating: Model()
         data class Generated(val request: String): Model()

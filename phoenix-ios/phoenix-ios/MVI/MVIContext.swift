@@ -14,18 +14,18 @@ struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
     private let modelType: Model.Type
     private let intentType: Intent.Type
 
-    private let content: (Model, MVIController<Model, Intent>) -> Content
+    private let content: (Model, @escaping (Intent) -> Void) -> Content
 
     @EnvironmentObject private var envDi: ObservableDI
 
-    @ObservedObject private var controllerHolder = ObservableController<Model, Intent>()
+    @StateObject private var controllerHolder = ObservableController<Model, Intent>()
 
     @State private var model: Model? = nil
 
     init(
             _ modelType: Model.Type,
             _ intentType: Intent.Type,
-            @ViewBuilder content: @escaping (Model, MVIController<Model, Intent>) -> Content
+            @ViewBuilder content: @escaping (Model, @escaping (Intent) -> Void) -> Content
     ) {
         self.modelType = modelType
         self.intentType = intentType
@@ -40,7 +40,7 @@ struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
         let m: Model = model ?? controllerHolder.controller!.firstModel
 
         var unsub: (() -> Void)? = nil
-        return content(m, controllerHolder.controller!)
+        return content(m, { controllerHolder.controller!.intent(intent: $0) })
                 .onAppear { unsub = self.controllerHolder.controller!.subscribe { self.model = $0 } }
                 .onDisappear { unsub?() }
     }

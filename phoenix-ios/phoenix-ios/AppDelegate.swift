@@ -7,18 +7,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let mocks = MockDIBuilder().apply {
         $0.homeModel = HomeView_Previews.mockModel
         $0.receiveModel = ReceiveView_Previews.mockModel
+        $0.scanModel = ScanView_Previews.mockModel
     }
 
     let di: DI
 
     override init() {
+        setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
+
         di = DI(
-            Phoenix().di
-//                mocks.di()
+            PhoenixBusiness().di
+//            mocks.di()
         )
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+        UITableView.appearance().backgroundColor = UIColor.clear
+        UITableViewCell.appearance().backgroundColor = UIColor.clear
+
         // Override point for customization after application launch.
         #if DEBUG
             var injectionBundlePath = "/Applications/InjectionIII.app/Contents/Resources"
