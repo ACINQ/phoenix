@@ -17,7 +17,6 @@ jobs:
     - name: Checkout Phoenix
       uses: actions/checkout@v2
       with:
-        ref: master
         path: phoenix
     
     - name: Checkout eclair-core
