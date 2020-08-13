@@ -76,9 +76,9 @@ jobs:
         TESTNET_KEY_64: ${{secrets.TESTNET_KEY_64}}
 
     - name: Sign artifact
-        run: |
-            mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk phoenix/phoenix-testnet.apk
-            apksigner sign --ks signingkey phoenix/phoenix-testnet.apk --ks-pass "$TESTNET_STORE_PASS" --ks-key-alias "$TESTNET_ALIAS" --key-pass "$TESTNET_KEY_PASS"
+      run: |
+        mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk phoenix/phoenix-testnet.apk
+        apksigner sign --ks signingkey phoenix/phoenix-testnet.apk --ks-pass "$TESTNET_STORE_PASS" --ks-key-alias "$TESTNET_ALIAS" --key-pass "$TESTNET_KEY_PASS"
       shell: bash
       env:
         TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
