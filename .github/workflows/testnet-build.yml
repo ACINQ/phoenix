@@ -67,10 +67,28 @@ jobs:
         ./gradlew clean
         ./gradlew assembleDebug --stacktrace
 
-    # 4 - upload apk
+    # 4 - sign apk
+
+    - name: Retrieve signing key
+      run: 'echo "$TESTNET_KEY_64" | base64 -d > signingkey'
+      shell: bash
+      env:
+        TESTNET_KEY_64: ${{secrets.TESTNET_KEY_64}}
+
+    - name: Sign artifact
+        run: |
+            mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk phoenix/phoenix-testnet.apk
+            apksigner sign --ks signingkey phoenix/phoenix-testnet.apk --ks-pass "$TESTNET_STORE_PASS" --ks-key-alias "$TESTNET_ALIAS" --key-pass "$TESTNET_KEY_PASS"
+      shell: bash
+      env:
+        TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
+        TESTNET_ALIAS: ${{secrets.TESTNET_ALIAS}}
+        TESTNET_KEY_PASS: ${{secrets.TESTNET_KEY_PASS}}
+
+    # 5 - upload apk
 
     - name: Upload apk
       uses: actions/upload-artifact@v2
       with:
         name: phoenix-testnet
-        path: phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-debug.apk
+        path: phoenix/phoenix-testnet.apk
