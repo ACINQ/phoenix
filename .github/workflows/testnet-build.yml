@@ -61,7 +61,8 @@ jobs:
     - name: Assemble debug apk
       run: |
         cd phoenix
-        bash ./gradlew assembleDebug --stacktrace
+        ./gradlew clean
+        ./gradlew assembleDebug --stacktrace
 
     - name: Upload apk
       uses: actions/upload-artifact@v2
