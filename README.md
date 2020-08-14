@@ -1,6 +1,6 @@
 ![Eclair Logo](.readme/phoenix_text.png)
 
-[![Build (Testnet)](https://github.com/ACINQ/phoenix/workflows/Build/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=workflow%3A%22TESTNET+Build%22)
+[![Testnet Build](https://github.com/ACINQ/phoenix/workflows/TESTNET%20Build/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=workflow%3A%22TESTNET+Build%22)
 [![Download Testnet APK](https://img.shields.io/badge/Download-Testnet%20APK-green?style=flat&logo=android&logoColor=white)](https://acinq.co/pub/phoenix/phoenix-testnet-latest.apk)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
