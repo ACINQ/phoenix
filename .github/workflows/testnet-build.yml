@@ -1,5 +1,5 @@
-# Build a Phoenix apk for TESTNET, using the master branch.
-name: TESTNET Build
+# Build a Phoenix apk for Testnet, using the master branch.
+name: Build
 
 on:
   push:
