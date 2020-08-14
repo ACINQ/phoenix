@@ -16,46 +16,12 @@ struct ScanView: MVIView {
 
     func view(model: Scan.Model, intent: @escaping IntentReceiver) -> some View {
         switch model {
-        case _ as Scan.ModelNeedHeight: return AnyView(NeedHeightView(intent: intent))
         case _ as Scan.ModelReady: return AnyView(ReadyView(intent: intent))
         case let m as Scan.ModelValidate: return AnyView(ValidateView(model: m, intent: intent))
         case let m as Scan.ModelSending: return AnyView(SendingView(model: m))
         case let m as Scan.ModelFulfilled: return AnyView(FulfilledView(model: m))
         default:
             fatalError("Unknown model \(model)")
-        }
-    }
-
-    struct NeedHeightView: View {
-        let intent: IntentReceiver
-
-        @State var blockHeight: String = ""
-
-        var body: some View {
-            VStack {
-                CustomTextField(
-                        text: $blockHeight,
-                        isFirstResponder: true,
-                        keyboardType: .numberPad,
-                        returnKeyType: .done,
-                        placeholder: "Tip Block Height"
-                )
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding()
-                        .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.gray, lineWidth: 4)
-                        )
-                        .padding()
-                }
-                Button {
-                    intent(Scan.IntentHeight(height: Int32(blockHeight)!))
-                } label: {
-                    Text("OK")
-                            .font(.title)
-                }
-                        .disabled(blockHeight.isEmpty)
-                        .padding()
         }
     }
 
@@ -143,7 +109,7 @@ struct ScanView: MVIView {
 
 class ScanView_Previews: PreviewProvider {
 
-    static let mockModel = Scan.ModelNeedHeight()
+    static let mockModel = Scan.ModelReady()
 
     static var previews: some View {
         mockView(ScanView()) { $0.scanModel = ScanView_Previews.mockModel }

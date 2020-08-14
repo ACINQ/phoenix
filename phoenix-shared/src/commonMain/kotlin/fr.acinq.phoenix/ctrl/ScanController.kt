@@ -9,7 +9,6 @@ typealias ScanController = MVI.Controller<Scan.Model, Scan.Intent>
 object Scan {
 
     sealed class Model : MVI.Model() {
-        object NeedHeight : Model()
         object Ready: Model()
 
         data class Validate(val request: String, val amountMsat: Long?, val requestDescription: String?): Model()
@@ -18,7 +17,6 @@ object Scan {
     }
 
     sealed class Intent : MVI.Intent() {
-        data class Height(val height: Int) : Intent()
         data class Parse(val request: String) : Intent()
         data class Send(val request: String, val amountMsat: Long) : Intent()
     }

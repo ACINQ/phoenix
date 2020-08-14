@@ -9,7 +9,7 @@ import org.kodein.di.bind
 class MockDIBuilder {
     var homeModel: Home.Model = Home.emptyModel
     var receiveModel: Receive.Model = Receive.Model.Generating
-    var scanModel: Scan.Model = Scan.Model.NeedHeight
+    var scanModel: Scan.Model = Scan.Model.Ready
 
     fun apply(block: MockDIBuilder.() -> Unit): MockDIBuilder {
         this.block()

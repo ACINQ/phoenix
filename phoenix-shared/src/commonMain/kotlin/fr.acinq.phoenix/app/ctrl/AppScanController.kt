@@ -13,18 +13,12 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Scan.Model.NeedHeight) {
+class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Scan.Model.Ready) {
 
     private val peer: Peer by instance()
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
-            is Scan.Intent.Height -> {
-                launch {
-                    peer.send(WrappedChannelEvent(ByteVector32.Zeroes, NewBlock(intent.height, null)))
-                    model(Scan.Model.Ready)
-                }
-            }
             is Scan.Intent.Parse -> {
                 launch {
                     val paymentRequest = PaymentRequest.read(intent.request)
