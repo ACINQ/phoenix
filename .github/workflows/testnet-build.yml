@@ -87,8 +87,17 @@ jobs:
 
     # 5 - upload apk
 
-    - name: Upload apk
+    - name: Upload apk as artifact for this action
       uses: actions/upload-artifact@v2
       with:
         name: phoenix-testnet
         path: phoenix/phoenix-testnet.apk
+
+    - name: Upload to acinq.co
+      uses: shallwefootball/s3-upload-action@master
+      with:
+        aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        aws_bucket: ${{ secrets.AWS_BUCKET }}
+        destination_dir: 'pub/phoenix'
+        source_dir: 'phoenix/phoenix-testnet.apk'
