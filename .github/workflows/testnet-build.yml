@@ -70,10 +70,10 @@ jobs:
     # 4 - sign apk
 
     - name: Retrieve signing key
-      run: 'echo "$TESTNET_KEY_64" | base64 -d > signingkey'
+      run: 'echo "$TESTNET_KEY_HEX" | xxd -r -p > signingkey'
       shell: bash
       env:
-        TESTNET_KEY_64: ${{secrets.TESTNET_KEY_64}}
+        TESTNET_KEY_HEX: ${{secrets.TESTNET_KEY_HEX}}
 
     - name: Sign artifact
       run: |
