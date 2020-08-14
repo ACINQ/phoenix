@@ -77,9 +77,9 @@ jobs:
 
     - name: Sign artifact
       run: |
-        mkdir phoenix/upload
-        mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk phoenix/upload/phoenix-testnet.apk
-        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS phoenix/upload/phoenix-testnet.apk
+        mkdir upload
+        mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk upload/phoenix-testnet.apk
+        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet.apk
       shell: bash
       env:
         TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
@@ -92,7 +92,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: phoenix-testnet
-        path: phoenix/upload/phoenix-testnet.apk
+        path: upload/phoenix-testnet.apk
 
     - name: Upload to acinq.co
       uses: shallwefootball/s3-upload-action@master
@@ -101,4 +101,4 @@ jobs:
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
         aws_bucket: ${{ secrets.AWS_BUCKET }}
         destination_dir: 'pub/phoenix'
-        source_dir: 'phoenix/upload'
+        source_dir: 'upload'
