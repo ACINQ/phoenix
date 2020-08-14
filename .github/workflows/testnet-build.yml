@@ -1,0 +1,101 @@
+# Build a Phoenix apk for Testnet, using the master branch.
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    # 1 - checkout project and dependencies
+
+    - name: Checkout Phoenix
+      uses: actions/checkout@v2
+      with:
+        path: phoenix
+
+    - name: Checkout eclair-core
+      uses: actions/checkout@v2
+      with:
+        repository: ACINQ/eclair
+        ref: android-phoenix
+        path: eclair-core
+
+    - name: Checkout Tor_Onion_Proxy_Library
+      uses: actions/checkout@v2
+      with:
+        repository: ACINQ/Tor_Onion_Proxy_Library
+        path: tor-lib
+
+    # 2 - setup cache/jdk
+
+    - name: Cache maven dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Set up jdk 1.8
+      uses: actions/setup-java@v1
+      with:
+         java-version: 1.8
+
+    # 3 - build dependencies & app
+
+    - name: Build eclair-core and install to local maven repo
+      run: |
+        cd eclair-core
+        mvn clean install -pl eclair-core -am -Dmaven.test.skip=true
+
+    - name: Build Tor_Onion_Proxy_Library and install to local maven repo
+      run: |
+        cd tor-lib
+        ./gradlew install
+        ./gradlew :universal:build
+        ./gradlew :android:build
+        ./gradlew :android:publishToMaven
+
+    - name: Assemble debug apk
+      run: |
+        cd phoenix
+        ./gradlew clean
+        ./gradlew assembleDebug --stacktrace
+
+    # 4 - sign apk
+
+    - name: Retrieve signing key
+      run: 'echo "$TESTNET_KEY_HEX" | xxd -r -p > signingkey'
+      shell: bash
+      env:
+        TESTNET_KEY_HEX: ${{secrets.TESTNET_KEY_HEX}}
+
+    - name: Sign artifact
+      run: |
+        mkdir upload
+        mv phoenix/app/build/outputs/apk/debug/phoenix-*-testnet-universal-*.apk upload/phoenix-testnet-latest.apk
+        /usr/local/lib/android/sdk/build-tools/29.0.3/apksigner sign --ks signingkey --ks-pass pass:$TESTNET_STORE_PASS --ks-key-alias $TESTNET_ALIAS --key-pass pass:$TESTNET_KEY_PASS upload/phoenix-testnet-latest.apk
+      shell: bash
+      env:
+        TESTNET_STORE_PASS: ${{secrets.TESTNET_STORE_PASS}}
+        TESTNET_ALIAS: ${{secrets.TESTNET_ALIAS}}
+        TESTNET_KEY_PASS: ${{secrets.TESTNET_KEY_PASS}}
+
+    # 5 - upload apk
+
+    - name: Upload apk as artifact for this action
+      uses: actions/upload-artifact@v2
+      with:
+        name: phoenix-testnet
+        path: upload/phoenix-testnet-latest.apk
+
+    - name: Upload to acinq.co
+      run: |
+        aws s3 cp ./upload/phoenix-testnet-latest.apk s3://acinq.co/pub/phoenix/
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: 'eu-west-1'
