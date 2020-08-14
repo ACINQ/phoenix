@@ -96,7 +96,7 @@ jobs:
 
     - name: Upload to acinq.co
       run: |
-        aws s3 cp phoenix/upload/ s3://acinq.co/pub/phoenix/
+        aws s3 cp ./upload/phoenix-testnet.apk s3://acinq.co/pub/phoenix/
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
