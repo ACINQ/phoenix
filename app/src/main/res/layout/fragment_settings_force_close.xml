@@ -50,13 +50,13 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="@dimen/space_md"
         android:background="@drawable/square_border_hz">
 
         <TextView
           android:id="@+id/instructions"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
           android:textIsSelectable="true"
           android:text="@string/closechannels_force_instructions"
           app:layout_constraintTop_toTopOf="parent" />
@@ -65,8 +65,7 @@
           android:id="@+id/sep_1"
           style="@style/HLineSeparator"
           android:layout_width="50dp"
-          android:layout_marginTop="@dimen/space_xs"
-          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/instructions" />
 
@@ -75,8 +74,6 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
-          android:layout_marginStart="@dimen/space_md"
-          android:layout_marginEnd="@dimen/space_md"
           android:text="@string/closechannels_force_destination"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_1" />
@@ -90,9 +87,7 @@
           android:layout_height="wrap_content"
           android:drawableStart="@drawable/ic_chain"
           android:drawablePadding="@dimen/space_xs"
-          android:layout_marginStart="@dimen/space_md"
           android:layout_marginTop="@dimen/space_xs"
-          android:layout_marginEnd="@dimen/space_md"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/destination_label"
           app:layout_constraintTop_toBottomOf="@id/destination_label" />
@@ -105,21 +100,20 @@
           android:textColor="?attr/mutedTextColor"
           android:textSize="@dimen/text_md"
           android:layout_marginTop="@dimen/space_xs"
-          android:layout_marginStart="@dimen/space_md"
-          android:layout_marginEnd="@dimen/space_md"
           app:layout_constraintTop_toBottomOf="@id/destination_value" />
 
         <View
           android:id="@+id/sep_2"
-          style="@style/HLineSeparator"
+          style="@style/HSeparator"
           android:layout_marginTop="@dimen/space_md"
-          android:layout_width="match_parent"
+          app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/destination_desc" />
 
         <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_2"
@@ -128,34 +122,26 @@
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
           android:text="@string/closechannels_channels_none"
           android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
           app:layout_constraintTop_toBottomOf="@id/sep_2" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/force_confirm_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:visibility="@{model.state == PreChannelsCloseState.READY}"
-          android:padding="@dimen/space_md"
-          app:icon_tint="?attr/negativeColor"
-          android:background="@drawable/button_bg_square"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_cross_circle"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/sep_2"
-          app:text="@string/closechannels_force_button" />
-
-        <fr.acinq.phoenix.utils.customviews.ProgressTextView
-          android:id="@+id/force_in_progress"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
-          android:visibility="@{model.state == ForceCloseState.IN_PROGRESS}"
+          android:visibility="@{model.state == PreChannelsCloseState.READY}"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/button_bg_primary_border"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_cross_circle"
+          app:icon_tint="?attr/negativeColor"
+          app:is_paused="@{model.state == ForceCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/sep_2"
-          app:text="@string/closechannels_message_in_progress" />
+          app:paused_text="@string/closechannels_message_in_progress"
+          app:text="@string/closechannels_force_button" />
 
         <TextView
           android:id="@+id/force_done"
@@ -163,8 +149,8 @@
           android:layout_height="wrap_content"
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_md"
           android:drawableTint="?attr/positiveColor"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_done"
           android:visibility="@{model.state == ForceCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
@@ -174,8 +160,8 @@
           android:id="@+id/force_error"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
           android:drawableStart="@drawable/ic_alert_triangle"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_error"
           android:visibility="@{model.state == ForceCloseState.ERROR}"
           app:layout_constraintTop_toBottomOf="@id/sep_2" />

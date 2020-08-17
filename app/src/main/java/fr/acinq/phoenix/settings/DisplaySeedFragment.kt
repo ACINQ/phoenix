@@ -92,6 +92,8 @@ class DisplaySeedFragment : BaseFragment() {
             model.decrypt(context, null)
           }, onFailure = { _, _ ->
             model.state.value = DisplaySeedState.Error.InvalidAuth
+          }, onCancel = {
+            model.state.value = DisplaySeedState.Init
           })
       } else if (encryptedSeed is EncryptedSeed.V2.WithAuth) {
         AuthHelper.promptHardAuth(this,
