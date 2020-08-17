@@ -55,7 +55,7 @@ object AuthHelper {
       }
     } else {
       log.warn("cannot authenticate with state=$canAuth")
-      onFailure(null, fragment.getString(R.string.accessctrl_auth_error_unsecure, canAuth ?: -2))
+      onFailure(null, fragment.getString(R.string.accessctrl_error_unsecure, canAuth ?: -2))
     }
   }
 
@@ -80,7 +80,7 @@ object AuthHelper {
       }
     } else {
       log.warn("cannot authenticate with state=$canAuth")
-      onFailure(null, fragment.getString(R.string.accessctrl_auth_error_unsecure, canAuth ?: -2))
+      onFailure(null, fragment.getString(R.string.accessctrl_error_unsecure, canAuth ?: -2))
     }
   }
 

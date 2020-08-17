@@ -362,34 +362,12 @@
   <!-- //////////////// access control //////////////// -->
 
   <string name="accessctrl_title">Bezpečnost</string>
-  <string name="accessctrl_subtitle">Vysoce doporučujeme nastavit PIN k ochraně vaší peněženky. Pokud to vaše zařízení podporuje, můžete použít biometrické přihlášení.</string>
-  <string name="accessctrl_pin_switch">Přihlášení pomocí PIN</string>
-  <string name="accessctrl_pin_scramble">Přeházet PIN tlačítka</string>
-  <string name="accessctrl_biometrics_switch">Biometrické přihlášení</string>
-  <string name="accessctrl_change_pin">Změnit PIN…</string>
-  <string name="accessctrl_biometric_enrollment_error">Přístup k biometrii selhal. Prosím, zkuste to znovu.</string>
-  <string name="accessctrl_pindialog_title_unlock">Prosím, zadejte váš stávající PIN</string>
-  <string name="accessctrl_pindialog_title_set_new"><![CDATA[Prosím, zadejte <b>váš nový PIN</b>]]></string>
-  <string name="accessctrl_pindialog_title_confirm_new"><![CDATA[Prosím, <b>potvrďte</b> váš nový PIN]]></string>
-
-  <string name="accessctrl_pin_update_success">PIN úspěšně aktualizován!</string>
-  <string name="accessctrl_biometric_enabled">Biometrické přihlášení aktivováno</string>
-  <string name="accessctrl_biometric_disabled">Biometrické přihlášení deaktivováno</string>
 
   <string name="accessctrl_auth_unavailable_no_hw">Vaše zařízení nepodporuje biometrické přihlášení.</string>
   <string name="accessctrl_auth_unavailable_hw_unavailable">Biometrický hardware není dostupný. Prosím, zkuste to znovu později.</string>
   <string name="accessctrl_auth_unavailable_none_enrolled">Prosím, nejdříve nastavte biometrii.</string>
 
-  <string name="accessctrl_error_wrong_pin">Neplatný PIN</string>
-  <string name="accessctrl_error_pins_match">PIN nesouhlasí. Prosím, zkuste to znovu.</string>
-  <string name="accessctrl_error_generic">Nastala chyba, peněženka nebyla dešifrována.\n\nProsím, zkuste to znovu.</string>
-
-  <string name="accessctrl_disable_bio_prompt_title">Vypnout biometrický zámek</string>
-  <string name="accessctrl_disable_bio_prompt_desc">Odteď budete muset použít váš PIN kód</string>
-  <string name="accessctrl_disable_bio_prompt_negative">Zrušit</string>
-
-  <string name="accessctrl_bio_prompt_title">Zapnout biometrický zámek</string>
-  <string name="accessctrl_bio_prompt_negative">Zrušit</string>
+  <string name="accessctrl_error_generic">Nastala chyba.\n\nProsím, zkuste to znovu.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

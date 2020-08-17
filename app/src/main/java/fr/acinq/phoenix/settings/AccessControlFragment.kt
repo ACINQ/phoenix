@@ -85,7 +85,7 @@ class AccessControlFragment : BaseFragment() {
                 context?.let { model.enableScreenLock(it) }
               }
             }, onFailure = { code, _ ->
-              showMessage(code?.let { getString(R.string.accessctrl_auth_error_with_code, it) } ?: getString(R.string.accessctrl_auth_error) )
+              showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
             }, onCancel = {
               model.isUpdatingState.value = false
             })
@@ -109,7 +109,7 @@ class AccessControlFragment : BaseFragment() {
               onSuccess = { crypto ->
                 lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
                   log.info("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
-                  showMessage(getString(R.string.accessctrl_error_generic))
+                  showMessage(getString(R.string.accessctrl_error_auth))
                   model.updateLockState(ctx)
                 }) {
                   encryptedSeed.decrypt(crypto?.cipher).run {
@@ -120,7 +120,7 @@ class AccessControlFragment : BaseFragment() {
                   }
                 }
               }, onFailure = { code, _ ->
-                showMessage(code?.let { getString(R.string.accessctrl_auth_error_with_code, it) } ?: getString(R.string.accessctrl_auth_error) )
+                showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
               }, onCancel = {
                 model.isUpdatingState.value = false
               })
@@ -145,7 +145,7 @@ class AccessControlFragment : BaseFragment() {
                     }
                   }
                 }, onFailure = { code, _ ->
-                  showMessage(code?.let { getString(R.string.accessctrl_auth_error_with_code, it) } ?: getString(R.string.accessctrl_auth_error))
+                  showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth))
                 }, onCancel = {
                   model.isUpdatingState.value = false
                 })

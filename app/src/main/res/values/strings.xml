@@ -426,18 +426,17 @@
   <string name="accessctrl_auth_unavailable_hw_unavailable">Your biometric hardware is not available.</string>
   <string name="accessctrl_auth_unavailable_none_enrolled">Please enroll a PIN/Schema/Fingerprint in the Android Security system first.</string>
 
-  <string name="accessctrl_error_generic">There was an error, the wallet has not been encrypted.\n\nPlease try again.</string>
-  <string name="accessctrl_auth_error">Authentication failed.</string>
-  <string name="accessctrl_auth_error_with_code">Authentication failed (code: %1$d)</string>
-  <string name="accessctrl_auth_error_unsecure">Device is not secure (code: %1$d)</string>
+  <string name="accessctrl_error_generic">There was an error, please try again.</string>
+  <string name="accessctrl_error_auth">Authentication failed.</string>
+  <string name="accessctrl_error_auth_with_code">Authentication failed (code: %1$d)</string>
+  <string name="accessctrl_error_unsecure">Device is not secure (code: %1$d)</string>
 
   <string name="accessctrl_screen_lock_switch">Screen lock</string>
   <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android screen lock or fingerprint</string>
   <string name="accessctrl_full_lock_switch">Full lock</string>
   <string name="accessctrl_full_lock_switch_desc">The app cannot access its data unless you\'ve authenticated.\n\nThis setting provides additional security but prevents the app from running in background.</string>
   <string name="accessctrl_full_lock_confirm_title">Notice</string>
-  <string name="accessctrl_full_lock_confirm_message">If you enable this feature, you will have to manually start your app when someone sends you money.</string>
-
+  <string name="accessctrl_full_lock_confirm_message">If you enable this feature, you will have to manually start the app when someone wishes to send you money.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
