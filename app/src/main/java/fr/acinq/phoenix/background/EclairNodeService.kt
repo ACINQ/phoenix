@@ -287,7 +287,7 @@ class EclairNodeService : Service() {
         when (e) {
           is GeneralSecurityException -> {
             log.debug("user entered wrong PIN")
-            updateState(KitState.Error.WrongPassword)
+            updateState(KitState.Error.V1WrongPassword)
           }
           is NetworkException, is UnknownHostException -> {
             log.info("network error: ", e)
@@ -910,8 +910,9 @@ sealed class KitState {
     data class Tor(val message: String) : Error()
     data class InvalidElectrumAddress(val address: String) : Error()
     object DeviceNotSecure : Error()
-    object InvalidBiometric : Error()
-    object WrongPassword : Error()
+    object AuthenticationFailed : Error()
+    object V1InvalidBiometric : Error()
+    object V1WrongPassword : Error()
     object NoConnectivity : Error()
     object UnreadableData : Error()
   }

@@ -85,7 +85,8 @@
   <string name="startup_error_network">Your internet connection is not working. Please check your WiFi or cellular network.</string>
   <string name="startup_error_wrong_pwd">PIN is incorrect</string>
   <string name="startup_error_biometrics">Biometric authentication has failed.</string>
-  <string name="startup_error_device_unsecure">You don\'t have not setup Android Screen Lock on your device.</string>
+  <string name="startup_error_device_unsecure">You have not setup a User authentication lock on your device.</string>
+  <string name="startup_error_auth_failed">Authentication failed.</string>
 
   <!-- //////////////// payment holder //////////////// -->
 

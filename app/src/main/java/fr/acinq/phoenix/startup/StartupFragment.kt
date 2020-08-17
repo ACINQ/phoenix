@@ -131,12 +131,16 @@ class StartupFragment : BaseFragment() {
       state is KitState.Error.Tor -> mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message)
       state is KitState.Error.UnreadableData -> mBinding.errorMessage.text = getString(R.string.startup_error_unreadable)
       state is KitState.Error.NoConnectivity -> mBinding.errorMessage.text = getString(R.string.startup_error_network)
-      state is KitState.Error.DeviceNotSecure -> mBinding.errorMessage.text = getString(R.string.startup_error_network)
-      state is KitState.Error.WrongPassword -> {
+      state is KitState.Error.DeviceNotSecure -> mBinding.errorMessage.text = getString(R.string.startup_error_device_unsecure)
+      state is KitState.Error.AuthenticationFailed -> {
+        mBinding.errorMessage.text = getString(R.string.startup_error_auth_failed)
+        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+      }
+      state is KitState.Error.V1WrongPassword -> {
         mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd)
         Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
       }
-      state is KitState.Error.InvalidBiometric -> {
+      state is KitState.Error.V1InvalidBiometric -> {
         mBinding.errorMessage.text = getString(R.string.startup_error_biometrics)
         Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
       }
@@ -151,8 +155,12 @@ class StartupFragment : BaseFragment() {
     BindingHelpers.show(mBinding.icon, state !is KitState.Started)
     // errors...
     BindingHelpers.show(mBinding.errorBox, state is KitState.Error)
-    BindingHelpers.show(mBinding.errorSeparator, state !is KitState.Error.WrongPassword && state !is KitState.Error.InvalidBiometric)
-    BindingHelpers.show(mBinding.errorRestartButton, state !is KitState.Error.WrongPassword && state !is KitState.Error.InvalidBiometric)
+    BindingHelpers.show(mBinding.errorSeparator, state !is KitState.Error.V1WrongPassword
+      && state !is KitState.Error.V1InvalidBiometric
+      && state !is KitState.Error.AuthenticationFailed)
+    BindingHelpers.show(mBinding.errorRestartButton, state !is KitState.Error.V1WrongPassword
+      && state !is KitState.Error.V1InvalidBiometric
+      && state !is KitState.Error.AuthenticationFailed)
     BindingHelpers.show(mBinding.errorSettingsButton, state is KitState.Error.Generic || state is KitState.Error.UnreadableData
       || state is KitState.Error.Tor || state is KitState.Error.InvalidElectrumAddress)
     // wait while starting...
@@ -172,14 +180,14 @@ class StartupFragment : BaseFragment() {
       val onSuccess = {
         lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
           log.error("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
-          app.state.postValue(KitState.Error.InvalidBiometric)
+          app.state.postValue(KitState.Error.AuthenticationFailed)
         }) {
           val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
           lifecycleScope.launch(Dispatchers.Main) { app.service?.startKit(seed) }
         }
       }
       if (Prefs.isScreenLocked(context) && AuthHelper.isDeviceSecure(context)) {
-        AuthHelper.promptSoftAuth(this, { onSuccess() }, { _, _ -> app.state.value = KitState.Error.InvalidBiometric })
+        AuthHelper.promptSoftAuth(this, { onSuccess() }, { _, _ -> app.state.value = KitState.Error.AuthenticationFailed })
       } else {
         onSuccess()
       }
@@ -189,14 +197,14 @@ class StartupFragment : BaseFragment() {
         onSuccess = { crypto ->
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
-            app.state.postValue(KitState.Error.InvalidBiometric)
+            app.state.postValue(KitState.Error.AuthenticationFailed)
           }) {
             val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))
             lifecycleScope.launch(Dispatchers.Main) { app.service?.startKit(seed) }
           }
         },
         onFailure = { _, _ ->
-          app.state.value = KitState.Error.InvalidBiometric
+          app.state.value = KitState.Error.AuthenticationFailed
         })
     }
   }
@@ -206,7 +214,7 @@ class StartupFragment : BaseFragment() {
     val migrationCallback: (pin: String) -> Unit = {
       lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.error("failed to handle v1 encrypted seed: ", e)
-        app.state.postValue(KitState.Error.WrongPassword)
+        app.state.postValue(KitState.Error.V1WrongPassword)
       }) {
         val seed = EncryptedSeed.migration_v1_v2(context, encryptedSeed, it).run {
           SeedManager.writeSeedToDisk(Wallet.getDatadir(context), this)
@@ -249,7 +257,7 @@ class StartupFragment : BaseFragment() {
             migrationCallback(pin)
           } catch (e: Exception) {
             log.error("could not decrypt pin: ", e)
-            app.state.value = KitState.Error.InvalidBiometric
+            app.state.value = KitState.Error.V1InvalidBiometric
           }
         }
 
