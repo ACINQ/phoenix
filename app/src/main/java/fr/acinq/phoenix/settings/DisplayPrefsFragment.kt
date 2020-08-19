@@ -29,6 +29,7 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsPrefsDisplayBinding
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.ThemeHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -63,7 +64,10 @@ class DisplayPrefsFragment : BaseFragment(stayIfNotStarted = true), SharedPrefer
   override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
     activity?.run {
       when (key) {
-        Prefs.PREFS_THEME -> this.recreate()
+        Prefs.PREFS_THEME -> {
+          ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
+          this.recreate()
+        }
         Prefs.PREFS_COIN_UNIT -> Converter.refreshCoinPattern(applicationContext)
       }
     }

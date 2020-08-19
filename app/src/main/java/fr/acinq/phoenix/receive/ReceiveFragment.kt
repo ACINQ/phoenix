@@ -122,6 +122,8 @@ class ReceiveFragment : BaseFragment() {
         }
       }
     })
+
+    context?.let { mBinding.descValue.setText(Prefs.getDefaultPaymentDescription(it)) }
   }
 
   override fun onStart() {
@@ -234,7 +236,6 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-  // payment request is generated in app view model and updates the receive view model
   private fun generatePaymentRequest() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when generating payment request: ", exception)
@@ -242,8 +243,7 @@ class ReceiveFragment : BaseFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
-      val desc = mBinding.descValue.text.toString()
-      val invoice = app.requireService.generatePaymentRequest(if (desc.isBlank()) Prefs.getDefaultPaymentDescription(requireContext()) else desc, extractAmount())
+      val invoice = app.requireService.generatePaymentRequest(mBinding.descValue.text.toString(), extractAmount())
       model.invoice.value = Pair(invoice, null)
     }
   }
