@@ -22,6 +22,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.AppContext
+import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
@@ -41,6 +42,7 @@ class FCMService : FirebaseMessagingService() {
 
   /** Called if the FCM token is updated. This may occur if the security of the previous token has been compromised. */
   override fun onNewToken(token: String) {
+    Prefs.saveFCMToken(applicationContext, token)
     EventBus.getDefault().post(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), token))
   }
 

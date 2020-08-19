@@ -233,6 +233,7 @@
   <string name="settings_force_close">Danger zone</string>
   <string name="settings_tor">Tor</string>
   <string name="settings_about">About</string>
+  <string name="settings_payment_settings">Payment settings</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -558,5 +559,20 @@
   <!-- //////////////// background node service //////////////// -->
 
   <string name="nodeservice_desc">Service containing the wallet\'s node.</string>
+
+  <!-- //////////////// fees settings //////////////// -->
+
+  <string name="paymentsettings_title">Payment settings</string>
+  <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Default payment description</string>
+  <string name="paymentsettings_defaultdesc_desc">Current: %1$s</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">This is the default description for invoices you create.</string>
+
+  <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
+  <string name="paymentsettings_paytoopen_auto_desc">When someone sends you money, sometimes a new Lightning channel must be created for the payment to be received.\n\nA %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
+  <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
+  <string name="paymentsettings_paytoopen_dialog_description">The app will automatically accept to open a channel when it\'s needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
 
 </resources>

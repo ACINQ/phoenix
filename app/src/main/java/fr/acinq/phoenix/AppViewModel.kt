@@ -30,6 +30,7 @@ import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.ElectrumServer
 import fr.acinq.phoenix.background.KitState
+import fr.acinq.phoenix.events.PayToOpenNavigationEvent
 import fr.acinq.phoenix.events.RemovePendingSwapIn
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
@@ -126,7 +127,7 @@ class AppViewModel : ViewModel() {
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PayToOpenRequestEvent) {
+  fun handleEvent(event: PayToOpenNavigationEvent) {
     navigationEvent.value = event
   }
 

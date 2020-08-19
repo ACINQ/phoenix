@@ -25,6 +25,7 @@ import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
+import fr.acinq.phoenix.R
 
 object Prefs {
 
@@ -60,6 +61,10 @@ object Prefs {
   const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
   const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
   const val PREFS_TRAMPOLINE_MAX_FEE_INDEX = "PREFS_TRAMPOLINE_MAX_FEE_INDEX"
+
+  // -- payment configuration
+  const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
+  const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
 
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
@@ -243,5 +248,21 @@ object Prefs {
 
   fun saveFCMToken(context: Context, token: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FCM_TOKEN, token).apply()
+  }
+
+  fun getDefaultPaymentDescription(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, null) ?: context.getString(R.string.receive_default_desc)
+  }
+
+  fun setDefaultPaymentDescription(context: Context, value: String) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, value).apply()
+  }
+
+  fun getAutoAcceptPayToOpen(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, false)
+  }
+
+  fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, value).apply()
   }
 }

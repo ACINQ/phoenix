@@ -25,11 +25,11 @@
       android:layout_height="@dimen/button_height"
       android:scaleType="fitCenter"
       android:adjustViewBounds="true"
-      app:layout_constraintBottom_toBottomOf="@id/text"
+      app:layout_constraintBottom_toBottomOf="@id/text_container"
       app:layout_constraintEnd_toStartOf="@id/spacer"
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/text"
+      app:layout_constraintTop_toTopOf="@id/text_container"
       tools:ignore="ContentDescription" />
 
     <ProgressBar
@@ -38,9 +38,9 @@
       android:layout_height="@dimen/button_height"
       android:indeterminateTint="?attr/textColor"
       android:visibility="invisible"
-      app:layout_constraintBottom_toBottomOf="@id/text"
+      app:layout_constraintBottom_toBottomOf="@id/text_container"
       app:layout_constraintEnd_toEndOf="@id/image"
-      app:layout_constraintTop_toTopOf="@id/text"
+      app:layout_constraintTop_toTopOf="@id/text_container"
       tools:ignore="ContentDescription" />
 
     <View
@@ -49,22 +49,41 @@
       android:layout_height="0dp"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/text"
+      app:layout_constraintEnd_toStartOf="@id/text_container"
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toEndOf="@id/image"
       app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-      android:id="@+id/text"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/text_container"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:lineSpacingMultiplier="1"
-      android:textSize="@dimen/text_lg"
       app:layout_constrainedWidth="true"
-      app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintHorizontal_chainStyle="packed"
       app:layout_constraintStart_toEndOf="@id/spacer"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintTop_toTopOf="parent">
+
+      <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1"
+        android:textSize="@dimen/text_lg"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1"
+        android:textSize="@dimen/text_md"
+        android:layout_marginTop="@dimen/space_xxs"
+        android:textColor="?attr/mutedTextColor"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/text" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
   </merge>
 </layout>

@@ -97,12 +97,24 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/settings_tor" />
 
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/payment_settings_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_tool"
+          app:layout_constraintTop_toBottomOf="@id/tor_button"
+          app:spacer_size="@dimen/space_md"
+          app:text="@string/settings_payment_settings" />
+
         <TextView
           android:id="@+id/security_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_security_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/tor_button" />
+          app:layout_constraintTop_toBottomOf="@id/payment_settings_button" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/access_control_button"

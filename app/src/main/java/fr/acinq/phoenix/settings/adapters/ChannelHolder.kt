@@ -23,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import fr.acinq.eclair.channel.DATA_PHOENIX_WAIT_REMOTE_CHANNEL_REESTABLISH
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.phoenix.R
@@ -42,23 +43,30 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val state = itemView.findViewById<TextView>(R.id.channel_state)
     val balance = itemView.findViewById<CoinView>(R.id.channel_balance_value)
     val capacity = itemView.findViewById<CoinView>(R.id.channel_capacity_value)
+    val balanceSeparator = itemView.findViewById<View>(R.id.channel_balance_separator)
 
     state.text = Transcriber.readableState(itemView.context, channel.state())
     icon.imageTintList = ColorStateList.valueOf(Transcriber.colorForState(itemView.context, channel.state()))
 
-    val data = channel.data()
-    if (data is HasCommitments) {
-      balance.setAmount(data.commitments().availableBalanceForSend())
-      capacity.setAmount(data.commitments().localCommit().spec().totalFunds())
-      itemView.setOnClickListener {
-        try {
-          val action = ListChannelsFragmentDirections.actionListChannelsToChannelDetails(data.channelId().toString())
-          itemView.findNavController().navigate(action)
-        } catch (e: Exception) {
-          log.error("could not serialize channel: ", e)
-          Toast.makeText(itemView.context, itemView.context.getString(R.string.listallchannels_serialization_error), Toast.LENGTH_SHORT).show()
+    when (val data = channel.data()) {
+      is HasCommitments -> {
+        balance.setAmount(data.commitments().availableBalanceForSend())
+        capacity.setAmount(data.commitments().localCommit().spec().totalFunds())
+      }
+      is DATA_PHOENIX_WAIT_REMOTE_CHANNEL_REESTABLISH -> {
+        data.data().commitments().apply {
+          balance.setAmount(availableBalanceForSend())
+          capacity.setAmount(localCommit().spec().totalFunds())
         }
       }
+      else -> {
+        balanceSeparator.visibility = View.GONE
+      }
+    }
+
+    itemView.setOnClickListener {
+      val action = ListChannelsFragmentDirections.actionListChannelsToChannelDetails(channel.channelId().toString())
+      itemView.findNavController().navigate(action)
     }
   }
 }

@@ -21,15 +21,15 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.DisplaySeedFragment">
+    tools:context=".settings.PaymentSettingsFragment">
 
     <fr.acinq.phoenix.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"
-      app:subtitle="@string/about_version"
-      app:title="@string/about_title" />
+      app:subtitle="@string/paymentsettings_subtitle"
+      app:title="@string/paymentsettings_title" />
 
     <ScrollView
       android:layout_width="match_parent"
@@ -43,19 +43,28 @@
         android:layout_height="wrap_content"
         android:background="@drawable/square_border_hz">
 
-        <TextView
-          android:id="@+id/general"
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/default_description_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:paddingTop="@dimen/space_md"
-          android:paddingBottom="@dimen/space_md"
-          android:paddingEnd="@dimen/space_md"
-          android:paddingStart="@dimen/space_lg_p"
-          android:text="@string/about_general"
-          app:layout_constraintTop_toTopOf="parent" />
+          app:layout_constraintTop_toTopOf="parent"
+          android:padding="@dimen/space_md"
+          app:icon="@color/transparent"
+          app:text="@string/paymentsettings_defaultdesc_title"
+          app:spacer_size="@dimen/space_md"
+          app:hz_bias="0"
+          android:background="@drawable/button_bg_square" />
+
+        <fr.acinq.phoenix.utils.customviews.SwitchView
+          android:id="@+id/pay_to_open_auto_switch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:icon="@color/transparent"
+          app:text="@string/paymentsettings_paytoopen_auto_title"
+          app:subtitle="@string/paymentsettings_paytoopen_auto_desc"
+          app:layout_constraintTop_toBottomOf="@id/default_description_button" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
-

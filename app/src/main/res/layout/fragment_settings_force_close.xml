@@ -50,7 +50,10 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
+        android:paddingTop="@dimen/space_md"
+        android:paddingBottom="@dimen/space_lg_p"
+        android:paddingEnd="@dimen/space_lg"
+        android:paddingStart="@dimen/space_lg_p"
         android:background="@drawable/square_border_hz">
 
         <TextView
@@ -119,29 +122,33 @@
           app:layout_constraintTop_toBottomOf="@id/sep_2"
           app:text="@string/closechannels_checking_channels" />
 
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/force_confirm_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:visibility="@{model.state == PreChannelsCloseState.READY || model.state == PreChannelsCloseState.NO_CHANNELS}"
+          android:layout_marginTop="@dimen/space_md"
+          android:background="@drawable/button_bg"
+          android:backgroundTint="?attr/negativeColor"
+          app:enableOrFade="@{model.state != PreChannelsCloseState.NO_CHANNELS}"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_cross_circle"
+          app:icon_tint="?attr/altTextColor"
+          app:is_paused="@{model.state == ForceCloseState.IN_PROGRESS}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/sep_2"
+          app:paused_text="@string/closechannels_message_in_progress"
+          app:text="@string/closechannels_force_button"
+          app:text_color="?attr/altTextColor" />
+
         <TextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md"
           android:text="@string/closechannels_channels_none"
+          android:textSize="@dimen/text_md"
           android:visibility="@{model.state == PreChannelsCloseState.NO_CHANNELS}"
-          app:layout_constraintTop_toBottomOf="@id/sep_2" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/force_confirm_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:visibility="@{model.state == PreChannelsCloseState.READY}"
-          android:layout_marginTop="@dimen/space_md"
-          android:background="@drawable/button_bg_primary_border"
-          app:hz_bias="0"
-          app:icon="@drawable/ic_cross_circle"
-          app:icon_tint="?attr/negativeColor"
-          app:is_paused="@{model.state == ForceCloseState.IN_PROGRESS}"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/sep_2"
-          app:paused_text="@string/closechannels_message_in_progress"
-          app:text="@string/closechannels_force_button" />
+          app:layout_constraintTop_toBottomOf="@id/force_confirm_button" />
 
         <TextView
           android:id="@+id/force_done"

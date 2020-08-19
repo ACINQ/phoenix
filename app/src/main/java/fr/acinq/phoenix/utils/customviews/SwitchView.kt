@@ -73,6 +73,11 @@ class SwitchView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     mBinding.text.text = text
   }
 
+  fun setSubtitle(text: String) {
+    mBinding.subtitle.text = text
+    mBinding.subtitle.visibility = View.VISIBLE
+  }
+
   fun isChecked(): Boolean {
     return mBinding.switchButton.isChecked
   }

@@ -18,6 +18,7 @@ package fr.acinq.phoenix.events
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.eclair.wire.PayToOpenRequest
 
 class PaymentPending
 
@@ -30,3 +31,5 @@ class ChannelStateChange
 object PeerConnectionChange
 
 class RemovePendingSwapIn(val address: String)
+
+class PayToOpenNavigationEvent(val payToOpen: PayToOpenRequest)

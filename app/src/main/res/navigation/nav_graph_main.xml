@@ -355,6 +355,9 @@
     <action
       android:id="@+id/action_settings_to_about"
       app:destination="@id/about_fragment" />
+    <action
+      android:id="@+id/action_settings_to_payment_settings"
+      app:destination="@id/payment_settings_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -442,5 +445,11 @@
     android:id="@+id/about_fragment"
     android:name="fr.acinq.phoenix.settings.AboutFragment"
     android:label="AboutFragment" />
+
+  <!-- settings: payment -->
+  <fragment
+    android:id="@+id/payment_settings_fragment"
+    android:name="fr.acinq.phoenix.settings.PaymentSettingsFragment"
+    android:label="PaymentSettingsFragment" />
 
 </navigation>

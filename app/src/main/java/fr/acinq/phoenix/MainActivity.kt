@@ -31,6 +31,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
@@ -38,6 +39,7 @@ import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.databinding.ActivityMainBinding
+import fr.acinq.phoenix.events.PayToOpenNavigationEvent
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
@@ -96,14 +98,22 @@ class MainActivity : AppCompatActivity() {
     app = ViewModelProvider(this).get(AppViewModel::class.java)
     app.navigationEvent.observe(this, Observer {
       when (it) {
-        is PayToOpenRequestEvent -> {
-          val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
-            amountMsat = it.payToOpenRequest().amountMsat().toLong(),
-            fundingSat = it.payToOpenRequest().fundingSatoshis().toLong(),
-            feeSat = it.payToOpenRequest().feeSatoshis().toLong(),
-            paymentHash = it.payToOpenRequest().paymentHash().toString(),
-            expireAt = it.payToOpenRequest().expireAt())
-          findNavController(R.id.nav_host_main).navigate(action)
+        is PayToOpenNavigationEvent -> {
+          val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
+          if (autoAcceptPayToOpen) {
+            app.service?.let { service ->
+              log.info("automatically accepting pay-to-open=$it")
+              service.acceptPayToOpen(it.payToOpen.paymentHash())
+            }
+          } else {
+            val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
+              amountMsat = it.payToOpen.amountMsat().toLong(),
+              fundingSat = it.payToOpen.fundingSatoshis().toLong(),
+              feeSat = it.payToOpen.feeSatoshis().toLong(),
+              paymentHash = it.payToOpen.paymentHash().toString(),
+              expireAt = it.payToOpen.expireAt())
+            findNavController(R.id.nav_host_main).navigate(action)
+          }
         }
         is PaymentSent -> {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
@@ -179,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     try {
       unbindService(app.serviceConnection)
     } catch (e: Exception) {
-      log.error("failed to unbind activity from node service: ", e)
+      log.error("failed to unbind activity from node service: {}", e.localizedMessage)
     }
     log.info("main activity destroyed")
   }

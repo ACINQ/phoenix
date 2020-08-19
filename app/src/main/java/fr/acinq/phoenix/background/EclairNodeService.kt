@@ -127,9 +127,6 @@ class EclairNodeService : Service() {
   private val kit: Kit? get() = state.value?.kit()
   private val api: Eclair? get() = state.value?.api()
 
-  /** FCM token allocated to this application. */
-  var fcmToken: String? = null
-
   /** State of network connections (Internet, Tor, Peer, Electrum). */
   val electrumConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.electrumServer)
   val torConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.torConnections)
@@ -145,18 +142,17 @@ class EclairNodeService : Service() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
-    Prefs.getFCMToken(applicationContext)?.run {
-      fcmToken = this
-    } ?: run {
+    Prefs.getFCMToken(applicationContext) ?: run {
       FirebaseInstanceId.getInstance().instanceId
         .addOnCompleteListener(OnCompleteListener { task ->
           if (!task.isSuccessful) {
             log.warn("failed to retrieve fcm token", task.exception)
             return@OnCompleteListener
           }
+          log.debug("retrieved fcm token")
           task.result?.token?.let { token ->
             Prefs.saveFCMToken(applicationContext, token)
-            fcmToken = token
+            handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), token))
           }
         })
     }
@@ -197,27 +193,23 @@ class EclairNodeService : Service() {
   /** Called when an intent is called for this service. */
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
-    log.info("starting service [ intent=$intent, flag=$flags, startId=$startId ]")
-
-    SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext)).also {
-      if (it is EncryptedSeed.V2.NoAuth) {
-        notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
-        it.decrypt()
-          .run { EncryptedSeed.byteArray2ByteVector(this) }
-          .run { startKit(this) }
-      } else {
-        // notify the user that the app must be started
+    log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
+    val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
+    if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
+      try {
+        EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
+          log.info("starting kit from intent")
+          notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
+          startKit(this)
+        }
+      } catch (e: Exception) {
+        log.info("failed to read encrypted seed=${encryptedSeed.javaClass.canonicalName}: ", e)
         notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
       }
+    } else {
+      log.info("notifying user of incoming payment intent")
+      notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
     }
-//    if (!Prefs.isSeedEncrypted(applicationContext)) {
-//      // Start the kit with an empty password. If the seed is actually encrypted, this attempt will fail.
-//      notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
-//      startKit()
-//    } else {
-//      // notify the user that the app must be started
-//      notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
-//    }
     shutdownHandler.removeCallbacksAndMessages(null)
     shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
     if (!isHeadless) stopForeground(STOP_FOREGROUND_REMOVE)
@@ -318,8 +310,14 @@ class EclairNodeService : Service() {
         Migration.doMigration(applicationContext)
         val (_kit, xpub) = doStartNode(applicationContext, seed)
         updateState(KitState.Started(_kit, xpub))
-        _kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
         ChannelsWatcher.schedule(applicationContext)
+        _kit.apply {
+          val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
+          nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
+          switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it))}
+          log.debug("added peer to db and forced connection")
+        }
       }
     }
   }
@@ -377,30 +375,12 @@ class EclairNodeService : Service() {
     }
 
     updateState(KitState.Bootstrap.Node)
-
-//    val seed = SeedManager.readSeedFromDir(Wallet.getDatadir(context)).run {
-//      when (this) {
-//        is EncryptedSeed.EncryptedSeedV1 -> EncryptedSeed.migration_v1_v2(context)
-//      }
-//    }
-//
-
-//    val seed = SeedPrefs.getEncryptedSeedDataNoAuth(context)
-//      ?.run { CipherWrapper.read(this) }
-//      ?.run { KeystoreHelper.decrypt(KeystoreHelper.KEY_NO_AUTH, this) }
-//      ?.run {`ByteVector$`.`MODULE$`.apply(MnemonicCode.toSeed(String(Hex.decode(this), Charsets.UTF_8), "").toArray()) }
-//      ?: throw NoSeedYet
-
-    log.info("seed successfully read")
     val master = DeterministicWallet.generate(seed)
-
     val address = Wallet.buildAddress(master)
     val xpub = Wallet.buildXpub(master)
 
     Class.forName("org.sqlite.JDBC")
-    val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
-    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
     val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor() }, "EclairSupervisor")
@@ -746,11 +726,10 @@ class EclairNodeService : Service() {
       val isConnected = api?.run {
         JavaConverters.asJavaIterableConverter(
           Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
-        ).asJava()
-          .any { it.state().equals("CONNECTED", true) }
+        ).asJava().any { it.state().equals("CONNECTED", true) }
       } ?: false
       if (isConnected) {
-        fcmToken?.let { EventBus.getDefault().post(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), fcmToken)) }
+        Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
       }
       log.info("peer connection ? $isConnected")
       peerConn.postValue(isConnected)
@@ -814,10 +793,26 @@ class EclairNodeService : Service() {
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: PayToOpenRequestEvent) {
+    val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
+    if (autoAcceptPayToOpen) {
+      log.info("automatically accepting pay-to-open=$event")
+      acceptPayToOpen(event.payToOpenRequest().paymentHash())
+    } else {
+      if (isHeadless) {
+        log.info("automatically rejecting pay-to-open=$event")
+        rejectPayToOpen(event.payToOpenRequest().paymentHash())
+      } else {
+        EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
+      }
+    }
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: Peer.SendFCMToken) {
     kit?.run {
       log.info("registering token=${event.token()} with node=${event.nodeId()}")
-      //switchboard().tell(event, ActorRef.noSender())
+      switchboard().tell(event, ActorRef.noSender())
     } ?: log.warn("could not register fcm token because kit is not ready yet")
   }
 

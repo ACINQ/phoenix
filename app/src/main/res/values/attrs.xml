@@ -67,6 +67,7 @@
     <attr name="text" />
     <attr name="text_color" />
     <attr name="text_size" />
+    <attr name="subtitle" />
     <attr name="icon" />
     <attr name="icon_tint" />
     <attr name="icon_size" />
