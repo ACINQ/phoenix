@@ -17,6 +17,7 @@
 <resources>
 
   <style name="default_theme" parent="Theme.MaterialComponents.NoActionBar">
+    <item name="isLightTheme">false</item>
     <item name="colorPrimary">@color/horizon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
