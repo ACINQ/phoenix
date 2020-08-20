@@ -38,6 +38,7 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
                             model(Receive.Model.Received(it.receivePayment.amount.toLong()))
                         }
                     }
+                    else -> {}
                 }
             }
         }

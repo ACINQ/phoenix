@@ -25,17 +25,20 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
             peer.openChannelsSubscription().consumeEach { channels ->
                 model(
                     lastModel.copy(
-                        channels = channels
-                            .mapNotNull { (id, state) ->
-                            (state as? HasCommitments)?.let {
-                                Home.Model.Channel(
-                                    cid = id.toHex(),
-                                    local = it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
-                                    remote = it.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong(),
-                                    state = it::class.simpleName ?: "[Unknown]"
-                                )
-                            }
-                        }
+//                        channels = channels
+//                            .mapNotNull { (id, state) ->
+//                            (state as? HasCommitments)?.let {
+//                                Home.Model.Channel(
+//                                    cid = id.toHex(),
+//                                    local = it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
+//                                    remote = it.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong(),
+//                                    state = it::class.simpleName ?: "[Unknown]"
+//                                )
+//                            }
+//                        }
+                        balanceSat = channels.values
+                            .filterIsInstance<HasCommitments>()
+                            .sumOf { it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong() }
                     )
                 )
             }

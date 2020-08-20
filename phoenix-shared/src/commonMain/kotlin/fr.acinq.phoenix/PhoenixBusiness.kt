@@ -29,17 +29,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.bind
-import org.kodein.di.eagerSingleton
-import org.kodein.di.instance
+import org.kodein.di.*
 import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness {
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, seed: ByteVector32) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, seed: ByteVector32) : Peer {
         // TODO: This is only valid on Salomon's computer!
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
@@ -98,19 +95,7 @@ class PhoenixBusiness {
             enableTrampolinePayment = true
         )
 
-        val electrum = ElectrumClient("localhost", 51001, null, MainScope()).apply { start() }
-        val watcher = ElectrumWatcher(electrum, MainScope()).apply { start() }
-        val peer = Peer(socketBuilder, params, remoteNodePubKey, watcher)
-        val electrumChannel = Channel<ElectrumMessage>(2)
-        MainScope().launch {
-            for(msg in electrumChannel) {
-                when(msg) {
-                    is ElectrumClientReady -> electrum.sendMessage(ElectrumHeaderSubscription(electrumChannel))
-                    is HeaderSubscriptionResponse -> peer.send(WrappedChannelEvent(ByteVector32.Zeroes, NewBlock(msg.height, msg.header)))
-                }
-            }
-        }
-        electrum.sendMessage(ElectrumStatusSubscription(electrumChannel))
+        val peer = Peer(socketBuilder, params, remoteNodePubKey, watcher, MainScope())
 
         return peer
     }
@@ -119,9 +104,11 @@ class PhoenixBusiness {
         bind<LoggerFactory>() with instance(LoggerFactory.default)
         bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
 
-        bind(tag = "seed") from instance(ByteVector32("0101010101010101010101010101010101010101010101010101010101010101"))
+        constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
 
-        bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(tag = "seed")) }
+        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()).apply { start() } }
+        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()).apply { start() } }
+        bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
 
         bind<HomeController>() with screenProvider { AppHomeController(di) }
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }

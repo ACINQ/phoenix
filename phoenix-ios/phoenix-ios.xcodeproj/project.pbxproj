@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		53BEF1E80E41F1AA4C9A9803 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF637BD83D356A4A9C74F /* MVIView.swift */; };
+		53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF85119FFF4F05588DA42 /* mocks.swift */; };
 		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
+		53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6CBB2587136D25A625A /* lang.swift */; };
 		53BEF981E71E3087871890F9 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */; };
 		53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */; };
 		53BEFA3292350CF33363A483 /* MVIContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6E3FE2787846F3F38F1 /* MVIContext.swift */; };
@@ -60,7 +62,9 @@
 
 /* Begin PBXFileReference section */
 		53BEF637BD83D356A4A9C74F /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
+		53BEF6CBB2587136D25A625A /* lang.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = lang.swift; sourceTree = "<group>"; };
 		53BEF6E3FE2787846F3F38F1 /* MVIContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIContext.swift; sourceTree = "<group>"; };
+		53BEF85119FFF4F05588DA42 /* mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mocks.swift; sourceTree = "<group>"; };
 		53BEF9AEB876A2611C6FC8F5 /* DI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DI.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
@@ -122,6 +126,8 @@
 			isa = PBXGroup;
 			children = (
 				53BEFFB3CB63090BBCFF6A36 /* ui.swift */,
+				53BEF85119FFF4F05588DA42 /* mocks.swift */,
+				53BEF6CBB2587136D25A625A /* lang.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -383,6 +389,8 @@
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
 				53BEF981E71E3087871890F9 /* ScanView.swift in Sources */,
 				53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */,
+				53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */,
+				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
