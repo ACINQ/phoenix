@@ -501,7 +501,7 @@ class EclairNodeService : Service() {
         log.info("successfully forced closed channel=${res._1}")
         successfullyClosed++
       } else {
-        log.info("failed to force close channel=${res._1}: ", outcome.left() as Throwable)
+        log.info("failed to force close channel=${res._1}: ", outcome.left().get() as Throwable)
       }
     }
     return successfullyClosed

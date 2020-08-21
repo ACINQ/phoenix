@@ -76,7 +76,7 @@ class ForceCloseFragment : BaseFragment() {
       model.state.value = PreChannelsCloseState.NO_CHANNELS
     }) {
       model.state.value = PreChannelsCloseState.CHECKING_CHANNELS
-      val channels = app.requireService.getChannels(`NORMAL$`.`MODULE$`)
+      val channels = app.requireService.getChannels()
       if (channels.count() == 0) {
         model.state.value = PreChannelsCloseState.NO_CHANNELS
       } else {
