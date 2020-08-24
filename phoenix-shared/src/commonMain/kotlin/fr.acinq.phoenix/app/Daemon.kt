@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.eklair.io.Peer
+import fr.acinq.eklair.utils.Connection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.consumeEach
@@ -25,7 +26,7 @@ class Daemon(override val di: DI) : DIAware {
     @OptIn(ExperimentalTime::class)
     private suspend fun connectionDaemon() {
         peer.openConnectedSubscription().consumeEach {
-            if (it == Peer.Connection.CLOSED) {
+            if (it == Connection.CLOSED) {
                 delay(2.seconds)
                 peer.connect("localhost", 48001)
             }

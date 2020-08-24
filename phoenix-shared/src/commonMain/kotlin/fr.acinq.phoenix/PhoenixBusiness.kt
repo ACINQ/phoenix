@@ -37,7 +37,6 @@ import org.kodein.log.LoggerFactory
 class PhoenixBusiness {
 
     fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, seed: ByteVector32) : Peer {
-        // TODO: This is only valid on Salomon's computer!
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
         val PeerFeeEstimator = object : FeeEstimator {
@@ -106,8 +105,8 @@ class PhoenixBusiness {
 
         constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
 
-        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()).apply { start() } }
-        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()).apply { start() } }
+        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()).apply { connect() } }
+        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
 
         bind<HomeController>() with screenProvider { AppHomeController(di) }

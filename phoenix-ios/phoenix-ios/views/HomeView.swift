@@ -62,7 +62,7 @@ struct HomeView : MVIView {
     }
 }
 
-extension EklairPeer.Connection {
+extension EklairConnection {
     func text() -> String {
         switch self {
         case .closed: return "Offline"
@@ -74,7 +74,7 @@ extension EklairPeer.Connection {
 }
 
 struct ConnectionStatus : View {
-    let status: EklairPeer.Connection
+    let status: EklairConnection
 
     @Binding var show: Bool
 
@@ -104,7 +104,7 @@ struct ConnectionStatus : View {
                                 .stroke(Color.gray, lineWidth: 1)
                 )
                 .opacity(dimStatus ? 0.2 : 1.0)
-                .isHidden(status == EklairPeer.Connection.established)
+                .isHidden(status == EklairConnection.established)
                 .onAppear {
                     if (!started) {
                         started = true
@@ -132,7 +132,7 @@ struct ConnectionPopup : View {
                 Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appGreen)
                 Text("Internet:")
                 Spacer()
-                Text(EklairPeer.Connection.established.text())
+                Text(EklairConnection.established.text())
             }
                     .padding()
 
@@ -142,7 +142,7 @@ struct ConnectionPopup : View {
                 Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
                 Text("Lightning peer:")
                 Spacer()
-                Text(EklairPeer.Connection.establishing.text())
+                Text(EklairConnection.establishing.text())
             }
                     .padding()
 
@@ -152,7 +152,7 @@ struct ConnectionPopup : View {
                 Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
                 Text("Electrum server:")
                 Spacer()
-                Text(EklairPeer.Connection.closed.text())
+                Text(EklairConnection.closed.text())
             }
                     .padding()
 
