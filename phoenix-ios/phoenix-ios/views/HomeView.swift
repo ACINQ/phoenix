@@ -29,7 +29,10 @@ struct HomeView : MVIView {
                     ScrollView {
                         LazyVStack {
                             ForEach(model.history.indices.reversed(), id: \.self) { index in
-                                TransactionCell(transaction: model.history[index])
+                                NavigationLink(destination: Text("Coucou!")) {
+                                    TransactionCell(transaction: model.history[index])
+                                }
+//                                        .buttonStyle(PlainButtonStyle())
                             }
                         }
                     }
@@ -51,7 +54,7 @@ struct HomeView : MVIView {
                     .padding(.top, keyWindow?.safeAreaInsets.bottom)
                     .padding(.top, 10)
                     .frame(maxHeight: .infinity)
-                    .background(Color(red: 0.96, green: 0.96, blue: 0.98))
+                    .background(Color.appBackground)
                     .edgesIgnoringSafeArea(.top)
         }
                 .navigationBarTitle("", displayMode: .inline)
@@ -94,7 +97,7 @@ struct ConnectionStatus : View {
         }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.all, 4)
-                .background(Color(red: 0.99, green: 0.99, blue: 1.0))
+                .background(Color.appBackgroundLight)
                 .cornerRadius(10)
                 .overlay(
                         RoundedRectangle(cornerRadius: 10)
@@ -126,6 +129,7 @@ struct ConnectionPopup : View {
                     .padding([.bottom])
 
             HStack {
+                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appGreen)
                 Text("Internet:")
                 Spacer()
                 Text(EklairPeer.Connection.established.text())
@@ -135,6 +139,7 @@ struct ConnectionPopup : View {
             Divider()
 
             HStack {
+                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
                 Text("Lightning peer:")
                 Spacer()
                 Text(EklairPeer.Connection.establishing.text())
@@ -144,6 +149,7 @@ struct ConnectionPopup : View {
             Divider()
 
             HStack {
+                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
                 Text("Electrum server:")
                 Spacer()
                 Text(EklairPeer.Connection.closed.text())
@@ -174,28 +180,35 @@ struct TransactionCell : View {
 
     var body: some View {
         HStack {
-            if transaction.success {
+            switch (transaction.status) {
+            case .success:
                 Image("payment_holder_def_success")
                         .padding(4)
                         .background(
                                 RoundedRectangle(cornerRadius: .infinity)
-                                        .fill(Color(hex: "91B4D1"))
+                                        .fill(Color.appHorizon)
                         )
-            } else {
+            case .pending:
+                Image("payment_holder_def_pending")
+                        .padding(4)
+            case .failure:
                 Image("payment_holder_def_failed")
                         .padding(4)
+            default: EmptyView()
             }
             VStack(alignment: .leading) {
                 Text(transaction.desc)
                         .lineLimit(1)
                         .truncationMode(.tail)
+                        .foregroundColor(.appDark)
                 Text(transaction.completionTimestamp.formatDate())
                         .font(.caption)
                         .foregroundColor(.gray)
             }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding([.leading, .trailing], 8)
-            Text(transaction.amountSat.formatNumber())
+            Text((transaction.amountSat >= 0 ? "+" : "") + transaction.amountSat.formatNumber())
+                    .foregroundColor(transaction.amountSat >= 0 ? .appGreen : .appRed)
         }
                 .padding([.top, .bottom], 14)
                 .padding([.leading, .trailing], 16)
@@ -225,7 +238,7 @@ struct BottomBar : View {
             ) {
                 Image("ic_receive").resizable().frame(width: 22, height: 22)
                 Text("Receive")
-                        .foregroundColor(Color(red: 0x2B / 0xFF, green: 0x31 / 0xFF, blue: 0x3E / 0xFF))
+                        .foregroundColor(.appDark)
             }
 
             Spacer()
@@ -240,7 +253,7 @@ struct BottomBar : View {
             ) {
                 Image("ic_scan").resizable().frame(width: 22, height: 22)
                 Text("Scan")
-                        .foregroundColor(Color(red: 0x2B / 0xFF, green: 0x31 / 0xFF, blue: 0x3E / 0xFF))
+                        .foregroundColor(.appDark)
             }
 
             Spacer()
@@ -256,9 +269,10 @@ class HomeView_Previews : PreviewProvider {
             connected: .establishing,
             balanceSat: 123500,
             history: [
-                mockSpendTransaction,
+                mockSpendFailedTransaction,
                 mockReceiveTransaction,
-                mockSpendFailedTransaction
+                mockSpendTransaction,
+                mockPendingTransaction
             ]
     )
 
