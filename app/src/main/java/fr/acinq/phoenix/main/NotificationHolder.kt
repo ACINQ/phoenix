@@ -60,7 +60,6 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       actionButton.visibility = View.VISIBLE
       actionButton.text = itemView.resources.getString(notification.actionResId)
       when (notification) {
-        InAppNotifications.NO_PIN_SET -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_access_control) }
         InAppNotifications.MNEMONICS_NEVER_SEEN -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
         else -> {}
       }

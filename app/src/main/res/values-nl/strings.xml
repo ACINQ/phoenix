@@ -282,8 +282,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Je wallet is niet beveiligd.</string>
-  <string name="inappnotif_set_up_pin_action">Stel een PIN in</string>
   <string name="inappnotif_mnemonics_never_seen">Bedankt voor het gebruiken van Phoenix. Heb je een backup van je wallet gemaakt?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Maak een backup van mijn wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix moet soms op de achtergrond draaien. Zorg ervoor dat je apparaat deze app niet abrupt afsluit vanwege energiebesparingsinstellingen.</string>

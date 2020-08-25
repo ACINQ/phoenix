@@ -295,8 +295,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
-  <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>

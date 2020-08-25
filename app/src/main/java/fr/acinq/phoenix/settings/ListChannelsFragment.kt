@@ -119,6 +119,7 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
     }) {
       model.state.value = ListChannelsState.IN_PROGRESS
       val channels = app.requireService.getChannels(null).toMutableList()
+        .apply { mapIndexed { index, c -> log.debug("channel #$index: $c") } }
       channelsAdapter.update(channels)
       model.channels.value = channels
       model.state.value = ListChannelsState.DONE

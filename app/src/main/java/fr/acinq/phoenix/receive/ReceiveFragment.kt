@@ -178,7 +178,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      val swapInFee = 100 * (appContext(it.context).swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+      val swapInFee = 100 * (appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
       AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
         Converter.html(getString(R.string.receive_swap_in_disclaimer_message, String.format("%.2f", swapInFee))))
         .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }

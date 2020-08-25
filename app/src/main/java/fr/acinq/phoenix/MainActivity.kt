@@ -60,11 +60,10 @@ class MainActivity : AppCompatActivity() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
       log.info("network available")
-      AppContext.getInstance(applicationContext).apply {
-        if (Prefs.isTorEnabled(applicationContext)) {
-          app.service?.reconnectTor()
-        }
+      if (Prefs.isTorEnabled(applicationContext)) {
+        app.service?.reconnectTor()
       }
+      app.service?.connectToPeer()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
@@ -84,7 +83,6 @@ class MainActivity : AppCompatActivity() {
   }
 
   private val navigationCallback = NavController.OnDestinationChangedListener { _, destination, args ->
-    log.debug("destination=${destination.id}, args=$args")
     app.currentNav.postValue(destination.id)
   }
 

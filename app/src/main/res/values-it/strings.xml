@@ -279,8 +279,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Il tuo wallet non è protetto.</string>
-  <string name="inappnotif_set_up_pin_action">Imposta un PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Grazie di aver usato Phoenix. Hai fatto un backup del tuo wallet?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fai il backup del wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix deve eseguire operazioni in background di tanto in tanto. Assicurati che le impostazioni di risparmio batteria del tuo dispositivo permettano a Phoenix di eseguire le operazioni.</string>

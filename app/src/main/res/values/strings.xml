@@ -244,11 +244,15 @@
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
   <string name="notif_fcm_title">Incoming payment</string>
+  <string name="notif_fcm_message_wait">Please wait…</string>
   <string name="notif_fcm_message_manual_start_app">Start the app to receive the payment.</string>
   <string name="notif_fcm_message_app_running_in_bg">Phoenix is running in background…</string>
 
   <string name="notif_payment_received_title">Received payment</string>
-  <string name="notif_payment_received_message">You received %1$s.</string>
+  <plurals name="notif_payment_received_message">
+    <item quantity="one">You received %1$d payment of %2$s.</item>
+    <item quantity="other">You received %1$d payments for a total of %2$s.</item>
+  </plurals>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -332,8 +336,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Your wallet is not protected.</string>
-  <string name="inappnotif_set_up_pin_action">Set a PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Thanks for using Phoenix. Please backup your wallet so that you don\'t lose your bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Backup my wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>

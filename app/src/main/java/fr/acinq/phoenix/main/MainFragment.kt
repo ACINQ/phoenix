@@ -245,7 +245,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   private fun refreshNotifications(context: Context) {
-    checkWalletIsSecure(context)
     checkMnemonics(context)
     checkBackgroundWorkerCanRun(context)
   }
@@ -269,15 +268,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
         Prefs.saveWatcherAttemptOutcome(context, WatchListener.`Ok$`.`MODULE$`)
       }
     } else {
-      appContext(context).notifications?.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
-    }
-  }
-
-  private fun checkWalletIsSecure(context: Context) {
-    if (!Prefs.isSeedEncrypted(context)) {
-      appContext(context).notifications.value?.add(InAppNotifications.NO_PIN_SET)
-    } else {
-      appContext(context).notifications.value?.remove(InAppNotifications.NO_PIN_SET)
+      appContext(context).notifications.value?.remove(InAppNotifications.BACKGROUND_WORKER_CANNOT_RUN)
     }
   }
 

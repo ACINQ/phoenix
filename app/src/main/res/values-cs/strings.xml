@@ -283,8 +283,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Vaše peněženka není chráněna.</string>
-  <string name="inappnotif_set_up_pin_action">Nastavit PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Děkujeme za používání Phoenix. Udělali jste zálohu vaší peněženky?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Zálohovat peněženku</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>

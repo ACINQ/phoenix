@@ -21,6 +21,7 @@ import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.pattern.Patterns
 import akka.util.Timeout
+import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -113,6 +114,7 @@ class EclairNodeService : Service() {
   /** True if the service is running headless (that is without a GUI) and as such should show a notification. */
   @Volatile
   private var isHeadless = true
+  private val receivedInBackground: MutableLiveData<List<MilliSatoshi>> = MutableLiveData(emptyList())
 
   private lateinit var appContext: AppContext
   private val stateLock = ReentrantLock()
@@ -161,16 +163,15 @@ class EclairNodeService : Service() {
     val intent = Intent(this, MainActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix)
-      .setAutoCancel(true)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif_fcm_title))
       .setContentIntent(PendingIntent.getActivity(this, Constants.FCM_NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
 
-  /** UI is binding to the service. The service is not headless anymore and we can call stopForeground. */
   override fun onBind(intent: Intent?): IBinder? {
     log.info("binding node service from intent=$intent")
+    // UI is binding to the service. The service is not headless anymore and we can remove the notification.
     isHeadless = false
     stopForeground(STOP_FOREGROUND_REMOVE)
     return binder
@@ -185,7 +186,13 @@ class EclairNodeService : Service() {
   private val shutdownHandler = Handler()
   private val shutdownRunnable: Runnable = Runnable {
     if (isHeadless) {
-      log.info("reached scheduled shutdown")
+      log.info("reached scheduled shutdown...")
+      if (receivedInBackground.value == null || receivedInBackground.value!!.isEmpty()) {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+      } else {
+        stopForeground(STOP_FOREGROUND_DETACH)
+        notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notificationBuilder.setAutoCancel(true).build())
+      }
       shutdown()
     }
   }
@@ -195,24 +202,33 @@ class EclairNodeService : Service() {
     super.onStartCommand(intent, flags, startId)
     log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
     val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
-    if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
-      try {
-        EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
-          log.info("starting kit from intent")
-          notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
-          startKit(this)
+    when {
+      state.value is KitState.Started -> {
+        notifyForegroundService(getString(R.string.notif_fcm_message_wait))
+        connectToPeer()
+      }
+      encryptedSeed is EncryptedSeed.V2.NoAuth -> {
+        try {
+          EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
+            log.info("starting kit from intent")
+            notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
+            startKit(this)
+          }
+        } catch (e: Exception) {
+          log.info("failed to read encrypted seed=${encryptedSeed.javaClass.canonicalName}: ", e)
+          notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
         }
-      } catch (e: Exception) {
-        log.info("failed to read encrypted seed=${encryptedSeed.javaClass.canonicalName}: ", e)
+      }
+      else -> {
+        log.info("notifying user of incoming payment intent")
         notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
       }
-    } else {
-      log.info("notifying user of incoming payment intent")
-      notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
     }
     shutdownHandler.removeCallbacksAndMessages(null)
     shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
-    if (!isHeadless) stopForeground(STOP_FOREGROUND_REMOVE)
+    if (!isHeadless) {
+      stopForeground(STOP_FOREGROUND_REMOVE)
+    }
     return START_NOT_STICKY
   }
 
@@ -240,8 +256,7 @@ class EclairNodeService : Service() {
   /** Shutdown the node, close connections and stop the service */
   fun shutdown() {
     closeConnections()
-    log.info("shutting down service in state=${state.value}")
-    stopForeground(STOP_FOREGROUND_REMOVE)
+    log.info("shutting down service in state=${state.value?.getName()}")
     stopSelf()
     updateState(KitState.Off)
   }
@@ -260,7 +275,7 @@ class EclairNodeService : Service() {
       stateLock.lock()
       val state = _state.value
       if (state !is KitState.Off) {
-        log.warn("ignore attempt to start kit with app state=${state}")
+        log.warn("ignore attempt to start kit with app state=${state?.getName()}")
         false
       } else {
         updateState(KitState.Bootstrap.Init, lazy = false)
@@ -304,6 +319,7 @@ class EclairNodeService : Service() {
         }
         if (isHeadless) {
           shutdown()
+          stopForeground(STOP_FOREGROUND_REMOVE)
         }
       }) {
         log.debug("initiating node startup from state=${_state.value?.getName()}")
@@ -315,7 +331,7 @@ class EclairNodeService : Service() {
           val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
           nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
           switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it))}
+          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
           log.debug("added peer to db and forced connection")
         }
       }
@@ -450,7 +466,7 @@ class EclairNodeService : Service() {
       delay(500)
       val closeScriptPubKey = Option.apply(Script.write(`package$`.`MODULE$`.addressToPublicKeyScript(address, Wallet.getChainHash())))
       val channelIds = prepareClosing()
-      log.info("requesting to *force* close channels=$channelIds")
+      log.info("requesting to *mutual* close channels=$channelIds")
       val closingResult = Await.result(api!!.close(channelIds, closeScriptPubKey, longTimeout), Duration.Inf())
       val successfullyClosed = handleClosingResult(closingResult)
       if (successfullyClosed == channelIds.size()) {
@@ -498,10 +514,10 @@ class EclairNodeService : Service() {
       val res = iterator.next()
       val outcome = res._2
       if (outcome.isRight) {
-        log.info("successfully forced closed channel=${res._1}")
+        log.info("successfully closed channel=${res._1}")
         successfullyClosed++
       } else {
-        log.info("failed to force close channel=${res._1}: ", outcome.left().get() as Throwable)
+        log.info("failed to close channel=${res._1}: ", outcome.left().get() as Throwable)
       }
     }
     return successfullyClosed
@@ -712,10 +728,10 @@ class EclairNodeService : Service() {
 
   /** Send a reconnect event to the ACINQ node. */
   @UiThread
-  fun reconnectToPeer() {
+  fun connectToPeer() {
     serviceScope.launch(Dispatchers.Default) {
       kit?.run {
-        log.info("forcing reconnection to peer")
+        log.info("forcing connection to peer")
         switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
       }
     }
@@ -730,6 +746,8 @@ class EclairNodeService : Service() {
       } ?: false
       if (isConnected) {
         Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
+      } else {
+        connectToPeer()
       }
       log.info("peer connection ? $isConnected")
       peerConn.postValue(isConnected)
@@ -798,6 +816,9 @@ class EclairNodeService : Service() {
     if (autoAcceptPayToOpen) {
       log.info("automatically accepting pay-to-open=$event")
       acceptPayToOpen(event.payToOpenRequest().paymentHash())
+      if (isHeadless) {
+        handleReceivedPaymentHeadless(event.payToOpenRequest().amountMsat())
+      }
     } else {
       if (isHeadless) {
         log.info("automatically rejecting pay-to-open=$event")
@@ -841,27 +862,34 @@ class EclairNodeService : Service() {
 
   /** Display a blocking notification and set the service as being foregrounded. */
   private fun notifyForegroundService(message: String) {
-    log.info("notifying foreground service with msg=$message")
-    notificationBuilder.setContentText(message)
-    val notification = notificationBuilder.build()
-    notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notification)
-    startForeground(Constants.FCM_NOTIFICATION_ID, notification)
+    log.debug("notifying foreground service with msg=$message")
+    updateNotification(message).also { startForeground(Constants.FCM_NOTIFICATION_ID, it) }
   }
+
+  private fun updateNotification(message: String): Notification =
+    notificationBuilder.setContentText(message).build().run {
+      notificationManager.notify(Constants.FCM_NOTIFICATION_ID, this)
+      this
+    }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: PaymentReceived) {
     if (isHeadless) {
-      val intent = Intent(this, MainActivity::class.java)
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-      notificationManager.notify(Constants.PAYMENT_RECEIVED_NOTIFICATION_ID,
-        NotificationCompat.Builder(this, Constants.PAYMENT_RECEIVED_NOTIFICATION_CHANNEL_ID)
-          .setSmallIcon(R.drawable.ic_phoenix_shape)
-          .setAutoCancel(true)
-          .setOnlyAlertOnce(true)
-          .setContentTitle(getString(R.string.notif_payment_received_title))
-          .setContentText(getString(R.string.notif_payment_received_message, Converter.printAmountPretty(event.amount(), applicationContext, withSign = false, withUnit = true)))
-          .setContentIntent(PendingIntent.getActivity(this, Constants.FCM_NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT))
-          .build())
+      handleReceivedPaymentHeadless(event.amount())
+    }
+  }
+
+  private fun handleReceivedPaymentHeadless(amount: MilliSatoshi) {
+    (receivedInBackground.value ?: emptyList()).run {
+      this + amount
+    }.let {
+      val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
+      val message = applicationContext.resources.getQuantityString(R.plurals.notif_payment_received_message, it.size, it.size,
+        Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true))
+      updateNotification(message)
+      receivedInBackground.postValue(it)
+      shutdownHandler.removeCallbacksAndMessages(null)
+      shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
     }
   }
 
