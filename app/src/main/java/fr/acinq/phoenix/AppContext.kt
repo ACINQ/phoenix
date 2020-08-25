@@ -31,9 +31,6 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.events.BalanceEvent
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -92,18 +89,17 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
     // notification channels (android 8+)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val channelWatcherChannel = NotificationChannel(Constants.WATCHER_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH)
-      channelWatcherChannel.description = getString(R.string.notification_channels_watcher_desc)
-
-      val paymentReceivedNotificationChannel = NotificationChannel(Constants.PAYMENT_RECEIVED_NOTIFICATION_CHANNEL_ID,
-        getString(R.string.notification_payment_received_title), NotificationManager.IMPORTANCE_DEFAULT)
-      paymentReceivedNotificationChannel.description = getString(R.string.notification_payment_received_desc)
-
-      val fcmNotificationChannel = NotificationChannel(Constants.FCM_NOTIFICATION_CHANNEL_ID, getString(R.string.notification_fcm_title), NotificationManager.IMPORTANCE_DEFAULT)
-      fcmNotificationChannel.description = getString(R.string.notification_fcm_desc)
-
-      // Register notifications channels with the system
-      getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(channelWatcherChannel, paymentReceivedNotificationChannel, fcmNotificationChannel))
+      getSystemService(NotificationManager::class.java)?.createNotificationChannels(listOf(
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER, getString(R.string.notification_channels_watcher_title), NotificationManager.IMPORTANCE_HIGH).apply {
+          description = getString(R.string.notification_channels_watcher_desc)
+        },
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN, getString(R.string.notification_pay_to_open_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+          description = getString(R.string.notification_pay_to_open_desc)
+        },
+        NotificationChannel(Constants.NOTIF_CHANNEL_ID__HEADLESS, getString(R.string.notification_headless_title), NotificationManager.IMPORTANCE_DEFAULT).apply {
+          description = getString(R.string.notification_headless_desc)
+        }
+      ))
     }
   }
 

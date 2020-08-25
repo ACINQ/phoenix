@@ -21,10 +21,10 @@
 
   <string name="notification_channels_watcher_title">Background watcher</string>
   <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
-  <string name="notification_payment_received_title">Received payment</string>
-  <string name="notification_payment_received_desc">Pops up when you received a payment and the app is not on.</string>
-  <string name="notification_fcm_title">Incoming Payment</string>
-  <string name="notification_fcm_desc">Alerts you if you have an incoming payment.</string>
+  <string name="notification_pay_to_open_title">Accept incoming payment</string>
+  <string name="notification_pay_to_open_desc">Pops up when someone sends you a payment and you need to accept it manually.</string>
+  <string name="notification_headless_title">Phoenix running in background</string>
+  <string name="notification_headless_desc">Notifies you that Phoenix is running in background. This happens when someone is sending you money and the app is not already started.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -243,16 +243,18 @@
   <string name="notif_watcher_connection_title">Phoenix needs network access</string>
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
-  <string name="notif_fcm_title">Incoming payment</string>
-  <string name="notif_fcm_message_wait">Please wait…</string>
-  <string name="notif_fcm_message_manual_start_app">Start the app to receive the payment.</string>
-  <string name="notif_fcm_message_app_running_in_bg">Phoenix is running in background…</string>
-
-  <string name="notif_payment_received_title">Received payment</string>
-  <plurals name="notif_payment_received_message">
+  <string name="notif_headless_title">Incoming payment</string>
+  <string name="notif_headless_message_wait">Please wait…</string>
+  <string name="notif_headless_message_manual_start_app">Start the app to receive the payment.</string>
+  <string name="notif_headless_message_app_running_in_bg">Tap to start</string>
+  <string name="notif_headless_payment_received_title">Received payment</string>
+  <plurals name="notif_headless_payment_received_message">
     <item quantity="one">You received %1$d payment of %2$s.</item>
     <item quantity="other">You received %1$d payments for a total of %2$s.</item>
   </plurals>
+
+  <string name="notif_pay_to_open_title">Accept incoming payment</string>
+  <string name="notif_pay_to_open_message">Tap to open the app</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -575,6 +577,6 @@
   <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
   <string name="paymentsettings_paytoopen_auto_desc">When someone sends you money, sometimes a new Lightning channel must be created for the payment to be received.\n\nA %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
-  <string name="paymentsettings_paytoopen_dialog_description">The app will automatically accept to open a channel when it\'s needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
+  <string name="paymentsettings_paytoopen_dialog_description">The app will automatically accept to open a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
 
 </resources>

@@ -108,7 +108,7 @@ class EclairNodeService : Service() {
   private val log = LoggerFactory.getLogger(this::class.java)
   private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
   private lateinit var notificationManager: NotificationManagerCompat
-  private val notificationBuilder = NotificationCompat.Builder(this, Constants.FCM_NOTIFICATION_CHANNEL_ID)
+  private val notificationBuilder = NotificationCompat.Builder(this, Constants.NOTIF_CHANNEL_ID__HEADLESS)
   private val binder = NodeBinder()
 
   /** True if the service is running headless (that is without a GUI) and as such should show a notification. */
@@ -164,8 +164,8 @@ class EclairNodeService : Service() {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix)
       .setOnlyAlertOnce(true)
-      .setContentTitle(getString(R.string.notif_fcm_title))
-      .setContentIntent(PendingIntent.getActivity(this, Constants.FCM_NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT))
+      .setContentTitle(getString(R.string.notif_headless_title))
+      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
 
@@ -191,7 +191,7 @@ class EclairNodeService : Service() {
         stopForeground(STOP_FOREGROUND_REMOVE)
       } else {
         stopForeground(STOP_FOREGROUND_DETACH)
-        notificationManager.notify(Constants.FCM_NOTIFICATION_ID, notificationBuilder.setAutoCancel(true).build())
+        notificationManager.notify(Constants.NOTIF_ID__HEADLESS, notificationBuilder.setAutoCancel(true).build())
       }
       shutdown()
     }
@@ -204,24 +204,24 @@ class EclairNodeService : Service() {
     val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
     when {
       state.value is KitState.Started -> {
-        notifyForegroundService(getString(R.string.notif_fcm_message_wait))
+        notifyForegroundService(getString(R.string.notif_headless_message_wait))
         connectToPeer()
       }
       encryptedSeed is EncryptedSeed.V2.NoAuth -> {
         try {
           EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
             log.info("starting kit from intent")
-            notifyForegroundService(getString(R.string.notif_fcm_message_app_running_in_bg))
+            notifyForegroundService(getString(R.string.notif_headless_message_app_running_in_bg))
             startKit(this)
           }
         } catch (e: Exception) {
           log.info("failed to read encrypted seed=${encryptedSeed.javaClass.canonicalName}: ", e)
-          notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
+          notifyForegroundService(getString(R.string.notif_headless_message_manual_start_app))
         }
       }
       else -> {
         log.info("notifying user of incoming payment intent")
-        notifyForegroundService(getString(R.string.notif_fcm_message_manual_start_app))
+        notifyForegroundService(getString(R.string.notif_headless_message_manual_start_app))
       }
     }
     shutdownHandler.removeCallbacksAndMessages(null)
@@ -825,6 +825,16 @@ class EclairNodeService : Service() {
         rejectPayToOpen(event.payToOpenRequest().paymentHash())
       } else {
         EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
+        if (!appContext.isAppVisible) {
+          notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
+            .setSmallIcon(R.drawable.ic_phoenix)
+            .setContentTitle(getString(R.string.notif_pay_to_open_title))
+            .setContentText(getString(R.string.notif_pay_to_open_message))
+            .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__CHANNELS_WATCHER,
+              Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
+            .setAutoCancel(true)
+            .build())
+        }
       }
     }
   }
@@ -863,12 +873,12 @@ class EclairNodeService : Service() {
   /** Display a blocking notification and set the service as being foregrounded. */
   private fun notifyForegroundService(message: String) {
     log.debug("notifying foreground service with msg=$message")
-    updateNotification(message).also { startForeground(Constants.FCM_NOTIFICATION_ID, it) }
+    updateNotification(message).also { startForeground(Constants.NOTIF_ID__HEADLESS, it) }
   }
 
   private fun updateNotification(message: String): Notification =
     notificationBuilder.setContentText(message).build().run {
-      notificationManager.notify(Constants.FCM_NOTIFICATION_ID, this)
+      notificationManager.notify(Constants.NOTIF_ID__HEADLESS, this)
       this
     }
 
@@ -884,7 +894,7 @@ class EclairNodeService : Service() {
       this + amount
     }.let {
       val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
-      val message = applicationContext.resources.getQuantityString(R.plurals.notif_payment_received_message, it.size, it.size,
+      val message = applicationContext.resources.getQuantityString(R.plurals.notif_headless_payment_received_message, it.size, it.size,
         Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true))
       updateNotification(message)
       receivedInBackground.postValue(it)
