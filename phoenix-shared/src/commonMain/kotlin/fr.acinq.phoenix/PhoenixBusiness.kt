@@ -8,13 +8,9 @@ import fr.acinq.eklair.blockchain.electrum.*
 import fr.acinq.eklair.blockchain.fee.FeeEstimator
 import fr.acinq.eklair.blockchain.fee.FeeTargets
 import fr.acinq.eklair.blockchain.fee.OnChainFeeConf
-import fr.acinq.eklair.channel.NewBlock
 import fr.acinq.eklair.crypto.LocalKeyManager
-import fr.acinq.eklair.db.ChannelsDb
-import fr.acinq.eklair.db.Databases
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.io.TcpSocket
-import fr.acinq.eklair.io.WrappedChannelEvent
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
 import fr.acinq.phoenix.app.Daemon
@@ -24,11 +20,10 @@ import fr.acinq.phoenix.app.ctrl.AppScanController
 import fr.acinq.phoenix.ctrl.HomeController
 import fr.acinq.phoenix.ctrl.ReceiveController
 import fr.acinq.phoenix.ctrl.ScanController
+import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
 
@@ -37,7 +32,6 @@ import org.kodein.log.LoggerFactory
 class PhoenixBusiness {
 
     fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, seed: ByteVector32) : Peer {
-        // TODO: This is only valid on Salomon's computer!
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
         val PeerFeeEstimator = object : FeeEstimator {
@@ -103,11 +97,12 @@ class PhoenixBusiness {
     val di = DI {
         bind<LoggerFactory>() with instance(LoggerFactory.default)
         bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
+        bind<NetworkMonitor>() with singleton { NetworkMonitor() }
 
         constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
 
-        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()).apply { start() } }
-        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()).apply { start() } }
+        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()) }
+        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
 
         bind<HomeController>() with screenProvider { AppHomeController(di) }
