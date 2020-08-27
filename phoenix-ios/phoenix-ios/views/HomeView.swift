@@ -13,7 +13,7 @@ struct HomeView : MVIView {
             ZStack {
                 VStack() {
                     HStack {
-                        ConnectionStatus(status: model.connected, show: $showConnections)
+                        ConnectionStatus(status: model.connections.global, show: $showConnections)
                         Spacer()
                     }
                     .padding()
@@ -42,7 +42,7 @@ struct HomeView : MVIView {
 
                 if showConnections {
                     VStack {
-                        ConnectionPopup(show: $showConnections)
+                        ConnectionPopup(connections: model.connections, show: $showConnections)
                     }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Color.black.opacity(0.25))
@@ -119,6 +119,7 @@ struct ConnectionStatus : View {
 }
 
 struct ConnectionPopup : View {
+    let connections: Connections
 
     @Binding var show: Bool
 
@@ -128,33 +129,13 @@ struct ConnectionPopup : View {
                     .font(.title2)
                     .padding([.bottom])
 
-            HStack {
-                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appGreen)
-                Text("Internet:")
-                Spacer()
-                Text(EklairConnection.established.text())
-            }
-                    .padding()
-
             Divider()
-
-            HStack {
-                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
-                Text("Lightning peer:")
-                Spacer()
-                Text(EklairConnection.establishing.text())
-            }
-                    .padding()
-
+            ConnectionCell(label: "Internet", connection: connections.internet)
             Divider()
-
-            HStack {
-                Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10).foregroundColor(.appRed)
-                Text("Electrum server:")
-                Spacer()
-                Text(EklairConnection.closed.text())
-            }
-                    .padding()
+            ConnectionCell(label: "Lightning peer", connection: connections.peer)
+            Divider()
+            ConnectionCell(label: "Electrum server", connection: connections.electrum)
+            Divider()
 
             HStack {
                 Spacer()
@@ -171,6 +152,26 @@ struct ConnectionPopup : View {
                 .background(Color.white)
                 .cornerRadius(15)
                 .padding(32)
+    }
+}
+
+struct ConnectionCell : View {
+    let label: String
+    let connection: EklairConnection
+
+    var body : some View {
+        HStack {
+            let bullet = Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10)
+
+            if connection == .established { bullet.foregroundColor(.appGreen) }
+            else if connection == .establishing { bullet.foregroundColor(.appYellow) }
+            else if connection == .closed { bullet.foregroundColor(.appRed) }
+
+            Text("\(label):")
+            Spacer()
+            Text(connection.text())
+        }
+            .padding([.top, .bottom], 8)
     }
 }
 
@@ -266,7 +267,7 @@ struct BottomBar : View {
 
 class HomeView_Previews : PreviewProvider {
     static let mockModel = Home.Model(
-            connected: .establishing,
+            connections: Connections(internet: .established, peer: .established, electrum: .closed),
             balanceSat: 123500,
             history: [
                 mockSpendFailedTransaction,

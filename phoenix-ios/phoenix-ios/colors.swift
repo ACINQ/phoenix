@@ -14,5 +14,6 @@ extension Color {
     static let appHorizon = Color(hex: "91B4D1")
     static let appRed = Color(hex: "D14F4F")
     static let appGreen = Color(hex: "1AC486")
+    static let appYellow = Color(hex: "#febc2e")
 
 }
