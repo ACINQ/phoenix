@@ -67,3 +67,15 @@ extension Color {
         )
     }
 }
+
+
+extension Image {
+    init(vector: String) {
+        let uiImage = UIImage(named: vector)!
+        let size = CGSize(width: 500, height: 500)
+        let scaled = UIGraphicsImageRenderer(size: size).image { _ in
+            uiImage.draw(in: CGRect(origin: .zero, size: size))
+        }
+        self.init(uiImage: scaled)
+    }
+}
