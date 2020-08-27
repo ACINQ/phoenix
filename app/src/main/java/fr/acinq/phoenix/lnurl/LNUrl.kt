@@ -76,7 +76,7 @@ interface LNUrl {
         if (k1 == null) {
           throw LNUrlAuthMissingK1()
         } else {
-          LNUrlAuth(url.topPrivateDomain()!!, url.toString(), k1)
+          LNUrlAuth(url.host()!!, url.toString(), k1)
         }
       } else {
         // otherwise execute GET to url to retrieve details from remote server
@@ -130,7 +130,7 @@ interface LNUrl {
 }
 
 @Parcelize
-class LNUrlAuth(val topDomain: String, val authEndpoint: String, val k1: String) : LNUrl, Parcelable
+class LNUrlAuth(val host: String, val authEndpoint: String, val k1: String) : LNUrl, Parcelable
 
 @Parcelize
 class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,
