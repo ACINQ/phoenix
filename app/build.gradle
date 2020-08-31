@@ -129,6 +129,10 @@ dependencies {
     exclude group: 'com.google.guava', module: 'listenablefuture'
   }
 
+  // ANDROIDX - view pager 2
+  def view_pager_version = "1.1.0-alpha01"
+  implementation "androidx.viewpager2:viewpager2:$view_pager_version"
+
   // logging
   implementation 'org.slf4j:slf4j-api:1.7.29'
   implementation 'com.github.tony19:logback-android:2.0.0'

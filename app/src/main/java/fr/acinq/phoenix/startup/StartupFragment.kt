@@ -52,6 +52,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
+/**
+ * This fragment is the navigation entry point. It checks the state of the app and redirects to
+ * the main fragment when the kit is started. If not, it starts the kit using EclairNodeService.
+ */
 class StartupFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)

@@ -16,9 +16,7 @@
 
 package fr.acinq.phoenix.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Base64
 import androidx.preference.PreferenceManager
 import fr.acinq.eclair.CoinUnit
@@ -30,9 +28,8 @@ import fr.acinq.phoenix.R
 object Prefs {
 
   private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
-
   private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
-  private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
+  private const val PREFS_SHOW_FTUE: String = "PREFS_SHOW_FTUE"
 
   // -- unit, fiat, conversion...
   const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
@@ -80,12 +77,12 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
   }
 
-  fun isFirstTime(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)
+  fun showFTUE(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_FTUE, true)
   }
 
-  fun setHasStartedOnce(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
+  fun setShowFTUE(context: Context, show: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_FTUE, show).apply()
   }
 
   // -- ==================================
@@ -155,20 +152,12 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_EXCHANGE_RATE_TIMESTAMP, timestamp).apply()
   }
 
-  fun getShowAmountInFiat(prefs: SharedPreferences): Boolean {
-    return prefs.getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
-  }
-
   fun getShowAmountInFiat(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
   }
 
   fun setShowAmountInFiat(context: Context, amountInFiat: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, amountInFiat).apply()
-  }
-
-  fun getFiatCurrency(prefs: SharedPreferences): String {
-    return prefs.getString(PREFS_FIAT_CURRENCY, "USD") ?: "USD"
   }
 
   fun getFiatCurrency(context: Context): String {
@@ -236,10 +225,6 @@ object Prefs {
 
   fun isPinScrambled(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCRAMBLE_PIN, false)
-  }
-
-  fun savePinScrambled(context: Context, isScrambled: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
   }
 
   fun getFCMToken(context: Context): String? {

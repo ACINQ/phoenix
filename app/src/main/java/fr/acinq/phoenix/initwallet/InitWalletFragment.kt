@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletBinding
+import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 
 
@@ -38,6 +39,10 @@ class InitWalletFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
+    val showFTUE = context?.let { Prefs.showFTUE(it) && Prefs.getLastVersionUsed(it) == 0 } ?: false
+    if (showFTUE) {
+      findNavController().navigate(R.id.action_init_wallet_to_ftue)
+    }
     mBinding.createSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_auto_create) }
     mBinding.restoreSeed.setOnClickListener { findNavController().navigate(R.id.action_init_wallet_to_restore) }
     mBinding.settings.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_settings) }

@@ -205,6 +205,7 @@
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Proceed</string>
+  <string name="utils_next">Next</string>
   <string name="utils_cancel">Cancel</string>
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
@@ -564,7 +565,7 @@
 
   <string name="nodeservice_desc">Service containing the wallet\'s node.</string>
 
-  <!-- //////////////// fees settings //////////////// -->
+  <!-- //////////////// settings: options for payments //////////////// -->
 
   <string name="paymentsettings_title">Payment settings</string>
   <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
@@ -578,5 +579,25 @@
   <string name="paymentsettings_paytoopen_auto_desc">When someone sends you money, sometimes a new Lightning channel must be created for the payment to be received.\n\nA %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
   <string name="paymentsettings_paytoopen_dialog_description">The app will automatically accept to open a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the received amount to cover the channel\'s creation cost.</string>
+
+  <!-- ftue -->
+
+  <string name="ftue__skip_button">Skip</string>
+  <string name="ftue__next_button">Next</string>
+  <string name="ftue__finish_button">Finish</string>
+  <string name="ftue__welcome__emoji" translatable="false">👋</string>
+  <string name="ftue__welcome__header">👋 Welcome!</string>
+  <string name="ftue__welcome__body">With Phoenix you can easily receive and send bitcoins.</string>
+  <string name="ftue__pay_to_open__header">Fast &amp; easy</string>
+  <string name="ftue__pay_to_open__body">
+    Payment are fast thanks to Lightning payment channels.
+    \n\n
+    For ease of use, channels are automatically created when needed, with a small cost.
+    \n\n
+    You can also control this manually if you prefer.
+  </string>
+  <string name="ftue__backup_seed__header">Keep control</string>
+  <string name="ftue__backup_seed__body">Funds are stored locally in the phone, and nowhere else.\n\nA 12-words phrase allows you to recover your funds if needed.\n\nKeep it safe!</string>
+  <string name="ftue__backup_seed__button">Finish</string>
 
 </resources>

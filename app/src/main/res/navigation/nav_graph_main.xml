@@ -124,6 +124,11 @@
     android:name="fr.acinq.phoenix.initwallet.InitWalletFragment"
     android:label="InitSeedFragment">
     <action
+      android:id="@+id/action_init_wallet_to_ftue"
+      app:destination="@id/ftue_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left" />
+    <action
       android:id="@+id/action_init_wallet_to_restore"
       app:destination="@id/restore_seed_fragment"
       app:enterAnim="@anim/slide_in_right"
@@ -228,9 +233,9 @@
       app:nullable="true" />
     <action
       android:id="@+id/action_read_input_to_lnurl_auth"
+      app:destination="@id/lnurl_auth"
       app:launchSingleTop="true"
-      app:popUpTo="@+id/main_fragment"
-      app:destination="@id/lnurl_auth" />
+      app:popUpTo="@+id/main_fragment" />
     <action
       android:id="@+id/action_read_input_to_lnurl_pay"
       app:destination="@+id/lnurl_pay" />
@@ -451,5 +456,18 @@
     android:id="@+id/payment_settings_fragment"
     android:name="fr.acinq.phoenix.settings.PaymentSettingsFragment"
     android:label="PaymentSettingsFragment" />
+
+  <!-- first time user exp -->
+  <fragment
+    android:id="@+id/ftue_fragment"
+    android:name="fr.acinq.phoenix.initwallet.FtueFragment"
+    android:label="FtueFragment">
+    <action
+      android:id="@+id/action_ftue_to_initwallet"
+      app:destination="@id/init_wallet_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/init_wallet_fragment" />
+  </fragment>
 
 </navigation>
