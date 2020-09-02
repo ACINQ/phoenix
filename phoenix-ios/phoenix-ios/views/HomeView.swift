@@ -8,6 +8,17 @@ struct HomeView : MVIView {
 
     @State var showConnections = false
 
+    class SelectedTransaction : Identifiable {
+        let id: Int
+        let transaction: PhoenixShared.Transaction
+        init(id: Int, transaction: PhoenixShared.Transaction) {
+            self.id = id
+            self.transaction = transaction
+        }
+    }
+
+    @State var selectedTransaction: SelectedTransaction? = nil
+
     var body: some View {
         mvi { model, intent in
             ZStack {
@@ -29,12 +40,21 @@ struct HomeView : MVIView {
                     ScrollView {
                         LazyVStack {
                             ForEach(model.history.indices.reversed(), id: \.self) { index in
-                                NavigationLink(destination: Text("Coucou!")) {
+                                Button {
+                                    selectedTransaction = SelectedTransaction(id: index, transaction: model.history[index])
+                                } label: {
                                     TransactionCell(transaction: model.history[index])
                                 }
-//                                        .buttonStyle(PlainButtonStyle())
                             }
                         }
+                                .sheet(item: $selectedTransaction) {
+                                    selectedTransaction = nil
+                                } content: {
+                                    TransactionView(
+                                            transaction: $0.transaction,
+                                            close: { selectedTransaction = nil }
+                                    )
+                                }
                     }
 
                     BottomBar()
@@ -202,17 +222,24 @@ struct TransactionCell : View {
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(.appDark)
-                Text(transaction.completionTimestamp.formatDate())
+                Text(transaction.timestamp.formatDate())
                         .font(.caption)
                         .foregroundColor(.gray)
             }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding([.leading, .trailing], 8)
-            Text((transaction.amountSat >= 0 ? "+" : "") + transaction.amountSat.formatNumber())
-                    .foregroundColor(transaction.amountSat >= 0 ? .appGreen : .appRed)
+                    .padding([.leading, .trailing], 6)
+            if (transaction.status != .failure) {
+                HStack {
+                    Text((transaction.amountSat >= 0 ? "+" : "") + transaction.amountSat.formatNumber())
+                            .foregroundColor(transaction.amountSat >= 0 ? .appGreen : .appRed)
+                    + Text(" sat")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                }
+            }
         }
                 .padding([.top, .bottom], 14)
-                .padding([.leading, .trailing], 16)
+                .padding([.leading, .trailing], 12)
     }
 
 }

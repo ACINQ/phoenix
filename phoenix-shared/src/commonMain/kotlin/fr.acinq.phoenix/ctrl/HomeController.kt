@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.ctrl
 
 import fr.acinq.eklair.utils.Connection
-import fr.acinq.phoenix.app.Transaction
+import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.plus
 
 
@@ -14,7 +14,6 @@ object Home {
         val balanceSat: Long,
         val history: List<Transaction>
     ) : MVI.Model() {
-//        data class Channel(val cid: String, val local: Long, val remote: Long, val state: String)
     }
 
     val emptyModel = Model(Connections(), 0, emptyList())

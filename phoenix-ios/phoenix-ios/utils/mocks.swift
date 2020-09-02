@@ -7,49 +7,57 @@ import Foundation
 import PhoenixShared
 
 let mockPendingTransaction = Transaction(
+        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 0),
         amountSat: -1900,
         desc: "1 Scala Chip Frappuccino",
         status: Transaction.Status.pending,
-        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        paymentRequest: "lnwhatever...",
-        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
-        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
-        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
-        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
+        timestamp: 0
+//        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+//        paymentRequest: "lnwhatever...",
+//        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+//        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
+//        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
+//        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
 )
 
 let mockSpendTransaction = Transaction(
+        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 1),
         amountSat: -1500,
         desc: "1 Blockaccino",
         status: Transaction.Status.success,
-        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        paymentRequest: "lnwhatever...",
-        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
-        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
-        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
-        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
+        timestamp: 0
+//        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+//        paymentRequest: "lnwhatever...",
+//        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+//        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
+//        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
+//        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
 )
 
 let mockReceiveTransaction = Transaction(
+        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 2),
         amountSat: 125000,
         desc: "On-Chain payment to 8b44f33a8c86f1fe0c18935df9db961ff5a6edb4ee49d3cee666458745d676fd",
         status: Transaction.Status.success,
-        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        paymentRequest: "lnwhatever...",
-        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
-        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
-        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
-        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
+        timestamp: 0
+//        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+//        paymentRequest: "lnwhatever...",
+//        paymentPreimage: "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+//        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
+//        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
+//        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
 )
 
 let mockSpendFailedTransaction = Transaction(
+        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 3),
         amountSat: -1700,
         desc: "1 Espresso Coin Panna",
         status: Transaction.Status.failure,
-        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        paymentRequest: "lnwhatever...",
-        paymentPreimage: "",
-        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
-        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
-        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
+        timestamp: 0
+//        paymentHash: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+//        paymentRequest: "lnwhatever...",
+//        paymentPreimage: "",
+//        creationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 10),
+//        expirationTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 5),
+//        completionTimestamp: Int64(NSDate().timeIntervalSince1970 - 60 * 8)
 )

@@ -9,17 +9,25 @@ import fr.acinq.eklair.blockchain.fee.FeeEstimator
 import fr.acinq.eklair.blockchain.fee.FeeTargets
 import fr.acinq.eklair.blockchain.fee.OnChainFeeConf
 import fr.acinq.eklair.crypto.LocalKeyManager
+import fr.acinq.eklair.db.ChannelsDb
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
-import fr.acinq.phoenix.app.Daemon
+import fr.acinq.phoenix.app.AppChannelsDB
+import fr.acinq.phoenix.app.AppConnectionsDaemon
+import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.app.ctrl.*
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.utils.NetworkMonitor
+import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import org.kodein.db.DB
+import org.kodein.db.DBFactory
+import org.kodein.db.impl.factory
+import org.kodein.db.inDir
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
 
@@ -27,7 +35,7 @@ import org.kodein.log.LoggerFactory
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness {
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, seed: ByteVector32) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteVector32) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
         val PeerFeeEstimator = object : FeeEstimator {
@@ -85,7 +93,7 @@ class PhoenixBusiness {
             enableTrampolinePayment = true
         )
 
-        val peer = Peer(socketBuilder, params, remoteNodePubKey, watcher, MainScope())
+        val peer = Peer(socketBuilder, params, remoteNodePubKey, watcher, channelsDB, MainScope())
 
         return peer
     }
@@ -95,11 +103,17 @@ class PhoenixBusiness {
         bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
         bind<NetworkMonitor>() with singleton { NetworkMonitor() }
 
+        bind<DBFactory<DB>>() with singleton { DB.factory.inDir(getApplicationFilesDirectoryPath(di)) }
+
+        bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
+//        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
+
         constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
 
-        bind<ElectrumClient>() with eagerSingleton { ElectrumClient("localhost", 51001, null, MainScope()) }
-        bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()) }
-        bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
+        bind<ElectrumClient>() with singleton { ElectrumClient("localhost", 51001, null, MainScope()) }
+        bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
+        bind<Peer>() with singleton { buildPeer(instance(), instance(), instance(), instance(tag = "seed")) }
+        bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
 
         bind<ContentController>() with screenProvider { AppContentController(di) }
         bind<InitController>() with screenProvider { AppInitController(di) }
@@ -108,7 +122,7 @@ class PhoenixBusiness {
         bind<ScanController>() with screenProvider { AppScanController(di) }
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
 
-        bind() from eagerSingleton { Daemon(di) }
+        bind() from eagerSingleton { AppConnectionsDaemon(di) }
         bind() from eagerSingleton { FakeDataStore(MainScope()) }
     }
 }

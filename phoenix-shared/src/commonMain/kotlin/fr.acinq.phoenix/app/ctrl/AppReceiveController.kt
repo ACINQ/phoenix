@@ -30,12 +30,12 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
                 when (it) {
                     is PaymentRequestGenerated -> {
                         if (it.receivePayment.paymentPreimage == preimage) {
-                            model(Receive.Model.Generated(it.request))
+                            model { Receive.Model.Generated(it.request) }
                         }
                     }
                     is PaymentReceived -> {
                         if (it.receivePayment.paymentPreimage == preimage) {
-                            model(Receive.Model.Received(it.receivePayment.amount.toLong()))
+                            model { Receive.Model.Received(it.receivePayment.amount.toLong()) }
                         }
                     }
                     else -> {}
@@ -47,10 +47,12 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
     override fun process(intent: Receive.Intent) {
         when (intent) {
             is Receive.Intent.Ask -> {
-                require(lastModel == Receive.Model.Awaiting)
-                model(Receive.Model.Generating)
                 launch {
-                    peer.send(ReceivePayment(preimage, intent.amountMsat.msat, CltvExpiry(100)))
+                    model {
+                        require(this == Receive.Model.Awaiting)
+                        Receive.Model.Generating
+                    }
+                    peer.send(ReceivePayment(preimage, intent.amountMsat.msat, CltvExpiry(100), "Phoenix payment"))
                 }
             }
         }

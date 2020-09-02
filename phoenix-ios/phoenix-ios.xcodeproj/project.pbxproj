@@ -18,6 +18,7 @@
 		53BEFB54A0625F9FF4177FC8 /* DI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF9AEB876A2611C6FC8F5 /* DI.swift */; };
 		53BEFD54160278C5E393E319 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFE171C182513A5762686 /* HomeView.swift */; };
 		53BEFF4EDB40975C2123C63D /* ui.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFB3CB63090BBCFF6A36 /* ui.swift */; };
+		53BEFFEBEA9EBE7B27B53AF4 /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF4DAE061532668494988 /* TransactionView.swift */; };
 		7555FF7F242A565900829871 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF7E242A565900829871 /* AppDelegate.swift */; };
 		7555FF81242A565900829871 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF80242A565900829871 /* SceneDelegate.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
@@ -64,6 +65,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		53BEF4DAE061532668494988 /* TransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		53BEF637BD83D356A4A9C74F /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
 		53BEF6CBB2587136D25A625A /* lang.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = lang.swift; sourceTree = "<group>"; };
 		53BEF6E3FE2787846F3F38F1 /* MVIContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIContext.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				53BEF0E7A62D4973FCC99476 /* widgets */,
 				C8D7A209301A31C14A982ECD /* InitView.swift */,
 				C8D7A44147508AA19378B739 /* RestoreWalletView.swift */,
+				53BEF4DAE061532668494988 /* TransactionView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -378,7 +381,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PskipAndroid=true\n";
+			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PskipAndroid=true\n./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PskipAndroid=true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -403,6 +406,7 @@
 				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
 				C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */,
+				53BEFFEBEA9EBE7B27B53AF4 /* TransactionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
