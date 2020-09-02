@@ -14,12 +14,8 @@ import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
 import fr.acinq.phoenix.app.Daemon
-import fr.acinq.phoenix.app.ctrl.AppHomeController
-import fr.acinq.phoenix.app.ctrl.AppReceiveController
-import fr.acinq.phoenix.app.ctrl.AppScanController
-import fr.acinq.phoenix.ctrl.HomeController
-import fr.acinq.phoenix.ctrl.ReceiveController
-import fr.acinq.phoenix.ctrl.ScanController
+import fr.acinq.phoenix.app.ctrl.*
+import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -105,10 +101,14 @@ class PhoenixBusiness {
         bind<ElectrumWatcher>() with eagerSingleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with eagerSingleton { buildPeer(instance(), instance(), instance(tag = "seed")) }
 
+        bind<ContentController>() with screenProvider { AppContentController(di) }
+        bind<InitController>() with screenProvider { AppInitController(di) }
         bind<HomeController>() with screenProvider { AppHomeController(di) }
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
         bind<ScanController>() with screenProvider { AppScanController(di) }
+        bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
 
         bind() from eagerSingleton { Daemon(di) }
+        bind() from eagerSingleton { FakeDataStore(MainScope()) }
     }
 }
