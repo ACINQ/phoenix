@@ -161,7 +161,7 @@ struct ConnectionCell : View {
 
     var body : some View {
         HStack {
-            let bullet = Image("ic_bullet").renderingMode(.template).resizable().frame(width: 10, height: 10)
+            let bullet = Image("ic_bullet").resizable().frame(width: 10, height: 10)
 
             if connection == .established { bullet.foregroundColor(.appGreen) }
             else if connection == .establishing { bullet.foregroundColor(.appYellow) }

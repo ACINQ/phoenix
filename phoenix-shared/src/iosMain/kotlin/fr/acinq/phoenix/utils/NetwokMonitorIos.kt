@@ -19,7 +19,6 @@ actual class NetworkMonitor : CoroutineScope by MainScope() {
 
     @OptIn(ExperimentalUnsignedTypes::class)
     actual fun start(): Unit {
-        println("START INTERNET MONITOR")
         nw_path_monitor_set_update_handler(monitor) { path ->
             val status =
                 if (nw_path_get_status(path) == nw_path_status_satisfied) Connection.ESTABLISHED
