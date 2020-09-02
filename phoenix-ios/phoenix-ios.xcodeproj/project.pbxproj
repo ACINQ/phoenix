@@ -26,6 +26,8 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* phoenix-iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* phoenix-iosTests.swift */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
+		C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A44147508AA19378B739 /* RestoreWalletView.swift */; };
+		C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitView.swift */; };
 		F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; };
 		F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -87,6 +89,8 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C8D7A209301A31C14A982ECD /* InitView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitView.swift; sourceTree = "<group>"; };
+		C8D7A44147508AA19378B739 /* RestoreWalletView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestoreWalletView.swift; sourceTree = "<group>"; };
 		F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhoenixShared.framework; path = "../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -141,6 +145,8 @@
 				53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */,
 				53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */,
 				53BEF0E7A62D4973FCC99476 /* widgets */,
+				C8D7A209301A31C14A982ECD /* InitView.swift */,
+				C8D7A44147508AA19378B739 /* RestoreWalletView.swift */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -395,6 +401,8 @@
 				53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */,
 				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
+				C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */,
+				C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +569,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
+				DEVELOPMENT_TEAM = 8U7RQ73AR9;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../phoenix-shared/build/xcode-frameworks";
 				INFOPLIST_FILE = "phoenix-ios/Info.plist";
@@ -582,6 +591,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"phoenix-ios/Preview Content\"";
+				DEVELOPMENT_TEAM = 8U7RQ73AR9;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../phoenix-shared/build/xcode-frameworks";
 				INFOPLIST_FILE = "phoenix-ios/Info.plist";
