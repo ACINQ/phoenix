@@ -15,9 +15,9 @@ class AppContentController(di: DI) : AppController<Content.Model, Content.Intent
 
     init {
         launch {
-        // TODO monitor database
+            // TODO monitor database
             ds.openTriggerSubscription().consumeEach {
-                model(Content.Model.IsInitialized)
+                model { Content.Model.IsInitialized }
             }
         }
     }

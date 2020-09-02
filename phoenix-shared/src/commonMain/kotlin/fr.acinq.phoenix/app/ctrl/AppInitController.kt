@@ -6,6 +6,7 @@ import fr.acinq.eklair.utils.toByteVector32
 import fr.acinq.phoenix.FakeDataStore
 import fr.acinq.phoenix.ctrl.Init
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 import kotlin.random.Random
@@ -18,7 +19,7 @@ class AppInitController(di: DI) : AppController<Init.Model, Init.Intent>(di, Ini
 
     override fun process(intent: Init.Intent) = when (intent) {
         Init.Intent.CreateWallet -> {
-            model(Init.Model.Creating)
+            launch { model { Init.Model.Creating } }
             val words = MnemonicCode.toMnemonics(Random.secure().nextBytes(16))
             ds.seed = MnemonicCode.toSeed(words, "").toByteVector32()
         }
