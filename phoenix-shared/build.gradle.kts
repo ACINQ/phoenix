@@ -97,7 +97,7 @@ kotlin {
 
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
+    val mode = System.getenv("XCODE_CONFIGURATION") ?: "DEBUG"
     val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>("ios").binaries.getFramework(mode)
     inputs.property("mode", mode)
     dependsOn(framework.linkTask)
