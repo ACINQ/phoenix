@@ -5,9 +5,12 @@ import PhoenixShared
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let mocks = MockDIBuilder().apply {
+        $0.contentModel = ContentView_Previews.mockModel
+        $0.initModel = InitView_Previews.mockModel
         $0.homeModel = HomeView_Previews.mockModel
         $0.receiveModel = ReceiveView_Previews.mockModel
         $0.scanModel = ScanView_Previews.mockModel
+        $0.restoreWalletModel = RestoreWalletView_Previews.mockModel
     }
 
     let di: DI

@@ -7,7 +7,10 @@ class ObservableDI: ObservableObject {
     init(_ di: DI) { self.di = di }
 }
 
-struct ContentView: View {
+struct ContentView: MVIView {
+    typealias Model = Content.Model
+    typealias Intent = Content.Intent
+
     static func UIKitAppearance() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -18,10 +21,16 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationView {
-            HomeView()
+        mvi { model, intent in
+            NavigationView {
+                if model is Content.ModelIsInitialized {
+                    HomeView()
+                } else {
+                    InitView()
+                }
+            }
         }
-                .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
+                    .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
     }
 }
 
@@ -32,4 +41,19 @@ func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) 
                             DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())
                     )
             )
+}
+
+class ContentView_Previews: PreviewProvider {
+    static let mockModel = Content.ModelNeedInitialization()
+
+    static var previews: some View {
+        mockView(ContentView()) { $0.contentModel = mockModel }
+                .previewDevice("iPhone 11")
+    }
+
+    #if DEBUG
+    @objc class func injected() {
+        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
+    }
+    #endif
 }

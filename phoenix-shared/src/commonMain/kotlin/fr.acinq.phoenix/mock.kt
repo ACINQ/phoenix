@@ -7,7 +7,7 @@ import org.kodein.di.bind
 
 
 class MockDIBuilder {
-    var rootModel: Content.Model = Content.Model.NeedInitialization
+    var contentModel: Content.Model = Content.Model.NeedInitialization
     var initModel: Init.Model = Init.Model.Initialization
     var homeModel: Home.Model = Home.emptyModel
     var receiveModel: Receive.Model = Receive.Model.Generating
@@ -20,7 +20,7 @@ class MockDIBuilder {
     }
 
     fun di() = DI {
-        bind<ContentController>() with screenProvider { Content.MockController(rootModel) }
+        bind<ContentController>() with screenProvider { Content.MockController(contentModel) }
         bind<InitController>() with screenProvider { Init.MockController(initModel) }
         bind<HomeController>() with screenProvider { Home.MockController(homeModel) }
         bind<ReceiveController>() with screenProvider { Receive.MockController(receiveModel) }
