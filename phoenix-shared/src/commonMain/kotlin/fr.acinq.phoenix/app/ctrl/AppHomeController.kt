@@ -3,6 +3,7 @@ package fr.acinq.phoenix.app.ctrl
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.channel.HasCommitments
 import fr.acinq.eklair.io.Peer
+import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,44 +18,40 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
     private val peer: Peer by instance()
     private val electrumClient: ElectrumClient by instance()
     private val networkMonitor: NetworkMonitor by instance()
+    private val historyManager: AppHistoryManager by instance()
 
     init {
         launch {
             peer.openConnectedSubscription().consumeEach {
-                model(lastModel.copy(connections = lastModel.connections.copy(peer = it)))
+                model { copy(connections = connections.copy(peer = it)) }
             }
         }
         launch {
             electrumClient.openConnectedSubscription().consumeEach {
-                model(lastModel.copy(connections = lastModel.connections.copy(electrum = it)))
+                model { copy(connections = connections.copy(electrum = it)) }
             }
         }
         launch {
             networkMonitor.openNetworkStateSubscription().consumeEach {
-                model(lastModel.copy(connections = lastModel.connections.copy(internet = it)))
+                model { copy(connections = connections.copy(internet = it)) }
             }
         }
 
         launch {
             peer.openChannelsSubscription().consumeEach { channels ->
-                model(
-                    lastModel.copy(
-//                        channels = channels
-//                            .mapNotNull { (id, state) ->
-//                            (state as? HasCommitments)?.let {
-//                                Home.Model.Channel(
-//                                    cid = id.toHex(),
-//                                    local = it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong(),
-//                                    remote = it.commitments.localCommit.spec.toRemote.truncateToSatoshi().toLong(),
-//                                    state = it::class.simpleName ?: "[Unknown]"
-//                                )
-//                            }
-//                        }
+                model {
+                    copy(
                         balanceSat = channels.values
                             .filterIsInstance<HasCommitments>()
                             .sumOf { it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong() }
                     )
-                )
+                }
+            }
+        }
+
+        launch {
+            historyManager.openTransactionsSubscriptions().consumeEach {
+                model { copy(history = it) }
             }
         }
     }

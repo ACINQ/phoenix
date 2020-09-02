@@ -7,9 +7,6 @@ import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.direct
@@ -22,13 +19,13 @@ import kotlin.time.seconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class Daemon(override val di: DI) : DIAware {
+class AppConnectionsDaemon(override val di: DI) : DIAware {
 
     private val monitor: NetworkMonitor by instance()
     private val peer: Peer by instance()
     private val electrumClient: ElectrumClient by instance()
 
-    private val logger = direct.instance<LoggerFactory>().newLogger(Daemon::class)
+    private val logger = direct.instance<LoggerFactory>().newLogger(AppConnectionsDaemon::class)
 
     init {
         MainScope().launch { networkStateMonitoring() }

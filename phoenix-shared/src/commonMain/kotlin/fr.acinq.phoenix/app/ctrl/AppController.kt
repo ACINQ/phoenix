@@ -3,6 +3,7 @@ package fr.acinq.phoenix.app.ctrl
 import fr.acinq.phoenix.ctrl.MVI
 import fr.acinq.phoenix.utils.newLogger
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 import org.kodein.di.DI
@@ -20,10 +21,18 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI,
 
     private val models = ConflatedBroadcastChannel(firstModel)
 
-    protected val lastModel get() = models.value
+    private val modelChanges = Channel<M.() -> M>()
 
     init {
         logger.info { "${this::class.simpleName} First Model: $firstModel" }
+
+        launch {
+            modelChanges.consumeEach { change ->
+                val newModel = models.value.change()
+                logger.info { "${this::class.simpleName} Model: $newModel" }
+                models.send(newModel)
+            }
+        }
     }
 
     final override fun subscribe(onModel: (M) -> Unit): () -> Unit {
@@ -34,9 +43,8 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI,
         return ({ subscription.cancel() })
     }
 
-    protected fun model(model: M) {
-        logger.info { "${this::class.simpleName} Model: $model" }
-        launch { models.send(model) }
+    protected suspend fun model(change: M.() -> M) {
+        modelChanges.send(change)
     }
 
     protected abstract fun process(intent: I)

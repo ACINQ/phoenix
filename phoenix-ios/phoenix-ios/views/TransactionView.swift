@@ -40,7 +40,7 @@ struct TransactionView : View {
                     HStack {
                         Text(transaction.amountSat < 0 ? "SENT" : "RECEIVED")
                                 .font(Font.title2.bold())
-                        Text(transaction.completionTimestamp.formatDate().uppercased())
+                        Text(transaction.timestamp.formatDate().uppercased())
                                 .font(Font.title2)
                     }
                             .padding()

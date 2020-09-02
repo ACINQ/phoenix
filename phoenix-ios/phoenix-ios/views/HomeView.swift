@@ -222,7 +222,7 @@ struct TransactionCell : View {
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .foregroundColor(.appDark)
-                Text(transaction.completionTimestamp.formatDate())
+                Text(transaction.timestamp.formatDate())
                         .font(.caption)
                         .foregroundColor(.gray)
             }

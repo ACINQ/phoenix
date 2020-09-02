@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eklair.channel.NewBlock
-import fr.acinq.eklair.io.*
+import fr.acinq.eklair.io.PaymentSent
+import fr.acinq.eklair.io.Peer
+import fr.acinq.eklair.io.SendPayment
 import fr.acinq.eklair.payment.PaymentRequest
 import fr.acinq.eklair.utils.UUID
 import fr.acinq.phoenix.ctrl.Scan
@@ -22,7 +22,7 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
             is Scan.Intent.Parse -> {
                 launch {
                     val paymentRequest = PaymentRequest.read(intent.request)
-                    model(Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description))
+                    model { Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description) }
                 }
             }
             is Scan.Intent.Send -> {
@@ -34,10 +34,10 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
                         val sent = peer.openListenerEventSubscription().consumeAsFlow()
                             .filterIsInstance<PaymentSent>()
                             .first { it.id == uuid }
-                        model(Scan.Model.Fulfilled(sent.recipientAmount.toLong(), paymentRequest.description))
+                        model { Scan.Model.Fulfilled(sent.paymentRequest.amount!!.toLong(), paymentRequest.description) }
                     }
 
-                    model(Scan.Model.Sending(paymentRequest.amount?.toLong() ?: intent.amountMsat, paymentRequest.description))
+                    model { Scan.Model.Sending(paymentRequest.amount?.toLong() ?: intent.amountMsat, paymentRequest.description) }
                     peer.send(SendPayment(uuid, paymentRequest))
                 }
             }
