@@ -9,7 +9,7 @@ protocol MVIView : View {
 }
 
 extension MVIView {
-    func mvi<Content: View>(@ViewBuilder content: @escaping (Model, @escaping IntentReceiver) -> Content) -> MVIContext<Model, Intent, Content> {
-        MVIContext(Model.self, Intent.self, content: content)
+    func mvi<Content: View>(background: Bool = false, onModel: ((Model) -> Void)? = nil, @ViewBuilder content: @escaping (Model, @escaping IntentReceiver) -> Content) -> MVIContext<Model, Intent, Content> {
+        MVIContext(Model.self, Intent.self, background: background, onModel: onModel, content: content)
     }
 }

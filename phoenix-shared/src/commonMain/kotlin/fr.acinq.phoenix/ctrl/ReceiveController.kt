@@ -9,7 +9,6 @@ object Receive {
         object Awaiting : Model()
         object Generating: Model()
         data class Generated(val request: String): Model()
-        data class Received(val amountMsat: Long): Model()
     }
 
     sealed class Intent : MVI.Intent() {

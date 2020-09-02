@@ -7,7 +7,7 @@ import Foundation
 import PhoenixShared
 
 let mockPendingTransaction = Transaction(
-        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 0),
+        id: "0",
         amountSat: -1900,
         desc: "1 Scala Chip Frappuccino",
         status: Transaction.Status.pending,
@@ -21,7 +21,7 @@ let mockPendingTransaction = Transaction(
 )
 
 let mockSpendTransaction = Transaction(
-        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 1),
+        id: "1",
         amountSat: -1500,
         desc: "1 Blockaccino",
         status: Transaction.Status.success,
@@ -35,7 +35,7 @@ let mockSpendTransaction = Transaction(
 )
 
 let mockReceiveTransaction = Transaction(
-        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 2),
+        id: "2",
         amountSat: 125000,
         desc: "On-Chain payment to 8b44f33a8c86f1fe0c18935df9db961ff5a6edb4ee49d3cee666458745d676fd",
         status: Transaction.Status.success,
@@ -49,7 +49,7 @@ let mockReceiveTransaction = Transaction(
 )
 
 let mockSpendFailedTransaction = Transaction(
-        id: EklairUUID(mostSignificantBits: 0, leastSignificantBits: 3),
+        id: "3",
         amountSat: -1700,
         desc: "1 Espresso Coin Panna",
         status: Transaction.Status.failure,

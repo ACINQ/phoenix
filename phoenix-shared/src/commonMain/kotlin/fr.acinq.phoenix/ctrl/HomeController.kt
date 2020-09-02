@@ -12,11 +12,12 @@ object Home {
     data class Model(
         val connections: Connections,
         val balanceSat: Long,
-        val history: List<Transaction>
+        val history: List<Transaction>,
+        val lastTransaction: Transaction?
     ) : MVI.Model() {
     }
 
-    val emptyModel = Model(Connections(), 0, emptyList())
+    val emptyModel = Model(Connections(), 0, emptyList(), null)
 
     sealed class Intent : MVI.Intent() {
         object Connect : Intent()

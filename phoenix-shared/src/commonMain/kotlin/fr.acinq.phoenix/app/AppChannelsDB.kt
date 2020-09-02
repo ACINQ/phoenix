@@ -33,7 +33,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
 
     @Serializable
     data class Channel(val channel: HasCommitments) : Metadata {
-        override val id: Any get() = listOf(channel.channelId.toHex())
+        override val id: Any get() = channel.channelId.toHex()
     }
 
     @Serializable

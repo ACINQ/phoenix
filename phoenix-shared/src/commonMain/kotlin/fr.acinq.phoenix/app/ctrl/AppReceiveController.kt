@@ -33,11 +33,6 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
                             model { Receive.Model.Generated(it.request) }
                         }
                     }
-                    is PaymentReceived -> {
-                        if (it.receivePayment.paymentPreimage == preimage) {
-                            model { Receive.Model.Received(it.receivePayment.amount.toLong()) }
-                        }
-                    }
                     else -> {}
                 }
             }

@@ -80,8 +80,6 @@ struct ReceiveView: MVIView {
                             .padding()
                 })
             }
-        case let m as Receive.ModelReceived:
-            return AnyView(Text("Received \(m.amountMsat / 1000) Satoshis!"))
         default:
             fatalError("Unknown model \(model)")
         }
