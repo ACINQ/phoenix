@@ -2,20 +2,17 @@ package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eklair.utils.toByteVector32
-import fr.acinq.phoenix.FakeDataStore
+import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.ctrl.RestoreWallet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
-import org.kodein.log.Logger
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppRestoreWalletController(di: DI) : AppController<RestoreWallet.Model, RestoreWallet.Intent>(di, RestoreWallet.Model.Warning) {
-    // TODO to be replaced by a real DB
-    private val ds : FakeDataStore by instance()
+
+    private val walletManager: WalletManager by instance()
 
     override fun process(intent: RestoreWallet.Intent) {
         when (intent) {
@@ -24,7 +21,7 @@ class AppRestoreWalletController(di: DI) : AppController<RestoreWallet.Model, Re
                 try {
                     MnemonicCode.validate(intent.mnemonics)
                     val seed = MnemonicCode.toSeed(intent.mnemonics, "")
-                    ds.seed = seed.toByteVector32()
+                    walletManager.createWallet(seed)
                 } catch (e: IllegalArgumentException) {
                     launch { model { RestoreWallet.Model.InvalidSeed } }
                 }

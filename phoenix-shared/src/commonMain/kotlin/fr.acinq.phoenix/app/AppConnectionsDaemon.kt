@@ -3,7 +3,6 @@ package fr.acinq.phoenix.app
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.utils.Connection
-import fr.acinq.phoenix.FakeDataStore
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -23,7 +22,7 @@ import kotlin.time.seconds
 class AppConnectionsDaemon(override val di: DI) : DIAware {
 
     // TODO to be replaced by a real DB
-    private val dataStore: FakeDataStore by instance()
+    private val walletManager: WalletManager by instance()
 
     private val monitor: NetworkMonitor by instance()
     private val peer: Peer by instance()
@@ -33,8 +32,8 @@ class AppConnectionsDaemon(override val di: DI) : DIAware {
 
     init {
         MainScope().launch {
-            dataStore.openTriggerSubscription().consumeEach {
-                if (it) networkStateMonitoring()
+            walletManager.openWalletUpdatesSubscription().consumeEach {
+                networkStateMonitoring()
             }
         }
     }
@@ -51,7 +50,8 @@ class AppConnectionsDaemon(override val di: DI) : DIAware {
 
             if (it != Connection.CLOSED) {
                 connectionDaemonJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
-                        peer.connect("localhost", 48001)
+                        val host: String by instance(tag = "host")
+                        peer.connect(host, 48001)
                     }
                 connectionElectrumJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
                         electrumClient.connect()

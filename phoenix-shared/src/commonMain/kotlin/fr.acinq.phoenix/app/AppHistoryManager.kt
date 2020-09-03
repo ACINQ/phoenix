@@ -4,6 +4,7 @@ import fr.acinq.eklair.io.*
 import fr.acinq.eklair.utils.UUID
 import fr.acinq.eklair.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Transaction
+import fr.acinq.phoenix.utils.TAG_APPLICATION
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -20,10 +21,8 @@ import org.kodein.di.instance
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainScope() {
 
-    private val dbFactory: DBFactory<DB> by instance()
+    private val db: DB by instance(tag = TAG_APPLICATION)
     private val peer: Peer by instance()
-
-    private val db = dbFactory.open("transactions", KotlinxSerializer())
 
     private val transactions = ConflatedBroadcastChannel<List<Transaction>>(db.find<Transaction>().all().useModels().toList())
 

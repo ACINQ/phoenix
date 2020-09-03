@@ -16,3 +16,6 @@ import org.kodein.log.newLogger
 expect inline fun <reified T: Any> DI.Builder.screenProvider(noinline creator: NoArgBindingDI<Any>.() -> T): NoArgDIBinding<*, T>
 
 fun DIAware.newLogger(): Logger = this.newLogger(direct.instance())
+
+// Tags
+const val TAG_APPLICATION = "application"

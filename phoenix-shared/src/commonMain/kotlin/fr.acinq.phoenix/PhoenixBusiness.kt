@@ -1,10 +1,12 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.crypto.Sha256
 import fr.acinq.eklair.*
-import fr.acinq.eklair.blockchain.electrum.*
+import fr.acinq.eklair.blockchain.electrum.ElectrumClient
+import fr.acinq.eklair.blockchain.electrum.ElectrumWatcher
 import fr.acinq.eklair.blockchain.fee.FeeEstimator
 import fr.acinq.eklair.blockchain.fee.FeeTargets
 import fr.acinq.eklair.blockchain.fee.OnChainFeeConf
@@ -14,12 +16,15 @@ import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
+import fr.acinq.eklair.utils.toByteVector32
 import fr.acinq.phoenix.app.AppChannelsDB
 import fr.acinq.phoenix.app.AppConnectionsDaemon
 import fr.acinq.phoenix.app.AppHistoryManager
+import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.app.ctrl.*
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.utils.NetworkMonitor
+import fr.acinq.phoenix.utils.TAG_APPLICATION
 import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,8 +37,10 @@ import org.kodein.db.DB
 import org.kodein.db.DBFactory
 import org.kodein.db.impl.factory
 import org.kodein.db.inDir
+import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
+import org.kodein.memory.text.toHexString
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
@@ -51,10 +58,11 @@ class PhoenixBusiness {
         }
     }
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteVector32) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteArray) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
-        val keyManager = LocalKeyManager(seed, Block.RegtestGenesisBlock.hash)
+        val keyManager = LocalKeyManager(seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
+        println("nodeId:${keyManager.nodeId}") // TODO remove this!
 
         val params = NodeParams(
             keyManager = keyManager,
@@ -115,16 +123,28 @@ class PhoenixBusiness {
         bind<NetworkMonitor>() with singleton { NetworkMonitor() }
 
         bind<DBFactory<DB>>() with singleton { DB.factory.inDir(getApplicationFilesDirectoryPath(di)) }
+        bind<DB>(tag = TAG_APPLICATION) with singleton {
+            instance<DBFactory<DB>>().open("application", KotlinxSerializer())
+        }
 
         bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
 //        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
 
-        constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
+//        constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
+//        constant(tag = "host") with "192.168.86.24"
+        constant(tag = "host") with "localhost"
 
-        bind<ElectrumClient>() with singleton { ElectrumClient("localhost", 51001, null, MainScope()) }
+        bind<ElectrumClient>() with singleton { ElectrumClient(instance(tag = "host"), 51001, null, MainScope()) }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
-        bind<Peer>() with singleton { buildPeer(instance(), instance(), instance(), instance(tag = "seed")) }
+//        bind<Peer>() with singleton { buildPeer(instance(), instance(), instance(), instance(tag = "seed")) }
+        bind<Peer>() with singleton {
+            instance<WalletManager>().getWallet()?.let {
+                println("Seed: ${it.seed}")
+                buildPeer(instance(), instance(), instance(), it.seed)
+            } ?: error("Wallet must be initialized.")
+        }
         bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
+        bind<WalletManager>() with singleton { WalletManager(di) }
 
         bind<ContentController>() with screenProvider { AppContentController(di) }
         bind<InitController>() with screenProvider { AppInitController(di) }
@@ -134,6 +154,5 @@ class PhoenixBusiness {
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
 
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
-        bind() from eagerSingleton { FakeDataStore(MainScope()) }
     }
 }
