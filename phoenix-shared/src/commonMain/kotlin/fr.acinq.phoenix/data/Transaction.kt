@@ -9,7 +9,7 @@ import org.kodein.db.model.orm.Metadata
 
 @Serializable
 data class Transaction(
-    override val id: UUID,
+    override val id: String,
     val amountSat: Long,
     val desc: String, // Swift does not support fields named description
     val status: Status,

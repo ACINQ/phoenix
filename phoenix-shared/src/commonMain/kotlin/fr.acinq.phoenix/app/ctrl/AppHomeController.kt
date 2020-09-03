@@ -5,6 +5,7 @@ import fr.acinq.eklair.channel.HasCommitments
 import fr.acinq.eklair.io.Peer
 import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
+import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
@@ -50,8 +51,17 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
         }
 
         launch {
+            var first = true
             historyManager.openTransactionsSubscriptions().consumeEach {
-                model { copy(history = it) }
+                model {
+                    val last = it.lastOrNull()
+                    if (!first && last != null && last.status != Transaction.Status.Pending) {
+                        copy(history = it, lastTransaction = last)
+                    } else {
+                        copy(history = it)
+                    }
+                }
+                first = false
             }
         }
     }

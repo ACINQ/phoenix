@@ -2,22 +2,38 @@ package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eklair.CltvExpiry
+import fr.acinq.eklair.blockchain.fee.ConstantFeeEstimator
 import fr.acinq.eklair.channel.HasCommitments
+import fr.acinq.eklair.crypto.KeyManager
 import fr.acinq.eklair.db.ChannelsDb
 import fr.acinq.eklair.io.ByteVector32KSerializer
+import fr.acinq.eklair.io.eklairSerializersModule
 import fr.acinq.eklair.utils.UUID
+import fr.acinq.eklair.wire.Tlv
+import fr.acinq.eklair.wire.UpdateMessage
+import fr.acinq.phoenix.PhoenixBusiness
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 import org.kodein.db.*
+import org.kodein.db.model.orm.DefaultSerializer
 import org.kodein.db.model.orm.Metadata
+import org.kodein.db.model.orm.Serializer
+import org.kodein.db.orm.kotlinx.KotlinxSerializer
 
 
 class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
 
-    val db = dbFactory.open("channels")
+    val db = dbFactory.open(
+        "channels",
+        KotlinxSerializer(SerializersModule {
+            include(eklairSerializersModule)
+            include(PhoenixBusiness.PeerFeeEstimator.serializersModule)
+        })
+    )
 
     @Serializable
     data class Channel(val channel: HasCommitments) : Metadata {
-        override val id: Any get() = listOf(channel.channelId.toHex())
+        override val id: Any get() = channel.channelId.toHex()
     }
 
     @Serializable

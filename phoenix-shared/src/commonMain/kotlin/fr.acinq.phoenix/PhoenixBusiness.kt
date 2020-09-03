@@ -24,6 +24,10 @@ import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
 import fr.acinq.phoenix.utils.screenProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import org.kodein.db.DB
 import org.kodein.db.DBFactory
 import org.kodein.db.impl.factory
@@ -35,13 +39,20 @@ import org.kodein.log.LoggerFactory
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness {
 
+    @Serializable
+    object PeerFeeEstimator : FeeEstimator {
+        override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
+        override fun getFeeratePerKw(target: Int): Long = 10000
+
+        val serializersModule = SerializersModule {
+            polymorphic(FeeEstimator::class) {
+                subclass(PeerFeeEstimator::class)
+            }
+        }
+    }
+
     fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteVector32) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
-
-        val PeerFeeEstimator = object : FeeEstimator {
-            override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
-            override fun getFeeratePerKw(target: Int): Long = 10000
-        }
 
         val keyManager = LocalKeyManager(seed, Block.RegtestGenesisBlock.hash)
 
