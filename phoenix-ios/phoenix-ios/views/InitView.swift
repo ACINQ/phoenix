@@ -8,6 +8,31 @@ struct InitView : MVIView {
     var body: some View {
         mvi { model, intent in
             VStack(spacing: 32) {
+
+                HStack {
+                    Spacer()
+
+                    NavigationLink(destination: ConfigurationView()) {
+                        Image("ic_settings")
+                                .resizable()
+                                .foregroundColor(.appHorizon)
+                                .frame(width: 22, height: 22)
+                    }
+                            .buttonStyle(PlainButtonStyle())
+                            .padding([.top, .bottom], 8)
+                            .padding([.leading, .trailing], 8)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.appHorizon, lineWidth: 2)
+                            )
+
+                }
+                        .padding(.all, 16)
+
+                Spacer()
+
                 Button {
                     intent(Init.IntentCreateWallet())
                 } label: {
@@ -46,6 +71,7 @@ struct InitView : MVIView {
                                         .stroke(Color.appHorizon, lineWidth: 2)
                         )
 
+                Spacer()
                 NavigationLink(
                             destination:
                             Text("Wait for it!")

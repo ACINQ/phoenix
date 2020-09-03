@@ -13,6 +13,7 @@ class MockDIBuilder {
     var receiveModel: Receive.Model = Receive.Model.Generating
     var scanModel: Scan.Model = Scan.Model.Ready
     var restoreWalletModel: RestoreWallet.Model = RestoreWallet.Model.Ready
+    var configurationModel: Configuration.Model = Configuration.Model.SimpleMode
 
     fun apply(block: MockDIBuilder.() -> Unit): MockDIBuilder {
         this.block()
@@ -26,5 +27,6 @@ class MockDIBuilder {
         bind<ReceiveController>() with screenProvider { Receive.MockController(receiveModel) }
         bind<ScanController>() with screenProvider { Scan.MockController(scanModel) }
         bind<RestoreWalletController>() with screenProvider { RestoreWallet.MockController(restoreWalletModel) }
+        bind<ConfigurationController>() with screenProvider { Configuration.MockController(configurationModel) }
     }
 }

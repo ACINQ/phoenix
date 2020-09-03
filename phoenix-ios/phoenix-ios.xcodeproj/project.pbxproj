@@ -28,7 +28,9 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* phoenix-iosTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* phoenix-iosTests.swift */; };
 		7555FFA1242A565B00829871 /* phoenix-iosUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */; };
+		C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */; };
 		C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A44147508AA19378B739 /* RestoreWalletView.swift */; };
+		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitView.swift */; };
 		F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; };
 		F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -94,7 +96,9 @@
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitView.swift; sourceTree = "<group>"; };
+		C8D7A2327BC90150A3E1493D /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		C8D7A44147508AA19378B739 /* RestoreWalletView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestoreWalletView.swift; sourceTree = "<group>"; };
+		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
 		F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhoenixShared.framework; path = "../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -153,6 +157,7 @@
 				C8D7A209301A31C14A982ECD /* InitView.swift */,
 				C8D7A44147508AA19378B739 /* RestoreWalletView.swift */,
 				53BEF4DAE061532668494988 /* TransactionView.swift */,
+				C8D7A7335040D755924F8FFC /* configuration */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -238,6 +243,15 @@
 				F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C8D7A7335040D755924F8FFC /* configuration */ = {
+			isa = PBXGroup;
+			children = (
+				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
+				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
+			);
+			path = configuration;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -411,6 +425,8 @@
 				C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */,
 				53BEFFEBEA9EBE7B27B53AF4 /* TransactionView.swift in Sources */,
 				53BEF1748D4A541C0BEEDF2B /* models.swift in Sources */,
+				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
+				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

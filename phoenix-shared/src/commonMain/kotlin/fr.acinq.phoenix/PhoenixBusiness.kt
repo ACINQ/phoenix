@@ -152,6 +152,7 @@ class PhoenixBusiness {
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
         bind<ScanController>() with screenProvider { AppScanController(di) }
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
+        bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
 
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
     }
