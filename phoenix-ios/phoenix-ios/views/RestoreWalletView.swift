@@ -7,9 +7,7 @@ struct RestoreWalletView: MVIView {
 
     var body: some View {
         mvi { model, intent in
-            VStack {
-                view(model: model, intent: intent)
-            }
+            view(model: model, intent: intent)
                     .padding(.top, keyWindow?.safeAreaInsets.bottom)
                     .padding(.bottom, keyWindow?.safeAreaInsets.top)
                     .padding([.leading, .trailing], 10)
@@ -20,9 +18,16 @@ struct RestoreWalletView: MVIView {
     }
 
     func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
-        switch model {
-        case _ as RestoreWallet.ModelWarning: return AnyView(WarningView(intent: intent))
-        default: return AnyView(RestoreView(model: model, intent: intent))
+        return Group {
+            if let _ = model as? RestoreWallet.ModelWarning {
+                WarningView(intent: intent)
+                .zIndex(1)
+                .transition(.move(edge: .bottom))
+                .animation(.default)
+				} else {
+                RestoreView(model: model, intent: intent)
+                .zIndex(0)
+            }
         }
     }
 
@@ -32,6 +37,7 @@ struct RestoreWalletView: MVIView {
         @State private var warningAccepted = false
 
         var body: some View {
+          VStack {
             Text("""
                  Do not import a seed that was NOT 
                  created by this application.
@@ -72,6 +78,8 @@ struct RestoreWalletView: MVIView {
                     )
 
             Spacer()
+          }
+          .background(Color.appBackground)
         }
     }
 
