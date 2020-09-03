@@ -15,7 +15,7 @@ struct HomeView : MVIView {
         mvi(
                 background: true,
                 onModel: { model in
-                    if model.lastTransaction != lastTransaction {
+                    if lastTransaction != model.lastTransaction {
                         lastTransaction = model.lastTransaction
                         selectedTransaction = lastTransaction
                     }
@@ -39,7 +39,7 @@ struct HomeView : MVIView {
 
                     ScrollView {
                         LazyVStack {
-                            ForEach(model.history.indices.reversed(), id: \.self) { index in
+                            ForEach(model.history.indices, id: \.self) { index in
                                 Button {
                                     selectedTransaction = model.history[index]
                                 } label: {
@@ -210,7 +210,7 @@ struct HomeView : MVIView {
                             .lineLimit(1)
                             .truncationMode(.tail)
                             .foregroundColor(.appDark)
-                    Text(transaction.timestamp.formatDate())
+                    Text(transaction.timestamp.formatDateMS())
                             .font(.caption)
                             .foregroundColor(.gray)
                 }
@@ -218,7 +218,7 @@ struct HomeView : MVIView {
                         .padding([.leading, .trailing], 6)
                 if (transaction.status != .failure) {
                     HStack {
-                        Text((transaction.amountSat >= 0 ? "+" : "") + transaction.amountSat.formatNumber())
+                        Text((transaction.amountSat >= 0 ? "+" : "") + Int64((Double(transaction.amountSat) / 1000.0).rounded()).formatNumber())
                                 .foregroundColor(transaction.amountSat >= 0 ? .appGreen : .appRed)
                                 + Text(" sat")
                                 .font(.caption)
@@ -233,6 +233,8 @@ struct HomeView : MVIView {
     }
 
     struct BottomBar : View {
+
+        @State var isShowingScan: Bool = false
 
         var body: some View {
             HStack {
@@ -250,7 +252,7 @@ struct HomeView : MVIView {
                 Spacer()
 
                 NavigationLink(
-                        destination: ReceiveView()//.onAppear { barHidden = false }
+                        destination: ReceiveView()
                 ) {
                     Image("ic_receive").resizable().frame(width: 22, height: 22)
                     Text("Receive")
@@ -265,7 +267,8 @@ struct HomeView : MVIView {
                 Spacer()
 
                 NavigationLink(
-                        destination: ScanView()//.onAppear { barHidden = false }
+                        destination: ScanView(isShowing: $isShowingScan),
+                        isActive: $isShowingScan
                 ) {
                     Image("ic_scan").resizable().frame(width: 22, height: 22)
                     Text("Scan")
@@ -295,7 +298,8 @@ class HomeView_Previews : PreviewProvider {
     )
 
     static var previews: some View {
-        mockView(HomeView()) { $0.homeModel = mockModel }
+//        mockView(HomeView()) { $0.homeModel = mockModel }
+        appView(HomeView())
                 .previewDevice("iPhone 11")
     }
 

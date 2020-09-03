@@ -9,6 +9,8 @@ import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -51,17 +53,17 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
         }
 
         launch {
-            var first = true
-            historyManager.openTransactionsSubscriptions().consumeEach {
+            historyManager.openTransactionsSubscriptions()
+                .consumeAsFlow()
+                .collectIndexed { nth, list ->
                 model {
-                    val last = it.lastOrNull()
-                    if (!first && last != null && last.status != Transaction.Status.Pending) {
-                        copy(history = it, lastTransaction = last)
+                    val lastTransaction = list.firstOrNull()
+                    if (nth != 0 && lastTransaction != null && lastTransaction.status != Transaction.Status.Pending) {
+                        copy(history = list, lastTransaction = lastTransaction)
                     } else {
-                        copy(history = it)
+                        copy(history = list)
                     }
                 }
-                first = false
             }
         }
     }

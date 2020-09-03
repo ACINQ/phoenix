@@ -13,7 +13,7 @@ object Scan {
 
         data class Validate(val request: String, val amountMsat: Long?, val requestDescription: String?): Model()
         data class Sending(val amountMsat: Long, val requestDescription: String?): Model()
-        data class Fulfilled(val amountMsat: Long, val requestDescription: String?): Model()
+//        data class Fulfilled(val amountMsat: Long, val requestDescription: String?): Model()
     }
 
     sealed class Intent : MVI.Intent() {

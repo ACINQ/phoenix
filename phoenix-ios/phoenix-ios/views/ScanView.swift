@@ -7,8 +7,14 @@ struct ScanView: MVIView {
     typealias Model = Scan.Model
     typealias Intent = Scan.Intent
 
+    @Binding var isShowing: Bool
+
     var body: some View {
-        mvi { model, intent in
+        mvi(onModel: { model in
+            if model is Scan.ModelSending {
+                isShowing = false
+            }
+        }) { model, intent in
             view(model: model, intent: intent)
         }
                 .navigationBarTitle("", displayMode: .inline)
@@ -19,7 +25,6 @@ struct ScanView: MVIView {
         case _ as Scan.ModelReady: return AnyView(ReadyView(intent: intent))
         case let m as Scan.ModelValidate: return AnyView(ValidateView(model: m, intent: intent))
         case let m as Scan.ModelSending: return AnyView(SendingView(model: m))
-        case let m as Scan.ModelFulfilled: return AnyView(FulfilledView(model: m))
         default:
             fatalError("Unknown model \(model)")
         }
@@ -90,20 +95,6 @@ struct ScanView: MVIView {
                     .padding()
         }
     }
-
-    struct FulfilledView: View {
-        let model: Scan.ModelFulfilled
-
-        var body: some View {
-            Text("Sent \(model.amountMsat) msat!")
-                    .font(.title)
-                    .padding()
-
-            Text(model.requestDescription ?? "")
-                    .padding()
-        }
-    }
-
 }
 
 
@@ -112,7 +103,7 @@ class ScanView_Previews: PreviewProvider {
     static let mockModel = Scan.ModelReady()
 
     static var previews: some View {
-        mockView(ScanView()) { $0.scanModel = ScanView_Previews.mockModel }
+        mockView(ScanView(isShowing: .constant(true))) { $0.scanModel = ScanView_Previews.mockModel }
                 .previewDevice("iPhone 11")
     }
 

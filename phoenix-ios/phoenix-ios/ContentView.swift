@@ -18,10 +18,9 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationView {
+        appView(NavigationView {
             HomeView()
-        }
-                .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
+        })
     }
 }
 
@@ -32,4 +31,8 @@ func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) 
                             DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())
                     )
             )
+}
+
+func appView<V : View>(_ content: V) -> some View {
+    content.environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
 }

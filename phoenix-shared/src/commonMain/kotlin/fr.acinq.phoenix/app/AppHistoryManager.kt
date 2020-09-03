@@ -25,7 +25,9 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
 
     private val db = dbFactory.open("transactions", KotlinxSerializer())
 
-    private val transactions = ConflatedBroadcastChannel<List<Transaction>>(db.find<Transaction>().all().useModels().toList())
+    private fun getList() = db.find<Transaction>().byIndex("timestamp").useModels(reverse = true) { it.toList() }
+
+    private val transactions = ConflatedBroadcastChannel(getList())
 
     init {
         launch {
@@ -46,7 +48,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                         db.put(
                             Transaction(
                                 it.id.toString(),
-                                it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
+                                -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
                                 it.paymentRequest.description ?: "",
                                 Transaction.Status.Pending,
                                 currentTimestampMillis()
@@ -57,7 +59,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                         db.put(
                             Transaction(
                                 it.id.toString(),
-                                it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
+                                -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
                                 it.paymentRequest.description ?: "",
                                 Transaction.Status.Success,
                                 currentTimestampMillis()
@@ -69,7 +71,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
             }
         }
 
-        fun updateChannel() = launch { transactions.send(db.find<Transaction>().all().useModels().toList()) }
+        fun updateChannel() = launch { transactions.send(getList()) }
 
         db.on<Transaction>().register {
             didPut { updateChannel() }

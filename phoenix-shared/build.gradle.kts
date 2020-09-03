@@ -47,7 +47,8 @@ kotlin {
         val secp256k1Version = "0.3.0"
         val ktorVersion = "1.4.0"
         val kodeinDIVersion = "7.1.0-master-87"
-        val kodeinDBVersion = "0.2.0-master-32"
+//        val kodeinDBVersion = "0.2.0"
+        val kodeinDBVersion = "0.2.0-master-34"
 
         val commonMain by getting {
             dependencies {
