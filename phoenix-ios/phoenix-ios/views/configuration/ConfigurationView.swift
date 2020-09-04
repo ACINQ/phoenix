@@ -10,9 +10,23 @@ struct ConfigurationView : MVIView {
             VStack(spacing: 0) {
                 let fullMode = model is Configuration.ModelFullMode
 
-                General()
-                if fullMode { Security() }
-                Advanced(fullMode: fullMode)
+                Section(header: "General") {
+                    NavigationMenu(label: "About", destination: AboutView())
+                    NavigationMenu(label: "Display", destination: DisplayConfigurationView())
+                    ButtonMenu(label: "Electrum Server")
+                }
+
+                Section(header: "Security", fullMode: fullMode) {
+                    ButtonMenu(label: "Recovery phrase")
+                    ButtonMenu(label: "App access settings")
+                }
+
+                Section(header: "Advanced") {
+                    ButtonMenu(label: "Channels list", visible: fullMode)
+                    ButtonMenu(label: "Logs")
+                    ButtonMenu(label: "Close all channels", visible: fullMode)
+                    ButtonMenu(label: "Danger zone", visible: fullMode).foregroundColor(Color.red)
+                }
 
                 Spacer()
             }
@@ -23,122 +37,84 @@ struct ConfigurationView : MVIView {
         }
     }
 
-
-    struct General: View {
-        var body: some View {
-            VStack {
-                Text("General")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.headline)
-                        .foregroundColor(.appHorizon)
-                        .padding([.leading, .top], 16)
-
-                Divider()
-
-                NavigationLink(destination: AboutView()) {
-                        Text("About").font(.subheadline)
-                                .buttonStyle(PlainButtonStyle())
-                                .foregroundColor(Color.black)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding([.leading, .trailing])
-                }
-
-                Divider()
-
-                Text("Display")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .padding([.leading, .trailing])
-
-                Divider()
-
-                Text("Electrum Server")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .padding([.leading, .trailing])
-
-                Divider()
-            }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white)
-
-        }
-    }
-
-    struct Security : View {
-        var body : some View {
-            VStack {
-                Text("Security")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.headline)
-                        .foregroundColor(.appHorizon)
-                        .padding([.leading, .top], 16)
-
-                Divider()
-                Text("Recovery phrase")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .padding([.leading, .trailing])
-
-                Divider()
-
-                Text("App access settings")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .padding([.leading, .trailing])
-
-                Divider()
-            }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white)
-        }
-    }
-
-    struct Advanced : View {
+    struct Section<Content> : View where Content : View {
+        let header: String
         let fullMode: Bool
+        let menu: () -> Content
+
+        init(header: String, fullMode: Bool = true, @ViewBuilder menu: @escaping () -> Content) {
+            self.header = header
+            self.fullMode = fullMode
+            self.menu = menu
+        }
 
         var body : some View {
-            VStack {
-                Text("Advanced")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.headline)
-                        .foregroundColor(.appHorizon)
-                        .padding([.leading, .top], 16)
-
-                if fullMode {
+            if fullMode {
+                VStack {
+                    Text(header)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .font(.headline)
+                            .foregroundColor(.appHorizon)
+                            .padding([.leading, .top], 16)
                     Divider()
-                    Text("Channels list")
+                    menu()
+                }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.white)
+            }
+        }
+    }
+
+    struct ButtonMenu: View {
+        let label: String
+        let action: () -> Void
+        let visible: Bool
+
+        init(label: String, visible: Bool = true, action: @escaping () -> Void = { }) {
+            self.label = label
+            self.action = action
+            self.visible = visible
+        }
+
+        var body : some View {
+            if visible {
+                Button {
+                    action()
+                } label: {
+                    Text(label)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .font(.subheadline)
+                            .foregroundColor(Color.black)
                             .padding([.leading, .trailing])
                 }
-
-                Divider()
-                Text("Logs")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .padding([.leading, .trailing])
-
-                if fullMode {
-                    Divider()
-                    Text("Close all channels")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.subheadline)
-                            .padding([.leading, .trailing])
-
-                Divider()
-                Text("Danger zone")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.subheadline)
-                        .foregroundColor(Color.red)
-                        .padding([.leading, .trailing])
-                }
-
                 Divider()
             }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white)
+        }
+    }
+    
+    struct NavigationMenu<T : View> : View {
+        let label: String
+        let destination: T
+        let visible: Bool
 
+        init(label: String, destination: T, visible: Bool = true) {
+            self.label = label
+            self.destination = destination
+            self.visible = visible
+        }
+
+        var body : some View {
+            if visible {
+                NavigationLink(destination: destination) {
+                    Text(label)
+                            .font(.subheadline)
+                            .buttonStyle(PlainButtonStyle())
+                            .foregroundColor(Color.black)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding([.leading, .trailing])
+                }
+                Divider()
+            }
         }
     }
 }
