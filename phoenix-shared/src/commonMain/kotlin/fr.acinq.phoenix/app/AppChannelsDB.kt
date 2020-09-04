@@ -60,9 +60,12 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
     override suspend fun listLocalChannels(): List<HasCommitments> {
         return db.find<Channel>()
             .all()
-            .useModels()
-            .map { it.channel }
-            .toList()
+            .useModels { seq ->
+                seq
+                    .map { it.channel }
+                    .toList()
+            }
+
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {
@@ -72,9 +75,11 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
     override suspend fun listHtlcInfos(channelId: ByteVector32, commitmentNumber: Long): List<Pair<ByteVector32, CltvExpiry>> {
         return db.find<HtlcInfo>()
             .byId(channelId.toHex(), commitmentNumber)
-            .useModels()
-            .map { it.paymentHash to it.cltvExpiry }
-            .toList()
+            .useModels { seq ->
+                seq
+                    .map { it.paymentHash to it.cltvExpiry }
+                    .toList()
+            }
     }
 
     override fun close() {
