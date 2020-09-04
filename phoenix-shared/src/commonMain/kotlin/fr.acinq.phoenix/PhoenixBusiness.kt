@@ -1,9 +1,7 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.crypto.Sha256
 import fr.acinq.eklair.*
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.blockchain.electrum.ElectrumWatcher
@@ -17,12 +15,13 @@ import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
 import fr.acinq.eklair.utils.toByteVector32
-import fr.acinq.phoenix.app.AppChannelsDB
-import fr.acinq.phoenix.app.AppConnectionsDaemon
-import fr.acinq.phoenix.app.AppHistoryManager
-import fr.acinq.phoenix.app.WalletManager
+import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
+import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
 import fr.acinq.phoenix.ctrl.*
+import fr.acinq.phoenix.ctrl.config.ConfigurationController
+import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.TAG_APPLICATION
 import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
@@ -40,7 +39,6 @@ import org.kodein.db.inDir
 import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
-import org.kodein.memory.text.toHexString
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
@@ -145,6 +143,7 @@ class PhoenixBusiness {
         }
         bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
         bind<WalletManager>() with singleton { WalletManager(di) }
+        bind<AppConfigurationManager>() with singleton { AppConfigurationManager(di) }
 
         bind<ContentController>() with screenProvider { AppContentController(di) }
         bind<InitController>() with screenProvider { AppInitController(di) }
@@ -152,7 +151,9 @@ class PhoenixBusiness {
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
         bind<ScanController>() with screenProvider { AppScanController(di) }
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
+        // App Configuration
         bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
+        bind<DisplayConfigurationController>() with screenProvider { AppDisplayConfigurationController(di) }
 
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
     }

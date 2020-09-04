@@ -13,19 +13,37 @@ struct ConfigurationView : MVIView {
                 Section(header: "General") {
                     NavigationMenu(label: "About", destination: AboutView())
                     NavigationMenu(label: "Display", destination: DisplayConfigurationView())
-                    ButtonMenu(label: "Electrum Server")
+                    ButtonMenu { } label: {
+                        Text("Electrum Server")
+                    }
+                    ButtonMenu { } label: {
+                        Text("Tor")
+                    }
                 }
 
                 Section(header: "Security", fullMode: fullMode) {
-                    ButtonMenu(label: "Recovery phrase")
-                    ButtonMenu(label: "App access settings")
+                    ButtonMenu { } label: {
+                        Text("Recovery phrase")
+                    }
+                    ButtonMenu { } label: {
+                        Text("App access settings")
+                    }
                 }
 
                 Section(header: "Advanced") {
-                    ButtonMenu(label: "Channels list", visible: fullMode)
-                    ButtonMenu(label: "Logs")
-                    ButtonMenu(label: "Close all channels", visible: fullMode)
-                    ButtonMenu(label: "Danger zone", visible: fullMode).foregroundColor(Color.red)
+                    ButtonMenu(visible: fullMode) { } label: {
+                        Text("Channels list")
+                    }
+                    ButtonMenu() { } label: {
+                        Text("Logs")
+                    }
+                    ButtonMenu(visible: fullMode) { } label: {
+                        Text("Close all channels")
+                    }
+                    ButtonMenu(visible: fullMode) { } label: {
+                        Text("Danger zone")
+                                .foregroundColor(Color.red)
+                    }
                 }
 
                 Spacer()
@@ -65,12 +83,12 @@ struct ConfigurationView : MVIView {
         }
     }
 
-    struct ButtonMenu: View {
-        let label: String
+    struct ButtonMenu<Content> : View where Content : View {
+        let label: () -> Content
         let action: () -> Void
         let visible: Bool
 
-        init(label: String, visible: Bool = true, action: @escaping () -> Void = { }) {
+        init(visible: Bool = true, action: @escaping () -> Void, @ViewBuilder label: @escaping () -> Content) {
             self.label = label
             self.action = action
             self.visible = visible
@@ -81,7 +99,9 @@ struct ConfigurationView : MVIView {
                 Button {
                     action()
                 } label: {
-                    Text(label)
+                    Group{
+                        label()
+                    }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .font(.subheadline)
                             .foregroundColor(Color.black)

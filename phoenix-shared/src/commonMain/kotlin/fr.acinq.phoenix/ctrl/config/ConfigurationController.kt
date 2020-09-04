@@ -1,4 +1,6 @@
-package fr.acinq.phoenix.ctrl
+package fr.acinq.phoenix.ctrl.config
+
+import fr.acinq.phoenix.ctrl.MVI
 
 typealias ConfigurationController = MVI.Controller<Configuration.Model, Configuration.Intent>
 

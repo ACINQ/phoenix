@@ -1,10 +1,9 @@
-package fr.acinq.phoenix.app.ctrl
+package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.phoenix.app.WalletManager
-import fr.acinq.phoenix.ctrl.Configuration
-import fr.acinq.phoenix.ctrl.Content
+import fr.acinq.phoenix.app.ctrl.AppController
+import fr.acinq.phoenix.ctrl.config.Configuration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
