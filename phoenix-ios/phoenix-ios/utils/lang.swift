@@ -13,10 +13,11 @@ extension Int64 {
         return formatter.string(from: NSNumber(value: self))!
     }
 
-    func formatDate() -> String {
+    func formatDateMS() -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
-        let time = Date(timeIntervalSince1970: TimeInterval(self))
-        return formatter.string(from: time)
+        formatter.timeStyle = .short
+        let date = Date(timeIntervalSince1970: TimeInterval(self / 1000))
+        return formatter.string(from: date)
     }
 }

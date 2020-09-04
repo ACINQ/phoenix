@@ -21,15 +21,18 @@ struct ContentView: MVIView {
     }
 
     var body: some View {
-        mvi { model, intent in
-            NavigationView {
-                if model is Content.ModelIsInitialized {
-                    HomeView()
-                } else {
-                    InitView()
+        appView(
+            mvi { model, intent in
+                NavigationView {
+                    if model is Content.ModelIsInitialized {
+                        HomeView()
+                    } else {
+                        InitView()
+                    }
                 }
             }
-        }
+        )
+
                     .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
     }
 }
@@ -41,6 +44,10 @@ func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) 
                             DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())
                     )
             )
+}
+
+func appView<V : View>(_ content: V) -> some View {
+    content.environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
 }
 
 class ContentView_Previews: PreviewProvider {

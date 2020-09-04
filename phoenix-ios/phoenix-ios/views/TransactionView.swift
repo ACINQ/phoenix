@@ -37,10 +37,10 @@ struct TransactionView : View {
                             .resizable()
                             .frame(width: 100, height: 100)
                             .foregroundColor(.appGreen)
-                    HStack {
+                    VStack {
                         Text(transaction.amountSat < 0 ? "SENT" : "RECEIVED")
                                 .font(Font.title2.bold())
-                        Text(transaction.timestamp.formatDate().uppercased())
+                        Text(transaction.timestamp.formatDateMS().uppercased())
                                 .font(Font.title2)
                     }
                             .padding()
@@ -58,12 +58,11 @@ struct TransactionView : View {
                             .frame(width: 100, height: 100)
                             .foregroundColor(.appRed)
                     VStack {
-                        HStack {
-                            Text("PAYMENT ")
-                                    .font(Font.title2)
-                            Text("FAILED")
-                                    .font(Font.title2.bold())
-                        }
+                        Text("PAYMENT ")
+                                .font(Font.title2)
+                        +
+                        Text("FAILED")
+                                .font(Font.title2.bold())
                         Text("NO FUND HAS BEEN SENT")
                                 .font(Font.title2)
                     }
@@ -73,7 +72,7 @@ struct TransactionView : View {
                 }
 
                 HStack(alignment: .bottom) {
-                    Text(abs(transaction.amountSat).formatNumber())
+                    Text(Int64((Double(abs(transaction.amountSat)) / 1000.0).rounded()).formatNumber())
                             .font(.largeTitle)
                     Text("sat")
                             .font(.title3)
@@ -90,7 +89,7 @@ struct TransactionView : View {
 
 class TransactionView_Previews : PreviewProvider {
     static var previews: some View {
-        TransactionView(transaction: mockReceiveTransaction, close: {})
+        TransactionView(transaction: mockSpendFailedTransaction, close: {})
     }
 
     #if DEBUG
