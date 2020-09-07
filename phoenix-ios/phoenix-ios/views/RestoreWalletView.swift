@@ -36,22 +36,21 @@ struct RestoreWalletView: MVIView {
 
         var body: some View {
           VStack {
-            Text("""
-                 Do not import a seed that was NOT 
-                 created by this application.
-
-                 Also, make sure that you don't have 
-                 another Phoenix wallet running with the
-                 same seed.
-                 """)
-                    .font(.title3)
-                    .padding()
+				
+				//
+				
+            Text(
+                "Do not import a seed that was NOT created by this application.\n\n" +
+                "Also, make sure that you don't have another Phoenix wallet running with the same seed."
+				)
+            .font(.title3)
+            .padding(.top, 20)
 
             Toggle(isOn: $warningAccepted) {
                 Text("I understand.").font(.title3)
             }
-                    .padding([.top, .bottom], 16)
-                    .padding([.leading, .trailing], 88)
+            .padding([.top, .bottom], 16)
+            .padding([.leading, .trailing], 88)
 
             Button {
                 intent(RestoreWallet.IntentAcceptWarning())
