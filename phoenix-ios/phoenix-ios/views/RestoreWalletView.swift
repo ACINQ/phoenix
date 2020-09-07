@@ -17,17 +17,16 @@ struct RestoreWalletView: MVIView {
                 .navigationBarTitle("Restore my wallet", displayMode: .inline)
     }
 
-    func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
-        return Group {
-            if let _ = model as? RestoreWallet.ModelWarning {
-                WarningView(intent: intent)
-                .zIndex(1)
-                .transition(.move(edge: .bottom))
-                .animation(.default)
-				} else {
-                RestoreView(model: model, intent: intent)
-                .zIndex(0)
-            }
+    @ViewBuilder func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
+        
+        if let _ = model as? RestoreWallet.ModelWarning {
+            WarningView(intent: intent)
+            .zIndex(1)
+            .transition(.move(edge: .bottom))
+            .animation(.default)
+        } else {
+            RestoreView(model: model, intent: intent)
+            .zIndex(0)
         }
     }
 
