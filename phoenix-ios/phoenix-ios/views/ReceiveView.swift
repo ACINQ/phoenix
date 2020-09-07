@@ -35,41 +35,43 @@ struct ReceiveView: MVIView {
     @StateObject var qrCode = QRCode()
 
     var body: some View {
-        mvi { model, intent in
-            self.view(model: model, intent: intent)
-                    .navigationBarTitle("Receive ", displayMode: .inline)
-                    .onAppear {
-                        intent(Receive.IntentAsk(amountMsat: 50000))
-                    }
+        mvi { model in
+            if let m = model as? Receive.ModelGenerated {
+                qrCode.generate(value: m.request)
+            }
+        } content: { model, intent in
+                view(model: model, intent: intent)
+                        .navigationBarTitle("Receive ", displayMode: .inline)
+                        .onAppear {
+                            intent(Receive.IntentAsk(amountMsat: 50000))
+                        }
+                    .navigationBarTitle("", displayMode: .inline)
         }
-                .navigationBarTitle("", displayMode: .inline)
     }
 
+    @ViewBuilder
     func view(model: Receive.Model, intent: (Receive.Intent) -> Void) -> some View {
         switch model {
         case _ as Receive.ModelAwaiting:
-            return AnyView(Text("..."))
+            Text("...")
         case _ as Receive.ModelGenerating:
-            return AnyView(Text("Generating payment request..."))
+            Text("Generating payment request...")
         case let m as Receive.ModelGenerated:
-            qrCode.generate(value: m.request)
             if qrCode.value == m.request {
-                let qrCodeView: AnyView
-                if let image = qrCode.image {
-                    qrCodeView = AnyView(
-                            image.resizable().scaledToFit()
-                            .padding()
-                            .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                            .stroke(Color.gray, lineWidth: 4)
-                            )
-                    )
-                } else {
-                    qrCodeView = AnyView(Text("Generating QRCode..."))
-                }
+                VStack {
+                    if let image = qrCode.image {
+                        image.resizable().scaledToFit()
+                                .padding()
+                                .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.gray, lineWidth: 4)
+                                )
+                                .padding()
+                    } else {
+                        Text("Generating QRCode...")
+                                .padding()
+                    }
 
-                return AnyView(VStack {
-                    qrCodeView.padding()
                     Text(m.request).padding()
                     Button {
                         UIPasteboard.general.string = m.request
@@ -78,12 +80,11 @@ struct ReceiveView: MVIView {
                                 .font(.title3)
                     }
                             .padding()
-                })
+                }
             }
         default:
             fatalError("Unknown model \(model)")
         }
-        return AnyView(Text("???"))
     }
 
 }
