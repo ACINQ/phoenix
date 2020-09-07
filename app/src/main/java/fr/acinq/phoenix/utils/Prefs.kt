@@ -236,7 +236,7 @@ object Prefs {
   }
 
   fun getDefaultPaymentDescription(context: Context): String {
-    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, null) ?: context.getString(R.string.receive_default_desc)
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, null) ?: ""
   }
 
   fun setDefaultPaymentDescription(context: Context, value: String) {

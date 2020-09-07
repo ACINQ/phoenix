@@ -98,6 +98,7 @@
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">No description</string>
   <string name="paymentholder_closing_desc">Closing #%1$s</string>
+  <string name="paymentholder_swap_in_desc">On-chain payment to %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
 
@@ -393,11 +394,17 @@
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s]]></string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
+  <string name="paymentdetails_desc_custom_title">Add note</string>
+  <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
   <string name="paymentdetails_destination_label">Sent to</string>
   <string name="paymentdetails_fees_label">Fees</string>
+  <string name="paymentdetails_pay_to_open_label">Fees</string>
+  <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel</string>
   <string name="paymentdetails_error_label">Error</string>
   <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
   <string name="paymentdetails_no_description">No description</string>
+  <string name="paymentdetails_swapout_address_label">Address</string>
+  <string name="paymentdetails_swapin_address_label">Address</string>
 
   <string name="paymentdetails_technicals_button">Show details</string>
 

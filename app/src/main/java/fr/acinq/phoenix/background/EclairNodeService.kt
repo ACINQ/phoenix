@@ -56,10 +56,8 @@ import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
-import fr.acinq.phoenix.AppContext
-import fr.acinq.phoenix.BuildConfig
-import fr.acinq.phoenix.MainActivity
-import fr.acinq.phoenix.R
+import fr.acinq.phoenix.*
+import fr.acinq.phoenix.db.*
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
@@ -117,13 +115,17 @@ class EclairNodeService : Service() {
   private val receivedInBackground: MutableLiveData<List<MilliSatoshi>> = MutableLiveData(emptyList())
 
   private lateinit var appContext: AppContext
-  private val stateLock = ReentrantLock()
+  // repositories for db access
+  private lateinit var appDb: AppDb
+  private lateinit var paymentMetaRepository: PaymentMetaRepository
+  private lateinit var payToOpenMetaRepository: PayToOpenMetaRepository
 
   /** State of the service, provides access to the kit when it's started. Private so that it's not mutated from the outside. */
   private val _state = MutableLiveData<KitState>(KitState.Off)
-
   /** Public observable state that can be used by the UI */
   val state: LiveData<KitState> get() = _state
+  /** Lock for state updates */
+  private val stateLock = ReentrantLock()
 
   /** Shorthands methods to get the kit/api, if available */
   private val kit: Kit? get() = state.value?.kit()
@@ -159,6 +161,9 @@ class EclairNodeService : Service() {
         })
     }
     appContext = AppContext.getInstance(applicationContext)
+    appDb = AppDb.getDb(applicationContext)
+    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaDao())
+    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenDao())
     notificationManager = NotificationManagerCompat.from(this)
     val intent = Intent(this, MainActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -399,7 +404,7 @@ class EclairNodeService : Service() {
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
-    val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor() }, "EclairSupervisor")
+    val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(appContext) }, "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
@@ -550,7 +555,7 @@ class EclairNodeService : Service() {
   }
 
   @UiThread
-  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean) = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean): UUID? = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     if (isHeadless) {
       throw CannotSendHeadless
     }
@@ -602,13 +607,18 @@ class EclairNodeService : Service() {
 
       val res = Await.result(Patterns.ask(paymentInitiator(), sendRequest, shortTimeout), Duration.Inf())
       log.info("payment initiator has accepted request and returned $res")
-      if (res is PaymentFailed) {
-        val failure = res.failures().mkString(", ")
-        log.error("payment has failed: [ $failure ])")
-        throw RuntimeException("Payment failure: $failure")
+      when (res) {
+        is PaymentFailed -> {
+          val failure = res.failures().mkString(", ")
+          log.error("payment has failed: [ $failure ]")
+          throw RuntimeException("payment failure: $failure")
+        }
+        is UUID -> res
+        else -> {
+          log.warn("unhandled payment initiator result: $res")
+          null
+        }
       }
-
-      Unit
     } ?: throw KitNotInitialized
   }
 
@@ -671,9 +681,16 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  suspend fun getPayments(): List<PlainPayment> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  suspend fun getPayments(): List<PaymentWithMeta> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.let {
-      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava()
+      val t = System.currentTimeMillis()
+      JavaConverters.seqAsJavaListConverter(it.nodeParams().db().payments().listPaymentsOverview(50)).asJava().map { p ->
+        val id = when {
+          p is PlainOutgoingPayment && p.parentId().isDefined -> p.parentId().get().toString()
+          else -> p.paymentHash().toString()
+        }
+        PaymentWithMeta(p, paymentMetaRepository.get(id))
+      }.also { log.debug("retrieved payment list in ${System.currentTimeMillis() - t}ms") }
     } ?: throw KitNotInitialized
   }
 
@@ -762,28 +779,33 @@ class EclairNodeService : Service() {
   fun handleEvent(event: ChannelClosingEvent) {
     // store channel closing event as an outgoing payment in database.
     kit?.run {
-      val id = UUID.randomUUID()
-      val preimage = `package$`.`MODULE$`.randomBytes32()
-      val paymentHash = Crypto.hash256(preimage.bytes())
-      val date = System.currentTimeMillis()
-      val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
-      val paymentCounterpart = OutgoingPayment(
-        /* id and parent id */ id, id,
-        /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
-        /* placeholder payment hash */ paymentHash,
-        /* type of payment */ "ClosingChannel",
-        /* balance */ event.balance,
-        /* recipient amount */ event.balance,
-        /* fake recipient id */ fakeRecipientId,
-        /* creation date */ date,
-        /* payment request */ Option.empty(),
-        /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
-      nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+      serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+        log.error("failed to save closing event=$event: ", e)
+      }) {
+        val id = UUID.randomUUID()
+        val preimage = `package$`.`MODULE$`.randomBytes32()
+        val paymentHash = Crypto.hash256(preimage.bytes())
+        val date = System.currentTimeMillis()
+        val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
+        val paymentCounterpart = OutgoingPayment(
+          /* id and parent id */ id, id,
+          /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
+          /* placeholder payment hash */ paymentHash,
+          /* type of payment */ "ClosingChannel",
+          /* balance */ event.balance,
+          /* recipient amount */ event.balance,
+          /* fake recipient id */ fakeRecipientId,
+          /* creation date */ date,
+          /* payment request */ Option.empty(),
+          /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
+        nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+        paymentMetaRepository.insert(PaymentMeta(paymentHash.toString(), closingTxId = event.txId))
 
-      val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-      val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
-        ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
-      nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+        val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
+        val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
+          ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+        nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+      }
     }
   }
 
@@ -791,21 +813,29 @@ class EclairNodeService : Service() {
   fun handleEvent(event: SwapInConfirmed) {
     // a confirmed swap-in means that a channel was opened ; this event is stored as an incoming payment in payment database.
     kit?.run {
-      try {
-        log.info("saving successful swap-in=$event as incoming payment")
+      serviceScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
+        log.error("failed to create and settle payment request placeholder for ${event.bitcoinAddress()}: ", e)
+      }) {
+        log.info("saving swap-in=$event as incoming payment")
+
+        // 1 - generate fake invoice
+        val description = applicationContext.getString(R.string.paymentholder_swap_in_desc, event.bitcoinAddress())
         val pr = doGeneratePaymentRequest(
-          description = "On-chain payment to ${event.bitcoinAddress()}",
+          description = description,
           amount_opt = Option.apply(event.amount()),
           routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
           timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)),
           paymentType = PaymentType.SwapIn())
+
+        // 2 - save payment in eclair db, and save additional metadata such as the address
+        paymentMetaRepository.insert(PaymentMeta(id = pr.paymentHash().toString(), swapInAddress = event.bitcoinAddress()))
         nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
-        log.info("successful swap-in=$event as been saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
+        log.info("swap-in=$event saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
+
+        // 3 - notify UI
         EventBus.getDefault().post(RemovePendingSwapIn(event.bitcoinAddress()))
         EventBus.getDefault().post(PaymentReceived(pr.paymentHash(),
           ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
-      } catch (e: Exception) {
-        log.error("failed to create and settle payment request placeholder for ${event.bitcoinAddress()}: ", e)
       }
     } ?: log.error("could not create and settle placeholder for on-chain payment because kit is not initialized")
   }
@@ -839,12 +869,19 @@ class EclairNodeService : Service() {
     }
   }
 
+  /** Prevents spamming the peer */
+  @Volatile
+  private var hasRegisteredFCMToken = false
+
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: Peer.SendFCMToken) {
     kit?.run {
-      log.info("registering token=${event.token()} with node=${event.nodeId()}")
-      switchboard().tell(event, ActorRef.noSender())
-    } ?: log.warn("could not register fcm token because kit is not ready yet")
+      if (!hasRegisteredFCMToken) {
+        log.info("registering token=${event.token()} with node=${event.nodeId()}")
+        switchboard().tell(event, ActorRef.noSender())
+        hasRegisteredFCMToken = true
+      }
+    } ?: log.debug("could not register fcm token because kit is not ready yet")
   }
 
   // =========================================================== //

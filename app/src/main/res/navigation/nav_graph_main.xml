@@ -47,19 +47,19 @@
     android:id="@+id/global_action_any_to_send"
     app:destination="@id/send_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to read input -->
   <action
     android:id="@+id/global_action_any_to_read_input"
     app:destination="@id/read_input"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to payment details page -->
   <action
     android:id="@+id/global_action_any_to_payment_details"
     app:destination="@id/nav_graph_payment_details"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment">
+    app:popUpTo="@id/main_fragment">
     <argument
       android:name="direction"
       app:argType="string" />
@@ -76,19 +76,19 @@
     android:id="@+id/global_action_any_to_electrum"
     app:destination="@id/electrum_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to tor settings -->
   <action
     android:id="@+id/global_action_any_to_tor"
     app:destination="@id/tor_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to global settings -->
   <action
     android:id="@+id/global_action_any_to_settings"
     app:destination="@id/settings_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
 
   <!-- main fragment -->
   <fragment
@@ -159,7 +159,7 @@
     android:label="StartupFragment">
     <action
       android:id="@+id/action_startup_to_main"
-      app:destination="@+id/main_fragment"
+      app:destination="@id/main_fragment"
       app:enterAnim="@anim/slide_up"
       app:exitAnim="@anim/fade_out"
       app:launchSingleTop="true"
@@ -200,7 +200,7 @@
       app:argType="string" />
     <action
       android:id="@+id/action_receive_with_open_to_main"
-      app:destination="@+id/main_fragment" />
+      app:destination="@id/main_fragment" />
     <argument
       android:name="expireAt"
       app:argType="long" />
@@ -214,7 +214,7 @@
     <action
       android:id="@+id/action_send_to_main"
       app:destination="@id/main_fragment"
-      app:popUpTo="@+id/main_fragment"
+      app:popUpTo="@id/main_fragment"
       app:popUpToInclusive="true" />
     <argument
       android:name="payload"
@@ -235,7 +235,7 @@
       android:id="@+id/action_read_input_to_lnurl_auth"
       app:destination="@id/lnurl_auth"
       app:launchSingleTop="true"
-      app:popUpTo="@+id/main_fragment" />
+      app:popUpTo="@id/main_fragment" />
     <action
       android:id="@+id/action_read_input_to_lnurl_pay"
       app:destination="@+id/lnurl_pay" />
@@ -243,7 +243,7 @@
       android:id="@+id/action_read_input_to_lnurl_withdraw"
       app:destination="@+id/lnurl_withdraw"
       app:launchSingleTop="true"
-      app:popUpTo="@+id/main_fragment" />
+      app:popUpTo="@id/main_fragment" />
   </fragment>
 
   <!-- nested graph with shared view model for payment details -->

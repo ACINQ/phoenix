@@ -30,11 +30,13 @@ import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.ElectrumServer
 import fr.acinq.phoenix.background.KitState
+import fr.acinq.phoenix.db.PaymentMeta
 import fr.acinq.phoenix.events.PayToOpenNavigationEvent
 import fr.acinq.phoenix.events.RemovePendingSwapIn
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -76,7 +78,7 @@ class AppViewModel : ViewModel() {
   val navigationEvent = SingleLiveEvent<Any>()
 
   /** List of payments. */
-  val payments = MutableLiveData<List<PlainPayment>>()
+  val payments = MutableLiveData<List<PaymentWithMeta>>()
 
   /** List of swap-ins waiting for confirmation. */
   val pendingSwapIns = MutableLiveData(HashMap<String, SwapInPending>())
@@ -132,7 +134,7 @@ class AppViewModel : ViewModel() {
   }
 
   fun refreshPayments() {
-    viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
       log.error("failed to retrieve payments: ", e)
     }) {
       service?.getPayments()?.also { payments.postValue(it) }
@@ -187,3 +189,5 @@ class NetworkInfoLiveData(service: MutableLiveData<EclairNodeService?>) : Mediat
     }
   }
 }
+
+data class PaymentWithMeta(val payment: PlainPayment, val meta: PaymentMeta?)

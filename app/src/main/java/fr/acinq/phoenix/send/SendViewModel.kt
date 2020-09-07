@@ -18,6 +18,8 @@ package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.blockchain.fee.FeeratesPerKB
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Constants
@@ -45,9 +47,9 @@ sealed class SendState {
     abstract val uri: BitcoinURI
 
     data class SwapRequired(override val uri: BitcoinURI) : Onchain()
-    data class Swapping(override val uri: BitcoinURI) : Onchain()
-    data class Ready(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain()
-    data class Sending(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain()
+    data class Swapping(override val uri: BitcoinURI, val feeratePerByte: Long) : Onchain()
+    data class Ready(override val uri: BitcoinURI, val pr: PaymentRequest, val feeratePerByte: Long, val fee: Satoshi) : Onchain()
+    data class Sending(override val uri: BitcoinURI, val pr: PaymentRequest, val feeratePerByte: Long, val fee: Satoshi) : Onchain()
     sealed class Error : Onchain() {
       data class ExceedsBalance(override val uri: BitcoinURI) : Error()
       data class SendingFailure(override val uri: BitcoinURI, val pr: PaymentRequest) : Onchain.Error()

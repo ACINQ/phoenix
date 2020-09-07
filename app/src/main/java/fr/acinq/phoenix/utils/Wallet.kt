@@ -19,6 +19,7 @@ package fr.acinq.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.WorkerThread
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
@@ -34,9 +35,13 @@ import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
+import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import scodec.bits.ByteVector
 import java.io.File
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 
@@ -45,7 +50,17 @@ object Wallet {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735")
-  val httpClient = OkHttpClient()
+  val httpClient = object : OkHttpClient() {
+    @WorkerThread
+    suspend fun simpleExecute(url: String, callback: (res: ResponseBody) -> Unit) {
+      newCall(okhttp3.Request.Builder().url(url).build()).execute().run {
+        val body = body()
+        if (isSuccessful && body != null) {
+          callback(body)
+        }
+      }
+    }
+  }
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
@@ -193,4 +208,16 @@ object Wallet {
   }
 
   fun HostAndPort.isOnion() = this.host.endsWith(".onion")
+
+  @WorkerThread
+  suspend fun OkHttpClient.simpleExecute(url: String, isSilent: Boolean = false, callback: (json: JSONObject) -> Unit) {
+    newCall(okhttp3.Request.Builder().url(url).build()).execute().run {
+      val body = body()
+      if (isSuccessful && body != null) {
+        callback(JSONObject(body.string())).also { body.close() }
+      } else if (!isSilent) {
+        throw RuntimeException("invalid response (code=${code()}) for url=$url")
+      }
+    }
+  }
 }

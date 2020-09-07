@@ -29,8 +29,10 @@ import fr.acinq.phoenix.R
 import org.slf4j.LoggerFactory
 import scala.Option
 import scala.math.`BigDecimal$`
+import scodec.bits.ByteVector
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
@@ -187,4 +189,9 @@ object Converter {
   }
 
   fun msat2sat(amount: MilliSatoshi): Satoshi = amount.truncateToSatoshi()
+
+  fun toAscii(b: ByteVector): String? {
+    val bytes: ByteArray = b.toArray()
+    return String(bytes, StandardCharsets.US_ASCII)
+  }
 }

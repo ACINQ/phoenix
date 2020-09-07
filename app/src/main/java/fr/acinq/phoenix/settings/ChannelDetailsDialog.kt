@@ -33,9 +33,9 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.phoenix.AppViewModel
-import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsChannelDetailsBinding
+import fr.acinq.phoenix.utils.Constants
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,7 +101,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }
 
     mBinding.fundingTxButton.setOnClickListener {
-      val uri = "https://blockstream.info/${if (BuildConfig.CHAIN == "testnet") "testnet/" else ""}tx/${model.fundingTxId.value}"
+      val uri = "${Constants.BLOCKSTREAM_EXPLORER_URL}/tx/${model.fundingTxId.value}"
       startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
     }
 

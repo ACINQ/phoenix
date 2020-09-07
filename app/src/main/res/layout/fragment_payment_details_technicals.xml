@@ -60,6 +60,18 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+          android:id="@+id/dest_pubkey_label"
+          style="@style/TechnicalsLabelView"
+          android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing}"
+          android:text="@string/paymentdetails_payment_hash_label" />
+
+        <TextView
+          android:id="@+id/dest_pubkey_value"
+          style="@style/TechnicalsValueView"
+          android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing}"
+          android:text="@{model.pubkey}" />
+
+        <TextView
           android:id="@+id/payment_hash_label"
           style="@style/TechnicalsLabelView"
           android:text="@string/paymentdetails_payment_hash_label" />

@@ -112,11 +112,11 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(MainViewModel::class.java)
     context?.let { ctx ->
-      appContext(ctx).notifications.observe(viewLifecycleOwner, Observer {
+      appContext(ctx).notifications.observe(viewLifecycleOwner, {
         notificationsAdapter.update(it)
       })
-      app.networkInfo.observe(viewLifecycleOwner, Observer {
-        log.info("update network info=$it")
+      app.networkInfo.observe(viewLifecycleOwner, {
+        log.debug("update network info=$it")
         if (it.electrumServer == null || !it.lightningConnected) {
           if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
             mBinding.connectivityButton.startAnimation(blinkingAnimation)
@@ -141,22 +141,28 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
           mBinding.torConnectedButton.visibility = View.GONE
         }
       })
-      appContext(ctx).balance.observe(viewLifecycleOwner, Observer {
+      appContext(ctx).balance.observe(viewLifecycleOwner, {
         mBinding.balance.setAmount(it)
       })
     }
-    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
+    app.pendingSwapIns.observe(viewLifecycleOwner, {
       refreshIncomingFunds()
     })
-    app.payments.observe(viewLifecycleOwner, Observer {
+    app.payments.observe(viewLifecycleOwner, {
       paymentsAdapter.submitList(it)
     })
-    model.incomingFunds.observe(viewLifecycleOwner, Observer { amount ->
+    model.incomingFunds.observe(viewLifecycleOwner, { amount ->
       if (amount.`$greater`(MilliSatoshi(0))) {
         refreshIncomingFundsAmountField()
         mBinding.incomingFundsNotif.visibility = View.VISIBLE
       } else {
         mBinding.incomingFundsNotif.visibility = View.INVISIBLE
+      }
+    })
+    app.currentNav.observe(viewLifecycleOwner, {
+      if (it == R.id.main_fragment) {
+        app.service?.refreshPeerConnectionState()
+        app.refreshPayments()
       }
     })
   }
@@ -179,13 +185,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
     mBinding.helpButton.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
     mBinding.torConnectedButton.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_tor) }
     mBinding.connectivityButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_connectivity) }
-
-    app.refreshPayments()
-  }
-
-  override fun onResume() {
-    super.onResume()
-    app.service?.refreshPeerConnectionState()
   }
 
   override fun onStop() {

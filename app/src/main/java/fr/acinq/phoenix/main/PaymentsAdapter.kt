@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.db.PlainIncomingPayment
 import fr.acinq.eclair.db.PlainOutgoingPayment
 import fr.acinq.eclair.db.PlainPayment
+import fr.acinq.phoenix.PaymentWithMeta
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.utils.Prefs
 
@@ -37,7 +38,7 @@ class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
     }
   }
 
-  private val mDiffer: AsyncListDiffer<PlainPayment> = AsyncListDiffer(this, DIFF_CALLBACK)
+  private val mDiffer: AsyncListDiffer<PaymentWithMeta> = AsyncListDiffer(this, DIFF_CALLBACK)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentHolder {
     val prefs = PreferenceManager.getDefaultSharedPreferences(parent.context)
@@ -51,33 +52,34 @@ class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
 
   override fun getItemCount(): Int = mDiffer.currentList.size
 
-  fun submitList(list: List<PlainPayment>) {
+  fun submitList(list: List<PaymentWithMeta>) {
     mDiffer.submitList(list)
   }
 
   companion object {
-    val DIFF_CALLBACK: DiffUtil.ItemCallback<PlainPayment> = object : DiffUtil.ItemCallback<PlainPayment>() {
-      override fun areItemsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
-        return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
-          val sameId = oldItem.parentId().isDefined && newItem.parentId().isDefined && oldItem.parentId().get() == newItem.parentId().get()
+    val DIFF_CALLBACK: DiffUtil.ItemCallback<PaymentWithMeta> = object : DiffUtil.ItemCallback<PaymentWithMeta>() {
+      override fun areItemsTheSame(oldItem: PaymentWithMeta, newItem: PaymentWithMeta): Boolean {
+        return if (oldItem.payment is PlainOutgoingPayment && newItem.payment is PlainOutgoingPayment) {
+          val sameId = oldItem.payment.parentId().isDefined && newItem.payment.parentId().isDefined && oldItem.payment.parentId().get() == newItem.payment.parentId().get()
           sameId
-        } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
-          val sameId = oldItem.paymentHash() == newItem.paymentHash()
+        } else if (oldItem.payment is PlainIncomingPayment && newItem.payment is PlainIncomingPayment) {
+          val sameId = oldItem.payment.paymentHash() == newItem.payment.paymentHash()
           sameId
         } else {
           false
         }
       }
 
-      override fun areContentsTheSame(oldItem: PlainPayment, newItem: PlainPayment): Boolean {
-        return if (oldItem is PlainOutgoingPayment && newItem is PlainOutgoingPayment) {
-          val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
-            || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-          oldItem.status()::class == newItem.status()::class && sameAmount
-        } else if (oldItem is PlainIncomingPayment && newItem is PlainIncomingPayment) {
-          val sameAmount = (oldItem.finalAmount().isDefined && newItem.finalAmount().isDefined && oldItem.finalAmount().get().toLong() == newItem.finalAmount().get().toLong())
-            || (oldItem.finalAmount().isEmpty && newItem.finalAmount().isEmpty)
-          oldItem.status()::class == newItem.status()::class && sameAmount
+      override fun areContentsTheSame(oldItem: PaymentWithMeta, newItem: PaymentWithMeta): Boolean {
+        val sameCustomDesc = oldItem.meta?.customDescription == newItem.meta?.customDescription
+        return if (oldItem.payment is PlainOutgoingPayment && newItem.payment is PlainOutgoingPayment) {
+          val sameAmount = (oldItem.payment.finalAmount().isDefined && newItem.payment.finalAmount().isDefined && oldItem.payment.finalAmount().get().toLong() == newItem.payment.finalAmount().get().toLong())
+            || (oldItem.payment.finalAmount().isEmpty && newItem.payment.finalAmount().isEmpty)
+          oldItem.payment.status()::class == newItem.payment.status()::class && sameAmount && sameCustomDesc
+        } else if (oldItem.payment is PlainIncomingPayment && newItem.payment is PlainIncomingPayment) {
+          val sameAmount = (oldItem.payment.finalAmount().isDefined && newItem.payment.finalAmount().isDefined && oldItem.payment.finalAmount().get().toLong() == newItem.payment.finalAmount().get().toLong())
+            || (oldItem.payment.finalAmount().isEmpty && newItem.payment.finalAmount().isEmpty)
+          oldItem.payment.status()::class == newItem.payment.status()::class && sameAmount && sameCustomDesc
         } else {
           false
         }

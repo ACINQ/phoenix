@@ -24,11 +24,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.google.common.base.Strings
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.*
+import fr.acinq.eclair.db.IncomingPaymentStatus
+import fr.acinq.eclair.db.OutgoingPaymentStatus
+import fr.acinq.eclair.db.PlainIncomingPayment
+import fr.acinq.eclair.db.PlainOutgoingPayment
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.NavGraphMainDirections
+import fr.acinq.phoenix.PaymentWithMeta
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.utils.Converter
@@ -51,8 +54,8 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   }
 
   @SuppressLint("SetTextI18n")
-  fun bindPaymentItem(position: Int, payment: PlainPayment) {
-    log.debug("binding payment #$position")
+  fun bindPaymentItem(position: Int, item: PaymentWithMeta) {
+    val payment = item.payment
     val fiatCode = Prefs.getFiatCurrency(itemView.context)
     val coinUnit = Prefs.getCoinUnit(itemView.context)
     val displayAmountAsFiat = Prefs.getShowAmountInFiat(itemView.context)
@@ -84,7 +87,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             itemView.context.getString(R.string.utils_unknown)
           }
           amountView.setTextColor(positiveColor)
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = Transcriber.relativeTime(context, (payment.status() as IncomingPaymentStatus.Received).receivedAt())
           iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
           iconView.setImageDrawable(itemView.context.getDrawable(R.drawable.payment_holder_def_success))
@@ -93,7 +96,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         payment.status() is IncomingPaymentStatus.`Pending$` -> {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = context.getString(R.string.paymentholder_waiting)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
@@ -102,7 +105,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         payment.status() is IncomingPaymentStatus.`Expired$` -> {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = context.getString(R.string.paymentholder_failed)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
@@ -117,7 +120,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         payment.status() is OutgoingPaymentStatus.`Pending$` -> {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = context.getString(R.string.paymentholder_processing)
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_pending))
@@ -132,7 +135,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             context.getString(R.string.utils_unknown)
           }
           amountView.setTextColor(negativeColor)
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Succeeded).completedAt())
           iconBgView.imageTintList = ColorStateList.valueOf(primaryColor)
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_success))
@@ -141,7 +144,7 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         payment.status() is OutgoingPaymentStatus.Failed -> {
           amountView.visibility = View.GONE
           unitView.visibility = View.GONE
-          handleDescription(payment, descriptionView)
+          handleDescription(item, descriptionView)
           detailsView.text = Transcriber.relativeTime(context, (payment.status() as OutgoingPaymentStatus.Failed).completedAt())
           iconBgView.imageTintList = ColorStateList.valueOf(context.getColor(R.color.transparent))
           iconView.setImageDrawable(context.getDrawable(R.drawable.payment_holder_def_failed))
@@ -151,19 +154,28 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     unitView.text = if (displayAmountAsFiat) fiatCode else coinUnit.code()
   }
 
-  private fun handleDescription(payment: PlainPayment, descriptionView: TextView) {
+  private fun handleDescription(item: PaymentWithMeta, descriptionView: TextView) {
     val defaultTextColor: Int = getAttrColor(R.attr.textColor)
     val mutedTextColor: Int = getAttrColor(R.attr.mutedTextColor)
-    val desc: String? = if (payment.paymentRequest().isDefined) {
-      PaymentRequest.fastReadDescription(payment.paymentRequest().get())
-    } else if (payment is PlainOutgoingPayment && payment.externalId().isDefined && payment.externalId().get().startsWith("closing-")) {
-      descriptionView.context.getString(R.string.paymentholder_closing_desc, payment.externalId().get().split("-").last())
+    val desc: String? = if (item.meta?.swapInAddress != null ) {
+      item.meta.swapInAddress
+    } else if (item.meta?.swapOutAddress != null) {
+      item.meta.swapOutAddress
+    } else if (item.payment.paymentRequest().isDefined) {
+      PaymentRequest.fastReadDescription(item.payment.paymentRequest().get())
+    } else if (item.payment is PlainOutgoingPayment && item.payment.externalId().isDefined && item.payment.externalId().get().startsWith("closing-")) {
+      descriptionView.context.getString(R.string.paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
     } else {
       null
     }
-    if (Strings.isNullOrEmpty(desc)) {
-      descriptionView.text = descriptionView.context.getString(R.string.paymentholder_no_desc)
-      descriptionView.setTextColor(mutedTextColor)
+    if (desc.isNullOrBlank()) {
+      if (item.meta?.customDescription.isNullOrBlank()) {
+        descriptionView.text = descriptionView.context.getString(R.string.paymentholder_no_desc)
+        descriptionView.setTextColor(mutedTextColor)
+      } else {
+        descriptionView.text = item.meta?.customDescription
+        descriptionView.setTextColor(defaultTextColor)
+      }
     } else {
       descriptionView.text = desc
       descriptionView.setTextColor(defaultTextColor)
