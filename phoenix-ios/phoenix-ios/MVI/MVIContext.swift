@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import OSLog
 
 struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
 
@@ -8,8 +9,12 @@ struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
         @Published var controller: MVIController<M, I>? = nil
 
         deinit {
-            unsub?()
-            controller?.stop()
+            let _unsub = self.unsub
+            let _controller = self.controller
+            DispatchQueue.main.async {
+                _unsub?()
+                _controller?.stop()
+            }
         }
     }
 
