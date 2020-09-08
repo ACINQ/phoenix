@@ -26,7 +26,7 @@ enum class BitcoinUnit(val label: String) {
     Bitcoin("Bitcoin");
 
     companion object default {
-        val values = BitcoinUnit.values()
+        val values = BitcoinUnit.values().toList()
     }
 }
 
@@ -37,7 +37,7 @@ enum class AppTheme(val label: String) {
      System("System default");
 
     companion object default {
-        val values = AppTheme.values()
+        val values = AppTheme.values().toList()
     }
 }
 
@@ -68,7 +68,7 @@ enum class FiatCurrency(val label: String) {
     USD("(USD) United States Dollar");
 
     companion object default {
-        val values = FiatCurrency.values()
+        val values = FiatCurrency.values().toList()
     }
 }
 
@@ -80,8 +80,8 @@ data class ElectrumServer(
     val host: String = "localhost",
     val port: Int = 51001,
     val customized: Boolean = false,
-    val blockHeight: Int = -1,
-    val tipTimestamp: Long = -1
+    val blockHeight: Int = 0,
+    val tipTimestamp: Long = 0
 ) : Metadata
 
 fun ElectrumServer.address(): String = "$host:$port"

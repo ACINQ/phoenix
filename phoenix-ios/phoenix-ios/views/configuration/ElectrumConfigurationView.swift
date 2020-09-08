@@ -8,8 +8,6 @@ struct ElectrumConfigurationView: MVIView {
     @State var showElectrumAddressPopup: Bool = false
 
     var body: some View {
-        let emptyText = Text("-")
-
         mvi { model, intent in
             ZStack {
                 VStack(spacing: 0) {
@@ -57,32 +55,38 @@ struct ElectrumConfigurationView: MVIView {
                             }
                         }
 
-                        Section(header: "Block height") {
-                            let height = m.electrumServer.blockHeight
-                            height != -1 ? Text("\(height.formatNumber())") : emptyText
-                        }
+                        if m.walletIsInitialized {
+                            Section(header: "Block height") {
+                                let height = m.electrumServer.blockHeight
+                                Text("\(height > 0 ? height.formatNumber() : "-")")
+                            }
 
-                        Section(header: "Tip timestamp") {
-                            let time = m.electrumServer.tipTimestamp
-                            time != -1 ? Text("\(time.formatDateS())") : emptyText
-                        }
+                            Section(header: "Tip timestamp") {
+                                let time = m.electrumServer.tipTimestamp
+                                Text("\(time > 0 ? time.formatDateS() : "-")")
+                            }
 
-                        Section(header: "Fee rate") {
-                            let feeRate = m.feeRate
-                            feeRate != -1 ? Text("\(feeRate.formatNumber()) sat/byte") : emptyText
-                        }
+                            Section(header: "Fee rate") {
+                                if m.feeRate > 0 {
+                                    Text("\(m.feeRate.formatNumber()) sat/byte")
+                                } else {
+                                    Text("-")
+                                }
+                            }
 
-                        Section(header: "Master public key") {
-                            if m.xpub == nil || m.path == nil {
-                                Text("-")
-                            } else {
-                                VStack(alignment: .leading) {
-                                    Text(m.xpub!)
-                                    Text("Path: \(m.path!)").padding(.top)
+                            Section(header: "Master public key") {
+                                if m.xpub == nil || m.path == nil {
+                                    Text("-")
+                                } else {
+                                    VStack(alignment: .leading) {
+                                        Text(m.xpub!)
+                                        Text("Path: \(m.path!)").padding(.top)
+                                    }
                                 }
                             }
                         }
-                    default: EmptyElectrumConfiguration()
+                    default:
+                        EmptyView()
                     }
 
                     Spacer()
@@ -124,26 +128,6 @@ struct ElectrumConfigurationView: MVIView {
                     .background(Color.white)
 
             Divider()
-        }
-    }
-
-    struct EmptyElectrumConfiguration: View {
-
-        var body: some View {
-            let emptyText = Text("-")
-
-            Section(header: "Block height") {
-                emptyText
-            }
-            Section(header: "Tip timestamp") {
-                emptyText
-            }
-            Section(header: "Fee rate") {
-                emptyText
-            }
-            Section(header: "Mater public key") {
-                emptyText
-            }
         }
     }
 

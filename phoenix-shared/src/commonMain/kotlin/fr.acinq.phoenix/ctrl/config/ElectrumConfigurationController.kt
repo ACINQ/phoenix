@@ -14,7 +14,7 @@ object ElectrumConfiguration {
             val walletIsInitialized: Boolean = false,
             val connection: Connection,
             val electrumServer: ElectrumServer,
-            val feeRate: Long = -1,
+            val feeRate: Long = 0,
             val xpub: String? = null,
             val path: String? = null
         ) : Model()
