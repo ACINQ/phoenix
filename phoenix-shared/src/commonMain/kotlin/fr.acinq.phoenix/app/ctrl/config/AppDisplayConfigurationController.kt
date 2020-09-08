@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class AppDisplayConfigurationController(di: DI) : AppController<DisplayConfiguration.Model, Intent>(di, DisplayConfiguration.Model.ShowConfiguration()) {
+class AppDisplayConfigurationController(di: DI) : AppController<DisplayConfiguration.Model, Intent>(di, DisplayConfiguration.Model()) {
     private val configurationManager: AppConfigurationManager by instance()
 
     init { sendDisplayConfigurationModel() }
@@ -28,7 +28,7 @@ class AppDisplayConfigurationController(di: DI) : AppController<DisplayConfigura
         launch {
             model {
                 val config = configurationManager.getAppConfiguration()
-                DisplayConfiguration.Model.ShowConfiguration(
+                DisplayConfiguration.Model(
                     fiatCurrency = config.fiatCurrency,
                     bitcoinUnit = config.bitcoinUnit,
                     appTheme = config.appTheme

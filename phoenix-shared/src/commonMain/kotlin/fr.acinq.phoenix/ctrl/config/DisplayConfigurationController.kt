@@ -7,13 +7,11 @@ typealias DisplayConfigurationController = MVI.Controller<DisplayConfiguration.M
 
 object DisplayConfiguration {
 
-    sealed class Model : MVI.Model() {
-        data class ShowConfiguration(
-            val fiatCurrency: FiatCurrency = FiatCurrency.USD,
-            val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
-            val appTheme: AppTheme = AppTheme.System
-        ) : Model()
-    }
+    data class Model(
+        val fiatCurrency: FiatCurrency = FiatCurrency.USD,
+        val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
+        val appTheme: AppTheme = AppTheme.System
+    ) : MVI.Model()
 
     sealed class Intent : MVI.Intent() {
         data class UpdateFiatCurrency(val fiatCurrency: FiatCurrency) : Intent()

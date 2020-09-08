@@ -15,7 +15,7 @@ class MockDIBuilder {
     var scanModel: Scan.Model = Scan.Model.Ready
     var restoreWalletModel: RestoreWallet.Model = RestoreWallet.Model.Ready
     var configurationModel: Configuration.Model = Configuration.Model.SimpleMode
-    var displayConfigurationModel: DisplayConfiguration.Model = DisplayConfiguration.Model.ShowConfiguration()
+    var displayConfigurationModel: DisplayConfiguration.Model = DisplayConfiguration.Model()
     var electrumConfigurationModel: ElectrumConfiguration.Model = ElectrumConfiguration.Model.Empty
 
     fun apply(block: MockDIBuilder.() -> Unit): MockDIBuilder {

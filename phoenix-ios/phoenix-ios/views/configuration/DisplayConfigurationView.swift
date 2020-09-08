@@ -13,13 +13,9 @@ struct DisplayConfigurationView: MVIView {
         mvi(
                 background: true,
                 onModel: { model in
-                    switch model {
-                    case let m as DisplayConfiguration.ModelShowConfiguration:
-                        selectedFiatCurrency = m.fiatCurrency
-                        selectedBitcoinUnit = m.bitcoinUnit
-                        selectedAppTheme = m.appTheme
-                    default: break
-                    }
+                    selectedFiatCurrency = model.fiatCurrency
+                    selectedBitcoinUnit = model.bitcoinUnit
+                    selectedAppTheme = model.appTheme
                 }
         ) { model, intent in
             Form {
@@ -70,7 +66,7 @@ struct DisplayConfigurationView: MVIView {
 }
 
 class DisplayConfigurationView_Previews: PreviewProvider {
-    static let mockModel = DisplayConfiguration.ModelShowConfiguration(fiatCurrency: .usd, bitcoinUnit: .satoshi, appTheme: .system)
+    static let mockModel = DisplayConfiguration.Model(fiatCurrency: .usd, bitcoinUnit: .satoshi, appTheme: .system)
 
     static var previews: some View {
         mockView(DisplayConfigurationView()) {
