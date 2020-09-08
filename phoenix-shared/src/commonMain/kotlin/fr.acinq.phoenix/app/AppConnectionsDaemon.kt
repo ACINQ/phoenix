@@ -4,6 +4,7 @@ import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.utils.Connection
 import fr.acinq.phoenix.utils.NetworkMonitor
+import fr.acinq.phoenix.utils.TAG_ACINQ_ADDRESS
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
@@ -21,7 +22,6 @@ import kotlin.time.seconds
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class AppConnectionsDaemon(override val di: DI) : DIAware {
 
-    // TODO to be replaced by a real DB
     private val walletManager: WalletManager by instance()
 
     private val monitor: NetworkMonitor by instance()
@@ -50,8 +50,7 @@ class AppConnectionsDaemon(override val di: DI) : DIAware {
 
             if (it != Connection.CLOSED) {
                 connectionDaemonJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
-                        val host: String by instance(tag = "host")
-                        peer.connect(host, 48001)
+                        peer.connect(direct.instance(tag = TAG_ACINQ_ADDRESS), 48001)
                     }
                 connectionElectrumJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
                         electrumClient.connect()

@@ -1,10 +1,7 @@
 package fr.acinq.phoenix
 
 import fr.acinq.phoenix.ctrl.*
-import fr.acinq.phoenix.ctrl.config.Configuration
-import fr.acinq.phoenix.ctrl.config.ConfigurationController
-import fr.acinq.phoenix.ctrl.config.DisplayConfiguration
-import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
+import fr.acinq.phoenix.ctrl.config.*
 import fr.acinq.phoenix.utils.screenProvider
 import org.kodein.di.DI
 import org.kodein.di.bind
@@ -19,6 +16,7 @@ class MockDIBuilder {
     var restoreWalletModel: RestoreWallet.Model = RestoreWallet.Model.Ready
     var configurationModel: Configuration.Model = Configuration.Model.SimpleMode
     var displayConfigurationModel: DisplayConfiguration.Model = DisplayConfiguration.Model.ShowConfiguration()
+    var electrumConfigurationModel: ElectrumConfiguration.Model = ElectrumConfiguration.Model.Empty
 
     fun apply(block: MockDIBuilder.() -> Unit): MockDIBuilder {
         this.block()
@@ -34,5 +32,6 @@ class MockDIBuilder {
         bind<RestoreWalletController>() with screenProvider { RestoreWallet.MockController(restoreWalletModel) }
         bind<ConfigurationController>() with screenProvider { Configuration.MockController(configurationModel) }
         bind<DisplayConfigurationController>() with screenProvider { DisplayConfiguration.MockController(displayConfigurationModel) }
+        bind<ElectrumConfigurationController>() with screenProvider { ElectrumConfiguration.MockController(electrumConfigurationModel) }
     }
 }

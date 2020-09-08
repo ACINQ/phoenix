@@ -13,9 +13,7 @@ struct ConfigurationView : MVIView {
                 Section(header: "General") {
                     NavigationMenu(label: "About", destination: AboutView())
                     NavigationMenu(label: "Display", destination: DisplayConfigurationView())
-                    ButtonMenu { } label: {
-                        Text("Electrum Server")
-                    }
+                    NavigationMenu(label: "Electrum Server", destination: ElectrumConfigurationView())
                     ButtonMenu { } label: {
                         Text("Tor")
                     }

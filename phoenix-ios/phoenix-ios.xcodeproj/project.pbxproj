@@ -33,6 +33,7 @@
 		C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */; };
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitView.swift */; };
+		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
 		F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; };
 		F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -96,6 +97,7 @@
 		7555FF9C242A565B00829871 /* phoenix-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "phoenix-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FFA0242A565B00829871 /* phoenix-iosUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "phoenix-iosUITests.swift"; sourceTree = "<group>"; };
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitView.swift; sourceTree = "<group>"; };
 		C8D7A2327BC90150A3E1493D /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		C8D7A44147508AA19378B739 /* RestoreWalletView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestoreWalletView.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
 				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
 				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
+				C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */,
 			);
 			path = configuration;
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
+				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

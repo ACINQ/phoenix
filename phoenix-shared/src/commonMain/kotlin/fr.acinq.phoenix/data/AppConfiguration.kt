@@ -12,9 +12,7 @@ data class AppConfiguration(
     // Display
     val fiatCurrency: FiatCurrency = FiatCurrency.USD,
     val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
-    val appTheme: AppTheme = AppTheme.System,
-    // Electrum Server
-    val electrumServer: String = ""
+    val appTheme: AppTheme = AppTheme.System
 ) : Metadata
 
 
@@ -77,3 +75,17 @@ enum class FiatCurrency(val label: String) {
         )
     }
 }
+
+@Serializable
+data class ElectrumServer(
+    // Unique ID a their is only one configuration per app
+    override val id: Int = 0,
+    // TODO if not customized, should be dynamic and random
+    val host: String = "localhost",
+    val port: Int = 51001,
+    val customized: Boolean = false,
+    val blockHeight: Int = -1,
+    val tipTimestamp: Long = -1
+) : Metadata
+
+fun ElectrumServer.address(): String = "$host:$port"

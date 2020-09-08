@@ -19,13 +19,14 @@ import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
 import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppElectrumConfigurationController
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.ConfigurationController
 import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
-import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.TAG_APPLICATION
-import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
-import fr.acinq.phoenix.utils.screenProvider
+import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
+import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.Wallet
+import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.Serializable
@@ -132,7 +133,10 @@ class PhoenixBusiness {
 //        constant(tag = TAG_ACINQ_ADDRESS) with "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735"
         bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
 
-        bind<ElectrumClient>() with singleton { ElectrumClient(instance(tag = "host"), 51001, null, MainScope()) }
+        bind<ElectrumClient>() with singleton {
+            val electrumServer = instance<AppConfigurationManager>().getElectrumServer()
+            ElectrumClient(electrumServer.host, electrumServer.port, null, MainScope())
+        }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with singleton {
             instance<WalletManager>().getWallet()?.let {
@@ -143,16 +147,21 @@ class PhoenixBusiness {
         bind<WalletManager>() with singleton { WalletManager(di) }
         bind<AppConfigurationManager>() with singleton { AppConfigurationManager(di) }
 
+        // MVI controllers
         bind<ContentController>() with screenProvider { AppContentController(di) }
         bind<InitController>() with screenProvider { AppInitController(di) }
         bind<HomeController>() with screenProvider { AppHomeController(di) }
         bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
         bind<ScanController>() with screenProvider { AppScanController(di) }
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
+
         // App Configuration
         bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
         bind<DisplayConfigurationController>() with screenProvider { AppDisplayConfigurationController(di) }
+        bind<ElectrumConfigurationController>() with screenProvider { AppElectrumConfigurationController(di) }
 
+        // App daemons
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
+        bind() from eagerSingleton { AppElectrumDaemon(di) }
     }
 }
