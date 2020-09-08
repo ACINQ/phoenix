@@ -14,34 +14,19 @@ struct ConfigurationView : MVIView {
                     NavigationMenu(label: "About", destination: AboutView())
                     NavigationMenu(label: "Display", destination: DisplayConfigurationView())
                     NavigationMenu(label: "Electrum Server", destination: ElectrumConfigurationView())
-                    ButtonMenu { } label: {
-                        Text("Tor")
-                    }
+                    NavigationMenu(label: "Tor", destination: EmptyView())
                 }
 
-                Section(header: "Security", fullMode: fullMode) {
-                    ButtonMenu { } label: {
-                        Text("Recovery phrase")
-                    }
-                    ButtonMenu { } label: {
-                        Text("App access settings")
-                    }
+                Section(header: "Security", visible: fullMode) {
+                    NavigationMenu(label: "Recovery phrase", destination: EmptyView())
+                    NavigationMenu(label: "App access settings", destination: EmptyView())
                 }
 
                 Section(header: "Advanced") {
-                    ButtonMenu(visible: fullMode) { } label: {
-                        Text("Channels list")
-                    }
-                    ButtonMenu() { } label: {
-                        Text("Logs")
-                    }
-                    ButtonMenu(visible: fullMode) { } label: {
-                        Text("Close all channels")
-                    }
-                    ButtonMenu(visible: fullMode) { } label: {
-                        Text("Danger zone")
-                                .foregroundColor(Color.red)
-                    }
+                    NavigationMenu(label: "Channels list", destination: EmptyView(), visible: fullMode)
+                    NavigationMenu(label: "Logs", destination: EmptyView())
+                    NavigationMenu(label: "Close all channels", destination: EmptyView(), visible: fullMode)
+                    NavigationMenu(label: "Danger zone", destination: EmptyView(), visible: fullMode)
                 }
 
                 Spacer()
@@ -55,17 +40,17 @@ struct ConfigurationView : MVIView {
 
     struct Section<Content> : View where Content : View {
         let header: String
-        let fullMode: Bool
+        let visible: Bool
         let menu: () -> Content
 
-        init(header: String, fullMode: Bool = true, @ViewBuilder menu: @escaping () -> Content) {
+        init(header: String, visible: Bool = true, @ViewBuilder menu: @escaping () -> Content) {
             self.header = header
-            self.fullMode = fullMode
+            self.visible = visible
             self.menu = menu
         }
 
         var body : some View {
-            if fullMode {
+            if visible {
                 VStack {
                     Text(header)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,35 +66,6 @@ struct ConfigurationView : MVIView {
         }
     }
 
-    struct ButtonMenu<Content> : View where Content : View {
-        let label: () -> Content
-        let action: () -> Void
-        let visible: Bool
-
-        init(visible: Bool = true, action: @escaping () -> Void, @ViewBuilder label: @escaping () -> Content) {
-            self.label = label
-            self.action = action
-            self.visible = visible
-        }
-
-        var body : some View {
-            if visible {
-                Button {
-                    action()
-                } label: {
-                    Group{
-                        label()
-                    }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.subheadline)
-                            .foregroundColor(Color.black)
-                            .padding([.leading, .trailing])
-                }
-                Divider()
-            }
-        }
-    }
-    
     struct NavigationMenu<T : View> : View {
         let label: String
         let destination: T
@@ -138,7 +94,7 @@ struct ConfigurationView : MVIView {
 }
 
 class ConfigurationView_Previews : PreviewProvider {
-    static let mockModel = Configuration.ModelSimpleMode()
+    static let mockModel = Configuration.ModelFullMode()
 
     static var previews: some View {
         mockView(ConfigurationView()) { $0.configurationModel = mockModel }
