@@ -1,15 +1,32 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.DeterministicWallet
+import fr.acinq.bitcoin.KeyPath
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eklair.utils.UUID
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.modules.SerializersModule
 import org.kodein.db.model.orm.Metadata
 
 @Serializable
 data class Wallet(
+    // Unique ID a their is only one wallet per app
     override val id: Int = 0,
-    val seed: ByteArray) : Metadata {
+    val mnemonics: List<String>) : Metadata {
+
+    val seed by lazy { MnemonicCode.toSeed(mnemonics, "") }
+    private val master by lazy { DeterministicWallet.generate(seed) }
+
+    fun derivedPublicKey(path: List<Long>, isMainnet: Boolean): String {
+        val privateKey = DeterministicWallet.derivePrivateKey(master, path)
+        val publicKey = DeterministicWallet.publicKey(privateKey)
+        return DeterministicWallet.encode(
+            input = publicKey,
+            prefix = if (isMainnet) DeterministicWallet.zpub else DeterministicWallet.vpub
+        )
+    }
 
     // Recommended when data class props contain arrays
     override fun equals(other: Any?): Boolean {

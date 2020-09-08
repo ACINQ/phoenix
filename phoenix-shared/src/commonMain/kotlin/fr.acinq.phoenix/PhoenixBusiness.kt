@@ -56,10 +56,10 @@ class PhoenixBusiness {
         }
     }
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteArray) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, wallet: Wallet) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
-        val keyManager = LocalKeyManager(seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
+        val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
         println("nodeId:${keyManager.nodeId}") // TODO remove this!
 
         val params = NodeParams(
@@ -134,11 +134,9 @@ class PhoenixBusiness {
 
         bind<ElectrumClient>() with singleton { ElectrumClient(instance(tag = "host"), 51001, null, MainScope()) }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
-//        bind<Peer>() with singleton { buildPeer(instance(), instance(), instance(), instance(tag = "seed")) }
         bind<Peer>() with singleton {
             instance<WalletManager>().getWallet()?.let {
-                println("Seed: ${it.seed}")
-                buildPeer(instance(), instance(), instance(), it.seed)
+                buildPeer(instance(), instance(), instance(), it)
             } ?: error("Wallet must be initialized.")
         }
         bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
