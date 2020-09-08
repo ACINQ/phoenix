@@ -162,6 +162,5 @@ class PhoenixBusiness {
 
         // App daemons
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
-        bind() from eagerSingleton { AppElectrumDaemon(di) }
     }
 }

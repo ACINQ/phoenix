@@ -26,7 +26,7 @@ enum class BitcoinUnit(val label: String) {
     Bitcoin("Bitcoin");
 
     companion object default {
-        val values = listOf(Satoshi, Bits, MilliBitcoin, Bitcoin)
+        val values = BitcoinUnit.values()
     }
 }
 
@@ -37,7 +37,7 @@ enum class AppTheme(val label: String) {
      System("System default");
 
     companion object default {
-        val values = listOf(Dark, Light, System)
+        val values = AppTheme.values()
     }
 }
 
@@ -68,11 +68,7 @@ enum class FiatCurrency(val label: String) {
     USD("(USD) United States Dollar");
 
     companion object default {
-        val values = listOf(
-            AUD, BRL, CAD, CHF, CLP, CNY, DKK, EUR, GBP, HKD,
-            INR, ISK, JPY, KRW, MXN, NZD, PLN, RUB, SEK, SGD,
-            THB, TWD, USD
-        )
+        val values = FiatCurrency.values()
     }
 }
 

@@ -101,12 +101,10 @@ struct ElectrumConfigurationView: MVIView {
 
     struct Section<Content>: View where Content: View {
         let header: String
-        let fullMode: Bool
         let content: () -> Content
 
         init(header: String, fullMode: Bool = true, @ViewBuilder content: @escaping () -> Content) {
             self.header = header
-            self.fullMode = fullMode
             self.content = content
         }
 
