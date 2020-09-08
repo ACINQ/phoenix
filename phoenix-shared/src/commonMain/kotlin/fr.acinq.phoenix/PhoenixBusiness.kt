@@ -128,9 +128,9 @@ class PhoenixBusiness {
         bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
 //        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
 
-//        constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
-//        constant(tag = "host") with "192.168.86.24"
-        constant(tag = "host") with "localhost"
+        constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
+//        constant(tag = TAG_ACINQ_ADDRESS) with "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735"
+        bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
 
         bind<ElectrumClient>() with singleton { ElectrumClient(instance(tag = "host"), 51001, null, MainScope()) }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }

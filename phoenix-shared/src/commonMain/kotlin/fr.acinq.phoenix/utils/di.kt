@@ -19,3 +19,5 @@ fun DIAware.newLogger(): Logger = this.newLogger(direct.instance())
 
 // Tags
 const val TAG_APPLICATION = "application"
+const val TAG_IS_MAINNET = "is_mainnet"
+const val TAG_ACINQ_ADDRESS = "peer_host"

@@ -7,6 +7,8 @@ import org.kodein.db.model.orm.Metadata
 data class AppConfiguration(
     // Unique ID a their is only one configuration per app
     override val id: Int = 0,
+    // Global
+    val chain: Chain = Chain.TESTNET,
     // Display
     val fiatCurrency: FiatCurrency = FiatCurrency.USD,
     val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
@@ -14,6 +16,9 @@ data class AppConfiguration(
     // Electrum Server
     val electrumServer: String = ""
 ) : Metadata
+
+
+enum class Chain { MAINNET, TESTNET }
 
 @Serializable
 enum class BitcoinUnit(val label: String) {
