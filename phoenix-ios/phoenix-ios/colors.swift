@@ -7,13 +7,17 @@ import SwiftUI
 
 extension Color {
 
-    static let appBackground = Color(red: 0.96, green: 0.96, blue: 0.98)
+    static let appBackground = Color(red: 0.96, green: 0.96, blue: 0.98) // deprecated
     static let appBackgroundLight = Color(red: 0.99, green: 0.99, blue: 1.0)
 
     static let appDark = Color(hex: "2B313E")
-    static let appHorizon = Color(hex: "91B4D1")
-    static let appRed = Color(hex: "D14F4F")
-    static let appGreen = Color(hex: "1AC486")
-    static let appYellow = Color(hex: "#febc2e")
+	
+    // See Colors.xcassets for RGB values.
+    // The assets catalog allows us to customize the values for light vs dark modes.
+
+    static let appHorizon = Color("appHorizon")
+    static let appRed = Color("appRed")
+    static let appGreen = Color("appGreen")
+    static let appYellow = Color("appYellow")
 
 }

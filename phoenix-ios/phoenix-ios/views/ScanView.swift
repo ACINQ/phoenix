@@ -20,11 +20,12 @@ struct ScanView: MVIView {
                 .navigationBarTitle("", displayMode: .inline)
     }
 
+    @ViewBuilder
     func view(model: Scan.Model, intent: @escaping IntentReceiver) -> some View {
         switch model {
-        case _ as Scan.ModelReady: return AnyView(ReadyView(intent: intent))
-        case let m as Scan.ModelValidate: return AnyView(ValidateView(model: m, intent: intent))
-        case let m as Scan.ModelSending: return AnyView(SendingView(model: m))
+        case _ as Scan.ModelReady: ReadyView(intent: intent)
+        case let m as Scan.ModelValidate: ValidateView(model: m, intent: intent)
+        case let m as Scan.ModelSending: SendingView(model: m)
         default:
             fatalError("Unknown model \(model)")
         }

@@ -11,6 +11,7 @@
 		53BEF1E80E41F1AA4C9A9803 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF637BD83D356A4A9C74F /* MVIView.swift */; };
 		53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF85119FFF4F05588DA42 /* mocks.swift */; };
 		53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* colors.swift */; };
+		53BEF52EB1E6D171A81BF859 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFB85B066C30B3C30EB95 /* log.swift */; };
 		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
 		53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6CBB2587136D25A625A /* lang.swift */; };
 		53BEF981E71E3087871890F9 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */; };
@@ -34,6 +35,7 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
+		DCC8B1B92502BAE2006B6227 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DCC8B1B82502BAE1006B6227 /* Colors.xcassets */; };
 		F43B86AB24A49FA7004C1291 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; };
 		F43B86AC24A49FA7004C1291 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -78,6 +80,7 @@
 		53BEF85119FFF4F05588DA42 /* mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mocks.swift; sourceTree = "<group>"; };
 		53BEF9AEB876A2611C6FC8F5 /* DI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DI.swift; sourceTree = "<group>"; };
 		53BEFA112E0701FFD6B84217 /* colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
+		53BEFB85B066C30B3C30EB95 /* log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = log.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 		53BEFE171C182513A5762686 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -103,6 +106,7 @@
 		C8D7A44147508AA19378B739 /* RestoreWalletView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestoreWalletView.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
+		DCC8B1B82502BAE1006B6227 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		F43B86AA24A49FA7004C1291 /* PhoenixShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhoenixShared.framework; path = "../phoenix-shared/build/xcode-frameworks/PhoenixShared.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -147,6 +151,7 @@
 				53BEF85119FFF4F05588DA42 /* mocks.swift */,
 				53BEF6CBB2587136D25A625A /* lang.swift */,
 				53BEF563E51BE558225C499B /* models.swift */,
+				53BEFB85B066C30B3C30EB95 /* log.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -202,6 +207,7 @@
 				7555FF7E242A565900829871 /* AppDelegate.swift */,
 				7555FF80242A565900829871 /* SceneDelegate.swift */,
 				7555FF82242A565900829871 /* ContentView.swift */,
+				DCC8B1B82502BAE1006B6227 /* Colors.xcassets */,
 				7555FF84242A565B00829871 /* Assets.xcassets */,
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
@@ -367,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */,
+				DCC8B1B92502BAE2006B6227 /* Colors.xcassets in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
 				7555FF85242A565B00829871 /* Assets.xcassets in Resources */,
 			);
@@ -435,6 +442,7 @@
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
+				53BEF52EB1E6D171A81BF859 /* log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

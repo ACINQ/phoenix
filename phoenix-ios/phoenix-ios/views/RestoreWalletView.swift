@@ -7,22 +7,25 @@ struct RestoreWalletView: MVIView {
 
     var body: some View {
         mvi { model, intent in
-            VStack {
-                view(model: model, intent: intent)
-            }
+            view(model: model, intent: intent)
                     .padding(.top, keyWindow?.safeAreaInsets.bottom)
                     .padding(.bottom, keyWindow?.safeAreaInsets.top)
                     .padding([.leading, .trailing], 10)
-                    .background(Color.appBackground)
                     .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
         }
                 .navigationBarTitle("Restore my wallet", displayMode: .inline)
     }
 
-    func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
-        switch model {
-        case _ as RestoreWallet.ModelWarning: return AnyView(WarningView(intent: intent))
-        default: return AnyView(RestoreView(model: model, intent: intent))
+    @ViewBuilder func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
+        
+        if let _ = model as? RestoreWallet.ModelWarning {
+            WarningView(intent: intent)
+            .zIndex(1)
+            .transition(.move(edge: .bottom))
+            .animation(.default)
+        } else {
+            RestoreView(model: model, intent: intent)
+            .zIndex(0)
         }
     }
 
@@ -32,22 +35,22 @@ struct RestoreWalletView: MVIView {
         @State private var warningAccepted = false
 
         var body: some View {
-            Text("""
-                 Do not import a seed that was NOT 
-                 created by this application.
-
-                 Also, make sure that you don't have 
-                 another Phoenix wallet running with the
-                 same seed.
-                 """)
-                    .font(.title3)
-                    .padding()
+          VStack {
+				
+				//
+				
+            Text(
+                "Do not import a seed that was NOT created by this application.\n\n" +
+                "Also, make sure that you don't have another Phoenix wallet running with the same seed."
+				)
+            .font(.title3)
+            .padding(.top, 20)
 
             Toggle(isOn: $warningAccepted) {
                 Text("I understand.").font(.title3)
             }
-                    .padding([.top, .bottom], 16)
-                    .padding([.leading, .trailing], 88)
+            .padding([.top, .bottom], 16)
+            .padding([.leading, .trailing], 88)
 
             Button {
                 intent(RestoreWallet.IntentAcceptWarning())
@@ -60,18 +63,20 @@ struct RestoreWalletView: MVIView {
                             .font(.title2)
                 }
             }
-                    .disabled(!$warningAccepted.wrappedValue)
-                    .buttonStyle(PlainButtonStyle())
-                    .padding([.top, .bottom], 8)
-                    .padding([.leading, .trailing], 16)
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.appHorizon, lineWidth: 2)
-                    )
+            .disabled(!$warningAccepted.wrappedValue)
+            .buttonStyle(PlainButtonStyle())
+            .padding([.top, .bottom], 8)
+            .padding([.leading, .trailing], 16)
+            .background(Color(UIColor.systemFill))
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.appHorizon, lineWidth: 2)
+            )
 
             Spacer()
+          }
+          .background(Color(UIColor.systemBackground))
         }
     }
 
@@ -86,7 +91,8 @@ struct RestoreWalletView: MVIView {
         var body: some View {
             VStack {
                 Text("Your wallet's seed is a list of 12 english words.")
-                        .font(.title3)
+                .font(.title3)
+                .padding(.top, 20)
 
                 TextField("Enter keywords from your seed", text: $wordInput).onChange(of: wordInput) { input in
                             intent(RestoreWallet.IntentFilterWordList(predicate: input))
@@ -100,13 +106,13 @@ struct RestoreWalletView: MVIView {
                         if model is RestoreWallet.ModelWordlist && mnemonics.count < 12 {
                             ForEach((model as! RestoreWallet.ModelWordlist).words, id: \.self) { word in
                                 Text(word)
-                                        .underline()
-                                        .frame(maxWidth: .infinity) // Hack to be able to tap ...
-                                        .background(Color.appBackground) // ... everywhere in the row
-                                        .onTapGesture {
-                                            mnemonics.append(word)
-                                            wordInput = ""
-                                        }
+                                    .underline()
+                                    .frame(maxWidth: .infinity) // Hack to be able to tap ...
+                                //  .background(Color.appBackground) // ... everywhere in the row
+                                    .onTapGesture {
+                                        mnemonics.append(word)
+                                        wordInput = ""
+                                    }
 
                             }
                         }
@@ -161,18 +167,22 @@ struct RestoreWalletView: MVIView {
                     intent(RestoreWallet.IntentValidateSeed(mnemonics: self.mnemonics))
                 } label: {
                     HStack {
-                        Image("ic_check_circle")
-                                .resizable()
-                                .frame(width: 16, height: 16)
+                    //  Image("ic_check_circle")
+                    //  .resizable()
+                    //  .frame(width: 16, height: 16)
+                        
+                        Image(systemName: "checkmark.circle")
+                        .imageScale(.small)
+
                         Text("Import")
-                                .font(.title2)
                     }
+                    .font(.title2)
                 }
                         .disabled(mnemonics.count != 12)
                         .buttonStyle(PlainButtonStyle())
                         .padding([.top, .bottom], 8)
                         .padding([.leading, .trailing], 16)
-                        .background(Color.white)
+                        .background(Color(UIColor.systemFill))
                         .cornerRadius(16)
                         .overlay(
                                 RoundedRectangle(cornerRadius: 16)
