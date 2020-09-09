@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.eklair.utils.UUID
 import kotlinx.serialization.Serializable
 import org.kodein.db.Index
 import org.kodein.db.indexSet

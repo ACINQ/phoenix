@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.eklair.blockchain.electrum.ElectrumClient
-import fr.acinq.eklair.channel.HasCommitments
-import fr.acinq.eklair.io.Peer
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.data.Transaction

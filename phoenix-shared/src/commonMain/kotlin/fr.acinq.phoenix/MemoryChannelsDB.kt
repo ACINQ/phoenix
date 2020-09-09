@@ -1,9 +1,9 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eklair.CltvExpiry
-import fr.acinq.eklair.channel.HasCommitments
-import fr.acinq.eklair.db.ChannelsDb
+import fr.acinq.eclair.CltvExpiry
+import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.db.ChannelsDb
 
 class MemoryChannelsDB : ChannelsDb {
 

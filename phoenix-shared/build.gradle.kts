@@ -44,7 +44,7 @@ kotlin {
 
         val coroutinesVersion = "1.3.9-native-mt"
         val serializationVersion = "1.0.0-RC"
-        val secp256k1Version = "0.3.0"
+        val secp256k1Version = "0.4.0"
         val ktorVersion = "1.4.0"
         val kodeinDIVersion = "7.1.0-master-87"
 //        val kodeinDBVersion = "0.2.0"
@@ -52,7 +52,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("fr.acinq.eklair:eklair:snapshot")
+                api("fr.acinq.eclair:eclair-kmp:snapshot")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 api("org.kodein.di:kodein-di:$kodeinDIVersion")
@@ -71,7 +71,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("androidx.core:core-ktx:1.3.1")
-                api("fr.acinq.secp256k1:secp256k1-jni-android:$secp256k1Version")
+                api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1Version")
                 api("io.ktor:ktor-network:$ktorVersion")
                 api("io.ktor:ktor-network-tls:$ktorVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
@@ -90,7 +90,7 @@ kotlin {
                     currentOs.isWindows -> "mingw"
                     else -> error("UnsupportedmOS $currentOs")
                 }
-                implementation("fr.acinq.secp256k1:secp256k1-jni-jvm-$target:$secp256k1Version")
+                implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:$secp256k1Version")
             }
         }
 

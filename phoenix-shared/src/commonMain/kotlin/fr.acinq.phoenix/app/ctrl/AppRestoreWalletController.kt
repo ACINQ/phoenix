@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.eklair.utils.toByteVector32
 import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.ctrl.RestoreWallet
 import kotlinx.coroutines.ExperimentalCoroutinesApi

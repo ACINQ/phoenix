@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.eklair.utils.Connection
+import fr.acinq.eclair.utils.Connection
 import kotlinx.coroutines.channels.ReceiveChannel
 
 
