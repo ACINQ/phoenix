@@ -49,7 +49,7 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
                     intent.address.split(":").let {
                         val host = it.first()
                         val port = it.last().toInt()
-                        configurationManager.putElectrumServerAddress(host, port)
+                        configurationManager.putElectrumServerAddress(host, port, intent.customized)
                     }
                     sendElectrumConfigurationModel()
                 } else {

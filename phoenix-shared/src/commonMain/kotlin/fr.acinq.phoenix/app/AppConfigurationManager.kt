@@ -97,8 +97,8 @@ class AppConfigurationManager (override val di: DI) : DIAware, CoroutineScope by
 
     fun getElectrumServer(): ElectrumServer = db[electrumServerKey] ?: createElectrumConfiguration()
 
-    fun putElectrumServerAddress(host: String, port: Int) {
-        putElectrumServer(getElectrumServer().copy(host = host, port = port))
+    fun putElectrumServerAddress(host: String, port: Int, customized: Boolean = false) {
+        putElectrumServer(getElectrumServer().copy(host = host, port = port, customized = customized))
     }
     fun putElectrumServer(electrumServer: ElectrumServer) {
         logger.info { "Update electrum configuration [$electrumServer]" }

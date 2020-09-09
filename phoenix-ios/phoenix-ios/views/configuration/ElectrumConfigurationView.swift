@@ -176,7 +176,7 @@ struct ElectrumConfigurationView: MVIView {
                                     .font(.title2)
                                     .padding()
                         }
-                    }.disabled(!customize)
+                    }
                             .frame(maxWidth: .infinity)
                             .opacity(customize ? 1 : 0.5)
                 }
