@@ -50,7 +50,7 @@ struct ContentView: MVIView {
 }
 
 func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) -> some View {
-    NavigationView { content }
+    content
             .environmentObject(
                     ObservableDI(
                             DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())
