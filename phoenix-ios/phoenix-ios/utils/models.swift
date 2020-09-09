@@ -6,7 +6,7 @@
 import PhoenixShared
 
 
-extension EklairConnection {
+extension Eclair_kmpConnection {
     func text() -> String {
         switch self {
         case .closed: return "Offline"
