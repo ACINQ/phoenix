@@ -1,9 +1,8 @@
 package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.bitcoin.KeyPath
-import fr.acinq.eklair.blockchain.electrum.ElectrumClient
-import fr.acinq.eklair.io.Peer
-import fr.acinq.eklair.utils.Connection
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.app.ctrl.AppController

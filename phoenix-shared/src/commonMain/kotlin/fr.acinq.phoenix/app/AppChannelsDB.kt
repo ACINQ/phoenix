@@ -1,23 +1,17 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eklair.CltvExpiry
-import fr.acinq.eklair.blockchain.fee.ConstantFeeEstimator
-import fr.acinq.eklair.channel.HasCommitments
-import fr.acinq.eklair.crypto.KeyManager
-import fr.acinq.eklair.db.ChannelsDb
-import fr.acinq.eklair.io.ByteVector32KSerializer
-import fr.acinq.eklair.io.eklairSerializersModule
-import fr.acinq.eklair.utils.UUID
-import fr.acinq.eklair.wire.Tlv
-import fr.acinq.eklair.wire.UpdateMessage
+import fr.acinq.eclair.CltvExpiry
+import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.db.ChannelsDb
+import fr.acinq.eclair.io.ByteVector32KSerializer
+import fr.acinq.eclair.io.eclairSerializersModule
+import fr.acinq.eclair.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import org.kodein.db.*
-import org.kodein.db.model.orm.DefaultSerializer
 import org.kodein.db.model.orm.Metadata
-import org.kodein.db.model.orm.Serializer
 import org.kodein.db.orm.kotlinx.KotlinxSerializer
 
 
@@ -26,7 +20,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
     val db = dbFactory.open(
         "channels",
         KotlinxSerializer(SerializersModule {
-            include(eklairSerializersModule)
+            include(eclairSerializersModule)
             include(PhoenixBusiness.PeerFeeEstimator.serializersModule)
         })
     )
