@@ -3,9 +3,13 @@ package fr.acinq.phoenix.app
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.utils.Connection
+import fr.acinq.phoenix.data.ElectrumServer
+import fr.acinq.phoenix.data.address
+import fr.acinq.phoenix.data.asServerAddress
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.TAG_ACINQ_ADDRESS
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import org.kodein.di.DI
@@ -20,8 +24,9 @@ import kotlin.time.seconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class AppConnectionsDaemon(override val di: DI) : DIAware {
+class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by MainScope() {
 
+    private val appConfigurationManager: AppConfigurationManager by instance()
     private val walletManager: WalletManager by instance()
 
     private val monitor: NetworkMonitor by instance()
@@ -30,42 +35,89 @@ class AppConnectionsDaemon(override val di: DI) : DIAware {
 
     private val logger = direct.instance<LoggerFactory>().newLogger(AppConnectionsDaemon::class)
 
+    private val electrumConnectionOrder = Channel<ConnectionOrder>()
+    private val peerConnectionOrder = Channel<ConnectionOrder>()
+
+    private var peerConnectionJob :Job? = null
+    private var electrumConnectionJob: Job? = null
+    private var networkMonitorJob: Job? = null
+
     init {
-        MainScope().launch {
+        // Electrum
+        launch {
+            electrumConnectionOrder.consumeEach {
+                when (it) {
+                    ConnectionOrder.CONNECT -> {
+                        electrumConnectionJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
+                            val electrumServer = appConfigurationManager.getElectrumServer()
+                            electrumClient.connect(electrumServer.asServerAddress())
+                        }
+                    }
+                    else -> {
+                        electrumConnectionJob?.cancel()
+                        electrumClient.disconnect()
+                    }
+                }
+            }
+        }
+        launch {
+            var previousElectrumServer: ElectrumServer? = null
+            appConfigurationManager.openElectrumServerUpdateSubscription().consumeEach {
+                if (previousElectrumServer?.address() != it.address()) {
+                    logger.info { "Electrum server has changed. We need to refresh the connection." }
+                    electrumConnectionOrder.send(ConnectionOrder.CLOSE)
+                    electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                }
+
+                previousElectrumServer = it
+            }
+        }
+        // Peer
+        launch {
+            peerConnectionOrder.consumeEach {
+                when (it) {
+                    ConnectionOrder.CONNECT -> {
+                        peerConnectionJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
+                            peer.connect(direct.instance(tag = TAG_ACINQ_ADDRESS), 48001)
+                        }
+                    }
+                    else -> {
+                        peerConnectionJob?.cancel()
+                    }
+                }
+            }
+        }
+        // Internet connection
+        launch {
             walletManager.openWalletUpdatesSubscription().consumeEach {
-                networkStateMonitoring()
+                if (networkMonitorJob == null) networkMonitorJob = networkStateMonitoring()
             }
         }
     }
 
-    private var connectionDaemonJob :Job? = null
-    private var connectionElectrumJob: Job? = null
-
-    private suspend fun networkStateMonitoring() {
+    private fun networkStateMonitoring() = launch {
         monitor.start()
         var networkStatus = Connection.CLOSED
         monitor.openNetworkStateSubscription().consumeEach {
             if (networkStatus == it) return@consumeEach
             logger.info { "New internet status: $it" }
 
-            if (it != Connection.CLOSED) {
-                connectionDaemonJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
-                        peer.connect(direct.instance(tag = TAG_ACINQ_ADDRESS), 48001)
-                    }
-                connectionElectrumJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
-                        electrumClient.connect()
-                    }
-            } else {
-                connectionDaemonJob?.cancel()
-                connectionElectrumJob?.cancel()
-                electrumClient.disconnect()
+            when(it) {
+                Connection.CLOSED -> {
+                    peerConnectionOrder.send(ConnectionOrder.CLOSE)
+                    electrumConnectionOrder.send(ConnectionOrder.CLOSE)
+                }
+                else -> {
+                    peerConnectionOrder.send(ConnectionOrder.CONNECT)
+                    electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                }
             }
 
             networkStatus = it
         }
     }
 
-    private fun connectionLoop(name: String, statusChannel: ReceiveChannel<Connection>, connect: () -> Unit) = MainScope().launch {
+    private fun connectionLoop(name: String, statusChannel: ReceiveChannel<Connection>, connect: () -> Unit) = launch {
         var retryDelay = 1.seconds
         statusChannel.consumeEach {
             logger.verbose { "New $name status $it" }
@@ -80,10 +132,10 @@ class AppConnectionsDaemon(override val di: DI) : DIAware {
         }
     }
 
-
     private fun increaseDelay(retryDelay: Duration) = when (val delay = retryDelay.inSeconds) {
         8.0 -> delay
         else -> delay * 2.0
     }.seconds
 
+    enum class ConnectionOrder { CONNECT, CLOSE }
 }

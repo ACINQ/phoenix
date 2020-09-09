@@ -37,8 +37,13 @@ class AppConfigurationManager (override val di: DI) : DIAware, CoroutineScope by
      */
     init {
         db.on<ElectrumServer>().register {
+            var oldElectrumServer = ElectrumServer()
+            willPut {
+                oldElectrumServer = getElectrumServer()
+            }
             didPut {
-                launch { electrumServerUpdates.send(it) }
+                if (oldElectrumServer.address() != it.address())
+                    launch { electrumServerUpdates.send(it) }
             }
         }
         launch {

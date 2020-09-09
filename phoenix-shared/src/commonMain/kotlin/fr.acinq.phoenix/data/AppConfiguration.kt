@@ -1,5 +1,7 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.eklair.io.TcpSocket
+import fr.acinq.eklair.utils.ServerAddress
 import kotlinx.serialization.Serializable
 import org.kodein.db.model.orm.Metadata
 
@@ -85,3 +87,4 @@ data class ElectrumServer(
 ) : Metadata
 
 fun ElectrumServer.address(): String = "$host:$port"
+fun ElectrumServer.asServerAddress(tls: TcpSocket.TLS? = null): ServerAddress = ServerAddress(host, port, tls)
