@@ -1,7 +1,7 @@
 import SwiftUI
 import PhoenixShared
 
-struct ConfigurationView : MVIView {
+struct ConfigurationView: MVIView {
     typealias Model = Configuration.Model
     typealias Intent = Configuration.Intent
 
@@ -10,23 +10,51 @@ struct ConfigurationView : MVIView {
             VStack(spacing: 0) {
                 let fullMode = model is Configuration.ModelFullMode
 
-                Section(header: "General") {
-                    NavigationMenu(label: "About", destination: AboutView())
-                    NavigationMenu(label: "Display", destination: DisplayConfigurationView())
-                    NavigationMenu(label: "Electrum Server", destination: ElectrumConfigurationView())
-                    NavigationMenu(label: "Tor", destination: EmptyView())
+                Section(
+                        header: Text("General")
+                                .bold()
+                                .font(.title3)
+                                .foregroundColor(.appHorizon)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                ) {
+                    NavigationMenu(label: Text("About"), destination: AboutView())
+                    NavigationMenu(label: Text("Display"), destination: DisplayConfigurationView())
+                    NavigationMenu(label: Text("Electrum Server"), destination: ElectrumConfigurationView())
+                    NavigationMenu(label: Text("Tor"), destination: EmptyView())
+                    Divider()
                 }
 
-                Section(header: "Security", visible: fullMode) {
-                    NavigationMenu(label: "Recovery phrase", destination: EmptyView())
-                    NavigationMenu(label: "App access settings", destination: EmptyView())
+                if fullMode {
+                    Section(
+                            header: Text("Security")
+                                    .bold()
+                                    .font(.title3)
+                                    .foregroundColor(.appHorizon)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding()
+                    ) {
+                        NavigationMenu(label: Text("Recovery phrase"), destination: EmptyView())
+                        NavigationMenu(label: Text("App access settings"), destination: EmptyView())
+                        Divider()
+                    }
                 }
 
-                Section(header: "Advanced") {
-                    NavigationMenu(label: "Channels list", destination: EmptyView(), visible: fullMode)
-                    NavigationMenu(label: "Logs", destination: EmptyView())
-                    NavigationMenu(label: "Close all channels", destination: EmptyView(), visible: fullMode)
-                    NavigationMenu(label: "Danger zone", destination: EmptyView(), visible: fullMode)
+                Section(
+                        header: Text("Advanced")
+                                .bold()
+                                .font(.title3)
+                                .foregroundColor(.appHorizon)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                ) {
+                    NavigationMenu(label: Text("Logs"), destination: EmptyView())
+                    if fullMode {
+                        NavigationMenu(label: Text("Channels list"), destination: EmptyView())
+                        NavigationMenu(label: Text("Close all channels"), destination: EmptyView())
+                        NavigationMenu(label: Text("Danger zone").foregroundColor(Color.red), destination: EmptyView())
+                    }
+                    Divider()
                 }
 
                 Spacer()
@@ -38,67 +66,37 @@ struct ConfigurationView : MVIView {
         }
     }
 
-    struct Section<Content> : View where Content : View {
-        let header: String
-        let visible: Bool
-        let menu: () -> Content
-
-        init(header: String, visible: Bool = true, @ViewBuilder menu: @escaping () -> Content) {
-            self.header = header
-            self.visible = visible
-            self.menu = menu
-        }
-
-        var body : some View {
-            if visible {
-                VStack {
-                    Text(header)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .font(.headline)
-                            .foregroundColor(.appHorizon)
-                            .padding([.leading, .top], 16)
-                    Divider()
-                    menu()
-                }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.white)
-            }
-        }
-    }
-
-    struct NavigationMenu<T : View> : View {
-        let label: String
+    struct NavigationMenu<Parent, T: View> : View where Parent : View {
+        let label: Parent
         let destination: T
-        let visible: Bool
 
-        init(label: String, destination: T, visible: Bool = true) {
+        init(label: Parent, destination: T) {
             self.label = label
             self.destination = destination
-            self.visible = visible
         }
 
-        var body : some View {
-            if visible {
-                NavigationLink(destination: destination) {
-                    Text(label)
-                            .font(.subheadline)
-                            .buttonStyle(PlainButtonStyle())
-                            .foregroundColor(Color.black)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding([.leading, .trailing])
-                }
-                Divider()
+        var body: some View {
+            Divider()
+            NavigationLink(destination: destination) {
+                label
+                    .foregroundColor(Color.black)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding([.leading, .trailing])
             }
+                    .padding(8)
+                    .background(Color.white)
         }
     }
 }
 
-class ConfigurationView_Previews : PreviewProvider {
+class ConfigurationView_Previews: PreviewProvider {
     static let mockModel = Configuration.ModelFullMode()
 
     static var previews: some View {
-        mockView(ConfigurationView()) { $0.configurationModel = mockModel }
-            .previewDevice("iPhone 11")
+        mockView(ConfigurationView()) {
+            $0.configurationModel = mockModel
+        }
+                .previewDevice("iPhone 11")
     }
 
     #if DEBUG
