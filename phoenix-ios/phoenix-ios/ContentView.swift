@@ -26,8 +26,20 @@ struct ContentView: MVIView {
                 NavigationView {
                     if model is Content.ModelIsInitialized {
                         HomeView()
-                    } else {
+                    } else if model is Content.ModelNeedInitialization {
                         InitView()
+                    } else {
+                        VStack {
+                            // Maybe a better animation / transition screen ?
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                    .imageScale(.large)
+                                    .rotationEffect(Angle(degrees: 360.0))
+                                    .animation(.easeIn)
+                        }
+                                .edgesIgnoringSafeArea(.all)
+                                .navigationBarTitle("", displayMode: .inline)
+                                .navigationBarHidden(true)
+                        // Phoenix Loading View ?
                     }
                 }
             }
