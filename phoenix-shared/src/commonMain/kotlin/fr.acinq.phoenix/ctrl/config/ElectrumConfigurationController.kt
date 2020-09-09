@@ -8,18 +8,15 @@ typealias ElectrumConfigurationController = MVI.Controller<ElectrumConfiguration
 
 object ElectrumConfiguration {
 
-    sealed class Model : MVI.Model() {
-        object Empty : Model()
-        data class ShowElectrumServer(
-            val walletIsInitialized: Boolean = false,
-            val connection: Connection,
-            val electrumServer: ElectrumServer,
-            val feeRate: Long = 0,
-            val xpub: String? = null,
-            val path: String? = null
-        ) : Model()
-        object InvalidAddress: Model()
-    }
+    data class Model(
+        val walletIsInitialized: Boolean = false,
+        val connection: Connection = Connection.CLOSED,
+        val electrumServer: ElectrumServer = ElectrumServer(),
+        val feeRate: Long = 0,
+        val xpub: String? = null,
+        val path: String? = null,
+        val error: Error? = null
+    ) : MVI.Model()
 
     sealed class Intent : MVI.Intent() {
         data class UpdateElectrumServer(val customized: Boolean, val address: String) : Intent()

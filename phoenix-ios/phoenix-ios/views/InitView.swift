@@ -8,6 +8,26 @@ struct InitView : MVIView {
 	var body: some View {
 		mvi { model, intent in
 			VStack {
+				HStack {
+					Spacer()
+
+					NavigationLink(destination: ConfigurationView()) {
+						Image(systemName: "gearshape")
+								.imageScale(.large)
+					}
+							.buttonStyle(PlainButtonStyle())
+							.padding([.top, .bottom], 8)
+							.padding([.leading, .trailing], 8)
+							.background(Color.white)
+							.cornerRadius(16)
+							.overlay(
+									RoundedRectangle(cornerRadius: 16)
+											.stroke(Color.appHorizon, lineWidth: 2)
+							)
+
+				}
+						.padding(.all, 16)
+						.padding(.bottom, 150)
 
 				Image("logo_flat")
 				.resizable()
@@ -73,7 +93,7 @@ struct InitView : MVIView {
 			.padding(.top, keyWindow?.safeAreaInsets.top)
 			.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.offset(x: 0, y: -40) // move center upwards
+			.offset(x: 0, y: -120) // move center upwards
 			.edgesIgnoringSafeArea(.all)
 			.navigationBarTitle("", displayMode: .inline)
 			.navigationBarHidden(true)

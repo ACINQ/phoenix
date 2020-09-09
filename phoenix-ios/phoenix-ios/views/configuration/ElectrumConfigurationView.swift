@@ -20,80 +20,85 @@ struct ElectrumConfigurationView: MVIView {
 
                     Divider()
 
-                    switch model {
-                    case let m as ElectrumConfiguration.ModelShowElectrumServer:
-                        Section(header: "Server") {
-                            VStack(alignment: .leading) {
-                                if m.connection == .established {
-                                    Text("Connected to:")
-                                    Text(m.electrumServer.address()).bold()
-                                } else if m.connection == .establishing {
-                                    Text("Connecting to:")
-                                    Text(m.electrumServer.address()).bold()
-                                } else if m.electrumServer.customized {
-                                    Text("You will connect to:")
-                                    Text(m.electrumServer.address()).bold()
-                                } else {
-                                    Text("Not connected")
-                                }
+                    Section(header: "Server") {
+                        VStack(alignment: .leading) {
+                            if model.connection == .established {
+                                Text("Connected to:")
+                                Text(model.electrumServer.address()).bold()
+                            } else if model.connection == .establishing {
+                                Text("Connecting to:")
+                                Text(model.electrumServer.address()).bold()
+                            } else if model.electrumServer.customized {
+                                Text("You will connect to:")
+                                Text(model.electrumServer.address()).bold()
+                            } else {
+                                Text("Not connected")
+                            }
 
-                                Button {
-                                    showElectrumAddressPopup = true
-                                } label: {
-                                    Image("ic_edit")
-                                    Text("Set server")
-                                }
-                                        .buttonStyle(PlainButtonStyle())
-                                        .padding([.top, .bottom], 8)
-                                        .padding([.leading, .trailing], 8)
-                                        .background(Color.white)
-                                        .cornerRadius(16)
-                                        .overlay(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                        .stroke(Color.appHorizon, lineWidth: 2)
-                                        )
+                            if model.error != nil {
+                                Text(model.error?.message ?? "")
+                                    .foregroundColor(Color.red)
+                            }
+
+                            Button {
+                                showElectrumAddressPopup = true
+                            } label: {
+                                Image(systemName: "square.and.pencil")
+                                    .imageScale(.medium)
+                                Text("Set server")
+                            }
+                                    .buttonStyle(PlainButtonStyle())
+                                    .padding(8)
+                                    .background(Color.white)
+                                    .cornerRadius(16)
+                                    .overlay(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                    .stroke(Color.appHorizon, lineWidth: 2)
+                                    )
+                        }
+                    }
+
+                    if model.walletIsInitialized {
+                        Section(header: "Block height") {
+                            let height = model.electrumServer.blockHeight
+                            Text("\(height > 0 ? height.formatNumber() : "-")")
+                        }
+
+                        Section(header: "Tip timestamp") {
+                            let time = model.electrumServer.tipTimestamp
+                            Text("\(time > 0 ? time.formatDateS() : "-")")
+                        }
+
+                        Section(header: "Fee rate") {
+                            if model.feeRate > 0 {
+                                Text("\(model.feeRate.formatNumber()) sat/byte")
+                            } else {
+                                Text("-")
                             }
                         }
 
-                        if m.walletIsInitialized {
-                            Section(header: "Block height") {
-                                let height = m.electrumServer.blockHeight
-                                Text("\(height > 0 ? height.formatNumber() : "-")")
-                            }
-
-                            Section(header: "Tip timestamp") {
-                                let time = m.electrumServer.tipTimestamp
-                                Text("\(time > 0 ? time.formatDateS() : "-")")
-                            }
-
-                            Section(header: "Fee rate") {
-                                if m.feeRate > 0 {
-                                    Text("\(m.feeRate.formatNumber()) sat/byte")
-                                } else {
-                                    Text("-")
-                                }
-                            }
-
-                            Section(header: "Master public key") {
-                                if m.xpub == nil || m.path == nil {
-                                    Text("-")
-                                } else {
-                                    VStack(alignment: .leading) {
-                                        Text(m.xpub!)
-                                        Text("Path: \(m.path!)").padding(.top)
-                                    }
+                        Section(header: "Master public key") {
+                            if model.xpub == nil || model.path == nil {
+                                Text("-")
+                            } else {
+                                VStack(alignment: .leading) {
+                                    Text(model.xpub!)
+                                    Text("Path: \(model.path!)").padding(.top)
                                 }
                             }
                         }
-                    default:
-                        EmptyView()
                     }
 
                     Spacer()
                 }
 
                 if showElectrumAddressPopup {
-                    ElectrumAddressPopup(intent: intent, show: $showElectrumAddressPopup)
+                    if model.electrumServer.customized {
+                        ElectrumAddressPopup(intent: intent, show: $showElectrumAddressPopup,
+                                customize: model.electrumServer.customized, addressInput: model.electrumServer.address())
+                    } else {
+                        ElectrumAddressPopup(intent: intent, show: $showElectrumAddressPopup)
+                    }
                 }
             }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -193,10 +198,15 @@ struct ElectrumConfigurationView: MVIView {
 }
 
 class ElectrumConfigurationView_Previews: PreviewProvider {
-    static let mockModel = ElectrumConfiguration.ModelShowElectrumServer(
-            walletIsInitialized: false, connection: .closed,
+    static let mockModel = ElectrumConfiguration.Model(
+            walletIsInitialized: true,
+            connection: .closed,
             electrumServer: ElectrumServer(id: 0, host: "tn.not.fyi", port: 55002, customized: true, blockHeight: 123456789, tipTimestamp: 1599564210),
-            feeRate: 9999, xpub: "vpub5ZqweUWHkV3Q5HrftL6c7L7rwvQdSPrQzPdFEd8tHU32EmduQqy1CgmAb4g1jQGoBFaGW4EcNhc1Bm9grBkV2hSUz787L7ALTfNbz3xNigS", path: "m/84'/1'/0'2")
+            feeRate: 9999,
+            xpub: "vpub5ZqweUWHkV3Q5HrftL6c7L7rwvQdSPrQzPdFEd8tHU32EmduQqy1CgmAb4g1jQGoBFaGW4EcNhc1Bm9grBkV2hSUz787L7ALTfNbz3xNigS",
+            path: "m/84'/1'/0'",
+            error: nil
+    )
 
     static var previews: some View {
         mockView(ElectrumConfigurationView()) {
