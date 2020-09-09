@@ -49,8 +49,7 @@ struct ReceiveView: MVIView {
         }
     }
 
-    @ViewBuilder
-    func view(model: Receive.Model, intent: (Receive.Intent) -> Void) -> some View {
+    @ViewBuilder func view(model: Receive.Model, intent: (Receive.Intent) -> Void) -> some View {
         switch model {
         case _ as Receive.ModelAwaiting:
             Text("...")
@@ -59,20 +58,16 @@ struct ReceiveView: MVIView {
         case let m as Receive.ModelGenerated:
             if qrCode.value == m.request {
                 VStack {
-                    if let image = qrCode.image {
-                        image.resizable().scaledToFit()
-                                .padding()
-                                .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.gray, lineWidth: 4)
-                                )
-                                .padding()
-                    } else {
-                        Text("Generating QRCode...")
-                                .padding()
-                    }
+                    qrCodeView()
+                            .frame(width: 250, height: 250)
+                            .padding()
+                            .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color.gray, lineWidth: 4)
+                            )
+                            .padding()
 
-                    Text(m.request).padding()
+//                    Text(m.request).padding()
                     Button {
                         UIPasteboard.general.string = m.request
                     } label: {
@@ -84,6 +79,15 @@ struct ReceiveView: MVIView {
             }
         default:
             fatalError("Unknown model \(model)")
+        }
+    }
+
+    @ViewBuilder func qrCodeView() -> some View {
+        if let image = qrCode.image {
+            image.resizable()
+        } else {
+            Text("Generating QRCode...")
+                    .padding()
         }
     }
 
