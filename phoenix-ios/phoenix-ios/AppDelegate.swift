@@ -11,6 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         $0.receiveModel = ReceiveView_Previews.mockModel
         $0.scanModel = ScanView_Previews.mockModel
         $0.restoreWalletModel = RestoreWalletView_Previews.mockModel
+        $0.configurationModel = ConfigurationView_Previews.mockModel
+        $0.displayConfigurationModel = DisplayConfigurationView_Previews.mockModel
+        $0.electrumConfigurationModel = ElectrumConfigurationView_Previews.mockModel
     }
 
     let di: DI

@@ -238,9 +238,10 @@ struct HomeView : MVIView {
 
         var body: some View {
             HStack {
-                Button {
 
-                } label: {
+                NavigationLink(
+                        destination: ConfigurationView()
+                ) {
                     Image("ic_settings").resizable().frame(width: 22, height: 22)
                 }
                         .padding()

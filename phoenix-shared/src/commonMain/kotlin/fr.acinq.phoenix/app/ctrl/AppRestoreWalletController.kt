@@ -19,9 +19,7 @@ class AppRestoreWalletController(di: DI) : AppController<RestoreWallet.Model, Re
             RestoreWallet.Intent.AcceptWarning -> launch { model { RestoreWallet.Model.Ready } }
             is RestoreWallet.Intent.ValidateSeed -> {
                 try {
-                    MnemonicCode.validate(intent.mnemonics)
-                    val seed = MnemonicCode.toSeed(intent.mnemonics, "")
-                    walletManager.createWallet(seed)
+                    walletManager.createWallet(intent.mnemonics)
                 } catch (e: IllegalArgumentException) {
                     launch { model { RestoreWallet.Model.InvalidSeed } }
                 }

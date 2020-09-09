@@ -19,9 +19,9 @@ class AppInitController(di: DI) : AppController<Init.Model, Init.Intent>(di, Ini
     override fun process(intent: Init.Intent) = when (intent) {
         Init.Intent.CreateWallet -> {
             launch { model { Init.Model.Creating } }
-            val words = MnemonicCode.toMnemonics(Random.secure().nextBytes(16))
-            val seed = MnemonicCode.toSeed(words, "")
-            walletManager.createWallet(seed)
+            walletManager.createWallet(
+                MnemonicCode.toMnemonics(Random.secure().nextBytes(16))
+            )
         }
     }
 

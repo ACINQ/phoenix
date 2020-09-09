@@ -8,19 +8,39 @@ struct InitView : MVIView {
 	var body: some View {
 		mvi { model, intent in
 			VStack {
-				
+				HStack {
+					Spacer()
+
+					NavigationLink(destination: ConfigurationView()) {
+						Image(systemName: "gearshape")
+								.imageScale(.large)
+					}
+							.buttonStyle(PlainButtonStyle())
+							.padding([.top, .bottom], 8)
+							.padding([.leading, .trailing], 8)
+							.background(Color.white)
+							.cornerRadius(16)
+							.overlay(
+									RoundedRectangle(cornerRadius: 16)
+											.stroke(Color.appHorizon, lineWidth: 2)
+							)
+
+				}
+						.padding(.all, 16)
+						.padding(.bottom, 150)
+
 				Image("logo_flat")
 				.resizable()
 				.frame(width: 96, height: 96)
 				.overlay(Circle().stroke(Color(UIColor.systemGray3), lineWidth: 1.5))
 				.clipShape(Circle())
 				.padding([.top, .bottom], 0)
-				
+
 				Text("Phoenix")
 				.font(Font.title2)
 				.padding(.top, 8)
 				.padding(.bottom, 80)
-				
+
 				Button {
 					intent(Init.IntentCreateWallet())
 				} label: {
@@ -29,10 +49,10 @@ struct InitView : MVIView {
 					//	.resizable()
 					//	.frame(width: 16, height: 16)
 					//	.foregroundColor(.white)
-						
+
 						Image(systemName: "flame")
 						.imageScale(.small)
-						
+
 						Text("Create new wallet")
 					}
 					.font(.title2)
@@ -44,16 +64,16 @@ struct InitView : MVIView {
 				.background(Color.appHorizon)
 				.cornerRadius(16)
 				.padding(.bottom, 40)
-				
+
 				NavigationLink(destination: RestoreWalletView()) {
 					HStack {
 					//	Image("ic_restore")
 					//	.resizable()
 					//	.frame(width: 16, height: 16)
-						
+
 						Image(systemName: "arrow.down.circle")
 						.imageScale(.small)
-						
+
 						Text("Restore my wallet")
 					}
 					.font(.title2)
@@ -68,12 +88,12 @@ struct InitView : MVIView {
 					.stroke(Color.appHorizon, lineWidth: 2)
 				)
 				.padding([.top, .bottom], 0)
-				
+
 			}
 			.padding(.top, keyWindow?.safeAreaInsets.top)
 			.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.offset(x: 0, y: -40) // move center upwards
+			.offset(x: 0, y: -120) // move center upwards
 			.edgesIgnoringSafeArea(.all)
 			.navigationBarTitle("", displayMode: .inline)
 			.navigationBarHidden(true)

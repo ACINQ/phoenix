@@ -1,9 +1,7 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.PrivateKey
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.bitcoin.crypto.Sha256
 import fr.acinq.eklair.*
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.blockchain.electrum.ElectrumWatcher
@@ -17,16 +15,18 @@ import fr.acinq.eklair.io.TcpSocket
 import fr.acinq.eklair.utils.msat
 import fr.acinq.eklair.utils.sat
 import fr.acinq.eklair.utils.toByteVector32
-import fr.acinq.phoenix.app.AppChannelsDB
-import fr.acinq.phoenix.app.AppConnectionsDaemon
-import fr.acinq.phoenix.app.AppHistoryManager
-import fr.acinq.phoenix.app.WalletManager
+import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
+import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppElectrumConfigurationController
 import fr.acinq.phoenix.ctrl.*
-import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.TAG_APPLICATION
-import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
-import fr.acinq.phoenix.utils.screenProvider
+import fr.acinq.phoenix.ctrl.config.ConfigurationController
+import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
+import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
+import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.data.Wallet
+import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.Serializable
@@ -40,7 +40,6 @@ import org.kodein.db.inDir
 import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
-import org.kodein.memory.text.toHexString
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
@@ -58,10 +57,10 @@ class PhoenixBusiness {
         }
     }
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, seed: ByteArray) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, wallet: Wallet) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
-        val keyManager = LocalKeyManager(seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
+        val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
         println("nodeId:${keyManager.nodeId}") // TODO remove this!
 
         val params = NodeParams(
@@ -130,22 +129,25 @@ class PhoenixBusiness {
         bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
 //        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
 
-//        constant(tag = "seed") with ByteVector32("0101010101010101010101010101010101010101010101010101010101010101")
-//        constant(tag = "host") with "192.168.86.24"
-        constant(tag = "host") with "localhost"
+        constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
+//        constant(tag = TAG_ACINQ_ADDRESS) with "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735"
+        bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
 
-        bind<ElectrumClient>() with singleton { ElectrumClient(instance(tag = "host"), 51001, null, MainScope()) }
+        bind<ElectrumClient>() with singleton {
+            val electrumServer = instance<AppConfigurationManager>().getElectrumServer()
+            ElectrumClient(electrumServer.host, electrumServer.port, null, MainScope())
+        }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
-//        bind<Peer>() with singleton { buildPeer(instance(), instance(), instance(), instance(tag = "seed")) }
         bind<Peer>() with singleton {
             instance<WalletManager>().getWallet()?.let {
-                println("Seed: ${it.seed}")
-                buildPeer(instance(), instance(), instance(), it.seed)
+                buildPeer(instance(), instance(), instance(), it)
             } ?: error("Wallet must be initialized.")
         }
         bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
         bind<WalletManager>() with singleton { WalletManager(di) }
+        bind<AppConfigurationManager>() with singleton { AppConfigurationManager(di) }
 
+        // MVI controllers
         bind<ContentController>() with screenProvider { AppContentController(di) }
         bind<InitController>() with screenProvider { AppInitController(di) }
         bind<HomeController>() with screenProvider { AppHomeController(di) }
@@ -153,6 +155,12 @@ class PhoenixBusiness {
         bind<ScanController>() with screenProvider { AppScanController(di) }
         bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
 
+        // App Configuration
+        bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
+        bind<DisplayConfigurationController>() with screenProvider { AppDisplayConfigurationController(di) }
+        bind<ElectrumConfigurationController>() with screenProvider { AppElectrumConfigurationController(di) }
+
+        // App daemons
         bind() from eagerSingleton { AppConnectionsDaemon(di) }
     }
 }

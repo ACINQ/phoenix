@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.phoenix.data.Wallet
 import fr.acinq.phoenix.utils.TAG_APPLICATION
 import kotlinx.coroutines.CoroutineScope
@@ -32,8 +33,9 @@ class WalletManager (override val di: DI) : DIAware, CoroutineScope by MainScope
         }
     }
 
-    fun createWallet(seed: ByteArray): Unit {
-        db.put(Wallet(seed = seed))
+    fun createWallet(mnemonics: List<String>): Unit {
+        MnemonicCode.validate(mnemonics)
+        db.put(Wallet(mnemonics = mnemonics))
     }
 
     fun getWallet() : Wallet? {
