@@ -3,9 +3,7 @@ package fr.acinq.phoenix.app
 import fr.acinq.eklair.blockchain.electrum.ElectrumClient
 import fr.acinq.eklair.io.Peer
 import fr.acinq.eklair.utils.Connection
-import fr.acinq.phoenix.data.ElectrumServer
-import fr.acinq.phoenix.data.address
-import fr.acinq.phoenix.data.asServerAddress
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.TAG_ACINQ_ADDRESS
 import kotlinx.coroutines.*
@@ -26,7 +24,7 @@ import kotlin.time.seconds
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by MainScope() {
 
-    private val appConfigurationManager: AppConfigurationManager by instance()
+    private val configurationManager: AppConfigurationManager by instance()
     private val walletManager: WalletManager by instance()
 
     private val monitor: NetworkMonitor by instance()
@@ -42,14 +40,16 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
     private var electrumConnectionJob: Job? = null
     private var networkMonitorJob: Job? = null
 
+    private var networkStatus = Connection.CLOSED
+
     init {
         // Electrum
         launch {
             electrumConnectionOrder.consumeEach {
-                when (it) {
-                    ConnectionOrder.CONNECT -> {
+                when {
+                    it == ConnectionOrder.CONNECT && networkStatus != Connection.CLOSED -> {
                         electrumConnectionJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
-                            val electrumServer = appConfigurationManager.getElectrumServer()
+                            val electrumServer = configurationManager.getElectrumServer()
                             electrumClient.connect(electrumServer.asServerAddress())
                         }
                     }
@@ -61,22 +61,28 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
             }
         }
         launch {
-            var previousElectrumServer: ElectrumServer? = null
-            appConfigurationManager.openElectrumServerUpdateSubscription().consumeEach {
-                if (previousElectrumServer?.address() != it.address()) {
-                    logger.info { "Electrum server has changed. We need to refresh the connection." }
-                    electrumConnectionOrder.send(ConnectionOrder.CLOSE)
-                    electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+            configurationManager.run {
+                if (!getElectrumServer().customized) {
+                    setRandomElectrumServer()
                 }
 
-                previousElectrumServer = it
+                var previousElectrumServer: ElectrumServer? = null
+                openElectrumServerUpdateSubscription().consumeEach {
+                    if (previousElectrumServer?.address() != it.address()) {
+                        logger.info { "Electrum server has changed. We need to refresh the connection." }
+                        electrumConnectionOrder.send(ConnectionOrder.CLOSE)
+                        electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                    }
+
+                    previousElectrumServer = it
+                }
             }
         }
         // Peer
         launch {
             peerConnectionOrder.consumeEach {
-                when (it) {
-                    ConnectionOrder.CONNECT -> {
+                when {
+                    it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
                         peerConnectionJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
                             peer.connect(direct.instance(tag = TAG_ACINQ_ADDRESS), 48001)
                         }
@@ -97,7 +103,6 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
 
     private fun networkStateMonitoring() = launch {
         monitor.start()
-        var networkStatus = Connection.CLOSED
         monitor.openNetworkStateSubscription().consumeEach {
             if (networkStatus == it) return@consumeEach
             logger.info { "New internet status: $it" }

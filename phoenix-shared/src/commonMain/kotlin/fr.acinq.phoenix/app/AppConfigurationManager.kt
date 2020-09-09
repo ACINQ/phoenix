@@ -37,18 +37,16 @@ class AppConfigurationManager (override val di: DI) : DIAware, CoroutineScope by
      */
     init {
         db.on<ElectrumServer>().register {
-            var oldElectrumServer = ElectrumServer()
-            willPut {
-                oldElectrumServer = getElectrumServer()
-            }
             didPut {
-                if (oldElectrumServer.address() != it.address())
-                    launch { electrumServerUpdates.send(it) }
+                launch { electrumServerUpdates.send(it) }
             }
         }
         launch {
             electrumClient.openNotificationsSubscription().consumeAsFlow()
                 .filterIsInstance<HeaderSubscriptionResponse>().collect { notification ->
+                    if (getElectrumServer().blockHeight == notification.height &&
+                        getElectrumServer().tipTimestamp == notification.header.time) return@collect
+
                     putElectrumServer(
                         getElectrumServer().copy(
                             blockHeight = notification.height,
@@ -90,18 +88,27 @@ class AppConfigurationManager (override val di: DI) : DIAware, CoroutineScope by
     private fun createElectrumConfiguration(): ElectrumServer {
         if (db[electrumServerKey] == null) {
             logger.info { "Create ElectrumX configuration" }
-            db.put(ElectrumServer())
+            setRandomElectrumServer()
         }
         return db[electrumServerKey] ?: error("ElectrumServer must be initialized.")
     }
 
     fun getElectrumServer(): ElectrumServer = db[electrumServerKey] ?: createElectrumConfiguration()
 
+    private fun putElectrumServer(electrumServer: ElectrumServer) {
+        logger.info { "Update electrum configuration [$electrumServer]" }
+        db.put(electrumServerKey, electrumServer)
+    }
     fun putElectrumServerAddress(host: String, port: Int, customized: Boolean = false) {
         putElectrumServer(getElectrumServer().copy(host = host, port = port, customized = customized))
     }
-    fun putElectrumServer(electrumServer: ElectrumServer) {
-        logger.info { "Update electrum configuration [$electrumServer]" }
-        db.put(electrumServerKey, electrumServer)
+    fun setRandomElectrumServer() {
+        putElectrumServer(
+            when (getAppConfiguration().chain) {
+                Chain.MAINNET -> electrumMainnetConfigurations.random()
+                Chain.TESTNET -> electrumTestnetConfigurations.random()
+                else -> platformElectrumRegtestConf()
+            }.asElectrumServer()
+        )
     }
 }

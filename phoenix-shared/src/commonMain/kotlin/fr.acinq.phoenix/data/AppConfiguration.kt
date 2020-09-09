@@ -10,7 +10,7 @@ data class AppConfiguration(
     // Unique ID a their is only one configuration per app
     override val id: Int = 0,
     // Global
-    val chain: Chain = Chain.TESTNET,
+    val chain: Chain = Chain.REGTEST,
     // Display
     val fiatCurrency: FiatCurrency = FiatCurrency.USD,
     val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
@@ -18,7 +18,7 @@ data class AppConfiguration(
 ) : Metadata
 
 
-enum class Chain { MAINNET, TESTNET }
+enum class Chain { MAINNET, TESTNET, REGTEST }
 
 @Serializable
 enum class BitcoinUnit(val label: String) {
@@ -79,8 +79,8 @@ data class ElectrumServer(
     // Unique ID a their is only one configuration per app
     override val id: Int = 0,
     // TODO if not customized, should be dynamic and random
-    val host: String = "localhost",
-    val port: Int = 51001,
+    val host: String,
+    val port: Int,
     val customized: Boolean = false,
     val blockHeight: Int = 0,
     val tipTimestamp: Long = 0
