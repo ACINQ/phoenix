@@ -1,8 +1,11 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eklair.io.*
-import fr.acinq.eklair.utils.UUID
-import fr.acinq.eklair.utils.currentTimestampMillis
+import fr.acinq.eclair.io.PaymentReceived
+import fr.acinq.eclair.io.PaymentSent
+import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.io.SendingPayment
+import fr.acinq.eclair.utils.UUID
+import fr.acinq.eclair.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.TAG_APPLICATION
 import kotlinx.coroutines.CoroutineScope
@@ -11,8 +14,10 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.kodein.db.*
-import org.kodein.db.orm.kotlinx.KotlinxSerializer
+import org.kodein.db.DB
+import org.kodein.db.find
+import org.kodein.db.on
+import org.kodein.db.useModels
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance

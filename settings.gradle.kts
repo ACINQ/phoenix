@@ -1,4 +1,4 @@
-rootProject.name = "phoenix"
+rootProject.name = "phoenix-kmm"
 
 include(":phoenix-shared")
 

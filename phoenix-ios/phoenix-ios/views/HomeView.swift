@@ -82,7 +82,7 @@ struct HomeView : MVIView {
     }
 
     struct ConnectionStatus : View {
-        let status: EklairConnection
+        let status: Eclair_kmpConnection
 
         @Binding var show: Bool
 
@@ -112,7 +112,7 @@ struct HomeView : MVIView {
                                     .stroke(Color.gray, lineWidth: 1)
                     )
                     .opacity(dimStatus ? 0.2 : 1.0)
-                    .isHidden(status == EklairConnection.established)
+                    .isHidden(status == Eclair_kmpConnection.established)
                     .onAppear {
                         if (!started) {
                             started = true
@@ -165,7 +165,7 @@ struct HomeView : MVIView {
 
     struct ConnectionCell : View {
         let label: String
-        let connection: EklairConnection
+        let connection: Eclair_kmpConnection
 
         var body : some View {
             HStack {

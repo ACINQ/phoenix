@@ -1,13 +1,8 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.DeterministicWallet
-import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.eklair.utils.UUID
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.modules.SerializersModule
 import org.kodein.db.model.orm.Metadata
 
 @Serializable

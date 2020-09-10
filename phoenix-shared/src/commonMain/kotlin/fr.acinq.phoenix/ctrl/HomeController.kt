@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.eklair.utils.Connection
+import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.plus
 
