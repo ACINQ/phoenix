@@ -44,17 +44,25 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
     override fun process(intent: ElectrumConfiguration.Intent) {
         when(intent) {
             is ElectrumConfiguration.Intent.UpdateElectrumServer -> {
-                if (intent.address.matches("""(.*):(\d*)""".toRegex())) {
-                    intent.address.split(":").let {
-                        val host = it.first()
-                        val port = it.last().toInt()
-                        configurationManager.putElectrumServerAddress(host, port)
+                var error: Error? = null
+
+                when {
+                    !intent.customized -> {
+                        configurationManager.setRandomElectrumServer()
                     }
-                    sendElectrumConfigurationModel()
-                } else {
-                    sendElectrumConfigurationModel(InvalidElectrumAddress)
+                    !intent.address.matches("""(.*):(\d*)""".toRegex()) -> {
+                        error = InvalidElectrumAddress
+                    }
+                    else -> {
+                        intent.address.split(":").let {
+                            val host = it.first()
+                            val port = it.last().toInt()
+                            configurationManager.putElectrumServerAddress(host, port, intent.customized)
+                        }
+                    }
                 }
 
+                sendElectrumConfigurationModel(error)
             }
         }
     }

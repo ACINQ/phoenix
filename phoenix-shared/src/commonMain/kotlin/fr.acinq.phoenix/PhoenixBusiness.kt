@@ -130,13 +130,9 @@ class PhoenixBusiness {
 //        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
 
         constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
-//        constant(tag = TAG_ACINQ_ADDRESS) with "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735"
         bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
 
-        bind<ElectrumClient>() with singleton {
-            val electrumServer = instance<AppConfigurationManager>().getElectrumServer()
-            ElectrumClient(electrumServer.host, electrumServer.port, null, MainScope())
-        }
+        bind<ElectrumClient>() with singleton { ElectrumClient(instance(), MainScope()) }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with singleton {
             instance<WalletManager>().getWallet()?.let {

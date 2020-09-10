@@ -29,7 +29,7 @@ struct ElectrumConfigurationView: MVIView {
                                 Text("Connecting to:")
                                 Text(model.electrumServer.address()).bold()
                             } else if model.electrumServer.customized {
-                                Text("You will connect to:")
+                                Text(model.walletIsInitialized ? "Not connected" : "You will connect to:")
                                 Text(model.electrumServer.address()).bold()
                             } else {
                                 Text("Not connected")
@@ -176,7 +176,7 @@ struct ElectrumConfigurationView: MVIView {
                                     .font(.title2)
                                     .padding()
                         }
-                    }.disabled(!customize)
+                    }
                             .frame(maxWidth: .infinity)
                             .opacity(customize ? 1 : 0.5)
                 }
