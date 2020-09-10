@@ -9,13 +9,19 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppContentController(di: DI) : AppController<Content.Model, Content.Intent>(di, Content.Model.NeedInitialization) {
+class AppContentController(di: DI) : AppController<Content.Model, Content.Intent>(di, Content.Model.Waiting) {
     private val walletManager: WalletManager by instance()
 
     init {
         launch {
-            walletManager.openWalletUpdatesSubscription().consumeEach {
+            if (walletManager.getWallet() != null) {
                 model { Content.Model.IsInitialized }
+            } else {
+                model { Content.Model.NeedInitialization }
+                walletManager.openWalletUpdatesSubscription().consumeEach {
+                    model { Content.Model.IsInitialized }
+                    return@consumeEach
+                }
             }
         }
     }
