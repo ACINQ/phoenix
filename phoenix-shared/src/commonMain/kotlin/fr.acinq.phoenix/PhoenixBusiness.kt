@@ -27,9 +27,13 @@ import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.Wallet
 import fr.acinq.phoenix.utils.*
+import io.ktor.client.*
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
@@ -120,6 +124,15 @@ class PhoenixBusiness {
         bind<LoggerFactory>() with instance(LoggerFactory.default)
         bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
         bind<NetworkMonitor>() with singleton { NetworkMonitor() }
+        bind<HttpClient>() with singleton {
+            HttpClient {
+                install(JsonFeature) {
+                    serializer = KotlinxSerializer(Json {
+                        ignoreUnknownKeys = true
+                    })
+                }
+            }
+        }
 
         bind<DBFactory<DB>>() with singleton { DB.factory.inDir(getApplicationFilesDirectoryPath(di)) }
         bind<DB>(tag = TAG_APPLICATION) with singleton {
