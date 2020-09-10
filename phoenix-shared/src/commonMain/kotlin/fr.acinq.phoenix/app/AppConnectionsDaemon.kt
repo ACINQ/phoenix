@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eklair.blockchain.electrum.ElectrumClient
-import fr.acinq.eklair.io.Peer
-import fr.acinq.eklair.utils.Connection
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.TAG_ACINQ_ADDRESS

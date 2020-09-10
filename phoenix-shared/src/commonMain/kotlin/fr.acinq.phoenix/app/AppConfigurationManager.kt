@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eklair.blockchain.electrum.ElectrumClient
-import fr.acinq.eklair.blockchain.electrum.HeaderSubscriptionResponse
+import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.TAG_APPLICATION
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +13,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import org.kodein.db.*
+import org.kodein.db.DB
+import org.kodein.db.get
+import org.kodein.db.key
+import org.kodein.db.on
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.direct

@@ -1,8 +1,7 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.eklair.utils.secure
-import fr.acinq.eklair.utils.toByteVector32
+import fr.acinq.eclair.utils.secure
 import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.ctrl.Init
 import kotlinx.coroutines.ExperimentalCoroutinesApi

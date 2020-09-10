@@ -1,9 +1,9 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.eklair.io.Peer
-import fr.acinq.eklair.io.SendPayment
-import fr.acinq.eklair.payment.PaymentRequest
-import fr.acinq.eklair.utils.UUID
+import fr.acinq.eclair.io.Peer
+import fr.acinq.eclair.io.SendPayment
+import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.utils.UUID
 import fr.acinq.phoenix.ctrl.Scan
 import kotlinx.coroutines.launch
 import org.kodein.di.DI

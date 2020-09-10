@@ -1,12 +1,11 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.eklair.utils.Connection
+import fr.acinq.eclair.utils.Connection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import platform.Network.*
 import platform.darwin.dispatch_get_main_queue

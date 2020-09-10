@@ -1,8 +1,5 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.eklair.io.SendPayment
-import fr.acinq.eklair.payment.PaymentRequest
-
 
 typealias ScanController = MVI.Controller<Scan.Model, Scan.Intent>
 
