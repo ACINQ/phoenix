@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.eklair.io.TcpSocket
+import fr.acinq.eclair.io.TcpSocket
 
 data class ElectrumConf(
     val host: String,

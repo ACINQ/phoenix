@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.eklair.io.TcpSocket
-import fr.acinq.eklair.utils.ServerAddress
+import fr.acinq.eclair.io.TcpSocket
+import fr.acinq.eclair.utils.ServerAddress
 import kotlinx.serialization.Serializable
 import org.kodein.db.model.orm.Metadata
 
