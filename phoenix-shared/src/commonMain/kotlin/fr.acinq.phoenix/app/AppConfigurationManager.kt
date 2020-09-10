@@ -110,7 +110,7 @@ class AppConfigurationManager (override val di: DI) : DIAware, CoroutineScope by
             when (getAppConfiguration().chain) {
                 Chain.MAINNET -> electrumMainnetConfigurations.random()
                 Chain.TESTNET -> electrumTestnetConfigurations.random()
-                else -> platformElectrumRegtestConf()
+                Chain.REGTEST -> platformElectrumRegtestConf()
             }.asElectrumServer()
         )
     }
