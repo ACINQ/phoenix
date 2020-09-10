@@ -5,6 +5,7 @@ typealias ContentController = MVI.Controller<Content.Model, Content.Intent>
 object Content {
 
     sealed class Model : MVI.Model() {
+        object Waiting : Model()
         object IsInitialized : Model()
         object NeedInitialization : Model()
     }
