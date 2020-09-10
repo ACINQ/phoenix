@@ -59,6 +59,9 @@ kotlin {
                 api("org.kodein.db:kodein-db:$kodeinDBVersion")
                 api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                api("io.ktor:ktor-client-core:$ktorVersion")
+                api("io.ktor:ktor-client-json:$ktorVersion")
+                api("io.ktor:ktor-client-serialization:$ktorVersion")
             }
         }
         val commonTest by getting {
@@ -94,7 +97,11 @@ kotlin {
             }
         }
 
-        val iosMain by getting {}
+        val iosMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-ios:$ktorVersion")
+            }
+        }
         val iosTest by getting {}
 
         all {
