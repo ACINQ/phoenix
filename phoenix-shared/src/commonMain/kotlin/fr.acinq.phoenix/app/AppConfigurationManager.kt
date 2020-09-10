@@ -6,12 +6,14 @@ import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.TAG_APPLICATION
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.serialization.SerializationException
 import org.kodein.db.*
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -59,9 +61,7 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
                     )
                 }
         }
-        launch {
-            updateRates()
-        }
+        launchUpdateRates() // TODO do we need to manage cancellation?
     }
 
     // General
@@ -126,7 +126,7 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
     public fun getBitcoinRates(): List<BitcoinPriceRate> = db.find<BitcoinPriceRate>().all().useModels {it.toList()}
     public fun getBitcoinRate(fiatCurrency: FiatCurrency): BitcoinPriceRate = db.find<BitcoinPriceRate>().byId(fiatCurrency.name).model()
 
-    private suspend fun updateRates() {
+    private fun launchUpdateRates() = launch {
         while (isActive) {
             val priceRates = buildMap<String, Double> {
                 try {
@@ -137,14 +137,11 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
 
                     val response = httpClient.get<MxnApiResponse>("https://api.bitso.com/v3/ticker/?book=btc_mxn")
                     if (response.success) put(FiatCurrency.MXN.name, response.payload.last)
-
-                } catch (e: Exception) {
+                } catch (t: Throwable) {
                     logger.error { "An issue occurred while retrieving exchange rates from API." }
-                    logger.error(e)
+                    logger.error(t)
                 }
             }
-
-            logger.verbose { "Exchange rates retrieved from API: $priceRates" }
 
             val exchangeRates =
                 FiatCurrency.values()
@@ -156,8 +153,8 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
                     }
 
             db.execBatch {
+                logger.verbose { "Saving price rates: $exchangeRates" }
                 exchangeRates.forEach {
-                    logger.verbose { "Put rate: $it" }
                     db.put(it)
                 }
             }
