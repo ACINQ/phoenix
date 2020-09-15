@@ -1,8 +1,3 @@
-//
-// Created by Salomon BRYS on 8/10/20.
-// Copyright (c) 2020 Acinq. All rights reserved.
-//
-
 import SwiftUI
 
 struct RoundedCorner: Shape {

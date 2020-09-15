@@ -1,9 +1,12 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.eclair.utils.ServerAddress
 import kotlinx.serialization.Serializable
 import org.kodein.db.model.orm.Metadata
+import kotlin.math.roundToLong
 
 @Serializable
 data class AppConfiguration(
@@ -21,16 +24,25 @@ data class AppConfiguration(
 enum class Chain { MAINNET, TESTNET, REGTEST }
 
 @Serializable
-enum class BitcoinUnit(val label: String) {
-    Satoshi("Satoshi (0.00000001 BTC)"),
-    Bits("Bits (0.000001 BTC)"),
-    MilliBitcoin("Milli-Bitcoin (0.001 BTC)"),
-    Bitcoin("Bitcoin");
+enum class BitcoinUnit(val label: String, val abbrev: String) {
+    Satoshi("Satoshi (0.00000001 BTC)", "sat"),
+    Bits("Bits (0.000001 BTC)", "bits"),
+    MilliBitcoin("Milli-Bitcoin (0.001 BTC)", "mbtc"),
+    Bitcoin("Bitcoin", "btc"),
+    ;
 
     companion object default {
         val values = BitcoinUnit.values().toList()
     }
 }
+
+fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi =
+    when (unit) {
+        BitcoinUnit.Satoshi -> MilliSatoshi((this * 1_000.0).roundToLong())
+        BitcoinUnit.Bits -> MilliSatoshi((this * 100_000.0).roundToLong())
+        BitcoinUnit.MilliBitcoin -> MilliSatoshi((this * 100_000_000.0).roundToLong())
+        BitcoinUnit.Bitcoin -> MilliSatoshi((this * 100_000_000_000.0).roundToLong())
+    }
 
 @Serializable
 enum class AppTheme(val label: String) {
