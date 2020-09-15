@@ -41,7 +41,7 @@ struct ElectrumConfigurationView: MVIView {
                             }
 
                             Button {
-                                showElectrumAddressPopup = true
+                                withAnimation { showElectrumAddressPopup = true }
                             } label: {
                                 Image(systemName: "square.and.pencil")
                                     .imageScale(.medium)
@@ -92,12 +92,11 @@ struct ElectrumConfigurationView: MVIView {
                     Spacer()
                 }
 
-                if showElectrumAddressPopup {
+                Popup(show: $showElectrumAddressPopup) {
                     if model.electrumServer.customized {
-                        ElectrumAddressPopup(intent: intent, show: $showElectrumAddressPopup,
-                                customize: model.electrumServer.customized, addressInput: model.electrumServer.address())
+                        ElectrumAddressPopup(intent: intent, customize: model.electrumServer.customized, addressInput: model.electrumServer.address())
                     } else {
-                        ElectrumAddressPopup(intent: intent, show: $showElectrumAddressPopup)
+                        ElectrumAddressPopup(intent: intent)
                     }
                 }
             }
@@ -139,60 +138,35 @@ struct ElectrumConfigurationView: MVIView {
     struct ElectrumAddressPopup: View {
         let intent: IntentReceiver
 
-        @Binding var show: Bool
         @State var customize: Bool = false
         @State var addressInput: String = ""
 
         var body: some View {
-            VStack {
-                VStack(alignment: .leading) {
-                    Toggle(isOn: $customize) {
-                        Text("Use a custom server")
-                    }
-                            .padding()
-                            .frame(maxWidth: .infinity)
-
-                    VStack(alignment: .leading) {
-                        Text("Server address")
-                                .padding([.leading, .trailing])
-                                .foregroundColor(Color.appHorizon)
-
-                        TextField("host:port", text: $addressInput)
-                                .padding([.leading, .trailing])
-                                .padding([.top, .bottom], 8)
-                                .disableAutocorrection(true)
-
-                        Text("Server must have a valid certificate")
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.appBackground)
-
-                        HStack {
-                            Spacer()
-                            Button("OK") {
-                                show = false
-                                intent(ElectrumConfiguration.IntentUpdateElectrumServer(customized: customize, address: addressInput))
-                            }
-                                    .font(.title2)
-                                    .padding()
-                        }
-                    }
-                            .frame(maxWidth: .infinity)
-                            .opacity(customize ? 1 : 0.5)
+            VStack(alignment: .leading) {
+                Toggle(isOn: $customize) {
+                    Text("Use a custom server")
                 }
+                        .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(15)
-                        .padding(32)
-                        .onTapGesture(perform: {})
+
+                VStack(alignment: .leading) {
+                    Text("Server address")
+                            .padding([.leading, .trailing])
+                            .foregroundColor(Color.appHorizon)
+
+                    TextField("host:port", text: $addressInput)
+                            .padding([.leading, .trailing])
+                            .padding([.top, .bottom], 8)
+                            .disableAutocorrection(true)
+
+                    Text("Server must have a valid certificate")
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.appBackground)
+
+                }
+                        .opacity(customize ? 1 : 0.5)
             }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.25))
-                    .edgesIgnoringSafeArea(.all)
-                    .transition(.opacity)
-                    .onTapGesture(perform: {
-                        show = false
-                    })
         }
     }
 }

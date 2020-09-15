@@ -61,13 +61,9 @@ struct HomeView : MVIView {
                 }
 
                 if showConnections {
-                    VStack {
-                        ConnectionPopup(connections: model.connections, show: $showConnections)
+                    Popup(show: $showConnections) {
+                        ConnectionPopup(connections: model.connections)
                     }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.black.opacity(0.25))
-                            .edgesIgnoringSafeArea(.all)
-                            .transition(.opacity)
                 }
             }
                     .padding(.top, keyWindow?.safeAreaInsets.top)
@@ -129,14 +125,11 @@ struct HomeView : MVIView {
     struct ConnectionPopup : View {
         let connections: Connections
 
-        @Binding var show: Bool
-
         var body: some View {
             VStack(alignment: .leading) {
                 Text("Connection status:")
                         .font(.title2)
                         .padding([.bottom])
-
                 Divider()
                 ConnectionCell(label: "Internet", connection: connections.internet)
                 Divider()
@@ -144,22 +137,8 @@ struct HomeView : MVIView {
                 Divider()
                 ConnectionCell(label: "Electrum server", connection: connections.electrum)
                 Divider()
-
-                HStack {
-                    Spacer()
-                    Button("OK") {
-                        show = false
-                    }
-                            .font(.title2)
-                            .padding([.top])
-                }
-
             }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .padding(32)
+                    .padding([.top, .leading, .trailing])
         }
     }
 
