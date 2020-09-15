@@ -24,7 +24,7 @@ struct HomeView : MVIView {
             ZStack {
                 VStack() {
                     HStack {
-                        ConnectionStatus(status: model.connections.global, show: $showConnections)
+                        ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
                         Spacer()
                     }
                     .padding()
@@ -80,42 +80,40 @@ struct HomeView : MVIView {
     struct ConnectionStatus : View {
         let status: Eclair_kmpConnection
 
-        @Binding var show: Bool
+        @Binding var showPopup: Bool
 
-        @State var started = false
         @State var dimStatus = false
 
         var body: some View {
-            Button {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    show = true
+            Group {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showPopup = true
+                    }
+                } label: {
+                    HStack {
+                        Image("ic_connection_lost")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                        Text(status.text())
+                                .font(.caption2)
+                    }
                 }
-            } label: {
-                HStack {
-                    Image("ic_connection_lost")
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                    Text(status.text())
-                            .font(.caption2)
-                }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.all, 4)
+                        .background(Color.appBackgroundLight)
+                        .cornerRadius(10)
+                        .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray, lineWidth: 1)
+                        )
+                        .opacity(dimStatus ? 0.2 : 1.0)
+                        .isHidden(status == Eclair_kmpConnection.established)
             }
-                    .buttonStyle(PlainButtonStyle())
-                    .padding(.all, 4)
-                    .background(Color.appBackgroundLight)
-                    .cornerRadius(10)
-                    .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray, lineWidth: 1)
-                    )
-                    .opacity(dimStatus ? 0.2 : 1.0)
-                    .isHidden(status == Eclair_kmpConnection.established)
                     .onAppear {
-                        if (!started) {
-                            started = true
-                            DispatchQueue.main.async {
-                                withAnimation(Animation.linear(duration: 1.0).repeatForever()) {
-                                    self.dimStatus.toggle()
-                                }
+                        DispatchQueue.main.async {
+                            withAnimation(Animation.linear(duration: 1.0).repeatForever()) {
+                                self.dimStatus.toggle()
                             }
                         }
                     }
@@ -278,8 +276,8 @@ class HomeView_Previews : PreviewProvider {
     )
 
     static var previews: some View {
-//        mockView(HomeView()) { $0.homeModel = mockModel }
-        appView(HomeView())
+        mockView(HomeView()) { $0.homeModel = mockModel }
+//        appView(HomeView())
                 .previewDevice("iPhone 11")
     }
 
