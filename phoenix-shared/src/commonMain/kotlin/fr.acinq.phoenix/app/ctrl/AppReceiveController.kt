@@ -35,7 +35,7 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
                             val ask = lastAsk ?: error("Received a payment request when none was expected")
                             check(it.receivePayment.amount == ask.paymentAmountMsat) { "Payment request amount not corresponding to expected" }
                             check(it.receivePayment.description == ask.paymentDescription) { "Payment request description not corresponding to expected" }
-                            model { Receive.Model.Generated(it.request, ask.amount, ask.unit, ask.desc) }
+                            model(Receive.Model.Generated(it.request, ask.amount, ask.unit, ask.desc))
                         }
                     }
                     else -> {}
@@ -52,7 +52,7 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
         when (intent) {
             is Receive.Intent.Ask -> {
                 launch {
-                    model { Receive.Model.Generating }
+                    model(Receive.Model.Generating)
                     lastAsk = intent
                     peer.send(ReceivePayment(preimage, intent.paymentAmountMsat, CltvExpiry(100), intent.paymentDescription)) // TODO: Is CltvExpiry correct?
                 }

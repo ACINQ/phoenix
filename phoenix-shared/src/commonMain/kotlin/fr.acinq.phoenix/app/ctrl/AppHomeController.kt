@@ -56,15 +56,15 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
             historyManager.openTransactionsSubscriptions()
                 .consumeAsFlow()
                 .collectIndexed { nth, list ->
-                model {
-                    val lastTransaction = list.firstOrNull()
-                    if (nth != 0 && lastTransaction != null && lastTransaction.status != Transaction.Status.Pending) {
-                        copy(history = list, lastTransaction = lastTransaction)
-                    } else {
-                        copy(history = list)
+                    model {
+                        val lastTransaction = list.firstOrNull()
+                        if (nth != 0 && lastTransaction != null && lastTransaction.status != Transaction.Status.Pending) {
+                            copy(history = list, lastTransaction = lastTransaction)
+                        } else {
+                            copy(history = list)
+                        }
                     }
                 }
-            }
         }
     }
 
