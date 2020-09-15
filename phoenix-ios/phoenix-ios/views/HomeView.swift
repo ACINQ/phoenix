@@ -59,6 +59,7 @@ struct HomeView : MVIView {
 
                     BottomBar()
                 }
+                        .padding(.top, keyWindow?.safeAreaInsets.top)
 
                 if showConnections {
                     Popup(show: $showConnections) {
@@ -66,12 +67,10 @@ struct HomeView : MVIView {
                     }
                 }
             }
-                    .padding(.top, keyWindow?.safeAreaInsets.top)
-                    .padding(.top, keyWindow?.safeAreaInsets.bottom)
-                    .padding(.top, 10)
                     .frame(maxHeight: .infinity)
                     .background(Color.appBackground)
                     .edgesIgnoringSafeArea(.top)
+                    .edgesIgnoringSafeArea(.bottom)
         }
                 .navigationBarTitle("", displayMode: .inline)
                 .navigationBarHidden(true)
@@ -256,6 +255,7 @@ struct HomeView : MVIView {
                 Spacer()
             }
                     .padding(.top, 10)
+                    .padding(.bottom, keyWindow?.safeAreaInsets.bottom)
                     .background(Color.white)
                     .cornerRadius(15, corners: [.topLeft, .topRight])
         }
@@ -276,8 +276,8 @@ class HomeView_Previews : PreviewProvider {
     )
 
     static var previews: some View {
-        mockView(HomeView()) { $0.homeModel = mockModel }
-//        appView(HomeView())
+//        mockView(HomeView()) { $0.homeModel = mockModel }
+        appView(HomeView())
                 .previewDevice("iPhone 11")
     }
 
