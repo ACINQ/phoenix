@@ -57,7 +57,7 @@ struct HomeView : MVIView {
                                 }
                     }
 
-                    BottomBar()
+                    BottomBar(canScan: model.connections.global == Eclair_kmpConnection.established)
                 }
                         .padding(.top, keyWindow?.safeAreaInsets.top)
 
@@ -210,6 +210,8 @@ struct HomeView : MVIView {
 
     struct BottomBar : View {
 
+        let canScan: Bool
+
         @State var isShowingScan: Bool = false
 
         var body: some View {
@@ -249,8 +251,9 @@ struct HomeView : MVIView {
                 ) {
                     Image("ic_scan").resizable().frame(width: 22, height: 22)
                     Text("Scan")
-                            .foregroundColor(.appDark)
+                            .foregroundColor(canScan ? .appDark : .gray)
                 }
+                        .disabled(!canScan)
 
                 Spacer()
             }
