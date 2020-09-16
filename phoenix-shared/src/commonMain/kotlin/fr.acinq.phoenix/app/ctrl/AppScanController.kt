@@ -18,7 +18,7 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
             is Scan.Intent.Parse -> {
                 launch {
                     val paymentRequest = PaymentRequest.read(intent.request)
-                    model { Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description) }
+                    model(Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description))
                 }
             }
             is Scan.Intent.Send -> {
@@ -28,7 +28,7 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
 
                     peer.send(SendPayment(uuid, paymentRequest))
 
-                    model { Scan.Model.Sending(paymentRequest.amount?.toLong() ?: intent.amountMsat, paymentRequest.description) }
+                    model(Scan.Model.Sending(paymentRequest.amount?.toLong() ?: intent.amountMsat, paymentRequest.description))
                 }
             }
         }

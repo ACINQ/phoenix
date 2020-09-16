@@ -17,7 +17,7 @@ class AppInitController(di: DI) : AppController<Init.Model, Init.Intent>(di, Ini
 
     override fun process(intent: Init.Intent) = when (intent) {
         Init.Intent.CreateWallet -> {
-            launch { model { Init.Model.Creating } }
+            launch { model(Init.Model.Creating) }
             walletManager.createWallet(
                 MnemonicCode.toMnemonics(Random.secure().nextBytes(16))
             )

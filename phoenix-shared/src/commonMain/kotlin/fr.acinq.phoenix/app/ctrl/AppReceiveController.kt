@@ -11,6 +11,10 @@ import fr.acinq.phoenix.ctrl.Receive
 import fr.acinq.phoenix.data.toMilliSatoshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.filter
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -28,19 +32,17 @@ class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent
 
     init {
         launch {
-            peer.openListenerEventSubscription().consumeEach {
-                when (it) {
-                    is PaymentRequestGenerated -> {
-                        if (it.receivePayment.paymentPreimage == preimage) {
-                            val ask = lastAsk ?: error("Received a payment request when none was expected")
-                            check(it.receivePayment.amount == ask.paymentAmountMsat) { "Payment request amount not corresponding to expected" }
-                            check(it.receivePayment.description == ask.paymentDescription) { "Payment request description not corresponding to expected" }
-                            model(Receive.Model.Generated(it.request, ask.amount, ask.unit, ask.desc))
-                        }
+            peer.openListenerEventSubscription()
+                .consumeAsFlow()
+                .filterIsInstance<PaymentRequestGenerated>()
+                .collect {
+                    if (it.receivePayment.paymentPreimage == preimage) {
+                        val ask = lastAsk ?: error("Received a payment request when none was expected")
+                        check(it.receivePayment.amount == ask.paymentAmountMsat) { "Payment request amount not corresponding to expected" }
+                        check(it.receivePayment.description == ask.paymentDescription) { "Payment request description not corresponding to expected" }
+                        model(Receive.Model.Generated(it.request, ask.amount, ask.unit, ask.desc))
                     }
-                    else -> {}
                 }
-            }
         }
     }
 
