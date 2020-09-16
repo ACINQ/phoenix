@@ -26,14 +26,14 @@ class AppDisplayConfigurationController(di: DI) : AppController<DisplayConfigura
 
     private fun sendDisplayConfigurationModel() {
         launch {
-            model {
-                val config = configurationManager.getAppConfiguration()
+            val config = configurationManager.getAppConfiguration()
+            model(
                 DisplayConfiguration.Model(
                     fiatCurrency = config.fiatCurrency,
                     bitcoinUnit = config.bitcoinUnit,
                     appTheme = config.appTheme
                 )
-            }
+            )
         }
     }
 }

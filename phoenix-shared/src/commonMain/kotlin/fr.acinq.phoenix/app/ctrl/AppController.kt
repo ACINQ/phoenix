@@ -47,6 +47,10 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI,
         modelChanges.send(change)
     }
 
+    protected suspend fun model(model: M) {
+        modelChanges.send { model }
+    }
+
     protected abstract fun process(intent: I)
 
     final override fun intent(intent: I) {

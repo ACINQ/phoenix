@@ -14,12 +14,12 @@ class AppConfigurationController(di: DI) : AppController<Configuration.Model, Co
 
     init {
         launch {
-            model {
+            model(
                 if (walletManager.getWallet() == null)
                     Configuration.Model.SimpleMode
                 else
                     Configuration.Model.FullMode
-            }
+            )
         }
     }
 

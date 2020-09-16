@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		53BEF1748D4A541C0BEEDF2B /* models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF563E51BE558225C499B /* models.swift */; };
 		53BEF1E80E41F1AA4C9A9803 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF637BD83D356A4A9C74F /* MVIView.swift */; };
+		53BEF1FBE4DE47D0E9864EF7 /* Popup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF06ED862595D9695C9A8 /* Popup.swift */; };
 		53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF85119FFF4F05588DA42 /* mocks.swift */; };
 		53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFA112E0701FFD6B84217 /* colors.swift */; };
 		53BEF52EB1E6D171A81BF859 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFB85B066C30B3C30EB95 /* log.swift */; };
@@ -18,6 +19,7 @@
 		53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */; };
 		53BEFA3292350CF33363A483 /* MVIContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6E3FE2787846F3F38F1 /* MVIContext.swift */; };
 		53BEFB54A0625F9FF4177FC8 /* DI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF9AEB876A2611C6FC8F5 /* DI.swift */; };
+		53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF60DF224046E5DE0FDCC /* publishers.swift */; };
 		53BEFD54160278C5E393E319 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFE171C182513A5762686 /* HomeView.swift */; };
 		53BEFF4EDB40975C2123C63D /* ui.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFB3CB63090BBCFF6A36 /* ui.swift */; };
 		53BEFFEBEA9EBE7B27B53AF4 /* TransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF4DAE061532668494988 /* TransactionView.swift */; };
@@ -72,8 +74,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		53BEF06ED862595D9695C9A8 /* Popup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Popup.swift; sourceTree = "<group>"; };
 		53BEF4DAE061532668494988 /* TransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionView.swift; sourceTree = "<group>"; };
 		53BEF563E51BE558225C499B /* models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = models.swift; sourceTree = "<group>"; };
+		53BEF60DF224046E5DE0FDCC /* publishers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = publishers.swift; sourceTree = "<group>"; };
 		53BEF637BD83D356A4A9C74F /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
 		53BEF6CBB2587136D25A625A /* lang.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = lang.swift; sourceTree = "<group>"; };
 		53BEF6E3FE2787846F3F38F1 /* MVIContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIContext.swift; sourceTree = "<group>"; };
@@ -140,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */,
+				53BEF06ED862595D9695C9A8 /* Popup.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -152,6 +157,7 @@
 				53BEF6CBB2587136D25A625A /* lang.swift */,
 				53BEF563E51BE558225C499B /* models.swift */,
 				53BEFB85B066C30B3C30EB95 /* log.swift */,
+				53BEF60DF224046E5DE0FDCC /* publishers.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -443,6 +449,8 @@
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEF52EB1E6D171A81BF859 /* log.swift in Sources */,
+				53BEF1FBE4DE47D0E9864EF7 /* Popup.swift in Sources */,
+				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

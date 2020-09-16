@@ -15,11 +15,11 @@ class AppContentController(di: DI) : AppController<Content.Model, Content.Intent
     init {
         launch {
             if (walletManager.getWallet() != null) {
-                model { Content.Model.IsInitialized }
+                model(Content.Model.IsInitialized)
             } else {
-                model { Content.Model.NeedInitialization }
+                model(Content.Model.NeedInitialization)
                 walletManager.openWalletUpdatesSubscription().consumeEach {
-                    model { Content.Model.IsInitialized }
+                    model(Content.Model.IsInitialized)
                     return@consumeEach
                 }
             }

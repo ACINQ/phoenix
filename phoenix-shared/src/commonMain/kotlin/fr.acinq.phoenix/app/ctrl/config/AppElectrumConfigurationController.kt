@@ -71,7 +71,7 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
         launch {
             val wallet = walletManager.getWallet()
 
-            model {
+            model(
                 if (wallet == null) {
                     ElectrumConfiguration.Model(
                         connection = electrumConnection,
@@ -91,7 +91,7 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
                         error = error
                     )
                 }
-            }
+            )
         }
     }
 }

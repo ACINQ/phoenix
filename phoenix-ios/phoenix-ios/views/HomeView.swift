@@ -24,7 +24,7 @@ struct HomeView : MVIView {
             ZStack {
                 VStack() {
                     HStack {
-                        ConnectionStatus(status: model.connections.global, show: $showConnections)
+                        ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
                         Spacer()
                     }
                     .padding()
@@ -59,23 +59,18 @@ struct HomeView : MVIView {
 
                     BottomBar()
                 }
+                        .padding(.top, keyWindow?.safeAreaInsets.top)
 
                 if showConnections {
-                    VStack {
-                        ConnectionPopup(connections: model.connections, show: $showConnections)
+                    Popup(show: $showConnections) {
+                        ConnectionPopup(connections: model.connections)
                     }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.black.opacity(0.25))
-                            .edgesIgnoringSafeArea(.all)
-                            .transition(.opacity)
                 }
             }
-                    .padding(.top, keyWindow?.safeAreaInsets.top)
-                    .padding(.top, keyWindow?.safeAreaInsets.bottom)
-                    .padding(.top, 10)
                     .frame(maxHeight: .infinity)
                     .background(Color.appBackground)
                     .edgesIgnoringSafeArea(.top)
+                    .edgesIgnoringSafeArea(.bottom)
         }
                 .navigationBarTitle("", displayMode: .inline)
                 .navigationBarHidden(true)
@@ -84,42 +79,40 @@ struct HomeView : MVIView {
     struct ConnectionStatus : View {
         let status: Eclair_kmpConnection
 
-        @Binding var show: Bool
+        @Binding var showPopup: Bool
 
-        @State var started = false
         @State var dimStatus = false
 
         var body: some View {
-            Button {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    show = true
+            Group {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showPopup = true
+                    }
+                } label: {
+                    HStack {
+                        Image("ic_connection_lost")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                        Text(status.text())
+                                .font(.caption2)
+                    }
                 }
-            } label: {
-                HStack {
-                    Image("ic_connection_lost")
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                    Text(status.text())
-                            .font(.caption2)
-                }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.all, 4)
+                        .background(Color.appBackgroundLight)
+                        .cornerRadius(10)
+                        .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.gray, lineWidth: 1)
+                        )
+                        .opacity(dimStatus ? 0.2 : 1.0)
+                        .isHidden(status == Eclair_kmpConnection.established)
             }
-                    .buttonStyle(PlainButtonStyle())
-                    .padding(.all, 4)
-                    .background(Color.appBackgroundLight)
-                    .cornerRadius(10)
-                    .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.gray, lineWidth: 1)
-                    )
-                    .opacity(dimStatus ? 0.2 : 1.0)
-                    .isHidden(status == Eclair_kmpConnection.established)
                     .onAppear {
-                        if (!started) {
-                            started = true
-                            DispatchQueue.main.async {
-                                withAnimation(Animation.linear(duration: 1.0).repeatForever()) {
-                                    self.dimStatus.toggle()
-                                }
+                        DispatchQueue.main.async {
+                            withAnimation(Animation.linear(duration: 1.0).repeatForever()) {
+                                self.dimStatus.toggle()
                             }
                         }
                     }
@@ -129,14 +122,11 @@ struct HomeView : MVIView {
     struct ConnectionPopup : View {
         let connections: Connections
 
-        @Binding var show: Bool
-
         var body: some View {
             VStack(alignment: .leading) {
                 Text("Connection status:")
                         .font(.title2)
                         .padding([.bottom])
-
                 Divider()
                 ConnectionCell(label: "Internet", connection: connections.internet)
                 Divider()
@@ -144,22 +134,8 @@ struct HomeView : MVIView {
                 Divider()
                 ConnectionCell(label: "Electrum server", connection: connections.electrum)
                 Divider()
-
-                HStack {
-                    Spacer()
-                    Button("OK") {
-                        show = false
-                    }
-                            .font(.title2)
-                            .padding([.top])
-                }
-
             }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white)
-                    .cornerRadius(15)
-                    .padding(32)
+                    .padding([.top, .leading, .trailing])
         }
     }
 
@@ -279,6 +255,7 @@ struct HomeView : MVIView {
                 Spacer()
             }
                     .padding(.top, 10)
+                    .padding(.bottom, keyWindow?.safeAreaInsets.bottom)
                     .background(Color.white)
                     .cornerRadius(15, corners: [.topLeft, .topRight])
         }

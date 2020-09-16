@@ -15,23 +15,23 @@ class AppRestoreWalletController(di: DI) : AppController<RestoreWallet.Model, Re
 
     override fun process(intent: RestoreWallet.Intent) {
         when (intent) {
-            RestoreWallet.Intent.AcceptWarning -> launch { model { RestoreWallet.Model.Ready } }
+            RestoreWallet.Intent.AcceptWarning -> launch { model(RestoreWallet.Model.Ready) }
             is RestoreWallet.Intent.ValidateSeed -> {
                 try {
                     walletManager.createWallet(intent.mnemonics)
                 } catch (e: IllegalArgumentException) {
-                    launch { model { RestoreWallet.Model.InvalidSeed } }
+                    launch { model(RestoreWallet.Model.InvalidSeed) }
                 }
             }
             is RestoreWallet.Intent.FilterWordList -> when {
                 intent.predicate.length > 1 -> launch {
-                    model {
+                    model(
                         RestoreWallet.Model.Wordlist(
                             MnemonicCode.englishWordlist.filter { it.startsWith(intent.predicate, ignoreCase = true) }
                         )
-                    }
+                    )
                 }
-                else -> launch { model { RestoreWallet.Model.Wordlist(emptyList()) } }
+                else -> launch { model(RestoreWallet.Model.Wordlist(emptyList())) }
             }
         }
     }
