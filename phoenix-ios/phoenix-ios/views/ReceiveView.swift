@@ -33,17 +33,11 @@ struct ReceiveView: MVIView {
 
     @StateObject var qrCode = QRCode()
 
-    @State var toastText: String? = nil
-    @State var sharing: Bool = false
+    @State var sharing: String? = nil
     @State var editing: Bool = false
     @State var unit: String = "sat"
 
-    private func toast(_ text: String) {
-        withAnimation(.linear(duration: 0.15)) { toastText = text }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation(.linear(duration: 0.15)) { toastText = nil }
-        }
-    }
+    @StateObject var toast = Toast()
 
     var body: some View {
         ZStack {
@@ -59,22 +53,10 @@ struct ReceiveView: MVIView {
                             }
             }
 
-            if (toastText != nil) {
-                VStack {
-                    Spacer()
-                    Text(toastText!)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.appDark.opacity(0.4))
-                            .cornerRadius(42)
-                            .padding([.bottom], 42)
-                }
-                        .transition(.opacity)
-            }
+            toast.view()
         }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.appBackground)
-
     }
 
     @ViewBuilder func view(model: Receive.Model, intent: @escaping IntentReceiver) -> some View {
@@ -98,14 +80,12 @@ struct ReceiveView: MVIView {
                         HStack {
                             actionButton(image: Image(systemName: "square.on.square")) {
                                 UIPasteboard.general.string = m.request
-                                toast("Copied in pasteboard!")
+                                toast.toast(text: "Copied in pasteboard!")
                             }
                             actionButton(image: Image(systemName: "square.and.arrow.up")) {
-                                sharing = true
+                                sharing = "lightning:\(m.request)"
                             }
-                                    .sheet(isPresented: $sharing) {
-                                        ActivityView(activityItems: ["lightning:\(m.request)"] as [Any], applicationActivities: nil)
-                                    }
+                                    .sharing($sharing)
 
                             actionButton(image: Image(systemName: "square.and.pencil")) {
                                 withAnimation { editing = true }
@@ -167,13 +147,7 @@ struct ReceiveView: MVIView {
         let intent: IntentReceiver
 
         var body: some View {
-            Popup(
-                    show: $show,
-                    closeable: !illegal,
-                    onOk: {
-                        intent(Receive.IntentAsk(amount: amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!), unit: unit, desc: desc.isEmpty ? nil : desc))
-                    }
-            ) {
+            Popup(show: show) {
                 VStack(alignment: .leading) {
                     Text("Edit my payment request")
                             .font(.title2)
@@ -216,21 +190,20 @@ struct ReceiveView: MVIView {
                     TextField("...", text: $desc)
                             .padding([.leading, .trailing, .bottom])
 
+                    HStack {
+                        Spacer()
+                        Button("OK") {
+                            intent(Receive.IntentAsk(amount: amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!), unit: unit, desc: desc.isEmpty ? nil : desc))
+                            withAnimation { show = false }
+                        }
+                                .font(.title2)
+                                .disabled(illegal)
+                    }
+                            .padding()
+
                 }
             }
         }
-    }
-
-    struct ActivityView: UIViewControllerRepresentable {
-
-        let activityItems: [Any]
-        let applicationActivities: [UIActivity]?
-
-        func makeUIViewController(context: UIViewControllerRepresentableContext<ActivityView>) -> UIActivityViewController {
-            UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
-        }
-
-        func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ActivityView>) {}
     }
 
 }

@@ -29,7 +29,7 @@ struct ConfigurationView: MVIView {
                 Section(header: headerText("Advanced")) {
                     NavigationMenu(label: Text("Logs"), destination: EmptyView())
                     if fullMode {
-                        NavigationMenu(label: Text("Channels list"), destination: EmptyView())
+                        NavigationMenu(label: Text("My payment channels"), destination: ChannelsConfigurationView())
                         NavigationMenu(label: Text("Close all channels"), destination: EmptyView())
                         NavigationMenu(label: Text("Danger zone").foregroundColor(Color.red), destination: EmptyView())
                     }

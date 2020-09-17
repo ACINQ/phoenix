@@ -57,14 +57,13 @@ struct HomeView : MVIView {
                                 }
                     }
 
-                    BottomBar()
+                    BottomBar(canScan: model.connections.global == Eclair_kmpConnection.established)
                 }
                         .padding(.top, keyWindow?.safeAreaInsets.top)
+                        .padding(.top)
 
-                if showConnections {
-                    Popup(show: $showConnections) {
-                        ConnectionPopup(connections: model.connections)
-                    }
+                Popup(show: showConnections) {
+                    ConnectionPopup(show: $showConnections, connections: model.connections)
                 }
             }
                     .frame(maxHeight: .infinity)
@@ -120,6 +119,9 @@ struct HomeView : MVIView {
     }
 
     struct ConnectionPopup : View {
+
+        @Binding var show: Bool
+
         let connections: Connections
 
         var body: some View {
@@ -134,6 +136,14 @@ struct HomeView : MVIView {
                 Divider()
                 ConnectionCell(label: "Electrum server", connection: connections.electrum)
                 Divider()
+                HStack {
+                    Spacer()
+                    Button("OK") {
+                        withAnimation { show = false }
+                    }
+                            .font(.title2)
+                }
+                        .padding()
             }
                     .padding([.top, .leading, .trailing])
         }
@@ -210,6 +220,8 @@ struct HomeView : MVIView {
 
     struct BottomBar : View {
 
+        let canScan: Bool
+
         @State var isShowingScan: Bool = false
 
         var body: some View {
@@ -249,8 +261,9 @@ struct HomeView : MVIView {
                 ) {
                     Image("ic_scan").resizable().frame(width: 22, height: 22)
                     Text("Scan")
-                            .foregroundColor(.appDark)
+                            .foregroundColor(canScan ? .appDark : .gray)
                 }
+                        .disabled(!canScan)
 
                 Spacer()
             }
