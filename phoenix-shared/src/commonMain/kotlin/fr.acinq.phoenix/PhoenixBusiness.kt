@@ -144,6 +144,12 @@ class PhoenixBusiness {
 
         constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
         bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
+        bind<String>(tag = TAG_MASTER_PUBKEY_PATH) with singleton {
+            if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'" else "m/84'/1'/0'"
+        }
+        bind<String>(tag = TAG_ONCHAIN_ADDRESS_PATH) with singleton {
+            if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'/0/0" else "m/84'/1'/0'/0/0"
+        }
 
         bind<ElectrumClient>() with singleton { ElectrumClient(instance(), MainScope()) }
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }

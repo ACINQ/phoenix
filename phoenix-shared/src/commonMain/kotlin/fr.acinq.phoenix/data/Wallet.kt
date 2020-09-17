@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.DeterministicWallet
-import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.*
 import kotlinx.serialization.Serializable
 import org.kodein.db.model.orm.Metadata
 
@@ -14,13 +13,21 @@ data class Wallet(
     val seed by lazy { MnemonicCode.toSeed(mnemonics, "") }
     private val master by lazy { DeterministicWallet.generate(seed) }
 
-    fun derivedPublicKey(path: List<Long>, isMainnet: Boolean): String {
-        val privateKey = DeterministicWallet.derivePrivateKey(master, path)
-        val publicKey = DeterministicWallet.publicKey(privateKey)
+    fun masterPublicKey(path: String, isMainnet: Boolean): String {
+        val publicKey =
+            DeterministicWallet.publicKey(
+                DeterministicWallet.derivePrivateKey(master, path)
+            )
         return DeterministicWallet.encode(
             input = publicKey,
             prefix = if (isMainnet) DeterministicWallet.zpub else DeterministicWallet.vpub
         )
+    }
+
+    fun onchainAddress(path: String, isMainnet: Boolean): String {
+        val chainHash=  if (isMainnet) Block.LivenetGenesisBlock.hash else Block.TestnetGenesisBlock.hash
+        val publicKey = DeterministicWallet.derivePrivateKey(master, path).publicKey
+        return computeBIP84Address(publicKey, chainHash)
     }
 
     // Recommended when data class props contain arrays

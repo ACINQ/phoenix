@@ -9,6 +9,7 @@ import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.InvalidElectrumAddress
 import fr.acinq.phoenix.utils.TAG_IS_MAINNET
+import fr.acinq.phoenix.utils.TAG_MASTER_PUBKEY_PATH
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ import org.kodein.di.instance
 class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(di, ElectrumConfiguration.Model()) {
     private val configurationManager: AppConfigurationManager by instance()
     private val isMainnet: Boolean by instance(tag = TAG_IS_MAINNET)
+    private val masterPubkeyPath: String by instance(tag = TAG_MASTER_PUBKEY_PATH)
     private val walletManager: WalletManager by instance()
     private val electrumClient: ElectrumClient by instance()
 
@@ -79,15 +81,14 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
                         error = error
                     )
                 } else {
-                    val path = if (isMainnet) "m/84'/0'/0'" else "m/84'/1'/0'"
-                    val xpub = wallet.derivedPublicKey(KeyPath.computePath(path), isMainnet)
+                    val xpub = wallet.masterPublicKey(masterPubkeyPath, isMainnet)
 
                     ElectrumConfiguration.Model(
                         walletIsInitialized = true,
                         connection = electrumConnection,
                         electrumServer = configurationManager.getElectrumServer(),
                         xpub = xpub,
-                        path = path,
+                        path = masterPubkeyPath,
                         error = error
                     )
                 }
