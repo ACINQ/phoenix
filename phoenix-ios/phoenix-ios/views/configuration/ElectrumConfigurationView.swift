@@ -92,11 +92,22 @@ struct ElectrumConfigurationView: MVIView {
                     Spacer()
                 }
 
-                Popup(show: $showElectrumAddressPopup) {
-                    if model.electrumServer.customized {
-                        ElectrumAddressPopup(intent: intent, customize: model.electrumServer.customized, addressInput: model.electrumServer.address())
-                    } else {
-                        ElectrumAddressPopup(intent: intent)
+                Popup(show: showElectrumAddressPopup) {
+                    VStack {
+                        if model.electrumServer.customized {
+                            ElectrumAddressPopup(intent: intent, customize: model.electrumServer.customized, addressInput: model.electrumServer.address())
+                        } else {
+                            ElectrumAddressPopup(intent: intent)
+                        }
+
+                        HStack {
+                            Spacer()
+                            Button("OK") {
+                                withAnimation { showElectrumAddressPopup = false }
+                            }
+                                    .font(.title2)
+                        }
+                                .padding()
                     }
                 }
             }

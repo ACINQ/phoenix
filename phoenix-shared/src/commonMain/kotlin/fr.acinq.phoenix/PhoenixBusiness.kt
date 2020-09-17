@@ -17,10 +17,12 @@ import fr.acinq.eclair.utils.sat
 import fr.acinq.eclair.utils.toByteVector32
 import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
+import fr.acinq.phoenix.app.ctrl.config.AppChannelsConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppElectrumConfigurationController
 import fr.acinq.phoenix.ctrl.*
+import fr.acinq.phoenix.ctrl.config.ChannelsConfigurationController
 import fr.acinq.phoenix.ctrl.config.ConfigurationController
 import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
@@ -44,6 +46,7 @@ import org.kodein.db.inDir
 import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.di.*
 import org.kodein.log.LoggerFactory
+import org.kodein.log.newLogger
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
@@ -61,11 +64,11 @@ class PhoenixBusiness {
         }
     }
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, wallet: Wallet) : Peer {
+    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, loggerFactory: LoggerFactory, wallet: Wallet) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
         val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
-        println("nodeId:${keyManager.nodeId}") // TODO remove this!
+        newLogger(loggerFactory).info { "NodeId: ${keyManager.nodeId}" }
 
         val params = NodeParams(
             keyManager = keyManager,
@@ -149,7 +152,7 @@ class PhoenixBusiness {
         bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
         bind<Peer>() with singleton {
             instance<WalletManager>().getWallet()?.let {
-                buildPeer(instance(), instance(), instance(), it)
+                buildPeer(instance(), instance(), instance(), instance(), it)
             } ?: error("Wallet must be initialized.")
         }
         bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
@@ -168,6 +171,7 @@ class PhoenixBusiness {
         bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
         bind<DisplayConfigurationController>() with screenProvider { AppDisplayConfigurationController(di) }
         bind<ElectrumConfigurationController>() with screenProvider { AppElectrumConfigurationController(di) }
+        bind<ChannelsConfigurationController>() with screenProvider { AppChannelsConfigurationController(di) }
 
         // App daemons
         bind() from eagerSingleton { AppConnectionsDaemon(di) }

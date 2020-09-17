@@ -17,6 +17,7 @@ class MockDIBuilder {
     var configurationModel: Configuration.Model = Configuration.Model.SimpleMode
     var displayConfigurationModel: DisplayConfiguration.Model = DisplayConfiguration.Model()
     var electrumConfigurationModel: ElectrumConfiguration.Model = ElectrumConfiguration.Model()
+    var channelsConfigurationModel: ChannelsConfiguration.Model = ChannelsConfiguration.emptyModel
 
     fun apply(block: MockDIBuilder.() -> Unit): MockDIBuilder {
         this.block()
@@ -33,5 +34,6 @@ class MockDIBuilder {
         bind<ConfigurationController>() with screenProvider { Configuration.MockController(configurationModel) }
         bind<DisplayConfigurationController>() with screenProvider { DisplayConfiguration.MockController(displayConfigurationModel) }
         bind<ElectrumConfigurationController>() with screenProvider { ElectrumConfiguration.MockController(electrumConfigurationModel) }
+        bind<ChannelsConfigurationController>() with screenProvider { ChannelsConfiguration.MockController(channelsConfigurationModel) }
     }
 }

@@ -24,12 +24,14 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI,
     private val modelChanges = Channel<M.() -> M>()
 
     init {
-        logger.info { "${this::class.simpleName} First Model: $firstModel" }
+        fun Any.oneLineString() = toString().lines().map { it.trim() } .joinToString(" ")
+
+        logger.info { "${this::class.simpleName} First Model: ${firstModel.oneLineString()}" }
 
         launch {
             modelChanges.consumeEach { change ->
                 val newModel = models.value.change()
-                logger.info { "${this::class.simpleName} Model: $newModel" }
+                logger.info { "${this::class.simpleName} Model: ${newModel.oneLineString()}" }
                 models.send(newModel)
             }
         }

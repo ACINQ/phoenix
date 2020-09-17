@@ -7,6 +7,7 @@ import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.NetworkMonitor
+import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collectIndexed
@@ -44,9 +45,7 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
             peer.openChannelsSubscription().consumeEach { channels ->
                 model {
                     copy(
-                        balanceSat = channels.values
-                            .filterIsInstance<HasCommitments>()
-                            .sumOf { it.commitments.localCommit.spec.toLocal.truncateToSatoshi().toLong() }
+                        balanceSat = channels.values.sumOf { it.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0 }
                     )
                 }
             }

@@ -4,38 +4,32 @@ import Combine
 
 struct Popup<Content: View>: View {
 
-    @Binding var show: Bool
-    let content: Content
-
-    let closeable: Bool
-    let onOk: () -> Void
+    let content: (() -> Content)?
 
     @State var keyboardHeight: CGFloat = 0
 
-    init(show: Binding<Bool>, closeable: Bool = true, onOk: @escaping () -> Void = {}, @ViewBuilder content: @escaping () -> Content) {
-        self._show = show
-        self.closeable = closeable
-        self.onOk = onOk
-        self.content = content()
+    init(show: Bool, @ViewBuilder content: @escaping () -> Content) {
+        if (show) {
+            self.content = content
+        } else {
+            self.content = nil
+        }
+    }
+
+    init<T>(of: T?, @ViewBuilder content: @escaping (T) -> Content) {
+        if let value = of {
+            self.content = { content(value) }
+        } else {
+            self.content = nil
+        }
     }
 
     var body: some View {
         Group {
-            if (show) {
+            if let content = self.content {
                 VStack {
                     VStack(alignment: .leading) {
-                        content
-                        HStack {
-                            Spacer()
-                            Button("OK") {
-                                onOk()
-                                withAnimation { show = false }
-                            }
-                                    .font(.title2)
-                                    .disabled(!closeable)
-                        }
-                                .padding()
-
+                        content()
                     }
                             .frame(maxWidth: .infinity)
                             .background(Color.white)

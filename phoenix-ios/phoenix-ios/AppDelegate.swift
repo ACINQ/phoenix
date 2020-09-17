@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         $0.configurationModel = ConfigurationView_Previews.mockModel
         $0.displayConfigurationModel = DisplayConfigurationView_Previews.mockModel
         $0.electrumConfigurationModel = ElectrumConfigurationView_Previews.mockModel
+        $0.channelsConfigurationModel = ChannelsConfigurationView_Previews.mockModel
     }
 
     let di: DI
