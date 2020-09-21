@@ -90,7 +90,7 @@ struct HomeView : MVIView {
                     }
                 } label: {
                     HStack {
-                        Image("ic_connection_lost")
+                        Image(systemName: "wifi.slash")
                                 .resizable()
                                 .frame(width: 16, height: 16)
                         Text(status.text())
@@ -155,11 +155,15 @@ struct HomeView : MVIView {
 
         var body : some View {
             HStack {
-                let bullet = Image("ic_bullet").resizable().frame(width: 10, height: 10)
-
-                if connection == .established { bullet.foregroundColor(.appGreen) }
-                else if connection == .establishing { bullet.foregroundColor(.appYellow) }
-                else if connection == .closed { bullet.foregroundColor(.appRed) }
+                if connection == .established {
+                    Image(systemName: "checkmark").foregroundColor(.appGreen)
+                }
+                else if connection == .establishing {
+                    Image(systemName: "hourglass").foregroundColor(.appYellow)
+                }
+                else if connection == .closed {
+                    Image(systemName: "xmark").foregroundColor(.appRed)
+                }
 
                 Text("\(label):")
                 Spacer()
@@ -177,17 +181,16 @@ struct HomeView : MVIView {
             HStack {
                 switch (transaction.status) {
                 case .success:
-                    Image("payment_holder_def_success")
+                    Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(Color.appHorizon)
                             .padding(4)
-                            .background(
-                                    RoundedRectangle(cornerRadius: .infinity)
-                                            .fill(Color.appHorizon)
-                            )
                 case .pending:
-                    Image("payment_holder_def_pending")
+                    Image(systemName: "hourglass")
+                            .foregroundColor(Color.appHorizon)
                             .padding(4)
                 case .failure:
-                    Image("payment_holder_def_failed")
+                    Image(systemName: "xmark")
+                            .foregroundColor(Color.appHorizon)
                             .padding(4)
                 default: EmptyView()
                 }
@@ -230,7 +233,7 @@ struct HomeView : MVIView {
                 NavigationLink(
                         destination: ConfigurationView()
                 ) {
-                    Image("ic_settings").resizable().frame(width: 22, height: 22)
+                    Image(systemName: "gearshape").resizable().frame(width: 22, height: 22)
                 }
                         .padding()
                         .padding(.leading, 8)
@@ -243,7 +246,7 @@ struct HomeView : MVIView {
                 NavigationLink(
                         destination: ReceiveView()
                 ) {
-                    Image("ic_receive").resizable().frame(width: 22, height: 22)
+                    Image(systemName: "square.and.arrow.down").resizable().frame(width: 22, height: 22)
                     Text("Receive")
                             .foregroundColor(.appDark)
                 }
@@ -259,7 +262,7 @@ struct HomeView : MVIView {
                         destination: ScanView(isShowing: $isShowingScan),
                         isActive: $isShowingScan
                 ) {
-                    Image("ic_scan").resizable().frame(width: 22, height: 22)
+                    Image(systemName: "camera.viewfinder").resizable().frame(width: 22, height: 22)
                     Text("Scan")
                             .foregroundColor(canScan ? .appDark : .gray)
                 }
