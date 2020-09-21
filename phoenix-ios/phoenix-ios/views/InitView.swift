@@ -93,7 +93,7 @@ struct InitView : MVIView {
 			.padding(.top, keyWindow?.safeAreaInsets.top)
 			.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.offset(x: 0, y: -120) // move center upwards
+			.offset(x: 0, y: -80) // move center upwards
 			.edgesIgnoringSafeArea(.all)
 			.navigationBarTitle("", displayMode: .inline)
 			.navigationBarHidden(true)
