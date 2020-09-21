@@ -7,6 +7,7 @@ object Scan {
 
     sealed class Model : MVI.Model() {
         object Ready: Model()
+        object BadRequest: Model()
 
         data class Validate(val request: String, val amountMsat: Long?, val requestDescription: String?): Model()
         data class Sending(val amountMsat: Long, val requestDescription: String?): Model()
