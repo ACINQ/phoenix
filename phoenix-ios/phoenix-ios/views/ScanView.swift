@@ -48,10 +48,11 @@ struct ScanView: MVIView {
                         .padding()
                         .font(.title2)
 
-                    QrCodeScannerView().found { request in
-                            print(request)
-                            intent(Scan.IntentParse(request: request))
-                        }
+                QrCodeScannerView { request in
+                    print(request)
+                    intent(Scan.IntentParse(request: request))
+                }
+                        .cornerRadius(10)
                         .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.gray, lineWidth: 4)

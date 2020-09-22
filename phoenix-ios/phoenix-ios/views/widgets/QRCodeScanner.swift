@@ -12,9 +12,8 @@ struct QrCodeScannerView: UIViewRepresentable {
     private let delegate = QrCodeCameraDelegate()
     private let metadataOutput = AVCaptureMetadataOutput()
 
-    func found(r: @escaping (String) -> Void) -> QrCodeScannerView {
-        delegate.onResult = r
-        return self
+    init(onResultAction: @escaping (String) -> Void) {
+        delegate.onResult = onResultAction
     }
 
     func setupCamera(_ uiView: CameraPreview) {
