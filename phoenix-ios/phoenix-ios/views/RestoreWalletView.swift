@@ -56,7 +56,7 @@ struct RestoreWalletView: MVIView {
                 intent(RestoreWallet.IntentAcceptWarning())
             } label: {
                 HStack {
-                    Image(systemName: "arrow.forward")
+                    Image("ic_arrow_next")
                             .resizable()
                             .frame(width: 16, height: 16)
                     Text("Next")
@@ -137,7 +137,7 @@ struct RestoreWalletView: MVIView {
                                         mnemonics.removeSubrange(index..<mnemonics.count)
                                     } label: {
                                         HStack {
-                                            Image(systemName: "xmark")
+                                            Image("ic_cross")
                                                     .resizable()
                                                     .frame(width: 24, height: 24)
                                                     .foregroundColor(Color.red)

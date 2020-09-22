@@ -20,7 +20,7 @@ struct TransactionView : View {
                     Button {
                         close()
                     } label: {
-                        Image(systemName: "xmark")
+                        Image("ic_cross")
                                 .resizable()
                                 .frame(width: 30, height: 30)
                     }
@@ -32,9 +32,10 @@ struct TransactionView : View {
             VStack {
                 switch (transaction.status) {
                 case .success:
-                    Image(systemName: "checkmark.circle")
+                    Image(vector: "ic_payment_success_static")
+                            .renderingMode(.template)
                             .resizable()
-                            .frame(width: 75, height: 75)
+                            .frame(width: 100, height: 100)
                             .foregroundColor(.appGreen)
                     VStack {
                         Text(transaction.amountSat < 0 ? "SENT" : "RECEIVED")
@@ -44,17 +45,17 @@ struct TransactionView : View {
                     }
                             .padding()
                 case .pending:
-                    Image(systemName: "paperplane")
+                    Image(vector: "ic_send")
                             .resizable()
-                            .frame(width: 75, height: 75)
+                            .frame(width: 100, height: 100)
                     Text("PENDING")
                             .font(Font.title2.bold())
                                 .padding()
                 case .failure:
-                    Image(systemName: "xmark")
+                    Image(vector: "ic_cross")
                             .renderingMode(.template)
                             .resizable()
-                            .frame(width: 75, height: 75)
+                            .frame(width: 100, height: 100)
                             .foregroundColor(.appRed)
                     VStack {
                         Text("PAYMENT ")
@@ -88,7 +89,7 @@ struct TransactionView : View {
 
 class TransactionView_Previews : PreviewProvider {
     static var previews: some View {
-        TransactionView(transaction: mockPendingTransaction, close: {})
+        TransactionView(transaction: mockSpendFailedTransaction, close: {})
     }
 
     #if DEBUG
