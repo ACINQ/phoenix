@@ -20,7 +20,7 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
                     try {
                         val paymentRequest = PaymentRequest.read(intent.request)
                         model(Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description))
-                    } catch (t: Throwable) {
+                    } catch (t: Throwable) { // TODO Throwable is not a good choice, analyze the possible output of PaymentRequest.read(...)
                         model(Scan.Model.BadRequest)
                     }
                 }
