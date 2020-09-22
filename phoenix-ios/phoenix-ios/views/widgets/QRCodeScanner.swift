@@ -7,7 +7,6 @@ import SwiftUI
 struct QrCodeScannerView: UIViewRepresentable {
 
     var supportedBarcodeTypes: [AVMetadataObject.ObjectType] = [.qr]
-    typealias UIViewType = CameraPreview
 
     private let session = AVCaptureSession()
     private let delegate = QrCodeCameraDelegate()
@@ -40,11 +39,24 @@ struct QrCodeScannerView: UIViewRepresentable {
                 uiView.previewLayer = previewLayer
 
                 session.startRunning()
+
+                // Keep getting metadata from camera
+                DispatchQueue.global(qos: .background).async {
+                    var isActive = true
+                    while(isActive) {
+                        DispatchQueue.main.sync {
+                            if !self.session.isInterrupted && !self.session.isRunning {
+                                isActive = false
+                            }
+                        }
+                        sleep(1)
+                    }
+                }
             }
         }
     }
 
-    func makeUIView(context: UIViewRepresentableContext<QrCodeScannerView>) -> QrCodeScannerView.UIViewType {
+    func makeUIView(context: UIViewRepresentableContext<QrCodeScannerView>) -> CameraPreview {
         let cameraView = CameraPreview(session: session)
 
         #if targetEnvironment(simulator)
@@ -79,18 +91,6 @@ struct QrCodeScannerView: UIViewRepresentable {
         default:
             uiView.createMessageView(message: accessDeniedMessage)
         }
-
-        DispatchQueue.global(qos: .background).async {
-            var isActive = true
-            while(isActive) {
-                DispatchQueue.main.sync {
-                    if !self.session.isInterrupted && !self.session.isRunning {
-                        isActive = false
-                    }
-                }
-                sleep(1)
-            }
-        }
     }
 
     func updateUIView(_ uiView: CameraPreview, context: UIViewRepresentableContext<QrCodeScannerView>) {
@@ -104,7 +104,6 @@ class CameraPreview: UIView {
 
     var previewLayer: AVCaptureVideoPreviewLayer?
     var session = AVCaptureSession()
-    weak var delegate: QrCodeCameraDelegate?
 
     init(session: AVCaptureSession) {
         super.init(frame: .zero)
@@ -142,6 +141,9 @@ class CameraPreview: UIView {
 */
 class QrCodeCameraDelegate: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
+    var scanInterval: Double = 1.0
+    var lastTime = Date(timeIntervalSince1970: 0)
+
     var onResult: (String) -> Void = { _  in }
 
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -152,7 +154,13 @@ class QrCodeCameraDelegate: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         }
     }
 
+
     func foundBarcode(_ stringValue: String) {
+        let now = Date()
+        // Avoid flooding controller
+        if now.timeIntervalSince(lastTime) >= scanInterval {
+            lastTime = now
             self.onResult(stringValue)
+        }
     }
 }

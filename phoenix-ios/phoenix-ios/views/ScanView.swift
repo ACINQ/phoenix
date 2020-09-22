@@ -101,7 +101,7 @@ struct ScanView: MVIView {
                             .padding()
                 }
             }
-                    .navigationBarTitle("Pay", displayMode: .inline)
+                    .navigationBarTitle("", displayMode: .inline)
         }
     }
 
