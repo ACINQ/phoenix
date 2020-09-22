@@ -26,7 +26,7 @@ class PaymentPending
 
 class BalanceEvent(val balance: MilliSatoshi)
 
-class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32, val closingType: ClosingType, val mainTxs: List<Transaction>, val delayedTxs: List<Transaction>)
+class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32, val closingType: ClosingType, val spendingTxs: List<Transaction>, val scriptDestMainOutput: String?)
 
 class ChannelStateChange
 

@@ -57,7 +57,10 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.*
-import fr.acinq.phoenix.db.*
+import fr.acinq.phoenix.db.AppDb
+import fr.acinq.phoenix.db.PayToOpenMetaRepository
+import fr.acinq.phoenix.db.PaymentMeta
+import fr.acinq.phoenix.db.PaymentMetaRepository
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
@@ -115,6 +118,7 @@ class EclairNodeService : Service() {
   private val receivedInBackground: MutableLiveData<List<MilliSatoshi>> = MutableLiveData(emptyList())
 
   private lateinit var appContext: AppContext
+
   // repositories for db access
   private lateinit var appDb: AppDb
   private lateinit var paymentMetaRepository: PaymentMetaRepository
@@ -122,8 +126,10 @@ class EclairNodeService : Service() {
 
   /** State of the service, provides access to the kit when it's started. Private so that it's not mutated from the outside. */
   private val _state = MutableLiveData<KitState>(KitState.Off)
+
   /** Public observable state that can be used by the UI */
   val state: LiveData<KitState> get() = _state
+
   /** Lock for state updates */
   private val stateLock = ReentrantLock()
 
@@ -799,8 +805,12 @@ class EclairNodeService : Service() {
           /* payment request */ Option.empty(),
           /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
         nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
-        paymentMetaRepository.insert(PaymentMeta(paymentHash.toString(), closingTxId = event.txId))
-
+        paymentMetaRepository.insert(PaymentMeta(
+          id = id.toString(),
+          closingSpendingTxs = PaymentMeta.serializeTxs(event.spendingTxs),
+          closingMainOutputScript = event.scriptDestMainOutput,
+          closingChannelId = event.channelId.toString(),
+          closingType = event.closingType.code))
         val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
         val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
           ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))

@@ -41,16 +41,15 @@ data class PaymentMeta(
   @ColumnInfo(name = "funding_tx") val fundingTxId: String? = null,
   @ColumnInfo(name = "funding_fee_pct") val fundingFeePct: Double? = null,
   @ColumnInfo(name = "funding_fee_raw_sat") val fundingFeeRawSat: Long? = null,
-  @ColumnInfo(name = "closing_txs_main") val closingTxsMain: String? = null,
-  @ColumnInfo(name = "closing_txs_delayed") val closingTxsDelayed: String? = null,
   @ColumnInfo(name = "closing_type") val closingType: Int? = null,
-  @ColumnInfo(name = "closing_cause") val closingCause: String? = null,
   @ColumnInfo(name = "closing_channel_id") val closingChannelId: String? = null,
+  @ColumnInfo(name = "closing_spending_txs") val closingSpendingTxs: String? = null,
+  @ColumnInfo(name = "closing_main_output_script") val closingMainOutputScript: String? = null,
+  @ColumnInfo(name = "closing_cause") val closingCause: String? = null,
   @ColumnInfo(name = "custom_desc") val customDescription: String? = null
 ) {
 
-  fun getMainTxsList(): List<String>? = closingTxsMain?.split(";")
-  fun getDelayedTxsList(): List<String>? = closingTxsDelayed?.split(";")
+  fun getSpendingTxs(): List<String>? = closingSpendingTxs?.split(";")?.map { it.trim() }
 
   companion object {
     fun serializeTxs(list: List<Transaction>): String? {

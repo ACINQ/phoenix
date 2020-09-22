@@ -16,8 +16,10 @@
 
 package fr.acinq.phoenix.paymentdetails
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Animatable
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -38,6 +40,7 @@ import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.phoenix.AppContext
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentPaymentDetailsBinding
@@ -48,8 +51,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Request
-import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -70,8 +71,9 @@ class PaymentDetailsFragment : BaseFragment() {
 
   // shared view model, living with payment details nested graph
   private val model: PaymentDetailsViewModel by navGraphViewModels(R.id.nav_graph_payment_details) {
-    AppDb.getDb(requireContext().applicationContext).run {
-      PaymentDetailsViewModel.Factory(args.identifier, PaymentMetaRepository.getInstance(paymentMetaDao()),
+    val appContext = appContext(requireContext())
+    AppDb.getDb(appContext.applicationContext).run {
+      PaymentDetailsViewModel.Factory(appContext, args.identifier, PaymentMetaRepository.getInstance(paymentMetaDao()),
         PayToOpenMetaRepository.getInstance(payToOpenDao()), NodeMetaRepository.getInstance(nodeMetaDao()))
     }
   }
@@ -113,9 +115,12 @@ class PaymentDetailsFragment : BaseFragment() {
           mBinding.amountValue.setAmount(state.amountToRecipient)
           showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
           if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
-
-
-            // something special
+            model.paymentMeta.value?.run {
+              if (closingType != ClosingType.Mutual.code) {
+                mBinding.infoLayout.visibility = View.VISIBLE
+                mBinding.infoBody.text = getString(R.string.paymentdetails_closing_desc)
+              }
+            }
           }
         }
         is PaymentDetailsState.Incoming.Pending -> {
@@ -141,6 +146,12 @@ class PaymentDetailsFragment : BaseFragment() {
     mBinding.customDescValue.setOnClickListener { handleEdit() }
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.showTechnicalsButton.setOnClickListener { findNavController().navigate(R.id.action_payment_details_to_payment_details_technicals) }
+    mBinding.onchainAddressExplorerButton.setOnClickListener {
+      model.onchainAddress.value?.let {
+        val uri = "${Constants.BLOCKSTREAM_EXPLORER_URL}/address/$it"
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+      }
+    }
   }
 
   private fun handleEdit() {
@@ -271,6 +282,7 @@ sealed class PaymentDetailsState {
 }
 
 class PaymentDetailsViewModel(
+  private val appContext: AppContext,
   private val paymentId: String,
   private val paymentMetaRepository: PaymentMetaRepository,
   private val payToOpenMetaRepository: PayToOpenMetaRepository,
@@ -287,8 +299,31 @@ class PaymentDetailsViewModel(
     state.value = PaymentDetailsState.Init
   }
 
+  val onchainAddress: LiveData<String> = Transformations.map(paymentMeta) {
+    it?.swapInAddress ?: it?.swapOutAddress ?: it?.closingMainOutputScript
+  }
+
+  val closingType: LiveData<String> = Transformations.map(paymentMeta) {
+    when (it?.closingType) {
+      ClosingType.Mutual.code -> appContext.getString(R.string.paymentdetails_closing_type_mutual)
+      ClosingType.Local.code -> appContext.getString(R.string.paymentdetails_closing_type_local)
+      ClosingType.Remote.code -> appContext.getString(R.string.paymentdetails_closing_type_remote)
+      ClosingType.Other.code -> appContext.getString(R.string.paymentdetails_closing_type_other)
+      else -> ""
+    }
+  }
+
+  val swapOutFeerate: LiveData<String> = Transformations.map(paymentMeta) {
+    it?.swapOutFeeratePerByte?.run { "$this sat/byte" } ?: ""
+  }
+
+  val closingSpendingTxs: LiveData<String> = Transformations.map(paymentMeta) {
+    it?.getSpendingTxs()?.joinToString("\n\n")
+  }
+
   val pubkey: LiveData<String> = Transformations.map(state) {
     when (it) {
+      is PaymentDetailsState.Outgoing.Sent.Closing -> ""
       is PaymentDetailsState.Outgoing -> it.parts.first().recipientNodeId().toString()
       else -> ""
     }
@@ -384,15 +419,13 @@ class PaymentDetailsViewModel(
           val completedAt = it.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.map { s -> s.completedAt() }.max()!!
           val head = it.first()
           if (paymentMeta?.swapOutAddress != null && paymentMeta.swapOutFeesSat != null && paymentMeta.swapOutFeeratePerByte != null) {
-            state.postValue(PaymentDetailsState.Outgoing.Sent.SwapOut(head.paymentType(),
-              it,
-              description,
-              amountToRecipient,
-              Converter.any2Msat(Satoshi(paymentMeta.swapOutFeesSat)),
-              completedAt,
+            val feeSwapOut = Satoshi(paymentMeta.swapOutFeesSat)
+            val descSwapOut = appContext.getString(R.string.paymentdetails_swap_out_desc)
+            state.postValue(PaymentDetailsState.Outgoing.Sent.SwapOut(head.paymentType(), it, descSwapOut, amountToRecipient.`$minus`(feeSwapOut), Converter.any2Msat(feeSwapOut), completedAt,
               paymentMeta.swapOutFeeratePerByte))
           } else if (head.paymentType() == "ClosingChannel" || (head.paymentRequest().isEmpty && head.externalId().isDefined && head.externalId().get().startsWith("closing-"))) {
-            state.postValue(PaymentDetailsState.Outgoing.Sent.Closing(head.paymentType(), it, description, amountToRecipient, fees, completedAt))
+            val descClosing = appContext.getString(R.string.paymentdetails_closing_desc, paymentMeta?.closingChannelId?.take(8) ?: "")
+            state.postValue(PaymentDetailsState.Outgoing.Sent.Closing(head.paymentType(), it, descClosing, amountToRecipient, fees, completedAt))
           } else {
             state.postValue(PaymentDetailsState.Outgoing.Sent.Normal(head.paymentType(), it, description, amountToRecipient, fees, completedAt))
           }
@@ -458,6 +491,7 @@ class PaymentDetailsViewModel(
   }
 
   class Factory(
+    private val appContext: AppContext,
     private val paymentId: String,
     private val paymentMetaRepository: PaymentMetaRepository,
     private val payToOpenMetaRepository: PayToOpenMetaRepository,
@@ -465,7 +499,7 @@ class PaymentDetailsViewModel(
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-      return PaymentDetailsViewModel(paymentId, paymentMetaRepository, payToOpenMetaRepository, nodeMetaRepository) as T
+      return PaymentDetailsViewModel(appContext, paymentId, paymentMetaRepository, payToOpenMetaRepository, nodeMetaRepository) as T
     }
   }
 }

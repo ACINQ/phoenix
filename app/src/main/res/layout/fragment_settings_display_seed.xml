@@ -49,7 +49,10 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/space_md"
+        android:paddingTop="@dimen/space_md"
+        android:paddingBottom="@dimen/space_lg_p"
+        android:paddingEnd="@dimen/space_lg"
+        android:paddingStart="@dimen/space_lg_p"
         android:background="@drawable/square_border_hz">
 
         <TextView

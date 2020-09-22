@@ -163,8 +163,12 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       item.meta.swapOutAddress
     } else if (item.payment.paymentRequest().isDefined) {
       PaymentRequest.fastReadDescription(item.payment.paymentRequest().get())
-    } else if (item.payment is PlainOutgoingPayment && item.payment.externalId().isDefined && item.payment.externalId().get().startsWith("closing-")) {
-      descriptionView.context.getString(R.string.paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
+    } else if (item.payment is PlainOutgoingPayment && (item.payment.paymentType() == "ClosingChannel" || (item.payment.externalId().isDefined && item.payment.externalId().get().startsWith("closing-")))) {
+      if (item.meta?.closingMainOutputScript?.isNotBlank() == true) {
+        item.meta.closingMainOutputScript
+      } else {
+        descriptionView.context.getString(R.string.paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
+      }
     } else {
       null
     }

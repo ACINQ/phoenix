@@ -354,7 +354,7 @@
   <string name="displayseed_error_generic">Could not unlock seed, please try again.</string>
   <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
   <string name="displayseed_instructions"><![CDATA[
-    The seed of the wallet is a list of 12 english words. It is your wallet backup and gives full access to the funds in the wallet.
+    The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed.
     <br /><br />
     <strong>Only you alone possess this seed. Keep it private.</strong>
     <br /><br />
@@ -397,20 +397,36 @@
   <string name="paymentdetails_desc_custom_title">Add note</string>
   <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
   <string name="paymentdetails_destination_label">Sent to</string>
+  <string name="paymentdetails_relayer_label">Relayed by</string>
   <string name="paymentdetails_fees_label">Fees</string>
   <string name="paymentdetails_pay_to_open_label">Fees</string>
   <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel</string>
   <string name="paymentdetails_error_label">Error</string>
-  <string name="paymentdetails_closing_desc">Payment for closing channel #%1$s</string>
+  <string name="paymentdetails_closing_desc">Payment for closing channel %1$s…</string>
+  <string name="paymentdetails_swap_out_desc">Payment to on-chain address</string>
   <string name="paymentdetails_no_description">No description</string>
-  <string name="paymentdetails_swapout_address_label">Address</string>
-  <string name="paymentdetails_swapin_address_label">Address</string>
+  <string name="paymentdetails_address_label">Address</string>
+  <string name="paymentdetails_address_open_explorer">Show in explorer</string>
+  <string name="paymentdetails_info_uniclose"><![CDATA[
+    This payment happened following a conflict in the channel. Funds are sent to %1$s (this address is on-chain, and belongs to you).
+    <br /><br />
+    To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
+  ]]></string>
 
   <string name="paymentdetails_technicals_button">Show details</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">Payment data</string>
+  <string name="paymentdetails_swap_out_feerate_label">Swap fee rate</string>
+  <string name="paymentdetails_closing_type_label">Closing type</string>
+  <string name="paymentdetails_closing_type_mutual">Mutual closing</string>
+  <string name="paymentdetails_closing_type_local">Local</string>
+  <string name="paymentdetails_closing_type_remote">Remote</string>
+  <string name="paymentdetails_closing_type_other">Other</string>
+  <string name="paymentdetails_closing_channel_label">Closed channel</string>
+  <string name="paymentdetails_closing_spending_txs_label">Closing transactions</string>
+  <string name="paymentdetails_pubkey_label">Target public key</string>
   <string name="paymentdetails_payment_hash_label">Payment Hash</string>
   <string name="paymentdetails_payment_request_label">Payment Request</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
@@ -418,7 +434,7 @@
   <string name="paymentdetails_expire_at_label">Expires at</string>
   <string name="paymentdetails_completed_at_label">Completed at</string>
 
-  <!-- //////////////// payment details: technicals data //////////////// -->
+  <!-- //////////////// channel state state //////////////// -->
 
   <string name="state_wait_confirmed">Funding tx is being confirmed</string>
   <string name="state_closing">Channel is closing</string>

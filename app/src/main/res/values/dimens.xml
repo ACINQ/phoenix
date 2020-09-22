@@ -60,6 +60,9 @@
   <!-- data row label width -->
   <dimen name="data_row_label_width">120dp</dimen>
 
+  <!-- payment details -->
+  <dimen name="details_label_width">76dp</dimen>
+
   <!-- max width -->
   <dimen name="max_width_xs">280dp</dimen>
   <dimen name="max_width_sm">330dp</dimen>

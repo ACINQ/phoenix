@@ -23,6 +23,7 @@ import androidx.annotation.WorkerThread
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import fr.acinq.bitcoin.Base58
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.DeterministicWallet
@@ -86,6 +87,10 @@ object Wallet {
 
   fun getChainHash(): ByteVector32 {
     return if (isMainnet()) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
+  }
+
+  fun getScriptHashVersion(): Byte {
+    return if (isMainnet()) Base58.`Prefix$`.`MODULE$`.ScriptAddress() else Base58.`Prefix$`.`MODULE$`.ScriptAddressTestnet()
   }
 
   fun buildAddress(master: DeterministicWallet.ExtendedPrivateKey): SingleAddressEclairWallet {

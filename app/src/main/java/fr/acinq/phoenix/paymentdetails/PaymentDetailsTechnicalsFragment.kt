@@ -50,6 +50,6 @@ class PaymentDetailsTechnicalsFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 }

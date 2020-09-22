@@ -139,8 +139,8 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
       override fun onResponse(call: Call, response: Response) {
         val body = response.body()
-        if (response.isSuccessful && body != null) {
-          try {
+        try {
+          if (response.isSuccessful && body != null) {
             val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
             log.debug("wallet context responded with {}", json.toString(2))
             // -- version context
@@ -179,11 +179,13 @@ class AppContext : Application(), DefaultLifecycleObserver {
             val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
             swapInSettings.postValue(remoteSwapInSettings)
             log.info("swap_in settings set to $remoteSwapInSettings")
-          } catch (e: Exception) {
-            log.error("error when reading wallet context body: ", e)
+          } else {
+            log.warn("could not retrieve wallet context from remote, code=${response.code()}")
           }
-        } else {
-          log.warn("could not retrieve wallet context from remote, code=${response.code()}")
+        } catch (e: Exception) {
+          log.error("error when reading wallet context body: ", e)
+        } finally {
+          body?.close()
         }
       }
     })
