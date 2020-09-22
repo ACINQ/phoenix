@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 import PhoenixShared
 
 import UIKit
@@ -9,21 +10,27 @@ struct ScanView: MVIView {
 
     @Binding var isShowing: Bool
 
+    @StateObject var toast = Toast()
+
     var body: some View {
-        mvi(onModel: { model in
-            if model is Scan.ModelSending {
-                isShowing = false
+        ZStack {
+            mvi(onModel: { model in
+                if model is Scan.ModelSending {
+                    isShowing = false
+                } else if model is Scan.ModelBadRequest {
+                    toast.toast(text: "Unexpected request format!")
+                }
+            }) { model, intent in
+                view(model: model, intent: intent)
             }
-        }) { model, intent in
-            view(model: model, intent: intent)
+            toast.view()
         }
-                .navigationBarTitle("", displayMode: .inline)
     }
 
     @ViewBuilder
     func view(model: Scan.Model, intent: @escaping IntentReceiver) -> some View {
         switch model {
-        case _ as Scan.ModelReady: ReadyView(intent: intent)
+        case _ as Scan.ModelReady, _ as Scan.ModelBadRequest: ReadyView(intent: intent)
         case let m as Scan.ModelValidate: ValidateView(model: m, intent: intent)
         case let m as Scan.ModelSending: SendingView(model: m)
         default:
@@ -34,29 +41,42 @@ struct ScanView: MVIView {
     struct ReadyView: View {
         let intent: IntentReceiver
 
-        @State var request: String = ""
-
         var body: some View {
             VStack {
-                Text("Payment Request:")
-                        .font(.title)
+                Spacer()
+                Text("Scan a QR code")
                         .padding()
-                TextEditor(text: $request)
-                        .padding()
+                        .font(.title2)
+
+                QrCodeScannerView { request in
+                    print(request)
+                    intent(Scan.IntentParse(request: request))
+                }
+                        .cornerRadius(10)
                         .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.gray, lineWidth: 4)
                         )
                         .padding()
+
+                Divider()
+                        .padding([.leading, .trailing])
+
                 Button {
-                    intent(Scan.IntentParse(request: request))
+                    if let request = UIPasteboard.general.string {
+                        intent(Scan.IntentParse(request: request))
+                    }
                 } label: {
-                    Text("OK")
-                            .font(.title)
+                    Image(systemName: "arrow.right.doc.on.clipboard")
+                    Text("Paste from clipboard")
+                            .font(.title2)
                 }
-                        .disabled(request.isEmpty)
+                        .disabled(!UIPasteboard.general.hasStrings)
                         .padding()
+                Spacer()
             }
+                    .navigationBarTitle("Payment request", displayMode: .inline)
+
         }
     }
 
@@ -66,21 +86,23 @@ struct ScanView: MVIView {
         let intent: IntentReceiver
 
         var body: some View {
-            Text("\(model.amountMsat ?? 0) msat")
-                    .font(.title)
-                    .padding()
-
-            Text(model.requestDescription ?? "")
-                    .padding()
-            
-            Button {
-                intent(Scan.IntentSend(request: model.request, amountMsat: model.amountMsat?.int64Value ?? 0))
-            } label: {
-                Text("Pay")
+            VStack {
+                Text("\(model.amountMsat ?? 0) msat")
                         .font(.title)
                         .padding()
+
+                Text(model.requestDescription ?? "")
+                        .padding()
+
+                Button {
+                    intent(Scan.IntentSend(request: model.request, amountMsat: model.amountMsat?.int64Value ?? 0))
+                } label: {
+                    Text("Pay")
+                            .font(.title)
+                            .padding()
+                }
             }
-            
+                    .navigationBarTitle("", displayMode: .inline)
         }
     }
 
@@ -88,12 +110,15 @@ struct ScanView: MVIView {
         let model: Scan.ModelSending
 
         var body: some View {
-            Text("Sending \(model.amountMsat) msat...")
-                    .font(.title)
-                    .padding()
+            VStack {
+                Text("Sending \(model.amountMsat) msat...")
+                        .font(.title)
+                        .padding()
 
-            Text(model.requestDescription ?? "")
-                    .padding()
+                Text(model.requestDescription ?? "")
+                        .padding()
+            }
+                    .navigationBarTitle("Sending payment", displayMode: .inline)
         }
     }
 }

@@ -18,7 +18,7 @@ allprojects {
         maven("https://dl.bintray.com/acinq/libs")
         maven("https://dl.bintray.com/kotlin/ktor")
         maven("https://kotlin.bintray.com/kotlinx")
-        maven("https://dl.bintray.com/kodein-framework/kodein-dev")
+        maven("https://dl.bintray.com/kodein-framework/Kodein-DB")
         google()
         jcenter()
     }

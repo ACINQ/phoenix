@@ -46,9 +46,9 @@ kotlin {
         val serializationVersion = "1.0.0-RC"
         val secp256k1Version = "0.4.0"
         val ktorVersion = "1.4.0"
-        val kodeinDIVersion = "7.1.0-master-87"
+        val kodeinDIVersion = "7.1.0"
 //        val kodeinDBVersion = "0.2.0"
-        val kodeinDBVersion = "0.2.0-master-34"
+        val kodeinDBVersion = "0.2.0-beta"
 
         val commonMain by getting {
             dependencies {
