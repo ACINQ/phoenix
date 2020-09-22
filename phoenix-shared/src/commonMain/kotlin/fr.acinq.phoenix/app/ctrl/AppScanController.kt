@@ -20,7 +20,7 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
                     try {
                         val paymentRequest = PaymentRequest.read(intent.request)
                         model(Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description))
-                    } catch (e: IllegalArgumentException) {
+                    } catch (t: Throwable) {
                         model(Scan.Model.BadRequest)
                     }
                 }
