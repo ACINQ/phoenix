@@ -28,7 +28,6 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsPaymentBinding
 import fr.acinq.phoenix.utils.AlertHelper
 import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.customviews.SwitchView
 import org.slf4j.Logger
@@ -65,7 +64,8 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
           callback = { value ->
             context?.let { Prefs.setDefaultPaymentDescription(it, value) }
           },
-          defaultValue = Prefs.getDefaultPaymentDescription(ctx))
+          defaultValue = Prefs.getDefaultPaymentDescription(ctx),
+          hint = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_hint))
           .setNegativeButton(getString(R.string.utils_cancel), null)
           .show()
       }
@@ -85,7 +85,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
         }
       }
     }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
   override fun onStop() {
@@ -94,9 +94,9 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
   }
 
   private fun refreshUI() {
-    context?.let {
-      mBinding.payToOpenAutoSwitch.setChecked(Prefs.getAutoAcceptPayToOpen(it))
-      mBinding.defaultDescriptionButton.setSubtitle(it.getString(R.string.paymentsettings_defaultdesc_desc, Prefs.getDefaultPaymentDescription(it)))
+    context?.let { ctx ->
+      mBinding.payToOpenAutoSwitch.setChecked(Prefs.getAutoAcceptPayToOpen(ctx))
+      mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
     }
   }
 }

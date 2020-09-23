@@ -37,12 +37,13 @@ object AlertHelper {
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme).setView(view)
   }
 
-  fun buildWithInput(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, callback: (String) -> Unit, defaultValue: String, inputType: Int = InputType.TYPE_CLASS_TEXT): AlertDialog.Builder {
+  fun buildWithInput(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, callback: (String) -> Unit, defaultValue: String, inputType: Int = InputType.TYPE_CLASS_TEXT, hint: String = ""): AlertDialog.Builder {
     val view = inflater.inflate(R.layout.dialog_alert_input, null)
     default(view, title, message)
     val input = view.findViewById<EditText>(R.id.alert_input).apply {
       this.inputType = inputType
       this.setText(defaultValue)
+      this.hint = hint
     }
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)

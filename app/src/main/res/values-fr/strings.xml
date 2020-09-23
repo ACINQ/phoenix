@@ -500,4 +500,19 @@
   Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
   ]]></string>
 
+  <!-- //////////////// settings: options for payments //////////////// -->
+
+  <string name="paymentsettings_title">Options des paiements</string>
+  <string name="paymentsettings_subtitle">Définissez ici des options pour les paiements que vous envoyez ou recevez.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Description des paiements reçus</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Description par défaut</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Elle peut être changée au cas par cas.</string>
+  <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
+
+  <string name="paymentsettings_paytoopen_auto_title">Création de canaux de paiement automatique</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Il est parfois nécessaire de créer un nouveau canal de paiement pour pouvoir recevoir des fonds.\n\nDans ce cas, des frais de %1$s%% sont déduits du montant reçu pour assurer la création du canal.</string>
+  <string name="paymentsettings_paytoopen_dialog_title">Confirmation</string>
+  <string name="paymentsettings_paytoopen_dialog_description">L\'application créera automatiquement un canal de paiement lorsque cela est nécessaire.\n\nDes frais de %1$s%% sont déduits du montant reçu pour couvrir le coût de création du canal.</string>
+
 </resources>
