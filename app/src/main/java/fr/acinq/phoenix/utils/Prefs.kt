@@ -244,7 +244,7 @@ object Prefs {
   }
 
   fun getAutoAcceptPayToOpen(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, false)
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, true)
   }
 
   fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {

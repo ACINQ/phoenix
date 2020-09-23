@@ -31,6 +31,7 @@ object Migration {
     val version = Prefs.getLastVersionUsed(context)
     if (0 < version && version < BuildConfig.VERSION_CODE) {
       log.info("last installed version: $version is behind current version: ${BuildConfig.VERSION_CODE}, starting migration")
+      disableAutoPayToOpen(context)
       log.info("end of migration")
     } else {
       log.debug("last installed version: $version, no migration needed")
@@ -42,6 +43,11 @@ object Migration {
   //   ...
   //   MigrationPrefs.saveMigrationDone(context, fromVersion, XX)
   // }
+
+  fun disableAutoPayToOpen(context: Context) {
+    log.info("disable auto pay-to-open for existing wallets to preserve expected behaviour")
+    Prefs.setAutoAcceptPayToOpen(context, false)
+  }
 }
 
 object MigrationPrefs {
