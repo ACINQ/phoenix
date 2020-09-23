@@ -21,9 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -32,6 +30,7 @@ import fr.acinq.phoenix.databinding.FragmentFtueBackupBinding
 import fr.acinq.phoenix.databinding.FragmentFtueBinding
 import fr.acinq.phoenix.databinding.FragmentFtueLightningBinding
 import fr.acinq.phoenix.databinding.FragmentFtueWelcomeBinding
+import fr.acinq.phoenix.utils.BindingHelpers
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -51,16 +50,13 @@ class FtueFragment : Fragment() {
       mBinding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
-          when (position) {
-            0, 1 -> {
-              mBinding.nextButton.setText(getString(R.string.ftue__next_button))
-              ResourcesCompat.getDrawable(resources, R.drawable.ic_arrow_next, context?.theme)?.let { mBinding.nextButton.setIcon(it) }
-            }
-            else -> {
-              mBinding.nextButton.setText(getString(R.string.ftue__finish_button))
-              ResourcesCompat.getDrawable(resources, R.drawable.ic_check, context?.theme)?.let { mBinding.nextButton.setIcon(it) }
-            }
-          }
+          BindingHelpers.show(mBinding.nextButton, position == 0 || position == 1)
+          BindingHelpers.show(mBinding.skipButton, position == 0 || position == 1)
+          mBinding.indicators.text = getString(when (position) {
+            0 -> R.string.ftue__bullet_1
+            1 -> R.string.ftue__bullet_2
+            else -> R.string.ftue__bullet_3
+          })
         }
       })
     }
@@ -80,13 +76,16 @@ class FtueFragment : Fragment() {
       when (mBinding.viewPager.currentItem) {
         0 -> mBinding.viewPager.currentItem = 1
         1 -> mBinding.viewPager.currentItem = 2
-        else -> {
-          context?.let {
-            Prefs.setShowFTUE(it, false)
-            findNavController().navigate(R.id.action_ftue_to_initwallet)
-          }
-        }
+        else -> leave()
       }
+    }
+    mBinding.skipButton.setOnClickListener { leave() }
+  }
+
+  fun leave() {
+    context?.let {
+      Prefs.setShowFTUE(it, false)
+      findNavController().navigate(R.id.action_ftue_to_initwallet)
     }
   }
 }
@@ -113,10 +112,6 @@ class FtueWelcomeFragment : Fragment() {
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    //    mBinding.nextButton.setOnClickListener { }
-  }
 }
 
 class FtueLightningFragment : Fragment() {
@@ -127,10 +122,6 @@ class FtueLightningFragment : Fragment() {
     mBinding = FragmentFtueLightningBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    //    mBinding.nextButton.setOnClickListener { }
   }
 }
 
@@ -145,6 +136,8 @@ class FtueBackupFragment : Fragment() {
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    //    mBinding.nextButton.setOnClickListener { }
+    mBinding.finishButton.setOnClickListener {
+      (parentFragment as FtueFragment).leave()
+    }
   }
 }

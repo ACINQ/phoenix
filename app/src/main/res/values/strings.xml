@@ -606,22 +606,16 @@
 
   <!-- ftue -->
 
+  <string name="ftue__bullet_1" translatable="false">●○○</string>
+  <string name="ftue__bullet_2" translatable="false">○●○</string>
+  <string name="ftue__bullet_3" translatable="false">○○●</string>
   <string name="ftue__skip_button">Skip</string>
-  <string name="ftue__next_button">Next</string>
-  <string name="ftue__finish_button">Finish</string>
-  <string name="ftue__welcome__emoji" translatable="false">👋</string>
-  <string name="ftue__welcome__header">👋 Welcome!</string>
-  <string name="ftue__welcome__body">With Phoenix you can easily receive and send bitcoins.</string>
-  <string name="ftue__pay_to_open__header">Fast &amp; easy</string>
-  <string name="ftue__pay_to_open__body">
-    Payment are fast thanks to Lightning payment channels.
-    \n\n
-    For ease of use, channels are automatically created when needed, with a small cost.
-    \n\n
-    You can also control this manually if you prefer.
-  </string>
+  <string name="ftue__welcome__header">Welcome!</string>
+  <string name="ftue__welcome__body">With Phoenix, receiving and sending bitcoins is safe, easy, and fast.</string>
+  <string name="ftue__pay_to_open__header">It\'s simple</string>
+  <string name="ftue__pay_to_open__body">Payment channels are automatically created when needed, with a small cost.\n\nYou can also control this manually.</string>
   <string name="ftue__backup_seed__header">Keep control</string>
-  <string name="ftue__backup_seed__body">Funds are stored locally in the phone, and nowhere else.\n\nA 12-words phrase allows you to recover your funds if needed.\n\nKeep it safe!</string>
-  <string name="ftue__backup_seed__button">Finish</string>
+  <string name="ftue__backup_seed__body">A backup phrase is generated, storing all the information needed to recover your Bitcoin funds.\n\nKeep it safe and secret!</string>
+  <string name="ftue__backup_seed__button">Get started</string>
 
 </resources>

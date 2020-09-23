@@ -31,15 +31,33 @@
       android:layout_height="match_parent" />
 
     <fr.acinq.phoenix.utils.customviews.ButtonView
-      android:id="@+id/next_button"
+      android:id="@+id/skip_button"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:backgroundTint="@color/transparent"
+      android:layout_height="70dp"
       android:padding="@dimen/space_md_p"
-      app:icon="@drawable/ic_arrow_next"
-      app:text_size="@dimen/text_lg"
+      android:background="@drawable/button_bg_square"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:text="@string/ftue__skip_button" />
+
+    <TextView
+      android:id="@+id/indicators"
+      android:layout_width="wrap_content"
+      android:layout_height="70dp"
+      android:text="@string/ftue__bullet_1"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-      app:text="@string/utils_next" />
+      app:layout_constraintStart_toStartOf="parent" />
+
+    <fr.acinq.phoenix.utils.customviews.ButtonView
+      android:id="@+id/next_button"
+      android:layout_width="wrap_content"
+      android:layout_height="70dp"
+      android:background="@drawable/button_bg_square"
+      android:padding="@dimen/space_md_p"
+      android:contentDescription="@string/utils_next"
+      app:icon="@drawable/ic_arrow_next"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

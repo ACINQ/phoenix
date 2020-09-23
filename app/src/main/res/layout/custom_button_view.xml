@@ -37,7 +37,7 @@
       android:layout_width="@dimen/button_height"
       android:layout_height="@dimen/button_height"
       android:indeterminateTint="?attr/textColor"
-      android:visibility="invisible"
+      android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="@id/text_container"
       app:layout_constraintEnd_toEndOf="@id/image"
       app:layout_constraintTop_toTopOf="@id/text_container"

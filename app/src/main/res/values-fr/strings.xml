@@ -515,4 +515,15 @@
   <string name="paymentsettings_paytoopen_dialog_title">Confirmation</string>
   <string name="paymentsettings_paytoopen_dialog_description">L\'application créera automatiquement un canal de paiement lorsque cela est nécessaire.\n\nDes frais de %1$s%% sont déduits du montant reçu pour couvrir le coût de création du canal.</string>
 
+  <!-- ftue -->
+
+  <string name="ftue__skip_button">Passer</string>
+  <string name="ftue__welcome__header">Bienvenue !</string>
+  <string name="ftue__welcome__body">Avec Phoenix, recevoir et envoyer des bitcoins est facile, rapide, et sûr.</string>
+  <string name="ftue__pay_to_open__header">C\'est simple</string>
+  <string name="ftue__pay_to_open__body">Les canaux de paiement sont automatiquement créés au besoin, pour un coût faible.\n\nVous pouvez aussi gérer cela manuellement.</string>
+  <string name="ftue__backup_seed__header">Gardez le contrôle</string>
+  <string name="ftue__backup_seed__body">Une clé privée est associée à votre wallet, et permet de récupérer vos fonds si besoin.\n\nPrenez en soin et gardez la secrète !</string>
+  <string name="ftue__backup_seed__button">Commencer</string>
+
 </resources>
