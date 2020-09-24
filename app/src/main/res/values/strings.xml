@@ -245,15 +245,12 @@
   <string name="notif_watcher_connection_title">Phoenix needs network access</string>
   <string name="notif_watcher_connection_message">The background watcher needs internet to function properly.</string>
 
-  <string name="notif_headless_title">Incoming payment</string>
-  <string name="notif_headless_message_wait">Please wait…</string>
-  <string name="notif_headless_message_manual_start_app">Start the app to receive the payment.</string>
-  <string name="notif_headless_message_app_running_in_bg">Tap to start</string>
-  <string name="notif_headless_payment_received_title">Received payment</string>
-  <plurals name="notif_headless_payment_received_message">
-    <item quantity="one">You received %1$d payment of %2$s.</item>
-    <item quantity="other">You received %1$d payments for a total of %2$s.</item>
-  </plurals>
+  <string name="notif__headless_title__default">Phoenix is running in background</string>
+  <string name="notif__headless_title__missed">Missed incoming payment</string>
+  <string name="notif__headless_title__received">Received payment</string>
+  <string name="notif__headless_message__app_locked">App was locked</string>
+  <string name="notif__headless_message__manual_pay_to_open">Manual channel creation required</string>
+  <string name="notif__headless_message__received_payment">Received %1$s</string>
 
   <string name="notif_pay_to_open_title">Accept incoming payment</string>
   <string name="notif_pay_to_open_message">Tap to open the app</string>

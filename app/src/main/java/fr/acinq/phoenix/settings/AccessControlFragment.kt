@@ -108,7 +108,7 @@ class AccessControlFragment : BaseFragment() {
               cipher = encryptedSeed.getDecryptionCipher(),
               onSuccess = { crypto ->
                 lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                  log.info("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
+                  log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
                   showMessage(getString(R.string.accessctrl_error_auth))
                   model.updateLockState(ctx)
                 }) {
@@ -133,7 +133,7 @@ class AccessControlFragment : BaseFragment() {
                 cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_WITH_AUTH),
                 onSuccess = { crypto ->
                   lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                    log.info("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
+                    log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
                     showMessage(getString(R.string.accessctrl_error_generic))
                     model.updateLockState(ctx)
                   }) {
@@ -159,7 +159,7 @@ class AccessControlFragment : BaseFragment() {
             }
             Unit
           } else {
-            log.info("invalid combination: ${encryptedSeed?.javaClass?.canonicalName} with switch=${mBinding.fullLockSwitch.isChecked()}")
+            log.info("invalid combination: ${encryptedSeed?.name()} with switch=${mBinding.fullLockSwitch.isChecked()}")
             model.updateLockState(ctx)
           }
         } else if (!AuthHelper.isDeviceSecure(context)) {

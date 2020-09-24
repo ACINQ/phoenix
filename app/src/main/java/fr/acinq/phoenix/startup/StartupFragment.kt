@@ -183,7 +183,7 @@ class StartupFragment : BaseFragment() {
     } else if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
       val onSuccess = {
         lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-          log.error("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
+          log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
           app.state.postValue(KitState.Error.AuthenticationFailed)
         }) {
           val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
@@ -200,7 +200,7 @@ class StartupFragment : BaseFragment() {
         encryptedSeed.getDecryptionCipher(),
         onSuccess = { crypto ->
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error("failed to decrypt ${encryptedSeed.javaClass.canonicalName}: ", e)
+            log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
             app.state.postValue(KitState.Error.AuthenticationFailed)
           }) {
             val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))

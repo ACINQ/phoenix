@@ -21,9 +21,10 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import fr.acinq.eclair.io.Peer
-import fr.acinq.phoenix.AppContext
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.SeedManager
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 
@@ -33,11 +34,17 @@ class FCMService : FirebaseMessagingService() {
 
   /** When receiving a message over FCM, starts the eclair node service (in foreground). */
   override fun onMessageReceived(remoteMessage: RemoteMessage) {
-    log.info("received fcm message=${remoteMessage} from ${remoteMessage.from}, starting eclair node service")
-    ContextCompat.startForegroundService(
-      applicationContext,
-      Intent(applicationContext, EclairNodeService::class.java)
-    )
+    log.info("received fcm message=${remoteMessage} from ${remoteMessage.from}")
+    val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
+    when (encryptedSeed) {
+      is EncryptedSeed.V2.NoAuth -> {
+        log.info("start foreground service")
+        ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, EclairNodeService::class.java))
+      }
+      else -> {
+        log.info("ignored fcm startup request with seed=${encryptedSeed?.name()}")
+      }
+    }
   }
 
   /** Called if the FCM token is updated. This may occur if the security of the previous token has been compromised. */

@@ -102,6 +102,8 @@ sealed class EncryptedSeed {
   /** Serializes an encrypted seed as a byte array. */
   abstract fun serialize(): ByteArray
 
+  fun name() = javaClass.canonicalName
+
   /** Version 1 encrypts the seed using a 6-digits PIN and [AesCbcWithIntegrity]. */
   @Deprecated("this EncryptedSeed class is deprecated", replaceWith = ReplaceWith("EncryptedSeed.V2.WithAuth"), level = DeprecationLevel.WARNING)
   class V1(private val salt: ByteArray, private val civ: AesCbcWithIntegrity.CipherTextIvMac) : EncryptedSeed() {

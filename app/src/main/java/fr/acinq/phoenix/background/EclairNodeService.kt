@@ -142,10 +142,6 @@ class EclairNodeService : Service() {
   val torConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.torConnections)
   val peerConn = MutableLiveData(Constants.DEFAULT_NETWORK_INFO.lightningConnected)
 
-  // ============================================================== //
-  //                  SERVICE BASE METHODS OVERRIDE                 //
-  // ============================================================== //
-
   override fun onCreate() {
     super.onCreate()
     log.info("creating node service...")
@@ -175,7 +171,7 @@ class EclairNodeService : Service() {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix)
       .setOnlyAlertOnce(true)
-      .setContentTitle(getString(R.string.notif_headless_title))
+      .setContentTitle(getString(R.string.notif__headless_title__default))
       .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
     log.info("service created")
   }
@@ -215,24 +211,24 @@ class EclairNodeService : Service() {
     val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
     when {
       state.value is KitState.Started -> {
-        notifyForegroundService(getString(R.string.notif_headless_message_wait))
+        notifyForegroundService(getString(R.string.notif__headless_title__default), null)
         connectToPeer()
       }
       encryptedSeed is EncryptedSeed.V2.NoAuth -> {
         try {
           EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt()).run {
             log.info("starting kit from intent")
-            notifyForegroundService(getString(R.string.notif_headless_message_app_running_in_bg))
+            notifyForegroundService(getString(R.string.notif__headless_title__default), null)
             startKit(this)
           }
         } catch (e: Exception) {
-          log.info("failed to read encrypted seed=${encryptedSeed.javaClass.canonicalName}: ", e)
-          notifyForegroundService(getString(R.string.notif_headless_message_manual_start_app))
+          log.info("failed to read encrypted seed=${encryptedSeed.name()}: ", e)
+          notifyForegroundService(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__app_locked))
         }
       }
       else -> {
-        log.info("notifying user of incoming payment intent")
-        notifyForegroundService(getString(R.string.notif_headless_message_manual_start_app))
+        log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
+        notifyForegroundService(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__app_locked))
       }
     }
     shutdownHandler.removeCallbacksAndMessages(null)
@@ -248,9 +244,9 @@ class EclairNodeService : Service() {
     EventBus.getDefault().unregister(this)
   }
 
-  // ======================================================================= //
-  //                  METHODS TO START/STOP NODE AND SERVICE                 //
-  // ======================================================================= //
+  // ============================================================= //
+  //                  START/STOP NODE AND SERVICE                  //
+  // ============================================================= //
 
   /** Close database connections opened by the node */
   private fun closeConnections() {
@@ -430,11 +426,9 @@ class EclairNodeService : Service() {
     return Pair(kit, xpub)
   }
 
-  // ================================================================================= //
-  //                    BELOW ARE METHODS TO INTERACT WITH THE NODE                    //
-  //                            SUSPENDED WHEN SYNCHRONOUS.                            //
-  //                          ALWAYS CALLABLE FROM UI THREAD.                          //
-  // ================================================================================= //
+  // =============================================================== //
+  //                    INTERACTION WITH THE NODE                    //
+  // =============================================================== //
 
   /** Default timeout for awaiting akka futures' completion */
   private val shortTimeout = Timeout(Duration.create(10, TimeUnit.SECONDS))
@@ -701,9 +695,9 @@ class EclairNodeService : Service() {
   }
 
 
-  // =============================================================== //
-  //                     METHODS FOR TOR HANDLING                    //
-  // =============================================================== //
+  // =================================================== //
+  //                     TOR HANDLING                    //
+  // =================================================== //
 
   var torManager: OnionProxyManager? = null
 
@@ -728,9 +722,9 @@ class EclairNodeService : Service() {
     torManager?.run { getInfo(cmd) } ?: throw RuntimeException("onion proxy manager not available")
   }
 
-  // ================================================================== //
-  //                  METHODS TO DEAL WITH CONNECTIONS                  //
-  // ================================================================== //
+  // ===================================================== //
+  //                  CONNECTION HANDLING                  //
+  // ===================================================== //
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: ElectrumClient.ElectrumReady) {
@@ -777,9 +771,9 @@ class EclairNodeService : Service() {
     }
   }
 
-  // =========================================================== //
-  //                  METHODS HANDLING UI EVENTS                 //
-  // =========================================================== //
+  // ================================================ //
+  //                  EVENTS HANDLING                 //
+  // ================================================ //
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: ChannelClosingEvent) {
@@ -862,6 +856,7 @@ class EclairNodeService : Service() {
     } else {
       if (isHeadless) {
         log.info("automatically rejecting pay-to-open=$event")
+        updateNotification(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__manual_pay_to_open))
         rejectPayToOpen(event.payToOpenRequest().paymentHash())
       } else {
         EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
@@ -895,7 +890,7 @@ class EclairNodeService : Service() {
   }
 
   // =========================================================== //
-  //                 UPDATE STATE AND NOTIFY USER                //
+  //                 STATE UPDATE & NOTIFICATIONS                //
   // =========================================================== //
 
   /**
@@ -918,16 +913,18 @@ class EclairNodeService : Service() {
   }
 
   /** Display a blocking notification and set the service as being foregrounded. */
-  private fun notifyForegroundService(message: String) {
+  private fun notifyForegroundService(title: String?, message: String?) {
     log.debug("notifying foreground service with msg=$message")
-    updateNotification(message).also { startForeground(Constants.NOTIF_ID__HEADLESS, it) }
+    updateNotification(title, message).also { startForeground(Constants.NOTIF_ID__HEADLESS, it) }
   }
 
-  private fun updateNotification(message: String): Notification =
-    notificationBuilder.setContentText(message).build().run {
+  private fun updateNotification(title: String?, message: String?): Notification {
+    title?.let { notificationBuilder.setContentTitle(it) }
+    message?.let { notificationBuilder.setContentText(it) }
+    return notificationBuilder.build().apply {
       notificationManager.notify(Constants.NOTIF_ID__HEADLESS, this)
-      this
     }
+  }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: PaymentReceived) {
@@ -941,9 +938,9 @@ class EclairNodeService : Service() {
       this + amount
     }.let {
       val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
-      val message = applicationContext.resources.getQuantityString(R.plurals.notif_headless_payment_received_message, it.size, it.size,
+      val message = getString(R.string.notif__headless_message__received_payment,
         Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true))
-      updateNotification(message)
+      updateNotification(getString(R.string.notif__headless_title__received), message)
       receivedInBackground.postValue(it)
       shutdownHandler.removeCallbacksAndMessages(null)
       shutdownHandler.postDelayed(shutdownRunnable, 60 * 1000)
