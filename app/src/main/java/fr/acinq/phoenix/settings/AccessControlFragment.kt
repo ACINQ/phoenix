@@ -42,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.Exception
 
 class AccessControlFragment : BaseFragment() {
 
@@ -70,7 +71,7 @@ class AccessControlFragment : BaseFragment() {
     super.onStart()
     context?.let { model.updateLockState(it) }
 
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.authUnavailable.setOnClickListener { startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS)) }
 
     mBinding.screenLockSwitch.setOnClickListener {
@@ -100,64 +101,10 @@ class AccessControlFragment : BaseFragment() {
       context?.let { ctx ->
         if (model.isUIFrozen.value != true && AuthHelper.isDeviceSecure(context)) {
           val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(ctx))
-
-          // -- disable full lock: V2.WithAuth -> V2.NoAuth
           if (mBinding.fullLockSwitch.isChecked() && encryptedSeed is EncryptedSeed.V2.WithAuth) {
-            model.isUpdatingState.value = true
-            AuthHelper.promptHardAuth(this,
-              cipher = encryptedSeed.getDecryptionCipher(),
-              onSuccess = { crypto ->
-                lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                  log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
-                  showMessage(getString(R.string.accessctrl_error_auth))
-                  model.updateLockState(ctx)
-                }) {
-                  encryptedSeed.decrypt(crypto?.cipher).run {
-                    EncryptedSeed.V2.NoAuth.encrypt(this)
-                  }.run {
-                    SeedManager.writeSeedToDisk(Wallet.getDatadir(ctx), this)
-                    model.updateLockState(ctx)
-                  }
-                }
-              }, onFailure = { code, _ ->
-                showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
-              }, onCancel = {
-                model.isUpdatingState.value = false
-              })
-
-          // -- enable full lock: V2.NoAuth -> V2.WithAuth
+            disableFullLock(ctx, encryptedSeed)
           } else if (!mBinding.fullLockSwitch.isChecked() && encryptedSeed is EncryptedSeed.V2.NoAuth) {
-            val onConfirm = {
-              model.isUpdatingState.value = true
-              AuthHelper.promptHardAuth(this,
-                cipher = KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_WITH_AUTH),
-                onSuccess = { crypto ->
-                  lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                    log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
-                    showMessage(getString(R.string.accessctrl_error_generic))
-                    model.updateLockState(ctx)
-                  }) {
-                    encryptedSeed.decrypt().run {
-                      EncryptedSeed.V2.WithAuth.encrypt(this, crypto!!.cipher!!)
-                    }.run {
-                      SeedManager.writeSeedToDisk(Wallet.getDatadir(ctx), this)
-                      model.updateLockState(ctx)
-                    }
-                  }
-                }, onFailure = { code, _ ->
-                  showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth))
-                }, onCancel = {
-                  model.isUpdatingState.value = false
-                })
-            }
-            AlertHelper.build(layoutInflater,
-              title = getString(R.string.accessctrl_full_lock_confirm_title),
-              message = getString(R.string.accessctrl_full_lock_confirm_message)).apply {
-              setPositiveButton(R.string.btn_confirm) { _, _ -> onConfirm() }
-              setNegativeButton(R.string.btn_cancel, null)
-              show()
-            }
-            Unit
+            enableFullLock(ctx, encryptedSeed)
           } else {
             log.info("invalid combination: ${encryptedSeed?.name()} with switch=${mBinding.fullLockSwitch.isChecked()}")
             model.updateLockState(ctx)
@@ -169,9 +116,81 @@ class AccessControlFragment : BaseFragment() {
     }
   }
 
+  private fun enableFullLock(ctx: Context, encryptedSeed: EncryptedSeed.V2.NoAuth) {
+    val cipher = try {
+      KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_WITH_AUTH)
+    } catch (e: Exception) {
+      log.info("could not get cipher: ", e)
+      showMessage(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      return
+    }
+    val onConfirm = {
+      model.isUpdatingState.value = true
+      AuthHelper.promptHardAuth(this,
+        cipher = cipher,
+        onSuccess = { crypto ->
+          lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
+            showMessage(getString(R.string.accessctrl_error_generic))
+            model.updateLockState(ctx)
+          }) {
+            encryptedSeed.decrypt().run {
+              EncryptedSeed.V2.WithAuth.encrypt(this, crypto!!.cipher!!)
+            }.run {
+              SeedManager.writeSeedToDisk(Wallet.getDatadir(ctx), this)
+              model.updateLockState(ctx)
+            }
+          }
+        }, onFailure = { code, _ ->
+          showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth))
+        }, onCancel = {
+          model.isUpdatingState.value = false
+        })
+    }
+    AlertHelper.build(layoutInflater,
+      title = getString(R.string.accessctrl_full_lock_confirm_title),
+      message = getString(R.string.accessctrl_full_lock_confirm_message)).apply {
+      setPositiveButton(R.string.btn_confirm) { _, _ -> onConfirm() }
+      setNegativeButton(R.string.btn_cancel, null)
+      show()
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     model.state.value?.let { refreshUI(it) }
+  }
+
+  private fun disableFullLock(context: Context, encryptedSeed: EncryptedSeed.V2.WithAuth) {
+    val cipher = try {
+      encryptedSeed.getDecryptionCipher()
+    } catch (e: Exception) {
+      log.info("could not get cipher: ", e)
+      showMessage(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      return
+    }
+    model.isUpdatingState.value = true
+    AuthHelper.promptHardAuth(this,
+      cipher = cipher,
+      onSuccess = { crypto ->
+        lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+          log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
+          showMessage(getString(R.string.accessctrl_error_auth))
+          model.updateLockState(context)
+        }) {
+          encryptedSeed.decrypt(crypto?.cipher).run {
+            EncryptedSeed.V2.NoAuth.encrypt(this)
+          }.run {
+            SeedManager.writeSeedToDisk(Wallet.getDatadir(context), this)
+            model.updateLockState(context)
+          }
+        }
+      }, onFailure = { code, _ ->
+        showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
+        model.isUpdatingState.value = false
+      }, onCancel = {
+        model.isUpdatingState.value = false
+      })
   }
 
   private fun refreshUI(state: AccessLockState) {

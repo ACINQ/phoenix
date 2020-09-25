@@ -138,15 +138,15 @@ class StartupFragment : BaseFragment() {
       state is KitState.Error.DeviceNotSecure -> mBinding.errorMessage.text = getString(R.string.startup_error_device_unsecure)
       state is KitState.Error.AuthenticationFailed -> {
         mBinding.errorMessage.text = getString(R.string.startup_error_auth_failed)
-        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+        Handler().postDelayed({ if (app.state.value is KitState.Error) app.state.value = KitState.Off }, 2500)
       }
       state is KitState.Error.V1WrongPassword -> {
         mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd)
-        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+        Handler().postDelayed({ if (app.state.value is KitState.Error) app.state.value = KitState.Off }, 2500)
       }
       state is KitState.Error.V1InvalidBiometric -> {
         mBinding.errorMessage.text = getString(R.string.startup_error_biometrics)
-        Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
+        Handler().postDelayed({ if (app.state.value is KitState.Error) app.state.value = KitState.Off }, 2500)
       }
       else -> {
         log.debug("kit [${state.getName()}] with context=$context, standing by...")
@@ -177,6 +177,7 @@ class StartupFragment : BaseFragment() {
   /** Decrypt seed and start the node. A authentication dialog may be displayed depending on the seed/prefs. */
   private fun unlockAndStart(context: Context, encryptedSeed: EncryptedSeed) {
     if (app.state.value !is KitState.Off) return
+
     // if the seed is version 1, it must be decrypted and migrated to [EncryptedSeed.V2]
     if (encryptedSeed is EncryptedSeed.V1) {
       handleV1Seed(context, encryptedSeed)
@@ -184,14 +185,17 @@ class StartupFragment : BaseFragment() {
       val onSuccess = {
         lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
           log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
-          app.state.postValue(KitState.Error.AuthenticationFailed)
+          setErrorState(KitState.Error.AuthenticationFailed)
         }) {
           val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
           lifecycleScope.launch(Dispatchers.Main) { app.service?.startKit(seed) }
         }
       }
       if (Prefs.isScreenLocked(context) && AuthHelper.isDeviceSecure(context)) {
-        AuthHelper.promptSoftAuth(this, { onSuccess() }, { _, _ -> app.state.value = KitState.Error.AuthenticationFailed })
+        AuthHelper.promptSoftAuth(this,
+          onSuccess = { onSuccess() },
+          onFailure = { _, _ -> setErrorState(KitState.Error.AuthenticationFailed) },
+          onCancel = { setErrorState(KitState.Error.AuthenticationFailed) })
       } else {
         onSuccess()
       }
@@ -201,15 +205,14 @@ class StartupFragment : BaseFragment() {
         onSuccess = { crypto ->
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
-            app.state.postValue(KitState.Error.AuthenticationFailed)
+            setErrorState(KitState.Error.AuthenticationFailed)
           }) {
             val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))
             lifecycleScope.launch(Dispatchers.Main) { app.service?.startKit(seed) }
           }
         },
-        onFailure = { _, _ ->
-          app.state.value = KitState.Error.AuthenticationFailed
-        })
+        onFailure = { _, _ -> setErrorState(KitState.Error.AuthenticationFailed) },
+        onCancel = { setErrorState(KitState.Error.AuthenticationFailed) })
     }
   }
 
@@ -218,7 +221,7 @@ class StartupFragment : BaseFragment() {
     val migrationCallback: (pin: String) -> Unit = {
       lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.error("failed to handle v1 encrypted seed: ", e)
-        app.state.postValue(KitState.Error.V1WrongPassword)
+        setErrorState(KitState.Error.V1WrongPassword)
       }) {
         val seed = EncryptedSeed.migration_v1_v2(context, encryptedSeed, it).run {
           SeedManager.writeSeedToDisk(Wallet.getDatadir(context), this)
@@ -261,7 +264,7 @@ class StartupFragment : BaseFragment() {
             migrationCallback(pin)
           } catch (e: Exception) {
             log.error("could not decrypt pin: ", e)
-            app.state.value = KitState.Error.V1InvalidBiometric
+            setErrorState(KitState.Error.V1InvalidBiometric)
           }
         }
 
@@ -293,6 +296,12 @@ class StartupFragment : BaseFragment() {
       else -> {
         migrationCallback(Constants.DEFAULT_PIN)
       }
+    }
+  }
+
+  private fun setErrorState(error: KitState.Error) {
+    if (app.state.value is KitState.Off) {
+      app.state.postValue(error)
     }
   }
 }

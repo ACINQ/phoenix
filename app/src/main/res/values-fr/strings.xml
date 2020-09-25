@@ -207,6 +207,7 @@
   <string name="settings_force_close">Zone à risque</string>
   <string name="settings_tor">Tor</string>
   <string name="settings_about">À propos</string>
+  <string name="settings_payment_settings">Options des paiements</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -218,8 +219,8 @@
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closechannels_title">Fermer tous les canaux de paiements</string>
-  <string name="closechannels_checking_channels">Vérification des canaux de paiements, veuillez patienter…</string>
+  <string name="closechannels_title">Fermer tous les canaux de paiement</string>
+  <string name="closechannels_checking_channels">Vérification des canaux de paiement, veuillez patienter…</string>
   <string name="closechannels_channels_recap">Vous avez actuellement %1$d canaux de paiement pour une balance totale de %2$s.</string>
   <string name="closechannels_channels_none">Vous n\'avez actuellement aucun canal de paiement qui pourrait être vidé.\n\nVous pouvez voir l\'état de vos canaux de paiement depuis la page \'Liste de canaux\'.</string>
   <string name="closechannels_mutual_title">Vider le portefeuille</string>
@@ -235,7 +236,7 @@
     <br/><br/>
     Cette fonctionnalité n\'est pas une solution miracle. Elle n\'est disponible qu\'en tant que mesure de sûreté, à <b>n\'utiliser qu\'en dernier recours</b>. Par exemple, si votre peer (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d\'accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, <b>si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support</b>.
     <br/><br/>
-    Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiements ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
+    Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiement ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
     <br/><br/>
     <b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas bien ce qu\'elle fait.</b>
   ]]></string>
@@ -251,7 +252,7 @@
 
   <string name="listallchannels_title">Liste des canaux de paiement</string>
   <string name="listallchannels_in_progress">Veuillez patienter…</string>
-  <string name="listallchannels_error">Echec de la récupération de la liste de canaux de paiements, veuillez réessayer.</string>
+  <string name="listallchannels_error">Echec de la récupération de la liste de canaux de paiement, veuillez réessayer.</string>
   <string name="listallchannels_node_id">Votre identifiant de noeud: %1$s</string>
   <string name="listallchannels_no_channels">Vous n\'avez pas de canal de paiement.</string>
   <plurals name="listallchannels_channels_header">
@@ -382,8 +383,8 @@
 
   <!-- //////////////// access control security //////////////// -->
 
-  <string name="accessctrl_title">Sécurité</string>
-  <string name="accessctrl_subtitle">Nous recommandons d\'activer le verrouillage écran pour prévenir une utilisation non désirée du wallet.</string>
+  <string name="accessctrl_title">Contrôle d\'accès</string>
+  <string name="accessctrl_subtitle">Nous recommandons d\'activer le verrouillage écran pour empêcher une utilisation non désirée du wallet.</string>
 
   <string name="accessctrl_auth_unavailable_short">Vous devez d\'abord sécuriser votre appareil.</string>
   <string name="accessctrl_auth_unavailable">Votre téléphone n\'est pas sécurisée par le Screen Lock d\'Android.\n\nVeuillez d\'abord enregistrer un PIN/Schéma/empreinte digitale dans Android.</string>
@@ -397,11 +398,11 @@
   <string name="accessctrl_error_unsecure">L\'appareil n\'est pas sécurisé (code: %1$d)</string>
 
   <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
-  <string name="accessctrl_screen_lock_switch_desc">Verrouille l\'accès à l\'application en utilisant le Screen Lock d\'Android.</string>
-  <string name="accessctrl_full_lock_switch">Verrouillage complet</string>
-  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut accéder à ses données que si vous vous êtes identifé.\n\nCette configuration apporte une sécurité supplémentaire, mais empêche l\'application de fonctionner en fond.</string>
-  <string name="accessctrl_full_lock_confirm_title">Note</string>
-  <string name="accessctrl_full_lock_confirm_message">Si vous activez cette fonctionnalité, vous devrez démarrer votre application manuellement si quelqu\'un souhaite vous envoyer de l\'argent.</string>
+  <string name="accessctrl_screen_lock_switch_desc">Verrouille l\'accès aux écrans de l\'application avec l\'authentification système d\'Android.</string>
+  <string name="accessctrl_full_lock_switch">Bloquer le fonctionnement en tâche de fond</string>
+  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
+  <string name="accessctrl_full_lock_confirm_title">Information</string>
+  <string name="accessctrl_full_lock_confirm_message">Les fonctionnalités en tâche de fond ne seront plus possible. Vous ne pourrez recevoir d\'argent que si l\'application est déverrouillée.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 

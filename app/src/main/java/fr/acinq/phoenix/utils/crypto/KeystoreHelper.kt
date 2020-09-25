@@ -18,10 +18,13 @@ package fr.acinq.phoenix.utils.crypto
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
+import android.security.keystore.StrongBoxUnavailableException
 import fr.acinq.phoenix.utils.Prefs
-import fr.acinq.phoenix.utils.tryWith
-import java.security.GeneralSecurityException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.security.KeyFactory
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -29,6 +32,8 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
 object KeystoreHelper {
+
+  private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   /** This key does not require the user to be authenticated */
   const val KEY_NO_AUTH = "PHOENIX_KEY_NO_AUTH"
@@ -53,16 +58,12 @@ object KeystoreHelper {
       .setKeySize(256)
       .setUserAuthenticationRequired(false)
       .setInvalidatedByBiometricEnrollment(false)
-      .build()
-    return KeyGenerator.getInstance(ENC_ALGO, keyStore.provider).run {
-      init(spec)
-      generateKey()
-    }
+    return generateKeyWithSpec(spec)
   }
 
   private fun getOrCreateKeyWithAuth(): SecretKey {
     keyStore.getKey(KEY_WITH_AUTH, null)?.let { return it as SecretKey }
-    val spec = KeyGenParameterSpec.Builder(KEY_WITH_AUTH, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).run {
+    val spec = KeyGenParameterSpec.Builder(KEY_WITH_AUTH, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).apply {
       setBlockModes(ENC_BLOCK_MODE)
       setEncryptionPaddings(ENC_PADDING)
       setRandomizedEncryptionRequired(true)
@@ -72,13 +73,29 @@ object KeystoreHelper {
       setInvalidatedByBiometricEnrollment(false)
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
         setUnlockedDeviceRequired(true)
-        setIsStrongBoxBacked(true)
       }
-      build()
     }
-    return KeyGenerator.getInstance(ENC_ALGO, keyStore.provider).run {
-      init(spec)
-      generateKey()
+    return generateKeyWithSpec(spec)
+  }
+
+  /** Generate key from key gen specs. If possible, store the key in strong box. */
+  private fun generateKeyWithSpec(spec: KeyGenParameterSpec.Builder): SecretKey {
+    val keygen = KeyGenerator.getInstance(ENC_ALGO, keyStore.provider)
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+      // try to use StrongBox on Android 9+, which is only supported by a few devices
+      try {
+        spec.setIsStrongBoxBacked(true)
+        keygen.init(spec.build())
+        keygen.generateKey()
+      } catch (e: StrongBoxUnavailableException) {
+        log.debug("strongbox is not available on this device")
+        spec.setIsStrongBoxBacked(false)
+        keygen.init(spec.build())
+        keygen.generateKey()
+      }
+    } else {
+      keygen.init(spec.build())
+      keygen.generateKey()
     }
   }
 
@@ -88,16 +105,20 @@ object KeystoreHelper {
     else -> throw IllegalArgumentException("unhandled key=$keyName")
   }
 
+  /** Tell if the provided key is stored inside a Trusted Execution Environment or a Secure Element. */
+  fun isKeyInSecureHardware(keyName: String) {
+    val key = getKeyForName(keyName)
+    KeyFactory.getInstance(key.algorithm, keyStore.provider).getKeySpec(key, KeyInfo::class.java).isInsideSecureHardware
+  }
+
   /** Get encryption Cipher for given key. */
-  internal fun getEncryptionCipher(keyName: String): Cipher = Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").run {
+  internal fun getEncryptionCipher(keyName: String): Cipher = Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").apply {
     init(Cipher.ENCRYPT_MODE, getKeyForName(keyName))
-    this
   }
 
   /** Get decryption Cipher for given key. */
-  internal fun getDecryptionCipher(keyName: String, iv: ByteArray): Cipher =  Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").run {
+  internal fun getDecryptionCipher(keyName: String, iv: ByteArray): Cipher = Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").apply {
     init(Cipher.DECRYPT_MODE, getKeyForName(keyName), IvParameterSpec(iv))
-    this
   }
 
   // -- legacy
