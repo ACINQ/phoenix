@@ -41,8 +41,8 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                         db.put(
                             Transaction(
                                 UUID.randomUUID().toString(),
-                                it.receivePayment.amount?.toLong() ?: error("Received a payment without amount ?!?"),
-                                it.receivePayment.description,
+                                it.incomingPayment.paymentRequest.amount?.toLong() ?: error("Received a payment without amount ?!?"),
+                                it.incomingPayment.paymentRequest.description ?: "",
                                 Transaction.Status.Success,
                                 currentTimestampMillis()
                             )
