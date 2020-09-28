@@ -22,6 +22,7 @@ import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,6 +87,7 @@ class PaymentDetailsFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    mBinding.infoBody.movementMethod = LinkMovementMethod.getInstance()
     if (args.fromEvent) {
       mBinding.mainLayout.layoutTransition = null
     }
@@ -117,8 +119,10 @@ class PaymentDetailsFragment : BaseFragment() {
           if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
             model.paymentMeta.value?.run {
               if (closingType != ClosingType.Mutual.code) {
+                log.info("show closing info= $this")
                 mBinding.infoLayout.visibility = View.VISIBLE
-                mBinding.infoBody.text = getString(R.string.paymentdetails_closing_desc)
+                val address = app.state.value?.getFinalAddress() ?: closingMainOutputScript ?: ""
+                mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
               }
             }
           }
@@ -299,7 +303,7 @@ class PaymentDetailsViewModel(
     state.value = PaymentDetailsState.Init
   }
 
-  val onchainAddress: LiveData<String> = Transformations.map(paymentMeta) {
+  val onchainAddress: LiveData<String?> = Transformations.map(paymentMeta) {
     it?.swapInAddress ?: it?.swapOutAddress ?: it?.closingMainOutputScript
   }
 
@@ -315,10 +319,6 @@ class PaymentDetailsViewModel(
 
   val swapOutFeerate: LiveData<String> = Transformations.map(paymentMeta) {
     it?.swapOutFeeratePerByte?.run { "$this sat/byte" } ?: ""
-  }
-
-  val closingSpendingTxs: LiveData<String> = Transformations.map(paymentMeta) {
-    it?.getSpendingTxs()?.joinToString("\n\n")
   }
 
   val pubkey: LiveData<String> = Transformations.map(state) {
@@ -424,7 +424,7 @@ class PaymentDetailsViewModel(
             state.postValue(PaymentDetailsState.Outgoing.Sent.SwapOut(head.paymentType(), it, descSwapOut, amountToRecipient.`$minus`(feeSwapOut), Converter.any2Msat(feeSwapOut), completedAt,
               paymentMeta.swapOutFeeratePerByte))
           } else if (head.paymentType() == "ClosingChannel" || (head.paymentRequest().isEmpty && head.externalId().isDefined && head.externalId().get().startsWith("closing-"))) {
-            val descClosing = appContext.getString(R.string.paymentdetails_closing_desc, paymentMeta?.closingChannelId?.take(8) ?: "")
+            val descClosing = appContext.getString(R.string.paymentdetails_closing_desc, paymentMeta?.closingChannelId?.take(10) ?: "")
             state.postValue(PaymentDetailsState.Outgoing.Sent.Closing(head.paymentType(), it, descClosing, amountToRecipient, fees, completedAt))
           } else {
             state.postValue(PaymentDetailsState.Outgoing.Sent.Normal(head.paymentType(), it, description, amountToRecipient, fees, completedAt))

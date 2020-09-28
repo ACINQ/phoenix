@@ -356,7 +356,7 @@
   <string name="paymentdetails_destination_label">Envoyé à</string>
   <string name="paymentdetails_fees_label">Frais</string>
   <string name="paymentdetails_error_label">Erreur</string>
-  <string name="paymentdetails_closing_desc">Paiement pour clôture du channel #%1$s</string>
+  <string name="paymentdetails_closing_desc">Paiement pour clôture du channel %1$s…</string>
   <string name="paymentdetails_no_description">Pas de description</string>
 
   <string name="paymentdetails_technicals_button">Afficher les détails techniques</string>

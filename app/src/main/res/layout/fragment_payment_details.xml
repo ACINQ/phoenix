@@ -184,7 +184,7 @@
             style="@style/MutedLabelView"
             android:layout_width="@dimen/details_label_width"
             android:text="@string/paymentdetails_address_label"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
             android:textAlignment="viewEnd"
             app:layout_constraintBaseline_toBaselineOf="@id/onchain_address_value"
             app:layout_constraintStart_toStartOf="parent" />
@@ -198,7 +198,7 @@
             android:ellipsize="none"
             android:textIsSelectable="true"
             android:text="@{model.onchainAddress}"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/onchain_address_label"
             app:layout_constraintTop_toTopOf="parent" />
@@ -207,7 +207,7 @@
             android:id="@+id/onchain_address_explorer_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
             android:layout_marginTop="@dimen/space_xxs"
             android:background="@drawable/button_bg_no_border"
             android:padding="@dimen/space_xxs"
@@ -432,28 +432,39 @@
 
           <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/info_layout"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded"
+            android:backgroundTint="?attr/mutedBgColor"
+            android:visibility="gone"
+            android:padding="@dimen/space_sm"
+            android:layout_marginTop="@dimen/space_lg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/error_value">
 
             <ImageView
               android:id="@+id/info_icon"
-              android:layout_width="30dp"
-              android:layout_height="30dp"
+              android:layout_width="@dimen/button_height"
+              android:layout_height="@dimen/button_height"
               android:contentDescription="@null"
+              android:layout_marginTop="@dimen/space_xs"
+              android:src="@drawable/ic_info"
               app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintTop_toTopOf="parent" />
+              app:layout_constraintTop_toTopOf="parent"
+              app:tint="?attr/onMutedBgTextColor" />
 
             <TextView
               android:id="@+id/info_body"
               android:layout_width="0dp"
               android:layout_height="wrap_content"
-              android:layout_marginStart="@dimen/space_md"
+              android:layout_marginStart="@dimen/space_xs"
+              android:textSize="@dimen/text_md"
+              android:textIsSelectable="true"
+              android:textColor="?attr/onMutedBgTextColor"
+              app:layout_constrainedWidth="true"
               app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintEnd_toStartOf="@id/info_icon"
+              app:layout_constraintStart_toEndOf="@id/info_icon"
               app:layout_constraintTop_toTopOf="parent" />
 
           </androidx.constraintlayout.widget.ConstraintLayout>
@@ -467,7 +478,7 @@
             app:icon_tint="?attr/mutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_value"
+            app:layout_constraintTop_toBottomOf="@id/info_layout"
             app:text="@string/paymentdetails_technicals_button"
             app:text_color="?attr/mutedTextColor"
             app:text_size="@dimen/text_md" />

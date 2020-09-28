@@ -405,7 +405,7 @@
   <string name="paymentdetails_address_label">Address</string>
   <string name="paymentdetails_address_open_explorer">Show in explorer</string>
   <string name="paymentdetails_info_uniclose"><![CDATA[
-    This payment happened following a conflict in the channel. Funds are sent to %1$s (this address is on-chain, and belongs to you).
+    This payment happened following a conflict in a channel. Funds will be sent to your on-chain address: %1$s.
     <br /><br />
     To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
   ]]></string>

@@ -425,6 +425,7 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, PayToOpenRequestEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
+    system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     log.info("bootstrap complete")

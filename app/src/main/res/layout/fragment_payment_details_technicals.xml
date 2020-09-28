@@ -94,8 +94,7 @@
         <TextView
           android:id="@+id/closing_spending_txs_value"
           style="@style/TechnicalsValueView"
-          android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing}"
-          android:text='@{model.closingSpendingTxs}' />
+          android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing}" />
 
         <!-- swap out -->
 
@@ -123,6 +122,20 @@
           android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut}"
           android:text="@{model.swapOutFeerate}" />
 
+        <!-- swap in -->
+
+        <TextView
+          android:id="@+id/swap_in_address_label"
+          style="@style/TechnicalsLabelView"
+          android:visibility="@{model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
+          android:text="@string/paymentdetails_address_label" />
+
+        <TextView
+          android:id="@+id/swap_in_address_value"
+          style="@style/TechnicalsValueView"
+          android:visibility="@{model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
+          android:text="@{model.paymentMeta.swapInAddress}" />
+
         <!-- regular ln payment data -->
 
         <TextView
@@ -140,37 +153,37 @@
         <TextView
           android:id="@+id/payment_hash_label"
           style="@style/TechnicalsLabelView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@string/paymentdetails_payment_hash_label" />
 
         <TextView
           android:id="@+id/payment_hash_value"
           style="@style/TechnicalsValueView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@{model.paymentHash}" />
 
         <TextView
           android:id="@+id/payment_request_label"
           style="@style/TechnicalsLabelView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@string/paymentdetails_payment_request_label" />
 
         <TextView
           android:id="@+id/payment_request_value"
           style="@style/TechnicalsValueView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@{model.paymentRequest}" />
 
         <TextView
           android:id="@+id/preimage_label"
           style="@style/TechnicalsLabelView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@string/paymentdetails_preimage_label" />
 
         <TextView
           android:id="@+id/preimage_value"
           style="@style/TechnicalsValueView"
-          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+          android:visibility="@{!(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn)}"
           android:text="@{model.preimage}" />
 
         <TextView

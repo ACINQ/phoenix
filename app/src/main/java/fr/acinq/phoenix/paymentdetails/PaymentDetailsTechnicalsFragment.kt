@@ -17,15 +17,17 @@
 package fr.acinq.phoenix.paymentdetails
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentPaymentDetailsTechnicalsBinding
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -34,6 +36,7 @@ class PaymentDetailsTechnicalsFragment : BaseFragment() {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentPaymentDetailsTechnicalsBinding
+
   // shared view model, living with payment details nested graph
   private val model: PaymentDetailsViewModel by navGraphViewModels(R.id.nav_graph_payment_details)
 
@@ -46,6 +49,14 @@ class PaymentDetailsTechnicalsFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     mBinding.model = model
+    mBinding.closingSpendingTxsValue.movementMethod = LinkMovementMethod.getInstance()
+    model.paymentMeta.observe(viewLifecycleOwner) { meta ->
+      meta?.getSpendingTxs()?.ifEmpty { null }?.map { tx ->
+        "<a href=\"${Constants.BLOCKSTREAM_EXPLORER_URL}/tx/$tx\">$tx</a>"
+      }?.joinToString("<br /><br />")?.run {
+        mBinding.closingSpendingTxsValue.text = Converter.html(this)
+      }
+    }
   }
 
   override fun onStart() {
