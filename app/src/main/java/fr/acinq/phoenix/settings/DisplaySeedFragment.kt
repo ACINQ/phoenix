@@ -78,7 +78,7 @@ class DisplaySeedFragment : BaseFragment() {
   override fun onStart() {
     super.onStart()
     mBinding.unlockButton.setOnClickListener { context?.let { unlockWallet(it) } }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
   @UiThread
@@ -87,19 +87,23 @@ class DisplaySeedFragment : BaseFragment() {
       model.state.value = DisplaySeedState.Unlocking
       val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
       if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
-        AuthHelper.promptSoftAuth(this,
-          onSuccess = {
-            model.decrypt(context, null)
-          }, onFailure = { _, _ ->
-            model.state.value = DisplaySeedState.Error.InvalidAuth
-          }, onCancel = {
-            model.state.value = DisplaySeedState.Init
-          })
+        if (Prefs.isScreenLocked(context)) {
+          AuthHelper.promptSoftAuth(this,
+            onSuccess = {
+              model.decrypt(encryptedSeed, null)
+            }, onFailure = { _, _ ->
+              model.state.value = DisplaySeedState.Error.InvalidAuth
+            }, onCancel = {
+              model.state.value = DisplaySeedState.Init
+            })
+        } else {
+          model.decrypt(encryptedSeed, null)
+        }
       } else if (encryptedSeed is EncryptedSeed.V2.WithAuth) {
         AuthHelper.promptHardAuth(this,
           cipher = encryptedSeed.getDecryptionCipher(),
           onSuccess = {
-            model.decrypt(context, it?.cipher)
+            model.decrypt(encryptedSeed, it?.cipher)
           }, onFailure = { _, _ ->
             model.state.value = DisplaySeedState.Error.InvalidAuth
           })
@@ -180,7 +184,7 @@ class DisplaySeedViewModel : ViewModel() {
   }
 
   @UiThread
-  fun decrypt(context: Context, cipher: Cipher?) {
+  fun decrypt(encryptedSeed: EncryptedSeed.V2, cipher: Cipher?) {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
       log.error("could not decrypt seed: ", e)
       state.postValue(when (e) {
@@ -188,11 +192,9 @@ class DisplaySeedViewModel : ViewModel() {
         else -> DisplaySeedState.Error.Generic
       })
     }) {
-      val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
       when (encryptedSeed) {
         is EncryptedSeed.V2.NoAuth -> encryptedSeed.decrypt()
         is EncryptedSeed.V2.WithAuth -> encryptedSeed.decrypt(cipher)
-        else -> throw RuntimeException("unhandled seed type")
       }.let {
         val words = EncryptedSeed.byteArray2String(it).split(" ")
         state.postValue(DisplaySeedState.Done(words))
