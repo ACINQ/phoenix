@@ -1,6 +1,6 @@
 import SwiftUI
 import PhoenixShared
-import OSLog
+import os
 
 protocol MVIView : View {
     associatedtype Model: MVI.Model

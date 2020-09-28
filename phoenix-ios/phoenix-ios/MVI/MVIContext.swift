@@ -1,6 +1,5 @@
 import SwiftUI
 import PhoenixShared
-import OSLog
 
 struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
 

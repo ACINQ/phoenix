@@ -1,4 +1,4 @@
-import OSLog
+import os
 
 extension Logger {
     init<V>(from: V.Type) {
