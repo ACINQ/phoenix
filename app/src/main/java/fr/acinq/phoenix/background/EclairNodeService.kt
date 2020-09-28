@@ -336,9 +336,14 @@ class EclairNodeService : Service() {
         ChannelsWatcher.schedule(applicationContext)
         _kit.apply {
           val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
-          nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
-          switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
+          if (nodeParams().db().peers().getPeer(Wallet.ACINQ.nodeId()).isEmpty) {
+            nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
+            Timer().schedule(object : TimerTask() {
+              override fun run() {
+                connectToPeer()
+              }
+            }, 5000)
+          }
           log.debug("added peer to db and forced connection")
         }
       }
@@ -744,30 +749,38 @@ class EclairNodeService : Service() {
   }
 
   /** Send a reconnect event to the ACINQ node. */
-  @UiThread
-  fun connectToPeer() {
+  private fun connectToPeer() {
     serviceScope.launch(Dispatchers.Default) {
       kit?.run {
-        log.info("forcing connection to peer")
-        switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+        if (!isConnectedToPeer()) {
+          log.info("forcing connection to peer")
+          switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+        } else {
+          log.debug("already connected")
+        }
       }
     }
   }
 
+  private fun isConnectedToPeer(): Boolean = api?.run {
+    JavaConverters.asJavaIterableConverter(
+      Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+    ).asJava().any { it.state().equals("CONNECTED", true) }
+  } ?: false
+
   fun refreshPeerConnectionState() {
     serviceScope.launch(Dispatchers.Default) {
-      val isConnected = api?.run {
-        JavaConverters.asJavaIterableConverter(
-          Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
-        ).asJava().any { it.state().equals("CONNECTED", true) }
-      } ?: false
+      val isConnected = isConnectedToPeer()
+      log.debug("peer connection ? $isConnected")
+      peerConn.postValue(isConnected)
       if (isConnected) {
-        Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
+        if (!hasRegisteredFCMToken) {
+          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
+          hasRegisteredFCMToken = true
+        }
       } else {
         connectToPeer()
       }
-      log.info("peer connection ? $isConnected")
-      peerConn.postValue(isConnected)
     }
   }
 
@@ -881,11 +894,8 @@ class EclairNodeService : Service() {
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: Peer.SendFCMToken) {
     kit?.run {
-      if (!hasRegisteredFCMToken) {
-        log.info("registering token=${event.token()} with node=${event.nodeId()}")
-        switchboard().tell(event, ActorRef.noSender())
-        hasRegisteredFCMToken = true
-      }
+      log.info("registering token=${event.token()} with node=${event.nodeId()}")
+      switchboard().tell(event, ActorRef.noSender())
     } ?: log.debug("could not register fcm token because kit is not ready yet")
   }
 

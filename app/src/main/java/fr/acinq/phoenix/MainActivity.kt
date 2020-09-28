@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
       if (Prefs.isTorEnabled(applicationContext)) {
         app.service?.reconnectTor()
       }
-      app.service?.connectToPeer()
+      app.service?.refreshPeerConnectionState()
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
