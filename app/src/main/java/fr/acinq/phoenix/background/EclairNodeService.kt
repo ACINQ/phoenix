@@ -508,7 +508,9 @@ class EclairNodeService : Service() {
   /** Create a list of ids of channels to be closed. */
   @WorkerThread
   private suspend fun prepareClosing(): ScalaList<Either<ByteVector32, ShortChannelId>> {
-    return getChannels().map {
+    return getChannels().filterNot {
+      it.state() is `CLOSING$` || it.state() is `CLOSED$`
+    }.map {
       val id: Either<ByteVector32, ShortChannelId> = Left.apply(it.channelId())
       id
     }.run {
