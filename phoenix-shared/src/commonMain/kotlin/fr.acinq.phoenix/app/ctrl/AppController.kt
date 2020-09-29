@@ -26,12 +26,12 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI,
     init {
         fun Any.oneLineString() = toString().lines().map { it.trim() } .joinToString(" ")
 
-        logger.info { "${this::class.simpleName} First Model: ${firstModel.oneLineString()}" }
+        logger.info { "First Model: ${firstModel.oneLineString()}" }
 
         launch {
             modelChanges.consumeEach { change ->
                 val newModel = models.value.change()
-                logger.info { "${this::class.simpleName} Model: ${newModel.oneLineString()}" }
+                logger.info { "Model: ${newModel.oneLineString()}" }
                 models.send(newModel)
             }
         }

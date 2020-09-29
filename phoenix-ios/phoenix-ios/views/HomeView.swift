@@ -14,9 +14,9 @@ struct HomeView : MVIView {
     var body: some View {
         mvi(
                 background: true,
-                onModel: { model in
-                    if lastTransaction != model.lastTransaction {
-                        lastTransaction = model.lastTransaction
+                onModel: { change in
+                    if lastTransaction != change.newModel.lastTransaction {
+                        lastTransaction = change.newModel.lastTransaction
                         selectedTransaction = lastTransaction
                     }
                 }
