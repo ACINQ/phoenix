@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("plugin.serialization") version "1.4.10"
 }
 
 val currentOs = org.gradle.internal.os.OperatingSystem.current()
@@ -42,12 +42,11 @@ kotlin {
 
     sourceSets {
 
-        val coroutinesVersion = "1.3.9-native-mt"
+        val coroutinesVersion = "1.3.9-native-mt-2"
         val serializationVersion = "1.0.0-RC"
-        val secp256k1Version = "0.4.0"
+        val secp256k1Version = "0.4.1"
         val ktorVersion = "1.4.0"
         val kodeinDIVersion = "7.1.0"
-//        val kodeinDBVersion = "0.2.0"
         val kodeinDBVersion = "0.2.0-beta"
 
         val commonMain by getting {
@@ -55,6 +54,7 @@ kotlin {
                 api("fr.acinq.eclair:eclair-kmp:snapshot")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 api("org.kodein.di:kodein-di:$kodeinDIVersion")
                 api("org.kodein.db:kodein-db:$kodeinDBVersion")
                 api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")

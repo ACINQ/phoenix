@@ -35,6 +35,7 @@ import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -57,6 +58,7 @@ class PhoenixBusiness {
         override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
         override fun getFeeratePerKw(target: Int): Long = 10000
 
+        @Transient
         val serializersModule = SerializersModule {
             polymorphic(FeeEstimator::class) {
                 subclass(PeerFeeEstimator::class)
