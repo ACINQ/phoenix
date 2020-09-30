@@ -14,12 +14,14 @@ struct ScanView: MVIView {
 
     var body: some View {
         ZStack {
-            mvi(onModel: { model in
-                if model is Scan.ModelSending {
+            mvi(onModel: { change in
+                print("NEW MODEL: \(change.newModel)")
+                if change.newModel is Scan.ModelSending {
                     isShowing = false
-                } else if model is Scan.ModelBadRequest {
+                } else if change.newModel is Scan.ModelBadRequest {
                     toast.toast(text: "Unexpected request format!")
                 }
+                change.animateIfModelTypeChanged()
             }) { model, intent in
                 view(model: model, intent: intent)
             }
@@ -75,7 +77,9 @@ struct ScanView: MVIView {
                         .padding()
                 Spacer()
             }
-                    .navigationBarTitle("Payment request", displayMode: .inline)
+                    .navigationBarTitle("Scan", displayMode: .inline)
+                    .zIndex(2)
+                    .transition(.asymmetric(insertion: .identity, removal: .move(edge: .bottom)))
 
         }
     }
@@ -102,7 +106,9 @@ struct ScanView: MVIView {
                             .padding()
                 }
             }
-                    .navigationBarTitle("", displayMode: .inline)
+                    .navigationBarTitle("Validate payment", displayMode: .inline)
+                    .zIndex(1)
+                    .transition(.asymmetric(insertion: .identity, removal: .opacity))
         }
     }
 
@@ -119,6 +125,7 @@ struct ScanView: MVIView {
                         .padding()
             }
                     .navigationBarTitle("Sending payment", displayMode: .inline)
+                    .zIndex(0)
         }
     }
 }

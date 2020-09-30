@@ -6,7 +6,11 @@ struct RestoreWalletView: MVIView {
     typealias Intent = RestoreWallet.Intent
 
     var body: some View {
-        mvi { model, intent in
+        mvi(onModel: { change in
+            if change.previousModel is RestoreWallet.ModelWarning && !(change.newModel is RestoreWallet.ModelWarning) {
+                change.animation = .default
+            }
+        }) { model, intent in
             view(model: model, intent: intent)
                     .padding(.top, keyWindow?.safeAreaInsets.bottom)
                     .padding(.bottom, keyWindow?.safeAreaInsets.top)
@@ -22,7 +26,6 @@ struct RestoreWalletView: MVIView {
             WarningView(intent: intent)
             .zIndex(1)
             .transition(.move(edge: .bottom))
-            .animation(.default)
         } else {
             RestoreView(model: model, intent: intent)
             .zIndex(0)

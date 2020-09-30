@@ -3,70 +3,111 @@ import PhoenixShared
 
 struct MVIContext<Model: MVI.Model, Intent: MVI.Intent, Content: View> : View {
 
-    class ObservableController<M : MVI.Model, I : MVI.Intent> : ObservableObject {
-        var unsub: (() -> Void)? = nil
-        @Published var controller: MVIController<M, I>? = nil
+    class ModelChange {
+        let newModel: Model
+        let previousModel: Model?
+        var animation: Animation? = nil
+
+        init(newModel: Model, previousModel: Model?) {
+            self.newModel = newModel
+            self.previousModel = previousModel
+        }
+
+        func animateIfModelTypeChanged(animation: Animation = .default) {
+            if (type(of: newModel) != type(of: previousModel)) {
+                self.animation = animation
+            }
+        }
+    }
+
+    private class MVIState: ObservableObject {
+        private var unsub: (() -> Void)? = nil
+        private var controller: MVIController<Model, Intent>? = nil
+        private var subCount: Int = 0
+        @Published var model: Model? = nil
+
+        private let background: Bool
+        private var onModel: ((ModelChange) -> Void)? = nil
+
+        init(background: Bool) {
+            self.background = background
+        }
 
         deinit {
-            let _unsub = self.unsub
-            let _controller = self.controller
+            let _unsub = unsub
+            let _controller = controller
             DispatchQueue.main.async {
                 _unsub?()
                 _controller?.stop()
             }
         }
+
+        func initController(_ di: DI, onModel: ((ModelChange) -> Void)? = nil) {
+            if controller == nil {
+                controller = di.instance(of: MVIController<Model, Intent>.self, params: [Model.self, Intent.self])
+                model = controller!.firstModel
+            }
+        }
+
+        func subscribe(onModel: ((ModelChange) -> Void)?) {
+            self.onModel = onModel
+            if unsub == nil {
+                unsub = controller!.subscribe { newModel in
+                    let modelChange = ModelChange(newModel: newModel, previousModel: self.model)
+                    self.onModel?(modelChange)
+                    if let animation = modelChange.animation {
+                        withAnimation(animation) {
+                            self.model = newModel
+                        }
+                    } else {
+                        self.model = newModel
+                    }
+                }
+            }
+            subCount += 1
+        }
+
+        func unsubscribe() {
+            subCount -= 1
+            if subCount < 0 { fatalError("subCount < 0") }
+            if subCount == 0 && !background {
+                unsub!()
+                unsub = nil
+            }
+        }
+
+        func intent(_ intent: Intent) {
+            controller!.intent(intent: intent)
+        }
     }
-
-    private let modelType: Model.Type
-    private let intentType: Intent.Type
-
-    private let background: Bool
-
-    private let onModel: ((Model) -> Void)?
 
     private let content: (Model, @escaping (Intent) -> Void) -> Content
 
     @EnvironmentObject private var envDi: ObservableDI
 
-    @StateObject private var controllerState = ObservableController<Model, Intent>()
+    @StateObject private var state: MVIState
 
-    @State private var model: Model? = nil
+    private var onModel: ((ModelChange) -> Void)? = nil
 
     init(
-            _ modelType: Model.Type,
-            _ intentType: Intent.Type,
             background: Bool = false,
-            onModel: ((Model) -> Void)? = nil,
+            onModel: ((ModelChange) -> Void)? = nil,
             @ViewBuilder content: @escaping (Model, @escaping (Intent) -> Void) -> Content
     ) {
-        self.modelType = modelType
-        self.intentType = intentType
-        self.background = background
+        _state = StateObject(wrappedValue: MVIState(background: background))
         self.onModel = onModel
         self.content = content
     }
 
     var body: some View {
-        if controllerState.controller == nil {
-            controllerState.controller = envDi.di.instance(of: MVIController<Model, Intent>.self, params: [modelType, intentType])
-        }
+        state.initController(envDi.di)
 
-        let m: Model = model ?? controllerState.controller!.firstModel
-
-        return content(m, { controllerState.controller!.intent(intent: $0) })
+        return content(state.model!, state.intent)
                 .onAppear {
-                    if controllerState.unsub == nil {
-                        controllerState.unsub = self.controllerState.controller!.subscribe {
-                            onModel?($0)
-                            self.model = $0
-                        }
-                    }
+                    state.subscribe(onModel: onModel)
                 }
                 .onDisappear {
-                    if !background {
-                        controllerState.unsub?()
-                        controllerState.unsub = nil
-                    }
+                    state.unsubscribe()
                 }
     }
 
