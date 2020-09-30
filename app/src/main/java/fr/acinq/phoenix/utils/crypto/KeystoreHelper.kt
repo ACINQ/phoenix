@@ -70,7 +70,6 @@ object KeystoreHelper {
       setKeySize(256)
       setUserAuthenticationRequired(true)
       setUserAuthenticationValidityDurationSeconds(-1)
-      setInvalidatedByBiometricEnrollment(false)
       if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
         setUnlockedDeviceRequired(true)
       }
@@ -113,7 +112,7 @@ object KeystoreHelper {
 
   /** Get encryption Cipher for given key. */
   internal fun getEncryptionCipher(keyName: String): Cipher = Cipher.getInstance("$ENC_ALGO/$ENC_BLOCK_MODE/$ENC_PADDING").apply {
-    init(Cipher.ENCRYPT_MODE, getKeyForName(keyName))
+    init(Cipher.ENCRYPT_MODE, getKeyForName(keyName), parameters)
   }
 
   /** Get decryption Cipher for given key. */

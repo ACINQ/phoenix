@@ -18,6 +18,7 @@ package fr.acinq.phoenix.settings
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -27,6 +28,7 @@ import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsAccessControlBinding
@@ -42,9 +44,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 
-class AccessControlFragment : BaseFragment() {
+class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -64,42 +65,43 @@ class AccessControlFragment : BaseFragment() {
       refreshUI(it)
       model.isUpdatingState.value = false
     })
+    model.errorMessage.observe(viewLifecycleOwner, Observer {
+      if (!it.isNullOrBlank()) {
+        context?.let { ctx -> Toast.makeText(ctx, it, Toast.LENGTH_SHORT).show() }
+      }
+    })
     mBinding.model = model
   }
 
   override fun onStart() {
     super.onStart()
     context?.let { model.updateLockState(it) }
-
+    PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this)
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
-    mBinding.authUnavailable.setOnClickListener { startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS)) }
+    mBinding.softAuthUnavailable.setOnClickListener { startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS)) }
 
     mBinding.screenLockSwitch.setOnClickListener {
-      if (model.isUIFrozen.value != true) {
-        if (AuthHelper.isDeviceSecure(context)) {
-          model.isUpdatingState.value = true
-          AuthHelper.promptSoftAuth(this,
-            onSuccess = {
-              if (mBinding.screenLockSwitch.isChecked()) {
-                context?.let { model.disableScreenLock(it) }
-              } else {
-                context?.let { model.enableScreenLock(it) }
-              }
-            }, onFailure = { code, _ ->
-              showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
-            }, onCancel = {
-              model.isUpdatingState.value = false
-            })
-        } else {
-          showMessage(getString(R.string.accessctrl_auth_unavailable_short))
-          context?.let { model.updateLockState(it) }
-        }
+      if (model.isUpdatingState.value != true) {
+        model.isUpdatingState.value = true
+        AuthHelper.promptSoftAuth(this,
+          onSuccess = {
+            if (mBinding.screenLockSwitch.isChecked()) {
+              context?.let { model.disableScreenLock(it) }
+            } else {
+              context?.let { model.enableScreenLock(it) }
+            }
+          }, onFailure = { code ->
+            context?.let { model.errorMessage.postValue(AuthHelper.translateAuthState(it, code) ?: it.getString(R.string.accessctrl_error_auth)) }
+            model.isUpdatingState.value = false
+          }, onCancel = {
+            model.isUpdatingState.value = false
+          })
       }
     }
 
     mBinding.fullLockSwitch.setOnClickListener {
       context?.let { ctx ->
-        if (model.isUIFrozen.value != true && AuthHelper.isDeviceSecure(context)) {
+        if (model.isUpdatingState.value != true) {
           val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(ctx))
           if (mBinding.fullLockSwitch.isChecked() && encryptedSeed is EncryptedSeed.V2.WithAuth) {
             disableFullLock(ctx, encryptedSeed)
@@ -109,10 +111,28 @@ class AccessControlFragment : BaseFragment() {
             log.info("invalid combination: ${encryptedSeed?.name()} with switch=${mBinding.fullLockSwitch.isChecked()}")
             model.updateLockState(ctx)
           }
-        } else if (!AuthHelper.isDeviceSecure(context)) {
-          showMessage(getString(R.string.accessctrl_auth_unavailable_short))
         }
       }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    model.state.value?.let { refreshUI(it) }
+    context?.let {
+      model.canUseSoftAuth.value = AuthHelper.canUseSoftAuth(it)
+      model.canUseHardAuth.value = AuthHelper.canUseHardAuth(it)
+    }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(this)
+  }
+
+  override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    if (key == Prefs.PREFS_MNEMONICS_SEEN_TIMESTAMP) {
+      model.state.value?.let { refreshUI(it) }
     }
   }
 
@@ -120,8 +140,8 @@ class AccessControlFragment : BaseFragment() {
     val cipher = try {
       KeystoreHelper.getEncryptionCipher(KeystoreHelper.KEY_WITH_AUTH)
     } catch (e: Exception) {
-      log.info("could not get cipher: ", e)
-      showMessage(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      log.error("could not get cipher: ", e)
+      model.errorMessage.postValue(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
       return
     }
     val onConfirm = {
@@ -130,8 +150,8 @@ class AccessControlFragment : BaseFragment() {
         cipher = cipher,
         onSuccess = { crypto ->
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
-            showMessage(getString(R.string.accessctrl_error_generic))
+            log.error("failed to encrypt ${encryptedSeed.name()}: ", e)
+            model.errorMessage.postValue(getString(R.string.accessctrl_error_auth))
             model.updateLockState(ctx)
           }) {
             encryptedSeed.decrypt().run {
@@ -141,32 +161,26 @@ class AccessControlFragment : BaseFragment() {
               model.updateLockState(ctx)
             }
           }
-        }, onFailure = { code, _ ->
-          showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth))
+        }, onFailure = { code ->
+          model.errorMessage.postValue(AuthHelper.translateAuthState(ctx, code) ?: ctx.getString(R.string.accessctrl_error_auth))
+          model.isUpdatingState.value = false
         }, onCancel = {
           model.isUpdatingState.value = false
         })
     }
-    AlertHelper.build(layoutInflater,
-      title = getString(R.string.accessctrl_full_lock_confirm_title),
-      message = getString(R.string.accessctrl_full_lock_confirm_message)).apply {
+    AlertHelper.build(layoutInflater, title = getString(R.string.accessctrl_full_lock_confirm_title), message = getString(R.string.accessctrl_full_lock_confirm_message)).apply {
       setPositiveButton(R.string.btn_confirm) { _, _ -> onConfirm() }
       setNegativeButton(R.string.btn_cancel, null)
       show()
     }
   }
 
-  override fun onResume() {
-    super.onResume()
-    model.state.value?.let { refreshUI(it) }
-  }
-
   private fun disableFullLock(context: Context, encryptedSeed: EncryptedSeed.V2.WithAuth) {
     val cipher = try {
       encryptedSeed.getDecryptionCipher()
     } catch (e: Exception) {
-      log.info("could not get cipher: ", e)
-      showMessage(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
+      log.error("could not get cipher: ", e)
+      model.errorMessage.postValue(getString(R.string.accessctrl_error_cipher, e.localizedMessage ?: e.javaClass.simpleName))
       return
     }
     model.isUpdatingState.value = true
@@ -174,8 +188,8 @@ class AccessControlFragment : BaseFragment() {
       cipher = cipher,
       onSuccess = { crypto ->
         lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-          log.info("failed to decrypt ${encryptedSeed.name()}: ", e)
-          showMessage(getString(R.string.accessctrl_error_auth))
+          log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
+          model.errorMessage.postValue(getString(R.string.accessctrl_error_auth))
           model.updateLockState(context)
         }) {
           encryptedSeed.decrypt(crypto?.cipher).run {
@@ -185,8 +199,8 @@ class AccessControlFragment : BaseFragment() {
             model.updateLockState(context)
           }
         }
-      }, onFailure = { code, _ ->
-        showMessage(code?.let { getString(R.string.accessctrl_error_auth_with_code, it) } ?: getString(R.string.accessctrl_error_auth) )
+      }, onFailure = { code ->
+        model.errorMessage.postValue(AuthHelper.translateAuthState(context, code) ?: context.getString(R.string.accessctrl_error_auth))
         model.isUpdatingState.value = false
       }, onCancel = {
         model.isUpdatingState.value = false
@@ -194,14 +208,12 @@ class AccessControlFragment : BaseFragment() {
   }
 
   private fun refreshUI(state: AccessLockState) {
-    log.info("refresh ui with state=$state")
+    log.debug("refresh ui with state=$state")
+    context?.let { model.isBackupDone.value = Prefs.isBackupDone(it) }
     mBinding.screenLockSwitch.setChecked(state is AccessLockState.Done.ScreenLock || state is AccessLockState.Done.FullLock)
     mBinding.fullLockSwitch.setChecked(state is AccessLockState.Done.FullLock)
   }
 
-  private fun showMessage(message: String) {
-    context?.let { Toast.makeText(it, message, Toast.LENGTH_SHORT).show() }
-  }
 }
 
 sealed class AccessLockState {
@@ -211,43 +223,32 @@ sealed class AccessLockState {
     object ScreenLock : Done()
     object FullLock : Done()
   }
-
-  object Unavailable : AccessLockState()
 }
 
 class AccessControlViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
 
   val state = MutableLiveData<AccessLockState>(AccessLockState.Init)
+
+  val isBackupDone = MutableLiveData(false)
+  val canUseSoftAuth = MutableLiveData(false)
+  val canUseHardAuth = MutableLiveData(false)
   val isUpdatingState = MutableLiveData(false)
-  val isUIFrozen: MediatorLiveData<Boolean> = MediatorLiveData()
-
-  init {
-    isUIFrozen.addSource(state) { updateUIFrozen() }
-    isUIFrozen.addSource(isUpdatingState) { updateUIFrozen() }
-  }
-
-  private fun updateUIFrozen() {
-    isUIFrozen.value = state.value is AccessLockState.Unavailable || (isUpdatingState.value ?: false)
-  }
+  val errorMessage = MutableLiveData("")
 
   fun updateLockState(context: Context) {
-    if (AuthHelper.isDeviceSecure(context)) {
-      val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
-      state.postValue(when (encryptedSeed) {
-        is EncryptedSeed.V2.NoAuth -> if (Prefs.isScreenLocked(context)) AccessLockState.Done.ScreenLock else AccessLockState.Done.None
-        is EncryptedSeed.V2.WithAuth -> AccessLockState.Done.FullLock
-        else -> AccessLockState.Init
-      })
-    } else {
-      state.postValue(AccessLockState.Unavailable)
-    }
+    val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
+    state.postValue(when (encryptedSeed) {
+      is EncryptedSeed.V2.NoAuth -> if (Prefs.isScreenLocked(context)) AccessLockState.Done.ScreenLock else AccessLockState.Done.None
+      is EncryptedSeed.V2.WithAuth -> AccessLockState.Done.FullLock
+      else -> AccessLockState.Done.None
+    })
   }
 
   @UiThread
   fun enableScreenLock(context: Context) {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.info("failed to enable Screen Lock: ", e)
+      log.error("failed to enable screen lock: ", e)
       updateLockState(context)
     }) {
       val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
@@ -263,7 +264,7 @@ class AccessControlViewModel : ViewModel() {
   @UiThread
   fun disableScreenLock(context: Context) {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.info("failed to disable Screen Lock: ", e)
+      log.error("failed to disable screen lock: ", e)
       updateLockState(context)
     }) {
       val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))

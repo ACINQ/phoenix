@@ -343,11 +343,9 @@
 
   <string name="accessctrl_title">Seguridad</string>
 
-  <string name="accessctrl_auth_unavailable_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
-  <string name="accessctrl_auth_unavailable_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
-  <string name="accessctrl_auth_unavailable_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
-
-  <string name="accessctrl_error_generic">Ocurrió un error, la wallet no ha sido cifrada.\n\nPor favor inténtalo de nuevo.</string>
+  <string name="accessctrl_auth_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

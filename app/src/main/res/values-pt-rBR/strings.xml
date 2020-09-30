@@ -381,11 +381,9 @@
 
   <string name="accessctrl_title">Segurança</string>
 
-  <string name="accessctrl_auth_unavailable_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
-  <string name="accessctrl_auth_unavailable_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
-  <string name="accessctrl_auth_unavailable_none_enrolled">Primeiro registre a biometria.</string>
-
-  <string name="accessctrl_error_generic">Ocorreu um erro, a carteira não foi criptografada.\n\nTente novamente.</string>
+  <string name="accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 

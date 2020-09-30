@@ -299,10 +299,6 @@ class EclairNodeService : Service() {
       serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.info("aborted node startup with ${e.javaClass.simpleName}")
         when (e) {
-          is GeneralSecurityException -> {
-            log.debug("user entered wrong PIN")
-            updateState(KitState.Error.V1WrongPassword)
-          }
           is NetworkException, is UnknownHostException -> {
             log.info("network error: ", e)
             updateState(KitState.Error.NoConnectivity)
@@ -334,18 +330,6 @@ class EclairNodeService : Service() {
         val (_kit, xpub) = doStartNode(applicationContext, seed)
         updateState(KitState.Started(_kit, xpub))
         ChannelsWatcher.schedule(applicationContext)
-        _kit.apply {
-          val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
-          if (nodeParams().db().peers().getPeer(Wallet.ACINQ.nodeId()).isEmpty) {
-            nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
-            Timer().schedule(object : TimerTask() {
-              override fun run() {
-                connectToPeer()
-              }
-            }, 5000)
-          }
-          log.debug("added peer to db and forced connection")
-        }
       }
     }
   }
@@ -411,6 +395,12 @@ class EclairNodeService : Service() {
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
+    if (setup.nodeParams().db().peers().getPeer(Wallet.ACINQ.nodeId()).isEmpty) {
+      val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
+      setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
+      log.info("added ACINQ to peer database")
+    }
+
     val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(appContext) }, "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
@@ -428,6 +418,7 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
+    kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
     log.info("bootstrap complete")
     return Pair(kit, xpub)
   }
@@ -999,10 +990,6 @@ sealed class KitState {
     data class Generic(val message: String) : Error()
     data class Tor(val message: String) : Error()
     data class InvalidElectrumAddress(val address: String) : Error()
-    object DeviceNotSecure : Error()
-    object AuthenticationFailed : Error()
-    object V1InvalidBiometric : Error()
-    object V1WrongPassword : Error()
     object NoConnectivity : Error()
     object UnreadableData : Error()
   }

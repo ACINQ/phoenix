@@ -26,7 +26,7 @@
   <!-- spaces -->
   <dimen name="space_xxl">96dp</dimen>
   <dimen name="space_xl">64dp</dimen>
-  <dimen name="space_lg_p">48dp</dimen>
+  <dimen name="space_lg_p">50dp</dimen>
   <dimen name="space_lg">32dp</dimen>
   <dimen name="space_md_p">24dp</dimen>
   <dimen name="space_md">16dp</dimen>

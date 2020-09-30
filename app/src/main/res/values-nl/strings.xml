@@ -359,11 +359,9 @@
 
   <string name="accessctrl_title">Beveiliging</string>
 
-  <string name="accessctrl_auth_unavailable_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
-  <string name="accessctrl_auth_unavailable_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
-  <string name="accessctrl_auth_unavailable_none_enrolled">Registreer eerst biometrie.</string>
-
-  <string name="accessctrl_error_generic">Er is een fout opgetreden, de wallet is niet versleuteld.\n\nProbeer opnieuw.</string>
+  <string name="accessctrl_auth_no_hw">Je toestel ondersteunt geen biometrische authenticatie.</string>
+  <string name="accessctrl_auth_hw_unavailable">Biometrische hardware is niet beschikbaar. Probeer later opnieuw.</string>
+  <string name="accessctrl_auth_none_enrolled">Registreer eerst biometrie.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

@@ -91,7 +91,7 @@ class DisplaySeedFragment : BaseFragment() {
           AuthHelper.promptSoftAuth(this,
             onSuccess = {
               model.decrypt(encryptedSeed, null)
-            }, onFailure = { _, _ ->
+            }, onFailure = {
               model.state.value = DisplaySeedState.Error.InvalidAuth
             }, onCancel = {
               model.state.value = DisplaySeedState.Init
@@ -100,13 +100,18 @@ class DisplaySeedFragment : BaseFragment() {
           model.decrypt(encryptedSeed, null)
         }
       } else if (encryptedSeed is EncryptedSeed.V2.WithAuth) {
+        val cipher = try {
+          encryptedSeed.getDecryptionCipher()
+        } catch (e: Exception) {
+          model.state.value = DisplaySeedState.Error.InvalidAuth
+          return
+        }
         AuthHelper.promptHardAuth(this,
-          cipher = encryptedSeed.getDecryptionCipher(),
+          cipher = cipher,
           onSuccess = {
             model.decrypt(encryptedSeed, it?.cipher)
-          }, onFailure = { _, _ ->
-            model.state.value = DisplaySeedState.Error.InvalidAuth
-          })
+          },
+          onFailure = { model.state.value = DisplaySeedState.Error.InvalidAuth })
       }
     }
   }

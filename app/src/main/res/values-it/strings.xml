@@ -357,11 +357,9 @@
 
   <string name="accessctrl_title">Sicurezza</string>
 
-  <string name="accessctrl_auth_unavailable_no_hw">Il tuo dispositivo non supporta l\'autenticazione biometrica.</string>
-  <string name="accessctrl_auth_unavailable_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
-  <string name="accessctrl_auth_unavailable_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
-
-  <string name="accessctrl_error_generic">C\'è stato un errore, il wallet non è stato cifrato.\n\nPer favore riprova.</string>
+  <string name="accessctrl_auth_no_hw">Il tuo dispositivo non supporta l\'autenticazione biometrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
+  <string name="accessctrl_auth_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 

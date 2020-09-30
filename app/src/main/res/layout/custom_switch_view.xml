@@ -30,10 +30,11 @@
       app:layout_constraintTop_toTopOf="@id/text"
       tools:ignore="ContentDescription" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/switch_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:minHeight="0dp"
       android:clickable="false"
       android:focusable="false"
       app:layout_constraintEnd_toEndOf="parent"

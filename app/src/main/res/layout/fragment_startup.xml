@@ -17,6 +17,17 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools">
 
+  <data>
+
+    <import type="fr.acinq.phoenix.background.KitState" />
+
+    <import type="fr.acinq.phoenix.AppLock" />
+
+    <variable
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
+  </data>
+
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,6 +56,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/rounded"
         android:padding="@dimen/space_md_p"
+        android:visibility="@{appModel.state instanceof KitState.Error}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,6 +114,7 @@
         android:id="@+id/binding_service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="@{appModel.state instanceof KitState.Disconnected}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
@@ -111,6 +124,7 @@
         android:id="@+id/starting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Init || appModel.state instanceof KitState.Bootstrap.Node}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/icon"
@@ -121,6 +135,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:contentDescription="@null"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
         app:layout_constraintBottom_toBottomOf="@id/starting_tor"
         app:layout_constraintEnd_toStartOf="@id/starting_tor"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -132,10 +147,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_xs"
+        android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
         android:text="@string/startup_wait_tor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/starting_tor_animation"
         app:layout_constraintTop_toBottomOf="@id/icon" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/authentication_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded"
+        android:visibility="@{!(appModel.state instanceof KitState.Disconnected) &amp;&amp; appModel.lockState instanceof AppLock.Locked}"
+        android:padding="@dimen/space_md_p"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/max_width_md">
+
+        <TextView
+          android:id="@+id/authentication_message"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/startup_unlock_required"
+          android:textAlignment="center"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/unlock_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_lg"
+          android:background="@drawable/button_bg_primary_border"
+          app:icon="@drawable/ic_shield"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/authentication_message"
+          app:layout_goneMarginTop="0dp"
+          app:text="@string/startup_unlock_button" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

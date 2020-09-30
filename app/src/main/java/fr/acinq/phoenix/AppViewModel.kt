@@ -68,6 +68,9 @@ class AppViewModel : ViewModel() {
   /** Mirrors the node state using a MediatorLiveData. */
   val state = StateLiveData(_service)
 
+  /** Application lock state. App can be locked with the kit being started. */
+  val lockState = MutableLiveData<AppLock>(AppLock.Locked.Default)
+
   /** Tracks the current URI contained the intent that started the app. */
   val currentURIIntent = MutableLiveData<String>()
 
@@ -162,6 +165,14 @@ class StateLiveData(service: MutableLiveData<EclairNodeService?>): MediatorLiveD
       }
     }
   }
+}
+
+sealed class AppLock {
+  sealed class Locked: AppLock() {
+    object Default: Locked()
+    data class AuthFailure(val code: Int? = null): Locked()
+  }
+  object Unlocked: AppLock()
 }
 
 data class NetworkInfo(val electrumServer: ElectrumServer?, val lightningConnected: Boolean, val torConnections: HashMap<String, TorConnectionStatus>)

@@ -16,22 +16,14 @@
 
 package fr.acinq.phoenix
 
-import android.app.KeyguardManager
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.biometric.BiometricConstants
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.background.KitState
-import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.utils.Wallet
-import fr.acinq.phoenix.utils.crypto.AuthHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

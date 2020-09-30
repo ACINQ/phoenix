@@ -36,13 +36,12 @@
       android:id="@+id/title"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/space_lg_p"
       android:layout_marginEnd="@dimen/space_lg"
       android:ellipsize="end"
       android:singleLine="true"
       app:layout_constraintBottom_toBottomOf="@id/back_button"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintStart_toEndOf="@id/back_button"
       app:layout_constraintTop_toTopOf="@id/back_button" />
 
     <TextView

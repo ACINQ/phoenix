@@ -25,12 +25,12 @@ apply plugin: 'com.google.gms.google-services'
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 
 android {
-  compileSdkVersion 29
+  compileSdkVersion 30
   ndkVersion '21.1.6352462'
   defaultConfig {
     applicationId "fr.acinq.phoenix.testnet"
     minSdkVersion 24
-    targetSdkVersion 29
+    targetSdkVersion 30
     versionCode 15
     versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -105,7 +105,7 @@ dependencies {
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ANDROIDX - constraint layout
-  def constraint_version = "2.0.0"
+  def constraint_version = "2.0.1"
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
@@ -116,7 +116,7 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
   // ANDROIDX - biometric
-  def biometric_version = "1.0.1"
+  def biometric_version = "1.1.0-alpha02"
   implementation "androidx.biometric:biometric:$biometric_version"
 
   // ANDROIDX - preferences

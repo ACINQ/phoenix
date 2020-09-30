@@ -386,16 +386,11 @@
   <string name="accessctrl_title">Contrôle d\'accès</string>
   <string name="accessctrl_subtitle">Nous recommandons d\'activer le verrouillage écran pour empêcher une utilisation non désirée du wallet.</string>
 
-  <string name="accessctrl_auth_unavailable_short">Vous devez d\'abord sécuriser votre appareil.</string>
-  <string name="accessctrl_auth_unavailable">Votre téléphone n\'est pas sécurisée par le Screen Lock d\'Android.\n\nVeuillez d\'abord enregistrer un PIN/Schéma/empreinte digitale dans Android.</string>
-  <string name="accessctrl_auth_unavailable_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
-  <string name="accessctrl_auth_unavailable_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
-  <string name="accessctrl_auth_unavailable_none_enrolled">Vous devez d\'abord enregistrer une identité biométrique dans Android.</string>
+  <string name="accessctrl_auth_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
+  <string name="accessctrl_auth_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
+  <string name="accessctrl_auth_none_enrolled">Vous devez d\'abord enregistrer un PIN/schéma/empreinte digitale dans Android.</string>
 
-  <string name="accessctrl_error_generic">Une erreur est survenue, veuillez réessayer.</string>
   <string name="accessctrl_error_auth">L\'authentification a échoué.</string>
-  <string name="accessctrl_error_auth_with_code">L\'authentification a échoué (code: %1$d)</string>
-  <string name="accessctrl_error_unsecure">L\'appareil n\'est pas sécurisé (code: %1$d)</string>
 
   <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
   <string name="accessctrl_screen_lock_switch_desc">Verrouille l\'accès aux écrans de l\'application avec l\'authentification système d\'Android.</string>

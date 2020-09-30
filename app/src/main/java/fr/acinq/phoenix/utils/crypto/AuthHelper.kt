@@ -16,13 +16,13 @@
 
 package fr.acinq.phoenix.utils.crypto
 
-import android.app.KeyguardManager
 import android.content.Context
 import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,62 +32,73 @@ import javax.crypto.Cipher
 object AuthHelper {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  fun isDeviceSecure(context: Context?) = context?.run {
-    getSystemService(KeyguardManager::class.java).isDeviceSecure && BiometricManager.from(this).canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
-  } ?: false
+  fun canUseSoftAuth(context: Context?) = context?.let { BiometricManager.from(it).canAuthenticate(softAuthCreds) == BiometricManager.BIOMETRIC_SUCCESS } ?: false
+  fun canUseHardAuth(context: Context?) = context?.let { BiometricManager.from(it).canAuthenticate(hardAuthCreds) == BiometricManager.BIOMETRIC_SUCCESS } ?: false
+  fun authState(context: Context?) = context?.let { BiometricManager.from(it).canAuthenticate(hardAuthCreds) } ?: BiometricManager.BIOMETRIC_STATUS_UNKNOWN
+
+  fun translateAuthState(context: Context, code: Int?): String? = when (code) {
+    BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> context.getString(R.string.accessctrl_auth_none_enrolled)
+    BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> context.getString(R.string.accessctrl_auth_hw_unavailable)
+    BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> context.getString(R.string.accessctrl_auth_no_hw)
+    BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> context.getString(R.string.accessctrl_auth_update_required)
+    BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> context.getString(R.string.accessctrl_auth_hw_unavailable)
+    BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> context.getString(R.string.accessctrl_auth_unsupported)
+    BiometricConstants.ERROR_LOCKOUT, BiometricConstants.ERROR_LOCKOUT_PERMANENT -> context.getString(R.string.accessctrl_auth_lockout)
+    else -> null
+  }
+
+  val softAuthCreds = BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK
+  val hardAuthCreds = BiometricManager.Authenticators.BIOMETRIC_STRONG
 
   /** Prompt authentication dialog that is not using a crypto object. */
   fun promptSoftAuth(
-    fragment: Fragment,
+    fragment: BaseFragment,
     onSuccess: () -> Unit,
-    onFailure: (errorCode: Int?, errString: CharSequence?) -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
     onCancel: (() -> Unit)? = null
   ) {
-    val canAuth = fragment.context?.let { BiometricManager.from(it).canAuthenticate() }
-    if (isDeviceSecure(fragment.context) && canAuth == BiometricManager.BIOMETRIC_SUCCESS) {
-      getAuthPrompt(fragment, { onSuccess() }, onFailure, onCancel).also {
-        it.authenticate(
-          BiometricPrompt.PromptInfo.Builder().run {
-            setTitle(fragment.getString(R.string.authprompt_title))
-            setDeviceCredentialAllowed(true)
-            build()
-          })
-      }
+    if (canUseSoftAuth(fragment.context)) {
+      getAuthPrompt(fragment, { onSuccess() }, onFailure, onCancel).authenticate(
+        BiometricPrompt.PromptInfo.Builder().apply {
+          setTitle(fragment.getString(R.string.authprompt_title))
+          setAllowedAuthenticators(softAuthCreds)
+        }.build())
     } else {
-      log.warn("cannot authenticate with state=$canAuth")
-      onFailure(null, fragment.getString(R.string.accessctrl_error_unsecure, canAuth ?: -2))
+      authState(fragment.context).let {
+        log.warn("cannot do soft authentication with state=$it")
+        onFailure(it)
+      }
     }
   }
 
   /** Prompt authentication dialog using a crypto object for stronger security in the success callback. */
   fun promptHardAuth(
-    fragment: Fragment,
+    fragment: BaseFragment,
     cipher: Cipher,
     onSuccess: (cryptoObject: BiometricPrompt.CryptoObject?) -> Unit,
-    onFailure: (errorCode: Int?, errString: CharSequence?) -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
     onCancel: (() -> Unit)? = null
   ) {
-    val canAuth = fragment.context?.let { BiometricManager.from(it).canAuthenticate() }
-    if (isDeviceSecure(fragment.context) && canAuth == BiometricManager.BIOMETRIC_SUCCESS) {
-      getAuthPrompt(fragment, onSuccess, onFailure, onCancel).also {
-        it.authenticate(
-          BiometricPrompt.PromptInfo.Builder().run {
-            setTitle(fragment.getString(R.string.authprompt_title))
-            setNegativeButtonText(fragment.getString(R.string.authprompt_hard_negative))
-            setDeviceCredentialAllowed(false)
-            build()
-          }, BiometricPrompt.CryptoObject(cipher))
-      }
+    if (canUseHardAuth(fragment.context)) {
+      getAuthPrompt(fragment, onSuccess, onFailure, onCancel).authenticate(
+        BiometricPrompt.PromptInfo.Builder().apply {
+          setTitle(fragment.getString(R.string.authprompt_title))
+          setNegativeButtonText(fragment.getString(R.string.authprompt_hard_negative))
+          setAllowedAuthenticators(hardAuthCreds)
+        }.build(),
+        BiometricPrompt.CryptoObject(cipher))
     } else {
-      log.warn("cannot authenticate with state=$canAuth")
-      onFailure(null, fragment.getString(R.string.accessctrl_error_unsecure, canAuth ?: -2))
+      authState(fragment.context).let {
+        log.warn("cannot do hard authentication with state=$it")
+        onFailure(it)
+      }
     }
   }
 
   private fun getAuthPrompt(
     fragment: Fragment,
     onSuccess: (cryptoObject: BiometricPrompt.CryptoObject?) -> Unit,
-    onFailure: (errorCode: Int?, errString: CharSequence?) -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
     onCancel: (() -> Unit)? = null
   ): BiometricPrompt {
     val callback = object : BiometricPrompt.AuthenticationCallback() {
@@ -95,7 +106,7 @@ object AuthHelper {
         super.onAuthenticationError(errorCode, errString)
         log.error("authentication error: ($errorCode): $errString")
         if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricConstants.ERROR_USER_CANCELED) {
-          onFailure(errorCode, errString)
+          onFailure(errorCode)
         } else {
           onCancel?.invoke()
         }
@@ -104,7 +115,7 @@ object AuthHelper {
       override fun onAuthenticationFailed() {
         super.onAuthenticationFailed()
         log.info("failed authentication")
-        onFailure(null, null)
+        onFailure(null)
       }
 
       override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {

@@ -28,7 +28,7 @@ import fr.acinq.phoenix.R
 object Prefs {
 
   private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
-  private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
+  const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
   private const val PREFS_SHOW_FTUE: String = "PREFS_SHOW_FTUE"
 
   // -- unit, fiat, conversion...
@@ -131,6 +131,8 @@ object Prefs {
   fun getMnemonicsSeenTimestamp(context: Context): Long {
     return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, 0)
   }
+
+  fun isBackupDone(context: Context): Boolean = getMnemonicsSeenTimestamp(context) > 0
 
   fun setMnemonicsSeenTimestamp(context: Context, timestamp: Long) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, timestamp).apply()
