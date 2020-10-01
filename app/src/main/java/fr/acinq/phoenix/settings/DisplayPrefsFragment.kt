@@ -58,16 +58,13 @@ class DisplayPrefsFragment : BaseFragment(stayIfNotStarted = true), SharedPrefer
 
   override fun onStart() {
     super.onStart()
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
   override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
     activity?.run {
       when (key) {
-        Prefs.PREFS_THEME -> {
-          ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
-          this.recreate()
-        }
+        Prefs.PREFS_THEME -> ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
         Prefs.PREFS_COIN_UNIT -> Converter.refreshCoinPattern(applicationContext)
       }
     }

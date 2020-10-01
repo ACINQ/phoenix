@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 ACINQ SAS
+  ~ Copyright 2020 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,23 +17,23 @@
 
 <resources>
 
-  <style name="default_theme" parent="Theme.MaterialComponents.NoActionBar">
-    <item name="isLightTheme">false</item>
+  <style name="default_theme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <item name="isLightTheme">true</item>
     <item name="colorPrimary">@color/horizon</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
-    <item name="bgColor">@color/oxford</item>
+    <item name="bgColor">@color/white</item>
     <item name="altBgColor">@color/ebony</item>
-    <item name="mutedBgColor">@color/ebony</item>
-    <item name="borderColor">@color/mako</item>
-    <item name="buttonRippleColor">@color/shuttle</item>
-    <item name="textColor">@color/edward</item>
-    <item name="mutedTextColor">@color/shuttle</item>
-    <item name="onMutedBgTextColor">@color/regent</item>
-    <item name="negativeColor">@color/red</item>
-    <item name="positiveColor">@color/green</item>
-    <item name="altTextColor">@color/dark</item>
-    <item name="android:windowLightStatusBar">false</item>
+    <item name="mutedBgColor">@color/athens</item>
+    <item name="borderColor">@color/geyser</item>
+    <item name="buttonRippleColor">@color/ripple</item>
+    <item name="textColor">@color/dark</item>
+    <item name="mutedTextColor">@color/casper</item>
+    <item name="onMutedBgTextColor">@color/slate</item>
+    <item name="negativeColor">@color/brandy</item>
+    <item name="positiveColor">@color/apple</item>
+    <item name="altTextColor">@color/white</item>
+    <item name="android:windowLightStatusBar">true</item>
 
     <!-- background -->
     <item name="colorSurface">?attr/bgColor</item>
@@ -40,6 +41,7 @@
     <item name="android:colorBackground">?attr/bgColor</item>
     <item name="android:windowBackground">@drawable/app_bg_testnet</item>
     <item name="android:navigationBarColor">?attr/bgColor</item>
+    <item name="android:windowLightNavigationBar">true</item>
 
     <!-- text -->
     <item name="android:textColor">?attr/textColor</item>
@@ -72,5 +74,4 @@
     <!-- preferences -->
     <item name="textColorAlertDialogListItem">?attr/textColor</item>
   </style>
-
 </resources>

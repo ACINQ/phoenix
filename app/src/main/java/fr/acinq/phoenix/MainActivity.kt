@@ -31,23 +31,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
-import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.background.EclairNodeService
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.events.PayToOpenNavigationEvent
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Prefs
-import fr.acinq.phoenix.utils.ThemeHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -94,7 +90,7 @@ class MainActivity : AppCompatActivity() {
     }
     mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
     app = ViewModelProvider(this).get(AppViewModel::class.java)
-    app.navigationEvent.observe(this, Observer {
+    app.navigationEvent.observe(this, {
       when (it) {
         is PayToOpenNavigationEvent -> {
           val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
@@ -128,10 +124,10 @@ class MainActivity : AppCompatActivity() {
         else -> log.info("unhandled navigation event $it")
       }
     })
-    app.state.observe(this, Observer {
+    app.state.observe(this, {
       handleUriIntent()
     })
-    app.currentURIIntent.observe(this, Observer {
+    app.currentURIIntent.observe(this, {
       handleUriIntent()
     })
     // app may be started with a payment request intent
