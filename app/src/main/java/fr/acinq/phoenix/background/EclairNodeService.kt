@@ -30,6 +30,7 @@ import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
+import android.text.format.DateUtils
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
@@ -659,7 +660,7 @@ class EclairNodeService : Service() {
         MultiPartHandler.ReceivePayment(
           /* amount */ amount_opt,
           /* description */ description,
-          /* expiry seconds */ Option.empty(),
+          /* expiry in seconds */ Option.apply(7 * DateUtils.DAY_IN_MILLIS / 1000),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
           /* payment preimage */ Option.empty(),
