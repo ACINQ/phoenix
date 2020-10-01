@@ -164,6 +164,11 @@
       app:exitAnim="@anim/fade_out"
       app:launchSingleTop="true"
       app:popUpTo="@id/main_fragment" />
+    <action
+      android:id="@+id/action_startup_to_patch_note"
+      app:destination="@id/patch_notes"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/slide_down" />
   </fragment>
 
   <!-- receive money -->
@@ -468,6 +473,16 @@
       app:enterAnim="@anim/slide_in_right"
       app:exitAnim="@anim/slide_out_left"
       app:popUpTo="@id/init_wallet_fragment" />
+  </fragment>
+
+  <!-- prepare send money (scan/paste invoice) -->
+  <fragment
+    android:id="@+id/patch_notes"
+    android:name="fr.acinq.phoenix.startup.PatchNotesFragment"
+    android:label="PatchNotesFragment">
+    <argument
+      android:name="version"
+      app:argType="long" />
   </fragment>
 
 </navigation>

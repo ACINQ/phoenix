@@ -619,4 +619,20 @@
   <string name="ftue__backup_seed__body">A backup phrase is generated, storing all the information needed to recover your Bitcoin funds.\n\nKeep it safe and secret!</string>
   <string name="ftue__backup_seed__button">Get started</string>
 
+  <!-- patch notes -->
+  <string name="patchnotes_title">Phoenix has been updated!</string>
+  <string name="patchnotes_v15"><![CDATA[
+    <h4>Background payment reception</h4>
+    <p>Phoenix is now able to receive payments even if the app is not started.</p>
+
+    <h4>Automatic channel creation</h4>
+    <p>Payment channels will be automatically created for you if needed.</p>
+    <p>This feature is required for the Background payment reception to work properly, but you can disable it if you want (in Settings > Payment settings).</p>
+    <p>The channel creation cost still applies (%1$s%%).</p>
+
+    <h4>Improved wallet lock</h4>
+    <p>The app lock now uses the system\'s lock. No need to remember yet another PIN!</p>
+    <p>The previous PIN code mechanism has been removed. Go to Settings > Security to enroll for the new screen lock feature.</p>
+  ]]></string>
+
 </resources>

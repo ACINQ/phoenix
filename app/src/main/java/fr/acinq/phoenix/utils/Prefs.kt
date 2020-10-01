@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
@@ -63,27 +64,14 @@ object Prefs {
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
   const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
 
+  // -- migration
+  const val PREFS_MIGRATED_FROM = "PREFS_MIGRATED_FROM"
+
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
   const val PREFS_FCM_TOKEN: String = "PREFS_FCM_TOKEN"
-
-  fun getLastVersionUsed(context: Context): Int {
-    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
-  }
-
-  fun setLastVersionUsed(context: Context, version: Int) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
-  }
-
-  fun showFTUE(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_FTUE, true)
-  }
-
-  fun setShowFTUE(context: Context, show: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_FTUE, show).apply()
-  }
 
   // -- ==================================
   // -- authentication with PIN/biometrics
@@ -169,6 +157,39 @@ object Prefs {
   fun setFiatCurrency(context: Context, code: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
   }
+
+  // -- ==================================
+  // -- version, ftue, migration...
+  // -- ==================================
+
+  fun getLastVersionUsed(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
+  }
+
+  fun setLastVersionUsed(context: Context, version: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
+  }
+
+  fun showFTUE(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_FTUE, true)
+  }
+
+  fun setShowFTUE(context: Context, show: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_FTUE, show).apply()
+  }
+
+  fun getMigratedFrom(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_MIGRATED_FROM, 0)
+  }
+
+  @SuppressLint("ApplySharedPref")
+  fun setMigratedFrom(context: Context, code: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_MIGRATED_FROM, code).commit()
+  }
+
+  // -- ==================================
+  // -- other...
+  // -- ==================================
 
   fun getTheme(context: Context): String {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default

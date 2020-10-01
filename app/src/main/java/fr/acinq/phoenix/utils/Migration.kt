@@ -14,29 +14,43 @@
  * limitations under the License.
  */
 
+
+
 package fr.acinq.phoenix.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BuildConfig
 import org.slf4j.LoggerFactory
 
+@Suppress("FunctionName")
 object Migration {
   private val log = LoggerFactory.getLogger(this::class.java)
+
+  val VERSIONS_WITH_NOTABLE_CHANGES = listOf(15)
 
   /** Apply migration scripts when needed. */
   fun doMigration(context: Context) {
     val version = Prefs.getLastVersionUsed(context)
     if (0 < version && version < BuildConfig.VERSION_CODE) {
-      log.info("last installed version: $version is behind current version: ${BuildConfig.VERSION_CODE}, starting migration")
-      disableAutoPayToOpen(context)
-      log.info("end of migration")
+      log.info("previously used version=$version, now using version=${BuildConfig.VERSION_CODE}, starting migration")
+      when {
+        version < 15 -> applyMigration_15(context)
+      }
+      log.info("end of migration from version=$version")
+      Prefs.setMigratedFrom(context, version)
     } else {
-      log.debug("last installed version: $version, no migration needed")
+      log.debug("previously used version=$version, no migration needed")
     }
     Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
+  }
+
+  /** A patch note must be shown if the given version is below at least one version with a notable change*/
+  fun listNotableChangesSince(version: Int): List<Int> {
+    return if (version > 0) {
+      VERSIONS_WITH_NOTABLE_CHANGES.filter { it > version }
+    } else {
+      emptyList()
+    }
   }
 
   // fun applyMigration_XX(context: Context, fromVersion: Int) {
@@ -44,25 +58,7 @@ object Migration {
   //   MigrationPrefs.saveMigrationDone(context, fromVersion, XX)
   // }
 
-  fun disableAutoPayToOpen(context: Context) {
-    log.info("disable auto pay-to-open for existing wallets to preserve expected behaviour")
-    Prefs.setAutoAcceptPayToOpen(context, false)
-  }
-}
-
-object MigrationPrefs {
-  private const val FILE_NAME = "migration_prefs"
-  private const val MIGRATION_CODE = "MIGRATION"
-  private fun getPrefs(context: Context): SharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
-
-  private fun getMigrationKey(fromVersion: Int, versionMigrated: Int) = "${MIGRATION_CODE}_FROM_${fromVersion}_COMPLETED_${versionMigrated}"
-
-  fun isMigrationDone(context: Context, key: String): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(key, false)
-  }
-
-  @SuppressLint("ApplySharedPref")
-  fun saveMigrationDone(context: Context, fromVersion: Int, migrationVersionDone: Int) {
-    getPrefs(context).edit().putBoolean(getMigrationKey(fromVersion, migrationVersionDone), true).commit()
+  private fun applyMigration_15(context: Context) {
+    Prefs.setAutoAcceptPayToOpen(context, true)
   }
 }

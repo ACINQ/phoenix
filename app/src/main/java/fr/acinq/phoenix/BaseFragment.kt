@@ -39,7 +39,7 @@ abstract class BaseFragment(private val stayIfNotStarted: Boolean = false) : Fra
     super.onActivityCreated(savedInstanceState)
     activity?.let {
       app = ViewModelProvider(it).get(AppViewModel::class.java)
-      app.state.observe(viewLifecycleOwner, Observer { state ->
+      app.state.observe(viewLifecycleOwner, { state ->
         handleAppState(state)
       })
     } ?: run {

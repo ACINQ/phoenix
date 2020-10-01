@@ -106,7 +106,11 @@ object Converter {
 
   public fun html(source: String): Spanned {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT)
+      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
     } else {
       Html.fromHtml(source)
     }

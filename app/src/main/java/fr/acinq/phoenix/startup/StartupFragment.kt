@@ -31,15 +31,13 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.phoenix.AppLock
-import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.MainActivity
-import fr.acinq.phoenix.R
+import fr.acinq.phoenix.*
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Migration
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 import fr.acinq.phoenix.utils.crypto.AuthHelper
@@ -168,17 +166,22 @@ class StartupFragment : BaseFragment() {
     if (Prefs.isScreenLocked(context) && AuthHelper.canUseSoftAuth(context) && lockState is AppLock.Locked) {
       log.debug("app is locked")
       AuthHelper.promptSoftAuth(this,
-        onSuccess = { redirectToNext() },
+        onSuccess = { redirectToNext(context) },
         onFailure = { code -> app.lockState.value = AppLock.Locked.AuthFailure(code) })
     } else {
       log.info("app is unlocked, redirect to next screen")
-      redirectToNext()
+      redirectToNext(context)
     }
   }
 
-  private fun redirectToNext() {
+  @Suppress("CascadeIf")
+  private fun redirectToNext(context: Context) {
     val uriIntent = app.currentURIIntent.value
-    if (uriIntent == null) {
+    val migratedFrom = Prefs.getMigratedFrom(context)
+    if (Migration.listNotableChangesSince(migratedFrom).isNotEmpty()) {
+      log.info("user has migrated from version=$migratedFrom, redirecting to patch note screen")
+      findNavController().navigate(StartupFragmentDirections.actionStartupToPatchNote(migratedFrom.toLong()))
+    } else if (uriIntent == null) {
       log.info("redirecting to main screen")
       findNavController().navigate(R.id.action_startup_to_main)
     } else {
