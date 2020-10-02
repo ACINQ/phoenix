@@ -26,6 +26,7 @@ import androidx.navigation.navGraphViewModels
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentPaymentDetailsTechnicalsBinding
+import fr.acinq.phoenix.db.getSpendingTxs
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger

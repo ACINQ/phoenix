@@ -21,6 +21,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.squareup.sqldelight'
 
 def gitCommitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
 
@@ -133,11 +134,8 @@ dependencies {
   def view_pager_version = "1.1.0-alpha01"
   implementation "androidx.viewpager2:viewpager2:$view_pager_version"
 
-  // ANDROIDX - room
-  def room_version = "2.2.5"
-  implementation "androidx.room:room-runtime:$room_version"
-  kapt "androidx.room:room-compiler:$room_version"
-  implementation "androidx.room:room-ktx:$room_version"
+  // SQLDelight
+  implementation "com.squareup.sqldelight:android-driver:1.4.3"
 
   // logging
   implementation 'org.slf4j:slf4j-api:1.7.29'

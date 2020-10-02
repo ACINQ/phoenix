@@ -83,7 +83,7 @@
           android:id="@+id/closing_channel_value"
           style="@style/TechnicalsValueView"
           android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing}"
-          android:text="@{model.paymentMeta.closingChannelId}" />
+          android:text="@{model.paymentMeta.closing_channel_id}" />
 
         <TextView
           android:id="@+id/closing_spending_txs_label"
@@ -108,7 +108,7 @@
           android:id="@+id/swap_out_address_value"
           style="@style/TechnicalsValueView"
           android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut}"
-          android:text="@{model.paymentMeta.swapOutAddress}" />
+          android:text="@{model.paymentMeta.swap_out_address}" />
 
         <TextView
           android:id="@+id/swap_out_feerate_label"
@@ -134,7 +134,7 @@
           android:id="@+id/swap_in_address_value"
           style="@style/TechnicalsValueView"
           android:visibility="@{model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn}"
-          android:text="@{model.paymentMeta.swapInAddress}" />
+          android:text="@{model.paymentMeta.swap_in_address}" />
 
         <!-- regular ln payment data -->
 

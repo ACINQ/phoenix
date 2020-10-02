@@ -17,24 +17,29 @@
 package fr.acinq.phoenix.db
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import fr.acinq.phoenix.Database
 
-@Database(entities = [PaymentMeta::class, PayToOpenMeta::class, NodeMeta::class], version = 1, exportSchema = true)
-public abstract class AppDb : RoomDatabase() {
-  abstract fun paymentMetaDao(): PaymentMetaDao
-  abstract fun payToOpenDao(): PayToOpenMetaDao
-  abstract fun nodeMetaDao(): NodeMetaDao
+object AppDb {
+  @Volatile
+  private var instance: Database? = null
 
-  companion object {
-    @Volatile
-    private var instance: AppDb? = null
+  val ready: Boolean
+    get() = instance != null
 
-    fun getDb(context: Context): AppDb {
-      return instance ?: synchronized(this) {
-        instance ?: Room.databaseBuilder(context.applicationContext, AppDb::class.java, "phoenix_meta_db").build().also { instance = it }
-      }
+  fun getInstance(context: Context): Database {
+    return instance ?: synchronized(this) {
+      instance ?: Database(AndroidSqliteDriver(
+        schema = Database.Schema,
+        context = context,
+        name = "items.db"
+      )).also { instance = it }
     }
   }
 }
+
+
+
+
+
+

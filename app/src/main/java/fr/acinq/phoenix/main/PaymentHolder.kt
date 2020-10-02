@@ -157,15 +157,15 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
   private fun handleDescription(item: PaymentWithMeta, descriptionView: TextView) {
     val defaultTextColor: Int = getAttrColor(R.attr.textColor)
     val mutedTextColor: Int = getAttrColor(R.attr.mutedTextColor)
-    val desc: String? = if (item.meta?.swapInAddress != null ) {
-      item.meta.swapInAddress
-    } else if (item.meta?.swapOutAddress != null) {
-      item.meta.swapOutAddress
+    val desc: String? = if (item.meta?.swap_in_address != null ) {
+      item.meta.swap_in_address
+    } else if (item.meta?.swap_out_address != null) {
+      item.meta.swap_out_address
     } else if (item.payment.paymentRequest().isDefined) {
       PaymentRequest.fastReadDescription(item.payment.paymentRequest().get())
     } else if (item.payment is PlainOutgoingPayment && (item.payment.paymentType() == "ClosingChannel" || (item.payment.externalId().isDefined && item.payment.externalId().get().startsWith("closing-")))) {
-      if (item.meta?.closingMainOutputScript?.isNotBlank() == true) {
-        item.meta.closingMainOutputScript
+      if (item.meta?.closing_main_output_script?.isNotBlank() == true) {
+        item.meta.closing_main_output_script
       } else {
         descriptionView.context.getString(R.string.paymentholder_closing_desc, item.payment.externalId().get().split("-").last())
       }
@@ -173,11 +173,11 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       null
     }
     if (desc.isNullOrBlank()) {
-      if (item.meta?.customDescription.isNullOrBlank()) {
+      if (item.meta?.custom_desc.isNullOrBlank()) {
         descriptionView.text = descriptionView.context.getString(R.string.paymentholder_no_desc)
         descriptionView.setTextColor(mutedTextColor)
       } else {
-        descriptionView.text = item.meta?.customDescription
+        descriptionView.text = item.meta?.custom_desc
         descriptionView.setTextColor(defaultTextColor)
       }
     } else {

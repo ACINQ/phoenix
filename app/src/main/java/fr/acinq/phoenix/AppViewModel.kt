@@ -17,12 +17,10 @@
 package fr.acinq.phoenix
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.lifecycle.*
 import fr.acinq.eclair.db.PlainPayment
-import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
@@ -33,7 +31,9 @@ import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.db.PaymentMeta
 import fr.acinq.phoenix.events.PayToOpenNavigationEvent
 import fr.acinq.phoenix.events.RemovePendingSwapIn
-import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.ServiceDisconnected
+import fr.acinq.phoenix.utils.SingleLiveEvent
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

@@ -50,15 +50,15 @@ class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 /**
  * This actor listens to events dispatched by eclair core.
  */
-class EclairSupervisor(private val appContext: AppContext) : UntypedActor() {
+class EclairSupervisor(appContext: AppContext) : UntypedActor() {
 
   private val paymentMetaRepository: PaymentMetaRepository
   private val payToOpenMetaRepository: PayToOpenMetaRepository
 
   init {
-    val appDb = AppDb.getDb(appContext.applicationContext)
-    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaDao())
-    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenDao())
+    val appDb2 = AppDb.getInstance(appContext.applicationContext)
+    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb2.paymentMetaQueries)
+    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb2.payToOpenMetaQueries)
   }
 
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
@@ -145,12 +145,11 @@ class EclairSupervisor(private val appContext: AppContext) : UntypedActor() {
         payToOpen?.let {
           if (it.decision().trySuccess(true)) {
             payToOpen.payToOpenRequest().amountMsat()
-            payToOpenMetaRepository.insert(PayToOpenMeta(
-              paymentHash = event.paymentHash.toString(),
-              feeSat = payToOpen.payToOpenRequest().feeSatoshis().toLong(),
-              amountSat = payToOpen.payToOpenRequest().amountMsat().truncateToSatoshi().toLong(),
-              capacitySat = payToOpen.payToOpenRequest().fundingSatoshis().toLong(),
-              timestamp = System.currentTimeMillis()))
+            payToOpenMetaRepository.insert(
+              paymentHash = event.paymentHash,
+              fee = payToOpen.payToOpenRequest().feeSatoshis(),
+              amount = payToOpen.payToOpenRequest().amountMsat().truncateToSatoshi(),
+              capacity = payToOpen.payToOpenRequest().fundingSatoshis())
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")

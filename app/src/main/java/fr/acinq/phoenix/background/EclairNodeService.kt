@@ -58,10 +58,9 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.*
-import fr.acinq.phoenix.db.AppDb
 import fr.acinq.phoenix.db.PayToOpenMetaRepository
-import fr.acinq.phoenix.db.PaymentMeta
 import fr.acinq.phoenix.db.PaymentMetaRepository
+import fr.acinq.phoenix.db.AppDb
 import fr.acinq.phoenix.events.*
 import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
@@ -88,7 +87,6 @@ import scodec.bits.ByteVector
 import java.io.IOException
 import java.lang.Runnable
 import java.net.UnknownHostException
-import java.security.GeneralSecurityException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -121,7 +119,7 @@ class EclairNodeService : Service() {
   private lateinit var appContext: AppContext
 
   // repositories for db access
-  private lateinit var appDb: AppDb
+  private lateinit var appDb: Database
   private lateinit var paymentMetaRepository: PaymentMetaRepository
   private lateinit var payToOpenMetaRepository: PayToOpenMetaRepository
 
@@ -164,9 +162,9 @@ class EclairNodeService : Service() {
         })
     }
     appContext = AppContext.getInstance(applicationContext)
-    appDb = AppDb.getDb(applicationContext)
-    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaDao())
-    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenDao())
+    appDb = AppDb.getInstance(applicationContext)
+    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaQueries)
+    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenMetaQueries)
     notificationManager = NotificationManagerCompat.from(this)
     val intent = Intent(this, MainActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -807,16 +805,12 @@ class EclairNodeService : Service() {
           /* payment request */ Option.empty(),
           /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
         nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
-        paymentMetaRepository.insert(PaymentMeta(
-          id = id.toString(),
-          closingSpendingTxs = PaymentMeta.serializeTxs(event.spendingTxs),
-          closingMainOutputScript = event.scriptDestMainOutput,
-          closingChannelId = event.channelId.toString(),
-          closingType = event.closingType.code))
+        paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
         val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
         val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
           ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
         nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+        EventBus.getDefault().post(PaymentPending())
       }
     }
   }
@@ -840,7 +834,7 @@ class EclairNodeService : Service() {
           paymentType = PaymentType.SwapIn())
 
         // 2 - save payment in eclair db, and save additional metadata such as the address
-        paymentMetaRepository.insert(PaymentMeta(id = pr.paymentHash().toString(), swapInAddress = event.bitcoinAddress()))
+        paymentMetaRepository.insertSwapIn(pr.paymentHash().toString(), event.bitcoinAddress())
         nodeParams().db().payments().receiveIncomingPayment(pr.paymentHash(), event.amount(), System.currentTimeMillis())
         log.info("swap-in=$event saved with payment_hash=${pr.paymentHash()}, amount=${pr.amount()}")
 

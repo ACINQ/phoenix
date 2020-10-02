@@ -16,97 +16,46 @@
 
 package fr.acinq.phoenix.db
 
-import androidx.annotation.WorkerThread
-import androidx.room.*
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.eclair.`package$`
 
 
-/**
- * Contain details/metadata that cannot be stored in the core eclair.sqlite payment database,
- * such as the final closing transaction id if the payment is a closing transaction...
- */
-@Entity(tableName = "payment_meta")
-data class PaymentMeta(
-  /** id can be a UUID for outgoing payments or a payment hash for incoming payments */
-  @PrimaryKey @ColumnInfo(name = "id") val id: String,
-  @ColumnInfo(name = "swap_in_address") val swapInAddress: String? = null,
-  @ColumnInfo(name = "swap_in_tx") val swapInTxId: String? = null,
-  @ColumnInfo(name = "swap_out_address") val swapOutAddress: String? = null,
-  @ColumnInfo(name = "swap_out_tx") val swapOutTxId: String? = null,
-  @ColumnInfo(name = "swap_out_feerate_per_byte") val swapOutFeeratePerByte: Long? = null,
-  @ColumnInfo(name = "swap_out_fee_sat") val swapOutFeesSat: Long? = null,
-  @ColumnInfo(name = "swap_out_conf") val swapOutConf: Long? = null,
-  @ColumnInfo(name = "funding_tx") val fundingTxId: String? = null,
-  @ColumnInfo(name = "funding_fee_pct") val fundingFeePct: Double? = null,
-  @ColumnInfo(name = "funding_fee_raw_sat") val fundingFeeRawSat: Long? = null,
-  @ColumnInfo(name = "closing_type") val closingType: Int? = null,
-  @ColumnInfo(name = "closing_channel_id") val closingChannelId: String? = null,
-  @ColumnInfo(name = "closing_spending_txs") val closingSpendingTxs: String? = null,
-  @ColumnInfo(name = "closing_main_output_script") val closingMainOutputScript: String? = null,
-  @ColumnInfo(name = "closing_cause") val closingCause: String? = null,
-  @ColumnInfo(name = "custom_desc") val customDescription: String? = null
-) {
-
-  fun getSpendingTxs(): List<String>? = closingSpendingTxs?.split(";")?.map { it.trim() }
-
-  companion object {
-    fun serializeTxs(list: List<Transaction>): String? {
-      return list.joinToString(";") { it.txid().toString() }.takeIf { it.isNotBlank() }
-    }
-  }
-}
-
-enum class ClosingType(val code: Int) {
+enum class ClosingType(val code: Long) {
   Mutual(0), Local(1), Remote(2), Other(3)
 }
 
-@Dao
-interface PaymentMetaDao {
-  @WorkerThread
-  @Query("SELECT * from payment_meta WHERE id=:id")
-  fun get(id: String): PaymentMeta?
+fun PaymentMeta.getSpendingTxs(): List<String>? = closing_spending_txs?.split(";")?.map { it.trim() }
 
-  @WorkerThread
-  @Query("SELECT * from payment_meta WHERE closing_channel_id=:channelId")
-  fun getByChannelId(channelId: String): PaymentMeta?
+class PaymentMetaRepository private constructor(private val queries: PaymentMetaQueries) {
 
-  @WorkerThread
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(paymentMeta: PaymentMeta)
+  fun get(paymentId: String): PaymentMeta? = queries.get(paymentId).executeAsOneOrNull()
 
-  @WorkerThread
-  @Update
-  fun update(paymentMeta: PaymentMeta)
+  fun insert(paymentId: String) = queries.insertEmpty(paymentId)
 
-  @WorkerThread
-  @Query("UPDATE payment_meta SET custom_desc=:desc WHERE id=:id")
-  fun updateDescription(id: String, desc: String)
-}
+  fun insertClosing(paymentId: String, closingType: ClosingType, closingChannelId: String, closingSpendingTxs: List<Transaction>, closingMainOutput: String?) = queries.insertClosing(
+    id = paymentId,
+    closing_type = closingType.code,
+    closing_channel_id = closingChannelId,
+    closing_spending_txs = closingSpendingTxs.joinToString(";") { it.txid().toString() }.takeIf { it.isNotBlank() },
+    closing_main_output_script = closingMainOutput)
 
-class PaymentMetaRepository private constructor(private val dao: PaymentMetaDao) {
+  fun insertSwapIn(paymentId: String, swapInAddress: String) = queries.insertSwapIn(id = paymentId, swap_in_address = swapInAddress)
 
-  suspend fun get(id: String): PaymentMeta? = dao.get(id)
-  suspend fun update(meta: PaymentMeta) = dao.update(meta)
-  suspend fun insert(meta: PaymentMeta) = dao.insert(meta)
-
-  suspend fun updateDescription(id: String, description: String) {
-    val desc = if (description.isBlank()) null else description
-    return get(id)?.run {
-      update(copy(customDescription = desc))
-    } ?: run {
-      insert(PaymentMeta(id, customDescription = desc))
+  fun setDesc(paymentId: String, description: String) {
+    description.takeIf { !it.isBlank() }.let {
+      get(paymentId) ?: insert(paymentId)
+      queries.setDesc(it, paymentId)
     }
   }
 
   fun setChannelClosingError(channelId: String, message: String?) {
-    dao.getByChannelId(channelId)?.run {
-      dao.update(copy(closingCause = message))
+    queries.getByChannelId(channelId).executeAsOneOrNull()?.run {
+      queries.setChannelClosingError(message, id)
     } ?: run {
-      dao.insert(PaymentMeta(
-        id = Crypto.hash256(`package$`.`MODULE$`.randomBytes32().bytes()).toString(),
-        closingCause = message))
+      val id = Crypto.hash256(`package$`.`MODULE$`.randomBytes32().bytes()).toString()
+      queries.insertEmpty(id)
+      queries.setChannelClosingError(message, id)
     }
   }
 
@@ -114,9 +63,9 @@ class PaymentMetaRepository private constructor(private val dao: PaymentMetaDao)
     @Volatile
     private var instance: PaymentMetaRepository? = null
 
-    fun getInstance(dao: PaymentMetaDao) =
+    fun getInstance(queries: PaymentMetaQueries) =
       instance ?: synchronized(this) {
-        instance ?: PaymentMetaRepository(dao).also { instance = it }
+        instance ?: PaymentMetaRepository(queries).also { instance = it }
       }
   }
 }

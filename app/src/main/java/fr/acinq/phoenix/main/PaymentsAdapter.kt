@@ -71,7 +71,7 @@ class PaymentsAdapter : RecyclerView.Adapter<PaymentHolder>() {
       }
 
       override fun areContentsTheSame(oldItem: PaymentWithMeta, newItem: PaymentWithMeta): Boolean {
-        val sameCustomDesc = oldItem.meta?.customDescription == newItem.meta?.customDescription
+        val sameCustomDesc = oldItem.meta?.custom_desc == newItem.meta?.custom_desc
         return if (oldItem.payment is PlainOutgoingPayment && newItem.payment is PlainOutgoingPayment) {
           val sameAmount = (oldItem.payment.finalAmount().isDefined && newItem.payment.finalAmount().isDefined && oldItem.payment.finalAmount().get().toLong() == newItem.payment.finalAmount().get().toLong())
             || (oldItem.payment.finalAmount().isEmpty && newItem.payment.finalAmount().isEmpty)

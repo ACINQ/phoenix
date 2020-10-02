@@ -293,7 +293,7 @@
               android:id="@+id/desc_value"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:visibility="@{model.description != null || model.paymentMeta.customDescription == null}"
+              android:visibility="@{model.description != null || model.paymentMeta.custom_desc == null}"
               android:text="@{model.description == null ? @string/paymentdetails_no_description : model.description}"
               app:isItalic="@{model.description == null}"
               app:layout_constraintTop_toTopOf="parent" />
@@ -302,7 +302,7 @@
               android:id="@+id/desc_separator"
               style="@style/HSeparator"
               android:layout_marginTop="@dimen/space_xs"
-              android:visibility="@{model.paymentMeta.customDescription != null &amp;&amp; model.description != null}"
+              android:visibility="@{model.paymentMeta.custom_desc != null &amp;&amp; model.description != null}"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintTop_toBottomOf="@id/desc_value" />
 
@@ -312,8 +312,8 @@
               android:layout_height="wrap_content"
               android:layout_marginTop="@dimen/space_xs"
               android:clickable="true"
-              android:visibility="@{model.paymentMeta.customDescription != null}"
-              android:text="@{model.paymentMeta.customDescription}"
+              android:visibility="@{model.paymentMeta.custom_desc != null}"
+              android:text="@{model.paymentMeta.custom_desc}"
               android:focusable="true"
               app:layout_constraintTop_toBottomOf="@id/desc_separator"
               app:layout_goneMarginTop="0dp" />

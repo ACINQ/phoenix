@@ -17,53 +17,29 @@
 package fr.acinq.phoenix.db
 
 import androidx.annotation.WorkerThread
-import androidx.room.*
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Satoshi
 
-/**
- * Stores accepted pay to open requests. Let the app know when a incoming payment was received by opening a new channel.
- * Note that the payment hash is a primary key for `received_payments` in the core `eclair.sqlite` db.
- *
- * A line is created
- */
-@Entity(tableName = "pay_to_open_meta")
-data class PayToOpenMeta(
-  @PrimaryKey(autoGenerate = true) val id: Long,
-  @ColumnInfo(name = "payment_hash") val paymentHash: String,
-  @ColumnInfo(name = "fee_sat") val feeSat: Long,
-  @ColumnInfo(name = "amount_sat") val amountSat: Long,
-  @ColumnInfo(name = "capacity_sat") val capacitySat: Long,
-  @ColumnInfo(name = "timestamp") val timestamp: Long
-) {
-  constructor(paymentHash: String, feeSat: Long, amountSat: Long, capacitySat: Long, timestamp: Long)
-    : this(0, paymentHash, feeSat, amountSat, capacitySat, timestamp)
-}
-
-@Dao
-interface PayToOpenMetaDao {
-  @WorkerThread
-  @Query("SELECT * from pay_to_open_meta WHERE payment_hash=:paymentHash")
-  fun get(paymentHash: String): PayToOpenMeta?
+class PayToOpenMetaRepository private constructor(private val queries: PayToOpenMetaQueries) {
 
   @WorkerThread
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(meta: PayToOpenMeta)
-}
-
-class PayToOpenMetaRepository private constructor(private val dao: PayToOpenMetaDao) {
+  fun get(paymentHash: String): PayToOpenMeta? = queries.get(paymentHash).executeAsOneOrNull()
 
   @WorkerThread
-  fun insert(meta: PayToOpenMeta) = dao.insert(meta)
-
-  @WorkerThread
-  fun get(paymentHash: String): PayToOpenMeta? = dao.get(paymentHash)
+  fun insert(paymentHash: ByteVector32, fee: Satoshi, amount: Satoshi, capacity: Satoshi) = queries.insert(
+    payment_hash = paymentHash.toString(),
+    fee_sat = fee.toLong(),
+    amount_sat = amount.toLong(),
+    capacity_sat = capacity.toLong(),
+    timestamp = System.currentTimeMillis())
 
   companion object {
     @Volatile
     private var instance: PayToOpenMetaRepository? = null
 
-    fun getInstance(dao: PayToOpenMetaDao) =
+    fun getInstance(queries: PayToOpenMetaQueries) =
       instance ?: synchronized(this) {
-        instance ?: PayToOpenMetaRepository(dao).also { instance = it }
+        instance ?: PayToOpenMetaRepository(queries).also { instance = it }
       }
   }
 }

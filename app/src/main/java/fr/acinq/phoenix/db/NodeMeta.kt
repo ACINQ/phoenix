@@ -17,8 +17,6 @@
 package fr.acinq.phoenix.db
 
 import android.text.format.DateUtils
-import androidx.annotation.WorkerThread
-import androidx.room.*
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Wallet
 import okhttp3.Request
@@ -27,46 +25,24 @@ import org.slf4j.LoggerFactory
 import kotlin.math.abs
 
 
-@Entity(tableName = "node_meta")
-data class NodeMeta(
-  @PrimaryKey @ColumnInfo(name = "pub_key") val pub_key: String,
-  @ColumnInfo(name = "alias") val alias: String,
-  @ColumnInfo(name = "update_timestamp") val timestamp: Long,
-  @ColumnInfo(name = "custom_alias") val customAlias: String? = null
-)
-
-@Dao
-interface NodeMetaDao {
-  @WorkerThread
-  @Query("SELECT * from node_meta WHERE pub_key=:id")
-  fun get(id: String): NodeMeta?
-
-  @WorkerThread
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(data: NodeMeta)
-}
-
-class NodeMetaRepository private constructor(private val dao: NodeMetaDao) {
+class NodeMetaRepository private constructor(private val queries: NodeMetaQueries) {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  /** Get the node metadata from db. If meta is too old (15 days) or does not exist, query 1ML and add to DB. */
-  @WorkerThread
-  suspend fun get(id: String): NodeMeta? {
-    val nodeMeta = dao.get(id)
-    return if (nodeMeta == null || abs(System.currentTimeMillis() - nodeMeta.timestamp) > DateUtils.DAY_IN_MILLIS * 15) {
+  fun get(pubKey: String): NodeMeta? {
+    val nodeMeta = queries.get(pubKey).executeAsOneOrNull()
+    return if (nodeMeta == null || abs(System.currentTimeMillis() - nodeMeta.update_timestamp) > DateUtils.DAY_IN_MILLIS * 15) {
       Wallet.httpClient.newCall(
-        Request.Builder().url("${Constants.ONEML_URL}/node/$id/json").build()
+        Request.Builder().url("${Constants.ONEML_URL}/node/$pubKey/json").build()
       ).execute().run {
         val body = body()
         if (!isSuccessful || body == null) {
           null
         } else {
           val alias = JSONObject(body.string()).getString("alias")
-          val meta = NodeMeta(id, alias, System.currentTimeMillis())
-          log.debug("got 1ML meta=$meta")
-          insert(meta)
+          log.debug("got 1ML alias=$alias for id=$pubKey")
+          queries.insert(pubKey, alias, System.currentTimeMillis())
           body.close()
-          meta
+          queries.get(pubKey).executeAsOneOrNull()
         }
       }
     } else {
@@ -74,15 +50,13 @@ class NodeMetaRepository private constructor(private val dao: NodeMetaDao) {
     }
   }
 
-  suspend fun insert(meta: NodeMeta) = dao.insert(meta)
-
   companion object {
     @Volatile
     private var instance: NodeMetaRepository? = null
 
-    fun getInstance(dao: NodeMetaDao) =
+    fun getInstance(queries: NodeMetaQueries) =
       instance ?: synchronized(this) {
-        instance ?: NodeMetaRepository(dao).also { instance = it }
+        instance ?: NodeMetaRepository(queries).also { instance = it }
       }
   }
 }

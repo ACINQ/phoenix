@@ -38,7 +38,6 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSendBinding
 import fr.acinq.phoenix.db.AppDb
-import fr.acinq.phoenix.db.PaymentMeta
 import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -283,11 +282,11 @@ class SendFragment : BaseFragment() {
         subtractFee = model.useMaxBalance.value ?: false)
       if (uuid != null) {
         context?.let {
-          AppDb.getDb(it).paymentMetaDao().insert(PaymentMeta(id = uuid.toString(),
-            swapOutAddress = swapOutData.uri.address,
-            swapOutFeeratePerByte = swapOutData.feeratePerByte,
-            swapOutFeesSat = swapOutData.fee.toLong()
-          ))
+          AppDb.getInstance(it.applicationContext).paymentMetaQueries.insertSwapOut(id = uuid.toString(),
+            swap_out_address = swapOutData.uri.address,
+            swap_out_feerate_per_byte = swapOutData.feeratePerByte,
+            swap_out_fee_sat = swapOutData.fee.toLong()
+          )
         }
       }
       findNavController().navigate(R.id.action_send_to_main)
