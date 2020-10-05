@@ -47,6 +47,12 @@ object BindingHelpers {
     view.visibility = if (isVisible) View.VISIBLE else View.GONE
   }
 
+  @BindingAdapter("hide")
+  @JvmStatic
+  fun hide(view: View, isHidden: Boolean) {
+    view.visibility = if (isHidden) View.INVISIBLE else View.VISIBLE
+  }
+
   @BindingAdapter("isItalic")
   @JvmStatic
   fun setItalic(view: TextView, isItalic: Boolean) {

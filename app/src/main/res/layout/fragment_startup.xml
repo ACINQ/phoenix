@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <data>
 
@@ -31,8 +30,7 @@
   <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:context=".startup.StartupFragment">
+    android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
@@ -45,6 +43,7 @@
         android:layout_height="120dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_phoenix"
+        app:hide="@{appModel.lockState instanceof AppLock.Locked.AuthFailure}"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,10 +56,12 @@
         android:background="@drawable/rounded"
         android:padding="@dimen/space_md_p"
         android:visibility="@{appModel.state instanceof KitState.Error}"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="@dimen/max_width_md">
 
         <TextView
           android:id="@+id/error_message"
@@ -114,6 +115,7 @@
         android:id="@+id/binding_service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="@dimen/space_sm"
         android:visibility="@{appModel.state instanceof KitState.Disconnected}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -124,6 +126,7 @@
         android:id="@+id/starting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="@dimen/space_sm"
         android:visibility="@{appModel.state instanceof KitState.Bootstrap.Init || appModel.state instanceof KitState.Bootstrap.Node}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -146,6 +149,7 @@
         android:id="@+id/starting_tor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="@dimen/space_sm"
         android:layout_marginStart="@dimen/space_xs"
         android:visibility="@{appModel.state instanceof KitState.Bootstrap.Tor}"
         android:text="@string/startup_wait_tor"
@@ -158,12 +162,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded"
-        android:visibility="@{!(appModel.state instanceof KitState.Disconnected) &amp;&amp; appModel.lockState instanceof AppLock.Locked}"
+        android:visibility="@{!(appModel.state instanceof KitState.Disconnected) &amp;&amp; (appModel.lockState instanceof AppLock.Locked.Default || appModel.lockState instanceof AppLock.Locked.AuthFailure)}"
         android:padding="@dimen/space_md_p"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/space_md"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/unlock_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="@dimen/max_width_md">
 
         <TextView
@@ -175,22 +180,23 @@
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/unlock_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_lg"
-          android:background="@drawable/button_bg_primary_border"
-          app:icon="@drawable/ic_shield"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/authentication_message"
-          app:layout_goneMarginTop="0dp"
-          app:text="@string/startup_unlock_button" />
-
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintWidth_max="@dimen/max_width_md" />
       </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/unlock_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg_primary_border"
+        android:visibility="@{!(appModel.state instanceof KitState.Disconnected) &amp;&amp; appModel.lockState instanceof AppLock.Locked}"
+        app:icon="@drawable/ic_shield"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon"
+        app:layout_goneMarginTop="0dp"
+        app:text="@string/startup_unlock_button" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>
