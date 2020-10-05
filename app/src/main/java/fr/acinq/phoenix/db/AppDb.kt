@@ -32,7 +32,7 @@ object AppDb {
       instance ?: Database(AndroidSqliteDriver(
         schema = Database.Schema,
         context = context,
-        name = "items.db"
+        name = "phoenix-meta.db"
       )).also { instance = it }
     }
   }
