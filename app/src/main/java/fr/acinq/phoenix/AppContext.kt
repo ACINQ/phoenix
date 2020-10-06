@@ -28,7 +28,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.phoenix.events.BalanceEvent
+import fr.acinq.phoenix.background.BalanceEvent
 import fr.acinq.phoenix.main.InAppNotifications
 import fr.acinq.phoenix.utils.*
 import okhttp3.Call

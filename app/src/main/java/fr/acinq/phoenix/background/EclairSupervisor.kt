@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.events
+package fr.acinq.phoenix.background
 
 import akka.actor.UntypedActor
 import fr.acinq.bitcoin.Base58Check

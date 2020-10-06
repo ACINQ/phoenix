@@ -61,8 +61,6 @@ import fr.acinq.phoenix.*
 import fr.acinq.phoenix.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.db.PaymentMetaRepository
 import fr.acinq.phoenix.db.AppDb
-import fr.acinq.phoenix.events.*
-import fr.acinq.phoenix.events.PayToOpenResponse
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.utils.crypto.SeedManager

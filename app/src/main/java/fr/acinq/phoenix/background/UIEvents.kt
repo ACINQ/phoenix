@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.events
+package fr.acinq.phoenix.background
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Transaction

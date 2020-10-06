@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -43,8 +42,8 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentMainBinding
-import fr.acinq.phoenix.events.ChannelStateChange
-import fr.acinq.phoenix.events.PaymentPending
+import fr.acinq.phoenix.background.ChannelStateChange
+import fr.acinq.phoenix.background.PaymentPending
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs

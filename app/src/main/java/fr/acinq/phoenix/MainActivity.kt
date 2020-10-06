@@ -27,7 +27,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -37,7 +36,7 @@ import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.ActivityMainBinding
-import fr.acinq.phoenix.events.PayToOpenNavigationEvent
+import fr.acinq.phoenix.background.PayToOpenNavigationEvent
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
