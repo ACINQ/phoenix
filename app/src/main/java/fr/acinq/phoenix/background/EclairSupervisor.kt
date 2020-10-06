@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.background
 
 import akka.actor.UntypedActor
+import android.content.Context
 import fr.acinq.bitcoin.Base58Check
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Script
@@ -35,7 +36,6 @@ import fr.acinq.eclair.wire.SwapInConfirmed
 import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
-import fr.acinq.phoenix.AppContext
 import fr.acinq.phoenix.db.*
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Wallet
@@ -50,15 +50,15 @@ class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 /**
  * This actor listens to events dispatched by eclair core.
  */
-class EclairSupervisor(appContext: AppContext) : UntypedActor() {
+class EclairSupervisor(applicationContext: Context) : UntypedActor() {
 
   private val paymentMetaRepository: PaymentMetaRepository
   private val payToOpenMetaRepository: PayToOpenMetaRepository
 
   init {
-    val appDb2 = AppDb.getInstance(appContext.applicationContext)
-    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb2.paymentMetaQueries)
-    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb2.payToOpenMetaQueries)
+    val appDb = AppDb.getInstance(applicationContext)
+    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaQueries)
+    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenMetaQueries)
   }
 
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)

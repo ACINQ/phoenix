@@ -58,9 +58,9 @@ import fr.acinq.eclair.payment.relay.Relayer
 import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.*
+import fr.acinq.phoenix.db.AppDb
 import fr.acinq.phoenix.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.db.PaymentMetaRepository
-import fr.acinq.phoenix.db.AppDb
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.utils.crypto.SeedManager
@@ -103,18 +103,23 @@ import scala.collection.immutable.List as ScalaList
  * whenever the GUI stops.
  */
 class EclairNodeService : Service() {
+
+  companion object {
+    const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_REASON"
+  }
+
   private val log = LoggerFactory.getLogger(this::class.java)
   private val serviceScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
   private lateinit var notificationManager: NotificationManagerCompat
   private val notificationBuilder = NotificationCompat.Builder(this, Constants.NOTIF_CHANNEL_ID__HEADLESS)
   private val binder = NodeBinder()
+  private lateinit var appContext: AppContext
+  private var spawnReason: String? = null
 
   /** True if the service is running headless (that is without a GUI) and as such should show a notification. */
   @Volatile
   private var isHeadless = true
   private val receivedInBackground: MutableLiveData<List<MilliSatoshi>> = MutableLiveData(emptyList())
-
-  private lateinit var appContext: AppContext
 
   // repositories for db access
   private lateinit var appDb: Database
@@ -164,9 +169,8 @@ class EclairNodeService : Service() {
     paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaQueries)
     payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenMetaQueries)
     notificationManager = NotificationManagerCompat.from(this)
-    val intent = Intent(this, MainActivity::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-    notificationBuilder.setSmallIcon(R.drawable.ic_phoenix)
+    val intent = Intent(this, MainActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) }
+    notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif__headless_title__default))
       .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
@@ -178,6 +182,7 @@ class EclairNodeService : Service() {
     // UI is binding to the service. The service is not headless anymore and we can remove the notification.
     isHeadless = false
     stopForeground(STOP_FOREGROUND_REMOVE)
+    notificationManager.cancel(Constants.NOTIF_ID__HEADLESS)
     return binder
   }
 
@@ -205,6 +210,7 @@ class EclairNodeService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
     log.info("start service from intent [ intent=$intent, flag=$flags, startId=$startId ]")
+    val reason = intent?.getStringExtra(EXTRA_REASON)?.also { spawnReason = it }
     val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))
     when {
       state.value is KitState.Started -> {
@@ -220,12 +226,20 @@ class EclairNodeService : Service() {
           }
         } catch (e: Exception) {
           log.info("failed to read encrypted seed=${encryptedSeed.name()}: ", e)
-          notifyForegroundService(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__app_locked))
+          if (reason == "IncomingPayment") {
+            notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
+          } else {
+            notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
+          }
         }
       }
       else -> {
         log.info("unhandled incoming payment with seed=${encryptedSeed?.name()}")
-        notifyForegroundService(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__app_locked))
+        if (reason == "IncomingPayment") {
+          notifyForegroundService(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__app_locked))
+        } else {
+          notifyForegroundService(getString(R.string.notif__headless_title__missed_fulfill), getString(R.string.notif__headless_message__pending_fulfill))
+        }
       }
     }
     shutdownHandler.removeCallbacksAndMessages(null)
@@ -398,7 +412,7 @@ class EclairNodeService : Service() {
       log.info("added ACINQ to peer database")
     }
 
-    val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(appContext) }, "EclairSupervisor")
+    val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(applicationContext) }, "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)
@@ -856,13 +870,13 @@ class EclairNodeService : Service() {
     } else {
       if (isHeadless) {
         log.info("automatically rejecting pay-to-open=$event")
-        updateNotification(getString(R.string.notif__headless_title__missed), getString(R.string.notif__headless_message__manual_pay_to_open))
+        updateNotification(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__manual_pay_to_open))
         rejectPayToOpen(event.payToOpenRequest().paymentHash())
       } else {
         EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
         if (!appContext.isAppVisible) {
           notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
-            .setSmallIcon(R.drawable.ic_phoenix)
+            .setSmallIcon(R.drawable.ic_phoenix_outline)
             .setContentTitle(getString(R.string.notif_pay_to_open_title))
             .setContentText(getString(R.string.notif_pay_to_open_message))
             .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__CHANNELS_WATCHER,

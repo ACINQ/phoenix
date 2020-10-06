@@ -85,8 +85,8 @@ class StartupFragment : BaseFragment() {
     app.lockState.observe(viewLifecycleOwner, { lockState ->
       when (lockState) {
         is AppLock.Locked.AuthFailure -> {
-          mBinding.authenticationMessage.text = lockState.code?.let {
-            getString(R.string.startup_error_auth_failed_with_details, AuthHelper.translateAuthState(requireContext(), it))
+          mBinding.authenticationMessage.text = context?.let { AuthHelper.translateAuthState(it, lockState.code) }?.let {
+            getString(R.string.startup_error_auth_failed_with_details, it)
           } ?: getString(R.string.startup_error_auth_failed)
           Handler().postDelayed({
             val lock = app.lockState.value

@@ -143,7 +143,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
     val title = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_title)
     val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_message else R.string.notif_watcher_connection_message)
     val builder = NotificationCompat.Builder(context, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
-      .setSmallIcon(R.drawable.ic_phoenix)
+      .setSmallIcon(R.drawable.ic_phoenix_outline)
       .setContentTitle(title)
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
