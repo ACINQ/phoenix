@@ -34,6 +34,7 @@ object Constants {
   const val PRICE_RATE_API = "https://blockchain.info/ticker"
   const val MXN_PRICE_RATE_API = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
   val ONEML_URL = if (Wallet.isMainnet()) "https://1ml.com" else "https://1ml.com/testnet"
+  val MEMPOOLSPACE_EXPLORER_URL = if (Wallet.isMainnet()) "https://mempool.space" else "https://mempool.space/testnet"
   val BLOCKSTREAM_EXPLORER_URL = if (Wallet.isMainnet()) "https://blockstream.info" else "https://blockstream.info/testnet"
   val BLOCKSTREAM_EXPLORER_API = "$BLOCKSTREAM_EXPLORER_URL/api"
 

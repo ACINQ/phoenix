@@ -152,7 +152,7 @@ class PaymentDetailsFragment : BaseFragment() {
     mBinding.showTechnicalsButton.setOnClickListener { findNavController().navigate(R.id.action_payment_details_to_payment_details_technicals) }
     mBinding.onchainAddressExplorerButton.setOnClickListener {
       model.onchainAddress.value?.let {
-        val uri = "${Constants.BLOCKSTREAM_EXPLORER_URL}/address/$it"
+        val uri = "${Prefs.getExplorer(context)}/address/$it"
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
       }
     }

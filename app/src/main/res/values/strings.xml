@@ -510,6 +510,7 @@
   <string name="prefs_display_coin_label">Bitcoin unit</string>
   <string name="prefs_display_fiat_label">Fiat currency</string>
   <string name="prefs_display_theme_label">Application theme</string>
+  <string name="prefs_display_explorer_label">Onchain explorer</string>
 
   <!-- //////////////// electrum server //////////////// -->
 

@@ -38,6 +38,7 @@ object Prefs {
   const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
+  const val PREFS_EXPLORER: String = "PREFS_EXPLORER"
 
   // -- authentication with PIN/biometrics
   const val PREFS_SCREEN_LOCK: String = "PREFS_SCREEN_LOCK_ENABLED"
@@ -156,6 +157,14 @@ object Prefs {
 
   fun setFiatCurrency(context: Context, code: String) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
+  }
+
+  fun getExplorer(context: Context?): String {
+    val pref = context?.let { PreferenceManager.getDefaultSharedPreferences(it).getString(PREFS_EXPLORER, null) }
+    return when {
+      "Blockstream.info".equals(pref, ignoreCase = true) -> Constants.BLOCKSTREAM_EXPLORER_URL
+      else -> Constants.MEMPOOLSPACE_EXPLORER_URL
+    }
   }
 
   // -- ==================================

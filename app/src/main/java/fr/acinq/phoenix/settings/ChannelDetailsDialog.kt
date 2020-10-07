@@ -36,6 +36,7 @@ import fr.acinq.phoenix.AppViewModel
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsChannelDetailsBinding
 import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Prefs
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,7 +102,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }
 
     mBinding.fundingTxButton.setOnClickListener {
-      val uri = "${Constants.BLOCKSTREAM_EXPLORER_URL}/tx/${model.fundingTxId.value}"
+      val uri = "${Prefs.getExplorer(context)}/tx/${model.fundingTxId.value}"
       startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
     }
 

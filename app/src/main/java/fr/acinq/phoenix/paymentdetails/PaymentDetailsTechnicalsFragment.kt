@@ -29,6 +29,7 @@ import fr.acinq.phoenix.databinding.FragmentPaymentDetailsTechnicalsBinding
 import fr.acinq.phoenix.db.getSpendingTxs
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -53,7 +54,7 @@ class PaymentDetailsTechnicalsFragment : BaseFragment() {
     mBinding.closingSpendingTxsValue.movementMethod = LinkMovementMethod.getInstance()
     model.paymentMeta.observe(viewLifecycleOwner) { meta ->
       meta?.getSpendingTxs()?.ifEmpty { null }?.map { tx ->
-        "<a href=\"${Constants.BLOCKSTREAM_EXPLORER_URL}/tx/$tx\">$tx</a>"
+        "<a href=\"${Prefs.getExplorer(context)}/tx/$tx\">$tx</a>"
       }?.joinToString("<br /><br />")?.run {
         mBinding.closingSpendingTxsValue.text = Converter.html(this)
       }

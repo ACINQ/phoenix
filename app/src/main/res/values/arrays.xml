@@ -88,4 +88,12 @@
     <item>dark</item>
     <item>default</item>
   </string-array>
+  <string-array name="explorer_labels">
+    <item>Mempool.space</item>
+    <item>Blockstream.info</item>
+  </string-array>
+  <string-array name="explorer_values">
+    <item>Mempool.space</item>
+    <item>Blockstream.info</item>
+  </string-array>
 </resources>
