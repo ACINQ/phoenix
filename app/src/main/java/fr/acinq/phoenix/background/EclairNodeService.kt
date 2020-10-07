@@ -160,7 +160,6 @@ class EclairNodeService : Service() {
           log.debug("retrieved fcm token")
           task.result?.token?.let { token ->
             Prefs.saveFCMToken(applicationContext, token)
-            handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), token))
           }
         })
     }
@@ -215,7 +214,7 @@ class EclairNodeService : Service() {
     when {
       state.value is KitState.Started -> {
         notifyForegroundService(getString(R.string.notif__headless_title__default), null)
-        connectToPeer()
+        connectToPeerIfNeeded()
       }
       encryptedSeed is EncryptedSeed.V2.NoAuth -> {
         try {
@@ -754,7 +753,7 @@ class EclairNodeService : Service() {
   }
 
   /** Send a reconnect event to the ACINQ node. */
-  private fun connectToPeer() {
+  private fun connectToPeerIfNeeded() {
     serviceScope.launch(Dispatchers.Default) {
       kit?.run {
         if (!isConnectedToPeer()) {
@@ -773,18 +772,20 @@ class EclairNodeService : Service() {
     ).asJava().any { it.state().equals("CONNECTED", true) }
   } ?: false
 
+  /** Prevents spamming the peer */
+  private var hasRefreshedFCMToken = false
+
   fun refreshPeerConnectionState() {
     serviceScope.launch(Dispatchers.Default) {
-      val isConnected = isConnectedToPeer()
-      log.debug("peer connection ? $isConnected")
-      peerConn.postValue(isConnected)
-      if (isConnected) {
-        if (!hasRegisteredFCMToken) {
-          Prefs.getFCMToken(applicationContext)?.let { handleEvent(Peer.SendFCMToken(Wallet.ACINQ.nodeId(), it)) }
-          hasRegisteredFCMToken = true
+      isConnectedToPeer().also {
+        log.debug("peer connection ? $it")
+        peerConn.postValue(it)
+        if (it && !hasRefreshedFCMToken) {
+          Prefs.getFCMToken(applicationContext)?.let { token ->
+            refreshFCMToken(token)
+            hasRefreshedFCMToken = true
+          }
         }
-      } else {
-        connectToPeer()
       }
     }
   }
@@ -888,16 +889,25 @@ class EclairNodeService : Service() {
     }
   }
 
-  /** Prevents spamming the peer */
-  @Volatile
-  private var hasRegisteredFCMToken = false
-
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: Peer.SendFCMToken) {
+  fun handleEvent(event: FCMToken) {
+    refreshFCMToken(event.token)
+  }
+
+  /** Set or unset the FCM token with the peer, depending on the encrypted seed type. */
+  fun refreshFCMToken(token: String?) {
     kit?.run {
-      log.info("registering token=${event.token()} with node=${event.nodeId()}")
-      switchboard().tell(event, ActorRef.noSender())
-    } ?: log.debug("could not register fcm token because kit is not ready yet")
+      when(SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))) {
+        is EncryptedSeed.V2.NoAuth -> {
+          log.info("registering fcm token=$token with node=${Wallet.ACINQ.nodeId()}")
+          token?.let { switchboard().tell(Peer.SendSetFCMToken(Wallet.ACINQ.nodeId(), it), ActorRef.noSender()) }
+        }
+        else -> {
+          log.info("unregistering fcm token from node=${Wallet.ACINQ.nodeId()}")
+          switchboard().tell(Peer.SendUnsetFCMToken(Wallet.ACINQ.nodeId()), ActorRef.noSender())
+        }
+      }
+    } ?: log.info("could not refresh fcm token because kit is not ready yet")
   }
 
   // =========================================================== //

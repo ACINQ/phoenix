@@ -35,3 +35,5 @@ object PeerConnectionChange
 class RemovePendingSwapIn(val address: String)
 
 class PayToOpenNavigationEvent(val payToOpen: PayToOpenRequest)
+
+data class FCMToken(val token: String)

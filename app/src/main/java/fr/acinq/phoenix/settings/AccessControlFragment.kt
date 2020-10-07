@@ -158,6 +158,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
               EncryptedSeed.V2.WithAuth.encrypt(this, crypto!!.cipher!!)
             }.run {
               SeedManager.writeSeedToDisk(Wallet.getDatadir(ctx), this)
+              Prefs.getFCMToken(ctx)?.let { app.service?.refreshFCMToken(it) }
               model.updateLockState(ctx)
             }
           }
@@ -196,6 +197,7 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
             EncryptedSeed.V2.NoAuth.encrypt(this)
           }.run {
             SeedManager.writeSeedToDisk(Wallet.getDatadir(context), this)
+            Prefs.getFCMToken(context)?.let { app.service?.refreshFCMToken(it) }
             model.updateLockState(context)
           }
         }
