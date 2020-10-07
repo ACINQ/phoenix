@@ -420,11 +420,15 @@
     android:name="fr.acinq.phoenix.settings.DisplaySeedFragment"
     android:label="DisplaySeedFragment" />
 
-  <!-- settings: wallet access (pin,...) -->
+  <!-- settings: wallet access control (screen lock,...) -->
   <fragment
     android:id="@+id/access_control"
     android:name="fr.acinq.phoenix.settings.AccessControlFragment"
-    android:label="access_control" />
+    android:label="access_control">
+    <action
+      android:id="@+id/action_access_control_to_display_seed"
+      app:destination="@id/display_seed" />
+  </fragment>
 
   <!-- settings: change display settings (theme, currency...) -->
   <fragment

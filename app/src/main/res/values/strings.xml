@@ -463,8 +463,9 @@
 
   <string name="accessctrl_screen_lock_switch">Screen lock</string>
   <string name="accessctrl_screen_lock_switch_desc">Lock access to the app with Android\'s screen lock/fingerprint</string>
-  <string name="accessctrl_full_lock_switch_unavailable">Enroll a fingerprint in Android to enable additional security features.</string>
-  <string name="accessctrl_full_lock_switch_backup_required">Please confirm you\'ve backed up your seed to enable additional security features.</string>
+  <string name="accessctrl_full_lock_switch_unavailable">Enroll a fingerprint in Android for additional security features.</string>
+  <string name="accessctrl_full_lock_switch_backup_required">Confirm that you\'ve backed up your recovery phrase for additional security features.</string>
+  <string name="accessctrl_full_lock_switch_backup_required_button">Access my recovery phrase</string>
   <string name="accessctrl_full_lock_switch">Prevent background execution</string>
   <string name="accessctrl_full_lock_switch_desc">App requires manual user unlock to run. Background payment reception is therefore not possible.\n\nOnly fingerprint authentication is supported.</string>
   <string name="accessctrl_full_lock_confirm_title">Notice</string>

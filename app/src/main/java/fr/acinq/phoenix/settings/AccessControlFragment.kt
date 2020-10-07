@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
@@ -113,6 +114,10 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
           }
         }
       }
+    }
+
+    mBinding.backupRequiredButton.setOnClickListener {
+      findNavController().navigate(R.id.action_access_control_to_display_seed)
     }
   }
 
