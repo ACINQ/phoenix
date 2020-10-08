@@ -121,16 +121,18 @@ object Wallet {
    * If the string cannot be read, throws an exception.
    */
   fun parseLNObject(input: String): Any {
-    val invoice = cleanUpInvoice(input)
     return try {
-      PaymentRequest.read(invoice)
+      PaymentRequest.read(input.apply {
+        if (startsWith("lightning://", true)) drop(12)
+        else if (startsWith("lightning:", true)) drop(10)
+      })
     } catch (e1: Exception) {
       try {
-        BitcoinURI(invoice)
+        BitcoinURI(input)
       } catch (e2: Exception) {
         try {
           // this can take some time since a HTTP request may be done
-          LNUrl.extractLNUrl(invoice)
+          LNUrl.extractLNUrl(input)
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")

@@ -262,15 +262,8 @@ class AppViewModel : ViewModel() {
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PeerConnected) {
-    log.debug("received peer connected $event")
-    peerConn.value = true
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun handleEvent(event: PeerDisconnected) {
-    log.debug("received peer disconnected $event")
-    peerConn.value = false
+  fun handleEvent(event: PeerConnectionChange) {
+    refreshPeerConnectionState()
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -299,6 +292,19 @@ class AppViewModel : ViewModel() {
       val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
         ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
       nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+    }
+  }
+
+  fun refreshPeerConnectionState() {
+    viewModelScope.launch(Dispatchers.Default) {
+      val isConnected = api?.run {
+         JavaConverters.asJavaIterableConverter(
+           Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+         ).asJava()
+           .any { it.state().equals("CONNECTED", true) }
+      } ?: false
+      log.info("peer connection ? $isConnected")
+      peerConn.postValue(isConnected)
     }
   }
 
@@ -571,17 +577,16 @@ class AppViewModel : ViewModel() {
 
   @WorkerThread
   private fun handleClosingResult(result: scala.collection.immutable.Map<Either<ByteVector32, ShortChannelId>, Either<Throwable, ChannelCommandResponse>>): Int {
-    // read the result
     val iterator = result.iterator()
     var successfullyClosed = 0
     while (iterator.hasNext()) {
       val res = iterator.next()
       val outcome = res._2
       if (outcome.isRight) {
-        log.info("successfully forced closed channel=${res._1}")
+        log.info("successfully closed channel=${res._1}")
         successfullyClosed++
       } else {
-        log.info("failed to force close channel=${res._1}: ", outcome.left() as Throwable)
+        log.info("failed to close channel=${res._1}: ", outcome.left().get() as Throwable)
       }
     }
     return successfullyClosed
@@ -592,13 +597,11 @@ class AppViewModel : ViewModel() {
    */
   @UiThread
   fun reconnectToPeer() {
-    viewModelScope.launch {
-      withContext(Dispatchers.IO) {
-        kit?.run {
-          log.info("sending connect to ACINQ actor")
-          switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
-        } ?: log.debug("appkit not ready yet")
-      }
+    viewModelScope.launch(Dispatchers.IO) {
+      kit?.run {
+        log.info("sending connect to ACINQ actor")
+        switchboard().tell(Peer.Connect(Wallet.ACINQ.nodeId(), Option.apply(Wallet.ACINQ.address())), ActorRef.noSender())
+      } ?: log.debug("appkit not ready yet")
     }
   }
 
@@ -687,6 +690,9 @@ class AppViewModel : ViewModel() {
     closeConnections()
     balance.postValue(MilliSatoshi(0))
     electrumConn.value = Constants.DEFAULT_NETWORK_INFO.electrumServer
+    torManager.value?.run {
+      viewModelScope.launch(Dispatchers.IO) { stop() }
+    }
     torConn.value = Constants.DEFAULT_NETWORK_INFO.torConnections
     state.postValue(KitState.Off)
   }
@@ -739,7 +745,6 @@ class AppViewModel : ViewModel() {
       state.postValue(KitState.Bootstrap.Tor)
       torManager.postValue(TorHelper.bootstrap(context, object : TorEventHandler() {
         override fun onConnectionUpdate(name: String, status: TorConnectionStatus) {
-          peerConn.postValue(status == TorConnectionStatus.CONNECTED)
           torConn.value?.apply {
             this[name] = status
             torConn.postValue(this)
