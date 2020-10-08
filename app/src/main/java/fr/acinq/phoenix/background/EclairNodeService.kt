@@ -590,7 +590,7 @@ class EclairNodeService : Service() {
         val amountFinal = if (subtractFee) amount.`$minus`(finalTrampolineFeesList.head()._1) else amount
 
         // 3 - build trampoline payment object
-        log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$finalTrampolineFeesList, subtractFee=$subtractFee ] for pr=$paymentRequest")
+        log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$finalTrampolineFeesList, subtractFee=$subtractFee ] for pr=${PaymentRequest.write(paymentRequest)}")
         PaymentInitiator.SendTrampolinePaymentRequest(
           /* amount to send */ amountFinal,
           /* payment request */ paymentRequest,
@@ -599,7 +599,7 @@ class EclairNodeService : Service() {
           /* final cltv expiry delta */ cltvExpiryDelta,
           /* route params */ Option.apply(null))
       } else {
-        log.info("sending payment (direct) [ amount=$amount ] for pr=$paymentRequest")
+        log.info("sending payment (direct) [ amount=$amount ] for pr=${PaymentRequest.write(paymentRequest)}")
         val customTlvs = `Seq$`.`MODULE$`.empty<Any>() as Seq<GenericTlv>
         PaymentInitiator.SendPaymentRequest(
           /* amount to send */ amount,
