@@ -234,27 +234,6 @@
             app:layout_constraintStart_toStartOf="parent" />
 
           <TextView
-            android:id="@+id/destination_alias"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_xs"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:paddingStart="@dimen/space_xxs"
-            android:paddingEnd="@dimen/space_xxs"
-            android:text="@{model.recipientMeta.alias}"
-            android:background="@drawable/rounded_sm"
-            android:backgroundTint="?attr/mutedBgColor"
-            android:textColor="?attr/onMutedBgTextColor"
-            android:textSize="@dimen/text_sm"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing) &amp;&amp; model.recipientMeta != null}"
-            app:layout_constraintBaseline_toBaselineOf="@id/destination_pubkey"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/destination_label"
-            app:layout_constraintWidth_max="120dp" />
-
-          <TextView
             android:id="@+id/destination_pubkey"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -264,7 +243,7 @@
             android:text="@{model.pubkey}"
             android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/destination_alias"
+            app:layout_constraintStart_toEndOf="@id/destination_label"
             app:layout_constraintTop_toBottomOf="@id/onchain_address_explorer_button" />
 
           <TextView
