@@ -25,22 +25,23 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentFtueBackupBinding
 import fr.acinq.phoenix.databinding.FragmentFtueBinding
 import fr.acinq.phoenix.databinding.FragmentFtueLightningBinding
 import fr.acinq.phoenix.databinding.FragmentFtueWelcomeBinding
 import fr.acinq.phoenix.utils.BindingHelpers
+import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class FtueFragment : Fragment() {
+class FtueFragment : BaseFragment(stayIfNotStarted = true) {
 
   private lateinit var mBinding: FragmentFtueBinding
   private lateinit var adapter: FtueViewAdapter
-  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentFtueBinding.inflate(inflater, container, false)
@@ -122,6 +123,12 @@ class FtueLightningFragment : Fragment() {
     mBinding = FragmentFtueLightningBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    val swapInFee = 100 * ((parentFragment as FtueFragment).appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+    mBinding.body.text = getString(R.string.ftue__pay_to_open__body, String.format("%.2f", swapInFee))
   }
 }
 
