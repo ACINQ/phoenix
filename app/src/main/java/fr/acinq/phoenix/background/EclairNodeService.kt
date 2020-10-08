@@ -865,9 +865,6 @@ class EclairNodeService : Service() {
     if (autoAcceptPayToOpen) {
       log.info("automatically accepting pay-to-open=$event")
       acceptPayToOpen(event.payToOpenRequest().paymentHash())
-      if (isHeadless) {
-        handleReceivedPaymentHeadless(event.payToOpenRequest().amountMsat())
-      }
     } else {
       if (isHeadless) {
         log.info("automatically rejecting pay-to-open=$event")
