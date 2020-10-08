@@ -18,6 +18,3 @@ app/debug
 apk
 logs
 sdk-dependencies
-
-## fcm config file
-google-services.json
