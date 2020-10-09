@@ -51,13 +51,14 @@ object KeystoreHelper {
 
   private fun getOrCreateKeyNoAuthRequired(): SecretKey {
     keyStore.getKey(KEY_NO_AUTH, null)?.let { return it as SecretKey }
-    val spec = KeyGenParameterSpec.Builder(KEY_NO_AUTH, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-      .setBlockModes(ENC_BLOCK_MODE)
-      .setEncryptionPaddings(ENC_PADDING)
-      .setRandomizedEncryptionRequired(true)
-      .setKeySize(256)
-      .setUserAuthenticationRequired(false)
-      .setInvalidatedByBiometricEnrollment(false)
+    val spec = KeyGenParameterSpec.Builder(KEY_NO_AUTH, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).apply {
+      setBlockModes(ENC_BLOCK_MODE)
+      setEncryptionPaddings(ENC_PADDING)
+      setRandomizedEncryptionRequired(true)
+      setKeySize(256)
+      setUserAuthenticationRequired(false)
+      setInvalidatedByBiometricEnrollment(false)
+    }
     return generateKeyWithSpec(spec)
   }
 
@@ -77,11 +78,11 @@ object KeystoreHelper {
     return generateKeyWithSpec(spec)
   }
 
-  /** Generate key from key gen specs. If possible, store the key in strong box. */
+  /** Generate key from key gen specs. If possible, store the key in strongbox. */
   private fun generateKeyWithSpec(spec: KeyGenParameterSpec.Builder): SecretKey {
     val keygen = KeyGenerator.getInstance(ENC_ALGO, keyStore.provider)
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-      // try to use StrongBox on Android 9+, which is only supported by a few devices
+      // try to use strongbox on Android 9+, which is only supported by a few devices
       try {
         spec.setIsStrongBoxBacked(true)
         keygen.init(spec.build())
@@ -102,12 +103,6 @@ object KeystoreHelper {
     KEY_NO_AUTH -> getOrCreateKeyNoAuthRequired()
     KEY_WITH_AUTH -> getOrCreateKeyWithAuth()
     else -> throw IllegalArgumentException("unhandled key=$keyName")
-  }
-
-  /** Tell if the provided key is stored inside a Trusted Execution Environment or a Secure Element. */
-  fun isKeyInSecureHardware(keyName: String) {
-    val key = getKeyForName(keyName)
-    KeyFactory.getInstance(key.algorithm, keyStore.provider).getKeySpec(key, KeyInfo::class.java).isInsideSecureHardware
   }
 
   /** Get encryption Cipher for given key. */
