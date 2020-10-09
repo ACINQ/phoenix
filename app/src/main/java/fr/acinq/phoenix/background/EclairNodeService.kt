@@ -559,8 +559,8 @@ class EclairNodeService : Service() {
           .fold(Pair(MilliSatoshi(0), CltvExpiryDelta(0))) { a, b -> Pair(a.first.`$plus`(b.first), a.second.`$plus`(b.second)) }
       }
     // return (max of fee, max of cltv expiry delta)
-    return Pair(MilliSatoshi(aggregateByRoutes.map { p -> p.first.toLong() }.max() ?: 0),
-      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.max() ?: 0))
+    return Pair(MilliSatoshi(aggregateByRoutes.map { p -> p.first.toLong() }.maxOrNull() ?: 0),
+      CltvExpiryDelta(aggregateByRoutes.map { p -> p.second.toInt() }.maxOrNull() ?: 0))
   }
 
   @UiThread
