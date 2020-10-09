@@ -51,17 +51,7 @@ object Wallet {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735")
-  val httpClient = object : OkHttpClient() {
-    @WorkerThread
-    suspend fun simpleExecute(url: String, callback: (res: ResponseBody) -> Unit) {
-      newCall(okhttp3.Request.Builder().url(url).build()).execute().run {
-        val body = body()
-        if (isSuccessful && body != null) {
-          callback(body)
-        }
-      }
-    }
-  }
+  val httpClient = object : OkHttpClient()
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
@@ -216,6 +206,7 @@ object Wallet {
 
   fun HostAndPort.isOnion() = this.host.endsWith(".onion")
 
+  /** Execute a (blocking) HTTP GET on the given url, expecting a JSON response. Will throw an exception if the query fails, or if the response is invalid/not JSON. */
   @WorkerThread
   suspend fun OkHttpClient.simpleExecute(url: String, isSilent: Boolean = false, callback: (json: JSONObject) -> Unit) {
     newCall(okhttp3.Request.Builder().url(url).build()).execute().run {
