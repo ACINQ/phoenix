@@ -36,13 +36,10 @@ import fr.acinq.phoenix.lnurl.LNUrl
 import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import scodec.bits.ByteVector
 import java.io.File
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 
@@ -51,7 +48,7 @@ object Wallet {
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   val ACINQ: NodeURI = NodeURI.parse("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@endurance.acinq.co:9735")
-  val httpClient = object : OkHttpClient()
+  val httpClient = OkHttpClient()
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
