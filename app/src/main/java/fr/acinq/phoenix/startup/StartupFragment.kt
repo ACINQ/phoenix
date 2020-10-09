@@ -26,12 +26,14 @@ import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.phoenix.*
+import fr.acinq.phoenix.AppLock
+import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.MainActivity
+import fr.acinq.phoenix.R
 import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
@@ -90,7 +92,7 @@ class StartupFragment : BaseFragment() {
           } ?: getString(R.string.startup_error_auth_failed)
           Handler().postDelayed({
             val lock = app.lockState.value
-            val blockingCodes = listOf(BiometricConstants.ERROR_LOCKOUT, BiometricConstants.ERROR_LOCKOUT_PERMANENT, BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
+            val blockingCodes = listOf(BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT, BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
             if (lock is AppLock.Locked.AuthFailure && !blockingCodes.contains(lock.code)) {
               app.lockState.value = AppLock.Locked.Default
             }
@@ -316,7 +318,7 @@ class StartupFragment : BaseFragment() {
           override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             super.onAuthenticationError(errorCode, errString)
             log.info("biometric auth error ($errorCode): $errString")
-            if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricConstants.ERROR_USER_CANCELED) {
+            if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode ==  BiometricPrompt.ERROR_USER_CANCELED) {
               onNegative()
             }
           }

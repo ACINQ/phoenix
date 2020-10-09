@@ -768,7 +768,7 @@ class EclairNodeService : Service() {
 
   private fun isConnectedToPeer(): Boolean = api?.run {
     JavaConverters.asJavaIterableConverter(
-      Await.result(peersInfo(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+      Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
     ).asJava().any { it.state().equals("CONNECTED", true) }
   } ?: false
 

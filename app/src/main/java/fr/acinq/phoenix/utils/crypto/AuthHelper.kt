@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.utils.crypto
 
 import android.content.Context
-import androidx.biometric.BiometricConstants
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -43,7 +42,7 @@ object AuthHelper {
     BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED -> context.getString(R.string.accessctrl_auth_update_required)
     BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> context.getString(R.string.accessctrl_auth_hw_unavailable)
     BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED -> context.getString(R.string.accessctrl_auth_unsupported)
-    BiometricConstants.ERROR_LOCKOUT, BiometricConstants.ERROR_LOCKOUT_PERMANENT -> context.getString(R.string.accessctrl_auth_lockout)
+    BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> context.getString(R.string.accessctrl_auth_lockout)
     else -> null
   }
 
@@ -105,7 +104,7 @@ object AuthHelper {
       override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
         super.onAuthenticationError(errorCode, errString)
         log.error("authentication error: ($errorCode): $errString")
-        if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricConstants.ERROR_USER_CANCELED) {
+        if (errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.ERROR_USER_CANCELED) {
           onFailure(errorCode)
         } else {
           onCancel?.invoke()
