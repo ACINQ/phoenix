@@ -957,7 +957,8 @@ class EclairNodeService : Service() {
     }.let {
       val total = it.reduce { acc, amount -> acc.`$plus`(amount) }
       val message = getString(R.string.notif__headless_message__received_payment,
-        Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true))
+        Converter.printAmountPretty(total, applicationContext, withSign = false, withUnit = true),
+        Converter.printFiatPretty(applicationContext, total, withSign = false, withUnit = true))
       updateNotification(getString(R.string.notif__headless_title__received), message)
       receivedInBackground.postValue(it)
       shutdownHandler.removeCallbacksAndMessages(null)
