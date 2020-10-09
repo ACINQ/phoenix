@@ -201,61 +201,63 @@ class StartupFragment : BaseFragment() {
     }
 
     // if the seed is version 1, it must be decrypted and migrated to [EncryptedSeed.V2]
-    if (encryptedSeed is EncryptedSeed.V1) {
-      handleV1Seed(context, encryptedSeed)
-    } else if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
-      val onSuccess = {
-        lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-          log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
-          app.lockState.postValue(AppLock.Locked.AuthFailure())
-        }) {
-          val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
-          lifecycleScope.launch(Dispatchers.Main) {
-            app.lockState.value = AppLock.Unlocked
-            app.service?.startKit(seed)
-          }
-        }
-      }
-      if (Prefs.isScreenLocked(context) && AuthHelper.canUseSoftAuth(context)) {
-        AuthHelper.promptSoftAuth(this,
-          onSuccess = { onSuccess() },
-          onFailure = { code -> app.lockState.value = AppLock.Locked.AuthFailure(code) })
-      } else {
-        onSuccess()
-      }
-    } else if (encryptedSeed is EncryptedSeed.V2.WithAuth) {
-      val cipher = try {
-        encryptedSeed.getDecryptionCipher()
-      } catch (e: Exception) {
-        when (e) {
-          is KeyPermanentlyInvalidatedException -> {
-            log.error("key has been permanently invalidated: ", e)
-            app.lockState.value = AppLock.Locked.AuthFailure(BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
-          }
-          else -> {
-            log.error("could not get cipher for ${encryptedSeed.name()}")
-            app.lockState.value = AppLock.Locked.AuthFailure()
-          }
-        }
-        return
-      }
-      AuthHelper.promptHardAuth(this,
-        cipher = cipher,
-        onSuccess = { crypto ->
+    when (encryptedSeed) {
+      is EncryptedSeed.V1 -> handleV1Seed(context, encryptedSeed)
+      is EncryptedSeed.V2.NoAuth -> {
+        val onSuccess = {
           lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
             log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
             app.lockState.postValue(AppLock.Locked.AuthFailure())
           }) {
-            val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))
+            val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
             lifecycleScope.launch(Dispatchers.Main) {
               app.lockState.value = AppLock.Unlocked
               app.service?.startKit(seed)
             }
           }
-        },
-        onFailure = { code ->
-          app.lockState.value = AppLock.Locked.AuthFailure(code)
-        })
+        }
+        if (Prefs.isScreenLocked(context) && AuthHelper.canUseSoftAuth(context)) {
+          AuthHelper.promptSoftAuth(this,
+            onSuccess = { onSuccess() },
+            onFailure = { code -> app.lockState.value = AppLock.Locked.AuthFailure(code) })
+        } else {
+          onSuccess()
+        }
+      }
+      is EncryptedSeed.V2.WithAuth -> {
+        val cipher = try {
+          encryptedSeed.getDecryptionCipher()
+        } catch (e: Exception) {
+          when (e) {
+            is KeyPermanentlyInvalidatedException -> {
+              log.error("key has been permanently invalidated: ", e)
+              app.lockState.value = AppLock.Locked.AuthFailure(BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
+            }
+            else -> {
+              log.error("could not get cipher for ${encryptedSeed.name()}")
+              app.lockState.value = AppLock.Locked.AuthFailure()
+            }
+          }
+          return
+        }
+        AuthHelper.promptHardAuth(this,
+          cipher = cipher,
+          onSuccess = { crypto ->
+            lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+              log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
+              app.lockState.postValue(AppLock.Locked.AuthFailure())
+            }) {
+              val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))
+              lifecycleScope.launch(Dispatchers.Main) {
+                app.lockState.value = AppLock.Unlocked
+                app.service?.startKit(seed)
+              }
+            }
+          },
+          onFailure = { code ->
+            app.lockState.value = AppLock.Locked.AuthFailure(code)
+          })
+      }
     }
   }
 
@@ -318,7 +320,7 @@ class StartupFragment : BaseFragment() {
           override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             super.onAuthenticationError(errorCode, errString)
             log.info("biometric auth error ($errorCode): $errString")
-            if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode ==  BiometricPrompt.ERROR_USER_CANCELED) {
+            if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
               onNegative()
             }
           }
