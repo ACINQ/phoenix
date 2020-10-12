@@ -41,11 +41,11 @@ struct ReceiveView: MVIView {
 
     var body: some View {
         ZStack {
-            mvi { model in
-                if let m = model as? Receive.ModelGenerated {
+            mvi(onModel: { change in
+                if let m = change.newModel as? Receive.ModelGenerated {
                     qrCode.generate(value: m.request)
                 }
-            } content: { model, intent in
+            }) { model, intent in
                     view(model: model, intent: intent)
                             .navigationBarTitle("Receive ", displayMode: .inline)
                             .onAppear {
@@ -169,7 +169,7 @@ struct ReceiveView: MVIView {
                                 .keyboardType(.decimalPad)
                                 .disableAutocorrection(true)
                                 .onChange(of: amount) {
-                                    illegal = !$0.isEmpty && Double($0) == nil
+                                    illegal = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
                                 }
                                 .foregroundColor(illegal ? Color.red : Color.black)
 

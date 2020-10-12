@@ -19,10 +19,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
 
     val db = dbFactory.open(
         "channels",
-        KotlinxSerializer(SerializersModule {
-            include(eclairSerializersModule)
-            include(PhoenixBusiness.PeerFeeEstimator.serializersModule)
-        })
+        KotlinxSerializer(eclairSerializersModule)
     )
 
     @Serializable
@@ -41,7 +38,16 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
     }
 
     override suspend fun addOrUpdateChannel(state: HasCommitments) {
-        db.put(Channel(state))
+        try {
+            println("PUT: ${Channel(state)}")
+            db.put(Channel(state))
+            println("OK!")
+        } catch (t: Throwable) {
+            println("OUCH!")
+            t.printStackTrace()
+            println("-----")
+            throw t
+        }
     }
 
     override suspend fun removeChannel(channelId: ByteVector32) {

@@ -30,7 +30,7 @@ class AppChannelsConfigurationController(di: DI) : AppController<ChannelsConfigu
 
     private val json = Json {
         prettyPrint = true
-        serializersModule = eclairSerializersModule + PhoenixBusiness.PeerFeeEstimator.serializersModule
+        serializersModule = eclairSerializersModule
     }
 
     init {

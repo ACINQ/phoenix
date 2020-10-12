@@ -5,6 +5,7 @@ import fr.acinq.eclair.io.SendPayment
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.UUID
 import fr.acinq.phoenix.ctrl.Scan
+import fr.acinq.phoenix.data.toMilliSatoshi
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -18,8 +19,12 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
             is Scan.Intent.Parse -> {
                 launch {
                     try {
-                        val paymentRequest = PaymentRequest.read(intent.request)
-                        model(Scan.Model.Validate(intent.request, paymentRequest.amount?.toLong(), paymentRequest.description))
+                        val paymentRequest = PaymentRequest.read(intent.request.removePrefix("lightning:"))
+                        model(Scan.Model.Validate(
+                            request = intent.request,
+                            amountSat = paymentRequest.amount?.truncateToSatoshi()?.toLong(),
+                            requestDescription = paymentRequest.description
+                        ))
                     } catch (t: Throwable) { // TODO Throwable is not a good choice, analyze the possible output of PaymentRequest.read(...)
                         model(Scan.Model.BadRequest)
                     }
@@ -30,9 +35,17 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
                     val paymentRequest = PaymentRequest.read(intent.request)
                     val uuid = UUID.randomUUID()
 
-                    peer.send(SendPayment(uuid, paymentRequest))
+                    val sendAmount = intent.amount.toMilliSatoshi(intent.unit)
+                    val actualRequest =
+                        if (sendAmount == paymentRequest.amount) paymentRequest
+                        else {
+                            logger.info { "Changing payment request from ${paymentRequest.amount} to $sendAmount" }
+                            paymentRequest.copy(amount = sendAmount)
+                        }
 
-                    model(Scan.Model.Sending(paymentRequest.amount?.toLong() ?: intent.amountMsat, paymentRequest.description))
+                    peer.send(SendPayment(uuid, actualRequest))
+
+                    model(Scan.Model.Sending)
                 }
             }
         }

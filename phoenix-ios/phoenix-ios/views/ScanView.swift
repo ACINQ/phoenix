@@ -27,6 +27,8 @@ struct ScanView: MVIView {
             }
             toast.view()
         }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.appBackground)
     }
 
     @ViewBuilder
@@ -89,22 +91,80 @@ struct ScanView: MVIView {
 
         let intent: IntentReceiver
 
+        @State var illegal: Bool = false
+        @State var amount: String
+        @State var unit: BitcoinUnit = .satoshi
+
+        @State private var textWidth: CGFloat?
+
+        init(model: Scan.ModelValidate, intent: @escaping IntentReceiver) {
+            self.model = model
+
+            if let amountSat = model.amountSat {
+                self._amount = State(initialValue: String(amountSat.int64Value))
+            } else {
+                self._amount = State(initialValue: "")
+            }
+
+            self.intent = intent
+        }
+
         var body: some View {
             VStack {
-                Text("\(model.amountMsat ?? 0) msat")
-                        .font(.title)
-                        .padding()
+                HStack(alignment: .bottom) {
+                    TextField("123", text: $amount)
+                            .keyboardType(.decimalPad)
+                            .disableAutocorrection(true)
+                            .fixedSize()
+                            .font(.title)
+                            .foregroundColor(Color.appHorizon)
+                            .multilineTextAlignment(.center)
+                            .onChange(of: amount) {
+                                illegal = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
+                            }
+                            .foregroundColor(illegal ? Color.red : Color.black)
+
+                    Picker(selection: $unit, label: Text(unit.abbrev).frame(width: 45)) {
+                        ForEach(0..<BitcoinUnit.default().values.count) {
+                            let u = BitcoinUnit.default().values[$0]
+                            Text(u.abbrev).tag(u)
+                        }
+                    }
+                            .pickerStyle(MenuPickerStyle())
+                            .padding(.bottom, 4)
+                }
+                        .padding([.leading, .trailing])
+                        .background(
+                                Line()
+                                        .stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 2, dash: [3]))
+                                        .frame(height: 1)
+                                        .padding(.top, 45)
+                        )
 
                 Text(model.requestDescription ?? "")
                         .padding()
+                        .padding([.top, .bottom])
 
                 Button {
-                    intent(Scan.IntentSend(request: model.request, amountMsat: model.amountMsat?.int64Value ?? 0))
+                    intent(Scan.IntentSend(request: model.request, amount: Double(amount)!, unit: unit))
                 } label: {
-                    Text("Pay")
-                            .font(.title)
-                            .padding()
+                    HStack {
+                        Image("ic_send")
+                                .renderingMode(.template)
+                                .resizable()
+                                .foregroundColor(Color.white)
+                                .frame(width: 22, height: 22)
+                        Text("Pay")
+                                .font(.title2)
+                                .foregroundColor(Color.white)
+                    }
+                            .padding(4)
+                            .padding([.leading, .trailing], 12)
+                            .background(Color.appHorizon)
+                            .cornerRadius(100)
+                            .opacity((amount.isEmpty || illegal) ? 0.4 : 1.0)
                 }
+                        .disabled(amount.isEmpty || illegal)
             }
                     .navigationBarTitle("Validate payment", displayMode: .inline)
                     .zIndex(1)
@@ -117,11 +177,8 @@ struct ScanView: MVIView {
 
         var body: some View {
             VStack {
-                Text("Sending \(model.amountMsat) msat...")
+                Text("Sending Payment...")
                         .font(.title)
-                        .padding()
-
-                Text(model.requestDescription ?? "")
                         .padding()
             }
                     .navigationBarTitle("Sending payment", displayMode: .inline)
@@ -133,7 +190,11 @@ struct ScanView: MVIView {
 
 class ScanView_Previews: PreviewProvider {
 
-    static let mockModel = Scan.ModelReady()
+    static let mockModel = Scan.ModelValidate(
+            request: "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9",
+            amountSat: 1500,
+            requestDescription: "1 Blockaccino"
+    )
 
     static var previews: some View {
         mockView(ScanView(isShowing: .constant(true))) { $0.scanModel = ScanView_Previews.mockModel }
