@@ -43,9 +43,9 @@ kotlin {
     sourceSets {
 
         val coroutinesVersion = "1.3.9-native-mt-2"
-        val serializationVersion = "1.0.0-RC"
+        val serializationVersion = "1.0.0"
         val secp256k1Version = "0.4.1"
-        val ktorVersion = "1.4.0"
+        val ktorVersion = "1.4.1"
         val kodeinDIVersion = "7.1.0"
         val kodeinDBVersion = "0.2.0-beta"
 
@@ -54,7 +54,7 @@ kotlin {
                 api("fr.acinq.eclair:eclair-kmp:snapshot")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
-//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 api("org.kodein.di:kodein-di:$kodeinDIVersion")
                 api("org.kodein.db:kodein-db:$kodeinDBVersion")
                 api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")
@@ -73,7 +73,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                api("androidx.core:core-ktx:1.3.1")
+                api("androidx.core:core-ktx:1.3.2")
                 api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1Version")
                 api("io.ktor:ktor-network:$ktorVersion")
                 api("io.ktor:ktor-network-tls:$ktorVersion")
@@ -84,8 +84,8 @@ kotlin {
         val androidTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
-                implementation("androidx.test.ext:junit:1.1.1")
-                implementation("androidx.test.espresso:espresso-core:3.2.0")
+                implementation("androidx.test.ext:junit:1.1.2")
+                implementation("androidx.test.espresso:espresso-core:3.3.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 val target = when {
                     currentOs.isLinux -> "linux"

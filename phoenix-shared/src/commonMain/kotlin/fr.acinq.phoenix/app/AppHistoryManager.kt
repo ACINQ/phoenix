@@ -51,7 +51,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                     is SendingPayment -> {
                         db.put(
                             Transaction(
-                                it.id.toString(),
+                                it.paymentId.toString(),
                                 -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
                                 it.paymentRequest.description ?: "",
                                 Transaction.Status.Pending,
@@ -62,7 +62,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                     is PaymentSent -> {
                         db.put(
                             Transaction(
-                                it.id.toString(),
+                                it.paymentId.toString(),
                                 -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
                                 it.paymentRequest.description ?: "",
                                 Transaction.Status.Success,

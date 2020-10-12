@@ -53,19 +53,6 @@ import org.kodein.log.newLogger
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
 class PhoenixBusiness {
 
-    @Serializable
-    object PeerFeeEstimator : FeeEstimator {
-        override fun getFeeratePerKb(target: Int): Long = Eclair.feerateKw2KB(10000)
-        override fun getFeeratePerKw(target: Int): Long = 10000
-
-        @Transient
-        val serializersModule = SerializersModule {
-            polymorphic(FeeEstimator::class) {
-                subclass(PeerFeeEstimator::class)
-            }
-        }
-    }
-
     fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, loggerFactory: LoggerFactory, wallet: Wallet) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
@@ -82,13 +69,6 @@ class PhoenixBusiness {
                 )
             ),
             dustLimit = 100.sat,
-            onChainFeeConf = OnChainFeeConf(
-                feeTargets = FeeTargets(6, 2, 2, 6),
-                feeEstimator = PeerFeeEstimator,
-                maxFeerateMismatch = 1.5,
-                closeOnOfflineMismatch = true,
-                updateFeeMinDiffRatio = 0.1
-            ),
             maxHtlcValueInFlightMsat = 150000000L,
             maxAcceptedHtlcs = 100,
             expiryDeltaBlocks = CltvExpiryDelta(144),
