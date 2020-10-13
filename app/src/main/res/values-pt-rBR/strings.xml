@@ -462,7 +462,7 @@
 
   <string name="accessctrl_screen_lock_switch">Bloqueio de tela</string>
   <string name="accessctrl_screen_lock_switch_desc">Restrinja o acesso ao aplicativo com o bloqueio de tela/biometria do Android</string>
-  <string name="accessctrl_full_lock_switch_unavailable">Registre uma impressão digital no Android para recursos de segurança adicion.</string>
+  <string name="accessctrl_full_lock_switch_unavailable">Registre uma biometria no Android para recursos de segurança adicionais.</string>
   <string name="accessctrl_full_lock_switch_backup_required">Confirme se você fez o backup da sua frase de recuperação para acessar recursos adicionais de segurança.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Acessar minha frase de recuperação</string>
   <string name="accessctrl_full_lock_switch">Impedir a execução em segundo plano</string>
