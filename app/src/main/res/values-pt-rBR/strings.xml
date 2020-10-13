@@ -87,7 +87,7 @@
   <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
-  <string name="startup_error_no_biometrics_or_key_invalidated">Registre uma impressão digital no Android primeiro para desbloquear a carteira.\n\nCaso contrário, restaure sua carteira usando sua seed de 12 palavras.</string>
+  <string name="startup_error_no_biometrics_or_key_invalidated">Primeiro registre uma biometria no Android para desbloquear a carteira.\n\nOu, restaure sua carteira usando sua seed de 12 palavras.</string>
   <string name="startup_error_auth_failed">A autenticação falhou.</string>
   <string name="startup_error_auth_failed_with_details">A autenticação falhou.\n—\n%1$s</string>
 
