@@ -74,22 +74,14 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <View
-          style="@style/HLineSeparator"
-          android:layout_columnSpan="2"
-          android:layout_marginTop="@dimen/space_md" />
-
         <TextView
           style="@style/TechnicalsLabelView"
           android:text="@string/electrum_block_height_label" />
 
         <TextView
           android:id="@+id/block_height"
+          android:paddingTop="@dimen/space_lg"
           style="@style/TechnicalsValueView" />
-
-        <View
-          style="@style/HLineSeparator"
-          android:layout_columnSpan="2" />
 
         <TextView
           style="@style/TechnicalsLabelView"
@@ -99,10 +91,6 @@
           android:id="@+id/tip_time"
           style="@style/TechnicalsValueView" />
 
-        <View
-          style="@style/HLineSeparator"
-          android:layout_columnSpan="2" />
-
         <TextView
           style="@style/TechnicalsLabelView"
           android:text="@string/electrum_fee_rate_label" />
@@ -110,10 +98,6 @@
         <TextView
           android:id="@+id/fee_rate"
           style="@style/TechnicalsValueView" />
-
-        <View
-          style="@style/HLineSeparator"
-          android:layout_columnSpan="2" />
 
         <TextView
           style="@style/TechnicalsLabelView"

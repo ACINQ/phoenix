@@ -53,8 +53,16 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
           mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.ButtonView_text_size, R.dimen.text_lg).toFloat())
         }
         mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.textColor)))
+
+        // display subtitle only if a title is set
+        if (arr.hasValue(R.styleable.ButtonView_subtitle)) {
+          mBinding.subtitle.text = arr.getString(R.styleable.ButtonView_subtitle)
+          mBinding.subtitle.visibility = View.VISIBLE
+        } else {
+          mBinding.subtitle.visibility = View.GONE
+        }
       } else {
-        mBinding.text.visibility = View.GONE
+        mBinding.textContainer.visibility = View.GONE
         mBinding.spacer.visibility = View.GONE
       }
 
@@ -130,6 +138,11 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
   fun setText(text: String) {
     mBinding.text.text = text
+  }
+
+  fun setSubtitle(text: String) {
+    mBinding.subtitle.text = text
+    mBinding.subtitle.visibility = View.VISIBLE
   }
 
   fun setIcon(icon: Drawable) {

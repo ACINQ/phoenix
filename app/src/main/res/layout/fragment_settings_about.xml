@@ -47,8 +47,11 @@
           android:id="@+id/general"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:paddingTop="@dimen/space_md"
+          android:paddingBottom="@dimen/space_md"
+          android:paddingEnd="@dimen/space_md"
+          android:paddingStart="@dimen/space_lg_p"
           android:text="@string/about_general"
-          android:padding="@dimen/space_md"
           app:layout_constraintTop_toTopOf="parent" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

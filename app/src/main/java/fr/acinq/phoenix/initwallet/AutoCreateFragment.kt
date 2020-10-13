@@ -30,13 +30,14 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletAutoCreateBinding
-import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.crypto.KeystoreHelper
 import fr.acinq.phoenix.utils.Wallet
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.SeedManager
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.spongycastle.util.encoders.Hex
@@ -73,16 +74,13 @@ class AutoCreateFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    if (context != null && Wallet.getSeedFile(context!!).exists()) {
-      findNavController().navigate(R.id.global_action_any_to_startup)
-    } else {
-      if (model.state.value == AutoCreateState.START) {
-        context?.let {
-          model.createAndSaveSeed(it.applicationContext)
-        }
+    context?.let {
+      if (Wallet.hasWalletBeenSetup(it)) {
+        findNavController().navigate(R.id.global_action_any_to_startup)
+      } else if (model.state.value == AutoCreateState.START) {
+        model.createAndSaveSeed(it)
       }
     }
-
   }
 }
 
@@ -98,23 +96,18 @@ class AutoCreateViewModel : ViewModel() {
 
   @UiThread
   fun createAndSaveSeed(context: Context) {
-    viewModelScope.launch {
-      withContext(Dispatchers.Default) {
-        try {
-          state.postValue(AutoCreateState.IN_PROGRESS)
-          log.info("creating words...")
-          val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
-          val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
-          delay(500)
-          EncryptedSeed.writeSeedToFile(context, seed, Constants.DEFAULT_PIN)
-          log.info("words written to file")
-          state.postValue(AutoCreateState.DONE)
-        } catch (t: Throwable) {
-          log.error("cannot create seed: ", t)
-          errorCause.postValue(t.localizedMessage)
-          state.postValue(AutoCreateState.ERROR)
-        }
-      }
+    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+      log.error("cannot create seed: ", e)
+      errorCause.postValue(e.localizedMessage)
+      state.postValue(AutoCreateState.ERROR)
+    }) {
+      state.postValue(AutoCreateState.IN_PROGRESS)
+      val words: List<String> = JavaConverters.seqAsJavaListConverter(MnemonicCode.toMnemonics(`package$`.`MODULE$`.randomBytes(16), MnemonicCode.englishWordlist())).asJava()
+      val seed: ByteArray = Hex.encode(words.joinToString(" ").toByteArray(Charsets.UTF_8))
+      delay(500)
+      EncryptedSeed.V2.NoAuth.encrypt(seed).let { SeedManager.writeSeedToDisk(Wallet.getDatadir(context), it) }
+      log.info("seed has been encrypted and saved")
+      state.postValue(AutoCreateState.DONE)
     }
   }
 }

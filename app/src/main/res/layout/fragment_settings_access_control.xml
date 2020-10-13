@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.phoenix.settings.AccessLockState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.phoenix.settings.AccessControlViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    tools:context=".settings.AccessControlFragment">
+
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:subtitle="@string/accessctrl_subtitle"
+      app:title="@string/accessctrl_title" />
+
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:fillViewport="true"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintTop_toBottomOf="@id/action_bar">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/square_border_hz">
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/soft_auth_unavailable"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
+          android:visibility="@{!model.canUseSoftAuth}"
+          app:icon="@drawable/ic_alert_triangle"
+          app:layout_constraintTop_toTopOf="parent"
+          app:text="@string/accessctrl_auth_none_enrolled" />
+
+        <fr.acinq.phoenix.utils.customviews.SwitchView
+          android:id="@+id/screen_lock_switch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:visibility="@{model.canUseSoftAuth}"
+          app:enableOrFade="@{!(model.isUpdatingState || model.state instanceof AccessLockState.Done.FullLock)}"
+          app:icon="@drawable/ic_lock"
+          app:layout_constraintTop_toBottomOf="@id/soft_auth_unavailable"
+          app:subtitle="@string/accessctrl_screen_lock_switch_desc"
+          app:text="@string/accessctrl_screen_lock_switch" />
+
+        <View
+          android:id="@+id/hard_auth_unavailable_sep"
+          style="@style/HSeparator"
+          android:layout_marginTop="@dimen/space_xxs"
+          android:layout_marginStart="@dimen/space_lg_p"
+          android:visibility="@{model.canUseSoftAuth &amp;&amp; (!model.canUseHardAuth || !model.isBackupDone()) &amp;&amp; model.state instanceof AccessLockState.Done.ScreenLock}"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/screen_lock_switch" />
+
+        <TextView
+          android:id="@+id/hard_auth_unavailable"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:paddingStart="@dimen/space_lg_p"
+          android:textSize="@dimen/text_md"
+          android:textColor="?attr/mutedTextColor"
+          android:visibility="@{model.canUseSoftAuth &amp;&amp; !model.canUseHardAuth &amp;&amp; model.state instanceof AccessLockState.Done.ScreenLock}"
+          android:text="@string/accessctrl_full_lock_switch_unavailable"
+          app:layout_constraintTop_toBottomOf="@id/hard_auth_unavailable_sep"
+          tools:ignore="RtlSymmetry" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="match_parent"
+          android:padding="@dimen/space_md"
+          android:paddingStart="@dimen/space_lg_p"
+          android:visibility="@{!model.isBackupDone() &amp;&amp; model.canUseSoftAuth &amp;&amp; model.canUseHardAuth &amp;&amp; model.state instanceof AccessLockState.Done.ScreenLock}"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/hard_auth_unavailable_sep"
+          tools:ignore="RtlSymmetry">
+
+          <TextView
+            android:id="@+id/backup_required"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_md"
+            android:text="@string/accessctrl_full_lock_switch_backup_required"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <fr.acinq.phoenix.utils.customviews.ButtonView
+            android:id="@+id/backup_required_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:paddingVertical="@dimen/space_xs"
+            android:paddingHorizontal="@dimen/space_sm"
+            app:icon="@drawable/ic_key"
+            app:icon_size="14dp"
+            app:layout_constraintStart_toStartOf="@id/backup_required"
+            app:layout_constraintTop_toBottomOf="@id/backup_required"
+            app:spacer_size="@dimen/space_xs"
+            app:text="@string/accessctrl_full_lock_switch_backup_required_button"
+            app:text_size="@dimen/text_md" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <fr.acinq.phoenix.utils.customviews.SwitchView
+          android:id="@+id/full_lock_switch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:visibility="@{model.isBackupDone() &amp;&amp; model.canUseHardAuth &amp;&amp; (model.state instanceof AccessLockState.Done.ScreenLock || model.state instanceof AccessLockState.Done.FullLock)}"
+          app:enableOrFade="@{!model.isUpdatingState}"
+          app:icon="@drawable/ic_shield"
+          app:layout_constraintTop_toBottomOf="@id/screen_lock_switch"
+          app:subtitle="@string/accessctrl_full_lock_switch_desc"
+          app:text="@string/accessctrl_full_lock_switch"
+          tools:layout_editor_absoluteX="0dp" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -16,15 +16,15 @@
 
 package fr.acinq.phoenix.utils
 
+import android.graphics.Typeface
 import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
 import androidx.databinding.InverseBindingAdapter
-import androidx.databinding.InverseBindingListener
 import androidx.lifecycle.MutableLiveData
 import fr.acinq.phoenix.utils.customviews.ButtonView
-import java.lang.Exception
 
 object BindingHelpers {
 
@@ -47,6 +47,18 @@ object BindingHelpers {
     view.visibility = if (isVisible) View.VISIBLE else View.GONE
   }
 
+  @BindingAdapter("hide")
+  @JvmStatic
+  fun hide(view: View, isHidden: Boolean) {
+    view.visibility = if (isHidden) View.INVISIBLE else View.VISIBLE
+  }
+
+  @BindingAdapter("isItalic")
+  @JvmStatic
+  fun setItalic(view: TextView, isItalic: Boolean) {
+    view.setTypeface(Typeface.DEFAULT, if (isItalic) Typeface.ITALIC else Typeface.NORMAL)
+  }
+
   @BindingAdapter("android:text")
   @JvmStatic
   fun setLong(view: EditText, liveDataLong: MutableLiveData<Long>) {
@@ -67,6 +79,12 @@ object BindingHelpers {
     } catch (e: Exception) {
       0L
     }
+  }
+
+  @BindingAdapter("is_paused")
+  @JvmStatic
+  fun isButtonsPaused(button: ButtonView, isPaused: Boolean) {
+    button.setIsPaused(isPaused)
   }
 
   @BindingAdapter("is_paused")

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright 2019 ACINQ SAS
+  ~ Copyright 2020 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Por favor, introduce tu PIN</string>
-
   <string name="pindialog_error">El código PIN debe ser un número de 6 dígitos.</string>
   <string name="pindialog_error_donotmatch">Los códigos PIN no coinciden.</string>
 
@@ -49,17 +48,6 @@
 
   <string name="biometricprompt_title">La cartera está bloqueada</string>
   <string name="biometricprompt_negative">Desbloquear con el PIN</string>
-
-  <!-- //////////////// placeholders ////////////////-->
-
-
-
-
-
-
-
-
-
 
   <!-- //////////////// Startup //////////////////// -->
 
@@ -210,7 +198,7 @@
   <string name="settings_display_prefs">Mostrar</string>
   <string name="settings_security_title">Seguridad</string>
   <string name="settings_display_seed">Frase de recuperación</string>
-  <string name="settings_seed_security">Configuración de acceso a la aplicación</string>
+  <string name="settings_access_control">Configuración de acceso a la aplicación</string>
   <string name="settings_advanced_title">Avanzado</string>
   <string name="settings_fees">Configuración de comisiones</string>
   <string name="settings_list_channels">Lista de canales</string>
@@ -225,7 +213,7 @@
 
   <string name="notif_watcher_cheating_title">Por favor, inicia Phoenix </string>
   <string name="notif_watcher_cheating_message">Se ha detectado un intento de engaño.</string>
-  
+
   <string name="notif_watcher_connection_title">Phoenix necesita acceso a la red</string>
   <string name="notif_watcher_connection_message">El observador de segundo plano necesita internet para funcionar correctamente.</string>
 
@@ -311,8 +299,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Tu cartera no está protegida.</string>
-  <string name="inappnotif_set_up_pin_action">Poner un PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Gracias por usar Phoenix. ¿Ya hiciste una copia de seguridad de tu cartera?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Crear copia de seguridad de mi cartera</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix necesita poder ejecutarse en segundo plano de vez en cuando. Asegúrate de que tu dispositivo no fuerce el cierre de esta aplicación para ahorrar batería.</string>
@@ -395,37 +381,13 @@
   <string name="state_offline">La contraparte está desconectada</string>
   <string name="state_shutdown">Apagar</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Seguridad</string>
-  <string name="seedsec_subtitle">Recomendamos encarecidamente que establezcas un PIN para proteger tu cartera. Si tu dispositivo lo admite, puedes usar la autenticación biométrica.</string>
-  <string name="seedsec_pin_switch">Autenticación de PIN</string>
-  <string name="seedsec_pin_scramble">Mezclar los números para introducir el PIN</string>
-  <string name="seedsec_biometrics_switch">Autenticación biométrica</string>
-  <string name="seedsec_change_pin">Cambiar mi PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">El alta de la autenticación biométrica ha fallado. Por favor inténtalo de nuevo.</string>
-  <string name="seedsec_pindialog_title_unlock">Por favor introduce tu PIN actual para continuar</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Por favor introduce <b>tu nuevo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Por favor <b>confirma</b> tu nuevo PIN]]></string>
+  <string name="accessctrl_title">Seguridad</string>
 
-  <string name="seedsec_pin_update_success">¡PIN actualizado correctamente!</string>
-  <string name="seedsec_biometric_enabled">Autenticación biométrica activada</string>
-  <string name="seedsec_biometric_disabled">Autenticación biométrica desactivada</string>
-
-  <string name="seedsec_biometric_support_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
-
-  <string name="seedsec_error_wrong_pin">PIN incorrecto</string>
-  <string name="seedsec_error_pins_match">Los PIN no coinciden. Inténtalo de nuevo.</string>
-  <string name="seedsec_error_generic">Ocurrió un error, la cartera no ha sido cifrada.\n\nPor favor inténtalo de nuevo.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Deshabilitar bloqueo biométrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">Desde ahora tendrás que utilizar tu PIN</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancelar</string>
-  
-  <string name="seedsec_bio_prompt_title">Habilitar bloqueo biométrico</string>
-  <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_auth_no_hw">Tu dispositivo no admite autenticación biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">El hardware biométrico no está disponible. Inténtalo nuevamente más tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Por favor habilita la autenticación biométrica primero.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
@@ -436,13 +398,6 @@
   <string name="lnurl_auth_failure">Fallo de autenticación.\n\nDetalles: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">No se puede conectar a %1$s</string>
   <string name="lnurl_auth_failure_remote_details">El servidor ha respondido con %1$s</string>
-
-  <!-- //////////////// ln url pay //////////////// -->
-
-
-
-
-
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -472,7 +427,7 @@
   <string name="electrum_title">Servidor Electrum</string>
   <string name="electrum_subtitle">Por defecto, Phoenix se conecta a servidores Electrum aleatorios para acceder a la cadena de bloques de Bitcoin. También puedes optar por conectarte a tu propio servidor Electrum.</string>
   <string name="electrum_change_button">Establecer servidor…</string>
-  
+
   <string name="electrum_block_height_label">Altura de bloque</string>
   <string name="electrum_tip_label">Marca de tiempo</string>
   <string name="electrum_fee_rate_label">Ratio de comisión</string>
@@ -491,19 +446,6 @@
   <string name="electrum_dialog_ssl_tor">Comprobar también el certificado para esta dirección Onion</string>
   <string name="electrum_dialog_input">Dirección del servidor (host:puerto).</string>
   <string name="electrum_empty_custom_address">Por favor, introduce una dirección de servidor Electrum</string>
-
-  <!-- //////////////// fees settings //////////////// -->
-
-
-
-
-
-
-
-
-
-
-
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 

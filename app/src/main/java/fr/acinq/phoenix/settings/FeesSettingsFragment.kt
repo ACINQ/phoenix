@@ -54,8 +54,8 @@ class FeesSettingsFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(FeesSettingsViewModel::class.java)
 
-    app.trampolineFeeSettings.value?.let { feeSettingsList ->
-      context?.let { ctx ->
+    context?.let { ctx ->
+      appContext(ctx).trampolineFeeSettings.value?.let { feeSettingsList ->
         feeSettingsLabelList = feeSettingsList.map {
           ctx.getString(R.string.fees_settings_trampoline_spinner_label,
             Converter.printAmountPretty(it.feeBase, ctx, withUnit = true), String.format("%.2f", it.feePercent))
@@ -79,8 +79,10 @@ class FeesSettingsFragment : BaseFragment() {
       override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (context != null && position < app.trampolineFeeSettings.value?.size ?: 0) {
-          Prefs.saveTrampolineMaxFeeIndex(context!!, position)
+        context?.let { ctx ->
+          if (position < appContext(ctx).trampolineFeeSettings.value?.size ?: 0) {
+            Prefs.saveTrampolineMaxFeeIndex(context!!, position)
+          }
         }
       }
     }

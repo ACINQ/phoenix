@@ -182,7 +182,7 @@
   <string name="settings_display_prefs">Visualizzazione</string>
   <string name="settings_security_title">Sicurezza</string>
   <string name="settings_display_seed">Visualizza mnemonic seed</string>
-  <string name="settings_seed_security">Impostazioni di accesso</string>
+  <string name="settings_access_control">Impostazioni di accesso</string>
   <string name="settings_advanced_title">Avanzate</string>
   <string name="settings_fees">Impostazioni commissioni</string>
   <string name="settings_list_channels">Lista canali</string>
@@ -279,8 +279,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Il tuo wallet non è protetto.</string>
-  <string name="inappnotif_set_up_pin_action">Imposta un PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Grazie di aver usato Phoenix. Hai fatto un backup del tuo wallet?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fai il backup del wallet</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix deve eseguire operazioni in background di tanto in tanto. Assicurati che le impostazioni di risparmio batteria del tuo dispositivo permettano a Phoenix di eseguire le operazioni.</string>
@@ -355,37 +353,13 @@
   <string name="state_offline">Il peer è offline</string>
   <string name="state_shutdown">Spegni</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Sicurezza</string>
-  <string name="seedsec_subtitle">Consigliamo vivamente di impostare un PIN per proteggere il tuo wallet. Se il tuo dispositivo lo supporta, puoi usare l\'autenticazione biometrica.</string>
-  <string name="seedsec_pin_switch">Autenticazione PIN</string>
-  <string name="seedsec_pin_scramble">Tasti PIN ordinati casualmente</string>
-  <string name="seedsec_biometrics_switch">Autenticazione biometrica</string>
-  <string name="seedsec_change_pin">Cambia il mio PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Impossibile fare la registrazione biometrica. Riprova in seguito.</string>
-  <string name="seedsec_pindialog_title_unlock">Per favore inserisci il PIN attuale per proseguire</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Per favore inserisci <b>il tuo nuovo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Per favore <b>conferma</b> il tuo nuovo PIN]]></string>
+  <string name="accessctrl_title">Sicurezza</string>
 
-  <string name="seedsec_pin_update_success">PIN aggiornato correttamente!</string>
-  <string name="seedsec_biometric_enabled">Autenticazione biometrica attivata</string>
-  <string name="seedsec_biometric_disabled">Autenticazione biometrica disattivata</string>
-
-  <string name="seedsec_biometric_support_no_hw">Il tuo dispositivo non supporta l\'autenticazione biometrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
-
-  <string name="seedsec_error_wrong_pin">PIN invalido</string>
-  <string name="seedsec_error_pins_match">I PIN non corrispondono. Per favore riprova.</string>
-  <string name="seedsec_error_generic">C\'è stato un errore, il wallet non è stato cifrato.\n\nPer favore riprova.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Disabilita il blocco biometrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">D\'ora in avanti dovrai usare il tuo PIN</string>
-  <string name="seedsec_disable_bio_prompt_negative">Annulla</string>
-
-  <string name="seedsec_bio_prompt_title">Abilita il blocco biometrico</string>
-  <string name="seedsec_bio_prompt_negative">Annulla</string>
+  <string name="accessctrl_auth_no_hw">Il tuo dispositivo non supporta l\'autenticazione biometrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
+  <string name="accessctrl_auth_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 
