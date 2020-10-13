@@ -588,7 +588,7 @@
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-    As taxas Bitcoin/fiat são obtidas de várias APIs de terceiros::
+    As taxas Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
     <br />- Blockchain.info
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
