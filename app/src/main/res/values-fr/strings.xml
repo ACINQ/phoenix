@@ -21,7 +21,7 @@
   <!-- //////////////// system notification channels //////////////// -->
 
   <string name="notification_channels_watcher_title">Vérification des channels</string>
-  <string name="notification_channels_watcher_desc">Ceci est une tâche de fonds qui vous alerte si un problème dans les channels lightning est détecté. Cette notification devrait être en priorité haute.</string>
+  <string name="notification_channels_watcher_desc">Ceci est une tâche de fond qui vous alerte si un problème dans les channels lightning est détecté. Cette notification devrait être en priorité haute.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -223,7 +223,7 @@
   <string name="notif_watcher_cheating_message">Une tentative de triche a été détectée.</string>
 
   <string name="notif_watcher_connection_title">Phoenix a besoin d\'internet</string>
-  <string name="notif_watcher_connection_message">La tâche de fonds surveillant les canaux de paiement a besoin d\'une connexion internet pour pouvoir fonctionner.</string>
+  <string name="notif_watcher_connection_message">La tâche de fond surveillant les canaux de paiement a besoin d\'une connexion internet pour pouvoir fonctionner.</string>
 
   <string name="notif__headless_title__default">Phoenix tourne en tâche de fond</string>
   <string name="notif__headless_title__missed_incoming">Paiement entrant manqué</string>
@@ -570,12 +570,12 @@
   <!-- patch notes -->
   <string name="patchnotes_title">Phoenix a éte mis à jour !</string>
   <string name="patchnotes_v15"><![CDATA[
-    <h4>Réception de paiement en tâche de fonds</h4>
+    <h4>Réception de paiement en tâche de fond</h4>
     <p>Phoenix est désormais capable de recevoir des paiement même si l\'application n\'est pas démarrée.</p>
 
     <h4>Création automatique des canaux de paiement</h4>
     <p>Un canal de paiement sera automatiquement créé si besoin.</p>
-    <p>Cette fonctionnalité est utile pour que la réception en tâche de fonds fonctionne correctement, mais vous pouvez la désactiver si vous le souhaitez (dans Configuration > Options des paiements).</p>
+    <p>Cette fonctionnalité est utile pour que la réception en tâche de fond fonctionne correctement, mais vous pouvez la désactiver si vous le souhaitez (dans Configuration > Options des paiements).</p>
     <p>Les frais de création de canal de paiement s\'appliquent toujours (%1$s%%).</p>
 
     <h4>Amélioration du verrouillage</h4>
