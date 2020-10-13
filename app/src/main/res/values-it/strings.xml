@@ -340,7 +340,6 @@
   <string name="paymentdetails_payment_request_label">Richiesta di pagamento</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Creato il</string>
-  <string name="paymentdetails_expire_at_label">Scade il</string>
   <string name="paymentdetails_completed_at_label">Completato il</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->

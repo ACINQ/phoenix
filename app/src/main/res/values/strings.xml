@@ -89,7 +89,7 @@
   <string name="startup_error_biometrics">Biometric authentication has failed.</string>
   <string name="startup_error_no_biometrics_or_key_invalidated">Enroll a fingerprint in Android first to unlock the wallet.\n\nOtherwise, restore your wallet using your 12-words seed backup.</string>
   <string name="startup_error_auth_failed">Authentication failed.</string>
-  <string name="startup_error_auth_failed_with_details">Authentication failed\n—\n%1$s</string>
+  <string name="startup_error_auth_failed_with_details">Authentication failed.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -402,7 +402,7 @@
   <string name="paymentdetails_relayer_label">Relayed by</string>
   <string name="paymentdetails_fees_label">Fees</string>
   <string name="paymentdetails_pay_to_open_label">Fees</string>
-  <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel</string>
+  <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel.</string>
   <string name="paymentdetails_error_label">Error</string>
   <string name="paymentdetails_closing_desc">Payment for closing channel %1$s…</string>
   <string name="paymentdetails_swap_out_desc">Payment to on-chain address</string>
@@ -433,7 +433,6 @@
   <string name="paymentdetails_payment_request_label">Payment Request</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Created at</string>
-  <string name="paymentdetails_expire_at_label">Expires at</string>
   <string name="paymentdetails_completed_at_label">Completed at</string>
 
   <!-- //////////////// channel state state //////////////// -->
@@ -624,6 +623,7 @@
   <string name="ftue__backup_seed__button">Get started</string>
 
   <!-- patch notes -->
+
   <string name="patchnotes_title">Phoenix has been updated!</string>
   <string name="patchnotes_v15"><![CDATA[
     <h4>Background payment reception</h4>
@@ -631,12 +631,12 @@
 
     <h4>Automatic channel creation</h4>
     <p>Payment channels will be automatically created for you if needed.</p>
-    <p>This feature is required for the Background payment reception to work properly, but you can disable it if you want (in Settings > Payment settings).</p>
+    <p>This feature is required for the background payment reception to work properly, but you can disable it if you want (in Settings > Payment settings).</p>
     <p>The channel creation cost still applies (%1$s%%).</p>
 
     <h4>Improved wallet lock</h4>
     <p>The app lock now uses the system\'s lock. No need to remember yet another PIN!</p>
-    <p>The previous PIN code mechanism has been removed. Go to Settings > Security to enroll for the new screen lock feature.</p>
+    <p>Go to Settings > Security to enroll for the new screen lock feature.</p>
   ]]></string>
 
 </resources>

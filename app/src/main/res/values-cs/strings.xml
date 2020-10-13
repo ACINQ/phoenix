@@ -344,7 +344,6 @@
   <string name="paymentdetails_payment_request_label">Platební Požadavek</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Vytvořeno v</string>
-  <string name="paymentdetails_expire_at_label">Vyprší v</string>
   <string name="paymentdetails_completed_at_label">Dokončeno v</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->

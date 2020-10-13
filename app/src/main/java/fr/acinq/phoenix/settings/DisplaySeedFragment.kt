@@ -66,7 +66,7 @@ class DisplaySeedFragment : BaseFragment() {
           context?.let { Toast.makeText(it, getString(R.string.displayseed_error_generic), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Error.InvalidAuth -> {
-          context?.let { Toast.makeText(it, getString(R.string.displayseed_error_wrong_password), Toast.LENGTH_SHORT).show() }
+          context?.let { Toast.makeText(it, getString(R.string.startup_error_auth_failed), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Done -> {
           context?.run { getSeedDialog(this, state.words) }?.show()

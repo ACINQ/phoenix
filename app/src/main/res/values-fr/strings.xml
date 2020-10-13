@@ -52,6 +52,9 @@
 
   <!-- //////////////// Startup //////////////////// -->
 
+  <string name="startup_unlock_required">Phoenix est verrouillé.\nVeuillez vous authentifier pour continuer.</string>
+  <string name="startup_unlock_button">Déverouiller</string>
+  <string name="startup_binding_service">Liaison au service…</string>
   <string name="startup_wait">Chargement…</string>
   <string name="startup_wait_tor">Démarrage de Tor…</string>
   <string name="startup_start_button">Redémarrer</string>
@@ -63,6 +66,9 @@
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
   <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
   <string name="startup_error_biometrics">L\'authentification biométrique a échoué.</string>
+  <string name="startup_error_no_biometrics_or_key_invalidated">Enregistrez d\'abord une empreinte digitale dans Android pour déverrouiller l\'application.\n\nVous pouvez sinon restaurer votre portefeuille en utilisant votre clé de sauvegarde.</string>
+  <string name="startup_error_auth_failed">Échec de l\'authentification.</string>
+  <string name="startup_error_auth_failed_with_details">Échec de l\'authentification.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -180,6 +186,7 @@
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Continuer</string>
+  <string name="utils_next">Suivant</string>
   <string name="utils_cancel">Annuler</string>
   <string name="utils_date_just_now">à l\'instant</string>
   <string name="utils_unknown">N/A</string>
@@ -190,6 +197,7 @@
   <string name="btn_cancel">Annuler</string>
   <string name="btn_close">Fermer</string>
   <string name="btn_pause_connecting">Connexion au peer…</string>
+  <string name="btn_pause_connecting_electrum">Connexion à electrum…</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -216,6 +224,18 @@
 
   <string name="notif_watcher_connection_title">Phoenix a besoin d\'internet</string>
   <string name="notif_watcher_connection_message">La tâche de fonds surveillant les canaux de paiement a besoin d\'une connexion internet pour pouvoir fonctionner.</string>
+
+  <string name="notif__headless_title__default">Phoenix tourne en tâche de fond</string>
+  <string name="notif__headless_title__missed_incoming">Paiement entrant manqué</string>
+  <string name="notif__headless_title__missed_fulfill">Résolution d\'un paiement en attente</string>
+  <string name="notif__headless_title__received">Paiement reçu</string>
+  <string name="notif__headless_message__app_locked">L\'application est verrouillée</string>
+  <string name="notif__headless_message__pending_fulfill">Cliquer pour lancer l\'application</string>
+  <string name="notif__headless_message__manual_pay_to_open">La création de canal de paiement requiert une action manuelle</string>
+  <string name="notif__headless_message__received_payment">Vous avez reçu %1$s (%2$s)</string>
+
+  <string name="notif_pay_to_open_title">Accepter un paiement entrant</string>
+  <string name="notif_pay_to_open_message">Cliquez pour ouvrir l\'application</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -353,22 +373,43 @@
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Reçu</b> %1$s]]></string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
+  <string name="paymentdetails_desc_custom_title">Ajouter une note</string>
+  <string name="paymentdetails_desc_custom_info">Vous pouvez attacher une note à ce paiement.</string>
   <string name="paymentdetails_destination_label">Envoyé à</string>
+  <string name="paymentdetails_relayer_label">Relayé par</string>
+  <string name="paymentdetails_pay_to_open_label">Frais</string>
+  <string name="paymentdetails_pay_to_open_desc">Ces frais couvrent le coût d\'ouverture d\'un nouveau canal de paiement.</string>
   <string name="paymentdetails_fees_label">Frais</string>
   <string name="paymentdetails_error_label">Erreur</string>
   <string name="paymentdetails_closing_desc">Paiement pour clôture du channel %1$s…</string>
+  <string name="paymentdetails_swap_out_desc">Paiement vers une addresse on-chain</string>
   <string name="paymentdetails_no_description">Pas de description</string>
+  <string name="paymentdetails_address_label">Adresse</string>
+  <string name="paymentdetails_address_open_explorer">Ouvrir dans une explorateur</string>
+  <string name="paymentdetails_info_uniclose"><![CDATA[
+    Ce paiement est survenu suite à un conflit dans un canal de paiement. Les fonds seront envoyés à l\'adresse suivante : %1$s.
+    <br /><br />
+    Pour récupérer vos fonds, suivez <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">ces instructions</a>.
+  ]]></string>
 
   <string name="paymentdetails_technicals_button">Afficher les détails techniques</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">Détails du paiement</string>
-  <string name="paymentdetails_payment_hash_label">Payment Hash</string>
+  <string name="paymentdetails_swap_out_feerate_label">Taux utilisés pour le swap</string>
+  <string name="paymentdetails_closing_type_label">Type de clôture</string>
+  <string name="paymentdetails_closing_type_mutual">Mutuelle</string>
+  <string name="paymentdetails_closing_type_local">Locale</string>
+  <string name="paymentdetails_closing_type_remote">Distante</string>
+  <string name="paymentdetails_closing_type_other">Autre</string>
+  <string name="paymentdetails_closing_channel_label">Identifiant du canal fermé</string>
+  <string name="paymentdetails_closing_spending_txs_label">Transactions de clôture</string>
+  <string name="paymentdetails_pubkey_label">Clé public de la cible</string>
+  <string name="paymentdetails_payment_hash_label">Payment hash</string>
   <string name="paymentdetails_payment_request_label">Requête de paiement</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Date de création</string>
-  <string name="paymentdetails_expire_at_label">Date d\'expiration</string>
   <string name="paymentdetails_completed_at_label">Date de complétion</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
@@ -394,6 +435,9 @@
 
   <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
   <string name="accessctrl_screen_lock_switch_desc">Verrouille l\'accès aux écrans de l\'application avec l\'authentification système d\'Android.</string>
+  <string name="accessctrl_full_lock_switch_unavailable">Enregistrez une empreinte digitale dans Android pour bénéficier d\'options supplémentaires.</string>
+  <string name="accessctrl_full_lock_switch_backup_required">Confirmez d\'abord que vous avez sauvegardé votre clé de sauvegarde pour bénéficier d\'options supplémentaires.</string>
+  <string name="accessctrl_full_lock_switch_backup_required_button">Accéder à ma clé de sauvegarde</string>
   <string name="accessctrl_full_lock_switch">Bloquer le fonctionnement en tâche de fond</string>
   <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
   <string name="accessctrl_full_lock_confirm_title">Information</string>
@@ -427,10 +471,11 @@
 
   <!-- //////////////// display preferences //////////////// -->
 
-  <string name="prefs_display_title">Display options</string>
-  <string name="prefs_display_coin_label">Bitcoin unit</string>
-  <string name="prefs_display_fiat_label">Fiat currency</string>
-  <string name="prefs_display_theme_label">Application theme</string>
+  <string name="prefs_display_title">Options d\'affichage</string>
+  <string name="prefs_display_coin_label">Unité des montants Bitcoin</string>
+  <string name="prefs_display_fiat_label">Monnaie fiduciaire</string>
+  <string name="prefs_display_theme_label">Thèmen de l\'application</string>
+  <string name="prefs_display_explorer_label">Explorateur de blocs</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
@@ -516,10 +561,26 @@
   <string name="ftue__skip_button">Passer</string>
   <string name="ftue__welcome__header">Bienvenue !</string>
   <string name="ftue__welcome__body">Avec Phoenix, recevoir et envoyer des bitcoins est facile, rapide, et sûr.</string>
-  <string name="ftue__pay_to_open__header">C\'est simple</string>
+  <string name="ftue__pay_to_open__header">Automatisation des canaux de paiement</string>
   <string name="ftue__pay_to_open__body">Les canaux de paiement sont créés automatiquement si besoin, pour un coût faible (%1$s%%). Par exemple, pour recevoir 100€, les frais seraient 10 centimes.\n\nVous pouvez aussi gérer cela manuellement.</string>
   <string name="ftue__backup_seed__header">Gardez le contrôle</string>
   <string name="ftue__backup_seed__body">Une clé privée est associée à votre wallet, et permet de récupérer vos fonds si besoin.\n\nPrenez en soin et gardez la secrète !</string>
   <string name="ftue__backup_seed__button">Commencer</string>
+
+  <!-- patch notes -->
+  <string name="patchnotes_title">Phoenix a éte mis à jour !</string>
+  <string name="patchnotes_v15"><![CDATA[
+    <h4>Réception de paiement en tâche de fonds</h4>
+    <p>Phoenix est désormais capable de recevoir des paiement même si l\'application n\'est pas démarrée.</p>
+
+    <h4>Création automatique des canaux de paiement</h4>
+    <p>Un canal de paiement sera automatiquement créé si besoin.</p>
+    <p>Cette fonctionnalité est utile pour que la réception en tâche de fonds fonctionne correctement, mais vous pouvez la désactiver si vous le souhaitez (dans Configuration > Options des paiements).</p>
+    <p>Les frais de création de canal de paiement s\'appliquent toujours (%1$s%%).</p>
+
+    <h4>Amélioration du verrouillage</h4>
+    <p>Le verrouillage de l\'application utilise maintenant celui du système Android. Plus besoin de se souvenir d\'un énième PIN !</p>
+    <p>Allez dans Configuration > Sécurité pour activer le verouillage écran.</p>
+  ]]></string>
 
 </resources>

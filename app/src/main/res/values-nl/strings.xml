@@ -61,6 +61,8 @@
   <string name="startup_error_network">Je internetverbinding werkt niet. Controleer je WiFi-signaal of je mobiele netwerk.</string>
   <string name="startup_error_wrong_pwd">PIN is onjuist</string>
   <string name="startup_error_biometrics">Biometrische authenticatie is mislukt.</string>
+  <string name="startup_error_auth_failed">Authenticatie is mislukt.</string>
+  <string name="startup_error_auth_failed_with_details">Authenticatie is mislukt.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -342,7 +344,6 @@
   <string name="paymentdetails_payment_request_label">Betalingsverzoek</string>
   <string name="paymentdetails_preimage_label">Voorbeeld</string>
   <string name="paymentdetails_created_at_label">Gemaakt op</string>
-  <string name="paymentdetails_expire_at_label">Verloopt op</string>
   <string name="paymentdetails_completed_at_label">Voltooid om</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->

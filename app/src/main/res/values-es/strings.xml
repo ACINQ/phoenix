@@ -62,6 +62,8 @@
   <string name="startup_error_network">Tu conexión a internet no funciona. Por favor, comprueba la conexión Wi-Fi o red móvil.</string>
   <string name="startup_error_wrong_pwd">PIN incorrecto</string>
   <string name="startup_error_biometrics">La autenticación biométrica falló.</string>
+  <string name="startup_error_auth_failed">La autenticación falló</string>
+  <string name="startup_error_auth_failed_with_details">La autenticación falló.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -368,7 +370,6 @@
   <string name="paymentdetails_payment_request_label">Solicitud de pago</string>
   <string name="paymentdetails_preimage_label">Preimagen</string>
   <string name="paymentdetails_created_at_label">Creado el</string>
-  <string name="paymentdetails_expire_at_label">Caduca a las</string>
   <string name="paymentdetails_completed_at_label">Completado el</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->

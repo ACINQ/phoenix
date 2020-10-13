@@ -894,7 +894,7 @@ class EclairNodeService : Service() {
   /** Set or unset the FCM token with the peer, depending on the encrypted seed type. */
   fun refreshFCMToken(token: String?) {
     kit?.run {
-      when(SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))) {
+      when (SeedManager.getSeedFromDir(Wallet.getDatadir(applicationContext))) {
         is EncryptedSeed.V2.NoAuth -> {
           log.info("registering fcm token=$token with node=${Wallet.ACINQ.nodeId()}")
           token?.let { switchboard().tell(Peer.SendSetFCMToken(Wallet.ACINQ.nodeId(), it), ActorRef.noSender()) }
@@ -938,7 +938,10 @@ class EclairNodeService : Service() {
 
   private fun updateNotification(title: String?, message: String?): Notification {
     title?.let { notificationBuilder.setContentTitle(it) }
-    message?.let { notificationBuilder.setContentText(it) }
+    message?.let {
+      notificationBuilder.setContentText(message)
+      notificationBuilder.setStyle(NotificationCompat.BigTextStyle().bigText(message))
+    }
     return notificationBuilder.build().apply {
       notificationManager.notify(Constants.NOTIF_ID__HEADLESS, this)
     }
