@@ -40,6 +40,7 @@ import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 import java.util.*
 
 
@@ -136,7 +137,14 @@ object Wallet {
           when {
             input.startsWith("lightning://", true) -> input.drop(12)
             input.startsWith("lightning:", true) -> input.drop(10)
-            else -> input
+            else -> {
+              val uri = URI(input)
+              if (uri.scheme != null) {
+                uri.getParams()["lightning"] ?: throw RuntimeException("not a valid LNURL fallback scheme")
+              } else {
+                input
+              }
+            }
           }.run { LNUrl.extractLNUrl(this) }
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")

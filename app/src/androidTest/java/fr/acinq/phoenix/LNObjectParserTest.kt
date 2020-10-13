@@ -22,6 +22,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.lnurl.LNUrlAuth
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.BitcoinURI
+import fr.acinq.phoenix.utils.UnreadableLightningObject
 import fr.acinq.phoenix.utils.Wallet
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,20 +47,33 @@ class LNObjectParserTest {
     // lnurl
     Wallet.parseLNObject("lnurl1dp68gurn8ghj7ctsdyhxcmndv9exket5wvhxxmmd9akxuatjdshkz0m5v9nn6mr0va5kufntxy7kzvfnv5ckxvmzxu6r2enrxscnxc33vvunsdrx8qmnxdfkxa3xgc3sv9jkgctyvgmrxde5xqcr2veh8ymrycf5vvuxydp5vyexgdpexgnxsmtpvv7nwc3cxyuxgdf58qmrsvehvvcxyvmrxvurxc3jx93rsetyvfjnyepn89jxvcmpxccnyvejxe3kxc3cxumxvde5v3jxvc3sxcmrycnxxuj63qyj") as LNUrlAuth
     Wallet.parseLNObject("lightning:LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94MKJARGV3EXZAELWDJHXUMFDAHR6WPSXU6NYVRRVE3K2VFJX9JXYCF3XA3RZDMPV43NWDPSVCUKXDFHVVEKXDMYXD3XVCN9XSEK2VPHVS6KVERYXUUNJWR9VS6XYCEHX5CQQCJJXZ") as LNUrlWithdraw
+    Wallet.parseLNObject("https://service.com/giftcard/redeem?id=123&lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94MKJARGV3EXZAELWDJHXUMFDAHR6WPSXU6NYVRRVE3K2VFJX9JXYCF3XA3RZDMPV43NWDPSVCUKXDFHVVEKXDMYXD3XVCN9XSEK2VPHVS6KVERYXUUNJWR9VS6XYCEHX5CQQCJJXZ") as LNUrlWithdraw
+    Wallet.parseLNObject("http://foo.bar?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94KX7EMFDCLHGCT884KX7EMFDCNXKVFAX5CRGCFJXANRWVN9VSUK2WTPVF3NXVP4V93KXD3HVS6RWVTZXY6NWVEHV5CNQCFN893RJWF4V9NRQVM9XANRYVR9X4NXGETY8Q6KYDC0Q6NTC") as LNUrlAuth
+    Wallet.parseLNObject("foobar://test?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94MKJARGV3EXZAELWDJHXUMFDAHR6WPNXF3KGVFN89JNZENPVY6NSVRP8QCKZCEKVCCRGCTPXY6RJVT9XGMK2DPE893KZEPJXE3RGVFKXYUNWV3EVV6R2DRPXG6RWWP5VDSSSQSUZT") as LNUrlWithdraw
   }
 
-  @Test(expected = RuntimeException::class)
+  @Test(expected = UnreadableLightningObject::class)
   fun bolt_11_invalid() {
     Wallet.parseLNObject("lntb15u1p0ct4v7pp5rdsy32dyuhxrsv67l05yfus4hmfu36cknav0zgxk432v0nvt5a0qdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5h2626t59xdj8jkjju3hwlg5rlsrqtcvr54k09k09ma77gd378ahsy0qc5hgvz44x57aswjns56kk7m75cgn6hns0yt7ur4m38k44wuusq0r7sfq4e23nvqznqfpvha452wd8ewemett86gw27n2uwqe8aqgp")  as PaymentRequest
   }
 
-  @Test(expected = RuntimeException::class)
+  @Test(expected = UnreadableLightningObject::class)
   fun bolt_11_bad_prefix() {
     Wallet.parseLNObject("whatever:lntb15u1p0ct4v7pp5rdsy32dyuhxrsv67l05yfus4hmfu36cknav0zgxk432v0nvt5a0qdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5h2626t59xdj8jkjju3hwlg5rlsrqtcvr54k09k09ma77gd378ahsy0qc5hgvz44x57aswjns56kk7m75cgn6hns0yt7ur4m38k44wuusq0r7sfq4e23nvqznqfpvha452wd8ewemett86gw27n2uwqe8aqgpfna3yz") as PaymentRequest
   }
 
-  @Test(expected = RuntimeException::class)
+  @Test(expected = UnreadableLightningObject::class)
   fun lnurl_invalid() {
     Wallet.parseLNObject("lnurl1dp68gurn8ghj7ctsdyhxcmndv9exket5wvhxxmmd9akxuatjdshkz0m5v9nn6mr0va5kufntxy7kzvfnv5ckxvmzxu6r2enrxscnxc33vvunsdrx8qmnxdfkxa3xgc3sv9jkgctyvgmrxde5xqcr2veh8ymrycf5vvuxydp5vyexgdpexgnxsmtpvv7nwc3cxyuxgdf58qmrsvehvvcxyvmrxvurxc3jx93rsetyvfjnyepn89jxvcmpxccnyvejxe3kxc3cxumxvde5v3jxvc3sxcmrycnxxuj63qyjaaaaaaaa") as LNUrlAuth
+  }
+
+  @Test(expected = UnreadableLightningObject::class)
+  fun lnurl_invalid_fallback_param() {
+    Wallet.parseLNObject("http://foo.bar/redeem?lightning2=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94KX7EMFDCLHGCT884KX7EMFDCNXKVFAX5CRGCFJXANRWVN9VSUK2WTPVF3NXVP4V93KXD3HVS6RWVTZXY6NWVEHV5CNQCFN893RJWF4V9NRQVM9XANRYVR9X4NXGETY8Q6KYDC0Q6NTC")
+  }
+
+  @Test(expected = UnreadableLightningObject::class)
+  fun lnurl_invalid_fallback_uri() {
+    Wallet.parseLNObject("foo:bar?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94KX7EMFDCLHGCT884KX7EMFDCNXKVFAX5CRGCFJXANRWVN9VSUK2WTPVF3NXVP4V93KXD3HVS6RWVTZXY6NWVEHV5CNQCFN893RJWF4V9NRQVM9XANRYVR9X4NXGETY8Q6KYDC0Q6NTC")
   }
 }
