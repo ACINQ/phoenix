@@ -73,7 +73,7 @@
 
   <!-- //////////////// Startup //////////////////// -->
 
-  <string name="startup_unlock_required">Phoenix está bloqueada.\nPor favor autentique para continuar.</string>
+  <string name="startup_unlock_required">A Phoenix está bloqueada.\nPor favor autentique para continuar.</string>
   <string name="startup_unlock_button">Desbloquear</string>
   <string name="startup_binding_service">Binding service…</string>
   <string name="startup_wait">Carregando…</string>
