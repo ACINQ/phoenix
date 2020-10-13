@@ -195,7 +195,7 @@
   <string name="settings_display_prefs">Tela</string>
   <string name="settings_security_title">Segurança</string>
   <string name="settings_display_seed">Frase de recuperação</string>
-  <string name="settings_seed_security">Configurações de acesso</string>
+  <string name="settings_access_control">Configurações de acesso</string>
   <string name="settings_advanced_title">Avançado</string>
   <string name="settings_fees">Configurações de taxas</string>
   <string name="settings_list_channels">Lista de canais</string>
@@ -295,8 +295,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
-  <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
@@ -379,37 +377,13 @@
   <string name="state_offline">O par está offline</string>
   <string name="state_shutdown">Desligar</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Segurança</string>
-  <string name="seedsec_subtitle">É muito importante criar um PIN para proteger sua carteira. Se o seu aparelho suportar, você pode usar autenticação biométrica.</string>
-  <string name="seedsec_pin_switch">Autenticação por PIN</string>
-  <string name="seedsec_pin_scramble">Embaralhamento de teclado PIN</string>
-  <string name="seedsec_biometrics_switch">Autenticação biométrica</string>
-  <string name="seedsec_change_pin">Alterar PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Falha no registro biométrico. Tente novamente.</string>
-  <string name="seedsec_pindialog_title_unlock">Insira seu PIN atual para continuar</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Insira <b>seu novo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Favor <b>confirmar</b> seu novo PIN]]></string>
+  <string name="accessctrl_title">Segurança</string>
 
-  <string name="seedsec_pin_update_success">PIN atualizado com sucesso!</string>
-  <string name="seedsec_biometric_enabled">Autenticação biométrica ativada</string>
-  <string name="seedsec_biometric_disabled">Autenticação biométrica desativada</string>
-
-  <string name="seedsec_biometric_support_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Primeiro registre a biometria.</string>
-
-  <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match">PINs não conferem. Tente novamente.</string>
-  <string name="seedsec_error_generic">Ocorreu um erro, a carteira não foi criptografada.\n\nTente novamente.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Desativar bloqueio biométrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">Você precisará usar seu código PIN a partir de agora</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancelar</string>
-
-  <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
-  <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 

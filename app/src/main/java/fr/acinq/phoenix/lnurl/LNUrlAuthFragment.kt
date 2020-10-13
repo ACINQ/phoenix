@@ -31,8 +31,8 @@ import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.Protocol
 import fr.acinq.eclair.crypto.`Mac32$`
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentLnurlAuthBinding
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.KitNotInitialized
@@ -152,7 +152,7 @@ class LNUrlAuthFragment : BaseFragment() {
       // 2 - build key that will be used to link with service
       DeterministicWallet.derivePrivateKey(key, path).privateKey()
     } else {
-      throw KitNotInitialized()
+      throw KitNotInitialized
     }
   }
 }

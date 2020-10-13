@@ -20,16 +20,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentSettingsBinding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class SettingsFragment : BaseFragment() {
+class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -41,9 +42,15 @@ class SettingsFragment : BaseFragment() {
     return mBinding.root
   }
 
-  override fun onActivityCreated(savedInstanceState: Bundle?) {
-    super.onActivityCreated(savedInstanceState)
-    mBinding.appModel = app
+  override fun handleAppState(state: KitState) {
+    super.handleAppState(state)
+    val isStarted = state is KitState.Started
+    mBinding.securityTitle.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.displaySeedButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.accessControlButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.listAllChannelsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.mutualCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.forceCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
   }
 
   override fun onStart() {
@@ -54,13 +61,13 @@ class SettingsFragment : BaseFragment() {
     mBinding.mutualCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_mutual_close) }
     mBinding.forceCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_force_close) }
     mBinding.displaySeedButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_display_seed) }
-    mBinding.seedSecurityButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_seed_security) }
+    mBinding.accessControlButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_access_control) }
     mBinding.listAllChannelsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_list_channels) }
     mBinding.logsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_logs) }
 //    mBinding.feesButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_fees) }
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
     mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
+    mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
   }
 
-  override fun handleKitState(state: KitState) {}
 }

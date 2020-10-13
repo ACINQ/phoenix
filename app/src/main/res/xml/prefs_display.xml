@@ -47,4 +47,14 @@
     android:title="@string/prefs_display_theme_label"
     app:iconSpaceReserved="false" />
 
+  <ListPreference
+    android:defaultValue="Mempool.space"
+    android:dialogTitle="@string/prefs_display_explorer_label"
+    android:entries="@array/explorer_labels"
+    android:entryValues="@array/explorer_values"
+    android:key="PREFS_EXPLORER"
+    android:summary="%s"
+    android:title="@string/prefs_display_explorer_label"
+    app:iconSpaceReserved="false" />
+
 </PreferenceScreen>

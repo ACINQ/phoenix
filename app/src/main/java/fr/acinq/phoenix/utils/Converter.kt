@@ -29,8 +29,10 @@ import fr.acinq.phoenix.R
 import org.slf4j.LoggerFactory
 import scala.Option
 import scala.math.`BigDecimal$`
+import scodec.bits.ByteVector
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
@@ -104,7 +106,11 @@ object Converter {
 
   public fun html(source: String): Spanned {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT)
+      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
     } else {
       Html.fromHtml(source)
     }
@@ -187,4 +193,9 @@ object Converter {
   }
 
   fun msat2sat(amount: MilliSatoshi): Satoshi = amount.truncateToSatoshi()
+
+  fun toAscii(b: ByteVector): String? {
+    val bytes: ByteArray = b.toArray()
+    return String(bytes, StandardCharsets.US_ASCII)
+  }
 }

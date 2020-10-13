@@ -105,7 +105,7 @@ object Logging {
 
     val triggeringPolicy = SizeBasedTriggeringPolicy<ILoggingEvent>()
     triggeringPolicy.context = lc
-    triggeringPolicy.maxFileSize = FileSize.valueOf("4mb")
+    triggeringPolicy.maxFileSize = FileSize.valueOf("8mb")
     triggeringPolicy.start()
 
     appender.encoder = encoder

@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.events
+package fr.acinq.phoenix.background
 
 import akka.actor.UntypedActor
+import android.content.Context
+import fr.acinq.bitcoin.Base58Check
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Script
 import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
@@ -32,6 +36,9 @@ import fr.acinq.eclair.wire.SwapInConfirmed
 import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
+import fr.acinq.phoenix.db.*
+import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters
@@ -43,7 +50,17 @@ class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 /**
  * This actor listens to events dispatched by eclair core.
  */
-class EclairSupervisor : UntypedActor() {
+class EclairSupervisor(applicationContext: Context) : UntypedActor() {
+
+  private val paymentMetaRepository: PaymentMetaRepository
+  private val payToOpenMetaRepository: PayToOpenMetaRepository
+
+  init {
+    val appDb = AppDb.getInstance(applicationContext)
+    paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaQueries)
+    payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenMetaQueries)
+  }
+
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
 
   // key is payment hash
@@ -54,18 +71,48 @@ class EclairSupervisor : UntypedActor() {
     when (event) {
       // -------------- CHANNELS LIFECYCLE -------------
       is ChannelStateChanged -> {
-        val data = event.currentData()
-        if (data is HasCommitments) {
+        if (event.currentData() is HasCommitments && event.currentData() is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && event.previousState() != `WAIT_FOR_INIT_INTERNAL$`.`MODULE$`) {
+          val data = event.currentData() as DATA_CLOSING
           // dispatch closing if the channel's goes to closing. Do NOT dispatch if the channel is restored and was already closing (i.e closing from an internal state).
-          if (data is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && event.previousState() != `WAIT_FOR_INIT_INTERNAL$`.`MODULE$`) {
-            log.info("closing channel ${data.channelId()}")
-            EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId()))
+          log.info("channel closing detected for id=${data.channelId()} with data=$data")
+          val balance = data.commitments().localCommit().spec().toLocal().truncateToSatoshi()
+          val spendingTxs = JavaConverters.seqAsJavaListConverter(data.spendingTxes()).asJava()
+          val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
+            .firstOrNull {
+              log.debug("txout with amount=${it.amount()} to script=${it.publicKeyScript().toBase58()}, against balance=${balance}")
+              it.amount() == balance && Script.isPayToScript(it.publicKeyScript())
+            }?.let {
+              val address = Base58Check.encode(Wallet.getScriptHashVersion(), Script.publicKeyHash(it.publicKeyScript()))
+              log.info("found closing txOut sending to script=${it.publicKeyScript().toBase58()} address=$address")
+              address
+            }
+          val closingType = when {
+            !data.mutualClosePublished().isEmpty && data.localCommitPublished().isEmpty && data.remoteCommitPublished().isEmpty && data.revokedCommitPublished().isEmpty -> ClosingType.Mutual
+            data.mutualClosePublished().isEmpty && !data.localCommitPublished().isEmpty && data.remoteCommitPublished().isEmpty && data.revokedCommitPublished().isEmpty -> ClosingType.Local
+            data.mutualClosePublished().isEmpty && data.localCommitPublished().isEmpty && !data.remoteCommitPublished().isEmpty && data.revokedCommitPublished().isEmpty -> ClosingType.Remote
+            else -> ClosingType.Other
           }
+          EventBus.getDefault().post(ChannelClosingEvent(data.commitments().availableBalanceForSend(), data.channelId(), closingType, spendingTxs, ourSpendingAddress))
         }
         // dispatch UI event if a channel reaches or leaves the WAIT FOR FUNDING CONFIRMED state
         if (event.currentState() == `WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$` || event.previousState() == `WAIT_FOR_FUNDING_CONFIRMED$`.`MODULE$`) {
           log.debug("channel ${event.channel()} in state ${event.currentState()} from ${event.previousState()}")
           EventBus.getDefault().post(ChannelStateChange())
+        }
+      }
+      is ChannelErrorOccurred -> {
+        if (event.channelId() != null && event.isFatal) {
+          val error = event.error()
+          val errorMessage = if (error is LocalError && error.t() != null) {
+            error.t().message ?: error.t()::javaClass.name
+          } else if (error is RemoteError) {
+            if (`package$`.`MODULE$`.isAsciiPrintable(error.e().data())) {
+              Converter.toAscii(error.e().data())
+            } else {
+              error.e().data().toString()
+            }
+          } else null
+          errorMessage?.let { paymentMetaRepository.setChannelClosingError(event.channelId().toString(), it) }
         }
       }
       is ChannelSignatureSent -> {
@@ -97,6 +144,12 @@ class EclairSupervisor : UntypedActor() {
         val payToOpen = payToOpenMap[event.paymentHash]
         payToOpen?.let {
           if (it.decision().trySuccess(true)) {
+            payToOpen.payToOpenRequest().amountMsat()
+            payToOpenMetaRepository.insert(
+              paymentHash = event.paymentHash,
+              fee = payToOpen.payToOpenRequest().feeSatoshis(),
+              amount = payToOpen.payToOpenRequest().amountMsat().truncateToSatoshi(),
+              capacity = payToOpen.payToOpenRequest().fundingSatoshis())
             payToOpenMap.remove(event.paymentHash)
           } else {
             log.warn("success promise for $event has failed")
