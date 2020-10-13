@@ -474,7 +474,7 @@
   <string name="prefs_display_title">Options d\'affichage</string>
   <string name="prefs_display_coin_label">Unité des montants Bitcoin</string>
   <string name="prefs_display_fiat_label">Monnaie fiduciaire</string>
-  <string name="prefs_display_theme_label">Thèmen de l\'application</string>
+  <string name="prefs_display_theme_label">Thème de l\'application</string>
   <string name="prefs_display_explorer_label">Explorateur de blocs</string>
 
   <!-- //////////////// electrum server //////////////// -->

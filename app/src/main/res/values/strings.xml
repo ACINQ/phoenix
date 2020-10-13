@@ -587,6 +587,12 @@
   <br/><br/>
   If you have questions, consult the <a href="https://phoenix.acinq.co/faq">FAQ</a>. You can also contact <a href="https://phoenix.acinq.co/support">support</a> for help.
   ]]></string>
+  <string name="about_fiat_rates"><![CDATA[
+    Bitcoin/fiat exchange rates are retrieved from various third-party APIs:
+    <br />- Blockchain.info
+    <br />- Bitso
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
+  ]]></string>
 
   <!-- //////////////// background node service //////////////// -->
 

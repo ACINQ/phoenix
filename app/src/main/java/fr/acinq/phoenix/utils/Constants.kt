@@ -31,8 +31,9 @@ object Constants {
   // -- apis
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
-  const val PRICE_RATE_API = "https://blockchain.info/ticker"
-  const val MXN_PRICE_RATE_API = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
+  const val BLOCKCHAININFO_TICKER = "https://blockchain.info/ticker"
+  const val BITSO_MXN_TICKER = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
+  const val COINDESK_CZK_TICKER = "https://api.coindesk.com/v1/bpi/currentprice/CZK.json"
   val ONEML_URL = if (Wallet.isMainnet()) "https://1ml.com" else "https://1ml.com/testnet"
   val MEMPOOLSPACE_EXPLORER_URL = if (Wallet.isMainnet()) "https://mempool.space" else "https://mempool.space/testnet"
   val BLOCKSTREAM_EXPLORER_URL = if (Wallet.isMainnet()) "https://blockstream.info" else "https://blockstream.info/testnet"

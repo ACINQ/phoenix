@@ -23,6 +23,7 @@
     <item>(CHF) Swiss Franc</item>
     <item>(CLP) Chilean Peso</item>
     <item>(CNY) Chinese Yuan</item>
+    <item>(CZK) Czech Koruna</item>
     <item>(DKK) Danish Krone</item>
     <item>(EUR) Euro</item>
     <item>(GBP) Great British Pound</item>
@@ -48,6 +49,7 @@
     <item>CHF</item>
     <item>CLP</item>
     <item>CNY</item>
+    <item>CZK</item>
     <item>DKK</item>
     <item>EUR</item>
     <item>GBP</item>

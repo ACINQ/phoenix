@@ -83,8 +83,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
     // poll exchange rate api every 120 minutes
     kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 120 * 60 * 1000) {
-      Wallet.httpClient.newCall(Request.Builder().url(Constants.PRICE_RATE_API).build()).enqueue(getExchangeRateHandler(applicationContext))
-      Wallet.httpClient.newCall(Request.Builder().url(Constants.MXN_PRICE_RATE_API).build()).enqueue(getMXNRateHandler(applicationContext))
+      Wallet.httpClient.newCall(Request.Builder().url(Constants.BLOCKCHAININFO_TICKER).build()).enqueue(handleBlockchainInfoTicker(applicationContext))
+      Wallet.httpClient.newCall(Request.Builder().url(Constants.BITSO_MXN_TICKER).build()).enqueue(getMXNRateHandler(applicationContext))
+      Wallet.httpClient.newCall(Request.Builder().url(Constants.COINDESK_CZK_TICKER).build()).enqueue(handleCoindeskCZKTicker(applicationContext))
     }
 
     // notification channels (android 8+)
@@ -191,15 +192,15 @@ class AppContext : Application(), DefaultLifecycleObserver {
     })
   }
 
-  private fun getExchangeRateHandler(context: Context): Callback {
+  private fun handleBlockchainInfoTicker(context: Context): Callback {
     return object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("could not retrieve exchange rates: ${e.localizedMessage}")
+        log.warn("could not retrieve exchange rates from blockchain.info: ${e.localizedMessage}")
       }
 
       override fun onResponse(call: Call, response: Response) {
         if (!response.isSuccessful) {
-          log.warn("could not retrieve exchange rates, api responds with ${response.code()}")
+          log.warn("could not retrieve rates, blockchain.info api responds with ${response.code()}")
         } else {
           response.body()?.let {
             try {
@@ -232,7 +233,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
             } finally {
               it.close()
             }
-          } ?: log.warn("exchange rate body is null")
+          } ?: log.warn("blockchain.info ticker body is null")
         }
       }
     }
@@ -241,17 +242,36 @@ class AppContext : Application(), DefaultLifecycleObserver {
   private fun getMXNRateHandler(context: Context): Callback {
     return object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("could not retrieve MXN rates: ${e.localizedMessage}")
+        log.warn("could not retrieve MXN rate from bitso: ${e.localizedMessage}")
       }
 
       override fun onResponse(call: Call, response: Response) {
         if (!response.isSuccessful) {
-          log.warn("could not retrieve MXN rates, api responds with ${response.code()}")
+          log.warn("could not retrieve MXN rates, bitso api responds with ${response.code()}")
         } else {
           response.body()?.let { body ->
             saveRate(context, "MXN") { JSONObject(body.string()).getJSONObject("payload").getDouble("last").toFloat() }
             body.close()
-          } ?: log.warn("MXN rate body is null")
+          } ?: log.warn("MXN ticker body is null")
+        }
+      }
+    }
+  }
+
+  private fun handleCoindeskCZKTicker(context: Context): Callback {
+    return object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("could not retrieve CZK rate: ${e.localizedMessage}")
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        if (!response.isSuccessful) {
+          log.warn("could not retrieve CZK rates, coindesk api responds with ${response.code()}")
+        } else {
+          response.body()?.let { body ->
+            saveRate(context, "CZK") { JSONObject(body.string()).getJSONObject("bpi").getJSONObject("CZK").getDouble("rate_float").toFloat() }
+            body.close()
+          } ?: log.warn("CZK ticker body is null")
         }
       }
     }
