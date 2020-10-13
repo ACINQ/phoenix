@@ -35,7 +35,7 @@ class LNUrlUnhandledTag(tag: String) : RuntimeException("unhandled LNURL tag=$ta
 
 sealed class LNUrlRemoteFailure : java.lang.RuntimeException() {
   object Generic : LNUrlRemoteFailure()
-  object CouldNotConnect: LNUrlRemoteFailure()
+  object CouldNotConnect : LNUrlRemoteFailure()
   object Unreadable : LNUrlRemoteFailure()
   data class Detailed(val reason: String) : LNUrlRemoteFailure()
   data class Code(val code: Int) : LNUrlRemoteFailure()
@@ -76,7 +76,7 @@ interface LNUrl {
         if (k1 == null) {
           throw LNUrlAuthMissingK1()
         } else {
-          LNUrlAuth(url.topPrivateDomain()!!, url.toString(), k1)
+          LNUrlAuth(url.host()!!, url.toString(), k1)
         }
       } else {
         // otherwise execute GET to url to retrieve details from remote server
@@ -105,8 +105,8 @@ interface LNUrl {
 
     fun handleLNUrlRemoteResponse(response: Response): JSONObject {
       val body = response.body()
-      return if (response.isSuccessful && body != null) {
-        try {
+      try {
+        if (response.isSuccessful && body != null) {
           val json = JSONObject(body.string())
           log.debug("remote lnurl service responded with: $json")
           if (json.has("status") && json.getString("status").trim().equals("error", true)) {
@@ -114,23 +114,25 @@ interface LNUrl {
             val message = if (json.has("reason")) json.getString("reason") else "N/A"
             throw LNUrlRemoteFailure.Detailed(message)
           } else {
-            json
+            return json
           }
-        } catch (e: JSONException) {
-          log.error("failed to read LNUrl response: ", e)
-          throw LNUrlRemoteFailure.Unreadable
+        } else if (!response.isSuccessful) {
+          throw LNUrlRemoteFailure.Code(response.code())
+        } else {
+          throw LNUrlRemoteFailure.Generic
         }
-      } else if (!response.isSuccessful) {
-        throw LNUrlRemoteFailure.Code(response.code())
-      } else {
-        throw LNUrlRemoteFailure.Generic
+      } catch (e: JSONException) {
+        log.error("failed to read LNUrl response: ", e)
+        throw LNUrlRemoteFailure.Unreadable
+      } finally {
+        body?.close()
       }
     }
   }
 }
 
 @Parcelize
-class LNUrlAuth(val topDomain: String, val authEndpoint: String, val k1: String) : LNUrl, Parcelable
+class LNUrlAuth(val host: String, val authEndpoint: String, val k1: String) : LNUrl, Parcelable
 
 @Parcelize
 class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,

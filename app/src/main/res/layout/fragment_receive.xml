@@ -325,7 +325,7 @@
           android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"
-          app:is_paused_inverse="@{appModel.peerConn}"
+          app:is_paused="@{!appModel.networkInfo.lightningConnected}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_in_sep"

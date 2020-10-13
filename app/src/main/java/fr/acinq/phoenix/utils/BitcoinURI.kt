@@ -16,16 +16,18 @@
 
 package fr.acinq.phoenix.utils
 
-import android.net.Uri
+import fr.acinq.bitcoin.Btc
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.BtcUnit
-import fr.acinq.eclair.CoinUtils
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.payment.PaymentRequest
+import org.slf4j.LoggerFactory
+import scala.math.BigDecimal
+import java.net.URI
+import java.net.URLDecoder
 
-class BitcoinURI(input: String) {
+class BitcoinURI(val raw: String) {
+  val log = LoggerFactory.getLogger(this::class.java)
 
-  val raw: String
   val address: String
   val message: String?
   val label: String?
@@ -33,72 +35,65 @@ class BitcoinURI(input: String) {
   val amount: Satoshi?
 
   init {
-
-    val uri = Uri.parse(stripScheme(input))
-
-    // -- should have no scheme (bitcoin: and bitcoin:// are stripped)
-    if (uri.scheme != null) {
-      throw BitcoinURIParseException("scheme=${uri.scheme} is not valid")
+    val uri = tryWith(BitcoinURIParseException("cannot parse $raw")) {
+      URI(if (raw.startsWith("bitcoin://", ignoreCase = true)) raw.removeRange(8, 10) else raw)
+        .run {
+          if (scheme != null && !scheme.equals("bitcoin", ignoreCase = true)) {
+            throw BitcoinURIParseException("invalid scheme=${scheme}")
+          }
+          URI(rawSchemeSpecificPart)
+        }
     }
-
-    // -- read and validate address
-    val path = uri.path
-    if (path.isNullOrBlank()) {
-      throw BitcoinURIParseException("address is missing")
-    }
-    try {
-      `package$`.`MODULE$`.addressToPublicKeyScript(path, Wallet.getChainHash())
-    } catch (e: IllegalArgumentException) {
+    this.address = try {
+      `package$`.`MODULE$`.addressToPublicKeyScript(uri.path, Wallet.getChainHash())
+      uri.path
+    } catch (e: Exception) {
       throw BitcoinURIParseException("invalid address", e)
     }
 
-    this.address = path!!
+    // parse query into list. If a key is duplicated, last value in query wins.
+    val params = uri.query?.split("&")
+      ?.mapNotNull {
+        it.split("=")
+          .takeIf { keyValuePair ->
+            keyValuePair.size == 2 && keyValuePair.none { p -> p.isBlank() } // 2 elements and none are empty
+          }
+      }
+      ?.associateBy({ URLDecoder.decode(it[0], Charsets.UTF_8.name()) }, { URLDecoder.decode(it[1], Charsets.UTF_8.name()) })
+      ?: emptyMap()
+    log.debug("params=$params retrieved from query=${uri.query}")
 
     // -- read label/message field parameter
-    this.label = uri.getQueryParameter("label")
-    this.message = uri.getQueryParameter("message")
+    this.label = params["label"]
+    this.message = params["message"]
 
-    // -- read and validate lightning payment request field
-    val lightningParam = uri.getQueryParameter("lightning")
-    if (lightningParam.isNullOrBlank()) {
-      this.lightning = null
-    } else {
-      this.lightning = PaymentRequest.read(lightningParam)
+    // -- read and deserializes lightning payment request field
+    this.lightning = params["lightning"]?.takeIf { it.isNotBlank() }?.run {
+      try {
+        PaymentRequest.read(this)
+      } catch (e: Exception) {
+        null
+      }
     }
 
     // -- read and validate amount field parameter. Amount is in BTC in the URI, and is converted to Satoshi,
-    val amountParam = uri.getQueryParameter("amount")
-    if (amountParam.isNullOrBlank()) {
-      this.amount = null
-    } else {
-      this.amount = CoinUtils.convertStringAmountToSat(amountParam, BtcUnit.code())
+    this.amount = params["amount"]?.toBigDecimalOrNull()?.takeIf { it > java.math.BigDecimal.ZERO }?.run {
+      try {
+        Btc.apply(BigDecimal.javaBigDecimal2bigDecimal(this)).toSatoshi()
+      } catch (e: Exception) {
+        null
+      }
     }
 
-    // -- check required (yet unused) parameters
+    // -- check for required parameters (none are handled by this wallet ATM)
     // see https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
-    for (p in uri.queryParameterNames) {
-      if (p.startsWith("req-")) {
-        throw BitcoinURIParseException("unhandled required param=$p")
-      }
+    if (params.any { it.key.startsWith("req-") }) {
+      throw BitcoinURIParseException("unhandled required params=$params")
     }
-
-    raw = input
-  }
-
-  private fun stripScheme(uri: String): String {
-    for (prefix in BITCOIN_PREFIXES) {
-      if (uri.toLowerCase().startsWith(prefix)) {
-        return uri.substring(prefix.length)
-      }
-    }
-    return uri
   }
 
   override fun toString(): String {
     return "${javaClass.simpleName} [ address=$address, amount=$amount, label=$label, message=$message, lightning=$lightning ]"
   }
 
-  companion object {
-    private val BITCOIN_PREFIXES = listOf("bitcoin://", "bitcoin:")
-  }
 }

@@ -53,8 +53,16 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
           mBinding.text.setTextSize(TypedValue.COMPLEX_UNIT_PX, arr.getDimensionPixelSize(R.styleable.ButtonView_text_size, R.dimen.text_lg).toFloat())
         }
         mBinding.text.setTextColor(arr.getColor(R.styleable.ButtonView_text_color, ThemeHelper.color(context, R.attr.textColor)))
+
+        // display subtitle only if a title is set
+        if (arr.hasValue(R.styleable.ButtonView_subtitle)) {
+          mBinding.subtitle.text = arr.getString(R.styleable.ButtonView_subtitle)
+          mBinding.subtitle.visibility = View.VISIBLE
+        } else {
+          mBinding.subtitle.visibility = View.GONE
+        }
       } else {
-        mBinding.text.visibility = View.GONE
+        mBinding.textContainer.visibility = View.GONE
         mBinding.spacer.visibility = View.GONE
       }
 
@@ -104,7 +112,11 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     // if button is paused, show progress bar with special text
     mBinding.progress.visibility = if (isPaused) View.VISIBLE else if (hasIcon) View.INVISIBLE else View.GONE
-    mBinding.text.text = if (isPaused) pausedText else defaultText
+    if (isPaused) {
+      if (pausedText != null) mBinding.text.text = pausedText
+    } else {
+      if (defaultText != null) mBinding.text.text = defaultText
+    }
 
     // spacer is shown only if the icon or the progress bar is shown
     val shouldShowSpacer = mBinding.image.visibility == View.VISIBLE || mBinding.progress.visibility == View.VISIBLE
@@ -119,9 +131,18 @@ class ButtonView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
   }
 
-  fun setText(text: String) {
+  fun setDefaultText(text: String) {
     defaultText = text
     mBinding.text.text = if (isPaused) pausedText else defaultText
+  }
+
+  fun setText(text: String) {
+    mBinding.text.text = text
+  }
+
+  fun setSubtitle(text: String) {
+    mBinding.subtitle.text = text
+    mBinding.subtitle.visibility = View.VISIBLE
   }
 
   fun setIcon(icon: Drawable) {

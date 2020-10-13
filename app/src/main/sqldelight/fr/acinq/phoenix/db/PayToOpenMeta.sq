@@ -1,0 +1,22 @@
+--
+-- Stores accepted pay-to-open metadata.
+-- Note that the payment hash is a primary key for `received_payments` in the core `eclair.sqlite` db.
+--
+
+CREATE TABLE PayToOpenMeta (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  payment_hash TEXT NOT NULL,
+  fee_sat INTEGER NOT NULL,
+  amount_sat INTEGER NOT NULL,
+  capacity_sat INTEGER NOT NULL,
+  timestamp INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS paytoopen_payment_hash_index ON PayToOpenMeta(payment_hash);
+
+get:
+SELECT * FROM PayToOpenMeta WHERE payment_hash=?;
+
+insert:
+INSERT INTO PayToOpenMeta(payment_hash, fee_sat, amount_sat, capacity_sat, timestamp)
+VALUES (?, ?, ?, ?, ?);

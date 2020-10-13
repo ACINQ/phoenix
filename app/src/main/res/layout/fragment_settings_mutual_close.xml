@@ -50,12 +50,15 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/space_md"
+        android:paddingBottom="@dimen/space_lg_p"
+        android:paddingEnd="@dimen/space_lg"
+        android:paddingStart="@dimen/space_lg_p"
         android:background="@drawable/square_border_hz">
 
         <fr.acinq.phoenix.utils.customviews.ProgressTextView
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.CHECKING_CHANNELS}"
           app:layout_constraintTop_toTopOf="parent"
           app:text="@string/closechannels_checking_channels" />
@@ -64,15 +67,14 @@
           android:id="@+id/channels_state"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_channels_none"
           app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
           android:id="@+id/instructions"
           android:layout_width="match_parent"
+          android:layout_marginTop="@dimen/space_md"
           android:layout_height="wrap_content"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_mutual_input_instructions"
           app:layout_constraintTop_toBottomOf="@id/channels_state"
           app:visibility="@{model.state == PreChannelsCloseState.READY}" />
@@ -82,8 +84,7 @@
           style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
-          android:layout_marginEnd="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md"
           android:hint="@string/closechannels_mutual_input_hint"
           app:layout_constraintTop_toBottomOf="@id/instructions"
           app:visibility="@{model.state == PreChannelsCloseState.READY}">
@@ -105,7 +106,6 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
           android:drawableStart="@drawable/ic_alert_triangle"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_error"
           android:visibility="@{model.state == MutualCloseState.ERROR}"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
@@ -118,9 +118,7 @@
           android:drawableStart="@drawable/ic_check"
           android:drawablePadding="@dimen/space_sm"
           android:drawableTint="?attr/positiveColor"
-          android:padding="@dimen/space_md"
           android:text="@string/closechannels_message_done"
-          android:textColor="?attr/altTextColor"
           android:visibility="@{model.state == MutualCloseState.DONE}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout" />
@@ -130,25 +128,17 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_md_p"
-          android:padding="@dimen/space_md"
           android:visibility="@{model.state == MutualCloseState.IN_PROGRESS}"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/mutual_close_address_layout"
           app:text="@string/closechannels_message_in_progress" />
 
-        <View
-          style="@style/HLineSeparator"
-          android:layout_width="match_parent"
-          android:visibility="@{model.state == PreChannelsCloseState.READY}"
-          app:layout_constraintBottom_toTopOf="@id/mutual_confirm_button" />
-
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/mutual_confirm_button"
-          android:layout_width="match_parent"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@drawable/button_bg_square"
+          android:background="@drawable/button_bg_primary_border"
           android:layout_marginTop="@dimen/space_md_p"
-          android:padding="@dimen/space_md"
           android:visibility="@{model.state == PreChannelsCloseState.READY}"
           app:enableOrFade="@{model.addressInput.length() > 0}"
           app:hz_bias="0"

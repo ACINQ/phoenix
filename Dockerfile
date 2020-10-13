@@ -27,7 +27,7 @@ ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 RUN git clone https://github.com/ACINQ/eclair -b $(cat eclair-core-version.txt)
 
 # build eclair-core
-RUN cd eclair && mvn install -pl eclair-core -am -DskipTests
+RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
 
 # main build image
 FROM ubuntu:19.10
@@ -39,7 +39,7 @@ ENV ANDROID_SDK_FILENAME sdk-tools-linux-4333796.zip
 ENV ANDROID_SDK_URL https://dl.google.com/android/repository/${ANDROID_SDK_FILENAME}
 ENV ANDROID_API_LEVELS android-29
 ENV ANDROID_BUILD_TOOLS_VERSION 28.0.3
-ENV ANDROID_NDK_VERSION 21.1.6352462
+ENV ANDROID_NDK_VERSION 21.3.6528147
 ENV CMAKE_VERSION 3.10.2.4988404
 ENV ANDROID_HOME /usr/local/android-sdk
 ENV PATH ${PATH}:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools

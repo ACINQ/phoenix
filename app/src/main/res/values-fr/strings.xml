@@ -127,10 +127,11 @@
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
-  <string name="send_amount_error_balance">Le montant dépasser votre solde.</string>
+  <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
+  <string name="send_chain_fees_edit">Ajuster fees</string>
   <string name="send_chain_fees_label">Fee rate</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Ce paiement est une transaction on-chain, plus lente et généralement plus chère. Des frais de minage vont être appliqués.</string>
@@ -141,9 +142,8 @@
   <string name="send_chain_fees_feedback_inf">Avec ce fee rate, le paiement ne devrait être reçu que dans au moins 12 heures.</string>
   <string name="send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>
-  <string name="send_swap_in_progress">Echange en cours…</string>
-  <string name="send_swap_error">L\'échange a échoué. Veuillez réessayer.</string>
-  <string name="send_swap_required_desc">Le destinataire de ce paiement est une adresse Bitcoin, il faut d\'abord faire un échange.</string>
+  <string name="send_swap_in_progress">Création de la transaction…</string>
+  <string name="send_swap_error">La transaction n\'a pas pu être créée. Veuillez réessayer.</string>
   <string name="send_swap_required_button">Préparer transaction</string>
   <string name="send_swap_complete_recap_amount">Montant</string>
   <string name="send_swap_complete_recap_fee">Frais de minage</string>
@@ -197,7 +197,7 @@
   <string name="settings_display_prefs">Affichage</string>
   <string name="settings_security_title">Sécurité</string>
   <string name="settings_display_seed">Phrase de sauvegarde</string>
-  <string name="settings_seed_security">Contrôle d\'accès</string>
+  <string name="settings_access_control">Contrôle d\'accès</string>
   <string name="settings_advanced_title">Avancé</string>
   <string name="settings_fees">Configuration des frais de transaction</string>
   <string name="settings_list_channels">Mes canaux de paiement</string>
@@ -206,6 +206,8 @@
   <string name="settings_mutual_close">Fermer tous mes canaux de paiement</string>
   <string name="settings_force_close">Zone à risque</string>
   <string name="settings_tor">Tor</string>
+  <string name="settings_about">À propos</string>
+  <string name="settings_payment_settings">Options des paiements</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -217,8 +219,8 @@
 
   <!-- //////////////// close all channels //////////////// -->
 
-  <string name="closechannels_title">Fermer tous les canaux de paiements</string>
-  <string name="closechannels_checking_channels">Vérification des canaux de paiements, veuillez patienter…</string>
+  <string name="closechannels_title">Fermer tous les canaux de paiement</string>
+  <string name="closechannels_checking_channels">Vérification des canaux de paiement, veuillez patienter…</string>
   <string name="closechannels_channels_recap">Vous avez actuellement %1$d canaux de paiement pour une balance totale de %2$s.</string>
   <string name="closechannels_channels_none">Vous n\'avez actuellement aucun canal de paiement qui pourrait être vidé.\n\nVous pouvez voir l\'état de vos canaux de paiement depuis la page \'Liste de canaux\'.</string>
   <string name="closechannels_mutual_title">Vider le portefeuille</string>
@@ -234,7 +236,7 @@
     <br/><br/>
     Cette fonctionnalité n\'est pas une solution miracle. Elle n\'est disponible qu\'en tant que mesure de sûreté, à <b>n\'utiliser qu\'en dernier recours</b>. Par exemple, si votre peer (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d\'accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, <b>si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support</b>.
     <br/><br/>
-    Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiements ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
+    Une fermeture forcée vous coûtera de l\'argent (pour payer les frais de transaction on-chain), et bloquera vos fonds pour plusieurs jours. <b>Ne désinstallez pas l\'application tant que vos canaux de paiement ne sont pas définitivement fermés, sous peine de perdre vos fonds.</b>
     <br/><br/>
     <b>N\'utilisez pas cette fonctionnalité si vous ne comprenez pas bien ce qu\'elle fait.</b>
   ]]></string>
@@ -250,7 +252,7 @@
 
   <string name="listallchannels_title">Liste des canaux de paiement</string>
   <string name="listallchannels_in_progress">Veuillez patienter…</string>
-  <string name="listallchannels_error">Echec de la récupération de la liste de canaux de paiements, veuillez réessayer.</string>
+  <string name="listallchannels_error">Echec de la récupération de la liste de canaux de paiement, veuillez réessayer.</string>
   <string name="listallchannels_node_id">Votre identifiant de noeud: %1$s</string>
   <string name="listallchannels_no_channels">Vous n\'avez pas de canal de paiement.</string>
   <plurals name="listallchannels_channels_header">
@@ -275,7 +277,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configuration</string>
-  <string name="menu_send">Scanner</string>
+  <string name="menu_send">Envoyer</string>
   <string name="menu_receive">Recevoir</string>
 
   <!-- //////////////// init wallet //////////////// -->
@@ -297,8 +299,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Votre portefeuille n\'est pas protégé.</string>
-  <string name="inappnotif_set_up_pin_action">Définir un code d\'accès</string>
   <string name="inappnotif_mnemonics_never_seen">Merci d\'utiliser Phoenix. Veuillez sauvegarder votre portefeuille pour ne pas perdre vos bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Sauvegarder mon portefeuille</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix a besoin de pouvoir travailler en tâche de fond de temps en temps. Assurez vous que votre système ne tue pas cette appli à des finds d\'économie de batterie.</string>
@@ -356,7 +356,7 @@
   <string name="paymentdetails_destination_label">Envoyé à</string>
   <string name="paymentdetails_fees_label">Frais</string>
   <string name="paymentdetails_error_label">Erreur</string>
-  <string name="paymentdetails_closing_desc">Paiement pour clôture du channel #%1$s</string>
+  <string name="paymentdetails_closing_desc">Paiement pour clôture du channel %1$s…</string>
   <string name="paymentdetails_no_description">Pas de description</string>
 
   <string name="paymentdetails_technicals_button">Afficher les détails techniques</string>
@@ -381,37 +381,23 @@
   <string name="state_offline">Le pair est hors-ligne</string>
   <string name="state_shutdown">Le channel est en arrêt</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control security //////////////// -->
 
-  <string name="seedsec_title">Sécurité</string>
-  <string name="seedsec_subtitle">Nous recommendons fortement de configurer un code PIN pour protéger votre portefeuille. Si votre téléphone le permet, vous pourrez aussi utiliser un système biométrique (empreinte digitale…).</string>
-  <string name="seedsec_pin_switch">Verrouillage avec code PIN</string>
-  <string name="seedsec_pin_scramble">Mélanger les touches du PIN</string>
-  <string name="seedsec_biometrics_switch">Verrouillage biométrique</string>
-  <string name="seedsec_change_pin">Changer mon code PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">L\'enregistrement biométrique n\'a pas abouti. Merci de réessayer.</string>
-  <string name="seedsec_pindialog_title_unlock">Veuillez saisir votre code PIN pour continuer</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Veuillez saisir votre <b>nouveau code PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Veuillez <b>confirmer</b> votre nouveau code PIN]]></string>
+  <string name="accessctrl_title">Contrôle d\'accès</string>
+  <string name="accessctrl_subtitle">Nous recommandons d\'activer le verrouillage écran pour empêcher une utilisation non désirée du wallet.</string>
 
-  <string name="seedsec_pin_update_success">Le code PIN a été mis à jour!</string>
-  <string name="seedsec_biometric_enabled">L\'authentification biométrique a été activée</string>
-  <string name="seedsec_biometric_disabled">L\'authentification biométrique a été désactivée</string>
+  <string name="accessctrl_auth_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
+  <string name="accessctrl_auth_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
+  <string name="accessctrl_auth_none_enrolled">Vous devez d\'abord enregistrer un PIN/schéma/empreinte digitale dans Android.</string>
 
-  <string name="seedsec_biometric_support_no_hw">Votre téléphone ne supporte pas l\'authentification biométrique.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Le système biométrique n\'est pas disponible, veuillez réessayer plus tard.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Vous devez d\'abord enregistrer une identité biométrique dans Android.</string>
+  <string name="accessctrl_error_auth">L\'authentification a échoué.</string>
 
-  <string name="seedsec_error_wrong_pin">Le code PIN est invalide</string>
-  <string name="seedsec_error_pins_match">Les code PINs ne correspondent pas. Veuillez réessayer.</string>
-  <string name="seedsec_error_generic">Une erreur est survenue, le portefeuille n\'a pas été encrypté.\n\nVeuillez réessayer.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Désactiver la protection biométrique</string>
-  <string name="seedsec_disable_bio_prompt_desc">Vous devrez désormais utiliser votre code PIN</string>
-  <string name="seedsec_disable_bio_prompt_negative">Annuler</string>
-
-  <string name="seedsec_bio_prompt_title">Activer la protection biométrique</string>
-  <string name="seedsec_bio_prompt_negative">Annuler</string>
+  <string name="accessctrl_screen_lock_switch">Verrouillage écran</string>
+  <string name="accessctrl_screen_lock_switch_desc">Verrouille l\'accès aux écrans de l\'application avec l\'authentification système d\'Android.</string>
+  <string name="accessctrl_full_lock_switch">Bloquer le fonctionnement en tâche de fond</string>
+  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
+  <string name="accessctrl_full_lock_confirm_title">Information</string>
+  <string name="accessctrl_full_lock_confirm_message">Les fonctionnalités en tâche de fond ne seront plus possible. Vous ne pourrez recevoir d\'argent que si l\'application est déverrouillée.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
@@ -495,5 +481,45 @@
   <string name="conndialog_lightning">Pair Lightning</string>
   <string name="conndialog_ok">Connecté</string>
   <string name="conndialog_not_ok">En connexion…</string>
+
+  <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">À propos</string>
+  <string name="about_version">Version: %1$s (%2$d)</string>
+  <string name="about_general"><![CDATA[
+  Phoenix est un portefeuille Bitcoin utilisant le réseau Lightning pour envoyer et recevoir des paiements.
+  <br/><br/>
+  C\'est un logiciel libre et open source, développé par <a href="https://phoenix.acinq.co">ACINQ</a> sous licence <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a>.
+  <br/><br/>
+  Notez que ce portefeuille est non-custodial, c\'est-à-dire que <strong>vous seul avez possession de la clé (ou seed) du portefeuille</strong>. Ne révelez cette seed à personne, et faites attention au hameçonnage.
+  <br/><br/>
+  Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
+  ]]></string>
+
+  <!-- //////////////// settings: options for payments //////////////// -->
+
+  <string name="paymentsettings_title">Options des paiements</string>
+  <string name="paymentsettings_subtitle">Définissez ici des options pour les paiements que vous envoyez ou recevez.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Description des paiements reçus</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Description par défaut</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Elle peut être changée au cas par cas.</string>
+  <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
+
+  <string name="paymentsettings_paytoopen_auto_title">Création de canaux de paiement automatique</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Il est parfois nécessaire de créer un nouveau canal de paiement pour pouvoir recevoir des fonds.\n\nDans ce cas, des frais de %1$s%% sont déduits du montant reçu pour assurer la création du canal.</string>
+  <string name="paymentsettings_paytoopen_dialog_title">Confirmation</string>
+  <string name="paymentsettings_paytoopen_dialog_description">L\'application créera automatiquement un canal de paiement lorsque cela est nécessaire.\n\nDes frais de %1$s%% sont déduits du montant reçu pour couvrir le coût de création du canal.</string>
+
+  <!-- ftue -->
+
+  <string name="ftue__skip_button">Passer</string>
+  <string name="ftue__welcome__header">Bienvenue !</string>
+  <string name="ftue__welcome__body">Avec Phoenix, recevoir et envoyer des bitcoins est facile, rapide, et sûr.</string>
+  <string name="ftue__pay_to_open__header">C\'est simple</string>
+  <string name="ftue__pay_to_open__body">Les canaux de paiement sont créés automatiquement si besoin, pour un coût faible (%1$s%%). Par exemple, pour recevoir 100€, les frais seraient 10 centimes.\n\nVous pouvez aussi gérer cela manuellement.</string>
+  <string name="ftue__backup_seed__header">Gardez le contrôle</string>
+  <string name="ftue__backup_seed__body">Une clé privée est associée à votre wallet, et permet de récupérer vos fonds si besoin.\n\nPrenez en soin et gardez la secrète !</string>
+  <string name="ftue__backup_seed__button">Commencer</string>
 
 </resources>

@@ -21,24 +21,42 @@ import android.graphics.drawable.Animatable2
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.acinq.phoenix.AppLock
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
+import fr.acinq.phoenix.MainActivity
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.security.PinDialog
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.KeystoreHelper
+import fr.acinq.phoenix.utils.Migration
 import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.crypto.AuthHelper
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.KeystoreHelper
+import fr.acinq.phoenix.utils.crypto.SeedManager
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
+/**
+ * This fragment is the navigation entry point. It checks the state of the app and redirects to
+ * the main fragment when the kit is started. If not, it starts the kit using EclairNodeService.
+ */
 class StartupFragment : BaseFragment() {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -53,7 +71,6 @@ class StartupFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    mBinding.appModel = app
     context?.let { ctx ->
       val torAnim = ctx.getDrawable(R.drawable.ic_tor_shield_animated)
       mBinding.startingTorAnimation.setImageDrawable(torAnim)
@@ -66,30 +83,40 @@ class StartupFragment : BaseFragment() {
         torAnim.start()
       }
     }
+    mBinding.appModel = app
+    app.lockState.observe(viewLifecycleOwner, { lockState ->
+      when (lockState) {
+        is AppLock.Locked.AuthFailure -> {
+          mBinding.authenticationMessage.text = context?.let { AuthHelper.translateAuthState(it, lockState.code) }?.let {
+            getString(R.string.startup_error_auth_failed_with_details, it)
+          } ?: getString(R.string.startup_error_auth_failed)
+          Handler().postDelayed({
+            val lock = app.lockState.value
+            val blockingCodes = listOf(BiometricPrompt.ERROR_LOCKOUT, BiometricPrompt.ERROR_LOCKOUT_PERMANENT, BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
+            if (lock is AppLock.Locked.AuthFailure && !blockingCodes.contains(lock.code)) {
+              app.lockState.value = AppLock.Locked.Default
+            }
+          }, 3000)
+        }
+        else -> mBinding.authenticationMessage.text = getString(R.string.startup_unlock_required)
+      }
+    })
   }
 
   override fun onStart() {
     super.onStart()
-    if (mPinDialog == null) {
-      mPinDialog = getPinDialog(object : PinDialog.PinDialogCallback {
-        override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
-          if (context != null) {
-            app.startKit(context!!, pinCode)
-          }
-          dialog.dismiss()
-        }
-
-        override fun onPinCancel(dialog: PinDialog) {}
-      }, cancelable = false)
-    }
     mBinding.errorRestartButton.setOnClickListener {
-      if (app.state.value is KitState.Error) app.state.value = KitState.Off
+      if (app.state.value is KitState.Error) {
+        app.service?.shutdown()
+        context?.let { checkStateAndLock(it) }
+      }
     }
     mBinding.errorSettingsButton.setOnClickListener {
       findNavController().navigate(R.id.global_action_any_to_settings)
     }
-    // required because PIN/biometric dialogs are dismissed if user alt-tab (state observer will not fire anymore)
-    app.state.value?.let { handleKitState(it) }
+    mBinding.unlockButton.setOnClickListener {
+      context?.let { checkStateAndLock(it) }
+    }
   }
 
   override fun onStop() {
@@ -97,74 +124,227 @@ class StartupFragment : BaseFragment() {
     mPinDialog?.dismiss()
   }
 
-  override fun handleKitState(state: KitState) {
-    // check current nav in controller - there can be race conditions between handleKitState started from onStart and from the observer
-    val currentNav = findNavController().currentDestination
-    if (currentNav != null && currentNav.id == R.id.startup_fragment) {
-      log.debug("nav=${currentNav.label} in state=${state.javaClass.canonicalName} with intent=${app.currentURIIntent.value}")
-      when {
-        state is KitState.Started && app.currentURIIntent.value == null -> {
-          log.info("kit [Started], redirect to main page")
-          findNavController().navigate(R.id.action_startup_to_main)
-        }
-        state is KitState.Started && app.currentURIIntent.value != null -> {
-          findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(app.currentURIIntent.value!!))
-          app.currentURIIntent.value = null
-        }
-        state is KitState.Off && context != null -> {
-          if (app.hasWalletBeenSetup(context!!)) {
-            log.info("kit [OFF] with ready wallet, starting kit")
-            unlockAndStart(context!!)
-          } else {
-            log.info("kit [OFF] with empty wallet, redirect to wallet initialization")
-            findNavController().navigate(R.id.global_action_any_to_init_wallet)
-          }
-        }
-        state is KitState.Error.Generic -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_generic, state.message) }
-        state is KitState.Error.InvalidElectrumAddress -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address) }
-        state is KitState.Error.Tor -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_tor, state.message) }
-        state is KitState.Error.UnreadableData -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_unreadable) }
-        state is KitState.Error.NoConnectivity -> context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_network) }
-        state is KitState.Error.WrongPassword -> {
-          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_wrong_pwd) }
-          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-        }
-        state is KitState.Error.InvalidBiometric -> {
-          context?.run { mBinding.errorMessage.text = getString(R.string.startup_error_biometrics) }
-          Handler().postDelayed({ app.state.value = KitState.Off }, 2500)
-        }
-        else -> {
-          log.debug("kit [$state] with context=$context, standing by...")
-        }
+  override fun handleAppState(state: KitState) {
+    context?.let { checkStateAndLock(it) }
+  }
+
+  private fun checkStateAndLock(context: Context) {
+    val kitState = app.state.value
+    val lockState = app.lockState.value
+    val seed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
+
+    when {
+      seed == null && kitState is KitState.Off -> {
+        log.info("kit=${kitState.getName()} with no seed found, redirect to wallet initialization")
+        findNavController().navigate(R.id.global_action_any_to_init_wallet)
+      }
+      seed == null -> {
+        log.info("kit=${kitState?.getName()} with no seed found, standing by...")
+      }
+      kitState is KitState.Started -> {
+        log.info("kit=${kitState.getName()}, check that the app is unlocked...")
+        checkLock(context)
+      }
+      kitState is KitState.Off -> {
+        log.info("kit=${kitState.getName()} seed=${seed.name()} lock=${lockState}, unlocking wallet and starting kit")
+        unlockAndStart(context, seed)
+      }
+      kitState is KitState.Error.Generic -> mBinding.errorMessage.text = getString(R.string.startup_error_generic, kitState.message)
+      kitState is KitState.Error.InvalidElectrumAddress -> mBinding.errorMessage.text = getString(R.string.startup_error_electrum_address)
+      kitState is KitState.Error.Tor -> mBinding.errorMessage.text = getString(R.string.startup_error_tor, kitState.message)
+      kitState is KitState.Error.UnreadableData -> mBinding.errorMessage.text = getString(R.string.startup_error_unreadable)
+      kitState is KitState.Error.NoConnectivity -> mBinding.errorMessage.text = getString(R.string.startup_error_network)
+      else -> {
+        log.debug("kit=${kitState?.getName()}, standing by...")
       }
     }
   }
 
-  private fun unlockAndStart(context: Context) {
-    if (app.state.value is KitState.Off) {
-      when {
-        // wallet is encrypted and we can use biometrics
-        Prefs.useBiometrics(context) && BiometricManager.from(context).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS ->
-          getBiometricAuth(negativeCallback = {
-            mPinDialog?.reset()
-            mPinDialog?.show()
-          }, successCallback = {
-            try {
-              val pin = KeystoreHelper.decryptPin(context)?.toString(Charsets.UTF_8)
-              app.startKit(context, pin!!)
-            } catch (e: Exception) {
-              log.error("could not decrypt pin: ", e)
-              app.state.value = KitState.Error.InvalidBiometric
+  private fun checkLock(context: Context) {
+    val lockState = app.lockState.value
+    if (app.state.value !is KitState.Started) {
+      log.debug("ignore checkLock with state=${app.state.value?.getName()}")
+    }
+    if (Prefs.isScreenLocked(context) && AuthHelper.canUseSoftAuth(context) && lockState is AppLock.Locked) {
+      log.debug("app is locked")
+      AuthHelper.promptSoftAuth(this,
+        onSuccess = { redirectToNext(context) },
+        onFailure = { code -> app.lockState.value = AppLock.Locked.AuthFailure(code) })
+    } else {
+      log.info("app is unlocked, redirect to next screen")
+      redirectToNext(context)
+    }
+  }
+
+  @Suppress("CascadeIf")
+  private fun redirectToNext(context: Context) {
+    val uriIntent = app.currentURIIntent.value
+    val migratedFrom = Prefs.getMigratedFrom(context)
+    if (Migration.listNotableChangesSince(migratedFrom).isNotEmpty()) {
+      log.info("user has migrated from version=$migratedFrom, redirecting to patch note screen")
+      findNavController().navigate(StartupFragmentDirections.actionStartupToPatchNote(migratedFrom.toLong()))
+    } else if (uriIntent == null) {
+      log.info("redirecting to main screen")
+      findNavController().navigate(R.id.action_startup_to_main)
+    } else {
+      log.info("redirecting to read input screen with intent=$uriIntent")
+      findNavController().navigate(ReadInputFragmentDirections.globalActionAnyToReadInput(uriIntent))
+      app.currentURIIntent.value = null
+    }
+  }
+
+  /** Decrypt seed and start the node. A authentication dialog may be displayed depending on the seed/prefs. */
+  private fun unlockAndStart(context: Context, encryptedSeed: EncryptedSeed) {
+    if (app.state.value !is KitState.Off) {
+      log.debug("ignore start request in state=${app.state.value}")
+      return
+    }
+
+    // if the seed is version 1, it must be decrypted and migrated to [EncryptedSeed.V2]
+    when (encryptedSeed) {
+      is EncryptedSeed.V1 -> handleV1Seed(context, encryptedSeed)
+      is EncryptedSeed.V2.NoAuth -> {
+        val onSuccess = {
+          lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+            log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
+            app.lockState.postValue(AppLock.Locked.AuthFailure())
+          }) {
+            val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt())
+            lifecycleScope.launch(Dispatchers.Main) {
+              app.lockState.value = AppLock.Unlocked
+              app.service?.startKit(seed)
             }
-          })
-        // wallet is encrypted and we don't use biometrics
-        Prefs.getIsSeedEncrypted(context) -> {
-          mPinDialog?.reset()
-          mPinDialog?.show()
+          }
         }
-        // wallet is not encrypted
-        else -> app.startKit(context, Constants.DEFAULT_PIN)
+        if (Prefs.isScreenLocked(context) && AuthHelper.canUseSoftAuth(context)) {
+          AuthHelper.promptSoftAuth(this,
+            onSuccess = { onSuccess() },
+            onFailure = { code -> app.lockState.value = AppLock.Locked.AuthFailure(code) })
+        } else {
+          onSuccess()
+        }
+      }
+      is EncryptedSeed.V2.WithAuth -> {
+        val cipher = try {
+          encryptedSeed.getDecryptionCipher()
+        } catch (e: Exception) {
+          when (e) {
+            is KeyPermanentlyInvalidatedException -> {
+              log.error("key has been permanently invalidated: ", e)
+              app.lockState.value = AppLock.Locked.AuthFailure(BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED)
+            }
+            else -> {
+              log.error("could not get cipher for ${encryptedSeed.name()}")
+              app.lockState.value = AppLock.Locked.AuthFailure()
+            }
+          }
+          return
+        }
+        AuthHelper.promptHardAuth(this,
+          cipher = cipher,
+          onSuccess = { crypto ->
+            lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+              log.error("failed to decrypt ${encryptedSeed.name()}: ", e)
+              app.lockState.postValue(AppLock.Locked.AuthFailure())
+            }) {
+              val seed = EncryptedSeed.byteArray2ByteVector(encryptedSeed.decrypt(crypto!!.cipher!!))
+              lifecycleScope.launch(Dispatchers.Main) {
+                app.lockState.value = AppLock.Unlocked
+                app.service?.startKit(seed)
+              }
+            }
+          },
+          onFailure = { code ->
+            app.lockState.value = AppLock.Locked.AuthFailure(code)
+          })
       }
     }
   }
+
+  /** Unlock a [EncryptedSeed.V1] seed, migrate it to a [EncryptedSeed.V2.NoAuth] seed and start the node. */
+  private fun handleV1Seed(context: Context, encryptedSeed: EncryptedSeed.V1) {
+    val migrationCallback: (pin: String) -> Unit = {
+      lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+        log.error("failed to handle v1 encrypted seed: ", e)
+        app.lockState.postValue(AppLock.Locked.AuthFailure())
+      }) {
+        val seed = EncryptedSeed.migration_v1_v2(context, encryptedSeed, it).run {
+          SeedManager.writeSeedToDisk(Wallet.getDatadir(context), this)
+          EncryptedSeed.byteArray2ByteVector(this.decrypt())
+        }
+        log.info("completed v1->v2 encrypted seed migration")
+        lifecycleScope.launch(Dispatchers.Main) {
+          app.lockState.value = AppLock.Unlocked
+          app.service?.startKit(seed)
+        }
+      }
+    }
+
+    // -- the legacy pin dialog will call the migration callback once pin is confirmed
+    mPinDialog = activity?.let {
+      val pinDialog = PinDialog((it as MainActivity).getActivityThis(), R.style.dialog_fullScreen, pinCallback = object : PinDialog.PinDialogCallback {
+        override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
+          migrationCallback(pinCode)
+          dialog.dismiss()
+        }
+
+        override fun onPinCancel(dialog: PinDialog) {}
+      }, cancelable = false)
+      pinDialog.setCanceledOnTouchOutside(false)
+      pinDialog
+    }
+
+    when {
+      Prefs.useBiometrics(context) && BiometricManager.from(context).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS -> {
+        val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
+          .setTitle(getString(R.string.biometricprompt_title))
+          .setDeviceCredentialAllowed(false)
+          .setNegativeButtonText(getString(R.string.biometricprompt_negative))
+
+        val onNegative = {
+          mPinDialog?.reset()
+          mPinDialog?.show()
+        }
+
+        val onSuccess = {
+          try {
+            val pin = KeystoreHelper.decryptPin(context).toString(Charsets.UTF_8)
+            migrationCallback(pin)
+          } catch (e: Exception) {
+            log.error("could not decrypt pin: ", e)
+            app.lockState.postValue(AppLock.Locked.AuthFailure())
+          }
+        }
+
+        val biometricPrompt = BiometricPrompt(this, { runnable -> Handler(Looper.getMainLooper()).post(runnable) }, object : BiometricPrompt.AuthenticationCallback() {
+          override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+            super.onAuthenticationError(errorCode, errString)
+            log.info("biometric auth error ($errorCode): $errString")
+            if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
+              onNegative()
+            }
+          }
+
+          override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            super.onAuthenticationSucceeded(result)
+            try {
+              onSuccess()
+            } catch (e: Exception) {
+              log.error("could not handle successful biometric auth callback: ", e)
+            }
+          }
+        })
+
+        biometricPrompt.authenticate(biometricPromptInfo.build())
+      }
+      Prefs.isSeedEncrypted(context) -> {
+        mPinDialog?.reset()
+        mPinDialog?.show()
+      }
+      else -> {
+        migrationCallback(Constants.DEFAULT_PIN)
+      }
+    }
+  }
+
 }

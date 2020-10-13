@@ -141,7 +141,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
-        app:layout_constraintWidth_max="@dimen/send_max_width" />
+        app:layout_constraintWidth_max="@dimen/max_width_md" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/payment_section"
@@ -152,7 +152,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
-        app:layout_constraintWidth_max="@dimen/send_max_width"
+        app:layout_constraintWidth_max="@dimen/max_width_md"
         app:visible="@{model.isFormVisible()}">
 
         <EditText
@@ -289,17 +289,6 @@
           app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
           app:layout_constraintTop_toBottomOf="@id/max_checkbox" />
 
-        <ImageView
-          android:layout_width="@dimen/button_height"
-          android:layout_height="@dimen/button_height"
-          android:src="@drawable/ic_info"
-          android:layout_marginTop="@dimen/space_xxxs"
-          android:tint="?attr/colorPrimary"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
-          android:contentDescription="@null"
-          app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toTopOf="@id/destination_chain_description" />
-
         <TextView
           android:id="@+id/destination_chain_description"
           android:layout_width="wrap_content"
@@ -351,11 +340,28 @@
           android:layout_marginStart="@dimen/space_md"
           android:text="@string/send_chain_fees_label"
           android:textAlignment="viewEnd"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
           app:layout_constraintBaseline_toBaselineOf="@id/chain_fees_value"
           app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
           app:layout_constraintHorizontal_bias="1"
           app:layout_constraintStart_toStartOf="parent" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/show_chain_fees_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          android:background="@drawable/button_bg_no_border"
+          android:padding="6dp"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm == false}"
+          app:icon="@drawable/ic_edit"
+          app:icon_size="14dp"
+          app:icon_tint="?attr/colorPrimary"
+          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
+          app:layout_constraintTop_toBottomOf="@id/description_value"
+          app:spacer_size="@dimen/space_xxs"
+          app:text="@string/send_chain_fees_edit"
+          app:text_size="@dimen/text_sm" />
 
         <EditText
           android:id="@+id/chain_fees_value"
@@ -372,7 +378,7 @@
           android:minWidth="24dp"
           android:singleLine="true"
           android:text="@={model.chainFeesSatBytes}"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
@@ -385,7 +391,7 @@
           android:layout_width="wrap_content"
           android:layout_marginStart="@dimen/space_xxs"
           android:text="@string/send_chain_fees_unit"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
           app:layout_constraintBaseline_toBaselineOf="@id/chain_fees_value"
           app:layout_constraintStart_toEndOf="@id/chain_fees_value" />
 
@@ -397,7 +403,7 @@
           android:background="@drawable/line_dots"
           android:backgroundTint="?attr/colorPrimary"
           android:layerType="software"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="@id/chain_fees_value"
           app:layout_constraintStart_toStartOf="@id/chain_fees_value"
@@ -412,7 +418,7 @@
           android:layout_marginEnd="@dimen/space_md"
           android:text="@string/send_chain_fees_feedback_invalid"
           android:textSize="@dimen/text_md"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
+          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
@@ -438,7 +444,7 @@
           android:visibility="@{model.state instanceof SendState.Onchain.SwapRequired}"
           app:icon="@drawable/ic_build"
           app:icon_tint="?attr/colorPrimary"
-          app:is_paused_inverse="@{appModel.peerConn}"
+          app:is_paused="@{!appModel.networkInfo.lightningConnected}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
@@ -469,7 +475,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          app:layout_constraintWidth_max="@dimen/send_max_width">
+          app:layout_constraintWidth_max="@dimen/max_width_md">
 
           <androidx.constraintlayout.widget.Guideline
             android:id="@+id/swap_mid_guideline"
@@ -501,6 +507,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
           <TextView
+            android:id="@+id/swap_recap_amount_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+
+          <TextView
             android:id="@+id/swap_recap_fee_label"
             style="@style/MutedLabelView"
             android:layout_width="wrap_content"
@@ -521,7 +539,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
-            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value_fiat" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
 
           <View
             android:id="@+id/swap_recap_total_separator"
@@ -530,7 +560,7 @@
             android:layout_marginTop="@dimen/space_xs"
             android:background="?attr/mutedTextColor"
             app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
-            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value_fiat" />
 
           <TextView
             android:id="@+id/swap_recap_total_label"
@@ -590,13 +620,11 @@
           android:backgroundTint="?attr/colorPrimary"
           android:visibility="@{model.state instanceof SendState.Lightning || model.state instanceof SendState.Onchain.Ready}"
           app:enableOrFade="@{model.state instanceof SendState.Lightning.Ready || model.state instanceof SendState.Onchain.Ready}"
-          app:is_paused_inverse="@{appModel.peerConn}"
           app:icon="@drawable/ic_send"
           app:icon_tint="?attr/altTextColor"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_recap_pay_separator"
-          app:paused_text="@string/btn_pause_connecting"
           app:text="@string/send_pay_button"
           app:text_color="?attr/altTextColor" />
 
