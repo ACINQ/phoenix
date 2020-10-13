@@ -20,6 +20,7 @@ import android.text.format.DateUtils
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.*
+import fr.acinq.phoenix.send.FeerateEstimationPerKb
 import okhttp3.MediaType
 
 /**
@@ -30,8 +31,13 @@ object Constants {
   // -- apis
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
   const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
-  const val PRICE_RATE_API = "https://blockchain.info/ticker"
-  const val MXN_PRICE_RATE_API = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
+  const val BLOCKCHAININFO_TICKER = "https://blockchain.info/ticker"
+  const val BITSO_MXN_TICKER = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
+  const val COINDESK_CZK_TICKER = "https://api.coindesk.com/v1/bpi/currentprice/CZK.json"
+  val ONEML_URL = if (Wallet.isMainnet()) "https://1ml.com" else "https://1ml.com/testnet"
+  val MEMPOOLSPACE_EXPLORER_URL = if (Wallet.isMainnet()) "https://mempool.space" else "https://mempool.space/testnet"
+  val BLOCKSTREAM_EXPLORER_URL = if (Wallet.isMainnet()) "https://blockstream.info" else "https://blockstream.info/testnet"
+  val BLOCKSTREAM_EXPLORER_API = "$BLOCKSTREAM_EXPLORER_URL/api"
 
   // -- default values
   internal const val DEFAULT_PIN = "111111"
@@ -41,12 +47,16 @@ object Constants {
 
   // -- android notifications
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5
-  const val WATCHER_NOTIFICATION_CHANNEL_ID = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
-  const val WATCHER_REQUEST_CODE = 37921816
+  const val NOTIF_CHANNEL_ID__CHANNELS_WATCHER = "${BuildConfig.APPLICATION_ID}.WATCHER_NOTIF_ID"
+  const val NOTIF_ID__CHANNELS_WATCHER = 37921816
+  const val NOTIF_CHANNEL_ID__PAY_TO_OPEN = "${BuildConfig.APPLICATION_ID}.PAYTOOPEN_NOTIF"
+  const val NOTIF_ID__PAY_TO_OPEN = 81320
+  const val NOTIF_CHANNEL_ID__HEADLESS = "${BuildConfig.APPLICATION_ID}.FCM_NOTIF"
+  const val NOTIF_ID__HEADLESS = 81321
 
   // -- default wallet values
   val DEFAULT_FEERATE = FeerateEstimationPerKb(rate20min = 12, rate60min = 6, rate12hours = 3)
-  val DEFAULT_NETWORK_INFO = NetworkInfo(networkConnected = true, electrumServer = null, lightningConnected = false, torConnections = HashMap())
+  val DEFAULT_NETWORK_INFO = NetworkInfo(electrumServer = null, lightningConnected = false, torConnections = HashMap())
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
     TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %

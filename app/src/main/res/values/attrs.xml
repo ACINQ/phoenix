@@ -46,6 +46,7 @@
   <attr name="icon" format="reference" />
   <attr name="icon_tint" format="color" />
   <attr name="icon_size" format="dimension" />
+  <attr name="subtitle" format="string" />
 
   <declare-styleable name="ProgressTextView">
     <attr name="text" />
@@ -66,6 +67,7 @@
     <attr name="text" />
     <attr name="text_color" />
     <attr name="text_size" />
+    <attr name="subtitle" />
     <attr name="icon" />
     <attr name="icon_tint" />
     <attr name="icon_size" />
@@ -78,12 +80,13 @@
     <attr name="text" />
     <attr name="text_color" />
     <attr name="text_size" />
+    <attr name="subtitle" />
     <attr name="icon" />
     <attr name="icon_tint" />
     <attr name="icon_size" />
   </declare-styleable>
   <declare-styleable name="ActionBarView">
     <attr name="title" format="string" />
-    <attr name="subtitle" format="string" />
+    <attr name="subtitle" />
   </declare-styleable>
 </resources>

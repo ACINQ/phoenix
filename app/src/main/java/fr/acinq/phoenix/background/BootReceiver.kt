@@ -21,7 +21,7 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * This receiver is started when the device has booted and schedules background jobs.
+ * This receiver is started when the device has booted, and schedules background jobs.
  */
 class BootReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {

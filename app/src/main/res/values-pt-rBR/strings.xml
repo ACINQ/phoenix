@@ -62,6 +62,8 @@
   <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
+  <string name="startup_error_auth_failed">A autenticação falhou.</string>
+  <string name="startup_error_auth_failed_with_details">A autenticação falhou.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -124,13 +126,13 @@
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de Bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_chain_fees_edit">Ajustar taxas</string>
+  <string name="send_chain_fees_edit">Ajustar taxa</string>
   <string name="send_chain_fees_label">Taxa</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Este pagamento é uma transação pela rede Bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
@@ -188,6 +190,7 @@
   <string name="btn_confirm">Confirmar</string>
   <string name="btn_cancel">Cancelar</string>
   <string name="btn_close">Fechar</string>
+  <string name="btn_pause_connecting">Conectando ao par…</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -195,7 +198,7 @@
   <string name="settings_display_prefs">Tela</string>
   <string name="settings_security_title">Segurança</string>
   <string name="settings_display_seed">Frase de recuperação</string>
-  <string name="settings_seed_security">Configurações de acesso</string>
+  <string name="settings_access_control">Configurações de acesso</string>
   <string name="settings_advanced_title">Avançado</string>
   <string name="settings_fees">Configurações de taxas</string>
   <string name="settings_list_channels">Lista de canais</string>
@@ -211,7 +214,7 @@
   <string name="notif_watcher_cheating_message">Foi detectada uma tentativa de fraude.</string>
 
   <string name="notif_watcher_connection_title">A Phoenix precisa de acesso à internet</string>
-  <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de Internet para funcionar corretamente.</string>
+  <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -228,20 +231,20 @@
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    Encerramento forçado permite fechar unilateralmente seus canais.
+    O encerramento forçado permite fechar seus canais de forma unilateral.
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
-    <b>Não use esse recurso se você não entender completamente o que ele faz.</b>
+    <b>Não use esse recurso se você não compreender exatamente o que ele faz.</b>
   ]]></string>
   <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
-  <string name="closechannels_force_destination_desc">Este endereço foi originado a partir da sua seed e pertence a você.</string>
+  <string name="closechannels_force_destination_desc">Este endereço tem origem na sua seed e pertence a você.</string>
   <string name="closechannels_force_button">Forçar encerramento de canais</string>
   <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
   <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
-  <string name="closechannels_message_done">Bitcoins enviados.</string>
+  <string name="closechannels_message_done">Fundos enviados.</string>
   <string name="closechannels_message_in_progress">Aguarde…</string>
 
   <!-- //////////////// list all channels //////////////// -->
@@ -273,7 +276,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Ler</string>
+  <string name="menu_send">Enviar</string>
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
@@ -295,8 +298,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
-  <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
@@ -366,7 +367,6 @@
   <string name="paymentdetails_payment_request_label">Solicitação de pagamento</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
-  <string name="paymentdetails_expire_at_label">Expira em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
@@ -379,37 +379,13 @@
   <string name="state_offline">O par está offline</string>
   <string name="state_shutdown">Desligar</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Segurança</string>
-  <string name="seedsec_subtitle">É muito importante criar um PIN para proteger sua carteira. Se o seu aparelho suportar, você pode usar autenticação biométrica.</string>
-  <string name="seedsec_pin_switch">Autenticação por PIN</string>
-  <string name="seedsec_pin_scramble">Embaralhamento de teclado PIN</string>
-  <string name="seedsec_biometrics_switch">Autenticação biométrica</string>
-  <string name="seedsec_change_pin">Alterar PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Falha no registro biométrico. Tente novamente.</string>
-  <string name="seedsec_pindialog_title_unlock">Insira seu PIN atual para continuar</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Insira <b>seu novo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Favor <b>confirmar</b> seu novo PIN]]></string>
+  <string name="accessctrl_title">Segurança</string>
 
-  <string name="seedsec_pin_update_success">PIN atualizado com sucesso!</string>
-  <string name="seedsec_biometric_enabled">Autenticação biométrica ativada</string>
-  <string name="seedsec_biometric_disabled">Autenticação biométrica desativada</string>
-
-  <string name="seedsec_biometric_support_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Primeiro registre a biometria.</string>
-
-  <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match">PINs não conferem. Tente novamente.</string>
-  <string name="seedsec_error_generic">Ocorreu um erro, a carteira não foi criptografada.\n\nTente novamente.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Desativar bloqueio biométrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">Você precisará usar seu código PIN a partir de agora</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancelar</string>
-
-  <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
-  <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
@@ -503,7 +479,7 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com phishing.
+  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>

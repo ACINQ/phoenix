@@ -31,8 +31,8 @@ import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.Protocol
 import fr.acinq.eclair.crypto.`Mac32$`
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentLnurlAuthBinding
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.KitNotInitialized
@@ -66,13 +66,13 @@ class LNUrlAuthFragment : BaseFragment() {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(LNUrlAuthViewModel::class.java)
-    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, args.url.topDomain))
-    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, args.url.topDomain)))
+    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, args.url.host))
+    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, args.url.host)))
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
-            is LNUrlRemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, args.url.topDomain)
+            is LNUrlRemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, args.url.host)
             is LNUrlRemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
             is LNUrlRemoteFailure.Code -> "HTTP ${state.cause.code}"
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
@@ -104,7 +104,7 @@ class LNUrlAuthFragment : BaseFragment() {
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
       val url = tryWith(InvalidAuthEndpoint) { HttpUrl.parse(args.url.authEndpoint)!! }
-      val key = getAuthLinkingKey(url.topPrivateDomain()!!)
+      val key = getAuthLinkingKey(url.host())
       val signedK1 = Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(args.url.k1).bytes(), key)).toHex()
       val request = Request.Builder().url(url.newBuilder()
         .addQueryParameter("sig", signedK1)
@@ -152,7 +152,7 @@ class LNUrlAuthFragment : BaseFragment() {
       // 2 - build key that will be used to link with service
       DeterministicWallet.derivePrivateKey(key, path).privateKey()
     } else {
-      throw KitNotInitialized()
+      throw KitNotInitialized
     }
   }
 }

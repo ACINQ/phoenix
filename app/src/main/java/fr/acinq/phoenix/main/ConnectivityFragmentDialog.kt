@@ -27,16 +27,16 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import fr.acinq.phoenix.AppViewModel
-import fr.acinq.phoenix.NetworkInfo
-import fr.acinq.phoenix.R
+import fr.acinq.phoenix.*
 import fr.acinq.phoenix.databinding.FragmentConnectivityBinding
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.ThemeHelper
 import fr.acinq.phoenix.utils.tor.TorConnectionStatus
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class ConnectivityFragmentDialog : DialogFragment() {
-
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentConnectivityBinding
   private lateinit var app: AppViewModel
 
@@ -48,36 +48,31 @@ class ConnectivityFragmentDialog : DialogFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    activity?.let {
-      app = ViewModelProvider(it).get(AppViewModel::class.java)
-    } ?: dismiss()
-    app.networkInfo.observe(viewLifecycleOwner, Observer {
-      context?.let { ctx ->
-        val isNetworkOk = handleNetworkConnection(ctx, it).and(handleElectrumConnection(ctx, it)).and(handleTorConnection(ctx, it)).and(handleLightningPeerConnection(ctx, it))
+    activity?.let { activity ->
+      app = ViewModelProvider(activity).get(AppViewModel::class.java)
+      app.networkInfo.observe(viewLifecycleOwner, Observer {
+        log.info("update network infos=$it")
+        val isNetworkOk = handleElectrumConnection(activity, it)
+          .and(handleTorConnection(activity, it))
+          .and(handleLightningPeerConnection(activity, it))
         mBinding.summary.visibility = if (isNetworkOk) View.GONE else View.VISIBLE
-      }
-    })
+      })
+    } ?: dismiss()
   }
 
   override fun onStart() {
     super.onStart()
-    mBinding.networkConnLabel.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
     mBinding.torConnLabel.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_tor) }
     mBinding.lightningConnLabel.setOnClickListener { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
     mBinding.electrumConnLabel.setOnClickListener { findNavController().navigate(R.id.global_action_any_to_electrum) }
     mBinding.close.setOnClickListener { findNavController().popBackStack() }
   }
 
-  private fun handleNetworkConnection(context: Context, ni: NetworkInfo): Boolean {
-    mBinding.networkConnState.text = context.getString(if (ni.networkConnected) R.string.conndialog_ok else R.string.conndialog_not_ok)
-    mBinding.networkConnLabel.setIconColor(ThemeHelper.color(context, if (ni.networkConnected) R.attr.positiveColor else R.attr.negativeColor))
-    return ni.networkConnected
-  }
 
   private fun handleLightningPeerConnection(context: Context, ni: NetworkInfo): Boolean {
     mBinding.lightningConnState.text = context.getString(if (ni.lightningConnected) R.string.conndialog_ok else R.string.conndialog_not_ok)
     mBinding.lightningConnLabel.setIconColor(ThemeHelper.color(context, if (ni.lightningConnected) R.attr.positiveColor else R.attr.negativeColor))
-    return ni.networkConnected
+    return ni.lightningConnected
   }
 
   private fun handleElectrumConnection(context: Context, ni: NetworkInfo): Boolean {

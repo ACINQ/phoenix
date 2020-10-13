@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "750755451299",
+    "firebase_url": "https://phoenix-mainnet.firebaseio.com",
+    "project_id": "phoenix-mainnet",
+    "storage_bucket": "phoenix-mainnet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750755451299:android:0db62fe160c68b960b8a16",
+        "android_client_info": {
+          "package_name": "fr.acinq.phoenix.mainnet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750755451299-d8nr439pf35oljj23u7fl34ms3g4bog6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.acinq.phoenix.mainnet",
+            "certificate_hash": "e03fd599eb338d40ae2a1a353aa6e5ad50afe82c"
+          }
+        },
+        {
+          "client_id": "750755451299-dhmba482tdpbh34eem3m16f1m41odgpg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKetfv4MzZtwh9tH0UyTbD5sqMP8BomcA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750755451299-dhmba482tdpbh34eem3m16f1m41odgpg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

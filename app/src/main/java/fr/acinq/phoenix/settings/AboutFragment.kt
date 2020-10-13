@@ -46,8 +46,10 @@ class AboutFragment : BaseFragment() {
     super.onActivityCreated(savedInstanceState)
     mBinding.general.text = Converter.html(getString(R.string.about_general))
     mBinding.general.movementMethod = LinkMovementMethod.getInstance()
+    mBinding.fiatRates.text = Converter.html(getString(R.string.about_fiat_rates))
+    mBinding.fiatRates.movementMethod = LinkMovementMethod.getInstance()
     mBinding.actionBar.setSubtitle(getString(R.string.about_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
 }

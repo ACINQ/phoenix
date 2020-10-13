@@ -1,5 +1,9 @@
 ![Eclair Logo](.readme/phoenix_text.png)
 
+[![Testnet Build](https://github.com/ACINQ/phoenix/workflows/TESTNET%20Build/badge.svg)](https://github.com/ACINQ/phoenix/actions?query=workflow%3A%22TESTNET+Build%22)
+[![Download Testnet APK](https://img.shields.io/badge/Download-Testnet%20APK-green?style=flat&logo=android&logoColor=white)](https://acinq.co/pub/phoenix/phoenix-testnet-latest.apk)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 Phoenix is a Bitcoin wallet. It allows you to send and receive bitcoins securely. It is non custodial and provides a simple and clean UX. Thanks to native Lightning support, payments are faster and cheaper.
 
 It is developed by [ACINQ](https://acinq.co), one of the leading companies working on Bitcoin scalability.
@@ -11,6 +15,8 @@ Head to our website for more information: https://phoenix.acinq.co
 This wallet is available for Android, and will hopefully be available for iOS in the future.
 
 You can download the binary from the [Release page](https://github.com/ACINQ/phoenix/releases), or from our [Google Play page](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet).
+
+For testing purposes, we also release a Testnet APK. Note that Testnet coins have no value.
 
 # Build the project
 

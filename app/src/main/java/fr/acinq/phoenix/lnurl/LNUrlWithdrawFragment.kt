@@ -133,9 +133,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
       val unit = mBinding.amountUnit.selectedItem.toString()
       val amountInput = mBinding.amountValue.text.toString()
       mBinding.amountError.text = ""
-      val fiat = Prefs.getFiatCurrency(context!!)
+      val fiat = Prefs.getFiatCurrency(requireContext())
       val amountOpt = if (unit == fiat) {
-        Option.apply(Converter.convertFiatToMsat(context!!, amountInput))
+        Option.apply(Converter.convertFiatToMsat(requireContext(), amountInput))
       } else {
         Converter.string2Msat_opt(amountInput, unit)
       }
@@ -147,9 +147,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
           throw LNUrlWithdrawAtMostMaxSat(args.url.maxWithdrawable)
         }
         if (unit == fiat) {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, context!!, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, requireContext(), withUnit = true))
         } else {
-          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(context!!, amount, withUnit = true))
+          mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(requireContext(), amount, withUnit = true))
         }
       } else {
         throw RuntimeException("amount is undefined")
@@ -159,10 +159,10 @@ class LNUrlWithdrawFragment : BaseFragment() {
       mBinding.amountConverted.text = ""
       mBinding.amountError.text = when (e) {
         is LNUrlWithdrawAtLeastMinSat -> getString(R.string.lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
-        is LNUrlWithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, context!!, withUnit = true) } ?: "")
+        is LNUrlWithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, it, withUnit = true) } ?: "")
         else -> getString(R.string.lnurl_withdraw_error_amount)
       }
-      Option.empty<MilliSatoshi>()
+      Option.empty()
     }
   }
 
@@ -176,7 +176,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         val amount = checkAmount()
         if (!amount.isEmpty) {
           model.state.value = LNUrlWithdrawState.InProgress
-          val pr = app.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
+          val pr = app.requireService.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
           Wallet.httpClient.newCall(Request.Builder().url(url).build()).enqueue(object : Callback {

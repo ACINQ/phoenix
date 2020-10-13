@@ -87,7 +87,7 @@
         android:layout_height="4dp"
         android:layout_marginStart="@dimen/space_md_p"
         android:layout_marginEnd="@dimen/space_md_p"
-        android:background="@drawable/rounded_top"
+        android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/colorPrimary"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"

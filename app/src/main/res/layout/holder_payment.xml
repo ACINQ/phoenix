@@ -74,7 +74,6 @@
     android:ellipsize="start"
     android:maxWidth="200dp"
     android:singleLine="true"
-    android:text="1.23456"
     android:textAlignment="viewEnd"
     android:textSize="@dimen/text_lg" />
 

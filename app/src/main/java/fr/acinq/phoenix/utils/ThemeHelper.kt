@@ -24,7 +24,7 @@ import androidx.appcompat.app.AppCompatDelegate
 object ThemeHelper {
   fun color(context: Context, @AttrRes attrRes: Int): Int {
     val typedValue = TypedValue()
-    context.theme.resolveAttribute (attrRes, typedValue, true)
+    context.theme.resolveAttribute(attrRes, typedValue, true)
     return typedValue.data
   }
 
