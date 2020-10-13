@@ -23,7 +23,7 @@
   <string name="notification_channels_watcher_desc">Alerta você em caso de necessidade de iniciar o aplicativo. Deve ser prioridade.</string>
   <string name="notification_pay_to_open_title">Aceitar pagamento</string>
   <string name="notification_pay_to_open_desc">Aparece quando alguém lhe envia um pagamento e você precisa aceitá-lo manualmente.</string>
-  <string name="notification_headless_title">Phoenix rodando em segundo plano</string>
+  <string name="notification_headless_title">A Phoenix está rodando em segundo plano</string>
   <string name="notification_headless_desc">Notifica você que a Phoenix está sendo executada em segundo plano. Isso acontece quando alguém está enviando dinheiro para você e o aplicativo ainda não foi iniciado.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
