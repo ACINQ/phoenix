@@ -587,5 +587,60 @@
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
+  <string name="about_fiat_rates"><![CDATA[
+    As taxas Bitcoin/fiat são obtidas de várias APIs de terceiros::
+    <br />- Blockchain.info
+    <br />- Bitso
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
+  ]]></string>
+
+  <!-- //////////////// background node service //////////////// -->
+
+  <string name="nodeservice_desc">Serviço contendo o servidor da carteira.</string>
+
+  <!-- //////////////// settings: options for payments //////////////// -->
+
+  <string name="paymentsettings_title">Configurações de pagamento</string>
+  <string name="paymentsettings_subtitle">Defina várias opções em relação aos pagamentos que você envia ou recebe.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
+  <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As solicitações de pagamento que você criar usarão esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
+
+  <string name="paymentsettings_paytoopen_auto_title">Aceitar abertura de canal de forma automática</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Às vezes, é necessário criar um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir o custo de abertura do canal.</string>
+
+  <!-- ftue -->
+
+  <string name="ftue__bullet_1" translatable="false">●○○</string>
+  <string name="ftue__bullet_2" translatable="false">○●○</string>
+  <string name="ftue__bullet_3" translatable="false">○○●</string>
+  <string name="ftue__skip_button">Pular</string>
+  <string name="ftue__welcome__header">Bem-vindo!</string>
+  <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil, e rápido.</string>
+  <string name="ftue__pay_to_open__header">Abertura de canal automática</string>
+  <string name="ftue__pay_to_open__body">Canais de pagamento serão abertos automaticamente para você, se necessário. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
+  <string name="ftue__backup_seed__header">Controlar</string>
+  <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
+  <string name="ftue__backup_seed__button">Começar</string>
+
+  <!-- patch notes -->
+
+  <string name="patchnotes_title">A Phoenix foi atualizada!</string>
+  <string name="patchnotes_v15"><![CDATA[
+    <h4>Recebimento de pagamento em segundo plano</h4>
+    <p>A Phoenix agora pode receber pagamentos mesmo se o aplicativo não estiver sido iniciado.</p>
+
+    <h4>Abertura automática de canal</h4>
+    <p>Canais de pagamento serão abertos automaticamente para você, se necessário.</p>
+    <p>Este recurso é necessário para que o recebimento de pagamento em segundo plano funcione corretamente, mas você pode desabilitá-lo se quiser (em Configurações > Configurações de pagamento).</p>
+    <p>O custo de abertura de canal ainda se aplica (%1$s%%).</p>
+
+    <h4>Aprimoramento da função de bloqueio</h4>
+    <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
+    <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
+  ]]></string>
 
 </resources>
