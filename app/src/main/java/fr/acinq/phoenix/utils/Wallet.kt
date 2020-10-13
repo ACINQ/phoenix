@@ -123,17 +123,21 @@ object Wallet {
    */
   fun parseLNObject(input: String): Any {
     return try {
-      PaymentRequest.read(input.apply {
-        if (startsWith("lightning://", true)) drop(12)
-        else if (startsWith("lightning:", true)) drop(10)
-      })
+      when {
+        input.startsWith("lightning://", true) -> input.drop(12)
+        input.startsWith("lightning:", true) -> input.drop(10)
+        else -> input
+      }.run { PaymentRequest.read(this) }
     } catch (e1: Exception) {
       try {
         BitcoinURI(input)
       } catch (e2: Exception) {
         try {
-          // this can take some time since a HTTP request may be done
-          LNUrl.extractLNUrl(input)
+          when {
+            input.startsWith("lightning://", true) -> input.drop(12)
+            input.startsWith("lightning:", true) -> input.drop(10)
+            else -> input
+          }.run { LNUrl.extractLNUrl(this) }
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
