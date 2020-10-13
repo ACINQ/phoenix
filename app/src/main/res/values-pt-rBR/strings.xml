@@ -220,7 +220,7 @@
   <string name="btn_cancel">Cancelar</string>
   <string name="btn_close">Fechar</string>
   <string name="btn_pause_connecting">Conectando ao par…</string>
-  <string name="btn_pause_connecting_electrum">Conectando ao Electrum…</string>
+  <string name="btn_pause_connecting_electrum">Conectando ao servidor Electrum…</string>
 
   <!-- //////////////// settings //////////////// -->
 
