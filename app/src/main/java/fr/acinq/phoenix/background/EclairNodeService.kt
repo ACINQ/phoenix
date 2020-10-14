@@ -48,10 +48,7 @@ import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.db.*
-import fr.acinq.eclair.io.PayToOpenRequestEvent
-import fr.acinq.eclair.io.Peer
-import fr.acinq.eclair.io.PeerConnected
-import fr.acinq.eclair.io.PeerDisconnected
+import fr.acinq.eclair.io.*
 import fr.acinq.eclair.payment.*
 import fr.acinq.eclair.payment.receive.MultiPartHandler
 import fr.acinq.eclair.payment.relay.Relayer
@@ -214,7 +211,6 @@ class EclairNodeService : Service() {
     when {
       state.value is KitState.Started -> {
         notifyForegroundService(getString(R.string.notif__headless_title__default), null)
-        connectToPeerIfNeeded()
       }
       encryptedSeed is EncryptedSeed.V2.NoAuth -> {
         try {
@@ -428,7 +424,8 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
-    kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
+    // this is only needed to create the peer when we don't yet have any channel, connection will be handled by the reconnection task
+    kit.switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ.nodeId(), Option.empty()), ActorRef.noSender())
     log.info("bootstrap complete")
     return Pair(kit, xpub)
   }
@@ -752,20 +749,6 @@ class EclairNodeService : Service() {
     refreshPeerConnectionState()
   }
 
-  /** Send a reconnect event to the ACINQ node. */
-  private fun connectToPeerIfNeeded() {
-    serviceScope.launch(Dispatchers.Default) {
-      kit?.run {
-        if (!isConnectedToPeer()) {
-          log.info("forcing connection to peer")
-          switchboard().tell(Peer.`Connect$`.`MODULE$`.apply(Wallet.ACINQ), ActorRef.noSender())
-        } else {
-          log.debug("already connected")
-        }
-      }
-    }
-  }
-
   private fun isConnectedToPeer(): Boolean = api?.run {
     JavaConverters.asJavaIterableConverter(
       Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
@@ -775,6 +758,7 @@ class EclairNodeService : Service() {
   /** Prevents spamming the peer */
   private var hasRefreshedFCMToken = false
 
+  /** Check state of connection with peer and refresh the peer connection live data. If needed, register fcm token with peer. */
   fun refreshPeerConnectionState() {
     serviceScope.launch(Dispatchers.Default) {
       isConnectedToPeer().also {
@@ -788,6 +772,11 @@ class EclairNodeService : Service() {
         }
       }
     }
+  }
+
+  /** Force the [fr.acinq.eclair.io.ReconnectionTask] to attempt reconnection to peer, if needed. */
+  fun sendTickReconnect() {
+    kit?.system()?.eventStream()?.publish(ReconnectionTask.`TickReconnect$`.`MODULE$`)
   }
 
   // ================================================ //

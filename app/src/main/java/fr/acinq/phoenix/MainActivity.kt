@@ -25,6 +25,7 @@ import android.net.Network
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -35,8 +36,8 @@ import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.KitState
-import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.background.PayToOpenNavigationEvent
+import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
@@ -54,11 +55,12 @@ class MainActivity : AppCompatActivity() {
   private val networkCallback = object : ConnectivityManager.NetworkCallback() {
     override fun onAvailable(network: Network) {
       super.onAvailable(network)
-      log.info("network available")
+      log.debug("network available")
       if (Prefs.isTorEnabled(applicationContext)) {
         app.service?.reconnectTor()
       }
       app.service?.refreshPeerConnectionState()
+      Handler().postDelayed({ app.service?.sendTickReconnect() }, 1000)
     }
 
     override fun onLosing(network: Network, maxMsToLive: Int) {
