@@ -426,7 +426,7 @@
   <string name="paymentdetails_closing_type_local">Local</string>
   <string name="paymentdetails_closing_type_remote">Remoto</string>
   <string name="paymentdetails_closing_type_other">Outro</string>
-  <string name="paymentdetails_closing_channel_label">Canal fechado</string>
+  <string name="paymentdetails_closing_channel_label">Canal encerrado</string>
   <string name="paymentdetails_closing_spending_txs_label">|Transações de fechamento de canais</string>
   <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
