@@ -621,7 +621,7 @@
   <string name="ftue__bullet_3" translatable="false">○○●</string>
   <string name="ftue__skip_button">Pular</string>
   <string name="ftue__welcome__header">Bem-vindo!</string>
-  <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil, e rápido.</string>
+  <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
   <string name="ftue__pay_to_open__header">Abertura automática de canais</string>
   <string name="ftue__pay_to_open__body">Se necessário, canais de pagamento serão abertos automaticamente para você. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
   <string name="ftue__backup_seed__header">Controlar</string>
