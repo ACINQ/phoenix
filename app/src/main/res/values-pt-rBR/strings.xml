@@ -623,7 +623,7 @@
   <string name="ftue__welcome__header">Bem-vindo!</string>
   <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil, e rápido.</string>
   <string name="ftue__pay_to_open__header">Abertura de canal automática</string>
-  <string name="ftue__pay_to_open__body">Canais de pagamento serão abertos automaticamente para você, se necessário. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
+  <string name="ftue__pay_to_open__body">Se necessário, canais de pagamento serão abertos automaticamente para você. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
   <string name="ftue__backup_seed__header">Controlar</string>
   <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
   <string name="ftue__backup_seed__button">Começar</string>
