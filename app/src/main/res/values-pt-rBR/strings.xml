@@ -636,7 +636,7 @@
     <p>A Phoenix agora pode receber pagamentos mesmo se o aplicativo não estiver sido iniciado.</p>
 
     <h4>Abertura automática de canais</h4>
-    <p>Canais de pagamento serão abertos automaticamente para você, se necessário.</p>
+    <p>Se necessário, canais de pagamento serão abertos automaticamente para você.</p>
     <p>Este recurso é necessário para que o recebimento de pagamento em segundo plano funcione corretamente, mas você pode desabilitá-lo se quiser (em Configurações > Configurações de pagamento).</p>
     <p>O custo de abertura de canais ainda se aplica (%1$s%%).</p>
 
