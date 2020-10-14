@@ -612,7 +612,7 @@
   <string name="paymentsettings_paytoopen_auto_title">Aceitar abertura de canais de forma automática</string>
   <string name="paymentsettings_paytoopen_auto_desc">Às vezes, é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir o custo de abertura do canal.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
-  <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá automaticamente abrir canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
+  <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
   
   <!-- ftue -->
 
