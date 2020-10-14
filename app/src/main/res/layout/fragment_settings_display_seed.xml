@@ -68,6 +68,7 @@
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_primary_border"
           android:layout_marginTop="@dimen/space_lg"
+          android:filterTouchesWhenObscured="true"
           app:hz_bias="0"
           app:icon="@drawable/ic_key"
           app:is_paused="@{model.state instanceof DisplaySeedState.Unlocking}"

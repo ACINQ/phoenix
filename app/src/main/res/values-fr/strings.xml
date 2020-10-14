@@ -460,7 +460,7 @@
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirer des fonds depuis <br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Retirer</string>
   <string name="lnurl_withdraw_wait">Demande de fonds en cours…</string>
-  <string name="lnurl_withdraw_success">Veuillez patienter pendant que %1$s est en train d\'envoyer les fonds.\n\nGardez bien l\'application en ligne.</string>
+  <string name="lnurl_withdraw_success">Veuillez patienter pendant que %1$s envoie les fonds.\n\nGardez bien l\'application en ligne.</string>
   <string name="lnurl_withdraw_error_internal">Cette demande de retrait n\'a pas pu être traitée. Veuillez réessayer.</string>
   <string name="lnurl_withdraw_error_invalid">Cette demande de retrait n\'est pas valide. Veuillez réessayer.</string>
   <string name="lnurl_withdraw_error_amount">Ce montant n\'est pas valide.</string>

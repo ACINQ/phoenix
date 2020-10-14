@@ -41,6 +41,9 @@
       android:layout_marginStart="@dimen/space_md_p"
       android:layout_marginEnd="@dimen/space_md_p"
       android:layout_marginTop="@dimen/space_lg"
+      android:importantForAccessibility="no"
+      android:importantForAutofill="no"
+      android:importantForContentCapture="no"
       app:layout_constraintTop_toBottomOf="@id/seed_dialog_header" />
 
     <TextView

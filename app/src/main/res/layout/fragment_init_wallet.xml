@@ -38,15 +38,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
         android:backgroundTint="?attr/colorPrimary"
-        app:text_color="?attr/altTextColor"
+        android:filterTouchesWhenObscured="true"
         app:icon="@drawable/ic_fire"
         app:icon_tint="?attr/altTextColor"
         app:layout_constraintBottom_toTopOf="@id/restore_seed"
-        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:text="@string/initwallet_create" />
+        app:layout_constraintVertical_chainStyle="packed"
+        app:text="@string/initwallet_create"
+        app:text_color="?attr/altTextColor" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/restore_seed"
@@ -54,12 +55,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginBottom="@dimen/space_md"
+        android:filterTouchesWhenObscured="true"
         android:background="@drawable/button_bg_primary_border"
-        app:layout_constraintEnd_toEndOf="parent"
         app:icon="@drawable/ic_restore"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create_seed"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:text="@string/initwallet_restore" />
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
@@ -68,9 +70,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
         android:layout_marginEnd="@dimen/space_md"
+        app:icon="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:icon="@drawable/ic_settings" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
