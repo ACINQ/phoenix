@@ -422,7 +422,7 @@
   <string name="paymentdetails_technicals_title">Dados de pagamento</string>
   <string name="paymentdetails_swap_out_feerate_label">Taxa de troca</string>
   <string name="paymentdetails_closing_type_label">Tipo de encerramento</string>
-  <string name="paymentdetails_closing_type_mutual">Fechamento mútuo</string>
+  <string name="paymentdetails_closing_type_mutual">Encerramento mútuo</string>
   <string name="paymentdetails_closing_type_local">Local</string>
   <string name="paymentdetails_closing_type_remote">Remoto</string>
   <string name="paymentdetails_closing_type_other">Outro</string>
