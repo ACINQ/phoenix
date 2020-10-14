@@ -190,6 +190,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg_primary_border"
         android:visibility="@{!(appModel.state instanceof KitState.Disconnected) &amp;&amp; appModel.lockState instanceof AppLock.Locked}"
+        android:filterTouchesWhenObscured="true"
         app:icon="@drawable/ic_shield"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
