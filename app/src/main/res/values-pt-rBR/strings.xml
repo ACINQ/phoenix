@@ -249,7 +249,7 @@
   <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
   
   <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
-  <string name="notif__headless_title__missed_incoming">Pagamentos a receber</string>
+  <string name="notif__headless_title__missed_incoming">Falha ao receber um pagamento</string>
   <string name="notif__headless_title__missed_fulfill">Concluir recebimento</string>
   <string name="notif__headless_title__received">Pagamento recebido</string>
   <string name="notif__headless_message__app_locked">O aplicativo está bloqueado</string>
