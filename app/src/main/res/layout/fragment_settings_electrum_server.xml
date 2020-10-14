@@ -59,6 +59,7 @@
           <TextView
             android:id="@+id/connection_state_value"
             style="@style/TechnicalsValueView"
+            app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -80,8 +81,8 @@
 
         <TextView
           android:id="@+id/block_height"
-          android:paddingTop="@dimen/space_lg"
-          style="@style/TechnicalsValueView" />
+          style="@style/TechnicalsValueView"
+          android:paddingTop="@dimen/space_lg" />
 
         <TextView
           style="@style/TechnicalsLabelView"
