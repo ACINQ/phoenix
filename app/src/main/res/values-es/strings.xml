@@ -394,7 +394,7 @@
 
   <string name="lnurl_auth_instructions"><![CDATA[Puedes utilizar tu cartera para iniciar sesión de forma anónima y autorizar una acción en:<br/><br/><b>%1$s</b><br/><br/>No se compartirán datos personales con este servicio.]]></string>
   <string name="lnurl_auth_button">Iniciar sesión</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Iniciando sesión en <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Iniciando sesión en\n<b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Autenticación exitosa.</string>
   <string name="lnurl_auth_failure">Fallo de autenticación.\n\nDetalles: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">No se puede conectar a %1$s</string>
