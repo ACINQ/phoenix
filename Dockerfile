@@ -1,5 +1,5 @@
 # base image to build eclair-core
-FROM adoptopenjdk/openjdk11:jdk-11.0.3_7-alpine as ECLAIR_CORE_BUILD
+FROM adoptopenjdk/openjdk11:jdk-11.0.8_10-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
 COPY ./app/build.gradle .
@@ -37,8 +37,8 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV ANDROID_SDK_FILENAME sdk-tools-linux-4333796.zip
 ENV ANDROID_SDK_URL https://dl.google.com/android/repository/${ANDROID_SDK_FILENAME}
-ENV ANDROID_API_LEVELS android-29
-ENV ANDROID_BUILD_TOOLS_VERSION 28.0.3
+ENV ANDROID_API_LEVELS android-30
+ENV ANDROID_BUILD_TOOLS_VERSION 30.0.2
 ENV ANDROID_NDK_VERSION 21.3.6528147
 ENV CMAKE_VERSION 3.10.2.4988404
 ENV ANDROID_HOME /usr/local/android-sdk
