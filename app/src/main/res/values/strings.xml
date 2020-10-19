@@ -250,7 +250,7 @@
 
   <string name="notif__headless_title__default">Phoenix is running in background</string>
   <string name="notif__headless_title__missed_incoming">Missed incoming payment</string>
-  <string name="notif__headless_title__missed_fulfill">Complete a pending payment</string>
+  <string name="notif__headless_title__missed_fulfill">A pending payment has been fulfilled</string>
   <string name="notif__headless_title__received">Payment received</string>
   <string name="notif__headless_message__app_locked">App is locked</string>
   <string name="notif__headless_message__pending_fulfill">Tap to start the app</string>

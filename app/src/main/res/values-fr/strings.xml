@@ -21,7 +21,7 @@
   <!-- //////////////// system notification channels //////////////// -->
 
   <string name="notification_channels_watcher_title">Vérification des channels</string>
-  <string name="notification_channels_watcher_desc">Ceci est une tâche de fond qui vous alerte si un problème dans les channels lightning est détecté. Cette notification devrait être en priorité haute.</string>
+  <string name="notification_channels_watcher_desc">Ceci est une tâche de fond qui vous alerte si un problème dans les channels Lightning est détecté. Cette notification devrait être en priorité haute.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -53,7 +53,7 @@
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_unlock_required">Phoenix est verrouillé.\nVeuillez vous authentifier pour continuer.</string>
-  <string name="startup_unlock_button">Déverouiller</string>
+  <string name="startup_unlock_button">Déverrouiller</string>
   <string name="startup_binding_service">Liaison au service…</string>
   <string name="startup_wait">Chargement…</string>
   <string name="startup_wait_tor">Démarrage de Tor…</string>
@@ -62,7 +62,7 @@
   <string name="startup_error_generic">L\'application n\'a pas pu démarrer suite à une erreur interne.\n\nDétails: %1$s</string>
   <string name="startup_error_electrum_address">L\'application n\'a pas pu démarrer. L\'adresse de votre serveur Electrum n\'est pas valide.\n\nVous pouvez corriger cela dans Configuration > Electrum.</string>
   <string name="startup_error_tor">Le service Tor n\'a pas pu démarrer. Vérifiez que votre connexion fonctionne et essayez de nouveau.\n\nDétails de l\'erreur: %1$s</string>
-  <string name="startup_error_unreadable">Echec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
+  <string name="startup_error_unreadable">Échec de la lecture des données du portefeuille. Veuillez redémarrer l\'application.</string>
   <string name="startup_error_network">L\'application n\'a pas accès à Internet. Veuillez vérifier votre connexion cellulaire ou WiFi.</string>
   <string name="startup_error_wrong_pwd">Le code PIN est incorrect</string>
   <string name="startup_error_biometrics">L\'authentification biométrique a échoué.</string>
@@ -75,7 +75,7 @@
   <string name="paymentholder_sending">Envoi…</string>
   <string name="paymentholder_processing">Traitement…</string>
   <string name="paymentholder_waiting">En attente…</string>
-  <string name="paymentholder_failed">Echoué</string>
+  <string name="paymentholder_failed">Échoué</string>
   <string name="paymentholder_sent_prefix">-</string>
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">Pas de description</string>
@@ -83,10 +83,10 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Editer ma requête de paiement</string>
+  <string name="receive_edit_title">Éditer ma requête de paiement</string>
   <string name="receive_edit_subtitle">Vous pouvez changer le montant demandé et la description de la requête de paiement.</string>
   <string name="receive_in_progress_message">Veuillez patienter…</string>
-  <string name="receive_error_message">Echec de la génération de la requête de paiement…\n\nVeuillez réessayer.</string>
+  <string name="receive_error_message">Échec de la génération de la requête de paiement…\n\nVeuillez réessayer.</string>
   <string name="receive_amount_label">Montant (optionnel)</string>
   <string name="receive_desc_label">Description du paiement (optionnel):</string>
   <string name="receive_default_desc">Phoenix payment</string>
@@ -96,7 +96,7 @@
   <string name="receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="receive_share_button">Partager…</string>
 
-  <string name="receive_address_label">Addresse</string>
+  <string name="receive_address_label">Adresse</string>
   <string name="receive_power_save_disclaimer">Vous êtes en mode d\'économie d\'énergie. Pour recevoir le paiement, assurez vous que l\'application est démarrée et a accès à Internet</string>
   <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
@@ -134,7 +134,7 @@
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
-  <string name="send_amount_error_swap_out_too_small">10000 sat minimum pour un paiement on-chain.</string>
+  <string name="send_amount_error_swap_out_too_small">10 000 sat minimum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Ajuster fees</string>
@@ -227,7 +227,7 @@
 
   <string name="notif__headless_title__default">Phoenix tourne en tâche de fond</string>
   <string name="notif__headless_title__missed_incoming">Paiement entrant manqué</string>
-  <string name="notif__headless_title__missed_fulfill">Résolution d\'un paiement en attente</string>
+  <string name="notif__headless_title__missed_fulfill">Un paiement en attente s\'est finalisé</string>
   <string name="notif__headless_title__received">Paiement reçu</string>
   <string name="notif__headless_message__app_locked">L\'application est verrouillée</string>
   <string name="notif__headless_message__pending_fulfill">Cliquer pour lancer l\'application</string>
@@ -272,7 +272,7 @@
 
   <string name="listallchannels_title">Liste des canaux de paiement</string>
   <string name="listallchannels_in_progress">Veuillez patienter…</string>
-  <string name="listallchannels_error">Echec de la récupération de la liste de canaux de paiement, veuillez réessayer.</string>
+  <string name="listallchannels_error">Échec de la récupération de la liste de canaux de paiement, veuillez réessayer.</string>
   <string name="listallchannels_node_id">Votre identifiant de noeud: %1$s</string>
   <string name="listallchannels_no_channels">Vous n\'avez pas de canal de paiement.</string>
   <plurals name="listallchannels_channels_header">
@@ -285,14 +285,14 @@
   <string name="listallchannels_funding_tx">Tx</string>
   <string name="listallchannels_funding_tx_desc">Consulter la transaction de création</string>
   <string name="listallchannels_close">Fermer</string>
-  <string name="listallchannels_share_subject">Détails de canal de paiement</string>
+  <string name="listallchannels_share_subject">Canaux de paiement</string>
   <string name="listallchannels_share_title">Partager le détails du canal de paiement</string>
-  <string name="listallchannels_serialization_error">Echec de la lecture des données du canal de paiement.</string>
+  <string name="listallchannels_serialization_error">Échec de la lecture des données du canal de paiement.</string>
 
   <!-- //////////////// channel details //////////////// -->
 
   <string name="channel_loading">Récupération des données…</string>
-  <string name="channel_error">Echec lors de la récupération des données de ce canal de paiement.</string>
+  <string name="channel_error">Échec lors de la récupération des données de ce canal de paiement.</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -309,7 +309,7 @@
 
   <string name="main_alert_electrum_connecting">Connexion à electrum…</string>
   <string name="main_alert_network_lost">Vous êtes hors ligne. Merci de vérifier l\'état de votre connexion…</string>
-  <string name="main_alert_lightning_connection_lost">Echec de la connexion au réseau Lightning…</string>
+  <string name="main_alert_lightning_connection_lost">Échec de la connexion au réseau Lightning…</string>
   <string name="main_alert_settings_button">Configuration</string>
   <string name="main_swapin_incoming">+%1$s entrant</string>
   <string name="main_faq_button">FAQ</string>
@@ -382,7 +382,7 @@
   <string name="paymentdetails_fees_label">Frais</string>
   <string name="paymentdetails_error_label">Erreur</string>
   <string name="paymentdetails_closing_desc">Paiement pour clôture du channel %1$s…</string>
-  <string name="paymentdetails_swap_out_desc">Paiement vers une addresse on-chain</string>
+  <string name="paymentdetails_swap_out_desc">Paiement vers une adresse on-chain</string>
   <string name="paymentdetails_no_description">Pas de description</string>
   <string name="paymentdetails_address_label">Adresse</string>
   <string name="paymentdetails_address_open_explorer">Ouvrir dans un explorateur</string>
@@ -439,7 +439,7 @@
   <string name="accessctrl_full_lock_switch_backup_required">Confirmez d\'abord que vous avez sauvegardé votre clé de sauvegarde pour bénéficier d\'options supplémentaires.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Accéder à ma clé de sauvegarde</string>
   <string name="accessctrl_full_lock_switch">Bloquer le fonctionnement en tâche de fond</string>
-  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
+  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverrouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
   <string name="accessctrl_full_lock_confirm_title">Information</string>
   <string name="accessctrl_full_lock_confirm_message">Les fonctionnalités en tâche de fond ne seront plus possible. Vous ne pourrez recevoir d\'argent que si l\'application est déverrouillée.</string>
 
@@ -499,8 +499,8 @@
   <string name="electrum_dialog_checkbox">Utiliser un serveur Electrum particulier</string>
   <string name="electrum_dialog_ssl">Le serveur doit avoir un certificat valide</string>
   <string name="electrum_dialog_ssl_tor">Également vérifier le certificat pour cette adresse en .onion</string>
-  <string name="electrum_dialog_input">Addresse du serveur (host:port).</string>
-  <string name="electrum_empty_custom_address">Veuillez saisir une addresse pour le serveur electrum</string>
+  <string name="electrum_dialog_input">Adresse du serveur (host:port).</string>
+  <string name="electrum_empty_custom_address">Veuillez saisir une adresse pour le serveur electrum</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
@@ -580,7 +580,7 @@
 
     <h4>Amélioration du verrouillage</h4>
     <p>Le verrouillage de l\'application utilise maintenant celui du système Android. Plus besoin de se souvenir d\'un énième PIN !</p>
-    <p>Allez dans Configuration > Sécurité pour activer le verouillage écran.</p>
+    <p>Allez dans Configuration > Sécurité pour activer le verrouillage écran.</p>
   ]]></string>
 
 </resources>
