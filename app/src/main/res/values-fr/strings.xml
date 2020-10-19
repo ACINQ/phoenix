@@ -385,7 +385,7 @@
   <string name="paymentdetails_swap_out_desc">Paiement vers une addresse on-chain</string>
   <string name="paymentdetails_no_description">Pas de description</string>
   <string name="paymentdetails_address_label">Adresse</string>
-  <string name="paymentdetails_address_open_explorer">Ouvrir dans une explorateur</string>
+  <string name="paymentdetails_address_open_explorer">Ouvrir dans un explorateur</string>
   <string name="paymentdetails_info_uniclose"><![CDATA[
     Ce paiement est survenu suite à un conflit dans un canal de paiement. Les fonds seront envoyés à l\'adresse suivante : %1$s.
     <br /><br />
@@ -447,7 +447,7 @@
 
   <string name="lnurl_auth_instructions"><![CDATA[Vous pouvez utiliser votre wallet pour signer et autoriser de façon anonyme une action sur le service suivant:<br/><br/><b>%1$s</b><br/><br/>Aucune information personnelle ne sera partagée avec ce service.]]></string>
   <string name="lnurl_auth_button">Autoriser</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Autorisation en cours avec <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Autorisation en cours avec\n<b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Autorisation réussie.</string>
   <string name="lnurl_auth_failure">Échec de l\'autorisation.\n\nDétails de l\'erreur: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">La connexion au service %1$s a échoué.</string>

@@ -20,6 +20,7 @@ import android.app.AlertDialog
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import fr.acinq.phoenix.R
@@ -37,7 +38,13 @@ object AlertHelper {
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme).setView(view)
   }
 
-  fun buildWithInput(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, callback: (String) -> Unit, defaultValue: String, inputType: Int = InputType.TYPE_CLASS_TEXT, hint: String = ""): AlertDialog.Builder {
+  fun buildWithInput(inflater: LayoutInflater,
+    title: CharSequence?,
+    message: CharSequence?,
+    callback: (String) -> Unit,
+    defaultValue: String,
+    inputType: Int = InputType.TYPE_CLASS_TEXT,
+    hint: String = ""): AlertDialog.Builder {
     val view = inflater.inflate(R.layout.dialog_alert_input, null)
     default(view, title, message)
     val input = view.findViewById<EditText>(R.id.alert_input).apply {
@@ -48,6 +55,18 @@ object AlertHelper {
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
       .setPositiveButton(inflater.context.getString(R.string.btn_confirm)) { _, _ -> callback(input.text.toString()) }
+  }
+
+  fun buildWithCheckBox(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, checkBoxLabel: CharSequence?, defaultValue: Boolean, callback: (Boolean) -> Unit): AlertDialog.Builder {
+    val view = inflater.inflate(R.layout.dialog_alert_checkbox, null)
+    default(view, title, message)
+    val checkbox = view.findViewById<CheckBox>(R.id.alert_checkbox).apply {
+      this.text = checkBoxLabel
+      this.isChecked = defaultValue
+    }
+    return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
+      .setView(view)
+      .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(checkbox.isChecked) }
   }
 
   private fun default(view: View, title: CharSequence?, message: CharSequence?) = view.apply {

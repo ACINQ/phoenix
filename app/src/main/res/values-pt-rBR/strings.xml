@@ -41,7 +41,7 @@
   <string name="restore_in_progress">Restaurando sua carteira…</string>
   <string name="restore_import_button">Importar</string>
   <string name="restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente.</string>
-  
+
   <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
   <string name="authprompt_title">Desbloquear para continuar</string>
@@ -59,7 +59,7 @@
 
   <string name="biometricprompt_title">A carteira está bloqueada</string>
   <string name="biometricprompt_negative">Desbloquear com PIN</string>
-  
+
    <!-- //////////////// placeholders ////////////////-->
 
   <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
@@ -244,10 +244,10 @@
 
   <string name="notif_watcher_cheating_title">Por favor abra a Phoenix</string>
   <string name="notif_watcher_cheating_message">Foi detectada uma tentativa de fraude.</string>
-  
+
   <string name="notif_watcher_connection_title">A Phoenix precisa de acesso à internet</string>
   <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
-  
+
   <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
   <string name="notif__headless_title__missed_incoming">Falha ao receber um pagamento</string>
   <string name="notif__headless_title__missed_fulfill">Concluir pagamento</string>
@@ -256,7 +256,7 @@
   <string name="notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
   <string name="notif__headless_message__manual_pay_to_open">A abertura de canal requer aprovação manual</string>
   <string name="notif__headless_message__received_payment">Recebido %1$s (%2$s)</string>
-  
+
   <string name="notif_pay_to_open_title">Aceitar pagamento</string>
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
 
@@ -474,12 +474,12 @@
 
   <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
   <string name="lnurl_auth_button">Entrar</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Acessando <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Acessando\n<b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
   <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
   <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
-  
+
   <!-- //////////////// ln url pay //////////////// -->
 
   <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
@@ -535,7 +535,7 @@
   <string name="electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
   <string name="electrum_dialog_input">Endereço do servidor (host:port).</string>
   <string name="electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
-  
+
    <!-- //////////////// fees settings //////////////// -->
 
   <string name="fees_settings_title" translatable="false">Fees Settings</string>
@@ -613,7 +613,7 @@
   <string name="paymentsettings_paytoopen_auto_desc">Às vezes, é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir o custo de abertura do canal.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
   <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
-  
+
   <!-- ftue -->
 
   <string name="ftue__bullet_1" translatable="false">●○○</string>

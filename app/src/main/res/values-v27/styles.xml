@@ -39,7 +39,7 @@
     <item name="colorSurface">?attr/bgColor</item>
     <item name="colorOnSurface">?attr/onMutedBgTextColor</item>
     <item name="android:colorBackground">?attr/bgColor</item>
-    <item name="android:windowBackground">@drawable/app_bg_testnet</item>
+    <item name="android:windowBackground">@drawable/app_bg_default</item>
     <item name="android:navigationBarColor">?attr/bgColor</item>
     <item name="android:windowLightNavigationBar">true</item>
 

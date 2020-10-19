@@ -474,7 +474,7 @@
 
   <string name="lnurl_auth_instructions"><![CDATA[You can use your wallet to anonymously sign and authorize an action on:<br/><br/><b>%1$s</b><br/><br/>No personal data will be shared with this service.]]></string>
   <string name="lnurl_auth_button">Sign-in</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Signing-in to <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Signing-in to\n<b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Authentication success.</string>
   <string name="lnurl_auth_failure">Authentication failure.\n\nDetails: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Could not connect to %1$s</string>
