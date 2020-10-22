@@ -40,10 +40,10 @@ import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
-import fr.acinq.phoenix.background.KitState
-import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.background.ChannelStateChange
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.background.PaymentPending
+import fr.acinq.phoenix.databinding.FragmentMainBinding
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
@@ -155,7 +155,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
         refreshIncomingFundsAmountField()
         mBinding.incomingFundsNotif.visibility = View.VISIBLE
       } else {
-        mBinding.incomingFundsNotif.visibility = View.INVISIBLE
+        mBinding.incomingFundsNotif.visibility = View.GONE
       }
     })
     app.currentNav.observe(viewLifecycleOwner, {
@@ -176,6 +176,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
 
     context?.let {
       refreshNotifications(it)
+      refreshBalanceDisplay(it)
     }
 
     mBinding.settingsButton.setOnClickListener { findNavController().navigate(R.id.action_main_to_settings) }
@@ -193,7 +194,20 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
   }
 
   override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-    context?.let { refreshNotifications(it) }
+    context?.let {
+      when (key) {
+        Prefs.PREFS_SHOW_BALANCE_HOME -> refreshBalanceDisplay(it)
+        else -> refreshNotifications(it)
+      }
+    }
+  }
+
+  private fun refreshBalanceDisplay(context: Context) {
+    if (Prefs.showBalanceHome(context)) {
+      mBinding.balance.visibility = View.VISIBLE
+    } else {
+      mBinding.balance.visibility = View.GONE
+    }
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)

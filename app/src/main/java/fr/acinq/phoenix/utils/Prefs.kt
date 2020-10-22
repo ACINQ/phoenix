@@ -24,7 +24,6 @@ import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
-import fr.acinq.phoenix.R
 
 object Prefs {
 
@@ -45,10 +44,13 @@ object Prefs {
 
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
 
@@ -73,6 +75,7 @@ object Prefs {
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
   const val PREFS_FCM_TOKEN: String = "PREFS_FCM_TOKEN"
+  const val PREFS_SHOW_BALANCE_HOME: String = "PREFS_SHOW_BALANCE_HOME"
 
   // -- ==================================
   // -- authentication with PIN/biometrics
@@ -202,6 +205,10 @@ object Prefs {
 
   fun getTheme(context: Context): String {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default
+  }
+
+  fun showBalanceHome(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_BALANCE_HOME, true)
   }
 
   fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {

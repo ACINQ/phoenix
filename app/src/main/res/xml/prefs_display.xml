@@ -57,4 +57,11 @@
     android:title="@string/prefs_display_explorer_label"
     app:iconSpaceReserved="false" />
 
+  <SwitchPreference
+    android:defaultValue="true"
+    app:summary="@string/prefs_display_balance_display_desc"
+    android:key="PREFS_SHOW_BALANCE_HOME"
+    android:title="@string/prefs_display_balance_display"
+    app:iconSpaceReserved="false" />
+
 </PreferenceScreen>

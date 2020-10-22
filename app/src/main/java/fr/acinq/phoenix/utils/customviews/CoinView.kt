@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.preference.PreferenceManager
+import fr.acinq.bitcoin.BtcAmount
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.R

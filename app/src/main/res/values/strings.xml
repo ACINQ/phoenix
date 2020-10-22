@@ -510,6 +510,8 @@
   <string name="prefs_display_fiat_label">Fiat currency</string>
   <string name="prefs_display_theme_label">Application theme</string>
   <string name="prefs_display_explorer_label">Onchain explorer</string>
+  <string name="prefs_display_balance_display">Show balance in home</string>
+  <string name="prefs_display_balance_display_desc">Hiding balance helps against prying eyes</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
