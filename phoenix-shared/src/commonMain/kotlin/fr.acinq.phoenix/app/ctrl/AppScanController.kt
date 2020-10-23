@@ -33,17 +33,10 @@ class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Sca
             is Scan.Intent.Send -> {
                 launch {
                     val paymentRequest = PaymentRequest.read(intent.request)
-                    val uuid = UUID.randomUUID()
+                    val paymentAmount = intent.amount.toMilliSatoshi(intent.unit)
+                    val paymentId = UUID.randomUUID()
 
-                    val sendAmount = intent.amount.toMilliSatoshi(intent.unit)
-                    val actualRequest =
-                        if (sendAmount == paymentRequest.amount) paymentRequest
-                        else {
-                            logger.info { "Changing payment request from ${paymentRequest.amount} to $sendAmount" }
-                            paymentRequest.copy(amount = sendAmount)
-                        }
-
-                    peer.send(SendPayment(uuid, actualRequest))
+                    peer.send(SendPayment(paymentId, paymentRequest, paymentAmount))
 
                     model(Scan.Model.Sending)
                 }

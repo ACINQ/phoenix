@@ -1,9 +1,10 @@
 package fr.acinq.phoenix.app
 
+import fr.acinq.eclair.io.PaymentNotSent
+import fr.acinq.eclair.io.PaymentProgress
 import fr.acinq.eclair.io.PaymentReceived
 import fr.acinq.eclair.io.PaymentSent
 import fr.acinq.eclair.io.Peer
-import fr.acinq.eclair.io.SendingPayment
 import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Transaction
@@ -48,25 +49,38 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                             )
                         )
                     }
-                    is SendingPayment -> {
+                    is PaymentProgress -> {
+                        val totalAmount = it.payment.paymentAmount + it.fees
                         db.put(
                             Transaction(
-                                it.paymentId.toString(),
-                                -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
-                                it.paymentRequest.description ?: "",
-                                Transaction.Status.Pending,
-                                currentTimestampMillis()
+                                id = it.payment.paymentId.toString(),
+                                amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
+                                desc = it.payment.paymentRequest.description ?: "",
+                                status = Transaction.Status.Pending,
+                                timestamp = currentTimestampMillis()
                             )
                         )
                     }
                     is PaymentSent -> {
+                        val totalAmount = it.payment.paymentAmount + it.fees
                         db.put(
                             Transaction(
-                                it.paymentId.toString(),
-                                -it.paymentRequest.amount!!.toLong(), // TODO: Why is amount nullable ?!?!?
-                                it.paymentRequest.description ?: "",
-                                Transaction.Status.Success,
-                                currentTimestampMillis()
+                                id = it.payment.paymentId.toString(),
+                                amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
+                                desc = it.payment.paymentRequest.description ?: "",
+                                status = Transaction.Status.Success,
+                                timestamp = currentTimestampMillis()
+                            )
+                        )
+                    }
+                    is PaymentNotSent -> {
+                        db.put(
+                            Transaction(
+                                id = it.payment.paymentId.toString(),
+                                amountSat = -it.payment.paymentAmount.toLong(), // storing value in MilliSatoshi
+                                desc = it.reason.name,
+                                status = Transaction.Status.Failure,
+                                timestamp = currentTimestampMillis()
                             )
                         )
                     }

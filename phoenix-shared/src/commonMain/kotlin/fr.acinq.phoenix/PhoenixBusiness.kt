@@ -6,7 +6,6 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
 import fr.acinq.eclair.blockchain.fee.FeeEstimator
-import fr.acinq.eclair.blockchain.fee.FeeTargets
 import fr.acinq.eclair.blockchain.fee.OnChainFeeConf
 import fr.acinq.eclair.crypto.LocalKeyManager
 import fr.acinq.eclair.db.ChannelsDb
@@ -69,6 +68,11 @@ class PhoenixBusiness {
                 )
             ),
             dustLimit = 100.sat,
+            onChainFeeConf = OnChainFeeConf(
+                maxFeerateMismatch = 10_000.0,
+                closeOnOfflineMismatch = true,
+                updateFeeMinDiffRatio = 0.1
+            ),
             maxHtlcValueInFlightMsat = 150000000L,
             maxAcceptedHtlcs = 100,
             expiryDeltaBlocks = CltvExpiryDelta(144),
