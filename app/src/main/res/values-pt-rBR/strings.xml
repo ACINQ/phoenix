@@ -601,7 +601,7 @@
   <!-- //////////////// settings: options for payments //////////////// -->
 
   <string name="paymentsettings_title">Configurações de pagamento</string>
-  <string name="paymentsettings_subtitle">Defina várias opções em relação aos pagamentos que você envia ou recebe.</string>
+  <string name="paymentsettings_subtitle">Defina opções em relação aos pagamentos que você envia ou recebe.</string>
 
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
