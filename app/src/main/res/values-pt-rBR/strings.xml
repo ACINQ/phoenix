@@ -606,7 +606,7 @@
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">As solicitações de pagamento que você criar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As cobranças que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
   <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
