@@ -1,12 +1,11 @@
 package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.eclair.channel.ChannelState
-import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.channel.Normal
 import fr.acinq.eclair.io.ByteVector32KSerializer
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.eclairSerializersModule
-import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
@@ -17,7 +16,6 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.plus
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -47,7 +45,7 @@ class AppChannelsConfigurationController(di: DI) : AppController<ChannelsConfigu
                                 state::class.simpleName ?: "Unknown",
                                 state.localCommitmentSpec?.let { it.toLocal.truncateToSatoshi().toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong() },
                                 json.encodeToString(ChannelState.serializer(), state),
-                                if (state is HasCommitments) {
+                                if (state is ChannelStateWithCommitments) {
                                     val prefix = when (appConfig.getAppConfiguration().chain) {
                                         Chain.MAINNET -> ""
                                         Chain.TESTNET -> "testnet/"

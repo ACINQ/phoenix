@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home

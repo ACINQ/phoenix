@@ -2,20 +2,20 @@ package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.CltvExpiry
-import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.db.ChannelsDb
 
 class MemoryChannelsDB : ChannelsDb {
 
-    private val channels = HashMap<ByteVector32, HasCommitments>()
+    private val channels = HashMap<ByteVector32, ChannelStateWithCommitments>()
     private val htlcInfos = HashMap<Pair<ByteVector32, Long>, Pair<ByteVector32, CltvExpiry>>()
 
 
-    override suspend fun addOrUpdateChannel(state: HasCommitments) {
+    override suspend fun addOrUpdateChannel(state: ChannelStateWithCommitments) {
         channels[state.channelId] = state
     }
 
-    override suspend fun listLocalChannels(): List<HasCommitments> {
+    override suspend fun listLocalChannels(): List<ChannelStateWithCommitments> {
         return channels.values.toList()
     }
 

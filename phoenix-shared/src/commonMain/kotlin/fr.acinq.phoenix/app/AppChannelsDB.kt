@@ -2,7 +2,7 @@ package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.CltvExpiry
-import fr.acinq.eclair.channel.HasCommitments
+import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.db.ChannelsDb
 import fr.acinq.eclair.io.ByteVector32KSerializer
 import fr.acinq.eclair.io.eclairSerializersModule
@@ -23,7 +23,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
     )
 
     @Serializable
-    data class Channel(val channel: HasCommitments) : Metadata {
+    data class Channel(val channel: ChannelStateWithCommitments) : Metadata {
         override val id: Any get() = channel.channelId.toHex()
     }
 
@@ -37,7 +37,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
         override val id: Any get() = listOf(channelId.toHex(), commitmentNumber, uuid)
     }
 
-    override suspend fun addOrUpdateChannel(state: HasCommitments) {
+    override suspend fun addOrUpdateChannel(state: ChannelStateWithCommitments) {
         try {
             println("PUT: ${Channel(state)}")
             db.put(Channel(state))
@@ -57,7 +57,7 @@ class AppChannelsDB(dbFactory: DBFactory<DB>) : ChannelsDb {
         }
     }
 
-    override suspend fun listLocalChannels(): List<HasCommitments> {
+    override suspend fun listLocalChannels(): List<ChannelStateWithCommitments> {
         return db.find<Channel>()
             .all()
             .useModels { seq ->
