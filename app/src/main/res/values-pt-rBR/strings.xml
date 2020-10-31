@@ -100,7 +100,7 @@
   <string name="paymentholder_sent_prefix">-</string>
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">Sem descrição</string>
-  <string name="paymentholder_closing_desc">Fechando #%1$s</string>
+  <string name="paymentholder_closing_desc">Encerrando #%1$s</string>
   <string name="paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
