@@ -87,7 +87,7 @@ class ListChannelsFragment : BaseFragment(), OnRefreshListener {
   override fun onStart() {
     super.onStart()
     getChannels()
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.actionBar.setSubtitle(getString(R.string.listallchannels_node_id, app.state.value?.getNodeId()?.toString() ?: getString(R.string.utils_unknown)))
     mBinding.shareButton.setOnClickListener {
       model.channels.value?.let { list ->

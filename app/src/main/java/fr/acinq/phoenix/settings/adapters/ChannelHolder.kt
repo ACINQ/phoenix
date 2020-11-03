@@ -20,7 +20,6 @@ import android.content.res.ColorStateList
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.eclair.channel.DATA_PHOENIX_WAIT_REMOTE_CHANNEL_REESTABLISH
@@ -41,26 +40,28 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     val icon = itemView.findViewById<ImageView>(R.id.channel_icon)
     val state = itemView.findViewById<TextView>(R.id.channel_state)
-    val balance = itemView.findViewById<CoinView>(R.id.channel_balance_value)
-    val capacity = itemView.findViewById<CoinView>(R.id.channel_capacity_value)
-    val balanceSeparator = itemView.findViewById<View>(R.id.channel_balance_separator)
+    val channelBalanceLayout = itemView.findViewById<View>(R.id.channel_balance_layout)
+    val sendableValue = itemView.findViewById<CoinView>(R.id.channel_sendable_value)
+    val receivableValue = itemView.findViewById<CoinView>(R.id.channel_receivable_value)
 
     state.text = Transcriber.readableState(itemView.context, channel.state())
     icon.imageTintList = ColorStateList.valueOf(Transcriber.colorForState(itemView.context, channel.state()))
 
     when (val data = channel.data()) {
       is HasCommitments -> {
-        balance.setAmount(data.commitments().availableBalanceForSend())
-        capacity.setAmount(data.commitments().localCommit().spec().totalFunds())
+        sendableValue.setAmount(data.commitments().availableBalanceForSend())
+        receivableValue.setAmount(data.commitments().availableBalanceForReceive())
+        channelBalanceLayout.visibility = View.VISIBLE
       }
       is DATA_PHOENIX_WAIT_REMOTE_CHANNEL_REESTABLISH -> {
         data.data().commitments().apply {
-          balance.setAmount(availableBalanceForSend())
-          capacity.setAmount(localCommit().spec().totalFunds())
+          sendableValue.setAmount(data.commitments().availableBalanceForSend())
+          receivableValue.setAmount(data.commitments().availableBalanceForReceive())
         }
+        channelBalanceLayout.visibility = View.VISIBLE
       }
       else -> {
-        balanceSeparator.visibility = View.GONE
+        channelBalanceLayout.visibility = View.GONE
       }
     }
 

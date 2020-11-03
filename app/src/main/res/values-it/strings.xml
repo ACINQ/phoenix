@@ -87,7 +87,6 @@
   <string name="receive_share_button">Condividi…</string>
 
   <string name="receive_address_label">Indirizzo</string>
-  <string name="receive_power_save_disclaimer">Sei in modalità power save. Per ricevere il pagamento assicurati che l\'app possa essere eseguita in background.</string>
   <string name="receive_withdraw_button">Usa il link LNURL</string>
 
   <string name="receive_swap_in_button">Mostra un indirizzo Bitcoin</string>

@@ -90,7 +90,6 @@
   <string name="receive_share_button">Sdílet…</string>
 
   <string name="receive_address_label">Adresa</string>
-  <string name="receive_power_save_disclaimer">Jste v módu šetření baterie. Pro přijetí platby se ujistěte, že aplikace může běžet na pozadí.</string>
   <string name="receive_withdraw_button">Použít LNURL odkaz</string>
 
   <string name="receive_swap_in_button">Zobrazit Bitcoinovou adresu</string>

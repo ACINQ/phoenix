@@ -16,12 +16,15 @@
 
 package fr.acinq.phoenix.main
 
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.acinq.phoenix.R
@@ -38,11 +41,11 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val spaceXS = itemView.resources.getDimensionPixelSize(R.dimen.space_xs)
 
     if (notification.priority == 1) {
-      itemView.background = itemView.context.getDrawable(R.drawable.app_notif_bg_critical)
+      itemView.background = ContextCompat.getDrawable(itemView.context, R.drawable.app_notif_bg_critical)
       messageView.setTextColor(itemView.context.getColor(R.color.white))
       iconView.imageTintList = ColorStateList.valueOf(itemView.context.getColor(R.color.white))
     } else {
-      itemView.background = itemView.context.getDrawable(R.drawable.app_notif_bg)
+      itemView.background = ContextCompat.getDrawable(itemView.context, R.drawable.app_notif_bg)
       messageView.setTextColor(ThemeHelper.color(itemView.context, R.attr.textColor))
       iconView.imageTintList = ColorStateList.valueOf(ThemeHelper.color(itemView.context, R.attr.textColor))
     }
@@ -54,13 +57,14 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     messageView.text = itemView.resources.getString(notification.messageResId)
-    iconView.setImageDrawable(itemView.context.getDrawable(notification.imageResId))
+    iconView.setImageDrawable(ContextCompat.getDrawable(itemView.context, notification.imageResId))
 
     if (notification.actionResId != null) {
       actionButton.visibility = View.VISIBLE
       actionButton.text = itemView.resources.getString(notification.actionResId)
       when (notification) {
         InAppNotifications.MNEMONICS_NEVER_SEEN -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
+        InAppNotifications.MEMPOOL_HIGH_USAGE -> actionButton.setOnClickListener { itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
         else -> {}
       }
       itemView.setPadding(spaceSM, spaceSM, spaceSM, 0)

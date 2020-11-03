@@ -40,49 +40,74 @@
     android:layout_marginStart="@dimen/space_sm"
     android:layout_marginEnd="@dimen/space_lg"
     android:ellipsize="end"
-    android:maxLines="2"
-    android:text="@string/lipsum"
+    android:text="@string/lipsum_short"
     android:textSize="@dimen/text_md"
-    app:layout_constrainedWidth="true"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toStartOf="@id/channel_balance_value"
+    app:layout_constraintEnd_toStartOf="@id/channel_balance_layout"
     app:layout_constraintHorizontal_bias="0"
     app:layout_constraintStart_toEndOf="@+id/channel_icon"
     app:layout_constraintTop_toTopOf="parent" />
 
-  <fr.acinq.phoenix.utils.customviews.CoinView
-    android:id="@+id/channel_balance_value"
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/channel_balance_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/space_xxs"
-    app:amount_size="@dimen/text_md"
     app:layout_constrainedWidth="true"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toStartOf="@id/channel_balance_separator"
-    app:layout_constraintHorizontal_bias="1"
-    app:layout_constraintTop_toTopOf="parent"
-    app:thin="false"
-    app:unit_size="@dimen/text_sm" />
-
-  <TextView
-    android:id="@+id/channel_balance_separator"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/space_xxs"
-    android:text="/"
-    app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
-    app:layout_constraintEnd_toStartOf="@id/channel_capacity_value" />
-
-  <fr.acinq.phoenix.utils.customviews.CoinView
-    android:id="@+id/channel_capacity_value"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:amount_size="@dimen/text_md"
-    app:layout_constrainedWidth="true"
-    app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="1"
-    app:thin="false"
-    app:unit_size="@dimen/text_sm" />
+    app:layout_constraintTop_toTopOf="parent">
 
+    <androidx.constraintlayout.widget.Barrier
+      android:id="@+id/channel_value_barrier"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:barrierDirection="start"
+      app:constraint_referenced_ids="channel_receivable_value,channel_sendable_value" />
+
+    <TextView
+      android:id="@+id/channel_sendable_label"
+      style="@style/MutedLabelView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_xxs"
+      android:text="@string/channel_send"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_sendable_value"
+      app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
+
+    <fr.acinq.phoenix.utils.customviews.CoinView
+      android:id="@+id/channel_sendable_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:amount_size="@dimen/text_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1"
+      app:layout_constraintTop_toTopOf="parent"
+      app:thin="false"
+      app:unit_size="@dimen/text_sm" />
+
+    <TextView
+      android:id="@+id/channel_receivable_label"
+      style="@style/MutedLabelView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_xxs"
+      android:text="@string/channel_receive"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_receivable_value"
+      app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
+
+    <fr.acinq.phoenix.utils.customviews.CoinView
+      android:id="@+id/channel_receivable_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_xxs"
+      app:amount_size="@dimen/text_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1"
+      app:layout_constraintTop_toBottomOf="@id/channel_sendable_value"
+      app:thin="false"
+      app:unit_size="@dimen/text_sm" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

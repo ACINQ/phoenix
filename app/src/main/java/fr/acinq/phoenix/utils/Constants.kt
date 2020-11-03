@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import android.text.format.DateUtils
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.*
@@ -65,4 +66,6 @@ object Constants {
     TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(576)), // 5 sat + 0.1 %
     TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(576))) // 5 sat + 0.12 %
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
+  val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false, Satoshi(10000))
+  val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
 }

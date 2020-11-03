@@ -182,19 +182,19 @@
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_error_message"
         android:visibility="@{model.state == PaymentGenerationState.ERROR}"
+        app:drawableStartCompat="@drawable/ic_alert_triangle"
         app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
 
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_swap_in_error_message"
         android:visibility="@{model.state == SwapInState.ERROR}"
+        app:drawableStartCompat="@drawable/ic_alert_triangle"
         app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -253,22 +253,41 @@
           app:layout_constraintTop_toBottomOf="@id/qr_image"
           app:layout_goneMarginTop="@dimen/space_md" />
 
-        <TextView
-          android:id="@+id/power_save_mode_warning"
-          android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/restricted_pay_to_open_layout"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg_p"
           android:layout_marginTop="@dimen/space_md"
-          android:layout_marginEnd="@dimen/space_lg_p"
-          android:text="@string/receive_power_save_disclaimer"
-          android:textAlignment="center"
-          android:textColor="?attr/mutedTextColor"
-          android:textSize="@dimen/text_sm"
-          android:visibility="gone"
+
           app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/raw_invoice" />
+          app:layout_constraintTop_toBottomOf="@id/raw_invoice"
+          app:layout_constraintWidth_max="@dimen/max_width_sm">
+
+          <TextView
+            android:id="@+id/restricted_pay_to_open_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:drawablePadding="@dimen/space_xs"
+            android:textAlignment="center"
+            android:text="@string/receive_high_fees_warning_title"
+            android:textSize="@dimen/text_md"
+            app:drawableStartCompat="@drawable/ic_info"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <TextView
+            android:id="@+id/restricted_pay_to_open_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:textAlignment="center"
+            android:text="@string/receive_high_fees_warning_message_low_liquidity"
+            android:textSize="@dimen/text_md"
+            app:layout_constraintTop_toBottomOf="@id/restricted_pay_to_open_title" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
@@ -280,7 +299,7 @@
           app:layout_constraintEnd_toStartOf="@id/share_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/power_save_mode_warning" />
+          app:layout_constraintTop_toBottomOf="@id/restricted_pay_to_open_layout" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
@@ -321,7 +340,7 @@
           android:id="@+id/swap_in_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"

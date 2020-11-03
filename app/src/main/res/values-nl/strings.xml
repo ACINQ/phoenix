@@ -91,7 +91,6 @@
   <string name="receive_share_button">Delen…</string>
 
   <string name="receive_address_label">Adres</string>
-  <string name="receive_power_save_disclaimer">Je gebruikt de energie-stand. Om de betaling te ontvangen heeft de app toestemming nodig om op de achtergrond te draaien.</string>
   <string name="receive_withdraw_button">Gebruik LNURL link</string>
 
   <string name="receive_swap_in_button">Laat Bitcoinadres zien</string>

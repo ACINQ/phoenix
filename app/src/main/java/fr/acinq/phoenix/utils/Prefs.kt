@@ -24,8 +24,11 @@ import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.SatUnit
 import fr.acinq.eclair.WatchListener
 import fr.acinq.eclair.`CoinUtils$`
+import org.json.JSONObject
+import org.slf4j.LoggerFactory
 
 object Prefs {
+  val log = LoggerFactory.getLogger(this::class.java)
 
   private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
   const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
@@ -38,6 +41,7 @@ object Prefs {
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
   const val PREFS_EXPLORER: String = "PREFS_EXPLORER"
+  private const val PREFS_LAST_KNOWN_WALLET_CONTEXT: String = "PREFS_LAST_KNOWN_WALLET_CONTEXT"
 
   // -- authentication with PIN/biometrics
   const val PREFS_SCREEN_LOCK: String = "PREFS_SCREEN_LOCK_ENABLED"
@@ -168,6 +172,21 @@ object Prefs {
       "Blockstream.info".equals(pref, ignoreCase = true) -> Constants.BLOCKSTREAM_EXPLORER_URL
       else -> Constants.MEMPOOLSPACE_EXPLORER_URL
     }
+  }
+
+  fun getLastKnownWalletContext(context: Context): JSONObject? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_LAST_KNOWN_WALLET_CONTEXT, null)?.run {
+      try {
+        JSONObject(this)
+      } catch (e: Exception){
+        log.debug("could not read wallet context json from preferences")
+        null
+      }
+    }
+  }
+
+  fun saveWalletContext(context: Context, json: JSONObject) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_LAST_KNOWN_WALLET_CONTEXT, json.toString()).apply()
   }
 
   // -- ==================================

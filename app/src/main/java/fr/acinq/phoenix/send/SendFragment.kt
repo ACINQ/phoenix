@@ -116,7 +116,8 @@ class SendFragment : BaseFragment() {
                 mBinding.swapRecapFeeValue.text = Converter.printAmountPretty(state.fee, ctx, withUnit = true)
                 mBinding.swapRecapFeeValueFiat.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, Converter.any2Msat(state.fee), withUnit = true))
                 mBinding.swapRecapTotalValue.text = Converter.printAmountPretty(totalAfterSwap, ctx, withUnit = true)
-                if (totalAfterSwap.`$greater`(appContext(ctx).balance.value)) {
+                val sendable = appContext(ctx).balance.value?.sendable
+                if (sendable == null || totalAfterSwap.`$greater`(sendable)) {
                   model.state.value = SendState.Onchain.Error.ExceedsBalance(state.uri)
                 }
               }
@@ -146,7 +147,7 @@ class SendFragment : BaseFragment() {
           appContext(ctx).balance.value?.let {
             val unit = Prefs.getCoinUnit(ctx)
             mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-            mBinding.amount.setText(Converter.printAmountRaw(it, ctx))
+            mBinding.amount.setText(Converter.printAmountRaw(it.sendable, ctx))
           }
         }
       }
@@ -220,8 +221,8 @@ class SendFragment : BaseFragment() {
     }
 
     appContext()?.balance?.value?.let {
-      mBinding.balanceValue.setAmount(it)
-    } ?: log.warn("balance is not available yet")
+      mBinding.balanceValue.setAmount(it.sendable)
+    }
 
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
 
@@ -330,7 +331,7 @@ class SendFragment : BaseFragment() {
         } else {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
         }
-        if (balance != null && amount.get().`$greater`(balance)) {
+        if (balance != null && amount.get().`$greater`(balance.sendable)) {
           throw InsufficientBalance()
         }
         if (model.state.value is SendState.Onchain && amount.get().`$less`(Satoshi(10000))) {

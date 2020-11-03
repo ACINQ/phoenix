@@ -92,12 +92,16 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Créer la requête</string>
 
+  <string name="receive_high_fees_warning_title">Frais de minage élevés sur la chaîne</string>
+  <string name="receive_high_fees_warning_message_low_liquidity">Vous pouvez recevoir au plus %1$s (%2$s) sans nouveau canal de paiement.\n\nRecevez au moins %3$s (%4$s) pour créer un nouveau canal.</string>
+  <string name="receive_high_fees_warning_message_no_liquidity">Vous n\'avez plus de liquidité entrante.\n\nRecevez au moins %1$s (%2$s) pour créer un nouveau canal.</string>
+  <string name="receive_high_fees_warning_message_no_channels">Vous n\'avez pas de canaux de paiement.\n\nRecevez au moins %1$s (%2$s) pour créer un nouveau canal.</string>
+
   <string name="receive_share_subject">Paiement demandé</string>
   <string name="receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="receive_share_button">Partager…</string>
 
   <string name="receive_address_label">Adresse</string>
-  <string name="receive_power_save_disclaimer">Vous êtes en mode d\'économie d\'énergie. Pour recevoir le paiement, assurez vous que l\'application est démarrée et a accès à Internet</string>
   <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
   <string name="receive_swap_in_button">Afficher une adresse Bitcoin</string>
@@ -293,6 +297,8 @@
 
   <string name="channel_loading">Récupération des données…</string>
   <string name="channel_error">Échec lors de la récupération des données de ce canal de paiement.</string>
+  <string name="channel_send">Envoi</string>
+  <string name="channel_receive">Réception</string>
 
   <!-- //////////////// menu //////////////// -->
 

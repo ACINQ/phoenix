@@ -141,7 +141,7 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
         }
       })
       appContext(ctx).balance.observe(viewLifecycleOwner, {
-        mBinding.balance.setAmount(it)
+        mBinding.balance.setAmount(it.sendable)
       })
     }
     app.pendingSwapIns.observe(viewLifecycleOwner, {

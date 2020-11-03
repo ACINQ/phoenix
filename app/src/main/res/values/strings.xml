@@ -114,12 +114,16 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Create invoice</string>
 
+  <string name="receive_high_fees_warning_title">High on-chain fees</string>
+  <string name="receive_high_fees_warning_message_low_liquidity">You can currently receive at most %1$s (%2$s) without new channels.\n\nReceive more than %3$s (%4$s) to create new channels.</string>m
+  <string name="receive_high_fees_warning_message_no_liquidity">You don\'t have any incoming liquidity left.\n\nReceive more than %1$s (%2$s) to create new channels.</string>
+  <string name="receive_high_fees_warning_message_no_channels">You don\'t have any channels. Receive more than %1$s (%2$s) to create new channels.</string>
+
   <string name="receive_share_subject">Payment requested</string>
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
   <string name="receive_address_label">Address</string>
-  <string name="receive_power_save_disclaimer">You\'re in power save mode. To receive the payment make sure that the app is allowed to run in background.</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
@@ -316,6 +320,8 @@
 
   <string name="channel_loading">Retrieving channel data…</string>
   <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
+  <string name="channel_send">Send</string>
+  <string name="channel_receive">Receive</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -347,6 +353,8 @@
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
   <string name="inappnotif_upgrade">An update for this app is available.</string>
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
+  <string name="inappnotif_mempool_high_usage">Bitcoin mempool is full with a high feerate.</string>
+  <string name="inappnotif_mempool_high_usage_action">See how that affects you</string>
 
   <!-- //////////////// display seed //////////////// -->
 
