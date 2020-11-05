@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
 
         di = DI(
-            PhoenixBusiness().di
+            DiIosKt.phoenixDI()
 //            mocks.di()
         )
     }

@@ -50,9 +50,9 @@ import org.kodein.log.newLogger
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
-class PhoenixBusiness {
+object PhoenixBusiness {
 
-    fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, loggerFactory: LoggerFactory, wallet: Wallet) : Peer {
+    private fun buildPeer(socketBuilder: TcpSocket.Builder, watcher: ElectrumWatcher, channelsDB: ChannelsDb, loggerFactory: LoggerFactory, wallet: Wallet) : Peer {
         val remoteNodePubKey = PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585")
 
         val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), Block.RegtestGenesisBlock.hash)
@@ -109,63 +109,70 @@ class PhoenixBusiness {
         return peer
     }
 
-    val di = DI {
-        bind<LoggerFactory>() with instance(LoggerFactory.default)
-        bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
-        bind<NetworkMonitor>() with singleton { NetworkMonitor() }
-        bind<HttpClient>() with singleton {
-            HttpClient {
-                install(JsonFeature) {
-                    serializer = KotlinxSerializer(Json {
-                        ignoreUnknownKeys = true
-                    })
+    val diModules get() = listOf(
+        DI.Module("Phoenix/Utility") {
+            bind<LoggerFactory>() with instance(LoggerFactory.default)
+            bind<TcpSocket.Builder>() with instance(TcpSocket.Builder())
+            bind<NetworkMonitor>() with singleton { NetworkMonitor(di) }
+            bind<HttpClient>() with singleton {
+                HttpClient {
+                    install(JsonFeature) {
+                        serializer = KotlinxSerializer(Json {
+                            ignoreUnknownKeys = true
+                        })
+                    }
                 }
             }
-        }
 
-        bind<DBFactory<DB>>() with singleton { DB.factory.inDir(getApplicationFilesDirectoryPath(di)) }
-        bind<DB>(tag = TAG_APPLICATION) with singleton {
-            instance<DBFactory<DB>>().open("application", KotlinxSerializer())
-        }
+            bind<DBFactory<DB>>() with singleton { DB.factory.inDir(getApplicationFilesDirectoryPath(di)) }
+            bind<DB>(tag = TAG_APPLICATION) with singleton {
+                instance<DBFactory<DB>>().open("application", KotlinxSerializer())
+            }
+        },
 
-        bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
+        DI.Module("Phoenix/Application") {
+            bind<ChannelsDb>() with singleton { AppChannelsDB(instance()) }
 //        bind<ChannelsDb>() with singleton { MemoryChannelsDB() }
 
-        constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
-        bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
-        bind<String>(tag = TAG_MASTER_PUBKEY_PATH) with singleton {
-            if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'" else "m/84'/1'/0'"
-        }
-        bind<String>(tag = TAG_ONCHAIN_ADDRESS_PATH) with singleton {
-            if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'/0/0" else "m/84'/1'/0'/0/0"
-        }
+            constant(tag = TAG_ACINQ_ADDRESS) with "localhost"
+            bind<Boolean>(tag = TAG_IS_MAINNET) with singleton { instance<AppConfigurationManager>().getAppConfiguration().chain == Chain.MAINNET }
+            bind<String>(tag = TAG_MASTER_PUBKEY_PATH) with singleton {
+                if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'" else "m/84'/1'/0'"
+            }
+            bind<String>(tag = TAG_ONCHAIN_ADDRESS_PATH) with singleton {
+                if (instance(tag = TAG_IS_MAINNET)) "m/84'/0'/0'/0/0" else "m/84'/1'/0'/0/0"
+            }
 
-        bind<ElectrumClient>() with singleton { ElectrumClient(instance(), MainScope()) }
-        bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
-        bind<Peer>() with singleton {
-            instance<WalletManager>().getWallet()?.let {
-                buildPeer(instance(), instance(), instance(), instance(), it)
-            } ?: error("Wallet must be initialized.")
-        }
-        bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
-        bind<WalletManager>() with singleton { WalletManager(di) }
-        bind<AppConfigurationManager>() with singleton { AppConfigurationManager(di) }
+            bind<ElectrumClient>() with singleton { ElectrumClient(instance(), MainScope()) }
+            bind<ElectrumWatcher>() with singleton { ElectrumWatcher(instance(), MainScope()) }
+            bind<Peer>() with singleton {
+                instance<WalletManager>().getWallet()?.let {
+                    buildPeer(instance(), instance(), instance(), instance(), it)
+                } ?: error("Wallet must be initialized.")
+            }
+            bind<AppHistoryManager>() with singleton { AppHistoryManager(di) }
+            bind<WalletManager>() with singleton { WalletManager(di) }
+            bind<AppConfigurationManager>() with singleton { AppConfigurationManager(di) }
+        },
 
-        // MVI controllers
-        bind<ContentController>() with screenProvider { AppContentController(di) }
-        bind<InitController>() with screenProvider { AppInitController(di) }
-        bind<HomeController>() with screenProvider { AppHomeController(di) }
-        bind<ReceiveController>() with screenProvider { AppReceiveController(di) }
-        bind<ScanController>() with screenProvider { AppScanController(di) }
-        bind<RestoreWalletController>() with screenProvider { AppRestoreWalletController(di) }
+        DI.Module("Phoenix/Control") {
+            // MVI controllers
+            bind<ContentController>() with provider { AppContentController(di) }
+            bind<InitController>() with provider { AppInitController(di) }
+            bind<HomeController>() with provider { AppHomeController(di) }
+            bind<ReceiveController>() with provider { AppReceiveController(di) }
+            bind<ScanController>() with provider { AppScanController(di) }
+            bind<RestoreWalletController>() with provider { AppRestoreWalletController(di) }
 
-        // App Configuration
-        bind<ConfigurationController>() with screenProvider { AppConfigurationController(di) }
-        bind<DisplayConfigurationController>() with screenProvider { AppDisplayConfigurationController(di) }
-        bind<ElectrumConfigurationController>() with screenProvider { AppElectrumConfigurationController(di) }
-        bind<ChannelsConfigurationController>() with screenProvider { AppChannelsConfigurationController(di) }
+            // App Configuration
+            bind<ConfigurationController>() with provider { AppConfigurationController(di) }
+            bind<DisplayConfigurationController>() with provider { AppDisplayConfigurationController(di) }
+            bind<ElectrumConfigurationController>() with provider { AppElectrumConfigurationController(di) }
+            bind<ChannelsConfigurationController>() with provider { AppChannelsConfigurationController(di) }
 
-        // App daemons
-        bind() from eagerSingleton { AppConnectionsDaemon(di) }
-    }
+            // App daemons
+            bind() from eagerSingleton { AppConnectionsDaemon(di) }
+        },
+
+    )
 }

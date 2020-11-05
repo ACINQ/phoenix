@@ -2,9 +2,9 @@ package fr.acinq.phoenix
 
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.*
-import fr.acinq.phoenix.utils.screenProvider
 import org.kodein.di.DI
 import org.kodein.di.bind
+import org.kodein.di.provider
 
 
 class MockDIBuilder {
@@ -25,15 +25,15 @@ class MockDIBuilder {
     }
 
     fun di() = DI {
-        bind<ContentController>() with screenProvider { Content.MockController(contentModel) }
-        bind<InitController>() with screenProvider { Init.MockController(initModel) }
-        bind<HomeController>() with screenProvider { Home.MockController(homeModel) }
-        bind<ReceiveController>() with screenProvider { Receive.MockController(receiveModel) }
-        bind<ScanController>() with screenProvider { Scan.MockController(scanModel) }
-        bind<RestoreWalletController>() with screenProvider { RestoreWallet.MockController(restoreWalletModel) }
-        bind<ConfigurationController>() with screenProvider { Configuration.MockController(configurationModel) }
-        bind<DisplayConfigurationController>() with screenProvider { DisplayConfiguration.MockController(displayConfigurationModel) }
-        bind<ElectrumConfigurationController>() with screenProvider { ElectrumConfiguration.MockController(electrumConfigurationModel) }
-        bind<ChannelsConfigurationController>() with screenProvider { ChannelsConfiguration.MockController(channelsConfigurationModel) }
+        bind<ContentController>() with provider { Content.MockController(contentModel) }
+        bind<InitController>() with provider { Init.MockController(initModel) }
+        bind<HomeController>() with provider { Home.MockController(homeModel) }
+        bind<ReceiveController>() with provider { Receive.MockController(receiveModel) }
+        bind<ScanController>() with provider { Scan.MockController(scanModel) }
+        bind<RestoreWalletController>() with provider { RestoreWallet.MockController(restoreWalletModel) }
+        bind<ConfigurationController>() with provider { Configuration.MockController(configurationModel) }
+        bind<DisplayConfigurationController>() with provider { DisplayConfiguration.MockController(displayConfigurationModel) }
+        bind<ElectrumConfigurationController>() with provider { ElectrumConfiguration.MockController(electrumConfigurationModel) }
+        bind<ChannelsConfigurationController>() with provider { ChannelsConfiguration.MockController(channelsConfigurationModel) }
     }
 }

@@ -10,11 +10,6 @@ import org.kodein.log.Logger
 import org.kodein.log.newLogger
 
 
-// Will be part of Kodein-DI in a future version (when first class support for iOS is released).
-// Ensures that the same screen will always receive the same controller.
-// I.e, in Android, the controller survives activity restarts.
-expect inline fun <reified T: Any> DI.Builder.screenProvider(noinline creator: NoArgBindingDI<Any>.() -> T): NoArgDIBinding<*, T>
-
 fun DIAware.newLogger(): Logger = this.newLogger(direct.instance())
 
 // Tags
