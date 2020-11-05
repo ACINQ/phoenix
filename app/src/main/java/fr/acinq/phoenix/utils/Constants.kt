@@ -60,11 +60,13 @@ object Constants {
   val DEFAULT_NETWORK_INFO = NetworkInfo(electrumServer = null, lightningConnected = false, torConnections = HashMap())
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
-    TrampolineFeeSetting(MilliSatoshi(1000), 0.0001, CltvExpiryDelta(576)), // 1 sat + 0.01 %
-    TrampolineFeeSetting(MilliSatoshi(3000), 0.0001, CltvExpiryDelta(576)), // 3 sat + 0.01 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.0005, CltvExpiryDelta(576)), // 5 sat + 0.05 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.001, CltvExpiryDelta(576)), // 5 sat + 0.1 %
-    TrampolineFeeSetting(MilliSatoshi(5000), 0.0012, CltvExpiryDelta(576))) // 5 sat + 0.12 %
+    TrampolineFeeSetting(Satoshi(0), 0, CltvExpiryDelta(576)), // 0 sat + 0.0 %
+    TrampolineFeeSetting(Satoshi(1), 100, CltvExpiryDelta(576)), // 1 sat + 0.01 %
+    TrampolineFeeSetting(Satoshi(3), 100, CltvExpiryDelta(576)), // 3 sat + 0.01 %
+    TrampolineFeeSetting(Satoshi(5), 500, CltvExpiryDelta(576)), // 5 sat + 0.05 %
+    TrampolineFeeSetting(Satoshi(7), 1000, CltvExpiryDelta(576)), // 7 sat + 0.1 %
+    TrampolineFeeSetting(Satoshi(10), 1200, CltvExpiryDelta(576)), // 10 sat + 0.12 %
+    TrampolineFeeSetting(Satoshi(12), 8000, CltvExpiryDelta(576))) // 12 sat + 0.8 %
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
   val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false, Satoshi(10000))
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))

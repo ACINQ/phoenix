@@ -20,10 +20,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
-import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.SatUnit
-import fr.acinq.eclair.WatchListener
-import fr.acinq.eclair.`CoinUtils$`
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.*
+import fr.acinq.phoenix.TrampolineFeeSetting
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
@@ -70,6 +69,8 @@ object Prefs {
   // -- payment configuration
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
   const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
+  const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
+  const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
 
   // -- migration
   const val PREFS_MIGRATED_FROM = "PREFS_MIGRATED_FROM"
@@ -178,7 +179,7 @@ object Prefs {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_LAST_KNOWN_WALLET_CONTEXT, null)?.run {
       try {
         JSONObject(this)
-      } catch (e: Exception){
+      } catch (e: Exception) {
         log.debug("could not read wallet context json from preferences")
         null
       }
@@ -307,5 +308,31 @@ object Prefs {
 
   fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {
     return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, value).apply()
+  }
+
+  fun getMaxTrampolineCustomFee(context: Context): TrampolineFeeSetting? {
+    PreferenceManager.getDefaultSharedPreferences(context).run {
+      val baseFee = getLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, -1)
+      val proportionalFee = getLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, -1)
+      return if (baseFee < 0L || proportionalFee < 0L) {
+        null
+      } else {
+        TrampolineFeeSetting(Satoshi(baseFee), proportionalFee, CltvExpiryDelta(576))
+      }
+    }
+  }
+
+  fun setMaxTrampolineCustomFee(context: Context, base: Satoshi, proportional: Long) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .putLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, base.toLong())
+      .putLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, proportional)
+      .apply()
+  }
+
+  fun removeMaxTrampolineCustomFee(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .remove(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE)
+      .remove(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE)
+      .commit()
   }
 }

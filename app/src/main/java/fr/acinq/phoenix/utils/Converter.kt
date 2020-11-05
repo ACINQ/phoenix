@@ -198,4 +198,22 @@ object Converter {
     val bytes: ByteArray = b.toArray()
     return String(bytes, StandardCharsets.US_ASCII)
   }
+
+  /** Convert a raw stringified percentage to a fee per millionths (decimals after the 4th are ignored). For example, 0.01% becomes 100. */
+  fun percentageToPerMillionths(percent: String): Long {
+    return (DecimalFormat().parse(percent.trim())!!.toDouble() * 1000000 / 100)
+      .toLong()
+      .coerceAtLeast(0)
+  }
+
+  /** Convert a per millionths Long to a percentage String (max 4 decimals). */
+  fun perMillionthsToPercentageString(perMillionths: Long): String {
+    return DecimalFormat("0.00##").apply { roundingMode = RoundingMode.FLOOR }.run {
+      format(perMillionths
+        .coerceAtLeast(0)
+        .toBigDecimal()
+        .divide(BigDecimal.valueOf(1000000))
+        .multiply(BigDecimal(100)))
+    }
+  }
 }

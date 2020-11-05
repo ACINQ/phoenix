@@ -546,19 +546,6 @@
   <string name="electrum_dialog_input">Server address (host:port).</string>
   <string name="electrum_empty_custom_address">Please enter an electrum server address</string>
 
-  <!-- //////////////// fees settings //////////////// -->
-
-  <string name="fees_settings_title" translatable="false">Fees Settings</string>
-  <string name="fees_settings_subtitle" translatable="false">These are the fees used for sending or receiving money with Phoenix.</string>
-
-  <string name="fees_settings_trampoline_title" translatable="false">Lightning payment</string>
-  <string name="fees_settings_trampoline_desc" translatable="false">The app will try to use the cheapest fee possible.</string>
-  <string name="fees_settings_trampoline_value" translatable="false">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label" translatable="false">At most %1$s + %2$s%%</string>
-
-  <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
-
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
   <string name="key_space_desc">Add whitespace</string>
@@ -623,6 +610,14 @@
   <string name="paymentsettings_paytoopen_auto_desc">It is sometimes necessary to create a new Lightning payment channel in order to receive an incoming payment.\n\nIn this case a fee of %1$s%% is deducted from the amount received, to cover the cost of creating the channel.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
   <string name="paymentsettings_paytoopen_dialog_description">The app will automatically create a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the amount received, to cover the cost of creating the channel.</string>
+
+  <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
+  <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
+  <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Override default fee for outgoing payments</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Flat base fee (in satoshi)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Enter a base fee in satoshi</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (in percent)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in percent</string>
 
   <!-- ftue -->
 

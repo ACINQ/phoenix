@@ -16,19 +16,26 @@
 
 package fr.acinq.phoenix.settings
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.TrampolineFeeSetting
 import fr.acinq.phoenix.databinding.FragmentSettingsPaymentBinding
-import fr.acinq.phoenix.utils.AlertHelper
-import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.customviews.SwitchView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,7 +46,8 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
   private lateinit var mBinding: FragmentSettingsPaymentBinding
 
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
-    if (key == Prefs.PREFS_PAYMENT_DEFAULT_DESCRIPTION || key == Prefs.PREFS_AUTO_ACCEPT_PAY_TO_OPEN) {
+    if (key == Prefs.PREFS_PAYMENT_DEFAULT_DESCRIPTION || key == Prefs.PREFS_AUTO_ACCEPT_PAY_TO_OPEN
+      || key == Prefs.PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE || key == Prefs.PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE) {
       refreshUI()
     }
   }
@@ -85,6 +93,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
         }
       }
     }
+    mBinding.trampolineFeesButton.setOnClickListener { context?.let { getMaxTrampolineFeeDialog(it)?.show() } }
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
@@ -97,6 +106,85 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
     context?.let { ctx ->
       mBinding.payToOpenAutoSwitch.setChecked(Prefs.getAutoAcceptPayToOpen(ctx))
       mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
+      val feeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()
+      if (feeSetting != null) {
+        mBinding.trampolineFeesButton.setSubtitle(
+          getString(R.string.paymentsettings_trampoline_fees_desc, Converter.printAmountPretty(feeSetting.feeBase, ctx, withUnit = true), feeSetting.printFeeProportional())
+        )
+      }
     }
+  }
+
+  private fun getMaxTrampolineFeeDialog(context: Context): AlertDialog? {
+    val view = layoutInflater.inflate(R.layout.dialog_max_trampoline_fee, null)
+    val overrideDefaultCheckbox = view.findViewById<CheckBox>(R.id.trampoline_fee_override_default_checkbox)
+    val baseFeeLabel = view.findViewById<TextView>(R.id.trampoline_fee_max_base_fee_label)
+    val baseFeeInput = view.findViewById<EditText>(R.id.trampoline_fee_max_base_fee_value)
+    val proportionalFeeLabel = view.findViewById<TextView>(R.id.trampoline_fee_max_proportional_fee_label)
+    val proportionalFeeInput = view.findViewById<EditText>(R.id.trampoline_fee_max_proportional_fee_value)
+    val prefsFeeSetting = Prefs.getMaxTrampolineCustomFee(context)
+    val defaultFeeSetting = appContext(context).trampolineFeeSettings.value?.last() ?: return null
+
+    fun updateState() {
+      val isChecked = overrideDefaultCheckbox.isChecked
+      BindingHelpers.enableOrFade(baseFeeLabel, isChecked)
+      BindingHelpers.enableOrFade(baseFeeInput, isChecked)
+      BindingHelpers.enableOrFade(proportionalFeeLabel, isChecked)
+      BindingHelpers.enableOrFade(proportionalFeeInput, isChecked)
+    }
+
+    overrideDefaultCheckbox.text = getString(R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox)
+    overrideDefaultCheckbox.setOnCheckedChangeListener { _, _ -> updateState() }
+
+    if (prefsFeeSetting != null) {
+      overrideDefaultCheckbox.isChecked = true
+      baseFeeInput.setText(Converter.printAmountRaw(prefsFeeSetting.feeBase, context))
+      proportionalFeeInput.setText(prefsFeeSetting.printFeeProportional())
+      updateState()
+    } else {
+      overrideDefaultCheckbox.isChecked = false
+      baseFeeInput.setText(Converter.printAmountRaw(defaultFeeSetting.feeBase, context))
+      proportionalFeeInput.setText(defaultFeeSetting.printFeeProportional())
+      updateState()
+    }
+
+    val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
+      .setView(view)
+      .setPositiveButton(R.string.btn_confirm, null) // overridden below
+      .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+      .create()
+
+    dialog.setOnShowListener {
+      val confirmButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+      confirmButton.setOnClickListener {
+        if (overrideDefaultCheckbox.isChecked) {
+          val baseFee = try {
+            Satoshi(baseFeeInput.text.toString().toLong())
+          } catch (e: Exception) {
+            log.debug("invalid base fee: ", e)
+            null
+          }
+          val proportionalFee = try {
+            Converter.percentageToPerMillionths(proportionalFeeInput.text.toString())
+          } catch (e: Exception) {
+            log.debug("invalid proportional fee: ", e)
+            null
+          }
+          if (baseFee == null || proportionalFee == null) {
+            Toast.makeText(context, "Enter a valid maximum fee setting", Toast.LENGTH_SHORT).show()
+          } else {
+            log.info("update max trampoline fee to base=$baseFee proportional=$proportionalFee")
+            Prefs.setMaxTrampolineCustomFee(context, baseFee, proportionalFee)
+            dialog.dismiss()
+          }
+        } else {
+          if (Prefs.removeMaxTrampolineCustomFee(context)) {
+            dialog.dismiss()
+          }
+        }
+      }
+    }
+
+    return dialog
   }
 }

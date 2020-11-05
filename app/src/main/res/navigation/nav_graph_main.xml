@@ -357,9 +357,6 @@
       android:id="@+id/action_settings_to_electrum"
       app:destination="@id/electrum_fragment" />
     <action
-      android:id="@+id/action_settings_to_fees"
-      app:destination="@id/fees_fragment" />
-    <action
       android:id="@+id/action_settings_to_tor"
       app:destination="@id/tor_fragment" />
     <action
@@ -435,12 +432,6 @@
     android:id="@+id/prefs_display"
     android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
     android:label="DisplayPrefsFragment" />
-
-  <!-- settings: consult and change fees profile -->
-  <fragment
-    android:id="@+id/fees_fragment"
-    android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
-    android:label="FeesSettingsFragment" />
 
   <!-- settings: TOR -->
   <fragment
