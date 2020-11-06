@@ -72,10 +72,11 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
     when (event) {
       // -------------- CHANNELS LIFECYCLE -------------
       is ChannelStateChanged -> {
-        if (event.currentData() is HasCommitments && event.currentData() is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && event.previousState() != `WAIT_FOR_INIT_INTERNAL$`.`MODULE$`) {
+        val validOriginForClosures = listOf(`NORMAL$`.`MODULE$`, `SHUTDOWN$`.`MODULE$`, `NEGOTIATING$`.`MODULE$`)
+        if (event.currentData() is HasCommitments && event.currentData() is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && validOriginForClosures.contains(event.previousState())) {
           val data = event.currentData() as DATA_CLOSING
           // dispatch closing if the channel's goes to closing. Do NOT dispatch if the channel is restored and was already closing (i.e closing from an internal state).
-          log.info("channel closing detected for id=${data.channelId()} with data=$data")
+          log.info("channel=${data.channelId()} closing from state=${event.previousState()} with data=$data")
           val balance = data.commitments().localCommit().spec().toLocal().truncateToSatoshi()
           val spendingTxs = JavaConverters.seqAsJavaListConverter(data.spendingTxes()).asJava()
           val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
