@@ -168,6 +168,7 @@
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">This payment is an on-chain transaction, which is slower and usually more expensive. A mining fee will apply.</string>
   <string name="send_chain_fees_feedback_invalid">Please use a valid fee rate.</string>
+  <string name="send_chain_fees_feedback_too_low">This fee rate is too low. It must be at least %1$s sat/byte.</string>
   <string name="send_chain_fees_feedback_20min">With this fee rate, the transaction should be received within 30 minutes.</string>
   <string name="send_chain_fees_feedback_1h">With this fee rate, the transaction should be received within the hour.</string>
   <string name="send_chain_fees_feedback_12h">With this fee rate, the transaction should be received within 12 hours.</string>

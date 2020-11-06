@@ -418,7 +418,10 @@
           android:layout_marginEnd="@dimen/space_md"
           android:text="@string/send_chain_fees_feedback_invalid"
           android:textSize="@dimen/text_md"
+          android:translationX="-26dp"
+          android:drawablePadding="@dimen/space_xs"
           android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
+          app:drawableLeftCompat="@drawable/ic_blank"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
@@ -437,7 +440,7 @@
         app:visible="@{model.isFormVisible()}">
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/swap_button"
+          android:id="@+id/prepare_swap_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/button_bg_primary_border"

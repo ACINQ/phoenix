@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.lifecycle.Observer
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -72,8 +72,12 @@ class SendFragment : BaseFragment() {
     mBinding.appModel = app
 
     app.state.value?.kit()?.run {
+      val minFeerateSwapout = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
       val feerate = nodeParams().onChainFeeConf().feeEstimator().run {
-        FeerateEstimationPerKb(getFeeratePerKb(2) / 1000, getFeeratePerKb(6) / 1000, getFeeratePerKb(72) / 1000)
+        FeerateEstimationPerKb(
+          rate20min = (getFeeratePerKb(2) / 1000).coerceAtLeast(minFeerateSwapout),
+          rate60min = (getFeeratePerKb(6) / 1000).coerceAtLeast(minFeerateSwapout),
+          rate12hours = (getFeeratePerKb(72) / 1000).coerceAtLeast(minFeerateSwapout))
       }
       log.info("feerates base estimation=$feerate")
       model.feerateEstimation.value = feerate
@@ -129,7 +133,7 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.amountErrorMessage.observe(viewLifecycleOwner, Observer { msgId ->
+    model.amountErrorMessage.observe(viewLifecycleOwner, { msgId ->
       if (model.isAmountFieldPristine.value != true) {
         if (msgId != null) {
           mBinding.amountConverted.text = ""
@@ -141,7 +145,7 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.useMaxBalance.observe(viewLifecycleOwner, Observer { useMax ->
+    model.useMaxBalance.observe(viewLifecycleOwner, { useMax ->
       if (useMax) {
         context?.let { ctx ->
           appContext(ctx).balance.value?.let {
@@ -153,24 +157,37 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.chainFeesSatBytes.observe(viewLifecycleOwner, Observer { feerate ->
+    model.chainFeesSatBytes.observe(viewLifecycleOwner, { feerate ->
       val state = model.state.value
       if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
         model.state.value = SendState.Onchain.SwapRequired(state.uri)
       }
 
       model.feerateEstimation.value?.let { feerateEstimation ->
-        mBinding.chainFeesFeedback.text = getString(when {
-          feerate < 1 -> R.string.send_chain_fees_feedback_invalid
-          feerate < feerateEstimation.rate12hours -> R.string.send_chain_fees_feedback_inf
-          feerate < feerateEstimation.rate60min -> R.string.send_chain_fees_feedback_12h
-          feerate < feerateEstimation.rate20min -> R.string.send_chain_fees_feedback_1h
-          else -> R.string.send_chain_fees_feedback_20min
-        })
+        val minFeerateSwapout = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
+        when {
+          feerate <= 0 -> mBinding.chainFeesFeedback.apply {
+            text = getString(R.string.send_chain_fees_feedback_invalid)
+            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_alert_triangle), null, null, null)
+          }
+          feerate < minFeerateSwapout -> mBinding.chainFeesFeedback.apply {
+            text = getString(R.string.send_chain_fees_feedback_too_low, minFeerateSwapout.toString())
+            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_alert_triangle), null, null, null)
+          }
+          else -> mBinding.chainFeesFeedback.apply {
+            text = getString(when {
+              feerate < feerateEstimation.rate12hours -> R.string.send_chain_fees_feedback_inf
+              feerate < feerateEstimation.rate60min -> R.string.send_chain_fees_feedback_12h
+              feerate < feerateEstimation.rate20min -> R.string.send_chain_fees_feedback_1h
+              else -> R.string.send_chain_fees_feedback_20min
+            })
+            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_blank), null, null, null)
+          }
+        }
       }
     })
 
-    app.networkInfo.observe(viewLifecycleOwner, Observer {
+    app.networkInfo.observe(viewLifecycleOwner, {
       if (!it.lightningConnected) {
         mBinding.sendButton.setIsPaused(true)
         mBinding.sendButton.setText(getString(R.string.btn_pause_connecting))
@@ -232,13 +249,13 @@ class SendFragment : BaseFragment() {
       val amount = checkAmount()
       if (amount.isDefined) {
         when (val state = model.state.value) {
-          is SendState.Onchain.Ready -> sendSwapOut(state) //sendSwapOut(state.pr.amount().get(), state.pr)
+          is SendState.Onchain.Ready -> sendSwapOut(state)
           is SendState.Lightning.Ready -> sendPaymentFinal(amount.get(), state.pr)
         }
       }
     }
 
-    mBinding.swapButton.setOnClickListener {
+    mBinding.prepareSwapButton.setOnClickListener {
       model.state.value?.let {
         if (it is SendState.Onchain) {
           requestSwapOut(it.uri)
@@ -263,7 +280,9 @@ class SendFragment : BaseFragment() {
       model.isAmountFieldPristine.value = false
       val amount = checkAmount()
       val feerateSatPerByte = model.chainFeesSatBytes.value!!
-      if (amount.isDefined && feerateSatPerByte > 0) {
+      if (feerateSatPerByte <= 0 || feerateSatPerByte < appContext()!!.swapOutSettings.value!!.minFeerateSatByte) {
+        model.showFeeratesForm.value = true
+      } else if (amount.isDefined) {
         Wallet.hideKeyboard(context, mBinding.amount)
         model.state.value = SendState.Onchain.Swapping(uri, feerateSatPerByte)
         app.requireService.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = `package$`.`MODULE$`.feerateByte2Kw(feerateSatPerByte))

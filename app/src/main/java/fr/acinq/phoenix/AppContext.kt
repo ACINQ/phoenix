@@ -126,6 +126,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
   /** Fee settings for swap-in (on-chain -> LN). */
   val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
 
+  /** Fee settings for swap-out (LN -> on-chain). */
+  val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
+
   /** Context of the Bitcoin mempool, used to display notifications. */
   val mempoolContext = MutableLiveData(Constants.DEFAULT_MEMPOOL_CONTEXT)
 
@@ -172,7 +175,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
     val inAppNotifs = notifications.value
 
     // -- check warning for high mempool usage (no free channels)
-    json.getJSONObject("mempool").run {
+    json.getJSONObject("mempool").getJSONObject("v1").run {
       mempoolContext.postValue(MempoolContext(getBoolean("high_usage"), Satoshi(getLong("pay_to_open_min_amount_sat"))))
       if (getBoolean("high_usage")) {
         inAppNotifs?.add(InAppNotifications.MEMPOOL_HIGH_USAGE)
@@ -213,7 +216,12 @@ class AppContext : Application(), DefaultLifecycleObserver {
     // -- swap-in settings
     val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
     swapInSettings.postValue(remoteSwapInSettings)
-    log.info("swap_in settings set to $remoteSwapInSettings")
+    log.info("swap-in settings set to $remoteSwapInSettings")
+
+    // -- swap-out settings
+    val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(1))
+    swapOutSettings.postValue(remoteSwapOutSettings)
+    log.info("swap-out settings set to $remoteSwapOutSettings")
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {
@@ -317,5 +325,6 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
 }
 
 data class SwapInSettings(val feePercent: Double)
+data class SwapOutSettings(val minFeerateSatByte: Long)
 data class MempoolContext(val highUsageWarning: Boolean, val minCapacityPayToOpen: Satoshi)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)
