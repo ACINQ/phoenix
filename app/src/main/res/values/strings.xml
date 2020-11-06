@@ -354,7 +354,7 @@
   <string name="inappnotif_background_worker_cannot_run">Phoenix needs to be able to run in background from time to time. Make sure your device does not aggressively kill this app for battery savings.</string>
   <string name="inappnotif_upgrade">An update for this app is available.</string>
   <string name="inappnotif_upgrade_critical">A critical update is available. The wallet may malfunction if not updated.</string>
-  <string name="inappnotif_mempool_high_usage">Bitcoin mempool is full with a high feerate.</string>
+  <string name="inappnotif_mempool_high_usage">Bitcoin mempool is full and fees are very high.</string>
   <string name="inappnotif_mempool_high_usage_action">See how that affects you</string>
 
   <!-- //////////////// display seed //////////////// -->
