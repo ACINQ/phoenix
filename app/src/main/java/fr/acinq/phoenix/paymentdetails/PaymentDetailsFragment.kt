@@ -42,6 +42,9 @@ import fr.acinq.eclair.db.IncomingPaymentStatus
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.wire.TemporaryNodeFailure
+import fr.acinq.eclair.wire.TrampolineFeeInsufficient
+import fr.acinq.eclair.wire.UnknownNextPeer
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentPaymentDetailsBinding
@@ -106,8 +109,19 @@ class PaymentDetailsFragment : BaseFragment() {
         is PaymentDetailsState.Outgoing.Failed -> {
           mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
           // use error of the last subpayment as it's probably the most pertinent
-          val failures = JavaConverters.asJavaCollectionConverter((state.parts.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList()
-          mBinding.errorValue.text = failures.joinToString("\n") { e -> e.failureMessage() }
+          when (state.failureType) {
+            is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
+            is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
+            is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
+            is OutgoingFailure.TrampolineFee -> {
+              mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
+              mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
+              mBinding.errorAction.setOnClickListener {
+                findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
+              }
+            }
+          }
+
           mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
           showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
         }
@@ -119,7 +133,6 @@ class PaymentDetailsFragment : BaseFragment() {
           if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
             model.paymentMeta.value?.run {
               if (closing_type != ClosingType.Mutual.code) {
-                log.info("show closing info= $this")
                 mBinding.infoLayout.visibility = View.VISIBLE
                 val address = app.state.value?.getFinalAddress() ?: closing_main_output_script ?: ""
                 mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
@@ -260,7 +273,7 @@ sealed class PaymentDetailsState {
     }
 
     data class Failed(override val paymentType: String, override val parts: List<OutgoingPayment>, override val description: String?,
-      override val amountToRecipient: MilliSatoshi) : Outgoing()
+      override val amountToRecipient: MilliSatoshi, val failureType: OutgoingFailure) : Outgoing()
 
     data class Pending(override val paymentType: String, override val parts: List<OutgoingPayment>, override val description: String?,
       override val amountToRecipient: MilliSatoshi) : Outgoing()
@@ -283,6 +296,13 @@ sealed class PaymentDetailsState {
     object Generic : Error()
     object NotFound : Error()
   }
+}
+
+sealed class OutgoingFailure {
+  data class Generic(val message: String): OutgoingFailure()
+  object RecipientUnknownOrNeedsLiquidity: OutgoingFailure()
+  object TrampolineFee: OutgoingFailure()
+  object IncorrectPaymentDetails: OutgoingFailure()
 }
 
 class PaymentDetailsViewModel(
@@ -384,6 +404,10 @@ class PaymentDetailsViewModel(
     }?.let { t -> DateFormat.getDateTimeInstance().format(t) } ?: ""
   }
 
+  val showFailedOutgoingPaymentAction: LiveData<Boolean> = Transformations.map(state) { state ->
+    state is PaymentDetailsState.Outgoing.Failed && state.failureType is OutgoingFailure.TrampolineFee
+  }
+
   suspend fun getPaymentMeta() {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
       log.error("failed to retrieve payment meta for id=$paymentId: ", e)
@@ -433,7 +457,16 @@ class PaymentDetailsViewModel(
       }
       payments.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
         payments.filter { p -> p.status() is OutgoingPaymentStatus.Failed }.also {
-          state.postValue(PaymentDetailsState.Outgoing.Failed(it.first().paymentType(), it, description, amountToRecipient))
+          val failure = JavaConverters.asJavaCollectionConverter((it.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList().last()
+          val failureType = when {
+            failure.failureMessage().contains(TrampolineFeeInsufficient.message(), ignoreCase = true) -> OutgoingFailure.TrampolineFee
+            failure.failureMessage().contains(TemporaryNodeFailure.message(), ignoreCase = true)
+              || failure.failureMessage().contains(UnknownNextPeer.message(), ignoreCase = true)
+              || failure.failureMessage().contains("is currently unavailable", ignoreCase = true) -> OutgoingFailure.RecipientUnknownOrNeedsLiquidity
+            failure.failureMessage().contains("incorrect payment details or unknown payment hash", ignoreCase = true) -> OutgoingFailure.IncorrectPaymentDetails
+            else -> OutgoingFailure.Generic(failure.failureMessage())
+          }
+          state.postValue(PaymentDetailsState.Outgoing.Failed(it.first().paymentType(), it, description, amountToRecipient, failureType))
         }
       }
       else -> {
@@ -485,7 +518,7 @@ class PaymentDetailsViewModel(
       log.error("failed to save description=$desc for payment=$paymentId: ", e)
     }) {
       log.debug("saving custom description=$desc for payment=$paymentId")
-      paymentMetaRepository.setDesc(paymentId,desc)
+      paymentMetaRepository.setDesc(paymentId, desc)
       getPaymentMeta()
     }
   }

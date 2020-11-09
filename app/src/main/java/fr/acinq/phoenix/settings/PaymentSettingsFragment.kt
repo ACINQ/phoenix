@@ -30,7 +30,9 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.CoinUnit
 import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.TrampolineFeeSetting
@@ -138,12 +140,12 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
 
     if (prefsFeeSetting != null) {
       overrideDefaultCheckbox.isChecked = true
-      baseFeeInput.setText(Converter.printAmountRaw(prefsFeeSetting.feeBase, context))
+      baseFeeInput.setText(Converter.printAmountRawForceUnit(prefsFeeSetting.feeBase, `SatUnit$`.`MODULE$`))
       proportionalFeeInput.setText(prefsFeeSetting.printFeeProportional())
       updateState()
     } else {
       overrideDefaultCheckbox.isChecked = false
-      baseFeeInput.setText(Converter.printAmountRaw(defaultFeeSetting.feeBase, context))
+      baseFeeInput.setText(Converter.printAmountRawForceUnit(defaultFeeSetting.feeBase, `SatUnit$`.`MODULE$`))
       proportionalFeeInput.setText(defaultFeeSetting.printFeeProportional())
       updateState()
     }

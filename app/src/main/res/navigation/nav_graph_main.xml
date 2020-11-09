@@ -285,6 +285,12 @@
       android:id="@+id/payment_details_technicals"
       android:name="fr.acinq.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
       android:label="PaymentDetailsTechnicalsFragment" />
+
+    <!-- navigate to payment settings -->
+    <action
+      android:id="@+id/global_payment_details_to_payment_settings_fragment"
+      app:destination="@id/payment_settings_fragment"
+      app:popUpTo="@id/main_fragment" />
   </navigation>
 
   <!-- LNURL: auth -->

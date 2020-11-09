@@ -60,6 +60,7 @@ object Converter {
     CoinUtils.COIN_FORMAT().roundingMode = RoundingMode.DOWN
   }
 
+  fun printAmountRawForceUnit(amount: BtcAmount, unit: CoinUnit): String = CoinUtils.rawAmountInUnit(amount, unit).bigDecimal().toPlainString()
   fun printAmountRaw(amount: BtcAmount, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
   fun printAmountRaw(amount: MilliSatoshi, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
 

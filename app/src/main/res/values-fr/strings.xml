@@ -400,6 +400,11 @@
 
   <string name="paymentdetails_technicals_button">Afficher les détails techniques</string>
 
+  <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Le destinataire n\'est pas joignable, ou ne dispose pas d\'assez de capacité entrante.</string>
+  <string name="paymentdetails_failure_invalid_details">Le destinataire a rejeté le paiement.\nCela arrive notamment lorsque le règlement a déjà été fait ou lorsqu\'il contient une date d\'expiration qui a été dépassée.</string>
+  <string name="paymentdetails_failure_trampoline_fees">Aucun chemin valable pour les frais de paiement courants. Réessayez en augmentant les frais.</string>
+  <string name="paymentdetails_failure_trampoline_fees_action">Modifier les frais de paiement</string>
+
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">Détails du paiement</string>

@@ -426,6 +426,11 @@
 
   <string name="paymentdetails_technicals_button">Show details</string>
 
+  <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Recipient is not reachable, or does not have enough inbound liquidity.</string>
+  <string name="paymentdetails_failure_invalid_details">Payment rejected by the recipient.\nThis usually occurs when the invoice has already been paid or when it contains an expiration date, and you attempted to send a payment after the expiration.</string>
+  <string name="paymentdetails_failure_trampoline_fees">No route found with current fee setting. Try with higher fees.</string>
+  <string name="paymentdetails_failure_trampoline_fees_action">Edit my fee setting</string>
+
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">Payment data</string>
