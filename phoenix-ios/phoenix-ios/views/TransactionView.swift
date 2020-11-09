@@ -63,7 +63,7 @@ struct TransactionView : View {
                         +
                         Text("FAILED")
                                 .font(Font.title2.bold())
-                        Text("NO FUND HAS BEEN SENT")
+                        Text("NO FUNDS HAVE BEEN SENT")
                                 .font(Font.title2)
                     }
                             .padding()
@@ -89,7 +89,13 @@ struct TransactionView : View {
 
 class TransactionView_Previews : PreviewProvider {
     static var previews: some View {
-        TransactionView(transaction: mockSpendFailedTransaction, close: {})
+        TransactionView(
+			transaction: mockPendingTransaction,
+		//	transaction: mockSpendTransaction,
+		//	transaction: mockSpendFailedTransaction,
+		//	transaction: mockReceiveTransaction,
+			close: {}
+		)
     }
 
     #if DEBUG
