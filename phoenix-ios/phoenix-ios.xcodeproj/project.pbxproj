@@ -429,7 +429,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PskipAndroid=true\n./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PskipAndroid=true\n";
+			shellScript = "cd \"$SRCROOT/..\"\necho ./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PXCODE_PLATFORM_NAME=${PLATFORM_NAME} -PskipAndroid=true\n./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=${CONFIGURATION} -PXCODE_PLATFORM_NAME=${PLATFORM_NAME} -PskipAndroid=true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

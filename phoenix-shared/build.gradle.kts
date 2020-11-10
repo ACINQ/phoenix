@@ -32,7 +32,7 @@ kotlin {
         }
     }
 
-    iosX64("ios") {
+    ios {
         binaries {
             framework {
                 baseName = "PhoenixShared"
@@ -112,13 +112,18 @@ kotlin {
 
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
-    val mode = System.getenv("XCODE_CONFIGURATION") ?: "Debug"
-    val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>("ios").binaries.getFramework(mode)
+    val mode = (project.property("XCODE_CONFIGURATION") as? String) ?: "Debug"
+    val platformName = (project.property("XCODE_PLATFORM_NAME") as? String) ?: "iphonesimulator"
+    val targetName = when (platformName) {
+        "iphonesimulator" -> "iosX64"
+        "iphoneos" -> "iosArm64"
+        else -> error("Unknown XCode platform $platformName")
+    }
+    val framework = kotlin.targets.getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>(targetName).binaries.getFramework(mode)
     inputs.property("mode", mode)
     dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
     from({ framework.outputDirectory })
-    into(targetDir)
+    into(buildDir.resolve("xcode-frameworks"))
 }
 tasks.getByName("build").dependsOn(packForXcode)
 
