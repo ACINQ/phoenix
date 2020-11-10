@@ -119,7 +119,6 @@
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_address_label">Endereço</string>
-  <string name="receive_power_save_disclaimer">Você está no modo de economia de energia. Para receber o pagamento, verifique se o aplicativo pode ser executado em segundo plano.</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
@@ -535,19 +534,6 @@
   <string name="electrum_dialog_ssl_tor">Verifique também o certificado para este endereço Onion</string>
   <string name="electrum_dialog_input">Endereço do servidor (host:port).</string>
   <string name="electrum_empty_custom_address">Insira um endereço de servidor Electrum</string>
-
-   <!-- //////////////// fees settings //////////////// -->
-
-  <string name="fees_settings_title" translatable="false">Fees Settings</string>
-  <string name="fees_settings_subtitle" translatable="false">These are the fees used for sending or receiving money with Phoenix.</string>
-
-  <string name="fees_settings_trampoline_title" translatable="false">Lightning payment</string>
-  <string name="fees_settings_trampoline_desc" translatable="false">The app will try to use the cheapest fee possible.</string>
-  <string name="fees_settings_trampoline_value" translatable="false">Lorem ipsum</string>
-  <string name="fees_settings_trampoline_spinner_label" translatable="false">At most %1$s + %2$s%%</string>
-
-  <string name="fees_settings_swap_in_title" translatable="false">Onchain → Lightning</string>
-  <string name="fees_settings_swap_in_desc" translatable="false">This fee covers the cost of opening a Lightning channel, which involves an on-chain transaction.</string>
 
   <!-- ////////////// virtual keyboard hints //////////////// -->
 

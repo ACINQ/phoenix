@@ -79,7 +79,14 @@ class AppContext : Application(), DefaultLifecycleObserver {
     Logging.setupLogger(applicationContext)
     ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     Converter.refreshCoinPattern(applicationContext)
-    updateWalletContext()
+    Prefs.getLastKnownWalletContext(applicationContext)?.run {
+      try {
+        handleWalletContext(this)
+      } catch (e: Exception) {
+        log.error("error when reading wallet context from preferences: ", e)
+      }
+    }
+    updateWalletContext(applicationContext)
 
     // poll exchange rate api every 120 minutes
     kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 120 * 60 * 1000) {
@@ -119,8 +126,14 @@ class AppContext : Application(), DefaultLifecycleObserver {
   /** Fee settings for swap-in (on-chain -> LN). */
   val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
 
+  /** Fee settings for swap-out (LN -> on-chain). */
+  val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
+
+  /** Context of the Bitcoin mempool, used to display notifications. */
+  val mempoolContext = MutableLiveData(Constants.DEFAULT_MEMPOOL_CONTEXT)
+
   /** Current balance of the node. */
-  val balance = MutableLiveData<MilliSatoshi>(MilliSatoshi(0))
+  val balance = MutableLiveData(Constants.DEFAULT_BALANCE)
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun handleEvent(event: BalanceEvent) {
@@ -132,7 +145,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
   //                        TODO: move this to a service                        //
   // ========================================================================== //
 
-  private fun updateWalletContext() {
+  private fun updateWalletContext(context: Context) {
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
         log.warn("could not retrieve wallet context from remote: ", e)
@@ -144,42 +157,8 @@ class AppContext : Application(), DefaultLifecycleObserver {
           if (response.isSuccessful && body != null) {
             val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
             log.debug("wallet context responded with {}", json.toString(2))
-            // -- version context
-            val installedVersion = BuildConfig.VERSION_CODE
-            val latestVersion = json.getInt("version")
-            val latestCriticalVersion = json.getInt("latest_critical_version")
-            notifications.value?.run {
-              if (installedVersion < latestCriticalVersion) {
-                log.info("a critical update (v$latestCriticalVersion) is deemed available")
-                add(InAppNotifications.UPGRADE_WALLET_CRITICAL)
-              } else if (latestVersion - installedVersion >= 2) {
-                add(InAppNotifications.UPGRADE_WALLET)
-              } else {
-                remove(InAppNotifications.UPGRADE_WALLET_CRITICAL)
-                remove(InAppNotifications.UPGRADE_WALLET)
-              }
-              notifications.postValue(this)
-            }
-
-            // -- trampoline settings
-            val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
-            val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
-            for (i in 0 until trampolineArray.length()) {
-              val setting: JSONObject = trampolineArray.get(i) as JSONObject
-              trampolineSettingsList += TrampolineFeeSetting(
-                feeBase = Converter.any2Msat(Satoshi(setting.getLong("fee_base_sat"))),
-                feePercent = setting.getDouble("fee_percent"),
-                cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
-            }
-
-            trampolineSettingsList.sortedWith(compareBy({ it.feePercent }, { it.feeBase }))
-            trampolineFeeSettings.postValue(trampolineSettingsList)
-            log.info("trampoline settings set to $trampolineSettingsList")
-
-            // -- swap-in settings
-            val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
-            swapInSettings.postValue(remoteSwapInSettings)
-            log.info("swap_in settings set to $remoteSwapInSettings")
+            handleWalletContext(json)
+            Prefs.saveWalletContext(context, json)
           } else {
             log.warn("could not retrieve wallet context from remote, code=${response.code()}")
           }
@@ -190,6 +169,59 @@ class AppContext : Application(), DefaultLifecycleObserver {
         }
       }
     })
+  }
+
+  private fun handleWalletContext(json: JSONObject) {
+    val inAppNotifs = notifications.value
+
+    // -- check warning for high mempool usage (no free channels)
+    json.getJSONObject("mempool").getJSONObject("v1").run {
+      mempoolContext.postValue(MempoolContext(getBoolean("high_usage")))
+      if (getBoolean("high_usage")) {
+        inAppNotifs?.add(InAppNotifications.MEMPOOL_HIGH_USAGE)
+      } else {
+        inAppNotifs?.remove(InAppNotifications.MEMPOOL_HIGH_USAGE)
+      }
+    }
+
+    // -- version context
+    val installedVersion = BuildConfig.VERSION_CODE
+    val latestVersion = json.getInt("version")
+    val latestCriticalVersion = json.getInt("latest_critical_version")
+    if (installedVersion < latestCriticalVersion) {
+      log.info("a critical update (v$latestCriticalVersion) is deemed available")
+      inAppNotifs?.add(InAppNotifications.UPGRADE_WALLET_CRITICAL)
+    } else if (latestVersion - installedVersion >= 2) {
+      inAppNotifs?.add(InAppNotifications.UPGRADE_WALLET)
+    } else {
+      inAppNotifs?.remove(InAppNotifications.UPGRADE_WALLET_CRITICAL)
+      inAppNotifs?.remove(InAppNotifications.UPGRADE_WALLET)
+    }
+    notifications.postValue(inAppNotifs)
+
+    // -- trampoline settings
+    val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
+    val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
+    for (i in 0 until trampolineArray.length()) {
+      val setting: JSONObject = trampolineArray.get(i) as JSONObject
+      trampolineSettingsList += TrampolineFeeSetting(
+        feeBase = Satoshi(setting.getLong("fee_base_sat")),
+        feeProportionalMillionths = setting.getLong("fee_per_millionths"),
+        cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
+    }
+    trampolineSettingsList.sortedWith(compareBy({ it.feeProportionalMillionths }, { it.feeBase }))
+    trampolineFeeSettings.postValue(trampolineSettingsList)
+    log.info("trampoline settings set to $trampolineSettingsList")
+
+    // -- swap-in settings
+    val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
+    swapInSettings.postValue(remoteSwapInSettings)
+    log.info("swap-in settings set to $remoteSwapInSettings")
+
+    // -- swap-out settings
+    val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(1))
+    swapOutSettings.postValue(remoteSwapOutSettings)
+    log.info("swap-out settings set to $remoteSwapOutSettings")
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {
@@ -288,5 +320,11 @@ class AppContext : Application(), DefaultLifecycleObserver {
   }
 }
 
-data class TrampolineFeeSetting(val feeBase: MilliSatoshi, val feePercent: Double, val cltvExpiry: CltvExpiryDelta)
+data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillionths: Long, val cltvExpiry: CltvExpiryDelta) {
+  fun printFeeProportional(): String = Converter.perMillionthsToPercentageString(feeProportionalMillionths)
+}
+
 data class SwapInSettings(val feePercent: Double)
+data class SwapOutSettings(val minFeerateSatByte: Long)
+data class MempoolContext(val highUsageWarning: Boolean)
+data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)

@@ -92,7 +92,6 @@
   <string name="receive_share_button">Compartir…</string>
 
   <string name="receive_address_label">Dirección</string>
-  <string name="receive_power_save_disclaimer">Estás en modo ahorro de energía. Para recibir el pago, asegúrate de que la aplicación pueda ejecutarse en segundo plano.</string>
   <string name="receive_withdraw_button">Utilizar enlace LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar una dirección de Bitcoin</string>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 ACINQ SAS
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +15,8 @@
   -->
 
 <resources>
+
+  <!-- fiat unit -->
   <string-array name="fiat_labels">
     <item>(AUD) Australian Dollar</item>
     <item>(BRL) Brazilian Real</item>
@@ -68,6 +69,8 @@
     <item>TWD</item>
     <item>USD</item>
   </string-array>
+
+  <!-- btc unit -->
   <string-array name="btc_unit_labels">
     <item>Satoshi (0.00000001 BTC)</item>
     <item>Bits (0.000001 BTC)</item>
@@ -80,6 +83,8 @@
     <item>mbtc</item>
     <item>btc</item>
   </string-array>
+
+  <!-- app theme -->
   <string-array name="theme_labels">
     <item>Light theme</item>
     <item>Dark theme</item>
@@ -90,6 +95,8 @@
     <item>dark</item>
     <item>default</item>
   </string-array>
+
+  <!-- on-chain explorer -->
   <string-array name="explorer_labels">
     <item>Mempool.space</item>
     <item>Blockstream.info</item>
@@ -98,4 +105,5 @@
     <item>Mempool.space</item>
     <item>Blockstream.info</item>
   </string-array>
+
 </resources>

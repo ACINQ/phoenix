@@ -285,6 +285,12 @@
       android:id="@+id/payment_details_technicals"
       android:name="fr.acinq.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
       android:label="PaymentDetailsTechnicalsFragment" />
+
+    <!-- navigate to payment settings -->
+    <action
+      android:id="@+id/global_payment_details_to_payment_settings_fragment"
+      app:destination="@id/payment_settings_fragment"
+      app:popUpTo="@id/main_fragment" />
   </navigation>
 
   <!-- LNURL: auth -->
@@ -356,9 +362,6 @@
     <action
       android:id="@+id/action_settings_to_electrum"
       app:destination="@id/electrum_fragment" />
-    <action
-      android:id="@+id/action_settings_to_fees"
-      app:destination="@id/fees_fragment" />
     <action
       android:id="@+id/action_settings_to_tor"
       app:destination="@id/tor_fragment" />
@@ -435,12 +438,6 @@
     android:id="@+id/prefs_display"
     android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
     android:label="DisplayPrefsFragment" />
-
-  <!-- settings: consult and change fees profile -->
-  <fragment
-    android:id="@+id/fees_fragment"
-    android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
-    android:label="FeesSettingsFragment" />
 
   <!-- settings: TOR -->
   <fragment

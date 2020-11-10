@@ -20,11 +20,12 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.wire.PayToOpenRequest
+import fr.acinq.phoenix.Balance
 import fr.acinq.phoenix.db.ClosingType
 
 class PaymentPending
 
-class BalanceEvent(val balance: MilliSatoshi)
+class BalanceEvent(val balance: Balance)
 
 class ChannelClosingEvent(val balance: MilliSatoshi, val channelId: ByteVector32, val closingType: ClosingType, val spendingTxs: List<Transaction>, val scriptDestMainOutput: String?)
 

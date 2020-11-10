@@ -36,6 +36,7 @@ import fr.acinq.eclair.wire.SwapInConfirmed
 import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
+import fr.acinq.phoenix.Balance
 import fr.acinq.phoenix.db.*
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Wallet
@@ -71,10 +72,11 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
     when (event) {
       // -------------- CHANNELS LIFECYCLE -------------
       is ChannelStateChanged -> {
-        if (event.currentData() is HasCommitments && event.currentData() is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && event.previousState() != `WAIT_FOR_INIT_INTERNAL$`.`MODULE$`) {
+        val validOriginForClosures = listOf(`NORMAL$`.`MODULE$`, `SHUTDOWN$`.`MODULE$`, `NEGOTIATING$`.`MODULE$`)
+        if (event.currentData() is HasCommitments && event.currentData() is DATA_CLOSING && event.currentState() == `CLOSING$`.`MODULE$` && validOriginForClosures.contains(event.previousState())) {
           val data = event.currentData() as DATA_CLOSING
           // dispatch closing if the channel's goes to closing. Do NOT dispatch if the channel is restored and was already closing (i.e closing from an internal state).
-          log.info("channel closing detected for id=${data.channelId()} with data=$data")
+          log.info("channel=${data.channelId()} closing from state=${event.previousState()} with data=$data")
           val balance = data.commitments().localCommit().spec().toLocal().truncateToSatoshi()
           val spendingTxs = JavaConverters.seqAsJavaListConverter(data.spendingTxes()).asJava()
           val ourSpendingAddress = spendingTxs.map { JavaConverters.seqAsJavaListConverter(it.txOut()).asJava() }.flatten()
@@ -119,10 +121,13 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
         EventBus.getDefault().post(PaymentPending())
       }
       is Relayer.OutgoingChannels -> {
-        val outgoingChannels = JavaConverters.seqAsJavaListConverter(event.channels()).asJava()
-        val total = MilliSatoshi(outgoingChannels.map { b -> b.commitments().availableBalanceForSend().toLong() }.sum())
-        log.info("receive Relayer.OutgoingChannels event with ${event.channels().size()} channels holding $total")
-        EventBus.getDefault().post(BalanceEvent(total))
+        val (sendable, receivable) = JavaConverters.seqAsJavaListConverter(event.channels()).asJava().map { channel ->
+          channel.commitments().availableBalanceForSend() to channel.commitments().availableBalanceForReceive()
+        }.fold(Pair(MilliSatoshi(0), MilliSatoshi(0)), { a, b ->
+          a.first.`$plus`(b.first) to a.second.`$plus`(b.second)
+        })
+        log.info("receive OutgoingChannels [ count=${event.channels().size()} sendable=$sendable receivable=$receivable")
+        EventBus.getDefault().post(BalanceEvent(Balance(event.channels().size(), sendable, receivable)))
       }
 
       // -------------- CONNECTION WATCHER --------------

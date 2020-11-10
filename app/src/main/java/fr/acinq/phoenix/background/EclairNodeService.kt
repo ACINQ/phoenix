@@ -571,15 +571,26 @@ class EclairNodeService : Service() {
 
       val sendRequest: Any = if (isTrampoline) {
         // 1 - compute trampoline fee settings for this payment
-        // note that if we have to subtract the fee from the amount, use ONLY the most expensive trampoline setting option, to make sure that the payment will go through
-        val trampolineFeeSettings = appContext.trampolineFeeSettings.value ?: throw RuntimeException("missing trampoline fee settings")
-        val feeSettingsDefault = if (subtractFee) listOf(trampolineFeeSettings.last()) else trampolineFeeSettings
+        val trampolineFeeSettings = Prefs.getMaxTrampolineCustomFee(appContext.applicationContext)?.let { pref ->
+          appContext.trampolineFeeSettings.value!!.filter {
+            it.feeBase < pref.feeBase && it.feeProportionalMillionths < pref.feeProportionalMillionths
+          } + pref
+        } ?: run {
+          appContext.trampolineFeeSettings.value!!
+        }.run {
+          if (subtractFee) {
+            // if fee is subtracted from amount, use ONLY the most expensive trampoline setting option, to make sure that the payment will go through
+            listOf(last())
+          } else {
+            this
+          }
+        }
         val feeSettingsFromHints = getPessimisticRouteSettingsFromHint(amount, paymentRequest)
         log.info("most expensive fee/expiry from payment request hints=$feeSettingsFromHints")
-        val finalTrampolineFeesList = JavaConverters.asScalaBufferConverter(feeSettingsDefault
+        val finalTrampolineFeesList = JavaConverters.asScalaBufferConverter(trampolineFeeSettings
           .map {
-            // fee = trampoline_base + trampoline_percent * amount + fee_from_hint
-            Tuple2(it.feeBase.`$plus`(amount.`$times`(it.feePercent)).`$plus`(feeSettingsFromHints.first), it.cltvExpiry.`$plus`(feeSettingsFromHints.second))
+            // the fee from routing hints is ignored.
+            Tuple2(`package$`.`MODULE$`.nodeFee(Converter.any2Msat(it.feeBase), it.feeProportionalMillionths, amount), it.cltvExpiry.`$plus`(feeSettingsFromHints.second))
           })
           .asScala().toList()
 

@@ -20,13 +20,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
-import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.SatUnit
-import fr.acinq.eclair.WatchListener
-import fr.acinq.eclair.`CoinUtils$`
-import fr.acinq.phoenix.R
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.*
+import fr.acinq.phoenix.TrampolineFeeSetting
+import org.json.JSONObject
+import org.slf4j.LoggerFactory
 
 object Prefs {
+  val log = LoggerFactory.getLogger(this::class.java)
 
   private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
   const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
@@ -39,16 +40,20 @@ object Prefs {
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
   const val PREFS_EXPLORER: String = "PREFS_EXPLORER"
+  private const val PREFS_LAST_KNOWN_WALLET_CONTEXT: String = "PREFS_LAST_KNOWN_WALLET_CONTEXT"
 
   // -- authentication with PIN/biometrics
   const val PREFS_SCREEN_LOCK: String = "PREFS_SCREEN_LOCK_ENABLED"
 
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
+
   @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
 
@@ -64,6 +69,8 @@ object Prefs {
   // -- payment configuration
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
   const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
+  const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
+  const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
 
   // -- migration
   const val PREFS_MIGRATED_FROM = "PREFS_MIGRATED_FROM"
@@ -73,6 +80,7 @@ object Prefs {
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
   const val PREFS_FCM_TOKEN: String = "PREFS_FCM_TOKEN"
+  const val PREFS_SHOW_BALANCE_HOME: String = "PREFS_SHOW_BALANCE_HOME"
 
   // -- ==================================
   // -- authentication with PIN/biometrics
@@ -167,6 +175,21 @@ object Prefs {
     }
   }
 
+  fun getLastKnownWalletContext(context: Context): JSONObject? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_LAST_KNOWN_WALLET_CONTEXT, null)?.run {
+      try {
+        JSONObject(this)
+      } catch (e: Exception) {
+        log.debug("could not read wallet context json from preferences")
+        null
+      }
+    }
+  }
+
+  fun saveWalletContext(context: Context, json: JSONObject) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_LAST_KNOWN_WALLET_CONTEXT, json.toString()).apply()
+  }
+
   // -- ==================================
   // -- version, ftue, migration...
   // -- ==================================
@@ -202,6 +225,10 @@ object Prefs {
 
   fun getTheme(context: Context): String {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default
+  }
+
+  fun showBalanceHome(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_BALANCE_HOME, true)
   }
 
   fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {
@@ -281,5 +308,31 @@ object Prefs {
 
   fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {
     return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, value).apply()
+  }
+
+  fun getMaxTrampolineCustomFee(context: Context): TrampolineFeeSetting? {
+    PreferenceManager.getDefaultSharedPreferences(context).run {
+      val baseFee = getLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, -1)
+      val proportionalFee = getLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, -1)
+      return if (baseFee < 0L || proportionalFee < 0L) {
+        null
+      } else {
+        TrampolineFeeSetting(Satoshi(baseFee), proportionalFee, CltvExpiryDelta(576))
+      }
+    }
+  }
+
+  fun setMaxTrampolineCustomFee(context: Context, base: Satoshi, proportional: Long) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .putLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, base.toLong())
+      .putLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, proportional)
+      .apply()
+  }
+
+  fun removeMaxTrampolineCustomFee(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .remove(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE)
+      .remove(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE)
+      .commit()
   }
 }

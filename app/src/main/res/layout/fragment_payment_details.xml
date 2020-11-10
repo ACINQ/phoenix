@@ -305,6 +305,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg_no_border"
             android:padding="@dimen/space_xxs"
+            android:layout_marginStart="@dimen/space_xxxs"
             app:icon="@drawable/ic_text"
             app:icon_size="14dp"
             app:icon_tint="?attr/mutedTextColor"
@@ -409,6 +410,28 @@
             app:layout_constraintStart_toEndOf="@id/error_label"
             app:layout_constraintTop_toBottomOf="@id/pay_to_open_desc" />
 
+          <fr.acinq.phoenix.utils.customviews.ButtonView
+            android:id="@+id/error_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:layout_marginStart="@dimen/space_xxs"
+            android:visibility="@{model.showFailedOutgoingPaymentAction}"
+            android:background="@drawable/button_bg_no_border"
+            android:padding="@dimen/space_xxs"
+            app:icon="@drawable/ic_edit"
+            app:icon_size="14dp"
+            app:icon_tint="?attr/mutedTextColor"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/error_label"
+            app:layout_constraintTop_toBottomOf="@id/error_value"
+            app:spacer_size="@dimen/space_xxs"
+            app:text="@string/utils_unknown"
+            app:text_color="?attr/mutedTextColor"
+            app:text_size="@dimen/text_md" />
+
           <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/info_layout"
             android:layout_width="match_parent"
@@ -420,7 +443,7 @@
             android:layout_marginTop="@dimen/space_lg"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/error_value">
+            app:layout_constraintTop_toBottomOf="@+id/error_action">
 
             <ImageView
               android:id="@+id/info_icon"

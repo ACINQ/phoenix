@@ -23,36 +23,12 @@
 
     <OnSwipe
       app:dragDirection="dragUp"
-      app:touchAnchorId="@id/payment_list"
-      app:touchAnchorSide="top" />
+      app:touchAnchorId="@id/balance"
+      app:touchAnchorSide="bottom" />
+
   </Transition>
 
   <ConstraintSet android:id="@+id/big_top">
-
-    <Constraint
-      android:id="@id/top_section"
-      android:layout_height="@dimen/balance_default_height"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <Constraint
-      android:id="@id/top_limiter"
-      android:layout_width="64dp"
-      android:layout_height="8dp"
-      app:layout_constraintBottom_toBottomOf="@id/top_section"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/balance" />
-
-    <Constraint
-      android:id="@id/balance"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      app:layout_constraintBottom_toBottomOf="@id/top_section"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/top_section" />
 
     <Constraint
       android:id="@+id/top_notification_bar"
@@ -67,41 +43,38 @@
       app:layout_constraintTop_toTopOf="parent" />
 
     <Constraint
+      android:id="@id/balance"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_md"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/top_notification_bar"
+      app:visibilityMode="ignore" />
+
+    <Constraint
       android:id="@id/incoming_funds_notif"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_marginBottom="@dimen/space_sm"
+      app:layout_constraintBottom_toTopOf="@id/top_limiter"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:visibilityMode="ignore" />
+
+    <Constraint
+      android:id="@id/top_limiter"
+      android:layout_width="64dp"
+      android:layout_height="8dp"
+      android:layout_marginTop="38dp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/balance"
-      app:visibilityMode="ignore" />
+      app:layout_goneMarginTop="30dp" />
 
   </ConstraintSet>
 
   <ConstraintSet android:id="@+id/small_top">
-
-    <Constraint
-      android:id="@id/top_section"
-      android:layout_height="@dimen/balance_min_height"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-    <Constraint
-      android:id="@id/top_limiter"
-      android:layout_width="match_parent"
-      android:layout_height="4dp"
-      android:layout_marginStart="@dimen/space_md"
-      android:layout_marginEnd="@dimen/space_md"
-      app:layout_constraintTop_toBottomOf="@id/top_section" />
-
-    <Constraint
-      android:id="@id/balance"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="28dp"
-      app:layout_constraintBottom_toBottomOf="@id/top_section"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent" />
 
     <Constraint
       android:id="@+id/top_notification_bar"
@@ -110,18 +83,41 @@
       android:layout_marginStart="@dimen/space_xs"
       android:layout_marginTop="@dimen/space_xs"
       android:layout_marginEnd="@dimen/space_xs"
+      android:alpha="0"
+      android:translationY="-50dp"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
     <Constraint
+      android:id="@id/balance"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/space_lg"
+      app:layout_constraintBottom_toTopOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:visibilityMode="ignore" />
+
+    <Constraint
       android:id="@id/incoming_funds_notif"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:alpha="0"
+      android:layout_marginBottom="@dimen/space_md_p"
+      app:layout_constraintBottom_toTopOf="@id/top_limiter"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/balance"
       app:visibilityMode="ignore" />
+
+    <Constraint
+      android:id="@id/top_limiter"
+      android:layout_width="64dp"
+      android:layout_height="8dp"
+      android:layout_marginTop="@dimen/space_md_p"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
   </ConstraintSet>
 </MotionScene>

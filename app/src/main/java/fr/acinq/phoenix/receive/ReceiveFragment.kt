@@ -28,7 +28,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -89,7 +88,7 @@ class ReceiveFragment : BaseFragment() {
       mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
     }
 
-    model.invoice.observe(viewLifecycleOwner, Observer {
+    model.invoice.observe(viewLifecycleOwner, {
       if (it != null) {
         model.generateQrCodeBitmap()
         mBinding.rawInvoice.text = if (it.second == null) PaymentRequest.write(it.first) else it.second
@@ -98,7 +97,7 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    model.bitmap.observe(viewLifecycleOwner, Observer { bitmap ->
+    model.bitmap.observe(viewLifecycleOwner, { bitmap ->
       if (bitmap != null) {
         mBinding.qrImage.setImageBitmap(bitmap)
         model.invoice.value?.let {
@@ -111,7 +110,7 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    app.pendingSwapIns.observe(viewLifecycleOwner, Observer {
+    app.pendingSwapIns.observe(viewLifecycleOwner, {
       model.invoice.value?.let { invoice ->
         // if user is swapping in and a payment is incoming on this address, move to main
         if (invoice.second != null && invoice.second != null && model.state.value == SwapInState.DONE) {
