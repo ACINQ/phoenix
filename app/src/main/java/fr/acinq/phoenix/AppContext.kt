@@ -176,7 +176,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
     // -- check warning for high mempool usage (no free channels)
     json.getJSONObject("mempool").getJSONObject("v1").run {
-      mempoolContext.postValue(MempoolContext(getBoolean("high_usage"), Satoshi(getLong("pay_to_open_min_amount_sat"))))
+      mempoolContext.postValue(MempoolContext(getBoolean("high_usage")))
       if (getBoolean("high_usage")) {
         inAppNotifs?.add(InAppNotifications.MEMPOOL_HIGH_USAGE)
       } else {
@@ -326,5 +326,5 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
 
 data class SwapInSettings(val feePercent: Double)
 data class SwapOutSettings(val minFeerateSatByte: Long)
-data class MempoolContext(val highUsageWarning: Boolean, val minCapacityPayToOpen: Satoshi)
+data class MempoolContext(val highUsageWarning: Boolean)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)

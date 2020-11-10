@@ -92,11 +92,6 @@
   <string name="receive_default_desc">Phoenix payment</string>
   <string name="receive_generate_button">Créer la requête</string>
 
-  <string name="receive_high_fees_warning_title">Frais de minage élevés sur la chaîne</string>
-  <string name="receive_high_fees_warning_message_low_liquidity">Vous pouvez recevoir au plus %1$s (%2$s) sans nouveau canal de paiement.\n\nRecevez au moins %3$s (%4$s) pour créer un nouveau canal.</string>
-  <string name="receive_high_fees_warning_message_no_liquidity">Vous n\'avez plus de liquidité entrante.\n\nRecevez au moins %1$s (%2$s) pour créer un nouveau canal.</string>
-  <string name="receive_high_fees_warning_message_no_channels">Vous n\'avez pas de canaux de paiement.\n\nRecevez au moins %1$s (%2$s) pour créer un nouveau canal.</string>
-
   <string name="receive_share_subject">Paiement demandé</string>
   <string name="receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="receive_share_button">Partager…</string>

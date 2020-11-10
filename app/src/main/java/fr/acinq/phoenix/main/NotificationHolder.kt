@@ -64,7 +64,7 @@ class NotificationHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       actionButton.text = itemView.resources.getString(notification.actionResId)
       when (notification) {
         InAppNotifications.MNEMONICS_NEVER_SEEN -> actionButton.setOnClickListener { itemView.findNavController().navigate(R.id.action_main_to_display_seed) }
-        InAppNotifications.MEMPOOL_HIGH_USAGE -> actionButton.setOnClickListener { itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq"))) }
+        InAppNotifications.MEMPOOL_HIGH_USAGE -> actionButton.setOnClickListener { itemView.context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/faq#high-mempool-size-impacts"))) }
         else -> {}
       }
       itemView.setPadding(spaceSM, spaceSM, spaceSM, 0)

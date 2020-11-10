@@ -69,6 +69,6 @@ object Constants {
     TrampolineFeeSetting(Satoshi(12), 8000, CltvExpiryDelta(576))) // 12 sat + 0.8 %
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
   val DEFAULT_SWAP_OUT_SETTINGS = SwapOutSettings(1)
-  val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false, Satoshi(10000))
+  val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false)
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
 }
