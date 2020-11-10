@@ -19,9 +19,7 @@ object Home {
 
     val emptyModel = Model(Connections(), 0, emptyList(), null)
 
-    sealed class Intent : MVI.Intent() {
-        object Connect : Intent()
-    }
+    sealed class Intent : MVI.Intent()
 
     class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 

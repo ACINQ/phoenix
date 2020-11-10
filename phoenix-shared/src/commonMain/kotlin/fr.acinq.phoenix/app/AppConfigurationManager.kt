@@ -29,6 +29,7 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
     private val db: DB by instance(tag = TAG_APPLICATION)
     private val electrumClient: ElectrumClient by instance()
     private val httpClient: HttpClient by instance()
+    private val chain: Chain by instance()
 
     private val logger = direct.instance<LoggerFactory>().newLogger(AppConfigurationManager::class)
 
@@ -114,7 +115,7 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
 
     fun setRandomElectrumServer() {
         putElectrumServer(
-            when (getAppConfiguration().chain) {
+            when (chain) {
                 Chain.MAINNET -> electrumMainnetConfigurations.random()
                 Chain.TESTNET -> electrumTestnetConfigurations.random()
                 Chain.REGTEST -> platformElectrumRegtestConf()

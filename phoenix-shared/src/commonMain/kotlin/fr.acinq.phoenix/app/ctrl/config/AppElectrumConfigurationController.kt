@@ -1,14 +1,13 @@
 package fr.acinq.phoenix.app.ctrl.config
 
-import fr.acinq.bitcoin.KeyPath
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
+import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.InvalidElectrumAddress
-import fr.acinq.phoenix.utils.TAG_IS_MAINNET
 import fr.acinq.phoenix.utils.TAG_MASTER_PUBKEY_PATH
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
@@ -19,7 +18,7 @@ import org.kodein.di.instance
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(di, ElectrumConfiguration.Model()) {
     private val configurationManager: AppConfigurationManager by instance()
-    private val isMainnet: Boolean by instance(tag = TAG_IS_MAINNET)
+    private val chain: Chain by instance()
     private val masterPubkeyPath: String by instance(tag = TAG_MASTER_PUBKEY_PATH)
     private val walletManager: WalletManager by instance()
     private val electrumClient: ElectrumClient by instance()
@@ -81,7 +80,7 @@ class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfigu
                         error = error
                     )
                 } else {
-                    val xpub = wallet.masterPublicKey(masterPubkeyPath, isMainnet)
+                    val xpub = wallet.masterPublicKey(masterPubkeyPath, chain == Chain.MAINNET)
 
                     ElectrumConfiguration.Model(
                         walletIsInitialized = true,

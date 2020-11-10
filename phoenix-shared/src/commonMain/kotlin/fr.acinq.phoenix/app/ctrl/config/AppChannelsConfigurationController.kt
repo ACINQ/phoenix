@@ -25,6 +25,7 @@ class AppChannelsConfigurationController(di: DI) : AppController<ChannelsConfigu
 
     private val peer: Peer by instance()
     private val appConfig: AppConfigurationManager by instance()
+    private val chain: Chain by instance()
 
     private val json = Json {
         prettyPrint = true
@@ -46,7 +47,7 @@ class AppChannelsConfigurationController(di: DI) : AppController<ChannelsConfigu
                                 state.localCommitmentSpec?.let { it.toLocal.truncateToSatoshi().toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong() },
                                 json.encodeToString(ChannelState.serializer(), state),
                                 if (state is ChannelStateWithCommitments) {
-                                    val prefix = when (appConfig.getAppConfiguration().chain) {
+                                    val prefix = when (chain) {
                                         Chain.MAINNET -> ""
                                         Chain.TESTNET -> "testnet/"
                                         Chain.REGTEST -> "_REGTEST_/"

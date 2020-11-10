@@ -78,7 +78,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                             Transaction(
                                 id = it.payment.paymentId.toString(),
                                 amountSat = -it.payment.paymentAmount.toLong(), // storing value in MilliSatoshi
-                                desc = it.reason.name,
+                                desc = it.reason.message(),
                                 status = Transaction.Status.Failure,
                                 timestamp = currentTimestampMillis()
                             )

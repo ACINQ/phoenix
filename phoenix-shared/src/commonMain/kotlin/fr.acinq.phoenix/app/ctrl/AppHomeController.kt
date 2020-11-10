@@ -67,14 +67,6 @@ class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Hom
         }
     }
 
-    override fun process(intent: Home.Intent) {
-        when (intent) {
-            is Home.Intent.Connect -> {
-                launch {
-                    peer.connect("localhost", 48001) // TODO: Only for demo
-                }
-            }
-        }
-    }
+    override fun process(intent: Home.Intent) {}
 
 }

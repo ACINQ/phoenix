@@ -36,12 +36,13 @@ val electrumMainnetConfigurations = listOf(
 )
 
 val electrumTestnetConfigurations = listOf(
-    ElectrumConf(host = "hsmithsxurybd7uh.onion", sslPort= 53012, tcpPort=53011),
-    ElectrumConf(host = "testnet.hsmiths.com", sslPort= 53012, tcpPort=53011),
-    ElectrumConf(host = "testnet.qtornado.com", sslPort= 51002, tcpPort=51001),
-    ElectrumConf(host = "testnet1.bauerj.eu"),
-    ElectrumConf(host = "tn.not.fyi", sslPort= 55002, tcpPort=55001),
-    ElectrumConf(host = "bitcoin.cluelessperson.com", sslPort= 51002, tcpPort=51001)
+//    ElectrumConf(host = "hsmithsxurybd7uh.onion", sslPort= 53012, tcpPort=53011),
+//    ElectrumConf(host = "testnet.hsmiths.com", sslPort= 53012, tcpPort=53011),
+//    ElectrumConf(host = "testnet.qtornado.com", sslPort= 51002, tcpPort=51001),
+//    ElectrumConf(host = "testnet1.bauerj.eu"),
+//    ElectrumConf(host = "tn.not.fyi", sslPort= 55002, tcpPort=55001),
+//    ElectrumConf(host = "bitcoin.cluelessperson.com", sslPort= 51002, tcpPort=51001),
+    ElectrumConf(host = "testnet1.electrum.acinq.co", sslPort= 51002, tcpPort=51001),
 )
 
 expect fun platformElectrumRegtestConf(): ElectrumConf

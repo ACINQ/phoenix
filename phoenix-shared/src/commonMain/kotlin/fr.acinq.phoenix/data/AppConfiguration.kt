@@ -10,16 +10,14 @@ import kotlin.math.roundToLong
 
 @Serializable
 data class AppConfiguration(
-    // Unique ID a their is only one configuration per app
-    override val id: Int = 0,
-    // Global
-    val chain: Chain = Chain.REGTEST,
     // Display
     val fiatCurrency: FiatCurrency = FiatCurrency.USD,
     val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
     val appTheme: AppTheme = AppTheme.System
-) : Metadata
-
+) : Metadata {
+    // Unique ID a their is only one configuration per app
+    override val id: Int get() = 0
+}
 
 enum class Chain { MAINNET, TESTNET, REGTEST }
 

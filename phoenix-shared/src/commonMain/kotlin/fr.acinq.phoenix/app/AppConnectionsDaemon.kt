@@ -1,11 +1,12 @@
 package fr.acinq.phoenix.app
 
+import fr.acinq.eclair.NodeUri
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.TAG_ACINQ_ADDRESS
+import fr.acinq.phoenix.utils.TAG_ACINQ_NODE_URI
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -30,6 +31,7 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
     private val monitor: NetworkMonitor by instance()
     private val peer: Peer by instance()
     private val electrumClient: ElectrumClient by instance()
+    val acinqNodeUri: NodeUri by instance(tag = TAG_ACINQ_NODE_URI)
 
     private val logger = direct.instance<LoggerFactory>().newLogger(AppConnectionsDaemon::class)
 
@@ -84,7 +86,7 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
                 when {
                     it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
                         peerConnectionJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
-                            peer.connect(direct.instance(tag = TAG_ACINQ_ADDRESS), 48001)
+                            peer.connect(acinqNodeUri.host, acinqNodeUri.port)
                         }
                     }
                     else -> {
