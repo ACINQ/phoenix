@@ -565,10 +565,10 @@
   <string name="paymentsettings_trampoline_fees_title">Frais max pour les paiements Lightning sortants</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
   <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Outrepasser les frais max de référence</string>
-  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Frais de base (en satoshi)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Frais de base (satoshi)</string>
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Saisissez une valeur en satoshis</string>
-  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Frais en proportion (en pourcentage)</string>
-  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Saisissez une valeur en pourcent</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Frais proportionnels (%)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Saisissez une valeur en %</string>
 
   <!-- ftue -->
 
