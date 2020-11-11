@@ -16,21 +16,22 @@
 
 package fr.acinq.phoenix.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Base64
 import androidx.preference.PreferenceManager
-import fr.acinq.eclair.CoinUnit
-import fr.acinq.eclair.SatUnit
-import fr.acinq.eclair.WatchListener
-import fr.acinq.eclair.`CoinUtils$`
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.eclair.*
+import fr.acinq.phoenix.TrampolineFeeSetting
+import org.json.JSONObject
+import org.slf4j.LoggerFactory
 
 object Prefs {
+  val log = LoggerFactory.getLogger(this::class.java)
 
   private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
-
-  private const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
-  private const val PREFS_IS_FIRST_TIME: String = "PREFS_IS_FIRST_TIME"
+  const val PREFS_MNEMONICS_SEEN_TIMESTAMP: String = "PREFS_MNEMONICS_SEEN_TIMESTAMP"
+  private const val PREFS_SHOW_FTUE: String = "PREFS_SHOW_FTUE"
 
   // -- unit, fiat, conversion...
   const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
@@ -38,12 +39,23 @@ object Prefs {
   const val PREFS_COIN_UNIT: String = "PREFS_COIN_UNIT"
   private const val PREFS_EXCHANGE_RATE_TIMESTAMP: String = "PREFS_EXCHANGE_RATES_TIMESTAMP"
   private const val PREFS_EXCHANGE_RATE_PREFIX: String = "PREFS_EXCHANGE_RATE_"
+  const val PREFS_EXPLORER: String = "PREFS_EXPLORER"
+  private const val PREFS_LAST_KNOWN_WALLET_CONTEXT: String = "PREFS_LAST_KNOWN_WALLET_CONTEXT"
 
   // -- authentication with PIN/biometrics
+  const val PREFS_SCREEN_LOCK: String = "PREFS_SCREEN_LOCK_ENABLED"
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_IS_SEED_ENCRYPTED: String = "PREFS_IS_SEED_ENCRYPTED"
-  private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
-  private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   private const val PREFS_USE_BIOMETRICS: String = "PREFS_USE_BIOMETRICS"
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  private const val PREFS_ENCRYPTED_PIN: String = "PREFS_ENCRYPTED_PIN"
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  private const val PREFS_ENCRYPTED_PIN_IV: String = "PREFS_ENCRYPTED_PIN_IV"
 
   // -- background channels watcher
   private const val PREFS_WATCHER_LAST_ATTEMPT_OUTCOME: String = "PREFS_WATCHER_LAST_ATTEMPT_OUTCOME"
@@ -54,61 +66,55 @@ object Prefs {
   const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
   const val PREFS_TRAMPOLINE_MAX_FEE_INDEX = "PREFS_TRAMPOLINE_MAX_FEE_INDEX"
 
+  // -- payment configuration
+  const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
+  const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
+  const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
+  const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
+
+  // -- migration
+  const val PREFS_MIGRATED_FROM = "PREFS_MIGRATED_FROM"
+
   // -- other
   const val PREFS_THEME: String = "PREFS_THEME"
   const val PREFS_TOR_ENABLED: String = "PREFS_TOR_ENABLED"
   const val PREFS_SCRAMBLE_PIN: String = "PREFS_SCRAMBLE_PIN"
-
-  fun getLastVersionUsed(context: Context): Int {
-    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
-  }
-
-  fun setLastVersionUsed(context: Context, version: Int) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
-  }
-
-  fun isFirstTime(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_FIRST_TIME, true)
-  }
-
-  fun setHasStartedOnce(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_FIRST_TIME, false).apply()
-  }
+  const val PREFS_FCM_TOKEN: String = "PREFS_FCM_TOKEN"
+  const val PREFS_SHOW_BALANCE_HOME: String = "PREFS_SHOW_BALANCE_HOME"
 
   // -- ==================================
   // -- authentication with PIN/biometrics
   // -- ==================================
 
-  fun getIsSeedEncrypted(context: Context): Boolean {
+  fun isScreenLocked(context: Context): Boolean = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCREEN_LOCK, false)
+
+  fun saveScreenLocked(context: Context, isLocked: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCREEN_LOCK, isLocked).apply()
+  }
+
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  fun isSeedEncrypted(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_IS_SEED_ENCRYPTED, false)
   }
 
-  fun setIsSeedEncrypted(context: Context) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, true).apply()
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
+  fun setIsSeedEncrypted(context: Context, isEncrypted: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_IS_SEED_ENCRYPTED, isEncrypted).apply()
   }
 
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun useBiometrics(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_USE_BIOMETRICS, false)
   }
 
-  fun useBiometrics(context: Context, useBiometrics: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_USE_BIOMETRICS, useBiometrics).apply()
-  }
-
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun getEncryptedPIN(context: Context): ByteArray? {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN, null)?.let { Base64.decode(it, Base64.DEFAULT) }
   }
 
-  fun saveEncryptedPIN(context: Context, encryptedPIN: ByteArray) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN, Base64.encodeToString(encryptedPIN, Base64.DEFAULT)).apply()
-  }
-
+  @Deprecated("only useful for EncryptedSeed.V1 access control system")
   fun getEncryptedPINIV(context: Context): ByteArray? {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_ENCRYPTED_PIN_IV, null)?.let { Base64.decode(it, Base64.DEFAULT) }
-  }
-
-  fun saveEncryptedPINIV(context: Context, iv: ByteArray) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_ENCRYPTED_PIN_IV, Base64.encodeToString(iv, Base64.DEFAULT)).apply()
   }
 
   // -- ==================================
@@ -122,6 +128,8 @@ object Prefs {
   fun getMnemonicsSeenTimestamp(context: Context): Long {
     return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, 0)
   }
+
+  fun isBackupDone(context: Context): Boolean = getMnemonicsSeenTimestamp(context) > 0
 
   fun setMnemonicsSeenTimestamp(context: Context, timestamp: Long) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_MNEMONICS_SEEN_TIMESTAMP, timestamp).apply()
@@ -143,20 +151,12 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_EXCHANGE_RATE_TIMESTAMP, timestamp).apply()
   }
 
-  fun getShowAmountInFiat(prefs: SharedPreferences): Boolean {
-    return prefs.getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
-  }
-
   fun getShowAmountInFiat(context: Context): Boolean {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
   }
 
   fun setShowAmountInFiat(context: Context, amountInFiat: Boolean) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, amountInFiat).apply()
-  }
-
-  fun getFiatCurrency(prefs: SharedPreferences): String {
-    return prefs.getString(PREFS_FIAT_CURRENCY, "USD") ?: "USD"
   }
 
   fun getFiatCurrency(context: Context): String {
@@ -167,8 +167,68 @@ object Prefs {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FIAT_CURRENCY, code.toUpperCase()).apply()
   }
 
+  fun getExplorer(context: Context?): String {
+    val pref = context?.let { PreferenceManager.getDefaultSharedPreferences(it).getString(PREFS_EXPLORER, null) }
+    return when {
+      "Blockstream.info".equals(pref, ignoreCase = true) -> Constants.BLOCKSTREAM_EXPLORER_URL
+      else -> Constants.MEMPOOLSPACE_EXPLORER_URL
+    }
+  }
+
+  fun getLastKnownWalletContext(context: Context): JSONObject? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_LAST_KNOWN_WALLET_CONTEXT, null)?.run {
+      try {
+        JSONObject(this)
+      } catch (e: Exception) {
+        log.debug("could not read wallet context json from preferences")
+        null
+      }
+    }
+  }
+
+  fun saveWalletContext(context: Context, json: JSONObject) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_LAST_KNOWN_WALLET_CONTEXT, json.toString()).apply()
+  }
+
+  // -- ==================================
+  // -- version, ftue, migration...
+  // -- ==================================
+
+  fun getLastVersionUsed(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_LAST_VERSION_USED, 0)
+  }
+
+  fun setLastVersionUsed(context: Context, version: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
+  }
+
+  fun showFTUE(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_FTUE, true)
+  }
+
+  fun setShowFTUE(context: Context, show: Boolean) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SHOW_FTUE, show).apply()
+  }
+
+  fun getMigratedFrom(context: Context): Int {
+    return PreferenceManager.getDefaultSharedPreferences(context).getInt(PREFS_MIGRATED_FROM, 0)
+  }
+
+  @SuppressLint("ApplySharedPref")
+  fun setMigratedFrom(context: Context, code: Int) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(PREFS_MIGRATED_FROM, code).commit()
+  }
+
+  // -- ==================================
+  // -- other...
+  // -- ==================================
+
   fun getTheme(context: Context): String {
     return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_THEME, ThemeHelper.default) ?: ThemeHelper.default
+  }
+
+  fun showBalanceHome(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SHOW_BALANCE_HOME, true)
   }
 
   fun getWatcherLastAttemptOutcome(context: Context): Pair<WatchListener.WatchResult?, Long> {
@@ -226,7 +286,53 @@ object Prefs {
     return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_SCRAMBLE_PIN, false)
   }
 
-  fun savePinScrambled(context: Context, isScrambled: Boolean) {
-    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_SCRAMBLE_PIN, isScrambled).apply()
+  fun getFCMToken(context: Context): String? {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_FCM_TOKEN, null)
+  }
+
+  fun saveFCMToken(context: Context, token: String) {
+    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_FCM_TOKEN, token).apply()
+  }
+
+  fun getDefaultPaymentDescription(context: Context): String {
+    return PreferenceManager.getDefaultSharedPreferences(context).getString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, null) ?: ""
+  }
+
+  fun setDefaultPaymentDescription(context: Context, value: String) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, value).apply()
+  }
+
+  fun getAutoAcceptPayToOpen(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, true)
+  }
+
+  fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, value).apply()
+  }
+
+  fun getMaxTrampolineCustomFee(context: Context): TrampolineFeeSetting? {
+    PreferenceManager.getDefaultSharedPreferences(context).run {
+      val baseFee = getLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, -1)
+      val proportionalFee = getLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, -1)
+      return if (baseFee < 0L || proportionalFee < 0L) {
+        null
+      } else {
+        TrampolineFeeSetting(Satoshi(baseFee), proportionalFee, CltvExpiryDelta(576))
+      }
+    }
+  }
+
+  fun setMaxTrampolineCustomFee(context: Context, base: Satoshi, proportional: Long) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .putLong(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE, base.toLong())
+      .putLong(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE, proportional)
+      .apply()
+  }
+
+  fun removeMaxTrampolineCustomFee(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit()
+      .remove(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE)
+      .remove(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE)
+      .commit()
   }
 }

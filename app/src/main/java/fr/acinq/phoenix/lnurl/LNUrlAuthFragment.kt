@@ -22,7 +22,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.ByteVector32
@@ -31,12 +35,11 @@ import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.Protocol
 import fr.acinq.eclair.crypto.`Mac32$`
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentLnurlAuthBinding
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.KitNotInitialized
-import fr.acinq.phoenix.utils.tryWith
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -49,13 +52,14 @@ import scodec.bits.ByteVector
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.nio.ByteOrder
+import java.util.*
 
 class LNUrlAuthFragment : BaseFragment() {
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentLnurlAuthBinding
-  private lateinit var model: LNUrlAuthViewModel
   private val args: LNUrlAuthFragmentArgs by navArgs()
+  private lateinit var model: LNUrlAuthViewModel
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentLnurlAuthBinding.inflate(inflater, container, false)
@@ -65,14 +69,19 @@ class LNUrlAuthFragment : BaseFragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    model = ViewModelProvider(this).get(LNUrlAuthViewModel::class.java)
-    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, args.url.host))
-    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, args.url.host)))
+    val url = try {
+      HttpUrl.parse(args.url.url)!!
+    } catch (e: Exception) {
+      log.error("could not parse url=${args.url.url}: ", e)
+      findNavController().popBackStack()
+      return
+    }
+    model = ViewModelProvider(this, LNUrlAuthViewModel.Factory(url)).get(LNUrlAuthViewModel::class.java)
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
-            is LNUrlRemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, args.url.host)
+            is LNUrlRemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
             is LNUrlRemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
             is LNUrlRemoteFailure.Code -> "HTTP ${state.cause.code}"
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
@@ -87,26 +96,27 @@ class LNUrlAuthFragment : BaseFragment() {
         else -> Unit
       }
     })
+    mBinding.instructions.text = Converter.html(getString(R.string.lnurl_auth_instructions, model.domainToSignIn))
+    mBinding.progress.setText(Converter.html(getString(R.string.lnurl_auth_in_progress, model.domainToSignIn)))
     mBinding.model = model
   }
 
   override fun onStart() {
     super.onStart()
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.loginButton.setOnClickListener { requestAuth() }
   }
 
   @UiThread
   private fun requestAuth() {
     lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.error("error in lnurl auth request to ${args.url.authEndpoint}: ", e)
+      log.error("error in lnurl auth request to ${args.url.url}: ", e)
       model.state.postValue(LNUrlAuthState.Error(e))
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
-      val url = tryWith(InvalidAuthEndpoint) { HttpUrl.parse(args.url.authEndpoint)!! }
-      val key = getAuthLinkingKey(url.host())
+      val key = getAuthLinkingKey(model.domainToSignIn)
       val signedK1 = Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(args.url.k1).bytes(), key)).toHex()
-      val request = Request.Builder().url(url.newBuilder()
+      val request = Request.Builder().url(model.url.newBuilder()
         .addQueryParameter("sig", signedK1)
         .addQueryParameter("key", key.publicKey().toString())
         .build())
@@ -122,7 +132,7 @@ class LNUrlAuthFragment : BaseFragment() {
       // if no failure, let's try to map to a pertinent state, with a fallback to Done.Authed
       delay(500)
       model.state.postValue(if (json.has("event")) {
-        when (json.getString("event").toLowerCase()) {
+        when (json.getString("event").toLowerCase(Locale.ROOT)) {
           "registered" -> LNUrlAuthState.Done.Registered
           "loggedin" -> LNUrlAuthState.Done.LoggedIn
           "linked" -> LNUrlAuthState.Done.Linked
@@ -152,12 +162,10 @@ class LNUrlAuthFragment : BaseFragment() {
       // 2 - build key that will be used to link with service
       DeterministicWallet.derivePrivateKey(key, path).privateKey()
     } else {
-      throw KitNotInitialized()
+      throw KitNotInitialized
     }
   }
 }
-
-private object InvalidAuthEndpoint : RuntimeException()
 
 sealed class LNUrlAuthState {
   object Init : LNUrlAuthState()
@@ -172,11 +180,22 @@ sealed class LNUrlAuthState {
   data class Error(val cause: Throwable) : LNUrlAuthState()
 }
 
-class LNUrlAuthViewModel : ViewModel() {
+class LNUrlAuthViewModel(val url: HttpUrl) : ViewModel() {
   private val log = LoggerFactory.getLogger(this::class.java)
-  val state = MutableLiveData<LNUrlAuthState>()
+  val state = MutableLiveData<LNUrlAuthState>(LNUrlAuthState.Init)
 
-  init {
-    state.value = LNUrlAuthState.Init
+  /**
+   * The domain used for the signing key is the effective top level domain + 1, or the host
+   * if null (e.g. localhost...). It's better to use eTLD + 1 because the service's lnurl
+   * (including sub domains) can change which would in turn change the signing key, i.e lock
+   * users out of their accounts.
+   */
+  val domainToSignIn: String = url.topPrivateDomain() ?: url.host()
+
+  class Factory(private val url: HttpUrl) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+      return LNUrlAuthViewModel(url) as T
+    }
   }
 }

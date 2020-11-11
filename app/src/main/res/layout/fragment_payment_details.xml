@@ -71,15 +71,16 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_margin="@dimen/space_lg"
-          android:drawableTop="@drawable/ic_alert_triangle"
           android:text="@string/paymentdetails_error"
           android:textAlignment="center"
           android:visibility="@{model.state instanceof PaymentDetailsState.Error}"
+          app:drawableTopCompat="@drawable/ic_alert_triangle"
           app:layout_constrainedWidth="true"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent" />
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintWidth_max="@dimen/max_width_sm" />
 
         <TextView
           android:layout_width="wrap_content"
@@ -165,64 +166,163 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/bottom_section"
-          android:layout_width="match_parent"
-          android:layout_height="0dp"
-          android:padding="@dimen/space_lg"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:paddingTop="@dimen/space_lg"
+          android:paddingBottom="@dimen/space_lg"
+          android:paddingStart="@dimen/space_md"
+          android:paddingEnd="@dimen/space_md"
           android:visibility="invisible"
-          app:layout_constraintTop_toBottomOf="@id/mid_section">
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/mid_section"
+          app:layout_constraintWidth_default="spread"
+          app:layout_constraintWidth_max="@dimen/max_width_md">
+
+          <TextView
+            android:id="@+id/onchain_address_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_address_label"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBaseline_toBaselineOf="@id/onchain_address_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/onchain_address_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:singleLine="true"
+            android:ellipsize="none"
+            android:textIsSelectable="true"
+            android:text="@{model.onchainAddress}"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/onchain_address_label"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <fr.acinq.phoenix.utils.customviews.ButtonView
+            android:id="@+id/onchain_address_explorer_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{(model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut || model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing || model.state instanceof PaymentDetailsState.Incoming.Received.SwapIn) &amp;&amp; model.onchainAddress != null}"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:background="@drawable/button_bg_no_border"
+            android:padding="@dimen/space_xxs"
+            app:icon="@drawable/ic_chain"
+            app:icon_size="14dp"
+            app:icon_tint="?attr/mutedTextColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/onchain_address_label"
+            app:layout_constraintTop_toBottomOf="@id/onchain_address_value"
+            app:spacer_size="@dimen/space_xxs"
+            app:text="@string/paymentdetails_address_open_explorer"
+            app:text_color="?attr/mutedTextColor"
+            app:text_size="@dimen/text_md" />
 
           <TextView
             android:id="@+id/destination_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
-            android:text="@string/paymentdetails_destination_label"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut ? @string/paymentdetails_relayer_label : @string/paymentdetails_destination_label}"
+            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
             android:textAlignment="viewEnd"
-            app:layout_constraintBaseline_toBaselineOf="@id/destination_value"
+            app:layout_constraintBaseline_toBaselineOf="@id/destination_pubkey"
             app:layout_constraintStart_toStartOf="parent" />
 
           <TextView
-            android:id="@+id/destination_value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_xs"
-            android:ellipsize="none"
-            android:singleLine="true"
-            android:text="@{model.destination}"
-            android:textIsSelectable="true"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/destination_label"
-            app:layout_constraintTop_toTopOf="parent" />
-
-          <TextView
-            android:id="@+id/desc_label"
-            style="@style/MutedLabelView"
-            android:layout_width="60dp"
-            android:text="@string/paymentdetails_desc_label"
-            android:textAlignment="viewEnd"
-            app:layout_constraintBaseline_toBaselineOf="@id/desc_value"
-            app:layout_constraintStart_toStartOf="parent" />
-
-          <TextView
-            android:id="@+id/desc_value"
+            android:id="@+id/destination_pubkey"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
-            android:textIsSelectable="true"
-            app:layout_constrainedHeight="true"
-            app:layout_constrainedWidth="true"
+            android:singleLine="true"
+            android:text="@{model.pubkey}"
+            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/destination_label"
+            app:layout_constraintTop_toBottomOf="@id/onchain_address_explorer_button" />
+
+          <TextView
+            android:id="@+id/desc_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_desc_label"
+            android:textAlignment="viewEnd"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/desc_layout" />
+
+          <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/desc_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/desc_label"
-            app:layout_constraintTop_toBottomOf="@id/destination_value" />
+            app:layout_constraintTop_toBottomOf="@id/destination_pubkey"
+            app:layout_constraintWidth_default="spread">
+
+            <TextView
+              android:id="@+id/desc_value"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:visibility="@{model.description != null || model.paymentMeta.custom_desc == null}"
+              android:text="@{model.description == null ? @string/paymentdetails_no_description : model.description}"
+              app:isItalic="@{model.description == null}"
+              app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+              android:id="@+id/desc_separator"
+              style="@style/HSeparator"
+              android:layout_marginTop="@dimen/space_xs"
+              android:visibility="@{model.paymentMeta.custom_desc != null &amp;&amp; model.description != null}"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toBottomOf="@id/desc_value" />
+
+            <TextView
+              android:id="@+id/custom_desc_value"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="@dimen/space_xs"
+              android:clickable="true"
+              android:visibility="@{model.paymentMeta.custom_desc != null}"
+              android:text="@{model.paymentMeta.custom_desc}"
+              android:focusable="true"
+              app:layout_constraintTop_toBottomOf="@id/desc_separator"
+              app:layout_goneMarginTop="0dp" />
+
+          </androidx.constraintlayout.widget.ConstraintLayout>
+
+          <fr.acinq.phoenix.utils.customviews.ButtonView
+            android:id="@+id/custom_desc_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_no_border"
+            android:padding="@dimen/space_xxs"
+            android:layout_marginStart="@dimen/space_xxxs"
+            app:icon="@drawable/ic_text"
+            app:icon_size="14dp"
+            app:icon_tint="?attr/mutedTextColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/desc_label"
+            app:layout_constraintTop_toBottomOf="@id/desc_layout"
+            app:spacer_size="@dimen/space_xxs"
+            app:text="@string/paymentdetails_desc_custom_title"
+            app:text_color="?attr/mutedTextColor"
+            app:text_size="@dimen/text_md" />
 
           <TextView
             android:id="@+id/fees_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
+            android:layout_width="@dimen/details_label_width"
+            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent}"
             android:text="@string/paymentdetails_fees_label"
             android:textAlignment="viewEnd"
             app:layout_constraintBaseline_toBaselineOf="@id/fees_value"
@@ -234,20 +334,62 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
+            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Sent}"
             app:amount_size="@dimen/text_lg"
             app:layout_constrainedHeight="true"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/fees_label"
-            app:layout_constraintTop_toBottomOf="@id/desc_value"
+            app:layout_constraintTop_toBottomOf="@id/custom_desc_button"
             app:thin="false"
             app:unit_size="@dimen/text_md" />
 
           <TextView
+            android:id="@+id/pay_to_open_fees_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_pay_to_open_label"
+            android:textAlignment="viewEnd"
+            android:visibility="@{model.payToOpenMeta != null}"
+            app:layout_constraintBaseline_toBaselineOf="@id/pay_to_open_fees_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <fr.acinq.phoenix.utils.customviews.CoinView
+            android:id="@+id/pay_to_open_fees_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:visibility="@{model.payToOpenMeta != null}"
+            app:amount_size="@dimen/text_lg"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/pay_to_open_fees_label"
+            app:layout_constraintTop_toBottomOf="@id/fees_value"
+            app:thin="false"
+            app:unit_size="@dimen/text_md" />
+
+          <TextView
+            android:id="@+id/pay_to_open_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{model.payToOpenMeta != null}"
+            android:textSize="@dimen/text_md"
+            android:textColor="?attr/mutedTextColor"
+            android:text="@string/paymentdetails_pay_to_open_desc"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@id/pay_to_open_fees_value"
+            app:layout_constraintTop_toBottomOf="@id/pay_to_open_fees_value" />
+
+          <TextView
             android:id="@+id/error_label"
             style="@style/MutedLabelView"
-            android:layout_width="60dp"
+            android:layout_width="@dimen/details_label_width"
             android:text="@string/paymentdetails_error_label"
             android:textAlignment="viewEnd"
             android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing.Failed}"
@@ -256,7 +398,7 @@
 
           <TextView
             android:id="@+id/error_value"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
@@ -266,7 +408,68 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/error_label"
-            app:layout_constraintTop_toBottomOf="@id/fees_value" />
+            app:layout_constraintTop_toBottomOf="@id/pay_to_open_desc" />
+
+          <fr.acinq.phoenix.utils.customviews.ButtonView
+            android:id="@+id/error_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:layout_marginStart="@dimen/space_xxs"
+            android:visibility="@{model.showFailedOutgoingPaymentAction}"
+            android:background="@drawable/button_bg_no_border"
+            android:padding="@dimen/space_xxs"
+            app:icon="@drawable/ic_edit"
+            app:icon_size="14dp"
+            app:icon_tint="?attr/mutedTextColor"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/error_label"
+            app:layout_constraintTop_toBottomOf="@id/error_value"
+            app:spacer_size="@dimen/space_xxs"
+            app:text="@string/utils_unknown"
+            app:text_color="?attr/mutedTextColor"
+            app:text_size="@dimen/text_md" />
+
+          <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded"
+            android:backgroundTint="?attr/mutedBgColor"
+            android:visibility="gone"
+            android:padding="@dimen/space_sm"
+            android:layout_marginTop="@dimen/space_lg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/error_action">
+
+            <ImageView
+              android:id="@+id/info_icon"
+              android:layout_width="@dimen/button_height"
+              android:layout_height="@dimen/button_height"
+              android:contentDescription="@null"
+              android:layout_marginTop="@dimen/space_xs"
+              android:src="@drawable/ic_info"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent"
+              app:tint="?attr/onMutedBgTextColor" />
+
+            <TextView
+              android:id="@+id/info_body"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="@dimen/space_xs"
+              android:textSize="@dimen/text_md"
+              android:textIsSelectable="true"
+              android:textColor="?attr/onMutedBgTextColor"
+              app:layout_constrainedWidth="true"
+              app:layout_constraintEnd_toEndOf="parent"
+              app:layout_constraintStart_toEndOf="@id/info_icon"
+              app:layout_constraintTop_toTopOf="parent" />
+
+          </androidx.constraintlayout.widget.ConstraintLayout>
 
           <fr.acinq.phoenix.utils.customviews.ButtonView
             android:id="@+id/show_technicals_button"
@@ -277,7 +480,7 @@
             app:icon_tint="?attr/mutedTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/error_value"
+            app:layout_constraintTop_toBottomOf="@id/info_layout"
             app:text="@string/paymentdetails_technicals_button"
             app:text_color="?attr/mutedTextColor"
             app:text_size="@dimen/text_md" />

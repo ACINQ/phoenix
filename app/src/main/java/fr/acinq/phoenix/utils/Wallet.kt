@@ -19,9 +19,11 @@ package fr.acinq.phoenix.utils
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.WorkerThread
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import fr.acinq.bitcoin.Base58
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.DeterministicWallet
@@ -29,14 +31,18 @@ import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
-import fr.acinq.phoenix.Xpub
+import fr.acinq.phoenix.background.Xpub
 import fr.acinq.phoenix.lnurl.LNUrl
+import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
+import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 import java.util.*
+
 
 object Wallet {
 
@@ -45,20 +51,12 @@ object Wallet {
   val ACINQ: NodeURI = NodeURI.parse("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@node.acinq.co:9735")
   val httpClient = OkHttpClient()
 
-  // ------------------------ DATADIR & FILES
-
   private const val ECLAIR_BASE_DATADIR = "node-data"
-  private const val SEED_FILE = "seed.dat"
+  internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
-  private const val NETWORK_DB_FILE = "network.sqlite"
-  private const val WALLET_DB_FILE = "wallet.sqlite"
 
   fun getDatadir(context: Context): File {
     return File(context.filesDir, ECLAIR_BASE_DATADIR)
-  }
-
-  fun getSeedFile(context: Context): File {
-    return File(getDatadir(context), SEED_FILE)
   }
 
   fun getChainDatadir(context: Context): File {
@@ -69,14 +67,18 @@ object Wallet {
     return File(getChainDatadir(context), ECLAIR_DB_FILE)
   }
 
-  fun getNetworkDBFile(context: Context): File {
-    return File(getChainDatadir(context), NETWORK_DB_FILE)
+  fun hasWalletBeenSetup(context: Context): Boolean {
+    return SeedManager.getSeedFromDir(getDatadir(context)) != null
   }
 
   fun isMainnet(): Boolean = "mainnet" == BuildConfig.CHAIN
 
   fun getChainHash(): ByteVector32 {
     return if (isMainnet()) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
+  }
+
+  fun getScriptHashVersion(): Byte {
+    return if (isMainnet()) Base58.`Prefix$`.`MODULE$`.ScriptAddress() else Base58.`Prefix$`.`MODULE$`.ScriptAddressTestnet()
   }
 
   fun buildAddress(master: DeterministicWallet.ExtendedPrivateKey): SingleAddressEclairWallet {
@@ -122,17 +124,28 @@ object Wallet {
    */
   fun parseLNObject(input: String): Any {
     return try {
-      PaymentRequest.read(input.apply {
-        if (startsWith("lightning://", true)) drop(12)
-        else if (startsWith("lightning:", true)) drop(10)
-      })
+      when {
+        input.startsWith("lightning://", true) -> input.drop(12)
+        input.startsWith("lightning:", true) -> input.drop(10)
+        else -> input
+      }.run { PaymentRequest.read(this) }
     } catch (e1: Exception) {
       try {
         BitcoinURI(input)
       } catch (e2: Exception) {
         try {
-          // this can take some time since a HTTP request may be done
-          LNUrl.extractLNUrl(input)
+          when {
+            input.startsWith("lightning://", true) -> input.drop(12)
+            input.startsWith("lightning:", true) -> input.drop(10)
+            else -> {
+              val uri = URI(input)
+              if (uri.scheme != null) {
+                uri.getParams()["lightning"] ?: throw RuntimeException("not a valid LNURL fallback scheme")
+              } else {
+                input
+              }
+            }
+          }.run { LNUrl.extractLNUrl(this) }
         } catch (e3: Exception) {
           log.debug("unhandled input=$input")
           log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
@@ -201,4 +214,17 @@ object Wallet {
   }
 
   fun HostAndPort.isOnion() = this.host.endsWith(".onion")
+
+  /** Execute a (blocking) HTTP GET on the given url, expecting a JSON response. Will throw an exception if the query fails, or if the response is invalid/not JSON. */
+  @WorkerThread
+  suspend fun OkHttpClient.simpleExecute(url: String, isSilent: Boolean = false, callback: (json: JSONObject) -> Unit) {
+    newCall(okhttp3.Request.Builder().url(url).build()).execute().run {
+      val body = body()
+      if (isSuccessful && body != null) {
+        callback(JSONObject(body.string())).also { body.close() }
+      } else if (!isSilent) {
+        throw RuntimeException("invalid response (code=${code()}) for url=$url")
+      }
+    }
+  }
 }

@@ -47,19 +47,19 @@
     android:id="@+id/global_action_any_to_send"
     app:destination="@id/send_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to read input -->
   <action
     android:id="@+id/global_action_any_to_read_input"
     app:destination="@id/read_input"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to payment details page -->
   <action
     android:id="@+id/global_action_any_to_payment_details"
     app:destination="@id/nav_graph_payment_details"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment">
+    app:popUpTo="@id/main_fragment">
     <argument
       android:name="direction"
       app:argType="string" />
@@ -76,19 +76,19 @@
     android:id="@+id/global_action_any_to_electrum"
     app:destination="@id/electrum_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to tor settings -->
   <action
     android:id="@+id/global_action_any_to_tor"
     app:destination="@id/tor_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
   <!-- global to global settings -->
   <action
     android:id="@+id/global_action_any_to_settings"
     app:destination="@id/settings_fragment"
     app:launchSingleTop="true"
-    app:popUpTo="@+id/main_fragment" />
+    app:popUpTo="@id/main_fragment" />
 
   <!-- main fragment -->
   <fragment
@@ -111,8 +111,8 @@
       android:id="@+id/action_main_to_display_seed"
       app:destination="@id/display_seed" />
     <action
-      android:id="@+id/action_main_to_seed_security"
-      app:destination="@id/seed_security" />
+      android:id="@+id/action_main_to_access_control"
+      app:destination="@id/access_control" />
     <action
       android:id="@+id/action_main_to_connectivity"
       app:destination="@id/connectivity_dialog" />
@@ -123,6 +123,11 @@
     android:id="@+id/init_wallet_fragment"
     android:name="fr.acinq.phoenix.initwallet.InitWalletFragment"
     android:label="InitSeedFragment">
+    <action
+      android:id="@+id/action_init_wallet_to_ftue"
+      app:destination="@id/ftue_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left" />
     <action
       android:id="@+id/action_init_wallet_to_restore"
       app:destination="@id/restore_seed_fragment"
@@ -154,11 +159,16 @@
     android:label="StartupFragment">
     <action
       android:id="@+id/action_startup_to_main"
-      app:destination="@+id/main_fragment"
+      app:destination="@id/main_fragment"
       app:enterAnim="@anim/slide_up"
       app:exitAnim="@anim/fade_out"
       app:launchSingleTop="true"
       app:popUpTo="@id/main_fragment" />
+    <action
+      android:id="@+id/action_startup_to_patch_note"
+      app:destination="@id/patch_notes"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/slide_down" />
   </fragment>
 
   <!-- receive money -->
@@ -195,7 +205,7 @@
       app:argType="string" />
     <action
       android:id="@+id/action_receive_with_open_to_main"
-      app:destination="@+id/main_fragment" />
+      app:destination="@id/main_fragment" />
     <argument
       android:name="expireAt"
       app:argType="long" />
@@ -209,7 +219,7 @@
     <action
       android:id="@+id/action_send_to_main"
       app:destination="@id/main_fragment"
-      app:popUpTo="@+id/main_fragment"
+      app:popUpTo="@id/main_fragment"
       app:popUpToInclusive="true" />
     <argument
       android:name="payload"
@@ -228,9 +238,9 @@
       app:nullable="true" />
     <action
       android:id="@+id/action_read_input_to_lnurl_auth"
+      app:destination="@id/lnurl_auth"
       app:launchSingleTop="true"
-      app:popUpTo="@+id/main_fragment"
-      app:destination="@id/lnurl_auth" />
+      app:popUpTo="@id/main_fragment" />
     <action
       android:id="@+id/action_read_input_to_lnurl_pay"
       app:destination="@+id/lnurl_pay" />
@@ -238,7 +248,7 @@
       android:id="@+id/action_read_input_to_lnurl_withdraw"
       app:destination="@+id/lnurl_withdraw"
       app:launchSingleTop="true"
-      app:popUpTo="@+id/main_fragment" />
+      app:popUpTo="@id/main_fragment" />
   </fragment>
 
   <!-- nested graph with shared view model for payment details -->
@@ -275,6 +285,12 @@
       android:id="@+id/payment_details_technicals"
       android:name="fr.acinq.phoenix.paymentdetails.PaymentDetailsTechnicalsFragment"
       android:label="PaymentDetailsTechnicalsFragment" />
+
+    <!-- navigate to payment settings -->
+    <action
+      android:id="@+id/global_payment_details_to_payment_settings_fragment"
+      app:destination="@id/payment_settings_fragment"
+      app:popUpTo="@id/main_fragment" />
   </navigation>
 
   <!-- LNURL: auth -->
@@ -338,8 +354,8 @@
       android:id="@+id/action_settings_to_logs"
       app:destination="@id/logs_fragment" />
     <action
-      android:id="@+id/action_settings_to_seed_security"
-      app:destination="@id/seed_security" />
+      android:id="@+id/action_settings_to_access_control"
+      app:destination="@id/access_control" />
     <action
       android:id="@+id/action_settings_to_prefs_display"
       app:destination="@id/prefs_display" />
@@ -347,14 +363,14 @@
       android:id="@+id/action_settings_to_electrum"
       app:destination="@id/electrum_fragment" />
     <action
-      android:id="@+id/action_settings_to_fees"
-      app:destination="@id/fees_fragment" />
-    <action
       android:id="@+id/action_settings_to_tor"
       app:destination="@id/tor_fragment" />
     <action
       android:id="@+id/action_settings_to_about"
       app:destination="@id/about_fragment" />
+    <action
+      android:id="@+id/action_settings_to_payment_settings"
+      app:destination="@id/payment_settings_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -407,23 +423,21 @@
     android:name="fr.acinq.phoenix.settings.DisplaySeedFragment"
     android:label="DisplaySeedFragment" />
 
-  <!-- settings: wallet access (pin,...) -->
+  <!-- settings: wallet access control (screen lock,...) -->
   <fragment
-    android:id="@+id/seed_security"
-    android:name="fr.acinq.phoenix.settings.SeedSecurityFragment"
-    android:label="seed_security" />
+    android:id="@+id/access_control"
+    android:name="fr.acinq.phoenix.settings.AccessControlFragment"
+    android:label="access_control">
+    <action
+      android:id="@+id/action_access_control_to_display_seed"
+      app:destination="@id/display_seed" />
+  </fragment>
 
   <!-- settings: change display settings (theme, currency...) -->
   <fragment
     android:id="@+id/prefs_display"
     android:name="fr.acinq.phoenix.settings.DisplayPrefsFragment"
     android:label="DisplayPrefsFragment" />
-
-  <!-- settings: consult and change fees profile -->
-  <fragment
-    android:id="@+id/fees_fragment"
-    android:name="fr.acinq.phoenix.settings.FeesSettingsFragment"
-    android:label="FeesSettingsFragment" />
 
   <!-- settings: TOR -->
   <fragment
@@ -442,5 +456,34 @@
     android:id="@+id/about_fragment"
     android:name="fr.acinq.phoenix.settings.AboutFragment"
     android:label="AboutFragment" />
+
+  <!-- settings: payment -->
+  <fragment
+    android:id="@+id/payment_settings_fragment"
+    android:name="fr.acinq.phoenix.settings.PaymentSettingsFragment"
+    android:label="PaymentSettingsFragment" />
+
+  <!-- first time user exp -->
+  <fragment
+    android:id="@+id/ftue_fragment"
+    android:name="fr.acinq.phoenix.initwallet.FtueFragment"
+    android:label="FtueFragment">
+    <action
+      android:id="@+id/action_ftue_to_initwallet"
+      app:destination="@id/init_wallet_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/init_wallet_fragment" />
+  </fragment>
+
+  <!-- prepare send money (scan/paste invoice) -->
+  <fragment
+    android:id="@+id/patch_notes"
+    android:name="fr.acinq.phoenix.startup.PatchNotesFragment"
+    android:label="PatchNotesFragment">
+    <argument
+      android:name="version"
+      app:argType="long" />
+  </fragment>
 
 </navigation>

@@ -25,6 +25,18 @@ import scala.math.BigDecimal
 import java.net.URI
 import java.net.URLDecoder
 
+fun URI.getParams(): Map<String, String> {
+  return query?.split("&")
+    ?.mapNotNull {
+      it.split("=")
+        .takeIf { keyValuePair ->
+          keyValuePair.size == 2 && keyValuePair.none { p -> p.isBlank() } // 2 elements and none are empty
+        }
+    }
+    ?.associateBy({ URLDecoder.decode(it[0], Charsets.UTF_8.name()) }, { URLDecoder.decode(it[1], Charsets.UTF_8.name()) })
+    ?: emptyMap()
+}
+
 class BitcoinURI(val raw: String) {
   val log = LoggerFactory.getLogger(this::class.java)
 
@@ -52,15 +64,7 @@ class BitcoinURI(val raw: String) {
     }
 
     // parse query into list. If a key is duplicated, last value in query wins.
-    val params = uri.query?.split("&")
-      ?.mapNotNull {
-        it.split("=")
-          .takeIf { keyValuePair ->
-            keyValuePair.size == 2 && keyValuePair.none { p -> p.isBlank() } // 2 elements and none are empty
-          }
-      }
-      ?.associateBy({ URLDecoder.decode(it[0], Charsets.UTF_8.name()) }, { URLDecoder.decode(it[1], Charsets.UTF_8.name()) })
-      ?: emptyMap()
+    val params = uri.getParams()
     log.debug("params=$params retrieved from query=${uri.query}")
 
     // -- read label/message field parameter

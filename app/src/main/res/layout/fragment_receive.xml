@@ -182,19 +182,19 @@
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_error_message"
         android:visibility="@{model.state == PaymentGenerationState.ERROR}"
+        app:drawableStartCompat="@drawable/ic_alert_triangle"
         app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
 
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_alert_triangle"
         android:padding="@dimen/space_lg"
         android:text="@string/receive_swap_in_error_message"
         android:visibility="@{model.state == SwapInState.ERROR}"
+        app:drawableStartCompat="@drawable/ic_alert_triangle"
         app:layout_constraintTop_toBottomOf="@id/invoice_params_layout" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -253,23 +253,6 @@
           app:layout_constraintTop_toBottomOf="@id/qr_image"
           app:layout_goneMarginTop="@dimen/space_md" />
 
-        <TextView
-          android:id="@+id/power_save_mode_warning"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg_p"
-          android:layout_marginTop="@dimen/space_md"
-          android:layout_marginEnd="@dimen/space_lg_p"
-          android:text="@string/receive_power_save_disclaimer"
-          android:textAlignment="center"
-          android:textColor="?attr/mutedTextColor"
-          android:textSize="@dimen/text_sm"
-          android:visibility="gone"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_chainStyle="packed"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/raw_invoice" />
-
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
@@ -280,7 +263,7 @@
           app:layout_constraintEnd_toStartOf="@id/share_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/power_save_mode_warning" />
+          app:layout_constraintTop_toBottomOf="@id/raw_invoice" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
@@ -321,11 +304,11 @@
           android:id="@+id/swap_in_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_md_p"
           android:visibility="@{model.state == PaymentGenerationState.DONE}"
           app:icon="@drawable/ic_swap"
           app:icon_tint="?attr/colorPrimary"
-          app:is_paused_inverse="@{appModel.peerConn}"
+          app:is_paused="@{!appModel.networkInfo.lightningConnected}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_in_sep"

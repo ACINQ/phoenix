@@ -115,8 +115,10 @@ class VirtualKeyboardView @JvmOverloads constructor(context: Context, attrs: Att
       when (event.action) {
         MotionEvent.ACTION_DOWN -> {
           dispatchCharEvent(KEY_DELETE)
-          mHandler?.removeMessages(MSG_LONGPRESS)
-          mHandler?.sendMessageDelayed(mHandler?.obtainMessage(MSG_LONGPRESS, KEY_DELETE), LONGPRESS_TIMEOUT.toLong())
+          mHandler?.run {
+            removeMessages(MSG_LONGPRESS)
+            sendMessageDelayed(obtainMessage(MSG_LONGPRESS, KEY_DELETE), LONGPRESS_TIMEOUT.toLong())
+          }
         }
         MotionEvent.ACTION_UP -> {
           mHandler?.removeMessages(MSG_REPEAT)

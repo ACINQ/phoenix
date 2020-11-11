@@ -95,6 +95,9 @@
         android:layout_marginTop="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
         android:visibility="@{model.state != RestoreSeedState.INIT}"
+        android:importantForAccessibility="noHideDescendants"
+        android:importantForAutofill="no"
+        android:importantForContentCapture="no"
         android:background="@drawable/rounded_sm"
         android:backgroundTint="?attr/mutedBgColor"
         app:layout_constraintTop_toBottomOf="@id/instructions">

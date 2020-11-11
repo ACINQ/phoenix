@@ -17,8 +17,11 @@
 package fr.acinq.phoenix.utils
 
 import android.app.AlertDialog
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
 import fr.acinq.phoenix.R
 
@@ -30,22 +33,54 @@ object AlertHelper {
   }
 
   fun build(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?): AlertDialog.Builder {
-    val context = inflater.context
     val view = inflater.inflate(R.layout.dialog_alert, null)
-    val titleView = view.findViewById<TextView>(R.id.alert_title)
-    val messageView = view.findViewById<TextView>(R.id.alert_message)
+    default(view, title, message)
+    return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme).setView(view)
+  }
 
-    title?.run {
-      titleView.visibility = View.VISIBLE
-      titleView.text = this
+  fun buildWithInput(inflater: LayoutInflater,
+    title: CharSequence?,
+    message: CharSequence?,
+    callback: (String) -> Unit,
+    defaultValue: String,
+    inputType: Int = InputType.TYPE_CLASS_TEXT,
+    hint: String = ""): AlertDialog.Builder {
+    val view = inflater.inflate(R.layout.dialog_alert_input, null)
+    default(view, title, message)
+    val input = view.findViewById<EditText>(R.id.alert_input).apply {
+      this.inputType = inputType
+      this.setText(defaultValue)
+      this.hint = hint
     }
-
-    message?.run {
-      messageView.visibility = View.VISIBLE
-      messageView.text = this
-    }
-
-    return AlertDialog.Builder(context, R.style.default_dialogTheme)
+    return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
+      .setPositiveButton(inflater.context.getString(R.string.btn_confirm)) { _, _ -> callback(input.text.toString()) }
+  }
+
+  fun buildWithCheckBox(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, checkBoxLabel: CharSequence?, defaultValue: Boolean, callback: (Boolean) -> Unit): AlertDialog.Builder {
+    val view = inflater.inflate(R.layout.dialog_alert_checkbox, null)
+    default(view, title, message)
+    val checkbox = view.findViewById<CheckBox>(R.id.alert_checkbox).apply {
+      this.text = checkBoxLabel
+      this.isChecked = defaultValue
+    }
+    return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
+      .setView(view)
+      .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(checkbox.isChecked) }
+  }
+
+  private fun default(view: View, title: CharSequence?, message: CharSequence?) = view.apply {
+    findViewById<TextView>(R.id.alert_title).apply {
+      if (title != null) {
+        visibility = View.VISIBLE
+        text = title
+      }
+    }
+    findViewById<TextView>(R.id.alert_message).apply {
+      if (message != null) {
+        visibility = View.VISIBLE
+        text = message
+      }
+    }
   }
 }

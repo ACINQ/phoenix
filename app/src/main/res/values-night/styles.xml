@@ -17,6 +17,7 @@
 <resources>
 
   <style name="default_theme" parent="Theme.MaterialComponents.NoActionBar">
+    <item name="isLightTheme">false</item>
     <item name="colorPrimary">@color/purple</item>
     <item name="colorPrimaryDark">@color/transparent</item>
     <item name="colorAccent">?attr/colorPrimary</item>
@@ -38,6 +39,7 @@
     <item name="colorOnSurface">?attr/onMutedBgTextColor</item>
     <item name="android:colorBackground">?attr/bgColor</item>
     <item name="android:windowBackground">@drawable/app_bg_testnet</item>
+    <item name="android:navigationBarColor">?attr/bgColor</item>
 
     <!-- text -->
     <item name="android:textColor">?attr/textColor</item>

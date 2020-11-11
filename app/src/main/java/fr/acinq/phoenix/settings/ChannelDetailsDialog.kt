@@ -33,9 +33,10 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.`JsonSerializers$`
 import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.phoenix.AppViewModel
-import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsChannelDetailsBinding
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Prefs
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,7 +102,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }
 
     mBinding.fundingTxButton.setOnClickListener {
-      val uri = "https://blockstream.info/${if (BuildConfig.CHAIN == "testnet") "testnet/" else ""}tx/${model.fundingTxId.value}"
+      val uri = "${Prefs.getExplorer(context)}/tx/${model.fundingTxId.value}"
       startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
     }
 
@@ -117,7 +118,7 @@ class ChannelDetailsDialog : DialogFragment() {
     }) {
       model.state.value = ChannelDetailsState.IN_PROGRESS
       withContext(this.coroutineContext + Dispatchers.Default) {
-        val channel = app.getChannel(ByteVector32.fromValidHex(args.channelId))
+        val channel = app.requireService.getChannel(ByteVector32.fromValidHex(args.channelId))
         val data = channel!!.data()
         if (data is HasCommitments) {
           model.fundingTxId.postValue(data.commitments().commitInput().outPoint().txid().toString())

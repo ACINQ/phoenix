@@ -22,21 +22,25 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.annotation.UiThread
-import androidx.biometric.BiometricManager
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsDisplaySeedBinding
-import fr.acinq.phoenix.security.PinDialog
-import fr.acinq.phoenix.utils.*
-import fr.acinq.phoenix.utils.encrypt.EncryptedSeed
+import fr.acinq.phoenix.utils.BindingHelpers
+import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.crypto.AuthHelper
+import fr.acinq.phoenix.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.utils.crypto.SeedManager
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
 import java.security.GeneralSecurityException
+import javax.crypto.Cipher
 
 class DisplaySeedFragment : BaseFragment() {
 
@@ -44,8 +48,6 @@ class DisplaySeedFragment : BaseFragment() {
 
   private lateinit var mBinding: FragmentSettingsDisplaySeedBinding
   private lateinit var model: DisplaySeedViewModel
-
-  private var mPinDialog: PinDialog? = null
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSettingsDisplaySeedBinding.inflate(inflater, container, false)
@@ -63,8 +65,8 @@ class DisplaySeedFragment : BaseFragment() {
         is DisplaySeedState.Error.Generic -> {
           context?.let { Toast.makeText(it, getString(R.string.displayseed_error_generic), Toast.LENGTH_SHORT).show() }
         }
-        is DisplaySeedState.Error.WrongPassword -> {
-          context?.let { Toast.makeText(it, getString(R.string.displayseed_error_wrong_password), Toast.LENGTH_SHORT).show() }
+        is DisplaySeedState.Error.InvalidAuth -> {
+          context?.let { Toast.makeText(it, getString(R.string.startup_error_auth_failed), Toast.LENGTH_SHORT).show() }
         }
         is DisplaySeedState.Done -> {
           context?.run { getSeedDialog(this, state.words) }?.show()
@@ -75,59 +77,43 @@ class DisplaySeedFragment : BaseFragment() {
 
   override fun onStart() {
     super.onStart()
-    mBinding.unlockButton.setOnClickListener { unlockWallet() }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.unlockButton.setOnClickListener { context?.let { unlockWallet(it) } }
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
-  override fun onStop() {
-    super.onStop()
-    mPinDialog?.dismiss()
-  }
-
-  private fun unlockWallet() {
+  @UiThread
+  private fun unlockWallet(context: Context) {
     if (model.state.value !is DisplaySeedState.Unlocking) {
-      context?.let { ctx ->
-        mPinDialog = getPinDialog()
-        when {
-          Prefs.useBiometrics(ctx) && BiometricManager.from(ctx).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS ->
-            getBiometricAuth(negativeCallback = {
-              mPinDialog?.reset()
-              mPinDialog?.show()
-            }, successCallback = {
-              try {
-                model.state.value = DisplaySeedState.Unlocking
-                val pin = KeystoreHelper.decryptPin(ctx)?.toString(Charsets.UTF_8)
-                model.getSeed(ctx, pin!!)
-              } catch (e: Exception) {
-                log.error("could not decrypt pin: ", e)
-                model.state.value = DisplaySeedState.Error.Generic
-              }
+      model.state.value = DisplaySeedState.Unlocking
+      val encryptedSeed = SeedManager.getSeedFromDir(Wallet.getDatadir(context))
+      if (encryptedSeed is EncryptedSeed.V2.NoAuth) {
+        if (Prefs.isScreenLocked(context)) {
+          AuthHelper.promptSoftAuth(this,
+            onSuccess = {
+              model.decrypt(encryptedSeed, null)
+            }, onFailure = {
+              model.state.value = DisplaySeedState.Error.InvalidAuth
+            }, onCancel = {
+              model.state.value = DisplaySeedState.Init
             })
-          Prefs.getIsSeedEncrypted(ctx) -> {
-            mPinDialog?.reset()
-            mPinDialog?.show()
-          }
-          else -> {
-            model.state.value = DisplaySeedState.Unlocking
-            model.getSeed(ctx, Constants.DEFAULT_PIN)
-          }
+        } else {
+          model.decrypt(encryptedSeed, null)
         }
+      } else if (encryptedSeed is EncryptedSeed.V2.WithAuth) {
+        val cipher = try {
+          encryptedSeed.getDecryptionCipher()
+        } catch (e: Exception) {
+          model.state.value = DisplaySeedState.Error.InvalidAuth
+          return
+        }
+        AuthHelper.promptHardAuth(this,
+          cipher = cipher,
+          onSuccess = {
+            model.decrypt(encryptedSeed, it?.cipher)
+          },
+          onFailure = { model.state.value = DisplaySeedState.Error.InvalidAuth })
       }
     }
-  }
-
-  private fun getPinDialog(): PinDialog? {
-    return mPinDialog ?: getPinDialog(object : PinDialog.PinDialogCallback {
-      override fun onPinConfirm(dialog: PinDialog, pinCode: String) {
-        context?.let {
-          model.state.value = DisplaySeedState.Unlocking
-          model.getSeed(it, pinCode)
-        }
-        dialog.dismiss()
-      }
-
-      override fun onPinCancel(dialog: PinDialog) {}
-    })
   }
 
   private fun getSeedDialog(context: Context, words: List<String>): AlertDialog {
@@ -189,7 +175,7 @@ sealed class DisplaySeedState {
   object Unlocking : DisplaySeedState()
   data class Done(val words: List<String>) : DisplaySeedState()
   sealed class Error : DisplaySeedState() {
-    object WrongPassword : Error()
+    object InvalidAuth : Error()
     object Generic : Error()
   }
 }
@@ -203,17 +189,20 @@ class DisplaySeedViewModel : ViewModel() {
   }
 
   @UiThread
-  fun getSeed(context: Context, pin: String) {
-    viewModelScope.launch(Dispatchers.IO) {
-      try {
-        val words = String(Hex.decode(EncryptedSeed.readSeedFile(context, pin)), Charsets.UTF_8).split(" ")
+  fun decrypt(encryptedSeed: EncryptedSeed.V2, cipher: Cipher?) {
+    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+      log.error("could not decrypt seed: ", e)
+      state.postValue(when (e) {
+        is GeneralSecurityException -> DisplaySeedState.Error.InvalidAuth
+        else -> DisplaySeedState.Error.Generic
+      })
+    }) {
+      when (encryptedSeed) {
+        is EncryptedSeed.V2.NoAuth -> encryptedSeed.decrypt()
+        is EncryptedSeed.V2.WithAuth -> encryptedSeed.decrypt(cipher)
+      }.let {
+        val words = EncryptedSeed.byteArray2String(it).split(" ")
         state.postValue(DisplaySeedState.Done(words))
-      } catch (t: Throwable) {
-        log.error("could not read seed: ", t)
-        when (t) {
-          is GeneralSecurityException -> state.postValue(DisplaySeedState.Error.WrongPassword)
-          else -> state.postValue(DisplaySeedState.Error.Generic)
-        }
       }
     }
   }

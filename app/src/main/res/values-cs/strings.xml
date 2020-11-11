@@ -90,7 +90,6 @@
   <string name="receive_share_button">Sdílet…</string>
 
   <string name="receive_address_label">Adresa</string>
-  <string name="receive_power_save_disclaimer">Jste v módu šetření baterie. Pro přijetí platby se ujistěte, že aplikace může běžet na pozadí.</string>
   <string name="receive_withdraw_button">Použít LNURL odkaz</string>
 
   <string name="receive_swap_in_button">Zobrazit Bitcoinovou adresu</string>
@@ -185,7 +184,7 @@
   <string name="settings_display_prefs">Zobrazení</string>
   <string name="settings_security_title">Bezpečnost</string>
   <string name="settings_display_seed">Obnovovací fráze</string>
-  <string name="settings_seed_security">Nastavení přístupu</string>
+  <string name="settings_access_control">Nastavení přístupu</string>
   <string name="settings_advanced_title">Pokročilé</string>
   <string name="settings_fees">Nastavení poplatků</string>
   <string name="settings_list_channels">Seznam kanálů</string>
@@ -283,8 +282,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Vaše peněženka není chráněna.</string>
-  <string name="inappnotif_set_up_pin_action">Nastavit PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Děkujeme za používání Phoenix. Udělali jste zálohu vaší peněženky?</string>
   <string name="inappnotif_mnemonics_never_seen_action">Zálohovat peněženku</string>
   <string name="inappnotif_background_worker_cannot_run">Phoenix potřebuje běžet na pozadí čas od času. Ujistěte se, že vaše zařízení neukončuje agresivně tuto aplikaci kvůli šetření baterie.</string>
@@ -346,7 +343,6 @@
   <string name="paymentdetails_payment_request_label">Platební Požadavek</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Vytvořeno v</string>
-  <string name="paymentdetails_expire_at_label">Vyprší v</string>
   <string name="paymentdetails_completed_at_label">Dokončeno v</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
@@ -359,37 +355,13 @@
   <string name="state_offline">Uzel je offline</string>
   <string name="state_shutdown">Vypnuto</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Bezpečnost</string>
-  <string name="seedsec_subtitle">Vysoce doporučujeme nastavit PIN k ochraně vaší peněženky. Pokud to vaše zařízení podporuje, můžete použít biometrické přihlášení.</string>
-  <string name="seedsec_pin_switch">Přihlášení pomocí PIN</string>
-  <string name="seedsec_pin_scramble">Přeházet PIN tlačítka</string>
-  <string name="seedsec_biometrics_switch">Biometrické přihlášení</string>
-  <string name="seedsec_change_pin">Změnit PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Přístup k biometrii selhal. Prosím, zkuste to znovu.</string>
-  <string name="seedsec_pindialog_title_unlock">Prosím, zadejte váš stávající PIN</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Prosím, zadejte <b>váš nový PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Prosím, <b>potvrďte</b> váš nový PIN]]></string>
+  <string name="accessctrl_title">Bezpečnost</string>
 
-  <string name="seedsec_pin_update_success">PIN úspěšně aktualizován!</string>
-  <string name="seedsec_biometric_enabled">Biometrické přihlášení aktivováno</string>
-  <string name="seedsec_biometric_disabled">Biometrické přihlášení deaktivováno</string>
-
-  <string name="seedsec_biometric_support_no_hw">Vaše zařízení nepodporuje biometrické přihlášení.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">Biometrický hardware není dostupný. Prosím, zkuste to znovu později.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Prosím, nejdříve nastavte biometrii.</string>
-
-  <string name="seedsec_error_wrong_pin">Neplatný PIN</string>
-  <string name="seedsec_error_pins_match">PIN nesouhlasí. Prosím, zkuste to znovu.</string>
-  <string name="seedsec_error_generic">Nastala chyba, peněženka nebyla dešifrována.\n\nProsím, zkuste to znovu.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Vypnout biometrický zámek</string>
-  <string name="seedsec_disable_bio_prompt_desc">Odteď budete muset použít váš PIN kód</string>
-  <string name="seedsec_disable_bio_prompt_negative">Zrušit</string>
-
-  <string name="seedsec_bio_prompt_title">Zapnout biometrický zámek</string>
-  <string name="seedsec_bio_prompt_negative">Zrušit</string>
+  <string name="accessctrl_auth_no_hw">Vaše zařízení nepodporuje biometrické přihlášení.</string>
+  <string name="accessctrl_auth_hw_unavailable">Biometrický hardware není dostupný. Prosím, zkuste to znovu později.</string>
+  <string name="accessctrl_auth_none_enrolled">Prosím, nejdříve nastavte biometrii.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

@@ -21,6 +21,10 @@
 
   <string name="notification_channels_watcher_title">Observador de segundo plano</string>
   <string name="notification_channels_watcher_desc">Alerta você em caso de necessidade de iniciar o aplicativo. Deve ser prioridade.</string>
+  <string name="notification_pay_to_open_title">Aceitar pagamento</string>
+  <string name="notification_pay_to_open_desc">Aparece quando alguém lhe envia um pagamento e você precisa aceitá-lo manualmente.</string>
+  <string name="notification_headless_title">A Phoenix está rodando em segundo plano</string>
+  <string name="notification_headless_desc">Notifica você que a Phoenix está sendo executada em segundo plano. Isso acontece quando alguém está enviando dinheiro para você e o aplicativo ainda não foi iniciado.</string>
 
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -38,6 +42,12 @@
   <string name="restore_import_button">Importar</string>
   <string name="restore_error">Esta seed é inválida e não pode ser importada.\n\nTente novamente.</string>
 
+  <!-- //////////////// Auth prompt (v2) //////////////////// -->
+
+  <string name="authprompt_title">Desbloquear para continuar</string>
+  <string name="authprompt_hard_negative">Cancelar</string>
+  <string name="authprompt_error_unsecure">O dispositivo não é seguro (code: %1$d)</string>
+
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">Insira o PIN</string>
@@ -50,11 +60,26 @@
   <string name="biometricprompt_title">A carteira está bloqueada</string>
   <string name="biometricprompt_negative">Desbloquear com PIN</string>
 
+   <!-- //////////////// placeholders ////////////////-->
+
+  <string name="lipsum_short" translatable="false">Etiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas.</string>
+  <string name="lipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut facilisis lectus. Integer massa tellus, suscipit sit amet felis vitae, blandit consectetur dolor. Fusce volutpat id magna id vestibulum. Integer a erat lacinia, placerat risus a, fermentum justo. Etiam euismod tincidunt dolor vel posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur non euismod dui. Morbi enim dui, blandit sed erat sit amet, porta pulvinar odio. Cras metus felis, vestibulum eu consequat vitae, consectetur quis nulla. Fusce vulputate, elit et luctus sodales, metus metus elementum sem, eget commodo nunc nunc in ex. Sed aliquam eros nibh, ac volutpat turpis accumsan vitae. Cras suscipit ipsum accumsan aliquam interdum.</string>
+  <string name="lipsum_long" translatable="false">
+    Praesent ut nisi fringilla, pharetra dui sit amet, ornare urna. Donec at ultrices nunc. Fusce gravida metus vitae viverra egestas. In hac habitasse platea dictumst. Proin consequat fringilla felis, vehicula vehicula turpis ullamcorper nec. Pellentesque urna massa, blandit cursus metus et, ultrices consectetur neque. Suspendisse hendrerit venenatis mi ac tincidunt. Morbi hendrerit orci vitae erat luctus, at dignissim turpis accumsan. Integer elementum est eu tincidunt ullamcorper. Phasellus varius porttitor vestibulum. Maecenas faucibus ullamcorper diam, ac commodo dui fringilla sed. Aliquam arcu velit, porta eu sem vel, rhoncus bibendum dolor.
+    \nEtiam porttitor egestas faucibus. Curabitur condimentum eros non ipsum elementum egestas. Nam tempor euismod erat eget scelerisque. Integer sit amet laoreet erat. Duis enim turpis, vehicula eu justo vitae, dapibus auctor mauris. Aenean euismod eleifend dui a aliquet. Aliquam eleifend malesuada tortor ornare volutpat. In augue tortor, gravida et volutpat elementum, iaculis non sapien. Etiam dolor nisi, pulvinar a rhoncus ac, eleifend ac libero. In lobortis enim vitae ultricies viverra. Maecenas accumsan elementum sem, nec pharetra urna maximus maximus.
+    \nIn sit amet volutpat ligula, ac pretium dolor. Phasellus posuere rhoncus magna quis fermentum. Ut risus turpis, fermentum facilisis mollis in, porttitor eget erat. Donec luctus egestas ligula et interdum. Phasellus vitae hendrerit sem, at vehicula nulla. Curabitur mollis risus quis metus euismod ullamcorper. Nam eu aliquet mi. Duis id urna ac urna iaculis blandit. Morbi eros dui, congue a posuere efficitur, imperdiet a nisi. Morbi non orci non lorem aliquet tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar, mi vitae sollicitudin dignissim, nunc urna facilisis massa, ut scelerisque mi felis in sapien.
+    \nNam felis felix, tristique commodo odio eget, imperdiet viverra erat. Donec venenatis magna pulvinar, finibus leo id, gravida augue. Integer ante leo, bibendum ac nibh quis, auctor commodo quam. Sed luctus vitae quam vel condimentum. Mauris eu rhoncus mauris. Fusce enim diam, consequat a odio sit amet, accumsan cursus nisl. Etiam lectus nunc, lacinia id purus sit amet, pulvinar auctor odio. Maecenas vitae arcu sit amet est cursus maximus. Nullam ac sapien non nibh tempor rhoncus. Mauris dignissim cursus libero quis egestas.
+  </string>
+
   <!-- //////////////// Startup //////////////////// -->
 
+  <string name="startup_unlock_required">A Phoenix está bloqueada.\nPor favor autentique para continuar.</string>
+  <string name="startup_unlock_button">Desbloquear</string>
+  <string name="startup_binding_service">Binding service…</string>
   <string name="startup_wait">Carregando…</string>
   <string name="startup_wait_tor">Iniciando Tor…</string>
   <string name="startup_start_button">Reiniciar</string>
+  <string name="startup_settings_button">Configurações</string>
   <string name="startup_error_generic">O aplicativo não pôde ser iniciado.\n\nDetalhes do erro: %1$s</string>
   <string name="startup_error_electrum_address">Não foi possível iniciar o aplicativo. O endereço personalizado do servidor Electrum não é válido.\n\nIr para configurações > Electrum para corrigir suas configurações.</string>
   <string name="startup_error_tor">Não foi possível iniciar o Tor. Verifique se sua conexão está funcionando e tente novamente.\n\nDetalhes do erro: %1$s</string>
@@ -62,6 +87,9 @@
   <string name="startup_error_network">Sua internet não está funcionando. Favor verificar a conexão WiFi ou rede de celular.</string>
   <string name="startup_error_wrong_pwd">PIN incorreto</string>
   <string name="startup_error_biometrics">A autenticação biométrica falhou.</string>
+  <string name="startup_error_no_biometrics_or_key_invalidated">Primeiro registre uma biometria no Android para desbloquear a carteira.\n\nOu, restaure sua carteira usando sua seed de 12 palavras.</string>
+  <string name="startup_error_auth_failed">A autenticação falhou.</string>
+  <string name="startup_error_auth_failed_with_details">A autenticação falhou.\n—\n%1$s</string>
 
   <!-- //////////////// payment holder //////////////// -->
 
@@ -73,6 +101,7 @@
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">Sem descrição</string>
   <string name="paymentholder_closing_desc">Fechando #%1$s</string>
+  <string name="paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
 
@@ -90,7 +119,6 @@
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_address_label">Endereço</string>
-  <string name="receive_power_save_disclaimer">Você está no modo de economia de energia. Para receber o pagamento, verifique se o aplicativo pode ser executado em segundo plano.</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
@@ -124,13 +152,13 @@
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de Bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_chain_fees_edit">Ajustar taxas</string>
+  <string name="send_chain_fees_edit">Ajustar taxa</string>
   <string name="send_chain_fees_label">Taxa</string>
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Este pagamento é uma transação pela rede Bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
@@ -176,10 +204,12 @@
   <string name="utils_converted_amount">≈ %1$s</string>
   <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
   <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
+  <string name="utils_unknown_amount" translatable="false">!?</string>
 
   <string name="utils_ok">Ok</string>
   <string name="utils_proceed">Continuar</string>
   <string name="utils_cancel">Cancelar</string>
+  <string name="utils_next">Próximo</string>
   <string name="utils_date_just_now">Agora</string>
   <string name="utils_unknown">N/A</string>
   <string name="utils_copied">Copiado!</string>
@@ -188,6 +218,8 @@
   <string name="btn_confirm">Confirmar</string>
   <string name="btn_cancel">Cancelar</string>
   <string name="btn_close">Fechar</string>
+  <string name="btn_pause_connecting">Conectando ao par…</string>
+  <string name="btn_pause_connecting_electrum">Conectando ao servidor Electrum…</string>
 
   <!-- //////////////// settings //////////////// -->
 
@@ -195,7 +227,7 @@
   <string name="settings_display_prefs">Tela</string>
   <string name="settings_security_title">Segurança</string>
   <string name="settings_display_seed">Frase de recuperação</string>
-  <string name="settings_seed_security">Configurações de acesso</string>
+  <string name="settings_access_control">Configurações de acesso</string>
   <string name="settings_advanced_title">Avançado</string>
   <string name="settings_fees">Configurações de taxas</string>
   <string name="settings_list_channels">Lista de canais</string>
@@ -203,7 +235,9 @@
   <string name="settings_electrum">Servidor Electrum</string>
   <string name="settings_mutual_close">Encerrar canais</string>
   <string name="settings_force_close">Zona de perigo</string>
+  <string name="settings_tor">Tor</string>
   <string name="settings_about">Sobre</string>
+  <string name="settings_payment_settings">Configurações de pagamento</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -211,7 +245,19 @@
   <string name="notif_watcher_cheating_message">Foi detectada uma tentativa de fraude.</string>
 
   <string name="notif_watcher_connection_title">A Phoenix precisa de acesso à internet</string>
-  <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de Internet para funcionar corretamente.</string>
+  <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
+
+  <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
+  <string name="notif__headless_title__missed_incoming">Falha ao receber um pagamento</string>
+  <string name="notif__headless_title__missed_fulfill">Concluir pagamento</string>
+  <string name="notif__headless_title__received">Pagamento recebido</string>
+  <string name="notif__headless_message__app_locked">O aplicativo está bloqueado</string>
+  <string name="notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
+  <string name="notif__headless_message__manual_pay_to_open">A abertura de canal requer aprovação manual</string>
+  <string name="notif__headless_message__received_payment">Recebido %1$s (%2$s)</string>
+
+  <string name="notif_pay_to_open_title">Aceitar pagamento</string>
+  <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -228,20 +274,20 @@
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    Encerramento forçado permite fechar unilateralmente seus canais.
+    O encerramento forçado permite fechar seus canais de forma unilateral.
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
     Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
-    <b>Não use esse recurso se você não entender completamente o que ele faz.</b>
+    <b>Não use esse recurso se você não compreender exatamente o que ele faz.</b>
   ]]></string>
   <string name="closechannels_force_destination">Os valores serão eventualmente enviados para:</string>
-  <string name="closechannels_force_destination_desc">Este endereço foi originado a partir da sua seed e pertence a você.</string>
+  <string name="closechannels_force_destination_desc">Este endereço tem origem na sua seed e pertence a você.</string>
   <string name="closechannels_force_button">Forçar encerramento de canais</string>
   <string name="closechannels_confirm_dialog_message">Tem certeza de que deseja continuar?</string>
   <string name="closechannels_message_error">Ocorreu um problema. Tente novamente.</string>
-  <string name="closechannels_message_done">Bitcoins enviados.</string>
+  <string name="closechannels_message_done">Fundos enviados.</string>
   <string name="closechannels_message_in_progress">Aguarde…</string>
 
   <!-- //////////////// list all channels //////////////// -->
@@ -273,7 +319,7 @@
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">Configurações</string>
-  <string name="menu_send">Ler</string>
+  <string name="menu_send">Enviar</string>
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
@@ -295,8 +341,6 @@
 
   <!-- //////////////// notifications //////////////////// -->
 
-  <string name="inappnotif_set_up_pin">Sua carteira não está protegida.</string>
-  <string name="inappnotif_set_up_pin_action">Insira um PIN</string>
   <string name="inappnotif_mnemonics_never_seen">Obrigado por usar a Phoenix. Faça o backup de sua carteira para não correr risco de perder seus bitcoins.</string>
   <string name="inappnotif_mnemonics_never_seen_action">Fazer backup</string>
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
@@ -351,22 +395,43 @@
   <string name="paymentdetails_status_received_successful"><![CDATA[<b>Recebido</b> %1$s]]></string>
 
   <string name="paymentdetails_desc_label">Desc.</string>
+  <string name="paymentdetails_desc_custom_title">Adicionar nota</string>
+  <string name="paymentdetails_desc_custom_info">Você pode inserir uma descrição para este pagamento.</string>
   <string name="paymentdetails_destination_label">Enviado para</string>
+  <string name="paymentdetails_relayer_label">Trasmitido por</string>
   <string name="paymentdetails_fees_label">Taxas</string>
+  <string name="paymentdetails_pay_to_open_label">Taxas</string>
+  <string name="paymentdetails_pay_to_open_desc">Esta taxa cobre o custo de abertura de um novo canal de pagamento.</string>
   <string name="paymentdetails_error_label">Erro</string>
   <string name="paymentdetails_closing_desc">Pagamento pelo encerramento do canal #%1$s</string>
+  <string name="paymentdetails_swap_out_desc">Pagamento para um endereço bitcoin</string>
   <string name="paymentdetails_no_description">Sem descrição</string>
+  <string name="paymentdetails_address_label">Endereço</string>
+  <string name="paymentdetails_address_open_explorer">Mostrar na blockchain</string>
+  <string name="paymentdetails_info_uniclose"><![CDATA[
+    Este pagamento aconteceu após um conflito em um canal. Os fundos serão enviados para o seu endereço bitcoin: %1$s.
+    <br /><br />
+    Para recuperar seus fundos, siga <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">as instruções contidas no FAQ</a>.
+  ]]></string>
 
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">Dados de pagamento</string>
+  <string name="paymentdetails_swap_out_feerate_label">Taxa de troca</string>
+  <string name="paymentdetails_closing_type_label">Tipo de encerramento</string>
+  <string name="paymentdetails_closing_type_mutual">Encerramento mútuo</string>
+  <string name="paymentdetails_closing_type_local">Local</string>
+  <string name="paymentdetails_closing_type_remote">Remoto</string>
+  <string name="paymentdetails_closing_type_other">Outro</string>
+  <string name="paymentdetails_closing_channel_label">Canal encerrado</string>
+  <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
+  <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
   <string name="paymentdetails_payment_request_label">Solicitação de pagamento</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
-  <string name="paymentdetails_expire_at_label">Expira em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
@@ -379,47 +444,47 @@
   <string name="state_offline">O par está offline</string>
   <string name="state_shutdown">Desligar</string>
 
-  <!-- //////////////// seed security //////////////// -->
+  <!-- //////////////// access control //////////////// -->
 
-  <string name="seedsec_title">Segurança</string>
-  <string name="seedsec_subtitle">É muito importante criar um PIN para proteger sua carteira. Se o seu aparelho suportar, você pode usar autenticação biométrica.</string>
-  <string name="seedsec_pin_switch">Autenticação por PIN</string>
-  <string name="seedsec_pin_scramble">Embaralhamento de teclado PIN</string>
-  <string name="seedsec_biometrics_switch">Autenticação biométrica</string>
-  <string name="seedsec_change_pin">Alterar PIN…</string>
-  <string name="seedsec_biometric_enrollment_error">Falha no registro biométrico. Tente novamente.</string>
-  <string name="seedsec_pindialog_title_unlock">Insira seu PIN atual para continuar</string>
-  <string name="seedsec_pindialog_title_set_new"><![CDATA[Insira <b>seu novo PIN</b>]]></string>
-  <string name="seedsec_pindialog_title_confirm_new"><![CDATA[Favor <b>confirmar</b> seu novo PIN]]></string>
+  <string name="accessctrl_title">Segurança</string>
+  <string name="accessctrl_subtitle">Recomendamos habilitar o bloqueio de tela para evitar o uso não intencional de sua carteira.</string>
 
-  <string name="seedsec_pin_update_success">PIN atualizado com sucesso!</string>
-  <string name="seedsec_biometric_enabled">Autenticação biométrica ativada</string>
-  <string name="seedsec_biometric_disabled">Autenticação biométrica desativada</string>
+  <string name="accessctrl_auth_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
+  <string name="accessctrl_auth_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
+  <string name="accessctrl_auth_none_enrolled">Primeiro registre a biometria.</string>
+  <string name="accessctrl_auth_update_required">É necessária uma atualização de segurança do Android.</string>
+  <string name="accessctrl_auth_unsupported">Não compatível com sua versão do Android.</string>
+  <string name="accessctrl_auth_lockout">Muitas tentativas, tente novamente mais tarde.</string>
 
-  <string name="seedsec_biometric_support_no_hw">O seu aparelho não suporta autenticação biométrica.</string>
-  <string name="seedsec_biometric_support_hw_unavailable">O hardware de biometria não está disponível. Tente novamente mais tarde.</string>
-  <string name="seedsec_biometric_support_none_enrolled">Primeiro registre a biometria.</string>
+  <string name="accessctrl_error_cipher">Incapaz de obter cifra: %1$s</string>
+  <string name="accessctrl_error_auth">Falha na autenticação.</string>
 
-  <string name="seedsec_error_wrong_pin">PIN inválido</string>
-  <string name="seedsec_error_pins_match">PINs não conferem. Tente novamente.</string>
-  <string name="seedsec_error_generic">Ocorreu um erro, a carteira não foi criptografada.\n\nTente novamente.</string>
-
-  <string name="seedsec_disable_bio_prompt_title">Desativar bloqueio biométrico</string>
-  <string name="seedsec_disable_bio_prompt_desc">Você precisará usar seu código PIN a partir de agora</string>
-  <string name="seedsec_disable_bio_prompt_negative">Cancelar</string>
-
-  <string name="seedsec_bio_prompt_title">Ativar bloqueio biométrico</string>
-  <string name="seedsec_bio_prompt_negative">Cancelar</string>
+  <string name="accessctrl_screen_lock_switch">Bloqueio de tela</string>
+  <string name="accessctrl_screen_lock_switch_desc">Restrinja o acesso ao aplicativo com o bloqueio de tela/biometria do Android</string>
+  <string name="accessctrl_full_lock_switch_unavailable">Registre uma biometria no Android para recursos de segurança adicionais.</string>
+  <string name="accessctrl_full_lock_switch_backup_required">Confirme se você fez o backup da sua frase de recuperação para acessar recursos adicionais de segurança.</string>
+  <string name="accessctrl_full_lock_switch_backup_required_button">Acessar minha frase de recuperação</string>
+  <string name="accessctrl_full_lock_switch">Impedir a execução em segundo plano</string>
+  <string name="accessctrl_full_lock_switch_desc">O aplicativo requer desbloqueio manual do usuário para ser executado. O recebimento de pagamento em segundo plano, portanto, não é possível.\n\nSomente autenticação biométrica é compatível.</string>
+  <string name="accessctrl_full_lock_confirm_title">Aviso</string>
+  <string name="accessctrl_full_lock_confirm_message">Funções que exigem execução em segundo plano serão desabilitadas. Para receber pagamentos, o aplicativo deverá ser desbloqueado.</string>
 
   <!-- //////////////// ln url login //////////////// -->
 
   <string name="lnurl_auth_instructions"><![CDATA[Você pode usar sua carteira de forma anônima para acessar e autorizar uma ação em:<br/><br/><b>%1$s</b><br/><br/>Nenhuma informação pessoal será compartilhada com este serviço.]]></string>
   <string name="lnurl_auth_button">Entrar</string>
-  <string name="lnurl_auth_in_progress"><![CDATA[Acessando <b>%1$s</b>]]></string>
+  <string name="lnurl_auth_in_progress"><![CDATA[Acessando\n<b>%1$s</b>]]></string>
   <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
   <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
   <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
+
+  <!-- //////////////// ln url pay //////////////// -->
+
+  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
+  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
+  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
@@ -443,6 +508,7 @@
   <string name="prefs_display_coin_label">Unidade de Bitcoin</string>
   <string name="prefs_display_fiat_label">Moeda fiduciária</string>
   <string name="prefs_display_theme_label">Tema</string>
+  <string name="prefs_display_explorer_label">Blockchain</string>
 
   <!-- //////////////// electrum server //////////////// -->
 
@@ -503,9 +569,66 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com phishing.
+  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
+  ]]></string>
+  <string name="about_fiat_rates"><![CDATA[
+    As taxas Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
+    <br />- Blockchain.info
+    <br />- Bitso
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
+  ]]></string>
+
+  <!-- //////////////// background node service //////////////// -->
+
+  <string name="nodeservice_desc">Serviço contendo o servidor da carteira.</string>
+
+  <!-- //////////////// settings: options for payments //////////////// -->
+
+  <string name="paymentsettings_title">Configurações de pagamento</string>
+  <string name="paymentsettings_subtitle">Defina várias opções em relação aos pagamentos que você envia ou recebe.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
+  <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As solicitações de pagamento que você criar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
+
+  <string name="paymentsettings_paytoopen_auto_title">Aceitar abertura de canais de forma automática</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Às vezes, é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir o custo de abertura do canal.</string>
+  <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
+  <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
+
+  <!-- ftue -->
+
+  <string name="ftue__bullet_1" translatable="false">●○○</string>
+  <string name="ftue__bullet_2" translatable="false">○●○</string>
+  <string name="ftue__bullet_3" translatable="false">○○●</string>
+  <string name="ftue__skip_button">Pular</string>
+  <string name="ftue__welcome__header">Bem-vindo!</string>
+  <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
+  <string name="ftue__pay_to_open__header">Abertura automática de canais</string>
+  <string name="ftue__pay_to_open__body">Se necessário, canais de pagamento serão abertos automaticamente para você. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
+  <string name="ftue__backup_seed__header">Controlar</string>
+  <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
+  <string name="ftue__backup_seed__button">Começar</string>
+
+  <!-- patch notes -->
+
+  <string name="patchnotes_title">A Phoenix foi atualizada!</string>
+  <string name="patchnotes_v15"><![CDATA[
+    <h4>Recebimento de pagamento em segundo plano</h4>
+    <p>A Phoenix agora pode receber pagamentos mesmo se o aplicativo não estiver sido iniciado.</p>
+
+    <h4>Abertura automática de canais</h4>
+    <p>Se necessário, canais de pagamento serão abertos automaticamente para você.</p>
+    <p>Este recurso é necessário para que o recebimento de pagamento em segundo plano funcione corretamente, mas você pode desabilitá-lo se quiser (em Configurações > Configurações de pagamento).</p>
+    <p>O custo de abertura de canais ainda se aplica (%1$s%%).</p>
+
+    <h4>Aprimoramento da função de bloqueio</h4>
+    <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
+    <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
   ]]></string>
 
 </resources>

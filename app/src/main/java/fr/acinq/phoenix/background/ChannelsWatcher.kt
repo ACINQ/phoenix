@@ -42,7 +42,7 @@ import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 
 /**
- * Watches the node channels to detect cheating attempts in background.
+ * Background job watching the node's channels to detect cheating attempts. A notification will be shown in that case.
  */
 class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
@@ -142,15 +142,15 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
     startIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
     val title = context.getString(if (isAlert) R.string.notif_watcher_cheating_title else R.string.notif_watcher_connection_title)
     val message = context.getString(if (isAlert) R.string.notif_watcher_cheating_message else R.string.notif_watcher_connection_message)
-    val builder = NotificationCompat.Builder(context, Constants.WATCHER_NOTIFICATION_CHANNEL_ID)
-      .setSmallIcon(R.drawable.ic_phoenix)
+    val builder = NotificationCompat.Builder(context, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
+      .setSmallIcon(R.drawable.ic_phoenix_outline)
       .setContentTitle(title)
       .setContentText(message)
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-      .setContentIntent(PendingIntent.getActivity(context, Constants.WATCHER_REQUEST_CODE, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+      .setContentIntent(PendingIntent.getActivity(context, Constants.NOTIF_ID__CHANNELS_WATCHER, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
       .setOngoing(isAlert)
       .setAutoCancel(true)
-    NotificationManagerCompat.from(context).notify(Constants.WATCHER_REQUEST_CODE, builder.build())
+    NotificationManagerCompat.from(context).notify(Constants.NOTIF_ID__CHANNELS_WATCHER, builder.build())
   }
 
   companion object {

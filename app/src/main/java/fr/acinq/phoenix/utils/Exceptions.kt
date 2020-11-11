@@ -19,10 +19,12 @@ package fr.acinq.phoenix.utils
 import java.lang.IllegalArgumentException
 
 // -- startup exception
+object NoSeedYet : Exception()
 class InvalidElectrumAddress(val address: String) : Exception(address)
 class TorSetupException(val s: String) : Exception(s)
 class NetworkException : RuntimeException()
-class KitNotInitialized : RuntimeException("kit is not initialized")
+object KitNotInitialized : RuntimeException("kit is not ready yet")
+object ServiceDisconnected : RuntimeException("node service is disconnected")
 
 // -- Channels errors
 class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
@@ -30,6 +32,7 @@ class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
 // -- payment exceptions
 class InsufficientBalance : RuntimeException()
 class SwapOutInsufficientAmount : RuntimeException()
+object CannotSendHeadless : RuntimeException("the service cannot send a payment while being headless")
 
 // -- parsing exceptions
 class UnreadableLightningObject(message: String): IllegalArgumentException(message)

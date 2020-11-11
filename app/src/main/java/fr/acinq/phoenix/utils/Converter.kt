@@ -29,8 +29,10 @@ import fr.acinq.phoenix.R
 import org.slf4j.LoggerFactory
 import scala.Option
 import scala.math.`BigDecimal$`
+import scodec.bits.ByteVector
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.regex.Pattern
@@ -58,6 +60,7 @@ object Converter {
     CoinUtils.COIN_FORMAT().roundingMode = RoundingMode.DOWN
   }
 
+  fun printAmountRawForceUnit(amount: BtcAmount, unit: CoinUnit): String = CoinUtils.rawAmountInUnit(amount, unit).bigDecimal().toPlainString()
   fun printAmountRaw(amount: BtcAmount, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
   fun printAmountRaw(amount: MilliSatoshi, context: Context): String = CoinUtils.rawAmountInUnit(amount, Prefs.getCoinUnit(context)).bigDecimal().toPlainString()
 
@@ -104,7 +107,11 @@ object Converter {
 
   public fun html(source: String): Spanned {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT)
+      Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
+        and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
     } else {
       Html.fromHtml(source)
     }
@@ -187,4 +194,27 @@ object Converter {
   }
 
   fun msat2sat(amount: MilliSatoshi): Satoshi = amount.truncateToSatoshi()
+
+  fun toAscii(b: ByteVector): String? {
+    val bytes: ByteArray = b.toArray()
+    return String(bytes, StandardCharsets.US_ASCII)
+  }
+
+  /** Convert a raw stringified percentage to a fee per millionths (decimals after the 4th are ignored). For example, 0.01% becomes 100. */
+  fun percentageToPerMillionths(percent: String): Long {
+    return (DecimalFormat().parse(percent.trim())!!.toDouble() * 1000000 / 100)
+      .toLong()
+      .coerceAtLeast(0)
+  }
+
+  /** Convert a per millionths Long to a percentage String (max 4 decimals). */
+  fun perMillionthsToPercentageString(perMillionths: Long): String {
+    return DecimalFormat("0.00##").apply { roundingMode = RoundingMode.FLOOR }.run {
+      format(perMillionths
+        .coerceAtLeast(0)
+        .toBigDecimal()
+        .divide(BigDecimal.valueOf(1000000))
+        .multiply(BigDecimal(100)))
+    }
+  }
 }

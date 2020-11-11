@@ -30,8 +30,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.KitState
 import fr.acinq.phoenix.R
+import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentSettingsTorBinding
 import fr.acinq.phoenix.utils.AlertHelper
 import fr.acinq.phoenix.utils.Prefs
@@ -41,7 +41,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class TorSettingFragment : BaseFragment(stayIfNotStarted = true), SharedPreferences.OnSharedPreferenceChangeListener {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsTorBinding
@@ -57,7 +57,9 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
     super.onActivityCreated(savedInstanceState)
     model = ViewModelProvider(this).get(TorSettingViewModel::class.java)
     mBinding.model = model
-    app.torConn.observe(viewLifecycleOwner, Observer { context?.let { refreshUIState(it) } })
+    app.networkInfo.observe(viewLifecycleOwner, Observer {
+      context?.let { refreshUIState(it) }
+    })
   }
 
   override fun onStart() {
@@ -73,7 +75,7 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
           context?.let {
             Prefs.saveTorEnabled(it, !isChecked)
             if (app.state.value is KitState.Started) {
-              app.shutdown()
+              app.service?.shutdown()
               findNavController().navigate(R.id.global_action_any_to_startup)
             }
           }
@@ -82,8 +84,6 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
         .show()
     }
   }
-
-  override fun handleKitState(state: KitState) {}
 
   override fun onStop() {
     super.onStop()
@@ -115,22 +115,22 @@ class TorSettingFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceC
   @SuppressLint("SetTextI18n")
   private fun getInfo() {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("failed to send getInfo to TOR: ", exception)
-      mBinding.getinfoValue.text = "error: failed to get info from tor\n[ ${exception.localizedMessage} ]"
+      log.error("failed to send getInfo to Tor: ", exception)
+      mBinding.getinfoValue.text = "error: failed to get info from Tor\n[ ${exception.localizedMessage} ]"
     }) {
       mBinding.getinfoValue.text = """
-version=${app.getTorInfo("version")}
-network=${app.getTorInfo("network-liveness")}
+version=${app.requireService.getTorInfo("version")}
+network=${app.requireService.getTorInfo("network-liveness")}
 
 ---
 or connections
 ---
-${app.getTorInfo("orconn-status")}
+${app.requireService.getTorInfo("orconn-status")}
 
 ---
 circuits
 ---
-${app.getTorInfo("circuit-status")}
+${app.requireService.getTorInfo("circuit-status")}
       """.trimMargin()
     }
   }
