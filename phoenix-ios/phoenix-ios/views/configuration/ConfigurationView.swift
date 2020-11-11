@@ -4,77 +4,86 @@ import PhoenixShared
 struct ConfigurationView: MVIView {
     typealias Model = Configuration.Model
     typealias Intent = Configuration.Intent
+	
+	var body: some View {
+		mvi { model, intent in
+			List {
+				let fullMode = model is Configuration.ModelFullMode
 
-    var body: some View {
-        mvi { model, intent in
-            VStack(spacing: 0) {
-                let fullMode = model is Configuration.ModelFullMode
-
-                Section(header: headerText("General")) {
-                    NavigationMenu(label: Text("About"), destination: AboutView())
-                    NavigationMenu(label: Text("Display"), destination: DisplayConfigurationView())
-                    NavigationMenu(label: Text("Electrum Server"), destination: ElectrumConfigurationView())
-                    NavigationMenu(label: Text("Tor"), destination: EmptyView())
-                    Divider()
+				Section(header: Text("General")) {
+					NavigationLink(destination:  AboutView()) {
+						Label { Text("About") } icon: {
+							Image(systemName: "info.circle")
+						}
+					}
+					NavigationLink(destination:  DisplayConfigurationView()) {
+						Label { Text("Display") } icon: {
+							Image(systemName: "paintbrush.pointed")
+						}
+					}
+					NavigationLink(destination:  ElectrumConfigurationView()) {
+						Label { Text("Electrum server") } icon: {
+							Image(systemName: "link")
+						}
+					}
+					NavigationLink(destination:  EmptyView()) {
+						Label { Text("Tor") } icon: {
+							Image(systemName: "shield.lefthalf.fill")
+						}
+					}
                 }
 
-                if fullMode {
-                    Section(header: headerText("Security")) {
-                        NavigationMenu(label: Text("Recovery phrase"), destination: EmptyView())
-                        NavigationMenu(label: Text("App access settings"), destination: EmptyView())
-                        Divider()
-                    }
-                }
+				if fullMode {
+					Section(header: Text("Security")) {
+						NavigationLink(destination: EmptyView()) {
+							Label { Text("App access settings") } icon: {
+								Image(systemName: "touchid")
+							}
+						}
+						NavigationLink(destination: EmptyView()) {
+							Label { Text("Recovery phrase") } icon: {
+								Image(systemName: "key")
+							}
+						}
+					}
+				}
 
-                Section(header: headerText("Advanced")) {
-                    NavigationMenu(label: Text("Logs"), destination: EmptyView())
+				Section(header: Text("Advanced")) {
+					NavigationLink(destination: EmptyView()) {
+						Label { Text("Logs") } icon: {
+							Image(systemName: "doc.text")
+						}
+					}
                     if fullMode {
-                        NavigationMenu(label: Text("My payment channels"), destination: ChannelsConfigurationView())
-                        NavigationMenu(label: Text("Close all channels"), destination: EmptyView())
-                        NavigationMenu(label: Text("Danger zone").foregroundColor(Color.red), destination: EmptyView())
+						NavigationLink(destination: ChannelsConfigurationView()) {
+							Label { Text("My payment channels") } icon: {
+								Image(systemName: "bolt")
+							}
+						}
+						NavigationLink(destination: EmptyView()) {
+							Label { Text("Close all channels") } icon: {
+								Image(systemName: "xmark.circle")
+							}
+						}
+						NavigationLink(destination: EmptyView()) {
+							Label { Text("Danger zone") } icon: {
+								Image(systemName: "exclamationmark.triangle")
+							}
+						}.foregroundColor(.appRed)
                     }
-                    Divider()
                 }
-
-                Spacer()
-            }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.appBackground)
-                    .edgesIgnoringSafeArea(.bottom)
-                    .navigationBarTitle("Settings", displayMode: .inline)
-        }
-    }
-
-    func headerText(_ label: String) -> some View {
-        Text(label)
-                .bold()
-                .font(.title3)
-                .foregroundColor(.appHorizon)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-    }
-
-    struct NavigationMenu<Parent, T: View> : View where Parent : View {
-        let label: Parent
-        let destination: T
-
-        init(label: Parent, destination: T) {
-            self.label = label
-            self.destination = destination
-        }
-
-        var body: some View {
-            Divider()
-            NavigationLink(destination: destination) {
-                label
-                    .foregroundColor(Color.black)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding([.leading, .trailing])
-            }
-                    .padding(8)
-                    .background(Color.white)
-        }
-    }
+			}
+			.listStyle(GroupedListStyle())
+			.onAppear() {
+				
+				// This doesn't work anymore on iOS 14 :(
+			//	UITableView.appearance().separatorInset =
+			//		UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 50)
+			}
+			.navigationBarTitle("Settings", displayMode: .inline)
+			
+		} // end: mvi
+	} // end: func
 }
 
 class ConfigurationView_Previews: PreviewProvider {
@@ -84,7 +93,7 @@ class ConfigurationView_Previews: PreviewProvider {
         mockView(ConfigurationView()) {
             $0.configurationModel = mockModel
         }
-                .previewDevice("iPhone 11")
+		.previewDevice("iPhone 11")
     }
 
     #if DEBUG
