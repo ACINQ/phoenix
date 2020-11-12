@@ -100,7 +100,7 @@
   <string name="paymentholder_sent_prefix">-</string>
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">Sem descrição</string>
-  <string name="paymentholder_closing_desc">Fechando #%1$s</string>
+  <string name="paymentholder_closing_desc">Encerrando #%1$s</string>
   <string name="paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
@@ -292,7 +292,7 @@
 
   <!-- //////////////// list all channels //////////////// -->
 
-  <string name="listallchannels_title">Lista de Canais</string>
+  <string name="listallchannels_title">Lista de canais</string>
   <string name="listallchannels_in_progress">Aguarde…</string>
   <string name="listallchannels_error">Ocorreu um erro ao recuperar a lista de canais. Tente novamente.</string>
   <string name="listallchannels_node_id">ID da carteira: %1$s</string>
@@ -569,12 +569,12 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é não custodial: <strong>significa que somente você tem a custódia das 12-palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
+  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-    As taxas Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
+    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
     <br />- Blockchain.info
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
@@ -587,16 +587,16 @@
   <!-- //////////////// settings: options for payments //////////////// -->
 
   <string name="paymentsettings_title">Configurações de pagamento</string>
-  <string name="paymentsettings_subtitle">Defina várias opções em relação aos pagamentos que você envia ou recebe.</string>
+  <string name="paymentsettings_subtitle">Defina opções em relação aos pagamentos que você envia ou recebe.</string>
 
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">As solicitações de pagamento que você criar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As cobranças que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
-  <string name="paymentsettings_paytoopen_auto_title">Aceitar abertura de canais de forma automática</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Às vezes, é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir o custo de abertura do canal.</string>
+  <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir os custos de abertura do canal.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
   <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
 
