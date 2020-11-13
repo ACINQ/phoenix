@@ -573,7 +573,7 @@ class EclairNodeService : Service() {
         // 1 - compute trampoline fee settings for this payment
         val trampolineFeeSettings = Prefs.getMaxTrampolineCustomFee(appContext.applicationContext)?.let { pref ->
           appContext.trampolineFeeSettings.value!!.filter {
-            it.feeBase < pref.feeBase && it.feeProportionalMillionths < pref.feeProportionalMillionths
+            it.feeBase <= pref.feeBase && it.feeProportionalMillionths <= pref.feeProportionalMillionths
           } + pref
         } ?: run {
           appContext.trampolineFeeSettings.value!!
