@@ -349,7 +349,7 @@
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
   <string name="inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
-  <string name="inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas muito altas.</string>
+  <string name="inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
   <string name="inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
 
   <!-- //////////////// display seed //////////////// -->
