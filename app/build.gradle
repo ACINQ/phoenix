@@ -32,8 +32,8 @@ android {
     applicationId "fr.acinq.phoenix.mainnet"
     minSdkVersion 24
     targetSdkVersion 30
-    versionCode 16
-    versionName "1.4.1"
+    versionCode 17
+    versionName "1.4.2-RC"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -143,7 +143,7 @@ dependencies {
 
   // eclair core
   def libsecp256k1_version = "1.3"
-  def eclair_version = "0.4.4-android-phoenix"
+  def eclair_version = "0.4.5-android-phoenix"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
     exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'
@@ -164,9 +164,9 @@ dependencies {
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
   // tor
-  def tor_ctl_version = "0.2"
-  def tor_wrapper_version = "0.0.3"
-  implementation "net.freehaven.tor.control:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
+  def tor_ctl_version = "0.4"
+  def tor_wrapper_version = "0.0.5"
+  implementation "info.guardianproject:jtorctl:$tor_ctl_version" // controlling tor instance via its control port
   implementation "com.msopentech.thali:universal:$tor_wrapper_version" // core library for the tor wrapper
   implementation "com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar"
 

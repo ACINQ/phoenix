@@ -573,7 +573,7 @@ class EclairNodeService : Service() {
         // 1 - compute trampoline fee settings for this payment
         val trampolineFeeSettings = Prefs.getMaxTrampolineCustomFee(appContext.applicationContext)?.let { pref ->
           appContext.trampolineFeeSettings.value!!.filter {
-            it.feeBase < pref.feeBase && it.feeProportionalMillionths < pref.feeProportionalMillionths
+            it.feeBase <= pref.feeBase && it.feeProportionalMillionths <= pref.feeProportionalMillionths
           } + pref
         } ?: run {
           appContext.trampolineFeeSettings.value!!
@@ -761,9 +761,14 @@ class EclairNodeService : Service() {
   }
 
   private fun isConnectedToPeer(): Boolean = api?.run {
-    JavaConverters.asJavaIterableConverter(
-      Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
-    ).asJava().any { it.state().equals("CONNECTED", true) }
+    try {
+      JavaConverters.asJavaIterableConverter(
+        Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+      ).asJava().any { it.state().equals("CONNECTED", true) }
+    } catch (e: Exception) {
+      log.error("failed to retrieve connection state from peer: ${e.localizedMessage}")
+      false
+    }
   } ?: false
 
   /** Prevents spamming the peer */
