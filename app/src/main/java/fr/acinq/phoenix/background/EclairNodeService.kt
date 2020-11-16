@@ -761,9 +761,14 @@ class EclairNodeService : Service() {
   }
 
   private fun isConnectedToPeer(): Boolean = api?.run {
-    JavaConverters.asJavaIterableConverter(
-      Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
-    ).asJava().any { it.state().equals("CONNECTED", true) }
+    try {
+      JavaConverters.asJavaIterableConverter(
+        Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+      ).asJava().any { it.state().equals("CONNECTED", true) }
+    } catch (e: Exception) {
+      log.error("failed to retrieve connection state from peer: ${e.localizedMessage}")
+      false
+    }
   } ?: false
 
   /** Prevents spamming the peer */
