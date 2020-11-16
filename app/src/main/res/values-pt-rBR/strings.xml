@@ -163,6 +163,7 @@
   <string name="send_chain_fees_unit">sat/byte</string>
   <string name="send_chain_fees_description">Este pagamento é uma transação pela rede Bitcoin, que é mais lenta e geralmente mais cara. Uma taxa será cobrada.</string>
   <string name="send_chain_fees_feedback_invalid">Por favor use uma taxa válida.</string>
+  <string name="send_chain_fees_feedback_too_low">Esta taxa é muito baixa. Deve ser de pelo menos %1$s sat/byte.</string>
   <string name="send_chain_fees_feedback_20min">Com esta taxa,a transação deve ser concluída no prazo de 30 minutos.</string>
   <string name="send_chain_fees_feedback_1h">Com esta taxa, a transação deve ser concluída no prazo de 1 hora.</string>
   <string name="send_chain_fees_feedback_12h">Com esta taxa, a transação deve ser concluída no prazo de 12 horas.</string>
@@ -180,7 +181,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Leia um código QR com solicitação de pagamento, endereço bitcoin ou uma LNURL</string>
+  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_expired">O pagamento expirou.</string>
@@ -274,7 +275,7 @@
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
   <string name="closechannels_force_instructions"><![CDATA[
-    O encerramento forçado permite fechar seus canais de forma unilateral.
+    O encerramento forçado permite encerrar seus canais de forma unilateral.
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
@@ -315,6 +316,8 @@
 
   <string name="channel_loading">Recuperando dados do canal…</string>
   <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
+  <string name="channel_send">Enviar</string>
+  <string name="channel_receive">Receber</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -346,6 +349,8 @@
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
   <string name="inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
+  <string name="inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
+  <string name="inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
 
   <!-- //////////////// display seed //////////////// -->
 
@@ -415,6 +420,11 @@
   ]]></string>
 
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
+  
+  <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
+  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a cobrança já foi paga ou quando a cobrança contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
+  <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
+  <string name="paymentdetails_failure_trampoline_fees_action">Mudar taxa</string>
 
   <!-- //////////////// payment details: technicals data //////////////// -->
 
@@ -509,7 +519,9 @@
   <string name="prefs_display_fiat_label">Moeda fiduciária</string>
   <string name="prefs_display_theme_label">Tema</string>
   <string name="prefs_display_explorer_label">Blockchain</string>
-
+  <string name="prefs_display_balance_display">Mostrar saldo na tela inicial</string>
+  <string name="prefs_display_balance_display_desc">Esconder o saldo ajuda a evitar olhares indiscretos</string>
+  
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
@@ -596,10 +608,18 @@
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
   <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido, para cobrir os custos de abertura do canal.</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido para cobrir os custos de abertura do canal.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
   <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
 
+  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
+  <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
+  <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Taxa base (satoshi)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
+  
   <!-- ftue -->
 
   <string name="ftue__bullet_1" translatable="false">●○○</string>
