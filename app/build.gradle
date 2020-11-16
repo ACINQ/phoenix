@@ -33,7 +33,7 @@ android {
     minSdkVersion 24
     targetSdkVersion 30
     versionCode 17
-    versionName "1.4.2-RC"
+    versionName "1.4.2"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
