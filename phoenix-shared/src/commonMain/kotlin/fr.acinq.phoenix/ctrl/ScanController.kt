@@ -20,6 +20,4 @@ object Scan {
         data class Send(val request: String, val amount: Double, val unit: BitcoinUnit) : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
-
 }

@@ -1,35 +1,24 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.CltvExpiry
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.io.PaymentRequestGenerated
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.ReceivePayment
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.secure
 import fr.acinq.phoenix.ctrl.Receive
-import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.toMilliSatoshi
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.filter
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppReceiveController(di: DI) : AppController<Receive.Model, Receive.Intent>(di, Receive.Model.Awaiting) {
+class AppReceiveController(loggerFactory: LoggerFactory, private val peer: Peer) : AppController<Receive.Model, Receive.Intent>(loggerFactory, Receive.Model.Awaiting) {
 
-    val preimage = ByteVector32(Random.secure().nextBytes(32))
-
-    val peer: Peer by instance()
+    private val preimage = ByteVector32(Random.secure().nextBytes(32))
 
     private val Receive.Intent.Ask.paymentAmountMsat: MilliSatoshi? get() = amount?.toMilliSatoshi(unit)
 

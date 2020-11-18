@@ -1,15 +1,7 @@
 import SwiftUI
 import PhoenixShared
 
-class ObservableDI: ObservableObject {
-    let di: DI
-
-    init(_ di: DI) { self.di = di }
-}
-
-struct ContentView: MVIView {
-    typealias Model = Content.Model
-    typealias Intent = Content.Intent
+struct ContentView: View {
 
     static func UIKitAppearance() {
         let appearance = UINavigationBarAppearance()
@@ -22,12 +14,12 @@ struct ContentView: MVIView {
 
     var body: some View {
         appView(
-            mvi { model, intent in
+            MVIView({ $0.content() }) { model, intent in
                 NavigationView {
                     if model is Content.ModelIsInitialized {
                         HomeView()
                     } else if model is Content.ModelNeedInitialization {
-                        InitView()
+                        InitializationView()
                     } else {
                         VStack {
                             // Maybe a better animation / transition screen ?
@@ -44,29 +36,15 @@ struct ContentView: MVIView {
                 }
             }
         )
-
-                    .environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
     }
 }
 
-func mockView<V : View>(_ content: V, block: @escaping (MockDIBuilder) -> Void) -> some View {
-    content
-            .environmentObject(
-                    ObservableDI(
-                            DI((UIApplication.shared.delegate as! AppDelegate).mocks.apply(block: block).di())
-                    )
-            )
-}
-
-func appView<V : View>(_ content: V) -> some View {
-    content.environmentObject(ObservableDI((UIApplication.shared.delegate as! AppDelegate).di))
-}
 
 class ContentView_Previews: PreviewProvider {
     static let mockModel = Content.ModelNeedInitialization()
 
     static var previews: some View {
-        mockView(ContentView()) { $0.contentModel = mockModel }
+        mockView(ContentView())
                 .previewDevice("iPhone 11")
     }
 

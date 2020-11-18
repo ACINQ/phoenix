@@ -12,6 +12,4 @@ object Configuration {
     }
 
     sealed class Intent : MVI.Intent()
-
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 }

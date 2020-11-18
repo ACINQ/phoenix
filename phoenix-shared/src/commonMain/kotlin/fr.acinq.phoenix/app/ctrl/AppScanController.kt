@@ -7,12 +7,9 @@ import fr.acinq.eclair.utils.UUID
 import fr.acinq.phoenix.ctrl.Scan
 import fr.acinq.phoenix.data.toMilliSatoshi
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
-class AppScanController(di: DI) : AppController<Scan.Model, Scan.Intent>(di, Scan.Model.Ready) {
-
-    private val peer: Peer by instance()
+class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : AppController<Scan.Model, Scan.Intent>(loggerFactory, Scan.Model.Ready) {
 
     override fun process(intent: Scan.Intent) {
         when (intent) {

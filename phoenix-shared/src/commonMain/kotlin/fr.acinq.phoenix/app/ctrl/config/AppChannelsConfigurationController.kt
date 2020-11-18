@@ -16,16 +16,11 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.json.Json
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppChannelsConfigurationController(di: DI) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(di, ChannelsConfiguration.emptyModel) {
-
-    private val peer: Peer by instance()
-    private val appConfig: AppConfigurationManager by instance()
-    private val chain: Chain by instance()
+class AppChannelsConfigurationController(loggerFactory: LoggerFactory, private val peer: Peer, private val appConfig: AppConfigurationManager, private val chain: Chain) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(loggerFactory, ChannelsConfiguration.emptyModel) {
 
     private val json = Json {
         prettyPrint = true

@@ -2,9 +2,7 @@ import SwiftUI
 import PhoenixShared
 
 
-struct ReceiveView: MVIView {
-    typealias Model = Receive.Model
-    typealias Intent = Receive.Intent
+struct ReceiveView: View {
 
     class QRCode : ObservableObject {
         @Published var value: String? = nil
@@ -41,15 +39,15 @@ struct ReceiveView: MVIView {
 
     var body: some View {
         ZStack {
-            mvi(onModel: { change in
+            MVIView({ $0.receive() }, onModel: { change in
                 if let m = change.newModel as? Receive.ModelGenerated {
                     qrCode.generate(value: m.request)
                 }
-            }) { model, intent in
-                    view(model: model, intent: intent)
+            }) { model, postIntent in
+                    view(model: model, postIntent: postIntent)
                             .navigationBarTitle("Receive ", displayMode: .inline)
                             .onAppear {
-                                intent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
+                                postIntent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
                             }
             }
 
@@ -59,7 +57,7 @@ struct ReceiveView: MVIView {
                 .background(Color.appBackground)
     }
 
-    @ViewBuilder func view(model: Receive.Model, intent: @escaping IntentReceiver) -> some View {
+    @ViewBuilder func view(model: Receive.Model, postIntent: @escaping (Receive.Intent) -> Void) -> some View {
         ZStack {
             VStack {
                 switch model {
@@ -103,7 +101,7 @@ struct ReceiveView: MVIView {
                         amount: m.amount?.description ?? "",
                         unit: m.unit,
                         desc: m.desc ?? "",
-                        intent: intent
+                        postIntent: postIntent
                 )
             }
         }
@@ -144,7 +142,7 @@ struct ReceiveView: MVIView {
 
         @State var illegal: Bool = false
 
-        let intent: IntentReceiver
+        let postIntent: (Receive.Intent) -> Void
 
         var body: some View {
             Popup(show: show) {
@@ -193,7 +191,7 @@ struct ReceiveView: MVIView {
                     HStack {
                         Spacer()
                         Button("OK") {
-                            intent(Receive.IntentAsk(amount: amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!), unit: unit, desc: desc.isEmpty ? nil : desc))
+                            postIntent(Receive.IntentAsk(amount: amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!), unit: unit, desc: desc.isEmpty ? nil : desc))
                             withAnimation { show = false }
                         }
                                 .font(.title2)
@@ -220,7 +218,7 @@ class ReceiveView_Previews: PreviewProvider {
 //    static let mockModel = Receive.ModelAwaiting()
 
     static var previews: some View {
-        mockView(ReceiveView()) { $0.receiveModel = ReceiveView_Previews.mockModel }
+        mockView(ReceiveView())
                 .previewDevice("iPhone 11")
     }
 

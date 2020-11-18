@@ -7,19 +7,19 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.DIAware
+import org.kodein.log.LoggerFactory
 import platform.Network.*
 import platform.darwin.dispatch_get_main_queue
 
+
 @OptIn(ExperimentalCoroutinesApi::class)
-actual class NetworkMonitor actual constructor(override val di: DI) : DIAware, CoroutineScope by MainScope() {
+actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, ctx: PlatformContext) : CoroutineScope by MainScope() {
     private val monitor = nw_path_monitor_create()
     private val connectivityChannel = ConflatedBroadcastChannel<Connection>()
     actual fun openNetworkStateSubscription(): ReceiveChannel<Connection> = connectivityChannel.openSubscription()
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    actual fun start(): Unit {
+    actual fun start() {
         nw_path_monitor_set_update_handler(monitor) { path ->
             val status =
                 if (nw_path_get_status(path) == nw_path_status_satisfied) Connection.ESTABLISHED
@@ -32,7 +32,7 @@ actual class NetworkMonitor actual constructor(override val di: DI) : DIAware, C
         nw_path_monitor_start(monitor)
     }
 
-    actual fun stop(): Unit {
+    actual fun stop() {
         nw_path_monitor_cancel(monitor)
     }
 }

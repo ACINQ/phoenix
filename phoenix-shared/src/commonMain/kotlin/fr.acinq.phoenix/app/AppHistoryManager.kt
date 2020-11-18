@@ -8,7 +8,6 @@ import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.Transaction
-import fr.acinq.phoenix.utils.TAG_APPLICATION
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -19,18 +18,12 @@ import org.kodein.db.DB
 import org.kodein.db.find
 import org.kodein.db.on
 import org.kodein.db.useModels
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.instance
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainScope() {
+class AppHistoryManager(private val appDb: DB, private val peer: Peer) : CoroutineScope by MainScope() {
 
-    private val db: DB by instance(tag = TAG_APPLICATION)
-    private val peer: Peer by instance()
-
-    private fun getList() = db.find<Transaction>().byIndex("timestamp").useModels(reverse = true) { it.toList() }
+    private fun getList() = appDb.find<Transaction>().byIndex("timestamp").useModels(reverse = true) { it.toList() }
 
     private val transactions = ConflatedBroadcastChannel(getList())
 
@@ -39,7 +32,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
             peer.openListenerEventSubscription().consumeEach {
                 when (it) {
                     is PaymentReceived -> {
-                        db.put(
+                        appDb.put(
                             Transaction(
                                 UUID.randomUUID().toString(),
                                 it.incomingPayment.paymentRequest.amount?.toLong() ?: error("Received a payment without amount ?!?"),
@@ -51,7 +44,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                     }
                     is PaymentProgress -> {
                         val totalAmount = it.payment.paymentAmount + it.fees
-                        db.put(
+                        appDb.put(
                             Transaction(
                                 id = it.payment.paymentId.toString(),
                                 amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
@@ -63,7 +56,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                     }
                     is PaymentSent -> {
                         val totalAmount = it.payment.paymentAmount + it.fees
-                        db.put(
+                        appDb.put(
                             Transaction(
                                 id = it.payment.paymentId.toString(),
                                 amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
@@ -74,7 +67,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
                         )
                     }
                     is PaymentNotSent -> {
-                        db.put(
+                        appDb.put(
                             Transaction(
                                 id = it.payment.paymentId.toString(),
                                 amountSat = -it.payment.paymentAmount.toLong(), // storing value in MilliSatoshi
@@ -91,7 +84,7 @@ class AppHistoryManager(override val di: DI) : DIAware, CoroutineScope by MainSc
 
         fun updateChannel() = launch { transactions.send(getList()) }
 
-        db.on<Transaction>().register {
+        appDb.on<Transaction>().register {
             didPut { updateChannel() }
             didDelete { updateChannel() }
         }

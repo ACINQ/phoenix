@@ -3,7 +3,6 @@ package fr.acinq.phoenix.app
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.utils.TAG_APPLICATION
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.utils.io.errors.*
@@ -13,25 +12,22 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.serialization.SerializationException
 import org.kodein.db.*
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.direct
-import org.kodein.di.instance
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
-class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by MainScope() {
-    private val db: DB by instance(tag = TAG_APPLICATION)
-    private val electrumClient: ElectrumClient by instance()
-    private val httpClient: HttpClient by instance()
-    private val chain: Chain by instance()
+class AppConfigurationManager(
+    private val appDB: DB,
+    private val electrumClient: ElectrumClient,
+    private val httpClient: HttpClient,
+    private val chain: Chain,
+    loggerFactory: LoggerFactory
+) : CoroutineScope by MainScope() {
 
-    private val logger = direct.instance<LoggerFactory>().newLogger(AppConfigurationManager::class)
+    private val logger = newLogger(loggerFactory)
 
     private val electrumServerUpdates = ConflatedBroadcastChannel<ElectrumServer>()
     fun openElectrumServerUpdateSubscription(): ReceiveChannel<ElectrumServer> =
@@ -42,7 +38,7 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
             e.g. for Electrum Server : reconnect to new server
      */
     init {
-        db.on<ElectrumServer>().register {
+        appDB.on<ElectrumServer>().register {
             didPut {
                 launch { electrumServerUpdates.send(it) }
             }
@@ -66,47 +62,47 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
     }
 
     // General
-    private val appConfigurationKey = db.key<AppConfiguration>(0)
+    private val appConfigurationKey = appDB.key<AppConfiguration>(0)
     private fun createAppConfiguration(): AppConfiguration {
-        if (db[appConfigurationKey] == null) {
+        if (appDB[appConfigurationKey] == null) {
             logger.info { "Create app configuration" }
-            db.put(AppConfiguration())
+            appDB.put(AppConfiguration())
         }
-        return db[appConfigurationKey] ?: error("App configuration must be initialized.")
+        return appDB[appConfigurationKey] ?: error("App configuration must be initialized.")
     }
 
-    fun getAppConfiguration(): AppConfiguration = db[appConfigurationKey] ?: createAppConfiguration()
+    fun getAppConfiguration(): AppConfiguration = appDB[appConfigurationKey] ?: createAppConfiguration()
 
     fun putFiatCurrency(fiatCurrency: FiatCurrency) {
         logger.info { "Change fiat currency [$fiatCurrency]" }
-        db.put(appConfigurationKey, getAppConfiguration().copy(fiatCurrency = fiatCurrency))
+        appDB.put(appConfigurationKey, getAppConfiguration().copy(fiatCurrency = fiatCurrency))
     }
 
     fun putBitcoinUnit(bitcoinUnit: BitcoinUnit) {
         logger.info { "Change bitcoin unit [$bitcoinUnit]" }
-        db.put(appConfigurationKey, getAppConfiguration().copy(bitcoinUnit = bitcoinUnit))
+        appDB.put(appConfigurationKey, getAppConfiguration().copy(bitcoinUnit = bitcoinUnit))
     }
 
     fun putAppTheme(appTheme: AppTheme) {
         logger.info { "Change app theme [$appTheme]" }
-        db.put(appConfigurationKey, getAppConfiguration().copy(appTheme = appTheme))
+        appDB.put(appConfigurationKey, getAppConfiguration().copy(appTheme = appTheme))
     }
 
     // Electrum
-    private val electrumServerKey = db.key<ElectrumServer>(0)
+    private val electrumServerKey = appDB.key<ElectrumServer>(0)
     private fun createElectrumConfiguration(): ElectrumServer {
-        if (db[electrumServerKey] == null) {
+        if (appDB[electrumServerKey] == null) {
             logger.info { "Create ElectrumX configuration" }
             setRandomElectrumServer()
         }
-        return db[electrumServerKey] ?: error("ElectrumServer must be initialized.")
+        return appDB[electrumServerKey] ?: error("ElectrumServer must be initialized.")
     }
 
-    fun getElectrumServer(): ElectrumServer = db[electrumServerKey] ?: createElectrumConfiguration()
+    fun getElectrumServer(): ElectrumServer = appDB[electrumServerKey] ?: createElectrumConfiguration()
 
     private fun putElectrumServer(electrumServer: ElectrumServer) {
         logger.info { "Update electrum configuration [$electrumServer]" }
-        db.put(electrumServerKey, electrumServer)
+        appDB.put(electrumServerKey, electrumServer)
     }
 
     fun putElectrumServerAddress(host: String, port: Int, customized: Boolean = false) {
@@ -124,8 +120,8 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
     }
 
     // Bitcoin exchange rates
-    public fun getBitcoinRates(): List<BitcoinPriceRate> = db.find<BitcoinPriceRate>().all().useModels {it.toList()}
-    public fun getBitcoinRate(fiatCurrency: FiatCurrency): BitcoinPriceRate = db.find<BitcoinPriceRate>().byId(fiatCurrency.name).model()
+    public fun getBitcoinRates(): List<BitcoinPriceRate> = appDB.find<BitcoinPriceRate>().all().useModels {it.toList()}
+    public fun getBitcoinRate(fiatCurrency: FiatCurrency): BitcoinPriceRate = appDB.find<BitcoinPriceRate>().byId(fiatCurrency.name).model()
 
     private fun launchUpdateRates() = launch {
         while (isActive) {
@@ -153,10 +149,10 @@ class AppConfigurationManager(override val di: DI) : DIAware, CoroutineScope by 
                         }
                     }
 
-            db.execBatch {
+            appDB.execBatch {
                 logger.verbose { "Saving price rates: $exchangeRates" }
                 exchangeRates.forEach {
-                    db.put(it)
+                    appDB.put(it)
                 }
             }
 

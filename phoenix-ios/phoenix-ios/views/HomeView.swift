@@ -2,9 +2,7 @@ import SwiftUI
 import PhoenixShared
 import Network
 
-struct HomeView : MVIView {
-    typealias Model = Home.Model
-    typealias Intent = Home.Intent
+struct HomeView : View {
 
     @State var lastTransaction: PhoenixShared.Transaction? = nil
     @State var showConnections = false
@@ -12,7 +10,8 @@ struct HomeView : MVIView {
     @State var selectedTransaction: PhoenixShared.Transaction? = nil
 
     var body: some View {
-        mvi(
+        MVIView(
+                { $0.home() },
                 background: true,
                 onModel: { change in
                     if lastTransaction != change.newModel.lastTransaction {
@@ -20,9 +19,9 @@ struct HomeView : MVIView {
                         selectedTransaction = lastTransaction
                     }
                 }
-        ) { model, intent in
+        ) { model, postIntent in
             ZStack {
-                VStack() {
+                VStack {
                     HStack {
                         ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
                         Spacer()
@@ -289,8 +288,7 @@ class HomeView_Previews : PreviewProvider {
     )
 
     static var previews: some View {
-//        mockView(HomeView()) { $0.homeModel = mockModel }
-        appView(HomeView())
+        mockView(HomeView())
                 .previewDevice("iPhone 11")
     }
 

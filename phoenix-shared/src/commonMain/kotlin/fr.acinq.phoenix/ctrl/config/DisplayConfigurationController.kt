@@ -19,5 +19,4 @@ object DisplayConfiguration {
         data class UpdateAppTheme(val appTheme: AppTheme) : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 }

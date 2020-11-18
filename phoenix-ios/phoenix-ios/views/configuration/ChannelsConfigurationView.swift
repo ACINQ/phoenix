@@ -1,10 +1,7 @@
 import SwiftUI
 import PhoenixShared
 
-struct ChannelsConfigurationView: MVIView {
-
-    typealias Model = ChannelsConfiguration.Model
-    typealias Intent = ChannelsConfiguration.Intent
+struct ChannelsConfigurationView: View {
 
     @State var sharing: String? = nil
 
@@ -13,7 +10,7 @@ struct ChannelsConfigurationView: MVIView {
     @StateObject var toast = Toast()
 
     var body: some View {
-        mvi { model, intent in
+        MVIView({ $0.channelsConfiguration() }) { model, postIntent in
             ZStack {
                 VStack {
                     Text("Your node ID: \(model.nodeId)")
@@ -165,7 +162,7 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
     )
 
     static var previews: some View {
-        mockView(ChannelsConfigurationView()) { $0.channelsConfigurationModel = mockModel }
+        mockView(ChannelsConfigurationView())
             .previewDevice("iPhone 11")
     }
 

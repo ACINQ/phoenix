@@ -5,12 +5,10 @@ import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.Configuration
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppConfigurationController(di: DI) : AppController<Configuration.Model, Configuration.Intent>(di, Configuration.Model.SimpleMode) {
-    private val walletManager: WalletManager by instance()
+class AppConfigurationController(loggerFactory: LoggerFactory, private val walletManager: WalletManager) : AppController<Configuration.Model, Configuration.Intent>(loggerFactory, Configuration.Model.SimpleMode) {
 
     init {
         launch {

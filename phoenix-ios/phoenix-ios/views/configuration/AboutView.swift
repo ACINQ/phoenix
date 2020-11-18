@@ -92,7 +92,7 @@ class AboutView_Previews : PreviewProvider {
     static let mockModel = Configuration.ModelSimpleMode()
 
     static var previews: some View {
-        mockView(AboutView()) { $0.configurationModel = mockModel }
+        AboutView()
             .previewDevice("iPhone 11")
     }
 

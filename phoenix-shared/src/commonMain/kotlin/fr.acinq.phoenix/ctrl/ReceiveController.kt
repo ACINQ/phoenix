@@ -17,6 +17,4 @@ object Receive {
         data class Ask(val amount: Double?, val unit: BitcoinUnit, val desc: String?) : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
-
 }

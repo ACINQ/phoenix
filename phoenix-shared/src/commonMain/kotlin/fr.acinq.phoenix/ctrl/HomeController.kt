@@ -21,8 +21,6 @@ object Home {
 
     sealed class Intent : MVI.Intent()
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
-
 }
 
 data class Connections(

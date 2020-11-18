@@ -1,12 +1,10 @@
 import SwiftUI
 import PhoenixShared
 
-struct ConfigurationView: MVIView {
-    typealias Model = Configuration.Model
-    typealias Intent = Configuration.Intent
-	
+struct ConfigurationView: View {
+
 	var body: some View {
-		mvi { model, intent in
+		MVIView({ $0.configuration() }) { model, postIntent in
 			List {
 				let fullMode = model is Configuration.ModelFullMode
 
@@ -90,9 +88,7 @@ class ConfigurationView_Previews: PreviewProvider {
     static let mockModel = Configuration.ModelFullMode()
 
     static var previews: some View {
-        mockView(ConfigurationView()) {
-            $0.configurationModel = mockModel
-        }
+        mockView(ConfigurationView())
 		.previewDevice("iPhone 11")
     }
 

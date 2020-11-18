@@ -17,5 +17,4 @@ object RestoreWallet {
         data class FilterWordList(val predicate: String) : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 }

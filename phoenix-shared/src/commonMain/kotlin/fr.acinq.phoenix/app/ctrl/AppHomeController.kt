@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
@@ -13,16 +12,11 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppHomeController(di: DI) : AppController<Home.Model, Home.Intent>(di, Home.emptyModel) {
-    private val peer: Peer by instance()
-    private val electrumClient: ElectrumClient by instance()
-    private val networkMonitor: NetworkMonitor by instance()
-    private val historyManager: AppHistoryManager by instance()
+class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, private val electrumClient: ElectrumClient, private val networkMonitor: NetworkMonitor, private val historyManager: AppHistoryManager) : AppController<Home.Model, Home.Intent>(loggerFactory, Home.emptyModel) {
 
     init {
         launch {

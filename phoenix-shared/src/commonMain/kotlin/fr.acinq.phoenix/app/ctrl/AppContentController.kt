@@ -5,13 +5,10 @@ import fr.acinq.phoenix.ctrl.Content
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppContentController(di: DI) : AppController<Content.Model, Content.Intent>(di, Content.Model.Waiting) {
-    private val walletManager: WalletManager by instance()
-
+class AppContentController(loggerFactory: LoggerFactory, private val walletManager: WalletManager) : AppController<Content.Model, Content.Intent>(loggerFactory, Content.Model.Waiting) {
     init {
         launch {
             if (walletManager.getWallet() != null) {

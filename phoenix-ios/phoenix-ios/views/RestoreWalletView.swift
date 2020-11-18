@@ -1,17 +1,15 @@
 import SwiftUI
 import PhoenixShared
 
-struct RestoreWalletView: MVIView {
-    typealias Model = RestoreWallet.Model
-    typealias Intent = RestoreWallet.Intent
+struct RestoreWalletView: View {
 
     var body: some View {
-        mvi(onModel: { change in
+        MVIView({ $0.restoreWallet() }, onModel: { change in
             if change.previousModel is RestoreWallet.ModelWarning && !(change.newModel is RestoreWallet.ModelWarning) {
                 change.animation = .default
             }
-        }) { model, intent in
-            view(model: model, intent: intent)
+        }) { model, postIntent in
+            view(model: model, postIntent: postIntent)
                     .padding(.top, keyWindow?.safeAreaInsets.bottom)
                     .padding(.bottom, keyWindow?.safeAreaInsets.top)
                     .padding([.leading, .trailing], 10)
@@ -20,22 +18,22 @@ struct RestoreWalletView: MVIView {
                 .navigationBarTitle("Restore my wallet", displayMode: .inline)
     }
 
-    @ViewBuilder func view(model: RestoreWallet.Model, intent: @escaping IntentReceiver) -> some View {
+    @ViewBuilder func view(model: RestoreWallet.Model, postIntent: @escaping (RestoreWallet.Intent) -> Void) -> some View {
         
         if let _ = model as? RestoreWallet.ModelWarning {
-            WarningView(intent: intent)
+            WarningView(postIntent: postIntent)
             .zIndex(1)
             .transition(.move(edge: .bottom))
         } else {
-            RestoreView(model: model, intent: intent)
+            RestoreView(model: model, postIntent: postIntent)
             .zIndex(0)
         }
     }
 
     struct WarningView: View {
-        let intent: IntentReceiver
+        let postIntent: (RestoreWallet.Intent) -> Void
 
-        @State private var warningAccepted = false
+        @State var warningAccepted = false
 
         var body: some View {
           VStack {
@@ -56,7 +54,7 @@ struct RestoreWalletView: MVIView {
             .padding([.leading, .trailing], 88)
 
             Button {
-                intent(RestoreWallet.IntentAcceptWarning())
+                postIntent(RestoreWallet.IntentAcceptWarning())
             } label: {
                 HStack {
                     Image("ic_arrow_next")
@@ -85,11 +83,11 @@ struct RestoreWalletView: MVIView {
 
     struct RestoreView: View {
         let model: RestoreWallet.Model
-        let intent: IntentReceiver
+        let postIntent: (RestoreWallet.Intent) -> Void
 
 
-        @State private var wordInput: String = ""
-        @State private var mnemonics = [String]()
+        @State var wordInput: String = ""
+        @State var mnemonics = [String]()
 
         var body: some View {
             VStack {
@@ -98,7 +96,7 @@ struct RestoreWalletView: MVIView {
                 .padding(.top, 20)
 
                 TextField("Enter keywords from your seed", text: $wordInput).onChange(of: wordInput) { input in
-                            intent(RestoreWallet.IntentFilterWordList(predicate: input))
+                            postIntent(RestoreWallet.IntentFilterWordList(predicate: input))
                         }
                         .padding()
                         .disableAutocorrection(true)
@@ -167,7 +165,7 @@ struct RestoreWalletView: MVIView {
                 Spacer()
 
                 Button {
-                    intent(RestoreWallet.IntentValidateSeed(mnemonics: self.mnemonics))
+                    postIntent(RestoreWallet.IntentValidateSeed(mnemonics: self.mnemonics))
                 } label: {
                     HStack {
                     //  Image("ic_check_circle")
@@ -206,9 +204,7 @@ class RestoreWalletView_Previews: PreviewProvider {
 //    static let mockModel = RestoreWallet.ModelWordlist(words: ["abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid"])
 
     static var previews: some View {
-        mockView(RestoreWalletView()) {
-            $0.restoreWalletModel = mockModel
-        }
+        mockView(RestoreWalletView())
                 .previewDevice("iPhone 11")
     }
 

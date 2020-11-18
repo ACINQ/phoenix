@@ -6,15 +6,10 @@ import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.TAG_ACINQ_NODE_URI
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.direct
-import org.kodein.di.instance
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -23,17 +18,17 @@ import kotlin.time.seconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by MainScope() {
+class AppConnectionsDaemon(
+    private val configurationManager: AppConfigurationManager,
+    private val walletManager: WalletManager,
+    private val monitor: NetworkMonitor,
+    private val electrumClient: ElectrumClient,
+    private val acinqNodeUri: NodeUri,
+    loggerFactory: LoggerFactory,
+    private val getPeer: () -> Peer // peer is lazy as it may not exist yet.
+) : CoroutineScope by MainScope() {
 
-    private val configurationManager: AppConfigurationManager by instance()
-    private val walletManager: WalletManager by instance()
-
-    private val monitor: NetworkMonitor by instance()
-    private val peer: Peer by instance()
-    private val electrumClient: ElectrumClient by instance()
-    val acinqNodeUri: NodeUri by instance(tag = TAG_ACINQ_NODE_URI)
-
-    private val logger = direct.instance<LoggerFactory>().newLogger(AppConnectionsDaemon::class)
+    private val logger = newLogger(loggerFactory)
 
     private val electrumConnectionOrder = Channel<ConnectionOrder>()
     private val peerConnectionOrder = Channel<ConnectionOrder>()
@@ -85,8 +80,8 @@ class AppConnectionsDaemon(override val di: DI) : DIAware, CoroutineScope by Mai
             peerConnectionOrder.consumeEach {
                 when {
                     it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
-                        peerConnectionJob = connectionLoop("Peer", peer.openConnectedSubscription()) {
-                            peer.connect(acinqNodeUri.host, acinqNodeUri.port)
+                        peerConnectionJob = connectionLoop("Peer", getPeer().openConnectedSubscription()) {
+                            getPeer().connect(acinqNodeUri.host, acinqNodeUri.port)
                         }
                     }
                     else -> {

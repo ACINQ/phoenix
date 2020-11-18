@@ -2,29 +2,21 @@ package fr.acinq.phoenix.android.mvi
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.viewinterop.viewModel
-import fr.acinq.phoenix.android.utils.di
+import fr.acinq.phoenix.android.utils.isPreview
+import fr.acinq.phoenix.ctrl.ControllerFactory
 import fr.acinq.phoenix.ctrl.MVI
-import org.kodein.di.DI
-import org.kodein.type.TypeToken
-import org.kodein.type.generic
 
 
-/**
- * Display some content according to the model being emited by an MVI controller.
- *
- * @param M Model
- * @param I Intent
- * @param controllerType Ttype token representing the type of controller we wish to use.
- * @param content Composable displaying content according to an [M] model.
- */
-@Composable
-fun <M : MVI.Model, I : MVI.Intent> mviView(
-    controllerType: TypeToken<MVI.Controller<M, I>>,
-    content: @Composable (model: M, postIntent: (I) -> Unit) -> Unit
-) {
+@Composable fun <M : MVI.Model, I : MVI.Intent> MVIView(getController: ControllerFactory.() -> MVI.Controller<M, I>, children: @Composable (model: M, postIntent: (I) -> Unit) -> Unit) {
     // Gets the MVI controller or create it if it does not already exist.
     // Note that the controller is stored inside a ViewModel, which means that it will survive configuration changes activity restarts.
-    val controller: MVI.Controller<M, I> by viewModel(factory = MVIControllerViewModel.Factory(di(), controllerType))
+    val controller = if (!isPreview) {
+        val viewModel: MVIControllerViewModel<M, I> = viewModel(factory = MVIControllerViewModel.Factory(controllerFactory, getController))
+        viewModel.controller
+    } else {
+        val cf = ControllerFactoryAmbient.current ?: MockControllers
+        remember { cf.getController() }
+    }
 
     var model by remember { mutableStateOf(controller.firstModel) }
 
@@ -38,29 +30,5 @@ fun <M : MVI.Model, I : MVI.Intent> mviView(
     }
 
     // Display content according to model.
-    content(model) { controller.intent(it) }
-}
-
-/**
- * @see View
- */
-inline class MVIContext<C : MVI.Controller<*, *>>(val controllerType: TypeToken<C>)
-
-/**
- * Utility to allow the `mvi<Controller>().View` syntax.
- *
- * @param C Controller type
- */
-inline fun <reified C : MVI.Controller<*, *>> mvi(): MVIContext<C> = MVIContext(generic())
-
-
-/**
- * Utility to allow the `mvi<Controller>().View` syntax.
- *
- * @param content Composable displaying content according to an [M] model.
- */
-@Composable
-fun <M : MVI.Model, I : MVI.Intent, C : MVI.Controller<M, I>> MVIContext<C>.View(content: @Composable (model: M, postIntent: (I) -> Unit) -> Unit) {
-    @Suppress("UNCHECKED_CAST")
-    mviView(controllerType as TypeToken<MVI.Controller<M, I>>, content)
+    children(model) { controller.intent(it) }
 }

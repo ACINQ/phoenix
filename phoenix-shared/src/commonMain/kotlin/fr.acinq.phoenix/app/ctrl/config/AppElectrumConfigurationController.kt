@@ -8,21 +8,13 @@ import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.InvalidElectrumAddress
-import fr.acinq.phoenix.utils.TAG_MASTER_PUBKEY_PATH
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppElectrumConfigurationController(di: DI) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(di, ElectrumConfiguration.Model()) {
-    private val configurationManager: AppConfigurationManager by instance()
-    private val chain: Chain by instance()
-    private val masterPubkeyPath: String by instance(tag = TAG_MASTER_PUBKEY_PATH)
-    private val walletManager: WalletManager by instance()
-    private val electrumClient: ElectrumClient by instance()
-
+class AppElectrumConfigurationController(loggerFactory: LoggerFactory, private val configurationManager: AppConfigurationManager, private val chain: Chain, private val masterPubkeyPath: String, private val walletManager: WalletManager, private val electrumClient: ElectrumClient) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(loggerFactory, ElectrumConfiguration.Model()) {
     private var electrumConnection: Connection = Connection.CLOSED
 
     init {

@@ -5,13 +5,10 @@ import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.ctrl.RestoreWallet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppRestoreWalletController(di: DI) : AppController<RestoreWallet.Model, RestoreWallet.Intent>(di, RestoreWallet.Model.Warning) {
-
-    private val walletManager: WalletManager by instance()
+class AppRestoreWalletController(loggerFactory: LoggerFactory, private val walletManager: WalletManager) : AppController<RestoreWallet.Model, RestoreWallet.Intent>(loggerFactory, RestoreWallet.Model.Warning) {
 
     override fun process(intent: RestoreWallet.Intent) {
         when (intent) {

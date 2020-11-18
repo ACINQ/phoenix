@@ -6,12 +6,9 @@ import fr.acinq.phoenix.ctrl.config.DisplayConfiguration
 import fr.acinq.phoenix.ctrl.config.DisplayConfiguration.Intent
 import fr.acinq.phoenix.ctrl.config.DisplayConfiguration.Intent.*
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
-import org.kodein.di.instance
+import org.kodein.log.LoggerFactory
 
-class AppDisplayConfigurationController(di: DI) : AppController<DisplayConfiguration.Model, Intent>(di, DisplayConfiguration.Model()) {
-    private val configurationManager: AppConfigurationManager by instance()
-
+class AppDisplayConfigurationController(loggerFactory: LoggerFactory, private val configurationManager: AppConfigurationManager) : AppController<DisplayConfiguration.Model, Intent>(loggerFactory, DisplayConfiguration.Model()) {
     init { sendDisplayConfigurationModel() }
 
     override fun process(intent: Intent) {

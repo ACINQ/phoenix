@@ -1,23 +1,22 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.phoenix.ctrl.MVI
-import fr.acinq.phoenix.utils.newLogger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
-import org.kodein.di.DI
-import org.kodein.di.DIAware
+import org.kodein.log.LoggerFactory
+import org.kodein.log.newLogger
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class AppController<M : MVI.Model, I : MVI.Intent>(override val di: DI, firstModel: M) : MVI.Controller<M, I>(firstModel), DIAware, CoroutineScope {
+abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: LoggerFactory, firstModel: M) : MVI.Controller<M, I>(firstModel), CoroutineScope {
 
     private val job = Job()
 
     override val coroutineContext = MainScope().coroutineContext + job
 
-    protected val logger = newLogger()
+    protected val logger = newLogger(loggerFactory)
 
     private val models = ConflatedBroadcastChannel(firstModel)
 

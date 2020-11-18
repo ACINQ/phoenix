@@ -22,5 +22,4 @@ object ElectrumConfiguration {
         data class UpdateElectrumServer(val customized: Boolean, val address: String) : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 }

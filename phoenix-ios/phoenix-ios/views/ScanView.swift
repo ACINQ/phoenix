@@ -4,9 +4,7 @@ import PhoenixShared
 
 import UIKit
 
-struct ScanView: MVIView {
-    typealias Model = Scan.Model
-    typealias Intent = Scan.Intent
+struct ScanView: View {
 
     @Binding var isShowing: Bool
 
@@ -14,7 +12,7 @@ struct ScanView: MVIView {
 
     var body: some View {
         ZStack {
-            mvi(onModel: { change in
+            MVIView({ $0.scan() }, onModel: { change in
                 print("NEW MODEL: \(change.newModel)")
                 if change.newModel is Scan.ModelSending {
                     isShowing = false
@@ -23,7 +21,7 @@ struct ScanView: MVIView {
                 }
                 change.animateIfModelTypeChanged()
             }) { model, intent in
-                view(model: model, intent: intent)
+                view(model: model, postIntent: intent)
             }
             toast.view()
         }
@@ -32,10 +30,10 @@ struct ScanView: MVIView {
     }
 
     @ViewBuilder
-    func view(model: Scan.Model, intent: @escaping IntentReceiver) -> some View {
+    func view(model: Scan.Model, postIntent: @escaping (Scan.Intent) -> Void) -> some View {
         switch model {
-        case _ as Scan.ModelReady, _ as Scan.ModelBadRequest: ReadyView(intent: intent)
-        case let m as Scan.ModelValidate: ValidateView(model: m, intent: intent)
+        case _ as Scan.ModelReady, _ as Scan.ModelBadRequest: ReadyView(postIntent: postIntent)
+        case let m as Scan.ModelValidate: ValidateView(model: m, postIntent: postIntent)
         case let m as Scan.ModelSending: SendingView(model: m)
         default:
             fatalError("Unknown model \(model)")
@@ -43,7 +41,7 @@ struct ScanView: MVIView {
     }
 
     struct ReadyView: View {
-        let intent: IntentReceiver
+        let postIntent: (Scan.Intent) -> Void
 
         var body: some View {
             VStack {
@@ -54,7 +52,7 @@ struct ScanView: MVIView {
 
                 QrCodeScannerView { request in
                     print(request)
-                    intent(Scan.IntentParse(request: request))
+                    postIntent(Scan.IntentParse(request: request))
                 }
                         .cornerRadius(10)
                         .overlay(
@@ -68,7 +66,7 @@ struct ScanView: MVIView {
 
                 Button {
                     if let request = UIPasteboard.general.string {
-                        intent(Scan.IntentParse(request: request))
+                        postIntent(Scan.IntentParse(request: request))
                     }
                 } label: {
                     Image(systemName: "arrow.right.doc.on.clipboard")
@@ -89,7 +87,7 @@ struct ScanView: MVIView {
     struct ValidateView: View {
         let model: Scan.ModelValidate
 
-        let intent: IntentReceiver
+        let postIntent: (Scan.Intent) -> Void
 
         @State var illegal: Bool = false
         @State var amount: String
@@ -97,7 +95,7 @@ struct ScanView: MVIView {
 
         @State private var textWidth: CGFloat?
 
-        init(model: Scan.ModelValidate, intent: @escaping IntentReceiver) {
+        init(model: Scan.ModelValidate, postIntent: @escaping (Scan.Intent) -> Void) {
             self.model = model
 
             if let amountSat = model.amountSat {
@@ -106,7 +104,7 @@ struct ScanView: MVIView {
                 self._amount = State(initialValue: "")
             }
 
-            self.intent = intent
+            self.postIntent = postIntent
         }
 
         var body: some View {
@@ -146,7 +144,7 @@ struct ScanView: MVIView {
                         .padding([.top, .bottom])
 
                 Button {
-                    intent(Scan.IntentSend(request: model.request, amount: Double(amount)!, unit: unit))
+                    postIntent(Scan.IntentSend(request: model.request, amount: Double(amount)!, unit: unit))
                 } label: {
                     HStack {
                         Image("ic_send")
@@ -197,7 +195,7 @@ class ScanView_Previews: PreviewProvider {
     )
 
     static var previews: some View {
-        mockView(ScanView(isShowing: .constant(true))) { $0.scanModel = ScanView_Previews.mockModel }
+        mockView(ScanView(isShowing: .constant(true)))
                 .previewDevice("iPhone 11")
     }
 

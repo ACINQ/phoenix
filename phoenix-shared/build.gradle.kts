@@ -46,7 +46,6 @@ kotlin {
         val serializationVersion = "1.0.0"
         val secp256k1Version = "0.4.1"
         val ktorVersion = "1.4.1"
-        val kodeinDIVersion = "7.1.0"
         val kodeinDBVersion = "0.2.0-beta"
 
         val commonMain by getting {
@@ -55,7 +54,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-                api("org.kodein.di:kodein-di:$kodeinDIVersion")
                 api("org.kodein.db:kodein-db:$kodeinDBVersion")
                 api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
@@ -78,7 +76,6 @@ kotlin {
                 api("io.ktor:ktor-network:$ktorVersion")
                 api("io.ktor:ktor-network-tls:$ktorVersion")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
-                api("org.kodein.di:kodein-di-framework-android-x:$kodeinDIVersion")
             }
         }
         val androidTest by getting {
@@ -112,8 +109,8 @@ kotlin {
 
 val packForXcode by tasks.creating(Sync::class) {
     group = "build"
-    val mode = (project.property("XCODE_CONFIGURATION") as? String) ?: "Debug"
-    val platformName = (project.property("XCODE_PLATFORM_NAME") as? String) ?: "iphonesimulator"
+    val mode = (project.findProperty("XCODE_CONFIGURATION") as? String) ?: "Debug"
+    val platformName = (project.findProperty("XCODE_PLATFORM_NAME") as? String) ?: "iphonesimulator"
     val targetName = when (platformName) {
         "iphonesimulator" -> "iosX64"
         "iphoneos" -> "iosArm64"

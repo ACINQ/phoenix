@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.ctrl
 
-typealias InitController = MVI.Controller<Init.Model, Init.Intent>
+typealias InitializationController = MVI.Controller<Initialization.Model, Initialization.Intent>
 
-object Init {
+object Initialization {
 
     sealed class Model : MVI.Model() {
         object Initialization : Model()
@@ -13,5 +13,4 @@ object Init {
         object CreateWallet : Intent()
     }
 
-    class MockController(model: Model): MVI.Controller.Mock<Model, Intent>(model)
 }
