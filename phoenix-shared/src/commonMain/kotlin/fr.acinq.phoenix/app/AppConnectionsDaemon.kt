@@ -8,8 +8,9 @@ import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -45,7 +46,7 @@ class AppConnectionsDaemon(
             electrumConnectionOrder.consumeEach {
                 when {
                     it == ConnectionOrder.CONNECT && networkStatus != Connection.CLOSED -> {
-                        electrumConnectionJob = connectionLoop("Electrum", electrumClient.openConnectedSubscription()) {
+                        electrumConnectionJob = connectionLoop("Electrum", electrumClient.connectionState) {
                             val electrumServer = configurationManager.getElectrumServer()
                             electrumClient.connect(electrumServer.asServerAddress())
                         }
@@ -80,7 +81,7 @@ class AppConnectionsDaemon(
             peerConnectionOrder.consumeEach {
                 when {
                     it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
-                        peerConnectionJob = connectionLoop("Peer", getPeer().openConnectedSubscription()) {
+                        peerConnectionJob = connectionLoop("Peer", getPeer().connectionState) {
                             getPeer().connect(acinqNodeUri.host, acinqNodeUri.port)
                         }
                     }
@@ -119,9 +120,9 @@ class AppConnectionsDaemon(
         }
     }
 
-    private fun connectionLoop(name: String, statusChannel: ReceiveChannel<Connection>, connect: () -> Unit) = launch {
+    private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
         var retryDelay = 1.seconds
-        statusChannel.consumeEach {
+        statusStateFlow.collect {
             logger.verbose { "New $name status $it" }
 
             if (it == Connection.CLOSED) {

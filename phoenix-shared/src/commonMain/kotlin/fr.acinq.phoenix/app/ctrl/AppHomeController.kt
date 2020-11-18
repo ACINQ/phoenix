@@ -9,6 +9,7 @@ import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
@@ -20,12 +21,12 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
 
     init {
         launch {
-            peer.openConnectedSubscription().consumeEach {
+            peer.connectionState.collect {
                 model { copy(connections = connections.copy(peer = it)) }
             }
         }
         launch {
-            electrumClient.openConnectedSubscription().consumeEach {
+            electrumClient.connectionState.collect {
                 model { copy(connections = connections.copy(electrum = it)) }
             }
         }
@@ -36,7 +37,7 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
         }
 
         launch {
-            peer.openChannelsSubscription().consumeEach { channels ->
+            peer.channelsFlow.collect { channels ->
                 model {
                     copy(
                         balanceSat = channels.values.sumOf { it.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0 }

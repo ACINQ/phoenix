@@ -10,6 +10,7 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.InvalidElectrumAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
@@ -21,7 +22,7 @@ class AppElectrumConfigurationController(loggerFactory: LoggerFactory, private v
         sendElectrumConfigurationModel()
 
         launch {
-            electrumClient.openConnectedSubscription().consumeEach {
+            electrumClient.connectionState.collect {
                 electrumConnection = it
                 sendElectrumConfigurationModel()
             }

@@ -13,6 +13,7 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.json.Json
@@ -29,32 +30,34 @@ class AppChannelsConfigurationController(loggerFactory: LoggerFactory, private v
 
     init {
         launch {
-            peer.openChannelsSubscription()
-                .consumeEach {
-                    model(ChannelsConfiguration.Model(
-                        peer.nodeParams.keyManager.nodeId.toString(),
-                        json.encodeToString(MapSerializer(ByteVector32KSerializer, ChannelState.serializer()), it),
-                        it.map { (id , state) ->
-                            ChannelsConfiguration.Model.Channel(
-                                id.toHex(),
-                                state is Normal,
-                                state::class.simpleName ?: "Unknown",
-                                state.localCommitmentSpec?.let { it.toLocal.truncateToSatoshi().toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong() },
-                                json.encodeToString(ChannelState.serializer(), state),
-                                if (state is ChannelStateWithCommitments) {
-                                    val prefix = when (chain) {
-                                        Chain.MAINNET -> ""
-                                        Chain.TESTNET -> "testnet/"
-                                        Chain.REGTEST -> "_REGTEST_/"
-                                    }
-                                    val txId = state.commitments.localCommit.publishableTxs.commitTx.tx.txid
-                                    "https://blockstream.info/$prefix/tx/$txId"
-                                } else null
-                            )
-                        }
-                    ))
+            peer.channelsFlow.collect {
+                model(ChannelsConfiguration.Model(
+                    peer.nodeParams.keyManager.nodeId.toString(),
+                    json.encodeToString(MapSerializer(ByteVector32KSerializer, ChannelState.serializer()), it),
+                    it.map { (id, state) ->
+                        ChannelsConfiguration.Model.Channel(
+                            id.toHex(),
+                            state is Normal,
+                            state::class.simpleName ?: "Unknown",
+                            state.localCommitmentSpec?.let {
+                                it.toLocal.truncateToSatoshi()
+                                    .toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong()
+                            },
+                            json.encodeToString(ChannelState.serializer(), state),
+                            if (state is ChannelStateWithCommitments) {
+                                val prefix = when (chain) {
+                                    Chain.MAINNET -> ""
+                                    Chain.TESTNET -> "testnet/"
+                                    Chain.REGTEST -> "_REGTEST_/"
+                                }
+                                val txId = state.commitments.localCommit.publishableTxs.commitTx.tx.txid
+                                "https://blockstream.info/$prefix/tx/$txId"
+                            } else null
+                        )
+                    }
+                ))
 
-                }
+            }
         }
     }
 
