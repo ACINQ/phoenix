@@ -10,6 +10,7 @@ class ObservableControllerFactory : ObservableObject {
 }
 
 class MockControllerFactory : ControllerFactory {
+	
     func channelsConfiguration() -> MVIController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent> {
         MVIControllerMock(model: ChannelsConfigurationView_Previews.mockModel)
     }
@@ -49,6 +50,11 @@ class MockControllerFactory : ControllerFactory {
     func scan() -> MVIController<Scan.Model, Scan.Intent> {
         MVIControllerMock(model: ScanView_Previews.mockModel)
     }
+	
+	func recoveryPhraseConfiguration() ->
+	MVIController<RecoveryPhraseConfiguration.Model, RecoveryPhraseConfiguration.Intent> {
+		MVIControllerMock(model: RecoverySeedView_Previews.mockModel)
+	}
 }
 
 func appView<V : View>(_ content: V) -> some View {

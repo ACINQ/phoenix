@@ -38,7 +38,7 @@ struct ConfigurationView: View {
 								Image(systemName: "touchid")
 							}
 						}
-						NavigationLink(destination: EmptyView()) {
+						NavigationLink(destination: RecoverySeedView()) {
 							Label { Text("Recovery phrase") } icon: {
 								Image(systemName: "key")
 							}

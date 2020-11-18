@@ -39,6 +39,7 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitializationView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
+		DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */; };
 		DCC8B1B92502BAE2006B6227 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DCC8B1B82502BAE1006B6227 /* Colors.xcassets */; };
 		DCF75B112559D97D009F16EB /* stylesheet.css in Resources */ = {isa = PBXBuildFile; fileRef = DCF75B0F2559D97D009F16EB /* stylesheet.css */; };
 		DCF75B142559D999009F16EB /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DCF75B162559D999009F16EB /* about.html */; };
@@ -116,6 +117,7 @@
 		C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
+		DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySeedView.swift; sourceTree = "<group>"; };
 		DCC8B1B82502BAE1006B6227 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		DCF75B0F2559D97D009F16EB /* stylesheet.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = stylesheet.css; sourceTree = "<group>"; };
 		DCF75B152559D999009F16EB /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
@@ -279,6 +281,7 @@
 				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
 				C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */,
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
+				DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */,
 			);
 			path = configuration;
 			sourceTree = "<group>";
@@ -448,6 +451,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */,
 				7555FF7F242A565900829871 /* PhoenixApplicationDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,

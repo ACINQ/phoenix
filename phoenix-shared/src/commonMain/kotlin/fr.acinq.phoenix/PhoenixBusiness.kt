@@ -18,11 +18,13 @@ import fr.acinq.phoenix.app.ctrl.config.AppChannelsConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
 import fr.acinq.phoenix.app.ctrl.config.AppElectrumConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppRecoveryPhraseConfigurationController
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.ChannelsConfigurationController
 import fr.acinq.phoenix.ctrl.config.ConfigurationController
 import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
+import fr.acinq.phoenix.ctrl.config.RecoveryPhraseConfigurationController
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
@@ -157,5 +159,6 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         override fun displayConfiguration(): DisplayConfigurationController = AppDisplayConfigurationController(loggerFactory, appConfigurationManager)
         override fun electrumConfiguration(): ElectrumConfigurationController = AppElectrumConfigurationController(loggerFactory, appConfigurationManager, chain, masterPubkeyPath, walletManager, electrumClient)
         override fun channelsConfiguration(): ChannelsConfigurationController = AppChannelsConfigurationController(loggerFactory, peer, appConfigurationManager, chain)
+        override fun recoveryPhraseConfiguration(): RecoveryPhraseConfigurationController = AppRecoveryPhraseConfigurationController(loggerFactory, walletManager)
     }
 }
