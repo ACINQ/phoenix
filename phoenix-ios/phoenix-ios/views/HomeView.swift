@@ -9,6 +9,8 @@ struct HomeView : View {
 
     @State var selectedTransaction: PhoenixShared.Transaction? = nil
 
+    @Environment(\.openURL) var openURL
+
     var body: some View {
         MVIView(
                 { $0.home() },
@@ -25,6 +27,25 @@ struct HomeView : View {
                     HStack {
                         ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
                         Spacer()
+                        Button {
+                            openURL(URL(string: "https://phoenix.acinq.co/faq")!)
+                        } label: {
+                            HStack {
+                                Image(systemName: "questionmark.circle")
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                Text("FAQ")
+                                        .font(.caption2)
+                            }
+                        }
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(.all, 4)
+                                .background(Color.appBackgroundLight)
+                                .cornerRadius(10)
+                                .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color.gray, lineWidth: 1)
+                                )
                     }
                     .padding()
 
