@@ -39,10 +39,18 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitializationView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
-		DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */; };
 		DC67654525655CA0004D4263 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC67654225655CA0004D4263 /* about.html */; };
 		DC67654625655CA0004D4263 /* stylesheet.css in Resources */ = {isa = PBXBuildFile; fileRef = DC67654425655CA0004D4263 /* stylesheet.css */; };
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
+		DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */; };
+		DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
+		DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */; };
+		DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */; };
+		DCACF6FC2566D0BA0009B01E /* AppSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F72566D0BA0009B01E /* AppSecurity.swift */; };
+		DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F82566D0BA0009B01E /* SecurityFile.swift */; };
+		DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */; };
+		DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF7082566D0F00009B01E /* AppAccessView.swift */; };
+		DCACF70E256701870009B01E /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF70D256701870009B01E /* LockView.swift */; };
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCC8B1B92502BAE2006B6227 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -125,10 +133,18 @@
 		C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
-		DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySeedView.swift; sourceTree = "<group>"; };
 		DC67654325655CA0004D4263 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
 		DC67654425655CA0004D4263 /* stylesheet.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = stylesheet.css; sourceTree = "<group>"; };
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySeedView.swift; sourceTree = "<group>"; };
+		DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
+		DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyStoreError.swift; sourceTree = "<group>"; };
+		DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordStore.swift; sourceTree = "<group>"; };
+		DCACF6F72566D0BA0009B01E /* AppSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSecurity.swift; sourceTree = "<group>"; };
+		DCACF6F82566D0BA0009B01E /* SecurityFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityFile.swift; sourceTree = "<group>"; };
+		DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordConvertible.swift; sourceTree = "<group>"; };
+		DCACF7082566D0F00009B01E /* AppAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAccessView.swift; sourceTree = "<group>"; };
+		DCACF70D256701870009B01E /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -192,6 +208,7 @@
 		53BEFD3C3C84A395C4A66297 /* views */ = {
 			isa = PBXGroup;
 			children = (
+				DCACF70D256701870009B01E /* LockView.swift */,
 				53BEFE171C182513A5762686 /* HomeView.swift */,
 				53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */,
 				53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */,
@@ -247,7 +264,10 @@
 				7555FF86242A565B00829871 /* Preview Content */,
 				53BEFD3C3C84A395C4A66297 /* views */,
 				53BEFD8D34A66724B3ACFA01 /* MVI */,
+				DCACF6F42566D0BA0009B01E /* security */,
 				53BEF1337AFCFF0AE82A46BD /* utils */,
+				DCACF6EE2566D0A60009B01E /* extensions */,
+				DC67654125655CA0004D4263 /* about */,
 				53BEFA112E0701FFD6B84217 /* colors.swift */,
 				53BEF4E19E60E093D8D51D0A /* controllers.swift */,
 			);
@@ -283,13 +303,10 @@
 		C8D7A7335040D755924F8FFC /* configuration */ = {
 			isa = PBXGroup;
 			children = (
-				DC67654125655CA0004D4263 /* about */,
 				C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */,
-				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
-				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
-				C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */,
-				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
-				DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */,
+				DCACF6E02566CEC40009B01E /* general */,
+				DCACF6E42566CF850009B01E /* security */,
+				DCACF6DF2566CEC40009B01E /* advanced */,
 			);
 			path = configuration;
 			sourceTree = "<group>";
@@ -300,7 +317,55 @@
 				DC67654225655CA0004D4263 /* about.html */,
 				DC67654425655CA0004D4263 /* stylesheet.css */,
 			);
-			path = about;
+			name = about;
+			path = views/configuration/about;
+			sourceTree = "<group>";
+		};
+		DCACF6DF2566CEC40009B01E /* advanced */ = {
+			isa = PBXGroup;
+			children = (
+				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
+			);
+			path = advanced;
+			sourceTree = "<group>";
+		};
+		DCACF6E02566CEC40009B01E /* general */ = {
+			isa = PBXGroup;
+			children = (
+				C8D7A2327BC90150A3E1493D /* AboutView.swift */,
+				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
+				C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */,
+			);
+			path = general;
+			sourceTree = "<group>";
+		};
+		DCACF6E42566CF850009B01E /* security */ = {
+			isa = PBXGroup;
+			children = (
+				DCACF7082566D0F00009B01E /* AppAccessView.swift */,
+				DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */,
+			);
+			path = security;
+			sourceTree = "<group>";
+		};
+		DCACF6EE2566D0A60009B01E /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
+		};
+		DCACF6F42566D0BA0009B01E /* security */ = {
+			isa = PBXGroup;
+			children = (
+				DCACF6F72566D0BA0009B01E /* AppSecurity.swift */,
+				DCACF6F82566D0BA0009B01E /* SecurityFile.swift */,
+				DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */,
+				DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */,
+				DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */,
+			);
+			path = security;
 			sourceTree = "<group>";
 		};
 		DCB0DB84255AE42F005B29C8 /* phoenix-ios-framework */ = {
@@ -525,14 +590,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */,
 				7555FF7F242A565900829871 /* PhoenixApplicationDelegate.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				DCACF70E256701870009B01E /* LockView.swift in Sources */,
+				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
+				DCACF6FC2566D0BA0009B01E /* AppSecurity.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				53BEF90975122B844248569C /* ReceiveView.swift in Sources */,
+				DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */,
 				53BEFA3292350CF33363A483 /* MVIView.swift in Sources */,
 				53BEFF4EDB40975C2123C63D /* ui.swift in Sources */,
+				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				53BEF981E71E3087871890F9 /* ScanView.swift in Sources */,
 				53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */,
 				53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */,
@@ -552,7 +623,9 @@
 				53BEFB1356C4F01D3F7A692F /* Toast.swift in Sources */,
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
+				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				53BEF5B2A55C55CFC474DC64 /* controllers.swift in Sources */,
+				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

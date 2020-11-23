@@ -7,9 +7,15 @@ import SwiftUI
 
 extension Color {
 
+	@available(*, deprecated, message:
+	    "Doesn't support Dark Mode. Maybe try: Color(UIColor.systemBackground)")
     static let appBackground = Color(red: 0.96, green: 0.96, blue: 0.98) // deprecated
+	
+	@available(*, deprecated, message:
+	    "Doesn't support Dark Mode. Maybe try: Color(UIColor.systemBackground)")
     static let appBackgroundLight = Color(red: 0.99, green: 0.99, blue: 1.0)
 
+	
     static let appDark = Color(hex: "2B313E")
 	
     // See Colors.xcassets for RGB values.

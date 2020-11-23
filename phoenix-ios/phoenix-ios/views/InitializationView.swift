@@ -33,16 +33,16 @@ struct InitializationView: View {
 				// ZStack: layer 1 (foreground)
 				VStack {
 				
-					Image("logo_flat")
+					Image("logo")
 					.resizable()
 					.frame(width: 96, height: 96)
-					.overlay(Circle().stroke(Color(UIColor.systemGray3), lineWidth: 1.5))
-					.clipShape(Circle())
+				//	.overlay(Circle().stroke(Color.secondary, lineWidth: 1.5))
+				//	.clipShape(Circle())
 					.padding([.top, .bottom], 0)
 
 					Text("Phoenix")
 					.font(Font.title2)
-					.padding(.top, 8)
+					.padding(.top, -10)
 					.padding(.bottom, 80)
 
 					Button {

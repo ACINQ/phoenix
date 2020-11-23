@@ -33,8 +33,8 @@ struct ConfigurationView: View {
 
 				if fullMode {
 					Section(header: Text("Security")) {
-						NavigationLink(destination: EmptyView()) {
-							Label { Text("App access settings") } icon: {
+						NavigationLink(destination: AppAccessView()) {
+							Label { Text("App access") } icon: {
 								Image(systemName: "touchid")
 							}
 						}

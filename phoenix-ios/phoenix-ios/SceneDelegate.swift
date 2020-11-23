@@ -43,11 +43,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
+        
+		// Shortly after this method returns:
+		//
+		// > UIKit takes a snapshot of your app’s current user interface.
+		// > The system displays the resulting image in the app switcher.
+		// > It also displays the image temporarily when bringing your app
+		// > back to the foreground.
+		//
+		// ContentView.onDidEnterBackground() will request a UI update (via a State change).
+		// But it appears that the update will run AFTER the OS takes the screenshot.
+		// So we have to explicitly notify the system than an update is needed / pending.
+		//
+		if let viewController = window?.rootViewController {
+			viewController.view.setNeedsLayout()
+		}
     }
-
-
 }
 
