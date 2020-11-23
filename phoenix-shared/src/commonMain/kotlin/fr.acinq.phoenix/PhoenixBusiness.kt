@@ -58,28 +58,33 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
         val params = NodeParams(
             keyManager = keyManager,
-            alias = "alice",
+            alias = "phoenix",
             features = Features(
                 setOf(
-                    ActivatedFeature(Feature.OptionDataLossProtect, FeatureSupport.Optional),
-                    ActivatedFeature(Feature.VariableLengthOnion, FeatureSupport.Optional)
+                    ActivatedFeature(Feature.OptionDataLossProtect, FeatureSupport.Mandatory),
+                    ActivatedFeature(Feature.VariableLengthOnion, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.PaymentSecret, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.BasicMultiPartPayment, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.Wumbo, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.StaticRemoteKey, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.TrampolinePayment, FeatureSupport.Optional),
                 )
             ),
-            dustLimit = 100.sat,
+            dustLimit = 546.sat,
             onChainFeeConf = OnChainFeeConf(
                 maxFeerateMismatch = 10_000.0,
                 closeOnOfflineMismatch = true,
                 updateFeeMinDiffRatio = 0.1
             ),
             maxHtlcValueInFlightMsat = 150000000L,
-            maxAcceptedHtlcs = 100,
+            maxAcceptedHtlcs = 30,
             expiryDeltaBlocks = CltvExpiryDelta(144),
             fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
-            htlcMinimum = 0.msat,
+            htlcMinimum = 1000.msat,
             minDepthBlocks = 3,
             toRemoteDelayBlocks = CltvExpiryDelta(144),
             maxToLocalDelayBlocks = CltvExpiryDelta(1000),
-            feeBase = 546000.msat,
+            feeBase = 1000.msat,
             feeProportionalMillionth = 10,
             reserveToFundingRatio = 0.01, // note: not used (overridden below)
             maxReserveToFundingRatio = 0.05,
