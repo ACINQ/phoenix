@@ -401,11 +401,11 @@ class EclairNodeService : Service() {
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
     log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
-    if (setup.nodeParams().db().peers().getPeer(Wallet.ACINQ.nodeId()).isEmpty) {
-      val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
-      setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
-      log.info("added ACINQ to peer database")
-    }
+    // we could do this only once, but we want to make sure that previous installs, that were using DNS resolution
+    // (which caused issues related to IPv6) do overwrite the previous value
+    val acinqNodeAddress = `NodeAddress$`.`MODULE$`.fromParts(Wallet.ACINQ.address().host, Wallet.ACINQ.address().port).get()
+    setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
+    log.info("added/updated ACINQ to peer database address=${acinqNodeAddress}")
 
     val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(applicationContext) }, "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
@@ -573,7 +573,7 @@ class EclairNodeService : Service() {
         // 1 - compute trampoline fee settings for this payment
         val trampolineFeeSettings = Prefs.getMaxTrampolineCustomFee(appContext.applicationContext)?.let { pref ->
           appContext.trampolineFeeSettings.value!!.filter {
-            it.feeBase < pref.feeBase && it.feeProportionalMillionths < pref.feeProportionalMillionths
+            it.feeBase <= pref.feeBase && it.feeProportionalMillionths <= pref.feeProportionalMillionths
           } + pref
         } ?: run {
           appContext.trampolineFeeSettings.value!!
@@ -761,9 +761,14 @@ class EclairNodeService : Service() {
   }
 
   private fun isConnectedToPeer(): Boolean = api?.run {
-    JavaConverters.asJavaIterableConverter(
-      Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
-    ).asJava().any { it.state().equals("CONNECTED", true) }
+    try {
+      JavaConverters.asJavaIterableConverter(
+        Await.result(peers(shortTimeout), Duration.Inf()) as scala.collection.Iterable<Peer.PeerInfo>
+      ).asJava().any { it.state().equals("CONNECTED", true) }
+    } catch (e: Exception) {
+      log.error("failed to retrieve connection state from peer: ${e.localizedMessage}")
+      false
+    }
   } ?: false
 
   /** Prevents spamming the peer */
