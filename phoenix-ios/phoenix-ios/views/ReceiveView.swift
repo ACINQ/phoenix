@@ -53,59 +53,118 @@ struct ReceiveView: View {
 
             toast.view()
         }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.appBackground)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    @ViewBuilder func view(model: Receive.Model, postIntent: @escaping (Receive.Intent) -> Void) -> some View {
-        ZStack {
-            VStack {
-                switch model {
-                case _ as Receive.ModelAwaiting:
-                    Text("...")
+    @ViewBuilder func view(
+		model: Receive.Model,
+		postIntent: @escaping (Receive.Intent) -> Void
+	) -> some View {
+		
+		ZStack {
+			switch model {
+				case _ as Receive.ModelAwaiting:
+					VStack {
+						Text("...")
+						Spacer()
+					}
+					.zIndex(0)
+					
                 case _ as Receive.ModelGenerating:
-                    Text("Generating payment request...")
+					VStack {
+						Text("Generating payment request...")
+						Spacer()
+					}
+					.zIndex(1)
+					
                 case let m as Receive.ModelGenerated:
-                    if qrCode.value == m.request {
-                        qrCodeView()
-                                .frame(width: 200, height: 200)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(20)
-                                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.appHorizon, lineWidth: 1))
-                                .padding()
-
-                        HStack {
-                            actionButton(image: Image(systemName: "square.on.square")) {
-                                UIPasteboard.general.string = m.request
-                                toast.toast(text: "Copied in pasteboard!")
-                            }
-                            actionButton(image: Image(systemName: "square.and.arrow.up")) {
-                                sharing = "lightning:\(m.request)"
-                            }
-                                    .sharing($sharing)
-
-                            actionButton(image: Image(systemName: "square.and.pencil")) {
-                                withAnimation { editing = true }
-                            }
-                        }
-                    }
-                default: fatalError("Unknown model \(model)")
-                }
-            }
-                    .padding([.bottom], 200)
-
-            if let m = model as? Receive.ModelGenerated {
-                PopupContent(
-                        show: $editing,
-                        amount: m.amount?.description ?? "",
-                        unit: m.unit,
-                        desc: m.desc ?? "",
-                        postIntent: postIntent
-                )
-            }
-        }
+					
+					generatedView(model: m, postIntent: postIntent)
+						.zIndex(2)
+                    
+                default:
+					fatalError("Unknown model \(model)")
+			}
+		}
     }
+
+	@ViewBuilder func generatedView(
+		model      : Receive.ModelGenerated,
+		postIntent : @escaping (Receive.Intent) -> Void
+	) -> some View {
+		
+		VStack {
+			if qrCode.value == model.request {
+				qrCodeView()
+					.frame(width: 200, height: 200)
+					.padding()
+					.background(Color.white)
+					.cornerRadius(20)
+					.overlay(
+						RoundedRectangle(cornerRadius: 20)
+					//      .stroke(Color(UIColor.separator), lineWidth: 1)
+							.stroke(Color.accent, lineWidth: 1)
+					)
+					.padding()
+				
+				VStack(alignment: .center) {
+					if let amount = model.amount {
+						Text("\(amount.description) \(model.unit.abbrev)")
+							.font(.caption2)
+							.foregroundColor(.secondary)
+							.padding(.bottom, 2)
+					} else {
+						Text("any amount")
+							.font(.caption2)
+							.foregroundColor(.secondary)
+							.padding(.bottom, 2)
+					}
+					if let desc = model.desc, desc.count > 0 {
+						Text(desc)
+							.lineLimit(1)
+							.font(.caption2)
+							.foregroundColor(.secondary)
+							.padding(.bottom, 2)
+					} else {
+						Text("no description")
+							.lineLimit(1)
+							.font(.caption2)
+							.foregroundColor(.secondary)
+							.padding(.bottom, 2)
+					}
+				}
+				.padding([.leading, .trailing], 20)
+
+				HStack {
+					actionButton(image: Image(systemName: "square.on.square")) {
+						UIPasteboard.general.string = model.request
+						toast.toast(text: "Copied in pasteboard!")
+					}
+					actionButton(image: Image(systemName: "square.and.arrow.up")) {
+						sharing = "lightning:\(model.request)"
+					}
+					.sharing($sharing)
+					
+					actionButton(image: Image(systemName: "square.and.pencil")) {
+						withAnimation { editing = true }
+					}
+				}
+				
+				Spacer()
+			}
+		} // </VStack>
+		.sheet(isPresented: $editing) {
+			
+			PopupContent(
+				show: $editing,
+				amount: model.amount?.description ?? "",
+				unit: model.unit,
+				desc: model.desc ?? "",
+				postIntent: postIntent
+			)
+		}
+		
+	}
 
     @ViewBuilder func qrCodeView() -> some View {
         if let image = qrCode.image {
@@ -119,17 +178,19 @@ struct ReceiveView: View {
     @ViewBuilder func actionButton(image: Image, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             image
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(Color.appDark)
-                    .frame(width: 20, height: 20)
-                    .padding(10)
-                    .background(Color.white)
-                    .cornerRadius(50)
-                    .overlay(RoundedRectangle(cornerRadius: 50).stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .padding(10)
+				.background(Color.buttonFill)
+                .cornerRadius(50)
+                .overlay(
+					RoundedRectangle(cornerRadius: 50)
+						.stroke(Color(UIColor.separator), lineWidth: 1)
+				)
         }
-                .padding()
+        .padding()
     }
 
     struct PopupContent : View {
@@ -140,72 +201,75 @@ struct ReceiveView: View {
         @State var unit: BitcoinUnit
         @State var desc: String
 
-        @State var illegal: Bool = false
+        @State var invalidAmount: Bool = false
 
         let postIntent: (Receive.Intent) -> Void
 
-        var body: some View {
-            Popup(show: show) {
-                VStack(alignment: .leading) {
-                    Text("Edit my payment request")
-                            .font(.title2)
-                            .padding()
+		var body: some View {
+			VStack(alignment: .leading) {
+				Text("Edit payment request")
+					.font(.title2)
+					.padding()
 
-                    Text("You can change the amount and the description of the payment request")
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.appBackground)
-                            .padding([.bottom])
+				HStack {
+					TextField("Amount (optional)", text: $amount)
+						.keyboardType(.decimalPad)
+						.disableAutocorrection(true)
+						.onChange(of: amount) {
+							invalidAmount = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
+						}
+						.foregroundColor(invalidAmount ? Color.red : Color.primary)
+						.padding()
 
-                    Text("Amount (optional)")
-                            .font(.system(size: 14))
-                            .padding([.leading, .trailing])
-                            .foregroundColor(Color.appHorizon)
+					Picker(selection: $unit, label: Text(unit.abbrev).frame(width: 50)) {
+						ForEach(0..<BitcoinUnit.default().values.count) {
+							let u = BitcoinUnit.default().values[$0]
+							Text(u.abbrev).tag(u)
+						}
+					}.pickerStyle(MenuPickerStyle())
+				}
+				.background(Capsule().stroke(Color(UIColor.separator)))
+				.padding()
 
-                    HStack {
-                        TextField("123", text: $amount)
-                                .keyboardType(.decimalPad)
-                                .disableAutocorrection(true)
-                                .onChange(of: amount) {
-                                    illegal = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
-                                }
-                                .foregroundColor(illegal ? Color.red : Color.black)
+				HStack {
+					TextField("Description (optional)", text: $desc)
+						.padding()
+				}
+				.background(Capsule().stroke(Color(UIColor.separator)))
+				.padding()
 
-                        Picker(selection: $unit, label: Text(unit.abbrev).frame(width: 50)) {
-                            ForEach(0..<BitcoinUnit.default().values.count) {
-                                let u = BitcoinUnit.default().values[$0]
-                                Text(u.abbrev).tag(u)
-                            }
-                        }.pickerStyle(MenuPickerStyle())
-                    }
-                            .padding([.leading, .trailing, .bottom])
+				Spacer()
+				
+				HStack {
+					Spacer()
+					Button("OK") {
+						saveChanges()
+						withAnimation { show = false }
+					}
+					.font(.title2)
+					.disabled(invalidAmount)
+				}
+				.padding()
 
-                    Text("Description (optional)")
-                            .font(.system(size: 14))
-                            .padding([.leading, .trailing])
-                            .foregroundColor(Color.appHorizon)
-
-                    TextField("...", text: $desc)
-                            .padding([.leading, .trailing, .bottom])
-
-                    HStack {
-                        Spacer()
-                        Button("OK") {
-                            postIntent(Receive.IntentAsk(amount: amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!), unit: unit, desc: desc.isEmpty ? nil : desc))
-                            withAnimation { show = false }
-                        }
-                                .font(.title2)
-                                .disabled(illegal)
-                    }
-                            .padding()
-
-                }
-            }
-        }
-    }
-
+			} // </VStack>
+			
+        } // </body>
+		
+		// Question: Is it possible to call this if the user manually dismisses the view ?
+		func saveChanges() -> Void {
+			if !invalidAmount {
+				postIntent(
+					Receive.IntentAsk(
+						amount : amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!),
+						unit   : unit,
+						desc   : desc.isEmpty ? nil : desc
+					)
+				)
+			}
+		}
+		
+    } // </PopupContent>
 }
-
 
 class ReceiveView_Previews: PreviewProvider {
 
