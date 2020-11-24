@@ -44,7 +44,7 @@ struct QrCodeScannerView: UIViewRepresentable {
                     var isActive = true
                     while(isActive) {
                         DispatchQueue.main.sync {
-                            if !self.session.isInterrupted && !self.session.isRunning {
+                            if !session.isInterrupted && !session.isRunning {
                                 isActive = false
                             }
                         }

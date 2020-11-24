@@ -32,7 +32,12 @@ struct ScanView: View {
     @ViewBuilder
     func view(model: Scan.Model, postIntent: @escaping (Scan.Intent) -> Void) -> some View {
         switch model {
-        case _ as Scan.ModelReady, _ as Scan.ModelBadRequest: ReadyView(postIntent: postIntent)
+        case _ as Scan.ModelReady, _ as Scan.ModelBadRequest: ReadyView(postIntent: postIntent, paymentRequest: nil)
+        case let m as Scan.ModelRequestWithoutAmount: ReadyView(
+                postIntent: postIntent,
+                isWarningDisplayed: true,
+                paymentRequest: m.request
+        )
         case let m as Scan.ModelValidate: ValidateView(model: m, postIntent: postIntent)
         case let m as Scan.ModelSending: SendingView(model: m)
         default:
@@ -42,45 +47,57 @@ struct ScanView: View {
 
     struct ReadyView: View {
         let postIntent: (Scan.Intent) -> Void
+        @State var isWarningDisplayed: Bool = false
+        let paymentRequest: String?
 
         var body: some View {
-            VStack {
-                Spacer()
-                Text("Scan a QR code")
-                        .padding()
-                        .font(.title2)
-
-                QrCodeScannerView { request in
-                    print(request)
-                    postIntent(Scan.IntentParse(request: request))
-                }
-                        .cornerRadius(10)
-                        .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.gray, lineWidth: 4)
-                        )
-                        .padding()
-
-                Divider()
-                        .padding([.leading, .trailing])
-
-                Button {
-                    if let request = UIPasteboard.general.string {
-                        postIntent(Scan.IntentParse(request: request))
-                    }
-                } label: {
-                    Image(systemName: "arrow.right.doc.on.clipboard")
-                    Text("Paste from clipboard")
+            ZStack {
+                VStack {
+                    Spacer()
+                    Text("Scan a QR code")
+                            .padding()
                             .font(.title2)
-                }
-                        .disabled(!UIPasteboard.general.hasStrings)
-                        .padding()
-                Spacer()
-            }
-                    .navigationBarTitle("Scan", displayMode: .inline)
-                    .zIndex(2)
-                    .transition(.asymmetric(insertion: .identity, removal: .move(edge: .bottom)))
 
+                    QrCodeScannerView { request in
+                        if !isWarningDisplayed {
+                            postIntent(Scan.IntentParse(request: request))
+                        }
+                    }
+                            .cornerRadius(10)
+                            .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color.gray, lineWidth: 4)
+                            )
+                            .padding()
+
+                    Divider()
+                            .padding([.leading, .trailing])
+
+                    Button {
+                        if let request = UIPasteboard.general.string {
+                            postIntent(Scan.IntentParse(request: request))
+                        }
+                    } label: {
+                        Image(systemName: "arrow.right.doc.on.clipboard")
+                        Text("Paste from clipboard")
+                                .font(.title2)
+                    }
+                            .disabled(!UIPasteboard.general.hasStrings)
+                            .padding()
+                    Spacer()
+                }
+                        .navigationBarTitle("Scan", displayMode: .inline)
+                        .zIndex(2)
+                        .transition(.asymmetric(insertion: .identity, removal: .move(edge: .bottom)))
+
+                if paymentRequest != nil {
+                    PopupAlert(
+                            show: $isWarningDisplayed,
+                            postIntent: postIntent,
+                            paymentRequest: paymentRequest!
+                    )
+                }
+            }
         }
     }
 
@@ -181,6 +198,52 @@ struct ScanView: View {
             }
                     .navigationBarTitle("Sending payment", displayMode: .inline)
                     .zIndex(0)
+        }
+    }
+
+    struct PopupAlert : View {
+
+        @Binding var show: Bool
+
+        let postIntent: (Scan.Intent) -> Void
+        let paymentRequest: String
+
+        var body: some View {
+            Popup(show: show) {
+                VStack(alignment: .leading) {
+
+                    Text("Warning")
+                            .font(.title2)
+                            .padding()
+
+                    Group {
+                        Text("This invoice doesn't include an amount. This may be dangerous: malicious nodes may be able to steal your payment. To be safe, ")
+                                + Text("ask the payee to specify an amount ").fontWeight(.bold)
+                                + Text("in the payment request.")
+                    }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+
+                    Text("Are you sure you want to pay this invoice?")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+
+                    HStack {
+                        Button("Cancel") {
+                            withAnimation { show = false }
+                        }
+                                .font(.title3)
+                        Spacer()
+                        Button("Confirm") {
+                            postIntent(Scan.IntentConfirmEmptyAmount(request: paymentRequest))
+                            withAnimation { show = false }
+                        }
+                                .font(.title3)
+                    }
+                            .padding()
+
+                }
+            }
         }
     }
 }
