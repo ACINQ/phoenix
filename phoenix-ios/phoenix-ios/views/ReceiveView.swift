@@ -87,7 +87,25 @@ struct ReceiveView: View {
 			}
 		}
     }
-
+	
+	func invoiceAmount(_ model: Receive.ModelGenerated) -> String {
+		
+		if let amount = model.amount {
+			return "\(amount.description) \(model.unit.abbrev)"
+		} else {
+			return NSLocalizedString("any amount", comment: "placeholder: invoice is amount-less")
+		}
+	}
+	
+	func invoiceDescription(_ model: Receive.ModelGenerated) -> String {
+		
+		if let desc = model.desc, desc.count > 0 {
+			return desc
+		} else {
+			return NSLocalizedString("no description", comment: "placeholder: invoice is description-less")
+		}
+	}
+	
 	@ViewBuilder func generatedView(
 		model      : Receive.ModelGenerated,
 		postIntent : @escaping (Receive.Intent) -> Void
@@ -108,30 +126,17 @@ struct ReceiveView: View {
 					.padding()
 				
 				VStack(alignment: .center) {
-					if let amount = model.amount {
-						Text("\(amount.description) \(model.unit.abbrev)")
-							.font(.caption2)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					} else {
-						Text("any amount")
-							.font(.caption2)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					}
-					if let desc = model.desc, desc.count > 0 {
-						Text(desc)
-							.lineLimit(1)
-							.font(.caption2)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					} else {
-						Text("no description")
-							.lineLimit(1)
-							.font(.caption2)
-							.foregroundColor(.secondary)
-							.padding(.bottom, 2)
-					}
+				
+					Text(invoiceAmount(model))
+						.font(.caption2)
+						.foregroundColor(.secondary)
+						.padding(.bottom, 2)
+				
+					Text(invoiceDescription(model))
+						.lineLimit(1)
+						.font(.caption2)
+						.foregroundColor(.secondary)
+						.padding(.bottom, 2)
 				}
 				.padding([.leading, .trailing], 20)
 
@@ -154,8 +159,8 @@ struct ReceiveView: View {
 			}
 		} // </VStack>
 		.sheet(isPresented: $editing) {
-			
-			PopupContent(
+		
+			ModifyInvoicePopup(
 				show: $editing,
 				amount: model.amount?.description ?? "",
 				unit: model.unit,
@@ -163,7 +168,6 @@ struct ReceiveView: View {
 				postIntent: postIntent
 			)
 		}
-		
 	}
 
     @ViewBuilder func qrCodeView() -> some View {
@@ -193,7 +197,7 @@ struct ReceiveView: View {
         .padding()
     }
 
-    struct PopupContent : View {
+    struct ModifyInvoicePopup : View {
 
         @Binding var show: Bool
 
@@ -208,7 +212,7 @@ struct ReceiveView: View {
 		var body: some View {
 			VStack(alignment: .leading) {
 				Text("Edit payment request")
-					.font(.title2)
+					.font(.title3)
 					.padding()
 
 				HStack {
@@ -219,30 +223,34 @@ struct ReceiveView: View {
 							invalidAmount = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
 						}
 						.foregroundColor(invalidAmount ? Color.red : Color.primary)
-						.padding()
+						.padding([.top, .bottom], 8)
+						.padding(.leading, 16)
+						.padding(.trailing, 0)
 
 					Picker(selection: $unit, label: Text(unit.abbrev).frame(width: 50)) {
 						ForEach(0..<BitcoinUnit.default().values.count) {
 							let u = BitcoinUnit.default().values[$0]
 							Text(u.abbrev).tag(u)
 						}
-					}.pickerStyle(MenuPickerStyle())
+					}
+					.pickerStyle(MenuPickerStyle())
+					.padding(.trailing, 2)
 				}
 				.background(Capsule().stroke(Color(UIColor.separator)))
-				.padding()
+				.padding([.leading, .trailing])
 
 				HStack {
 					TextField("Description (optional)", text: $desc)
-						.padding()
+						.padding([.top, .bottom], 8)
+						.padding([.leading, .trailing], 16)
 				}
 				.background(Capsule().stroke(Color(UIColor.separator)))
-				.padding()
-
-				Spacer()
+				.padding([.leading, .trailing])
 				
+				Spacer()
 				HStack {
 					Spacer()
-					Button("OK") {
+					Button("Done") {
 						saveChanges()
 						withAnimation { show = false }
 					}
@@ -268,7 +276,52 @@ struct ReceiveView: View {
 			}
 		}
 		
-    } // </PopupContent>
+    } // </ModifyInvoicePopup>
+	
+	struct FeePromptPopup : View {
+		
+		@Binding var show: Bool
+		let postIntent: (Receive.Intent) -> Void
+		
+		var body: some View {
+			VStack(alignment: .leading) {
+				
+				Text("Receive with a Bitcoin address")
+					.font(.system(.title3, design: .serif))
+					.lineLimit(nil)
+					.padding(.bottom, 20)
+				
+				VStack(alignment: .leading, spacing: 14) {
+				
+					Text("A standard Bitcoin address will be displayed next.")
+						
+					Text("Funds sent to this address will be shown on your wallet after one confirmation.")
+					
+					Text("There is a small fee: ") +
+					Text("0.10%").bold() +
+					Text("\nFor example, to receive $100, the fee is 10 cents.")
+				}
+				
+				HStack {
+					Spacer()
+					Button("Cancel") {
+						withAnimation { show = false }
+					}
+					.font(.title3)
+					.padding(.trailing, 8)
+					
+					Button("Proceed") {
+						withAnimation { show = false }
+					}
+					.font(.title3)
+				}
+				.padding(.top, 20)
+				
+			} // </VStack>
+			.padding()
+		}
+		
+	} // </FeePromptPopup>
 }
 
 class ReceiveView_Previews: PreviewProvider {
