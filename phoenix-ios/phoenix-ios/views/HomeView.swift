@@ -280,7 +280,7 @@ struct HomeView : View {
                         isActive: $isShowingScan
                 ) {
                     Image("ic_scan").resizable().frame(width: 22, height: 22)
-                    Text("Scan")
+                    Text("Send")
                             .foregroundColor(canScan ? .appDark : .gray)
                 }
                         .disabled(!canScan)
