@@ -806,29 +806,34 @@ class EclairNodeService : Service() {
       serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.error("failed to save closing event=$event: ", e)
       }) {
-        val id = UUID.randomUUID()
-        val preimage = `package$`.`MODULE$`.randomBytes32()
-        val paymentHash = Crypto.hash256(preimage.bytes())
-        val date = System.currentTimeMillis()
-        val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
-        val paymentCounterpart = OutgoingPayment(
-          /* id and parent id */ id, id,
-          /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
-          /* placeholder payment hash */ paymentHash,
-          /* type of payment */ "ClosingChannel",
-          /* balance */ event.balance,
-          /* recipient amount */ event.balance,
-          /* fake recipient id */ fakeRecipientId,
-          /* creation date */ date,
-          /* payment request */ Option.empty(),
-          /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
-        nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
-        paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
-        val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-        val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
-          ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
-        nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
-        EventBus.getDefault().post(PaymentPending())
+        if (event.balance == MilliSatoshi(0)) {
+          log.info("ignore closing channel event=$event because our balance is empty")
+        } else {
+          log.info("save closing channel event=$event")
+          val id = UUID.randomUUID()
+          val preimage = `package$`.`MODULE$`.randomBytes32()
+          val paymentHash = Crypto.hash256(preimage.bytes())
+          val date = System.currentTimeMillis()
+          val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
+          val paymentCounterpart = OutgoingPayment(
+            /* id and parent id */ id, id,
+            /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
+            /* placeholder payment hash */ paymentHash,
+            /* type of payment */ "ClosingChannel",
+            /* balance */ event.balance,
+            /* recipient amount */ event.balance,
+            /* fake recipient id */ fakeRecipientId,
+            /* creation date */ date,
+            /* payment request */ Option.empty(),
+            /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
+          nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+          paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
+          val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
+          val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
+            ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+          nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+          EventBus.getDefault().post(PaymentPending())
+        }
       }
     }
   }
