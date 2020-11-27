@@ -48,7 +48,7 @@ object Wallet {
 
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  val ACINQ: NodeURI = NodeURI.parse("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@node.acinq.co:9735")
+  val ACINQ: NodeURI = NodeURI.parse("03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@34.239.230.56:9735")
   val httpClient = OkHttpClient()
 
   private const val ECLAIR_BASE_DATADIR = "node-data"
