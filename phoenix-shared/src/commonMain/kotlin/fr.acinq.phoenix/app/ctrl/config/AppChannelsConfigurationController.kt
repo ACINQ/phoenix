@@ -6,7 +6,6 @@ import fr.acinq.eclair.channel.Normal
 import fr.acinq.eclair.io.ByteVector32KSerializer
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.eclairSerializersModule
-import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
 import fr.acinq.phoenix.data.Chain
@@ -21,7 +20,11 @@ import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppChannelsConfigurationController(loggerFactory: LoggerFactory, private val peer: Peer, private val appConfig: AppConfigurationManager, private val chain: Chain) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(loggerFactory, ChannelsConfiguration.emptyModel) {
+class AppChannelsConfigurationController(
+    loggerFactory: LoggerFactory, 
+    private val peer: Peer, 
+    private val chain: Chain
+) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(loggerFactory, ChannelsConfiguration.emptyModel) {
 
     private val json = Json {
         prettyPrint = true

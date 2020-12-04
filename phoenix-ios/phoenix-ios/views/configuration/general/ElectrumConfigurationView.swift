@@ -58,8 +58,8 @@ struct ElectrumConfigurationView: View {
 
                     if model.walletIsInitialized {
                         Section(header: "Block height") {
-                            let height = model.electrumServer.blockHeight
-                            Text("\(height > 0 ? height.formatNumber() : "-")")
+                            let blockHeight = model.electrumServer.blockHeight
+							Text("\(blockHeight > 0 ? blockHeight.formatInDecimalStyle() : "-")")
                         }
 
                         Section(header: "Tip timestamp") {
@@ -69,7 +69,7 @@ struct ElectrumConfigurationView: View {
 
                         Section(header: "Fee rate") {
                             if model.feeRate > 0 {
-                                Text("\(model.feeRate.formatNumber()) sat/byte")
+								Text("\(model.feeRate.formatInDecimalStyle()) sat/byte")
                             } else {
                                 Text("-")
                             }

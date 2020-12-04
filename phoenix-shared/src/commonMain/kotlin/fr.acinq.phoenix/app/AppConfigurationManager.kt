@@ -22,7 +22,6 @@ import kotlin.time.minutes
 class AppConfigurationManager(
     private val appDB: DB,
     private val electrumClient: ElectrumClient,
-    private val httpClient: HttpClient,
     private val chain: Chain,
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
@@ -58,7 +57,6 @@ class AppConfigurationManager(
                     )
                 }
         }
-        launchUpdateRates() // TODO do we need to manage cancellation?
     }
 
     // General
@@ -117,47 +115,5 @@ class AppConfigurationManager(
                 Chain.REGTEST -> platformElectrumRegtestConf()
             }.asElectrumServer()
         )
-    }
-
-    // Bitcoin exchange rates
-    public fun getBitcoinRates(): List<BitcoinPriceRate> = appDB.find<BitcoinPriceRate>().all().useModels {it.toList()}
-    public fun getBitcoinRate(fiatCurrency: FiatCurrency): BitcoinPriceRate = appDB.find<BitcoinPriceRate>().byId(fiatCurrency.name).model()
-
-    private fun launchUpdateRates() = launch {
-        while (isActive) {
-            val priceRates = buildMap<String, Double> {
-                try {
-                    val rates = httpClient.get<Map<String, PriceRate>>("https://blockchain.info/ticker")
-                    rates.forEach {
-                        put(it.key, it.value.last)
-                    }
-
-                    val response = httpClient.get<MxnApiResponse>("https://api.bitso.com/v3/ticker/?book=btc_mxn")
-                    if (response.success) put(FiatCurrency.MXN.name, response.payload.last)
-                } catch (t: Throwable) {
-                    logger.error { "An issue occurred while retrieving exchange rates from API." }
-                    logger.error(t)
-                }
-            }
-
-            val exchangeRates =
-                FiatCurrency.values()
-                    .filter { it.name in priceRates.keys }
-                    .mapNotNull { fiatCurrency ->
-                        priceRates[fiatCurrency.name]?.let { priceRate ->
-                            BitcoinPriceRate(fiatCurrency, priceRate)
-                        }
-                    }
-
-            appDB.execBatch {
-                logger.verbose { "Saving price rates: $exchangeRates" }
-                exchangeRates.forEach {
-                    appDB.put(it)
-                }
-            }
-
-            yield()
-            delay(5.minutes)
-        }
     }
 }

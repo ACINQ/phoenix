@@ -10,90 +10,115 @@ struct HomeView : View {
     @State var selectedTransaction: PhoenixShared.Transaction? = nil
 
     @Environment(\.openURL) var openURL
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
     var body: some View {
-        MVIView(
-                { $0.home() },
-                background: true,
-                onModel: { change in
-                    if lastTransaction != change.newModel.lastTransaction {
-                        lastTransaction = change.newModel.lastTransaction
-                        selectedTransaction = lastTransaction
-                    }
-                }
+        MVIView({ $0.home() },
+			background: true,
+			onModel: { change in
+				if lastTransaction != change.newModel.lastTransaction {
+					lastTransaction = change.newModel.lastTransaction
+					selectedTransaction = lastTransaction
+				}
+			}
         ) { model, postIntent in
-            ZStack {
-                VStack {
-                    HStack {
-                        ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
-                        Spacer()
-                        Button {
-                            openURL(URL(string: "https://phoenix.acinq.co/faq")!)
-                        } label: {
-                            HStack {
-                                Image(systemName: "questionmark.circle")
-                                        .resizable()
-                                        .frame(width: 16, height: 16)
-                                Text("FAQ")
-                                        .font(.caption2)
-                            }
-                        }
-                                .buttonStyle(PlainButtonStyle())
-                                .padding(.all, 4)
-                                .background(Color.appBackgroundLight)
-                                .cornerRadius(10)
-                                .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                                .stroke(Color.gray, lineWidth: 1)
-                                )
-                    }
-                    .padding()
+            
+			mainView(model, postIntent)
+				.navigationBarTitle("", displayMode: .inline)
+				.navigationBarHidden(true)
+    	}
+	}
+	
+	@ViewBuilder func mainView(
+		_ model: Home.Model,
+		_ postIntent: @escaping (Home.Intent) -> Void
+	) -> some View {
+		
+		ZStack {
+			
+			VStack {
+				HStack {
+					
+					ConnectionStatus(status: model.connections.global, showPopup: $showConnections)
+					
+					Spacer()
+					
+					Button {
+						openURL(URL(string: "https://phoenix.acinq.co/faq")!)
+					} label: {
+						HStack {
+							Image(systemName: "questionmark.circle")
+								.resizable()
+								.frame(width: 16, height: 16)
+							Text("FAQ")
+								.font(.caption2)
+						}
+					}
+					.buttonStyle(PlainButtonStyle())
+					.padding(.all, 4)
+					.background(Color.appBackgroundLight)
+					.cornerRadius(10)
+					.overlay(
+						RoundedRectangle(cornerRadius: 10)
+							.stroke(Color.gray, lineWidth: 1)
+					)
+					
+				} // </HStack>
+				.padding()
 
-                    HStack(alignment: .bottom) {
-                        Text(model.balanceSat.formatNumber())
-                                .font(.largeTitle)
-                        Text("sat")
-                                .font(.title2)
-                                .padding(.bottom, 4)
-                    }
+				// === Total Balance ====
+				HStack(alignment: .bottom) {
+					
+					let amount = Utils.format(currencyPrefs, sat: model.balanceSat)
+					Text(amount.digits)
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+					
+					Text(amount.type)
+						.font(.title2)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+					
+				} // </HStack>
 
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(model.history.indices, id: \.self) { index in
-                                Button {
-                                    selectedTransaction = model.history[index]
-                                } label: {
-                                    TransactionCell(transaction: model.history[index])
-                                }
-                            }
-                        }
-                                .sheet(isPresented: .constant(selectedTransaction != nil)) {
-                                    selectedTransaction = nil
-                                } content: {
-                                    TransactionView(
-                                            transaction: selectedTransaction!,
-                                            close: { selectedTransaction = nil }
-                                    )
-                                }
-                    }
+				// === Transaction List ====
+				ScrollView {
+					LazyVStack {
+						ForEach(model.history.indices, id: \.self) { index in
+							Button {
+								selectedTransaction = model.history[index]
+							} label: {
+								TransactionCell(transaction: model.history[index])
+							}
+						}
+					}
+					.sheet(isPresented: .constant(selectedTransaction != nil)) {
+						selectedTransaction = nil
+					} content: {
+						TransactionView(
+							transaction: selectedTransaction!,
+							close: { selectedTransaction = nil }
+						)
+					}
+				}
 
-                    BottomBar(canScan: model.connections.global == Eclair_kmpConnection.established)
-                }
-                        .padding(.top, keyWindow?.safeAreaInsets.top)
-                        .padding(.top)
+				BottomBar(canScan: model.connections.global == Eclair_kmpConnection.established)
+			
+			} // </VStack>
+			.padding(.top, keyWindow?.safeAreaInsets.top)
+			.padding(.top)
 
-                Popup(show: showConnections) {
-                    ConnectionPopup(show: $showConnections, connections: model.connections)
-                }
-            }
-                    .frame(maxHeight: .infinity)
-                    .background(Color.appBackground)
-                    .edgesIgnoringSafeArea(.top)
-                    .edgesIgnoringSafeArea(.bottom)
-        }
-                .navigationBarTitle("", displayMode: .inline)
-                .navigationBarHidden(true)
-    }
+			Popup(show: showConnections) {
+				ConnectionPopup(show: $showConnections, connections: model.connections)
+			}
+		
+		} // </ZStack>
+		.frame(maxHeight: .infinity)
+		.background(Color.appBackground)
+		.edgesIgnoringSafeArea(.top)
+		.edgesIgnoringSafeArea(.bottom)
+	}
 
     struct ConnectionStatus : View {
         let status: Eclair_kmpConnection
@@ -189,53 +214,69 @@ struct HomeView : View {
         }
     }
 
-    struct TransactionCell : View {
+	struct TransactionCell : View {
 
-        let transaction: PhoenixShared.Transaction
+		let transaction: PhoenixShared.Transaction
+		
+		@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
-        var body: some View {
-            HStack {
-                switch (transaction.status) {
-                case .success:
-                    Image("payment_holder_def_success")
-                            .padding(4)
-                            .background(
-                                    RoundedRectangle(cornerRadius: .infinity)
-                                            .fill(Color.appHorizon)
-                            )
-                case .pending:
-                    Image("payment_holder_def_pending")
-                            .padding(4)
-                case .failure:
-                    Image("payment_holder_def_failed")
-                            .padding(4)
-                default: EmptyView()
-                }
-                VStack(alignment: .leading) {
-                    Text(transaction.desc)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .foregroundColor(.appDark)
-                    Text(transaction.timestamp.formatDateMS())
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding([.leading, .trailing], 6)
-                if (transaction.status != .failure) {
-                    HStack {
-                        Text((transaction.amountSat >= 0 ? "+" : "") + Int64((Double(transaction.amountSat) / 1000.0).rounded()).formatNumber())
-                                .foregroundColor(transaction.amountSat >= 0 ? .appGreen : .appRed)
-                                + Text(" sat")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                    }
-                }
-            }
-                    .padding([.top, .bottom], 14)
-                    .padding([.leading, .trailing], 12)
-        }
-
+		var body: some View {
+			HStack {
+				switch (transaction.status) {
+				case .success:
+					Image("payment_holder_def_success")
+						.padding(4)
+						.background(
+							RoundedRectangle(cornerRadius: .infinity)
+								.fill(Color.appHorizon)
+						)
+				case .pending:
+					Image("payment_holder_def_pending")
+						.padding(4)
+				case .failure:
+					Image("payment_holder_def_failed")
+						.padding(4)
+				default: EmptyView()
+				}
+                
+				VStack(alignment: .leading) {
+					Text(transaction.desc)
+						.lineLimit(1)
+						.truncationMode(.tail)
+						.foregroundColor(.appDark)
+					Text(transaction.timestamp.formatDateMS())
+						.font(.caption)
+						.foregroundColor(.gray)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding([.leading, .trailing], 6)
+				
+                if transaction.status != .failure {
+					HStack(spacing: 0) {
+						
+						// transaction.amountSat is actually in msat !
+						// There is a pending PR that contains a fix for this bug.
+						// I'm going to try to get it merged independently of the PR soon.
+						//
+						let amount = Utils.format(currencyPrefs, msat: transaction.amountSat)
+						let isNegative = transaction.amountSat < 0
+						
+						Text(isNegative ? "" : "+")
+							.foregroundColor(isNegative ? .appRed : .appGreen)
+							.padding(.trailing, 1)
+						
+						Text(amount.digits)
+							.foregroundColor(isNegative ? .appRed : .appGreen)
+							
+						Text(" " + amount.type)
+							.font(.caption)
+							.foregroundColor(.gray)
+					}
+				}
+			}
+			.padding([.top, .bottom], 14)
+			.padding([.leading, .trailing], 12)
+		}
     }
 
     struct BottomBar : View {
@@ -293,6 +334,10 @@ struct HomeView : View {
                     .cornerRadius(15, corners: [.topLeft, .topRight])
         }
     }
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
+	}
 }
 
 class HomeView_Previews : PreviewProvider {
@@ -310,7 +355,8 @@ class HomeView_Previews : PreviewProvider {
 
     static var previews: some View {
         mockView(HomeView())
-                .previewDevice("iPhone 11")
+			.environmentObject(CurrencyPrefs.mockEUR())
+            .previewDevice("iPhone 11")
     }
 
     #if DEBUG

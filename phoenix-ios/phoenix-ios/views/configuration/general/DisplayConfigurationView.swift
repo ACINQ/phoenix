@@ -9,29 +9,29 @@ struct DisplayConfigurationView: View {
 				Section {
 					Picker(
 						selection: Binding(
-							get: { model.fiatCurrency },
+							get: { Prefs.shared.fiatCurrency },
 							set: {
-								postIntent(DisplayConfiguration.IntentUpdateFiatCurrency(fiatCurrency: $0))
+								Prefs.shared.fiatCurrency = $0
 							}
 						), label: Text("Fiat currency")
 					) {
 						ForEach(0 ..< FiatCurrency.default().values.count) {
 							let fiatCurrency = FiatCurrency.default().values[$0]
-							Text(fiatCurrency.label).tag(fiatCurrency)
+							fiatCurrencyText(fiatCurrency).tag(fiatCurrency)
 						}
 					}
 					
 					Picker(
 						selection: Binding(
-							get: { model.bitcoinUnit },
+							get: { Prefs.shared.bitcoinUnit },
 							set: {
-								postIntent(DisplayConfiguration.IntentUpdateBitcoinUnit(bitcoinUnit: $0))
+								Prefs.shared.bitcoinUnit = $0
 							}
 						), label: Text("Bitcoin unit")
 					) {
 						ForEach(0 ..< BitcoinUnit.default().values.count) {
-							let unit = BitcoinUnit.default().values[$0]
-							Text(unit.label).tag(unit)
+							let bitcoinUnit = BitcoinUnit.default().values[$0]
+							bitcoinUnitText(bitcoinUnit).tag(bitcoinUnit)
 						}
 					}
                 }
@@ -59,6 +59,26 @@ struct DisplayConfigurationView: View {
             Spacer()
         }
     }
+	
+	@ViewBuilder func fiatCurrencyText(_ fiatCurrency: FiatCurrency) -> some View {
+		
+		Text(fiatCurrency.shortLabel) +
+		Text(" (\(fiatCurrency.longLabel))")
+			.font(.footnote)
+			.foregroundColor(Color.secondary)
+	}
+	
+	@ViewBuilder func bitcoinUnitText(_ bitcoinUnit: BitcoinUnit) -> some View {
+		
+		if bitcoinUnit.explanation.count == 0 {
+			Text(bitcoinUnit.label)
+		} else {
+			Text(bitcoinUnit.label) +
+			Text(" (\(bitcoinUnit.explanation))")
+				.font(.footnote)
+				.foregroundColor(Color.secondary)
+		}
+	}
 }
 
 class DisplayConfigurationView_Previews: PreviewProvider {

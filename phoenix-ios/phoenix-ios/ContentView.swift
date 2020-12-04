@@ -43,6 +43,7 @@ struct ContentView: View {
 						))
 				}
 			}
+			.environmentObject(CurrencyPrefs())
 			.onReceive(didEnterBackgroundPublisher, perform: { _ in
 				onDidEnterBackground()
 			})

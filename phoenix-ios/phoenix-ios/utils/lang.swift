@@ -6,10 +6,14 @@
 import Foundation
 
 extension Int64 {
-    func formatNumber() -> String {
+	
+    /// Do NOT use this for currency values.
+    /// For currency, use Utils.format(...)
+    ///
+    func formatInDecimalStyle() -> String {
         let formatter = NumberFormatter()
-        formatter.groupingSeparator = " "
         formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = true
         return formatter.string(from: NSNumber(value: self))!
     }
 
@@ -31,10 +35,14 @@ extension Int64 {
 }
 
 extension Int32 {
-    func formatNumber() -> String {
+	
+    /// Do NOT use this for currency values.
+    /// For currency, use Utils.format(...)
+    ///
+    func formatInDecimalStyle() -> String {
         let formatter = NumberFormatter()
-        formatter.groupingSeparator = " "
         formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = true
         return formatter.string(from: NSNumber(value: self))!
     }
 }

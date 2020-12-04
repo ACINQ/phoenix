@@ -9,8 +9,9 @@ import PhoenixShared
 struct TransactionView : View {
 
     let transaction: PhoenixShared.Transaction
-
     let close: () -> Void
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
     var body: some View {
         ZStack {
@@ -72,19 +73,31 @@ struct TransactionView : View {
                 }
 
                 HStack(alignment: .bottom) {
-                    Text(Int64((Double(abs(transaction.amountSat)) / 1000.0).rounded()).formatNumber())
-                            .font(.largeTitle)
-                    Text("sat")
-                            .font(.title3)
-                            .padding(.bottom, 4)
-                            .foregroundColor(.gray)
+					// transaction.amountSat is actually in msat !
+					// There is a pending PR that contains a fix for this bug.
+					// I'm going to try to get it merged independently of the PR soon.
+					//
+					let amount = Utils.format(currencyPrefs, msat: transaction.amountSat)
+					
+                    Text(amount.digits)
+                        .font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+                    Text(amount.type)
+                        .font(.title3)
+						.foregroundColor(.gray)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
                 }
-                        .padding()
+                .padding()
             }
         }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.appBackground)
     }
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
+	}
 }
 
 class TransactionView_Previews : PreviewProvider {
@@ -96,6 +109,7 @@ class TransactionView_Previews : PreviewProvider {
 		//	transaction: mockReceiveTransaction,
 			close: {}
 		)
+		.environmentObject(CurrencyPrefs.mockEUR())
     }
 
     #if DEBUG

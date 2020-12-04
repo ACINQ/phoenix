@@ -1,13 +1,7 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.DeterministicWallet
-import fr.acinq.bitcoin.KeyPath
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.phoenix.utils.TAG_IS_MAINNET
-import org.kodein.di.instance
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class WalletTest {
     private val wallet = Wallet(mnemonics = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about".split(" "))
