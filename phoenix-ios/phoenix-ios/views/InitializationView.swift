@@ -2,113 +2,139 @@ import SwiftUI
 import PhoenixShared
 
 struct InitializationView: View {
-
+	
 	var body: some View {
-		MVIView({ $0.initialization() }) { model, postIntent in
-			ZStack {
-				
-				// ZStack: layer 0 (background)
-				// Position the settings icon in top-right corner.
-				HStack{
-					Spacer()
-					VStack {
-						NavigationLink(destination: ConfigurationView()) {
-							Image(systemName: "gearshape")
-							.imageScale(.large)
-						}
-						.buttonStyle(PlainButtonStyle())
-						.padding([.top, .bottom], 8)
-						.padding([.leading, .trailing], 8)
-						.background(Color.white)
-						.cornerRadius(16)
-						.overlay(
-							RoundedRectangle(cornerRadius: 16)
-							.stroke(Color.appHorizon, lineWidth: 2)
-						)
-						Spacer()
-					}
-					.padding(.all, 16)
-				}
-				
-				// ZStack: layer 1 (foreground)
+		MVIView({ $0.initialization() }, onModel: { change in
+			
+			if let model = change.newModel as? Initialization.ModelGeneratedWallet {
+				createWallet(model: model)
+			}
+			
+		}) { model, postIntent in
+			
+			main(model, postIntent)
+		}
+	}
+	
+	@ViewBuilder func main(
+		_ model: Initialization.Model,
+		_ postIntent: @escaping (Initialization.Intent) -> Void
+	) -> some View {
+		
+		ZStack {
+			
+			// ZStack: layer 0 (background)
+			// Position the settings icon in top-right corner.
+			HStack{
+				Spacer()
 				VStack {
-				
-					Image("logo")
+					NavigationLink(destination: ConfigurationView()) {
+						Image(systemName: "gearshape")
+						.imageScale(.large)
+					}
+					.buttonStyle(PlainButtonStyle())
+					.padding([.top, .bottom], 8)
+					.padding([.leading, .trailing], 8)
+					.background(Color.white)
+					.cornerRadius(16)
+					.overlay(
+						RoundedRectangle(cornerRadius: 16)
+						.stroke(Color.appHorizon, lineWidth: 2)
+					)
+					Spacer()
+				}
+				.padding(.all, 16)
+			}
+			
+			// ZStack: layer 1 (foreground)
+			VStack {
+			
+				Image("logo")
 					.resizable()
 					.frame(width: 96, height: 96)
 				//	.overlay(Circle().stroke(Color.secondary, lineWidth: 1.5))
 				//	.clipShape(Circle())
 					.padding([.top, .bottom], 0)
 
-					Text("Phoenix")
+				Text("Phoenix")
 					.font(Font.title2)
 					.padding(.top, -10)
 					.padding(.bottom, 80)
 
-					Button {
-						postIntent(Initialization.IntentCreateWallet())
-					} label: {
-						HStack {
-						//	Image("ic_fire")
-						//	.resizable()
-						//	.frame(width: 16, height: 16)
-						//	.foregroundColor(.white)
-
-							Image(systemName: "flame")
+				Button {
+					createMnemonics(postIntent)
+				} label: {
+					HStack {
+						Image(systemName: "flame")
 							.imageScale(.small)
 
-							Text("Create new wallet")
-						}
-						.font(.title2)
-						.foregroundColor(.appBackgroundLight)
+						Text("Create new wallet")
 					}
-					.buttonStyle(PlainButtonStyle())
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-					.background(Color.appHorizon)
-					.cornerRadius(16)
-					.padding(.bottom, 40)
+					.font(.title2)
+					.foregroundColor(Color(red: 0.99, green: 0.99, blue: 1.0))
+				}
+				.buttonStyle(PlainButtonStyle())
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.background(Color.appHorizon)
+				.cornerRadius(16)
+				.padding(.bottom, 40)
 
-					NavigationLink(destination: RestoreWalletView()) {
-						HStack {
-						//	Image("ic_restore")
-						//	.resizable()
-						//	.frame(width: 16, height: 16)
-
-							Image(systemName: "arrow.down.circle")
+				NavigationLink(destination: RestoreWalletView()) {
+					HStack {
+						Image(systemName: "arrow.down.circle")
 							.imageScale(.small)
 
-							Text("Restore my wallet")
-						}
-						.font(.title2)
+						Text("Restore my wallet")
 					}
-					.buttonStyle(PlainButtonStyle())
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
-					.background(Color(UIColor.systemFill))
-					.cornerRadius(16)
-					.overlay(
-						RoundedRectangle(cornerRadius: 16)
-						.stroke(Color.appHorizon, lineWidth: 2)
-					)
-					.padding([.top, .bottom], 0)
+					.font(.title2)
+				}
+				.buttonStyle(PlainButtonStyle())
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.background(Color(UIColor.systemFill))
+				.cornerRadius(16)
+				.overlay(
+					RoundedRectangle(cornerRadius: 16)
+					.stroke(Color.appHorizon, lineWidth: 2)
+				)
+				.padding([.top, .bottom], 0)
 
-				} // </VStack>
-				.padding(.top, keyWindow?.safeAreaInsets.top)
-				.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.offset(x: 0, y: -40) // move center upwards; focus is buttons, not logo
-				.edgesIgnoringSafeArea(.all)
-				.navigationBarTitle("", displayMode: .inline)
-				.navigationBarHidden(true)
+			} // </VStack>
+			.padding(.top, keyWindow?.safeAreaInsets.top)
+			.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.offset(x: 0, y: -40) // move center upwards; focus is buttons, not logo
+			.edgesIgnoringSafeArea(.all)
+			.navigationBarTitle("", displayMode: .inline)
+			.navigationBarHidden(true)
 				
-			} // </ZStack>
+		} // </ZStack>
+	}
+	
+	func createMnemonics(
+		_ postIntent: @escaping (Initialization.Intent) -> Void
+	) -> Void {
+		
+		let swiftEntropy = AppSecurity.shared.generateEntropy()
+		let kotlinEntropy = KotlinByteArray.fromSwiftData(swiftEntropy)
+		
+		let intent = Initialization.IntentGenerateWallet(entropy: kotlinEntropy)
+		postIntent(intent)
+	}
+	
+	func createWallet(model: Initialization.ModelGeneratedWallet) -> Void {
+		
+		AppSecurity.shared.addKeychainEntry(mnemonics: model.mnemonics) { (error: Error?) in
+			if error == nil {
+				PhoenixApplicationDelegate.get().loadWallet(seed: model.seed)
+			}
 		}
 	}
 }
 
 class InitView_Previews : PreviewProvider {
-    static let mockModel = Initialization.ModelInitialization()
+    static let mockModel = Initialization.ModelReady()
 
     static var previews: some View {
         mockView(InitializationView())

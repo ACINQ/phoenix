@@ -1,10 +1,14 @@
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.MnemonicCode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class WalletTest {
-    private val wallet = Wallet(mnemonics = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about".split(" "))
+    private val mnemonics = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+    private val seed = MnemonicCode.toSeed(mnemonics, passphrase = "")
+
+    private val wallet = Wallet(seed)
 
     @Test
     fun masterPublicKey() {

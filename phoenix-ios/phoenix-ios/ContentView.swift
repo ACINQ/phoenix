@@ -87,35 +87,22 @@ struct ContentView: View {
 		.navigationBarHidden(true)
 	}
 	
-	private func handleFirstAppLaunch() -> Void {
-		print("handleFirstAppLaunch()")
-		
-		// The very first time the app is launched we need to:
-		// - randomly generate the databaseKey
-		// - randomly generate the lockingKey
-		// - wrap the databaseKey with the lockingKey
-		// - store the lockingKey in the OS keychain
-		// - store the wrapped databaseKey (ciphertext) in the security.json file
-		
-		let databaseKey = AppSecurity.shared.generateDatabaseKey()
-		AppSecurity.shared.addKeychainEntry(databaseKey: databaseKey) {(error: Error?) in
-			
-			self.onAppLaunch()
-		}
-	}
-	
 	private func onAppLaunch() -> Void {
 		print("onAppLaunch()")
 		
-		AppSecurity.shared.tryUnlockWithKeychain {(databaseKey: Data?, enabledSecurity: EnabledSecurity) in
+		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, enabledSecurity: EnabledSecurity) in
 			
-			if databaseKey == nil && enabledSecurity.isEmpty {
-				return handleFirstAppLaunch()
-			}
-			
-			if databaseKey != nil {
+			if let mnemonics = mnemonics {
+				// wallet is unlocked
+				PhoenixApplicationDelegate.get().loadWallet(mnemonics: mnemonics)
 				self.isUnlocked = true
+			
+			} else if enabledSecurity.isEmpty {
+				// wallet not yet configured
+				self.isUnlocked = true
+				
 			} else {
+				// wallet is locked
 				self.enabledSecurity = enabledSecurity
 			}
 		}

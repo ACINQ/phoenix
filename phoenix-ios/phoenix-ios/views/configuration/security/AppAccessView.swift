@@ -8,8 +8,8 @@ struct AppAccessView : View {
 	var cancellables = Set<AnyCancellable>()
 	
 	@State var biometricStatus = AppSecurity.shared.biometricStatus()
-	@State var shutupCompiler = false
 	@State var biometricsEnabled = AppSecurity.shared.enabledSecurity.value.contains(.biometrics)
+	@State var ignoreToggle = false
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -50,12 +50,6 @@ struct AppAccessView : View {
 			}
 			.disabled(!biometricStatus.isAvailable())
 			
-		//	Button(action: {
-		//		self.testBiometrics()
-		//	}) {
-		//		Text("Authenticate with Touch ID")
-		//	}
-			
 		}
 		.navigationBarTitle("App Access", displayMode: .inline)
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
@@ -75,35 +69,59 @@ struct AppAccessView : View {
 	func toggleBiometrics(_ flag: Bool) {
 		print("toggleBiometrics()")
 		
-		// Todo: fetch from AppDelegate (or wherever we have this already)
-		let databaseKey = AppSecurity.shared.generateDatabaseKey()
+		if ignoreToggle {
+			ignoreToggle = false
+			return
+		}
 		
 		if flag { // toggle => ON
+			enableBiometrics()
 			
-			AppSecurity.shared.addBiometricsEntry(databaseKey: databaseKey) {(error: Error?) in
-				if error != nil {
-					self.biometricsEnabled = false // failed to enable biometrics
-				}
-			}
 		} else { // toggle => OFF
+			disableBiometrics()
+		}
+	}
+	
+	func enableBiometrics() -> Void {
+		
+		// state is: enabledSecurity == .none
+		
+		let Fail: () -> Void = {
+			self.ignoreToggle = true
+			self.biometricsEnabled = false // failed to enable biometrics
+		}
+		
+		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, _) in
 			
-			AppSecurity.shared.addKeychainEntry(databaseKey: databaseKey) { (error: Error?) in
-				if error != nil {
-					self.biometricsEnabled = true // failed to disable biometrics
-				}
+			guard let mnemnoics = mnemonics else {
+				return Fail()
+			}
+			
+			AppSecurity.shared.addBiometricsEntry(mnemonics: mnemnoics) {(error: Error?) in
+				if error != nil { Fail() }
 			}
 		}
 	}
 	
-	func testBiometrics() {
-		print("testBiometrics()")
+	func disableBiometrics() -> Void {
 		
-		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<Data?, Error>) in
-			switch result {
-				case .success(let databaseKey):
-					print("databaseKey: \(databaseKey?.hexEncodedString() ?? "nil")")
-				case .failure(let error):
-					print("error: \(error)")
+		// state is: enabledSecurity == .biometrics
+		
+		let Fail: () -> Void = {
+			self.ignoreToggle = true
+			self.biometricsEnabled = true // failed to disable biometrics
+		}
+		
+		let prompt = NSLocalizedString("Authenticate to disable biometrics.", comment: "User prompt")
+		
+		AppSecurity.shared.tryUnlockWithBiometrics(prompt: prompt) { result in
+			
+			guard case .success(let mnemonics) = result else {
+				return Fail()
+			}
+			
+			AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
+				if error != nil { Fail() }
 			}
 		}
 	}

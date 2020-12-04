@@ -5,6 +5,7 @@ import PhoenixShared
 class PhoenixApplicationDelegate: UIResponder, UIApplicationDelegate {
 
     let business: PhoenixBusiness
+	private var walletLoaded = false
 
     override init() {
         setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
@@ -34,6 +35,22 @@ class PhoenixApplicationDelegate: UIResponder, UIApplicationDelegate {
 
         return true
     }
+	
+	// MARK: PhoenixBusiness
+	
+	func loadWallet(mnemonics: [String]) -> Void {
+		
+		let seed = business.prepWallet(mnemonics: mnemonics, passphrase: "")
+		loadWallet(seed: seed)
+	}
+	
+	func loadWallet(seed: KotlinByteArray) -> Void {
+		
+		if !walletLoaded {
+			business.loadWallet(seed: seed)
+			walletLoaded = true
+		}
+	}
 
     // MARK: UISceneSession Lifecycle
 
@@ -45,8 +62,10 @@ class PhoenixApplicationDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        // If any sessions were discarded while the application was not running,
+		// this will be called shortly after application:didFinishLaunchingWithOptions.
+        // Use this method to release any resources that were specific to the discarded
+		// scenes, as they will not return.
     }
 
     static func get() -> PhoenixApplicationDelegate { UIApplication.shared.delegate as! PhoenixApplicationDelegate }

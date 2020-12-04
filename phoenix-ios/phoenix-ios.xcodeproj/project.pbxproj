@@ -41,6 +41,7 @@
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
 		DC18C418256FE22300A2D083 /* preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C417256FE22300A2D083 /* preferences.swift */; };
 		DC18C41D256FF91100A2D083 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* utils.swift */; };
+		DC649FDC2577002300853C46 /* kotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC649FDB2577002300853C46 /* kotlin.swift */; };
 		DC67654525655CA0004D4263 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC67654225655CA0004D4263 /* about.html */; };
 		DC67654625655CA0004D4263 /* stylesheet.css in Resources */ = {isa = PBXBuildFile; fileRef = DC67654425655CA0004D4263 /* stylesheet.css */; };
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
@@ -137,6 +138,7 @@
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
 		DC18C417256FE22300A2D083 /* preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preferences.swift; sourceTree = "<group>"; };
 		DC18C41C256FF91100A2D083 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
+		DC649FDB2577002300853C46 /* kotlin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = kotlin.swift; sourceTree = "<group>"; };
 		DC67654325655CA0004D4263 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
 		DC67654425655CA0004D4263 /* stylesheet.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = stylesheet.css; sourceTree = "<group>"; };
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				53BEF8EAA43946FC1C7A6E7E /* shapes.swift */,
 				DC18C417256FE22300A2D083 /* preferences.swift */,
 				DC18C41C256FF91100A2D083 /* utils.swift */,
+				DC649FDB2577002300853C46 /* kotlin.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -599,6 +602,7 @@
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */,
 				7555FF7F242A565900829871 /* PhoenixApplicationDelegate.swift in Sources */,
+				DC649FDC2577002300853C46 /* kotlin.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,

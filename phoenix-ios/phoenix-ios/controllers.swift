@@ -50,11 +50,6 @@ class MockControllerFactory : ControllerFactory {
     func scan() -> MVIController<Scan.Model, Scan.Intent> {
         MVIControllerMock(model: ScanView_Previews.mockModel)
     }
-	
-	func recoveryPhraseConfiguration() ->
-	MVIController<RecoveryPhraseConfiguration.Model, RecoveryPhraseConfiguration.Intent> {
-		MVIControllerMock(model: RecoverySeedView_Previews.mockModel)
-	}
 }
 
 func appView<V : View>(_ content: V) -> some View {

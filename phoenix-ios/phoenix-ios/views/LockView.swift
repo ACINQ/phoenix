@@ -130,14 +130,13 @@ struct LockView : View {
 	
 	func tryBiometricsLogin() -> Void {
 		
-		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<Data?, Error>) in
+		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<[String], Error>) in
 			
 			switch result {
-				case .success(let databaseKey):
-					if databaseKey != nil {
-						withAnimation(.easeInOut) {
-							isUnlocked = true
-						}
+				case .success(let mnemonics):
+					PhoenixApplicationDelegate.get().loadWallet(mnemonics: mnemonics)
+					withAnimation(.easeInOut) {
+						isUnlocked = true
 					}
 				case .failure(let error):
 					print("error: \(error)")

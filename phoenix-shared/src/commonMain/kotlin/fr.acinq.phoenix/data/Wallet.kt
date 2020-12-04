@@ -1,16 +1,14 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.*
-import kotlinx.serialization.Serializable
-import org.kodein.db.model.orm.Metadata
 
-@Serializable
-data class Wallet(
-    // Unique ID a their is only one wallet per app
-    override val id: Int = 0,
-    val mnemonics: List<String>) : Metadata {
+// @DefinitelyNotSerializable_DoNotPutMeInTheDatabase_Ever
+data class Wallet(val seed: ByteArray) {
 
-    val seed by lazy { MnemonicCode.toSeed(mnemonics, "") }
+    init {
+        require(seed.size == 64) { "invalid seed.size" }
+    }
+
     private val master by lazy { DeterministicWallet.generate(seed) }
 
     fun masterPublicKey(path: String, isMainnet: Boolean): String {
@@ -37,14 +35,11 @@ data class Wallet(
 
         other as Wallet
 
-        if (id != other.id) return false
         if (!seed.contentEquals(other.seed)) return false
 
         return true
     }
     override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + seed.contentHashCode()
-        return result
+        return seed.contentHashCode()
     }
 }

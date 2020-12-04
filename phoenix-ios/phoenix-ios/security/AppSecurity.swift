@@ -104,13 +104,29 @@ class AppSecurity {
 		return NSError(domain: "AppSecurity", code: code, userInfo: userInfo)
 	}
 	
+	private func validateParameter(mnemonics: [String]) -> Data {
+		
+		precondition(mnemonics.count == 12, "Invalid parameter: mnemonics.count")
+		
+		let space = " "
+		precondition(mnemonics.allSatisfy { !$0.contains(space) },
+		  "Invalid parameter: mnemonics.word")
+		
+		let mnemonicsData = mnemonics.joined(separator: space).data(using: .utf8)
+		
+		precondition(mnemonicsData != nil,
+		  "Invalid parameter: mnemonics.work contains non-utf8 characters")
+		
+		return mnemonicsData!
+	}
+	
 	// --------------------------------------------------------------------------------
 	// MARK:- Public Utilities
 	// --------------------------------------------------------------------------------
 	
-	public func generateDatabaseKey() -> Data {
+	public func generateEntropy() -> Data {
 		
-		let key = SymmetricKey(size: .bits256)
+		let key = SymmetricKey(size: .bits128)
 		
 		return key.withUnsafeBytes {(bytes: UnsafeRawBufferPointer) -> Data in
 			return Data(bytes: bytes.baseAddress!, count: bytes.count)
@@ -161,11 +177,11 @@ class AppSecurity {
 	/// Otherwise it will  fail, and the completion closure will specify the additional security in place.
 	///
 	public func tryUnlockWithKeychain(
-		completion: @escaping (_ databaseKey: Data?, _ configuration: EnabledSecurity) -> Void
+		completion: @escaping (_ mnemonics: [String]?, _ configuration: EnabledSecurity) -> Void
 	) {
-		let succeed = {(_ databaseKey: Data) -> Void in
+		let succeed = {(_ mnemonics: [String]) -> Void in
 			DispatchQueue.main.async {
-				completion(databaseKey, EnabledSecurity.none)
+				completion(mnemonics, EnabledSecurity.none)
 			}
 		}
 		
@@ -208,8 +224,11 @@ class AppSecurity {
 			}
 			
 			// Decrypt the databaseKey using the lockingKey
-			if let databaseKey = try? ChaChaPoly.open(sealedBox, using: lockingKey) {
-				succeed(databaseKey)
+			if let data = try? ChaChaPoly.open(sealedBox, using: lockingKey),
+			   let str = String(data: data, encoding: .utf8)
+			{
+				let mnemonics: [String] = str.split(separator: " ").map { String($0) }
+				succeed(mnemonics)
 			} else {
 				fail(securityFile.enabledSecurity)
 			}
@@ -225,10 +244,10 @@ class AppSecurity {
 	/// - the user is explicitly disabling existing security options
 	///
 	public func addKeychainEntry(
-		databaseKey : Data,
+		mnemonics : [String],
 		completion  : @escaping (_ error: Error?) -> Void
 	) {
-		precondition(databaseKey.count == (256 / 8), "Invalid databaseKey")
+		let mnemonicsData = validateParameter(mnemonics: mnemonics)
 		
 		let succeed = {(securityFile: SecurityFile) -> Void in
 			DispatchQueue.main.async {
@@ -251,7 +270,7 @@ class AppSecurity {
 			
 			let sealedBox: ChaChaPoly.SealedBox
 			do {
-				sealedBox = try ChaChaPoly.seal(databaseKey, using: lockingKey)
+				sealedBox = try ChaChaPoly.seal(mnemonicsData, using: lockingKey)
 			} catch {
 				return fail(error)
 			}
@@ -348,11 +367,12 @@ class AppSecurity {
 	/// Attempts to extract the databaseKey using biometrics (e.g. touchID, faceID)
 	///
 	public func tryUnlockWithBiometrics(
-		completion: @escaping (_ result: Result<Data?, Error>) -> Void
+		prompt: String? = nil,
+		completion: @escaping (_ result: Result<[String], Error>) -> Void
 	) {
-		let succeed = {(_ databaseKey: Data?) in
+		let succeed = {(_ mnemonics: [String]) in
 			DispatchQueue.main.async {
-				completion(Result.success(databaseKey))
+				completion(Result.success(mnemonics))
 			}
 		}
 		
@@ -383,7 +403,7 @@ class AppSecurity {
 		//	let sealedBox_passphrase = try? keyInfo_passphrase?.toSealedBox()
 			
 			let context = LAContext()
-			context.localizedReason = self.biometricsPrompt()
+			context.localizedReason = prompt ?? self.biometricsPrompt()
 			
 			var query = [String: Any]()
 			query[kSecUseAuthenticationContext as String] = context
@@ -403,12 +423,17 @@ class AppSecurity {
 			}
 		
 			// Decrypt the databaseKey using the lockingKey
-			let databaseKey: Data
+			let mnemonicsData: Data
 			do {
-				databaseKey = try ChaChaPoly.open(sealedBox_biometrics, using: lockingKey)
+				mnemonicsData = try ChaChaPoly.open(sealedBox_biometrics, using: lockingKey)
 			} catch {
 				return fail(error)
 			}
+			
+			guard let mnemonicsString = String(data: mnemonicsData, encoding: .utf8) else {
+				return fail(self.genericError(500, "Keychain data is invalid"))
+			}
+			let mnemonics = mnemonicsString.split(separator: " ").map { String($0) }
 			
 		#if targetEnvironment(simulator)
 			
@@ -433,32 +458,32 @@ class AppSecurity {
 			//
 			// So we're going to fake it here.
 			
-			let prompt = self.biometricsPrompt()
+			let reason = prompt ?? self.biometricsPrompt()
 						
 			LAContext().evaluatePolicy( .deviceOwnerAuthenticationWithBiometrics,
-			           localizedReason: prompt
+			           localizedReason: reason
 			) {(success, error) in
 				
 				if let error = error {
 					fail(error)
 				} else {
-					succeed(databaseKey)
+					succeed(mnemonics)
 				}
 			}
 		#else
 		
 			// iOS device
-			succeed(databaseKey)
+			succeed(mnemonics)
 		
 		#endif
 		}
 	}
 	
 	public func addBiometricsEntry(
-		databaseKey : Data,
+		mnemonics : [String],
 		completion  : @escaping (_ error: Error?) -> Void
 	) {
-		precondition(databaseKey.count == (256 / 8), "Invalid databaseKey")
+		let mnemonicsData = validateParameter(mnemonics: mnemonics)
 		
 		let succeed = {(securityFile: SecurityFile) -> Void in
 			DispatchQueue.main.async {
@@ -481,7 +506,7 @@ class AppSecurity {
 			
 			let sealedBox: ChaChaPoly.SealedBox
 			do {
-				sealedBox = try ChaChaPoly.seal(databaseKey, using: lockingKey)
+				sealedBox = try ChaChaPoly.seal(mnemonicsData, using: lockingKey)
 			} catch {
 				return fail(error)
 			}
