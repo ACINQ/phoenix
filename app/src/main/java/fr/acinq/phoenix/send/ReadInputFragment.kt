@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.send
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -43,6 +44,7 @@ import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
 import fr.acinq.phoenix.lnurl.LNUrlAuth
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.customviews.ButtonView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -110,7 +112,27 @@ class ReadInputFragment : BaseFragment() {
           }
         }
         is ReadInputState.Done.Onchain -> {
-          findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.raw))
+          val uri = it.bitcoinUri
+          if (it.bitcoinUri.lightning != null) {
+            val view = layoutInflater.inflate(R.layout.dialog_payment_mode, null)
+            val payOnChain = view.findViewById<ButtonView>(R.id.paymode_onchain_button)
+            val payOnLightning = view.findViewById<ButtonView>(R.id.paymode_lightning_button)
+            val dialog = AlertDialog.Builder(context, R.style.default_dialogTheme)
+              .setView(view)
+              .setCancelable(false)
+              .create()
+            payOnChain.setOnClickListener {
+              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = uri.raw))
+              dialog.dismiss()
+            }
+            payOnLightning.setOnClickListener {
+              findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = PaymentRequest.write(uri.lightning)))
+              dialog.dismiss()
+            }
+            dialog.show()
+          } else {
+            findNavController().navigate(SendFragmentDirections.globalActionAnyToSend(payload = it.bitcoinUri.raw))
+          }
         }
         is ReadInputState.Done.Url -> {
           when (it.url) {
