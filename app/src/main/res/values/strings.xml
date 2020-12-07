@@ -651,4 +651,9 @@
     <p>Go to Settings > Security to enroll for the new screen lock feature.</p>
   ]]></string>
 
+  <string name="paymentmode_onchain">Pay on-chain</string>
+  <string name="paymentmode_onchain_desc">On-chain transactions are typically slower and more expensive</string>
+  <string name="paymentmode_lightning">Pay with Lightning</string>
+  <string name="paymentmode_lightning_desc">This is the recommended option</string>
+
 </resources>
