@@ -219,7 +219,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
     log.info("swap-in settings set to $remoteSwapInSettings")
 
     // -- swap-out settings
-    val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(1))
+    val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(0))
     swapOutSettings.postValue(remoteSwapOutSettings)
     log.info("swap-out settings set to $remoteSwapOutSettings")
   }

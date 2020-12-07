@@ -58,6 +58,7 @@ class SendFragment : BaseFragment() {
   private lateinit var model: SendViewModel
 
   private lateinit var unitList: List<String>
+  private val minFeerateSwapout by lazy { getMinSwapoutFeerate() }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSendBinding.inflate(inflater, container, false)
@@ -72,7 +73,6 @@ class SendFragment : BaseFragment() {
     mBinding.appModel = app
 
     app.state.value?.kit()?.run {
-      val minFeerateSwapout = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
       val feerate = nodeParams().onChainFeeConf().feeEstimator().run {
         FeerateEstimationPerKb(
           rate20min = (getFeeratePerKb(2) / 1000).coerceAtLeast(minFeerateSwapout),
@@ -164,7 +164,6 @@ class SendFragment : BaseFragment() {
       }
 
       model.feerateEstimation.value?.let { feerateEstimation ->
-        val minFeerateSwapout = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
         when {
           feerate <= 0 -> mBinding.chainFeesFeedback.apply {
             text = getString(R.string.send_chain_fees_feedback_invalid)
@@ -271,6 +270,15 @@ class SendFragment : BaseFragment() {
     EventBus.getDefault().unregister(this)
   }
 
+  private fun getMinSwapoutFeerate(): Long {
+    val minSetting = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
+    return if (minSetting == 0L) {
+      (app.state.value?.kit()?.nodeParams()?.onChainFeeConf()?.feeEstimator()?.getFeeratePerKb(36) ?: 1000) / 1000
+    } else {
+      minSetting
+    }
+  }
+
   private fun requestSwapOut(uri: BitcoinURI) {
     lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
       log.error("error when requesting swap-out: ", exception)
@@ -280,7 +288,7 @@ class SendFragment : BaseFragment() {
       model.isAmountFieldPristine.value = false
       val amount = checkAmount()
       val feerateSatPerByte = model.chainFeesSatBytes.value!!
-      if (feerateSatPerByte <= 0 || feerateSatPerByte < appContext()!!.swapOutSettings.value!!.minFeerateSatByte) {
+      if (feerateSatPerByte <= 0 || feerateSatPerByte < minFeerateSwapout) {
         model.showFeeratesForm.value = true
       } else if (amount.isDefined) {
         Wallet.hideKeyboard(context, mBinding.amount)
@@ -361,7 +369,7 @@ class SendFragment : BaseFragment() {
       }
       amount
     } catch (e: Exception) {
-      log.info("could not check amount: ${e.message}")
+      log.debug("could not check amount: ${e.message}")
       mBinding.amountConverted.text = ""
       model.amountErrorMessage.value = when (e) {
         is SwapOutInsufficientAmount -> R.string.send_amount_error_swap_out_too_small
