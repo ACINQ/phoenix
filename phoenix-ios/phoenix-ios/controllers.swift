@@ -23,10 +23,6 @@ class MockControllerFactory : ControllerFactory {
         MVIControllerMock(model: ContentView_Previews.mockModel)
     }
 
-    func displayConfiguration() -> MVIController<DisplayConfiguration.Model, DisplayConfiguration.Intent> {
-        MVIControllerMock(model: DisplayConfigurationView_Previews.mockModel)
-    }
-
     func electrumConfiguration() -> MVIController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent> {
         MVIControllerMock(model: ElectrumConfigurationView_Previews.mockModel)
     }

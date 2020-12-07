@@ -34,7 +34,6 @@ val MockControllers = object : ControllerFactory {
     override fun scan(): ScanController = MVI.Controller.Mock(TODO())
     override fun restoreWallet(): RestoreWalletController = MVI.Controller.Mock(TODO())
     override fun configuration(): ConfigurationController = MVI.Controller.Mock(TODO())
-    override fun displayConfiguration(): DisplayConfigurationController = MVI.Controller.Mock(TODO())
     override fun electrumConfiguration(): ElectrumConfigurationController = MVI.Controller.Mock(TODO())
     override fun channelsConfiguration(): ChannelsConfigurationController = MVI.Controller.Mock(TODO())
 }

@@ -73,6 +73,33 @@ extension BitcoinUnit {
 	}
 }
 
+enum Theme: String, CaseIterable {
+	case light
+	case dark
+	case system
+	
+	func localized() -> String {
+		switch self {
+		case .light  : return NSLocalizedString("Light", comment: "App theme option")
+		case .dark   : return NSLocalizedString("Dark", comment: "App theme option")
+		case .system : return NSLocalizedString("System", comment: "App theme option")
+		}
+	}
+	
+	func serialize() -> String {
+		return self.rawValue
+	}
+	
+	static func deserialize(_ str: String) -> Theme? {
+		for value in Theme.allCases {
+			if str == value.serialize() {
+				return value
+			}
+		}
+		return nil
+	}
+}
+
 class Prefs {
 	
 	public static let shared = Prefs()
@@ -83,6 +110,7 @@ class Prefs {
 		case currencyType
 		case fiatCurrency
 		case bitcoinUnit
+		case theme
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -142,6 +170,26 @@ class Prefs {
 			let str = newValue.serialize()
 			UserDefaults.standard.set(str, forKey: UserDefaultsKey.bitcoinUnit.rawValue)
 			bitcoinUnitPublisher.send(newValue)
+		}
+	}
+	
+	lazy private(set) var themePublisher: CurrentValueSubject<Theme, Never> = {
+		var value = self.theme
+		return CurrentValueSubject<Theme, Never>(value)
+	}()
+	
+	var theme: Theme {
+		get {
+			var saved: Theme? = nil
+			if let str = UserDefaults.standard.string(forKey: UserDefaultsKey.theme.rawValue) {
+				saved = Theme.deserialize(str)
+			}
+			return saved ?? Theme.system
+		}
+		set {
+			let str = newValue.serialize()
+			UserDefaults.standard.set(str, forKey: UserDefaultsKey.theme.rawValue)
+			themePublisher.send(newValue)
 		}
 	}
 }

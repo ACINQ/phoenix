@@ -1,23 +1,11 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.eclair.utils.ServerAddress
 import kotlinx.serialization.Serializable
 import org.kodein.db.model.orm.Metadata
 import kotlin.math.roundToLong
-
-@Serializable
-data class AppConfiguration(
-    // Display
-    val fiatCurrency: FiatCurrency = FiatCurrency.USD,
-    val bitcoinUnit: BitcoinUnit = BitcoinUnit.Satoshi,
-    val appTheme: AppTheme = AppTheme.System
-) : Metadata {
-    // Unique ID a their is only one configuration per app
-    override val id: Int get() = 0
-}
 
 enum class Chain { MAINNET, TESTNET, REGTEST }
 
@@ -45,17 +33,6 @@ fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi =
         BitcoinUnit.MilliBitcoin -> MilliSatoshi((this * 100_000_000.0).roundToLong())
         BitcoinUnit.Bitcoin -> MilliSatoshi((this * 100_000_000_000.0).roundToLong())
     }
-
-@Serializable
-enum class AppTheme(val label: String) {
-     Dark("Dark theme"),
-     Light("Light theme"),
-     System("System default");
-
-    companion object default {
-        val values = AppTheme.values().toList()
-    }
-}
 
 @Serializable
 enum class FiatCurrency(

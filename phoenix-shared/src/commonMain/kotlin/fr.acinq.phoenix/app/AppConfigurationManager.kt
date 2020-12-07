@@ -59,33 +59,6 @@ class AppConfigurationManager(
         }
     }
 
-    // General
-    private val appConfigurationKey = appDB.key<AppConfiguration>(0)
-    private fun createAppConfiguration(): AppConfiguration {
-        if (appDB[appConfigurationKey] == null) {
-            logger.info { "Create app configuration" }
-            appDB.put(AppConfiguration())
-        }
-        return appDB[appConfigurationKey] ?: error("App configuration must be initialized.")
-    }
-
-    fun getAppConfiguration(): AppConfiguration = appDB[appConfigurationKey] ?: createAppConfiguration()
-
-    fun putFiatCurrency(fiatCurrency: FiatCurrency) {
-        logger.info { "Change fiat currency [$fiatCurrency]" }
-        appDB.put(appConfigurationKey, getAppConfiguration().copy(fiatCurrency = fiatCurrency))
-    }
-
-    fun putBitcoinUnit(bitcoinUnit: BitcoinUnit) {
-        logger.info { "Change bitcoin unit [$bitcoinUnit]" }
-        appDB.put(appConfigurationKey, getAppConfiguration().copy(bitcoinUnit = bitcoinUnit))
-    }
-
-    fun putAppTheme(appTheme: AppTheme) {
-        logger.info { "Change app theme [$appTheme]" }
-        appDB.put(appConfigurationKey, getAppConfiguration().copy(appTheme = appTheme))
-    }
-
     // Electrum
     private val electrumServerKey = appDB.key<ElectrumServer>(0)
     private fun createElectrumConfiguration(): ElectrumServer {
