@@ -72,10 +72,9 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             ),
             dustLimit = 546.sat,
             onChainFeeConf = OnChainFeeConf(
-//                maxFeerateMismatch = 10_000.0,
                 closeOnOfflineMismatch = true,
                 updateFeeMinDiffRatio = 0.1,
-                feerateTolerance = FeerateTolerance(ratioLow = 0.5, ratioHigh = 2.0)
+                feerateTolerance = FeerateTolerance(ratioLow = 0.01, ratioHigh = 100.0)
             ),
             maxHtlcValueInFlightMsat = 150000000L,
             maxAcceptedHtlcs = 30,
