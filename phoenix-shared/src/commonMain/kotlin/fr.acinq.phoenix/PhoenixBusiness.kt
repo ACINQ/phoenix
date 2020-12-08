@@ -54,7 +54,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         }
 
         val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), genesisBlock.hash)
-        newLogger(loggerFactory).info { "NodeId: ${keyManager.nodeId}" }
+        newLogger(loggerFactory).info { "nodeid=${keyManager.nodeId}" }
 
         val params = NodeParams(
             keyManager = keyManager,
@@ -68,6 +68,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
                     ActivatedFeature(Feature.Wumbo, FeatureSupport.Optional),
                     ActivatedFeature(Feature.StaticRemoteKey, FeatureSupport.Optional),
                     ActivatedFeature(Feature.TrampolinePayment, FeatureSupport.Optional),
+                    ActivatedFeature(Feature.AnchorOutputs, FeatureSupport.Optional),
                 )
             ),
             dustLimit = 546.sat,
@@ -107,6 +108,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             trampolineNode = acinqNodeUri,
             enableTrampolinePayment = true
         )
+
+        newLogger(loggerFactory).info { "params=$params" }
 
         val databases = object : Databases {
             override val channels: ChannelsDb get() = channelsDB
