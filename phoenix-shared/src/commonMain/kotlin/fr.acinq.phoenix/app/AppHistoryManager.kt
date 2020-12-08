@@ -1,5 +1,7 @@
 package fr.acinq.phoenix.app
 
+import fr.acinq.eclair.db.IncomingPayment
+import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.io.PaymentNotSent
 import fr.acinq.eclair.io.PaymentProgress
 import fr.acinq.eclair.io.PaymentReceived
@@ -32,45 +34,57 @@ class AppHistoryManager(private val appDb: DB, private val peer: Peer) : Corouti
             peer.openListenerEventSubscription().consumeEach {
                 when (it) {
                     is PaymentReceived -> {
+                        val status = it.incomingPayment.status
+                        require(status is IncomingPayment.Status.Received) { "Got PaymentReceived notification with an incomming payment $status" }
                         appDb.put(
                             Transaction(
-                                UUID.randomUUID().toString(),
-                                it.incomingPayment.paymentRequest.amount?.toLong() ?: error("Received a payment without amount ?!?"),
-                                it.incomingPayment.paymentRequest.description ?: "",
-                                Transaction.Status.Success,
-                                currentTimestampMillis()
+                                id = UUID.randomUUID().toString(),
+                                amountSat = status.amount.msat,
+                                desc = when (val origin = it.incomingPayment.origin) {
+                                    is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: ""
+                                    is IncomingPayment.Origin.KeySend -> ""
+                                    is IncomingPayment.Origin.SwapIn -> ""
+                                },
+                                status = Transaction.Status.Success,
+                                timestamp = status.receivedAt
                             )
                         )
                     }
                     is PaymentProgress -> {
-                        val totalAmount = it.payment.paymentAmount + it.fees
+                        val totalAmount = it.request.amount + it.fees
                         appDb.put(
                             Transaction(
-                                id = it.payment.paymentId.toString(),
+                                id = it.request.paymentId.toString(),
                                 amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
-                                desc = it.payment.paymentRequest.description ?: "",
+                                desc = it.request.details.paymentRequest.description ?: "",
                                 status = Transaction.Status.Pending,
                                 timestamp = currentTimestampMillis()
                             )
                         )
                     }
                     is PaymentSent -> {
-                        val totalAmount = it.payment.paymentAmount + it.fees
+                        val status = it.payment.status
+                        require(status is OutgoingPayment.Status.Succeeded) { "Got PaymentReceived notification with an incomming payment $status" }
+                        val totalAmount = it.payment.recipientAmount + it.payment.fees
                         appDb.put(
                             Transaction(
-                                id = it.payment.paymentId.toString(),
+                                id = it.payment.id.toString(),
                                 amountSat = -totalAmount.toLong(), // storing value in MilliSatoshi
-                                desc = it.payment.paymentRequest.description ?: "",
+                                desc = when (val details = it.payment.details) {
+                                    is OutgoingPayment.Details.Normal -> details.paymentRequest.description ?: ""
+                                    is OutgoingPayment.Details.KeySend -> ""
+                                    is OutgoingPayment.Details.SwapOut -> ""
+                                },
                                 status = Transaction.Status.Success,
-                                timestamp = currentTimestampMillis()
+                                timestamp = status.completedAt
                             )
                         )
                     }
                     is PaymentNotSent -> {
                         appDb.put(
                             Transaction(
-                                id = it.payment.paymentId.toString(),
-                                amountSat = -it.payment.paymentAmount.toLong(), // storing value in MilliSatoshi
+                                id = it.request.paymentId.toString(),
+                                amountSat = -it.request.amount.msat, // storing value in MilliSatoshi
                                 desc = it.reason.message(),
                                 status = Transaction.Status.Failure,
                                 timestamp = currentTimestampMillis()

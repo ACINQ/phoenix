@@ -1,0 +1,9 @@
+# This file defines whether Android is loaded by Gradle & IntelliJ.
+# At least one of both properties 'sdk.dir' or 'skip.android' must be set.
+
+# Must be set in order for Android to be loaded.
+#sdk.dir=/Location/to/Android/sdk
+
+# Instructs Gradle to skip Android.
+# Note that this property takes precedence over sdk.dir (you can have sdk.dir set and still skip Android).
+#skip.android=true

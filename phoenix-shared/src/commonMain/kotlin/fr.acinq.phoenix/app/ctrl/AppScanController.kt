@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.app.ctrl
 
+import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.SendPayment
 import fr.acinq.eclair.payment.PaymentRequest
@@ -28,11 +29,11 @@ class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : 
             }
             is Scan.Intent.Send -> {
                 launch {
-                    readPaymentRequest(intent.request)?.run {
+                    readPaymentRequest(intent.request)?.let {
                         val paymentAmount = intent.amount.toMilliSatoshi(intent.unit)
                         val paymentId = UUID.randomUUID()
 
-                        peer.send(SendPayment(paymentId, this, paymentAmount))
+                        peer.send(SendPayment(paymentId, paymentAmount, it.nodeId, OutgoingPayment.Details.Normal(it)))
 
                         model(Scan.Model.Sending)
                     }

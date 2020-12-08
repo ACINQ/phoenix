@@ -1,34 +1,42 @@
 plugins {
-    id("com.android.library")
+    val withAndroid = System.getProperty("withAndroid")!!.toBoolean()
+    if (withAndroid) id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.4.10"
 }
 
 val currentOs = org.gradle.internal.os.OperatingSystem.current()
 
-android {
-    compileSdkVersion(30)
-    defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(30)
-    }
+val withAndroid = System.getProperty("withAndroid")!!.toBoolean()
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+if (withAndroid) {
+    // The `android` extension function is not in classpath if android plugin is not applied
+    extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+        compileSdkVersion(30)
+        defaultConfig {
+            minSdkVersion(24)
+            targetSdkVersion(30)
+        }
 
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        testOptions {
+            unitTests.isReturnDefaultValues = true
+        }
+
+        sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    }
 }
 
 kotlin {
-    android {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+    if (withAndroid) {
+        android {
+            compilations.all {
+                kotlinOptions.jvmTarget = "1.8"
+            }
         }
     }
 
@@ -62,6 +70,7 @@ kotlin {
                 api("io.ktor:ktor-client-serialization:$ktorVersion")
             }
         }
+
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -69,28 +78,30 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                api("androidx.core:core-ktx:1.3.2")
-                api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1Version")
-                api("io.ktor:ktor-network:$ktorVersion")
-                api("io.ktor:ktor-network-tls:$ktorVersion")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
-            }
-        }
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("androidx.test.ext:junit:1.1.2")
-                implementation("androidx.test.espresso:espresso-core:3.3.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-                val target = when {
-                    currentOs.isLinux -> "linux"
-                    currentOs.isMacOsX -> "darwin"
-                    currentOs.isWindows -> "mingw"
-                    else -> error("UnsupportedmOS $currentOs")
+        if (withAndroid) {
+            val androidMain by getting {
+                dependencies {
+                    api("androidx.core:core-ktx:1.3.2")
+                    api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1Version")
+                    api("io.ktor:ktor-network:$ktorVersion")
+                    api("io.ktor:ktor-network-tls:$ktorVersion")
+                    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
                 }
-                implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:$secp256k1Version")
+            }
+            val androidTest by getting {
+                dependencies {
+                    implementation(kotlin("test-junit"))
+                    implementation("androidx.test.ext:junit:1.1.2")
+                    implementation("androidx.test.espresso:espresso-core:3.3.0")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+                    val target = when {
+                        currentOs.isLinux -> "linux"
+                        currentOs.isMacOsX -> "darwin"
+                        currentOs.isWindows -> "mingw"
+                        else -> error("UnsupportedmOS $currentOs")
+                    }
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:$secp256k1Version")
+                }
             }
         }
 

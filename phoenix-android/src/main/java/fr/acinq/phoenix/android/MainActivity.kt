@@ -19,6 +19,7 @@ import fr.acinq.phoenix.android.mvi.CF
 import fr.acinq.phoenix.android.mvi.MockView
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.ctrl.Initialization
+import java.security.SecureRandom
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,17 +45,19 @@ fun InitializationView() {
                     Modifier.padding(10.dp)
                 ) {
                     when (model) {
-                        is Initialization.Model.Initialization -> {
+                        is Initialization.Model.Ready -> {
                             Button(
                                 onClick = {
                                     logger.info { "Clicked!" }
-                                    postIntent(Initialization.Intent.CreateWallet)
+                                    val entropy = ByteArray(32)
+                                    SecureRandom().nextBytes(entropy)
+                                    postIntent(Initialization.Intent.GenerateWallet(entropy))
                                 }
                             ) {
                                 Text("Create Wallet!")
                             }
                         }
-                        is Initialization.Model.Creating -> {
+                        is Initialization.Model.GeneratedWallet -> {
                             Text("TODO!")
                         }
                     }
@@ -64,7 +67,7 @@ fun InitializationView() {
     }
 }
 
-val MockModelInitialization = Initialization.Model.Initialization
+val MockModelInitialization = Initialization.Model.Ready
 
 @Preview(device = Devices.PIXEL_3)
 @Composable

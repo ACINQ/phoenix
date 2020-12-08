@@ -5,10 +5,10 @@ buildscript {
     }
 
     dependencies {
-        val androidVersion = if (System.getProperty("idea.paths.selector").orEmpty().startsWith("IntelliJIdea")) "4.0.1" else "4.2.0-alpha16"
-        classpath("com.android.tools.build:gradle:$androidVersion")
-
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
+        val isIntelliJ = System.getProperty("isIntelliJ")!!.toBoolean()
+        val androidVersion = if (isIntelliJ) "4.0.1" else "7.0.0-alpha02"
+        classpath("com.android.tools.build:gradle:$androidVersion")
     }
 }
 

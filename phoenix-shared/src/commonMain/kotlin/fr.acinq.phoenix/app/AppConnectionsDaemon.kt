@@ -82,7 +82,7 @@ class AppConnectionsDaemon(
                 when {
                     it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
                         peerConnectionJob = connectionLoop("Peer", getPeer().connectionState) {
-                            getPeer().connect(acinqNodeUri.host, acinqNodeUri.port)
+                            getPeer().connect()
                         }
                     }
                     else -> {
@@ -123,10 +123,10 @@ class AppConnectionsDaemon(
     private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
         var retryDelay = 1.seconds
         statusStateFlow.collect {
-            logger.verbose { "New $name status $it" }
+            logger.debug { "New $name status $it" }
 
             if (it == Connection.CLOSED) {
-                logger.verbose { "Wait for $retryDelay before retrying connection on $name" }
+                logger.debug { "Wait for $retryDelay before retrying connection on $name" }
                 delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
                 connect()
             } else if (it == Connection.ESTABLISHED) {

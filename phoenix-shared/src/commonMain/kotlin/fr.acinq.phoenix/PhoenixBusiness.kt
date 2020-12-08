@@ -6,8 +6,13 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
+import fr.acinq.eclair.blockchain.fee.FeerateTolerance
 import fr.acinq.eclair.blockchain.fee.OnChainFeeConf
 import fr.acinq.eclair.crypto.LocalKeyManager
+import fr.acinq.eclair.db.ChannelsDb
+import fr.acinq.eclair.db.Databases
+import fr.acinq.eclair.db.InMemoryPaymentsDb
+import fr.acinq.eclair.db.PaymentsDb
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.eclair.utils.msat
@@ -67,9 +72,10 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             ),
             dustLimit = 546.sat,
             onChainFeeConf = OnChainFeeConf(
-                maxFeerateMismatch = 10_000.0,
+//                maxFeerateMismatch = 10_000.0,
                 closeOnOfflineMismatch = true,
-                updateFeeMinDiffRatio = 0.1
+                updateFeeMinDiffRatio = 0.1,
+                feerateTolerance = FeerateTolerance(ratioLow = 0.5, ratioHigh = 2.0)
             ),
             maxHtlcValueInFlightMsat = 150000000L,
             maxAcceptedHtlcs = 30,
@@ -83,19 +89,19 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             feeProportionalMillionth = 10,
             reserveToFundingRatio = 0.01, // note: not used (overridden below)
             maxReserveToFundingRatio = 0.05,
-            revocationTimeout = 20,
-            authTimeout = 10,
-            initTimeout = 10,
-            pingInterval = 30,
-            pingTimeout = 10,
+            revocationTimeoutSeconds = 20,
+            authTimeoutSeconds = 10,
+            initTimeoutSeconds = 10,
+            pingIntervalSeconds = 30,
+            pingTimeoutSeconds = 10,
             pingDisconnect = true,
             autoReconnect = false,
-            initialRandomReconnectDelay = 5,
-            maxReconnectInterval = 3600,
+            initialRandomReconnectDelaySeconds = 5,
+            maxReconnectIntervalSeconds = 3600,
             chainHash = genesisBlock.hash,
             channelFlags = 1,
-            paymentRequestExpiry = 3600,
-            multiPartPaymentExpiry = 30,
+            paymentRequestExpirySeconds = 3600,
+            multiPartPaymentExpirySeconds = 60,
             minFundingSatoshis = 1000.sat,
             maxFundingSatoshis = 16777215.sat,
             maxPaymentAttempts = 5,
@@ -103,7 +109,12 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             enableTrampolinePayment = true
         )
 
-        val peer = Peer(tcpSocketBuilder, params, acinqNodeUri.id, electrumWatcher, channelsDB, MainScope())
+        val databases = object : Databases {
+            override val channels: ChannelsDb get() = channelsDB
+            override val payments: PaymentsDb get() = paymentsDB
+        }
+
+        val peer = Peer(tcpSocketBuilder, params, electrumWatcher, databases, MainScope())
 
         return peer
     }
@@ -124,6 +135,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val dbFactory by lazy { DB.factory.inDir(getApplicationFilesDirectoryPath(ctx)) }
     private val appDB by lazy { dbFactory.open("application", KotlinxSerializer()) }
     private val channelsDB by lazy { AppChannelsDB(dbFactory) }
+    private val paymentsDB by lazy { InMemoryPaymentsDb() }
 
     // RegTest
 //    val acinqNodeUri = NodeUri(PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585"), "localhost", 48001)
