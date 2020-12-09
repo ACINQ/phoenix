@@ -3,6 +3,7 @@ plugins {
     if (withAndroid) id("com.android.library")
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.4.10"
+    id("com.squareup.sqldelight")
 }
 
 val currentOs = org.gradle.internal.os.OperatingSystem.current()
@@ -55,6 +56,7 @@ kotlin {
         val secp256k1Version = "0.4.1"
         val ktorVersion = "1.4.1"
         val kodeinDBVersion = "0.2.0-beta"
+        val sqldelightVersion = "1.4.4"
 
         val commonMain by getting {
             dependencies {
@@ -68,6 +70,7 @@ kotlin {
                 api("io.ktor:ktor-client-core:$ktorVersion")
                 api("io.ktor:ktor-client-json:$ktorVersion")
                 api("io.ktor:ktor-client-serialization:$ktorVersion")
+                implementation("com.squareup.sqldelight:runtime:$sqldelightVersion")
             }
         }
 
@@ -86,6 +89,7 @@ kotlin {
                     api("io.ktor:ktor-network:$ktorVersion")
                     api("io.ktor:ktor-network-tls:$ktorVersion")
                     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+                    implementation("com.squareup.sqldelight:android-driver:$sqldelightVersion")
                 }
             }
             val androidTest by getting {
@@ -101,6 +105,7 @@ kotlin {
                         else -> error("UnsupportedmOS $currentOs")
                     }
                     implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-$target:$secp256k1Version")
+                    implementation("com.squareup.sqldelight:sqlite-driver:$sqldelightVersion")
                 }
             }
         }
@@ -108,13 +113,25 @@ kotlin {
         val iosMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-ios:$ktorVersion")
+                implementation("com.squareup.sqldelight:native-driver:$sqldelightVersion")
             }
         }
-        val iosTest by getting {}
+
+        val iosTest by getting {
+            dependencies {
+                implementation("com.squareup.sqldelight:native-driver:$sqldelightVersion")
+            }
+        }
 
         all {
             languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
         }
+    }
+}
+
+sqldelight {
+    database("ChannelsDatabase") {
+        packageName = "fr.acinq.phoenix.db"
     }
 }
 

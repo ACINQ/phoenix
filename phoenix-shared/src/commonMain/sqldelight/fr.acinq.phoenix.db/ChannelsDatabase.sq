@@ -1,0 +1,46 @@
+PRAGMA foreign_keys = 1;
+
+-- channels table
+-- note: boolean are stored as INTEGER, with 0=false
+CREATE TABLE IF NOT EXISTS local_channels (
+    channel_id BLOB NOT NULL PRIMARY KEY,
+    data BLOB NOT NULL,
+    is_closed INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+-- htlcs info table
+CREATE TABLE IF NOT EXISTS htlc_infos (
+    channel_id BLOB NOT NULL,
+    commitment_number INTEGER NOT NULL,
+    payment_hash BLOB NOT NULL,
+    cltv_expiry INTEGER NOT NULL,
+    FOREIGN KEY(channel_id) REFERENCES local_channels(channel_id)
+);
+
+CREATE INDEX IF NOT EXISTS htlc_infos_idx ON htlc_infos(channel_id, commitment_number);
+
+-- channels queries
+getChannel:
+SELECT * FROM local_channels WHERE channel_id=?;
+
+updateChannel:
+UPDATE local_channels SET data=? WHERE channel_id=?;
+
+insertChannel:
+INSERT INTO local_channels VALUES (?, ?, 0);
+
+closeLocalChannel:
+UPDATE local_channels SET is_closed=1 WHERE channel_id=?;
+
+listLocalChannels:
+SELECT data FROM local_channels WHERE is_closed=0;
+
+-- htlcs info queries
+insertHtlcInfo:
+INSERT INTO htlc_infos VALUES (?, ?, ?, ?);
+
+listHtlcInfos:
+SELECT payment_hash, cltv_expiry FROM htlc_infos WHERE channel_id=? AND commitment_number=?;
+
+deleteHtlcInfo:
+DELETE FROM htlc_infos WHERE channel_id=?;

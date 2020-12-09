@@ -20,10 +20,18 @@ import fr.acinq.eclair.utils.sat
 import fr.acinq.eclair.utils.toByteVector32
 import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
-import fr.acinq.phoenix.app.ctrl.config.*
+import fr.acinq.phoenix.app.ctrl.config.AppChannelsConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppDisplayConfigurationController
+import fr.acinq.phoenix.app.ctrl.config.AppElectrumConfigurationController
 import fr.acinq.phoenix.ctrl.*
-import fr.acinq.phoenix.ctrl.config.*
+import fr.acinq.phoenix.ctrl.config.ChannelsConfigurationController
+import fr.acinq.phoenix.ctrl.config.ConfigurationController
+import fr.acinq.phoenix.ctrl.config.DisplayConfigurationController
+import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.db.SqliteChannelsDb
+import fr.acinq.phoenix.db.createChannelsDbDriver
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.PlatformContext
 import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
@@ -112,7 +120,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         newLogger(loggerFactory).info { "params=$params" }
 
         val databases = object : Databases {
-            override val channels: ChannelsDb get() = channelsDB
+            override val channels: ChannelsDb get() = channelsDb
             override val payments: PaymentsDb get() = paymentsDB
         }
 
@@ -136,12 +144,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     }
     private val dbFactory by lazy { DB.factory.inDir(getApplicationFilesDirectoryPath(ctx)) }
     private val appDB by lazy { dbFactory.open("application", KotlinxSerializer()) }
-    private val channelsDB by lazy { AppChannelsDB(dbFactory) }
+    private val channelsDb by lazy { SqliteChannelsDb(createChannelsDbDriver(ctx)) }
     private val paymentsDB by lazy { InMemoryPaymentsDb() }
-
-    // RegTest
-//    val acinqNodeUri = NodeUri(PublicKey.fromHex("039dc0e0b1d25905e44fdf6f8e89755a5e219685840d0bc1d28d3308f9628a3585"), "localhost", 48001)
-//    val chain = Chain.REGTEST
 
     // TestNet
     private val acinqNodeUri = NodeUri(PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"), "13.248.222.197", 9735)
