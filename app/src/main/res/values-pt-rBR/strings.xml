@@ -651,7 +651,7 @@
     <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
   ]]></string>
 
- <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
+  <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
   <string name="paymentmode_onchain_desc">Transações na rede Bitcoin geralmente são mais lentas e mais caras</string>
   <string name="paymentmode_lightning">Pagar usando a rede Lightning</string>
   <string name="paymentmode_lightning_desc">Esta é a opção recomendada</string>
