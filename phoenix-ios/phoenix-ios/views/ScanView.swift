@@ -116,7 +116,7 @@ struct ScanView: View {
             self.model = model
 
             if let amountMsat = model.amountMsat {
-                self._amount = State(initialValue: String(amountMsat.int64Value))
+                self._amount = State(initialValue: String(amountMsat.int64Value / 1000))
             } else {
                 self._amount = State(initialValue: "")
             }
