@@ -8,7 +8,7 @@ import PhoenixShared
 
 let mockPendingTransaction = Transaction(
         id: "0",
-        amountSat: -1900,
+        amountMsat: -1900,
         desc: "1 Scala Chip Frappuccino",
         status: Transaction.Status.pending,
         timestamp: 0
@@ -22,7 +22,7 @@ let mockPendingTransaction = Transaction(
 
 let mockSpendTransaction = Transaction(
         id: "1",
-        amountSat: -1500,
+        amountMsat: -1500,
         desc: "1 Blockaccino",
         status: Transaction.Status.success,
         timestamp: 0
@@ -36,7 +36,7 @@ let mockSpendTransaction = Transaction(
 
 let mockReceiveTransaction = Transaction(
         id: "2",
-        amountSat: 125000,
+        amountMsat: 125000,
         desc: "On-Chain payment to 8b44f33a8c86f1fe0c18935df9db961ff5a6edb4ee49d3cee666458745d676fd",
         status: Transaction.Status.success,
         timestamp: 0
@@ -50,7 +50,7 @@ let mockReceiveTransaction = Transaction(
 
 let mockSpendFailedTransaction = Transaction(
         id: "3",
-        amountSat: -1700,
+        amountMsat: -1700,
         desc: "1 Espresso Coin Panna",
         status: Transaction.Status.failure,
         timestamp: 0

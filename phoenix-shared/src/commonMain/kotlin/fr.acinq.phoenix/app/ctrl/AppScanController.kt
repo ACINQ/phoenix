@@ -55,7 +55,7 @@ class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : 
         model(
             Scan.Model.Validate(
                 request = request,
-                amountSat = paymentRequest.amount?.truncateToSatoshi()?.toLong(),
+                amountMsat = paymentRequest.amount?.toLong(),
                 requestDescription = paymentRequest.description
             )
         )

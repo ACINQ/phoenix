@@ -115,8 +115,8 @@ struct ScanView: View {
         init(model: Scan.ModelValidate, postIntent: @escaping (Scan.Intent) -> Void) {
             self.model = model
 
-            if let amountSat = model.amountSat {
-                self._amount = State(initialValue: String(amountSat.int64Value))
+            if let amountMsat = model.amountMsat {
+                self._amount = State(initialValue: String(amountMsat.int64Value))
             } else {
                 self._amount = State(initialValue: "")
             }
@@ -253,7 +253,7 @@ class ScanView_Previews: PreviewProvider {
 
     static let mockModel = Scan.ModelValidate(
             request: "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9",
-            amountSat: 1500,
+            amountMsat: 1500,
             requestDescription: "1 Blockaccino"
     )
 

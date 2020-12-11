@@ -11,7 +11,7 @@ object Scan {
         object Ready: Model()
         object BadRequest: Model()
         data class RequestWithoutAmount(val request: String): Model()
-        data class Validate(val request: String, val amountSat: Long?, val requestDescription: String?): Model()
+        data class Validate(val request: String, val amountMsat: Long?, val requestDescription: String?): Model()
         object Sending: Model()
     }
 

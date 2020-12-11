@@ -39,7 +39,7 @@ struct TransactionView : View {
                             .frame(width: 100, height: 100)
                             .foregroundColor(.appGreen)
                     VStack {
-                        Text(transaction.amountSat < 0 ? "SENT" : "RECEIVED")
+                        Text(transaction.amountMsat < 0 ? "SENT" : "RECEIVED")
                                 .font(Font.title2.bold())
                         Text(transaction.timestamp.formatDateMS().uppercased())
                                 .font(Font.title2)
@@ -73,11 +73,7 @@ struct TransactionView : View {
                 }
 
                 HStack(alignment: .bottom) {
-					// transaction.amountSat is actually in msat !
-					// There is a pending PR that contains a fix for this bug.
-					// I'm going to try to get it merged independently of the PR soon.
-					//
-					let amount = Utils.format(currencyPrefs, msat: transaction.amountSat)
+					let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat)
 					
                     Text(amount.digits)
                         .font(.largeTitle)

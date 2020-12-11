@@ -254,12 +254,8 @@ struct HomeView : View {
                 if transaction.status != .failure {
 					HStack(spacing: 0) {
 						
-						// transaction.amountSat is actually in msat !
-						// There is a pending PR that contains a fix for this bug.
-						// I'm going to try to get it merged independently of the PR soon.
-						//
-						let amount = Utils.format(currencyPrefs, msat: transaction.amountSat)
-						let isNegative = transaction.amountSat < 0
+						let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat)
+						let isNegative = transaction.amountMsat < 0
 						
 						Text(isNegative ? "" : "+")
 							.foregroundColor(isNegative ? .appRed : .appGreen)
