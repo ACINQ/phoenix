@@ -39,7 +39,7 @@ class AppHistoryManager(private val appDb: DB, private val peer: Peer) : Corouti
                         appDb.put(
                             Transaction(
                                 id = UUID.randomUUID().toString(),
-                                amountSat = status.amount.msat,
+                                amountMsat = status.amount.msat,
                                 desc = when (val origin = it.incomingPayment.origin) {
                                     is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: ""
                                     is IncomingPayment.Origin.KeySend -> ""
