@@ -581,12 +581,12 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
+  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
+    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros:
     <br />- Blockchain.info
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Distribuído por Coindesk</a>
