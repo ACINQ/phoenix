@@ -17,7 +17,7 @@ class Toast: ObservableObject {
                 Text(text)
                         .padding()
                         .foregroundColor(.white)
-                        .background(Color.appDark.opacity(0.4))
+                        .background(Color.primaryForeground.opacity(0.4))
                         .cornerRadius(42)
                         .padding([.bottom], 42)
             }

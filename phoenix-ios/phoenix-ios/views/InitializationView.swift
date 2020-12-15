@@ -30,12 +30,12 @@ struct InitializationView: View {
 				VStack {
 					NavigationLink(destination: ConfigurationView()) {
 						Image(systemName: "gearshape")
-						.imageScale(.large)
+							.renderingMode(.template)
+							.imageScale(.large)
 					}
 					.buttonStyle(PlainButtonStyle())
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 8)
-					.background(Color.white)
+					.padding(.all, 8)
+					.background(Color.buttonFill)
 					.cornerRadius(16)
 					.overlay(
 						RoundedRectangle(cornerRadius: 16)
@@ -134,11 +134,20 @@ struct InitializationView: View {
 }
 
 class InitView_Previews : PreviewProvider {
-    static let mockModel = Initialization.ModelReady()
+	static let mockModel = Initialization.ModelReady()
 
-    static var previews: some View {
-        mockView(InitializationView())
-                .previewDevice("iPhone 11")
+	static var previews: some View {
+		mockView(InitializationView())
+			.preferredColorScheme(.light)
+			.previewDevice("iPhone 8")
+			
+		mockView(InitializationView())
+			.preferredColorScheme(.dark)
+			.previewDevice("iPhone 8")
+			
+		mockView(InitializationView())
+			.preferredColorScheme(.light)
+			.previewDevice("iPhone 11")
     }
 
     #if DEBUG

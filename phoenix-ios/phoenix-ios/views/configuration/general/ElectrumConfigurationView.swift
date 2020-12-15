@@ -130,7 +130,7 @@ struct ElectrumConfigurationView: View {
                 Text(header).bold()
                         .frame(width: 90, alignment: .leading)
                         .font(.subheadline)
-                        .foregroundColor(.appDark)
+                        .foregroundColor(.primaryForeground)
                         .padding([.leading, .top, .bottom])
 
                 content()
@@ -169,7 +169,7 @@ struct ElectrumConfigurationView: View {
                     Text("Server must have a valid certificate")
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.appBackground)
+                            .background(Color.primaryForeground)
 
                 }
                         .opacity(customize ? 1 : 0.5)

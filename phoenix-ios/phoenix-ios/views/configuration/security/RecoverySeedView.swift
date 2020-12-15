@@ -52,10 +52,12 @@ struct RecoverySeedView : View {
 						Image(systemName: "key").imageScale(.small)
 						Text("Display seed")
 					}
-				}.disabled(isDecrypting)
+				}
+				.disabled(isDecrypting)
 					
 			} // </VStack>
-			.padding(.top, 40)
+			.padding(.top, 20)
+			.padding(.bottom, 20)
 			.padding([.leading, .trailing], 30)
 				
 		} // </ScrollView>

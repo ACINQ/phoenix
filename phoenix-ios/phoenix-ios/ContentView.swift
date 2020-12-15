@@ -20,6 +20,9 @@ struct ContentView: View {
 	@State var isUnlocked = false
 	@State var enabledSecurity = EnabledSecurity()
 
+	@Environment(\.popoverState) private var popoverState: PopoverState
+	@State private var popoverContent: AnyView? = nil
+	
 	var body: some View {
 	
 		if isUnlocked || !enabledSecurity.isEmpty {
@@ -32,11 +35,18 @@ struct ContentView: View {
 						.onAppear {
 							unlockedOnce = true
 						}
+					
+					if let popoverContent = popoverContent {
+						PopoverWrapper {
+							popoverContent
+						}
+						.zIndex(1) // needed for proper animation
+					}
 				}
 				
 				if !isUnlocked {
 					LockView(isUnlocked: $isUnlocked)
-						.zIndex(1) // needed for proper animation
+						.zIndex(2) // needed for proper animation
 						.transition(.asymmetric(
 							insertion : .identity,
 							removal   : .move(edge: .bottom)
@@ -47,11 +57,24 @@ struct ContentView: View {
 			.onReceive(didEnterBackgroundPublisher, perform: { _ in
 				onDidEnterBackground()
 			})
+			.onReceive(popoverState.displayContent) {
+				let newPopoverContent = $0
+				withAnimation {
+					popoverContent = newPopoverContent
+				}
+			}
+			.onReceive(popoverState.close) { _ in
+				withAnimation {
+					popoverContent = nil
+				}
+			}
 			
 		} else {
 			
-			loadingView().onAppear {
-				onAppLaunch()
+			NavigationView {
+				loadingView().onAppear {
+					onAppLaunch()
+				}
 			}
 		}
 	}
@@ -79,8 +102,6 @@ struct ContentView: View {
 		VStack {
 			Image(systemName: "arrow.triangle.2.circlepath")
 				.imageScale(.large)
-				.rotationEffect(Angle(degrees: 360.0))
-				.animation(.easeIn)
 		}
 		.edgesIgnoringSafeArea(.all)
 		.navigationBarTitle("", displayMode: .inline)
