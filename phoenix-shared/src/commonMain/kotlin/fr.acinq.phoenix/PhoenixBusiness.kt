@@ -1,8 +1,6 @@
 package fr.acinq.phoenix
 
-import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
@@ -161,6 +159,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val appConfigurationManager by lazy { AppConfigurationManager(appDB, electrumClient, chain, loggerFactory) }
 
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDB, httpClient) }
+    val util by lazy { Utilities(loggerFactory, chain) }
 
     fun start() {
         AppConnectionsDaemon(
