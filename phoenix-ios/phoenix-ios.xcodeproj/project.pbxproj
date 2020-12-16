@@ -16,6 +16,7 @@
 		53BEF90975122B844248569C /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */; };
 		53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6CBB2587136D25A625A /* lang.swift */; };
 		53BEF981E71E3087871890F9 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFCB8A24A5FAA785AFD03 /* ScanView.swift */; };
+		53BEF98CDD61115030E87C12 /* uikitAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF9304C486A6B146ABE99 /* uikitAppearance.swift */; };
 		53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */; };
 		53BEFA3292350CF33363A483 /* MVIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF6E3FE2787846F3F38F1 /* MVIView.swift */; };
 		53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */; };
@@ -57,7 +58,8 @@
 		DCACF70E256701870009B01E /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF70D256701870009B01E /* LockView.swift */; };
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DCC8B1B92502BAE2006B6227 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */; };
+		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +111,7 @@
 		53BEF6E3FE2787846F3F38F1 /* MVIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVIView.swift; sourceTree = "<group>"; };
 		53BEF85119FFF4F05588DA42 /* mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = mocks.swift; sourceTree = "<group>"; };
 		53BEF8EAA43946FC1C7A6E7E /* shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shapes.swift; sourceTree = "<group>"; };
+		53BEF9304C486A6B146ABE99 /* uikitAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = uikitAppearance.swift; sourceTree = "<group>"; };
 		53BEFA112E0701FFD6B84217 /* colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
 		53BEFB712EB39BF83E92E7DE /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
@@ -154,6 +157,8 @@
 		DCACF7082566D0F00009B01E /* AppAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAccessView.swift; sourceTree = "<group>"; };
 		DCACF70D256701870009B01E /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationViewerView.swift; sourceTree = "<group>"; };
+		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +194,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53BEF0A8669F9379E4E4596F /* logs */ = {
+			isa = PBXGroup;
+			children = (
+				F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */,
+				F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */,
+			);
+			path = logs;
+			sourceTree = "<group>";
+		};
 		53BEF0E7A62D4973FCC99476 /* widgets */ = {
 			isa = PBXGroup;
 			children = (
@@ -282,6 +296,7 @@
 				DC67654125655CA0004D4263 /* about */,
 				53BEFA112E0701FFD6B84217 /* colors.swift */,
 				53BEF4E19E60E093D8D51D0A /* controllers.swift */,
+				53BEF9304C486A6B146ABE99 /* uikitAppearance.swift */,
 			);
 			path = "phoenix-ios";
 			sourceTree = "<group>";
@@ -319,6 +334,7 @@
 				DCACF6E02566CEC40009B01E /* general */,
 				DCACF6E42566CF850009B01E /* security */,
 				DCACF6DF2566CEC40009B01E /* advanced */,
+				53BEF0A8669F9379E4E4596F /* logs */,
 			);
 			path = configuration;
 			sourceTree = "<group>";
@@ -528,7 +544,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */,
-				DCC8B1B92502BAE2006B6227 /* (null) in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
 				DC67654525655CA0004D4263 /* about.html in Resources */,
 				7555FF85242A565B00829871 /* Assets.xcassets in Resources */,
@@ -642,6 +657,9 @@
 				DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */,
 				53BEF5B2A55C55CFC474DC64 /* controllers.swift in Sources */,
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
+				F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */,
+				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
+				53BEF98CDD61115030E87C12 /* uikitAppearance.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

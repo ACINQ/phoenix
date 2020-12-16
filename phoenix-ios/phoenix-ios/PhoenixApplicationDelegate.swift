@@ -16,9 +16,7 @@ class PhoenixApplicationDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        UITableView.appearance().backgroundColor = .clear
-        UITableView.appearance().separatorStyle = .none
-        UITableViewCell.appearance().backgroundColor = .clear
+        UIKitAppearance()
 
         // Override point for customization after application launch.
         #if DEBUG

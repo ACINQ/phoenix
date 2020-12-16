@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.phoenix.ctrl.config.ChannelsConfigurationController
-import fr.acinq.phoenix.ctrl.config.ConfigurationController
-import fr.acinq.phoenix.ctrl.config.ElectrumConfigurationController
+import fr.acinq.phoenix.ctrl.config.*
 
 
 interface ControllerFactory {
@@ -15,4 +13,5 @@ interface ControllerFactory {
     fun configuration(): ConfigurationController
     fun electrumConfiguration(): ElectrumConfigurationController
     fun channelsConfiguration(): ChannelsConfigurationController
+    fun logsConfiguration(): LogsConfigurationController
 }

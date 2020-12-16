@@ -47,7 +47,7 @@ struct ConfigurationView: View {
 				}
 
 				Section(header: Text("Advanced")) {
-					NavigationLink(destination: EmptyView()) {
+					NavigationLink(destination: LogsConfigurationView()) {
 						Label { Text("Logs") } icon: {
 							Image(systemName: "doc.text")
 						}

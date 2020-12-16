@@ -30,9 +30,9 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
     private val queries = database.channelsDatabaseQueries
 
     override suspend fun addOrUpdateChannel(state: ChannelStateWithCommitments) {
+        val channelId = state.channelId.toByteArray()
+        val data = ChannelStateWithCommitments.serialize(state)
         withContext(Dispatchers.Default) {
-            val channelId = state.channelId.toByteArray()
-            val data = ChannelStateWithCommitments.serialize(state)
             queries.transaction {
                 queries.getChannel(channelId).executeAsOneOrNull()?.run {
                     queries.updateChannel(channel_id = this.channel_id, data = data)
@@ -51,9 +51,10 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
     }
 
     override suspend fun listLocalChannels(): List<ChannelStateWithCommitments> {
-        return withContext(Dispatchers.Default) {
-            queries.listLocalChannels().executeAsList().map { ChannelStateWithCommitments.deserialize(it) }
+        val bytes = withContext(Dispatchers.Default) {
+            queries.listLocalChannels().executeAsList()
         }
+        return bytes.map { ChannelStateWithCommitments.deserialize(it) }
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {
