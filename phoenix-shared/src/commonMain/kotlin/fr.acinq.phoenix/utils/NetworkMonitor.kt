@@ -1,12 +1,15 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.eclair.utils.Connection
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.StateFlow
 import org.kodein.log.LoggerFactory
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 expect class NetworkMonitor(loggerFactory: LoggerFactory, ctx: PlatformContext) {
-    fun openNetworkStateSubscription(): ReceiveChannel<Connection>
+    val networkState: StateFlow<Connection>
     fun start()
     fun stop()
 }

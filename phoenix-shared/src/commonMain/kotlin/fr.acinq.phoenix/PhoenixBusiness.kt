@@ -49,7 +49,7 @@ import org.kodein.log.newLogger
 class PhoenixBusiness(private val ctx: PlatformContext) {
 
     private fun buildPeer(): Peer {
-        val wallet = walletManager.getWallet() ?: error("Wallet must be initialized.")
+        val wallet = walletManager.wallet ?: error("Wallet must be initialized.")
 
         val genesisBlock = when (chain) {
             Chain.MAINNET -> Block.LivenetGenesisBlock
@@ -165,19 +165,15 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         AppConnectionsDaemon(
             appConfigurationManager,
             walletManager,
+            currencyManager,
             networkMonitor,
             electrumClient,
-            acinqNodeUri,
             loggerFactory
-        ) {
-            // initialize lazy variables
-            currencyManager
-            peer
-        }
+        ) { peer }
     }
 
     fun loadWallet(seed: ByteArray): Unit {
-        if (walletManager.getWallet() == null) {
+        if (walletManager.wallet == null) {
             walletManager.loadWallet(seed)
         }
     }

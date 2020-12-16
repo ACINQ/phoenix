@@ -33,10 +33,6 @@ class CurrencyManager(
 
     val events = EventBus<CurrencyEvent>()
 
-    init {
-        launchUpdateRates() // Do we need to manage cancellation ?
-    }
-
     fun getBitcoinRates(): List<BitcoinPriceRate> {
         return appDB.find<BitcoinPriceRate>().all().useModels { it.toList() }
     }
@@ -49,7 +45,15 @@ class CurrencyManager(
         return appDB[key] ?: BitcoinPriceRate(fiatCurrency, -1.0)
     }
 
-    private fun launchUpdateRates() = launch {
+    public fun start() {
+        updateRatesJob = updateRates()
+    }
+    public fun stop() {
+        launch { updateRatesJob?.cancelAndJoin() }
+    }
+
+    var updateRatesJob: Job? = null
+    private fun updateRates() = launch {
         while (isActive) {
             val priceRates = buildMap<String, Double> {
                 try {

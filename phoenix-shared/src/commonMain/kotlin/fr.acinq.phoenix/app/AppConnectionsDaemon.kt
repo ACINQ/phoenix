@@ -1,16 +1,19 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eclair.NodeUri
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
-import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.data.ElectrumServer
+import fr.acinq.phoenix.data.address
+import fr.acinq.phoenix.data.asServerAddress
 import fr.acinq.phoenix.utils.NetworkMonitor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -22,9 +25,9 @@ import kotlin.time.seconds
 class AppConnectionsDaemon(
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
+    private val currencyManager: CurrencyManager,
     private val monitor: NetworkMonitor,
     private val electrumClient: ElectrumClient,
-    private val acinqNodeUri: NodeUri,
     loggerFactory: LoggerFactory,
     private val getPeer: () -> Peer // peer is lazy as it may not exist yet.
 ) : CoroutineScope by MainScope() {
@@ -87,13 +90,14 @@ class AppConnectionsDaemon(
                     }
                     else -> {
                         peerConnectionJob?.cancel()
+                        getPeer().disconnect()
                     }
                 }
             }
         }
         // Internet connection
         launch {
-            walletManager.openWalletUpdatesSubscription().consumeEach {
+            walletManager.walletState.filter { it != null }.collect {
                 if (networkMonitorJob == null) networkMonitorJob = networkStateMonitoring()
             }
         }
@@ -101,18 +105,19 @@ class AppConnectionsDaemon(
 
     private fun networkStateMonitoring() = launch {
         monitor.start()
-        monitor.openNetworkStateSubscription().consumeEach {
-            if (networkStatus == it) return@consumeEach
+        monitor.networkState.filter { it != networkStatus }.collect {
             logger.info { "New internet status: $it" }
 
             when(it) {
                 Connection.CLOSED -> {
                     peerConnectionOrder.send(ConnectionOrder.CLOSE)
                     electrumConnectionOrder.send(ConnectionOrder.CLOSE)
+                    currencyManager.stop()
                 }
                 else -> {
                     peerConnectionOrder.send(ConnectionOrder.CONNECT)
                     electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                    currencyManager.start()
                 }
             }
 
@@ -121,7 +126,7 @@ class AppConnectionsDaemon(
     }
 
     private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
-        var retryDelay = 1.seconds
+        var retryDelay = 0.5.seconds
         statusStateFlow.collect {
             logger.debug { "New $name status $it" }
 
@@ -130,7 +135,7 @@ class AppConnectionsDaemon(
                 delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                retryDelay = 1.seconds
+                retryDelay = 0.5.seconds
             }
         }
     }

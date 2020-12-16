@@ -31,7 +31,7 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
             }
         }
         launch {
-            networkMonitor.openNetworkStateSubscription().consumeEach {
+            networkMonitor.networkState.collect {
                 model { copy(connections = connections.copy(internet = it)) }
             }
         }
