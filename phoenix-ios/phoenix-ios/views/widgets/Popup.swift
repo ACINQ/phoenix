@@ -32,7 +32,7 @@ struct Popup<Content: View>: View {
 						content()
 					}
 					.frame(maxWidth: .infinity)
-					.background(Color.white)
+					.background(Color(UIColor.secondarySystemBackground))
 					.cornerRadius(15)
 					.padding(32)
 					.padding([.bottom], keyboardHeight * 0.8)

@@ -26,7 +26,6 @@ struct ScanView: View {
             toast.view()
         }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.appBackground)
     }
 
     @ViewBuilder
