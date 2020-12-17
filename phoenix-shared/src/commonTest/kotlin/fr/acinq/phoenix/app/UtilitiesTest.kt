@@ -65,7 +65,7 @@ class UtilitiesTest {
                     assertNotNull(error)
                 }
                 else if (input.chain != chain) {
-                    val error = result.right
+                    val error = result.left
                     assertNotNull(error)
 
                     assertTrue { error is BitcoinAddressError.ChainMismatch }
@@ -75,7 +75,7 @@ class UtilitiesTest {
                     assertTrue { mismatch.addrChain == input.chain }
                 }
                 else {
-                    val info = result.left
+                    val info = result.right
                     assertNotNull(info)
 
                     assertTrue { info.chain == input.chain }
