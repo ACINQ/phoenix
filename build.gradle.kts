@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
 
         val isIntelliJ = System.getProperty("isIntelliJ")!!.toBoolean()
         val androidVersion = if (isIntelliJ) "4.0.1" else "7.0.0-alpha02"
