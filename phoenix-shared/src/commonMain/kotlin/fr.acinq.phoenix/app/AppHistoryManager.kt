@@ -34,19 +34,17 @@ class AppHistoryManager(private val appDb: DB, private val peer: Peer) : Corouti
             peer.openListenerEventSubscription().consumeEach {
                 when (it) {
                     is PaymentReceived -> {
-                        val status = it.incomingPayment.status
-                        require(status is IncomingPayment.Status.Received) { "Got PaymentReceived notification with an incomming payment $status" }
                         appDb.put(
                             Transaction(
                                 id = UUID.randomUUID().toString(),
-                                amountMsat = status.amount.msat,
+                                amountMsat = it.received.amount.msat,
                                 desc = when (val origin = it.incomingPayment.origin) {
                                     is IncomingPayment.Origin.Invoice -> origin.paymentRequest.description ?: ""
                                     is IncomingPayment.Origin.KeySend -> ""
                                     is IncomingPayment.Origin.SwapIn -> ""
                                 },
                                 status = Transaction.Status.Success,
-                                timestamp = status.receivedAt
+                                timestamp = it.received.receivedAt
                             )
                         )
                     }
