@@ -1,10 +1,11 @@
 import UIKit
 import SwiftUI
-import PhoenixShared
+import Combine
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+	var cancellables = Set<AnyCancellable>()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
@@ -15,6 +16,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             window.rootViewController = UIHostingController(rootView: contentView)
             self.window = window
             window.makeKeyAndVisible()
+			window.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle() // see note below
+			
+			Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
+				self?.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
+			}.store(in: &cancellables)
+			
+			// There are other ways to accomplish this, but they are buggy.
+			//
+			// SwiftUI offers 2 similar methods:
+			// - .colorScheme()
+			// - .preferredColorScheme()
+			//
+			// I used multiple variations to make those work, but all variations had bugs.
+			// If you use only colorScheme(), certain UI elements like the statusBar don't adapt properly.
+			// If you use only the preferredColorScheme, then passing it a non-nil value once will
+			// prevent your UI from supporting the system color prior to app re-launch.
+			// There may be other variations I didn't try, but this solution is currently the most stable.
         }
     }
 

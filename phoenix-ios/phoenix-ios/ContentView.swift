@@ -16,10 +16,11 @@ struct ContentView: View {
 		UIApplication.didEnterBackgroundNotification
 	)
 
-	@State var unlockedOnce = false
-	@State var isUnlocked = false
-	@State var enabledSecurity = EnabledSecurity()
 
+	@State private var unlockedOnce = false
+	@State private var isUnlocked = false
+	@State private var enabledSecurity = EnabledSecurity()
+	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	@State private var popoverContent: AnyView? = nil
 
@@ -57,7 +58,7 @@ struct ContentView: View {
 			.onReceive(didEnterBackgroundPublisher, perform: { _ in
 				onDidEnterBackground()
 			})
-.onReceive(popoverState.displayContent) {
+			.onReceive(popoverState.displayContent) {
 				let newPopoverContent = $0
 				withAnimation {
 					popoverContent = newPopoverContent
@@ -70,7 +71,8 @@ struct ContentView: View {
 			}
 
 		} else {
-NavigationView {
+
+			NavigationView {
 				loadingView().onAppear {
 					onAppLaunch()
 				}
@@ -78,7 +80,8 @@ NavigationView {
 		}
 	}
 
-	@ViewBuilder func primaryView() -> some View {
+	@ViewBuilder
+	func primaryView() -> some View {
 
 		appView(MVIView({ $0.content() }) { model, intent in
 
@@ -96,7 +99,8 @@ NavigationView {
 		})
     }
 
-	@ViewBuilder func loadingView() -> some View {
+	@ViewBuilder
+	func loadingView() -> some View {
 
 		VStack {
 			Image(systemName: "arrow.triangle.2.circlepath")
@@ -114,7 +118,7 @@ NavigationView {
 		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, enabledSecurity: EnabledSecurity) in
 
 			if let mnemonics = mnemonics {
-// wallet is unlocked
+				// wallet is unlocked
 				PhoenixApplicationDelegate.get().loadWallet(mnemonics: mnemonics)
 				self.isUnlocked = true
 

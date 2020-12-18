@@ -86,6 +86,22 @@ enum Theme: String, CaseIterable {
 		}
 	}
 	
+	func toInterfaceStyle() -> UIUserInterfaceStyle {
+		switch self {
+		case .light  : return .light
+		case .dark   : return .dark
+		case .system : return .unspecified
+		}
+	}
+	
+	func toColorScheme() -> ColorScheme? {
+		switch self {
+		case .light  : return ColorScheme.light
+		case .dark   : return ColorScheme.dark
+		case .system : return nil
+		}
+	}
+	
 	func serialize() -> String {
 		return self.rawValue
 	}
