@@ -1,5 +1,15 @@
 import SwiftUI
 import PhoenixShared
+import os.log
+
+#if DEBUG && false
+fileprivate var logger = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "RestoreWalletView"
+)
+#else
+fileprivate var logger = Logger(OSLog.disabled)
+#endif
 
 struct RestoreWalletView: View {
 
@@ -7,8 +17,8 @@ struct RestoreWalletView: View {
 	@State var mnemonics = [String]()
 	@State var autocomplete = [String]()
 	
-    var body: some View {
-        MVIView({ $0.restoreWallet() },
+	var body: some View {
+		MVIView({ $0.restoreWallet() },
 			onModel: { change in
 			
 				if let model = change.newModel as? RestoreWallet.ModelFilteredWordlist {
@@ -20,11 +30,11 @@ struct RestoreWalletView: View {
 				
 			}) { model, postIntent in
 			
-			main(model: model, postIntent: postIntent)
-				.padding(.top, keyWindow?.safeAreaInsets.bottom)
-				.padding(.bottom, keyWindow?.safeAreaInsets.top)
-				.padding([.leading, .trailing], 10)
-				.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
+				main(model: model, postIntent: postIntent)
+					.padding(.top, keyWindow?.safeAreaInsets.bottom)
+					.padding(.bottom, keyWindow?.safeAreaInsets.top)
+					.padding([.leading, .trailing], 10)
+					.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
 		}
 		.navigationBarTitle("Restore my wallet", displayMode: .inline)
     }
@@ -121,6 +131,7 @@ struct RestoreView: View {
 	@Binding var autocomplete: [String]
 	
 	@State var wordInput: String = ""
+	@State var isProcessingPaste = false
 	
 	var body: some View {
 	
@@ -131,10 +142,9 @@ struct RestoreView: View {
 				.padding(.top, 20)
 
 			TextField("Enter keywords from your seed", text: $wordInput)
-				.onChange(of: wordInput) { input in
-					onInput(input)
+				.onChange(of: wordInput) { _ in
+					onInput()
 				}
-				
 				.padding()
 				.disableAutocorrection(true)
 				.disabled(mnemonics.count == 12)
@@ -144,7 +154,7 @@ struct RestoreView: View {
 				LazyHStack {
 					if autocomplete.count < 12 {
 						ForEach(autocomplete, id: \.self) { word in
-							
+
 							Text(word)
 								.underline()
 								.frame(maxWidth: .infinity) // Hack to be able to tap ...
@@ -166,23 +176,23 @@ struct RestoreView: View {
 			// #2   #8
 			// ...  ...
 			ForEach(0..<6, id: \.self) { idx in
-				
+
 				let idxLeftColumn = idx
 				let idxRightColumn = idx + 6
-				
+
 				VStack(spacing: 2) {
 					HStack(alignment: .center, spacing: 0) {
-						
+
 						Text("#\(idxLeftColumn + 1) ")
 							.font(.headline)
 							.foregroundColor(.secondary)
 							.padding(.trailing, 2)
-						
+
 						HStack {
 							Text(mnemonic(idxLeftColumn))
 								.font(.headline)
 								.frame(maxWidth: .infinity, alignment: .leading)
-							
+
 							Button {
 								mnemonics.removeSubrange(idxLeftColumn..<mnemonics.count)
 							} label: {
@@ -194,17 +204,17 @@ struct RestoreView: View {
 							.isHidden(mnemonics.count <= idxLeftColumn)
 						}
 						.padding(.trailing, 8)
-						
+
 						Text("#\(idxRightColumn + 1) ")
 							.font(.headline)
 							.foregroundColor(.secondary)
 							.padding(.trailing, 2)
-						
+
 						HStack {
 							Text(mnemonic(idxRightColumn ))
 								.font(.headline)
 								.frame(maxWidth: .infinity, alignment: .leading)
-							
+
 							Button {
 								mnemonics.removeSubrange(idxRightColumn..<mnemonics.count)
 							} label: {
@@ -215,10 +225,10 @@ struct RestoreView: View {
 							}
 							.isHidden(mnemonics.count <= idxRightColumn)
 						}
-						
+
 					} // </HStack>
 					.padding([.leading, .trailing], 16)
-					
+
 				} // </VStack>
 			} // </ForEach>
 
@@ -234,7 +244,7 @@ struct RestoreView: View {
 			Spacer()
 
 			Button {
-				postIntent(RestoreWallet.IntentValidate(mnemonics: self.mnemonics))
+				onImportButtonTapped()
 			} label: {
 				HStack {
 					Image(systemName: "checkmark.circle")
@@ -258,7 +268,7 @@ struct RestoreView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.onChange(of: autocomplete) { _ in
-			onAutocompleteChanged()
+			onAutocompleteListChanged()
 		}
 	}
 	
@@ -266,26 +276,38 @@ struct RestoreView: View {
 		return (mnemonics.count > idx) ? mnemonics[idx] : " "
 	}
 	
-	func onInput(_ input: String) -> Void {
+	func onInput() -> Void {
+		logger.trace("onInput(): \"\(wordInput)\"")
 		
 		// When the user hits space, we auto-accept the first mnemonic in the autocomplete list
-		if maybeSelectMnemonic() {
+		if maybeSelectMnemonic(isAutocompleteTrigger: false) {
 			return
 		}
+		
+		updateAutocompleteList()
+	}
+	
+	func updateAutocompleteList() {
+		logger.trace("updateAutocompleteList()")
 		
 		// Some keyboards will inject the entire word plus a space.
 		//
 		// For example, if using a sliding keyboard (e.g. SwiftKey),
 		// then after sliding from key to key, and lifting your finger,
-		// the entire word will be injected plus a space.
+		// the entire word will be injected plus a space: "bacon "
 		//
-		// So we need to trim the input.
+		// We should also consider the possibility that the user pasted in their seed.
 		
-		let predicate = input.trimmingCharacters(in: .whitespaces)
-		postIntent(RestoreWallet.IntentFilterWordList(predicate: predicate))
+		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
+		if let firstToken = tokens.first {
+			postIntent(RestoreWallet.IntentFilterWordList(predicate: String(firstToken)))
+		} else {
+			autocomplete = []
+		}
 	}
 	
-	func onAutocompleteChanged() {
+	func onAutocompleteListChanged() {
+		logger.trace("onAutocompleteListChanged()")
 		
 		// Example flow that gets us here:
 		//
@@ -297,37 +319,98 @@ struct RestoreView: View {
 		// - the library responds with: ["bacon"]
 		// - this function is called
 		
-		maybeSelectMnemonic()
+		maybeSelectMnemonic(isAutocompleteTrigger: true)
 	}
 	
 	@discardableResult
-	func maybeSelectMnemonic() -> Bool {
+	func maybeSelectMnemonic(isAutocompleteTrigger: Bool) -> Bool {
 		
-		// Example:
-		// The input is "Bacon ", and the autocomplete list is ["bacon"],
-		// so we should automatically select the mnemonic.
-		//
-		// This needs to happen if:
-		//
-		// - the user hits space when typing, so we want to automatically accept
-		//   the first entry in the autocomplete list
-		//
-		// - the user is using a fancy keyboard (e.g. SwiftKey),
-		//   and the input was injected at one time as a word plus space: "Bacon "
+		logger.trace("maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
 		
 		if wordInput.hasSuffix(" "),
 		   let acceptedWord = autocomplete.first
 		{
+			// Example:
+			// The input is "Bacon ", and the autocomplete list is ["bacon"],
+			// so we should automatically select the mnemonic.
+			//
+			// This needs to happen if:
+			//
+			// - the user hits space when typing, so we want to automatically accept
+			//   the first entry in the autocomplete list
+			//
+			// - the user is using a fancy keyboard (e.g. SwiftKey),
+			//   and the input was injected at one time as a word plus space: "Bacon "
+			
 			selectMnemonic(acceptedWord)
 			return true
+		}
+		
+		if isAutocompleteTrigger && autocomplete.count >= 1 {
+			
+			// Example:
+			// The user pasted in their seed, so the input has multiple tokens: "bacon fat animal ...",
+			// We want to automatically select each mnemonic in the list (if it's an exact match).
+			
+			let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
+			if let firstToken = tokens.first {
+				
+				let mnemonic = autocomplete[0]
+				if firstToken.caseInsensitiveCompare(mnemonic) == .orderedSame {
+					
+					if !isProcessingPaste && tokens.count > 1 {
+					
+						// Paste processsing triggered:
+						// - there are multiple tokens in the wordList
+						// - the first token is an exact match
+						// - let's process each token until we reach the end or a non-match
+						
+						isProcessingPaste = true
+						logger.debug("isProcessingPaste = true")
+					}
+					
+					if isProcessingPaste {
+						
+						selectMnemonic(mnemonic)
+						return true
+					}
+				}
+			}
+		}
+		
+		if isAutocompleteTrigger && isProcessingPaste {
+			isProcessingPaste = false
+			logger.debug("isProcessingPaste = false")
 		}
 		
 		return false
 	}
 	
 	func selectMnemonic(_ word: String) -> Void {
-		mnemonics.append(word)
-		wordInput = ""
+		logger.trace("selectMnemonic()")
+		
+		if (mnemonics.count < 12) {
+			mnemonics.append(word)
+		}
+		
+		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
+		if let token = tokens.first,
+		   let range = wordInput.range(of: token)
+		{
+			wordInput.removeSubrange(wordInput.startIndex ..< range.upperBound)
+			wordInput = wordInput.trimmingCharacters(in: .whitespaces)
+			
+		} else {
+			wordInput = ""
+		}
+		
+		logger.debug("remaining wordInput: \"\(wordInput)\"")
+		updateAutocompleteList()
+	}
+	
+	func onImportButtonTapped() -> Void {
+		
+		postIntent(RestoreWallet.IntentValidate(mnemonics: self.mnemonics))
 	}
 }
 
