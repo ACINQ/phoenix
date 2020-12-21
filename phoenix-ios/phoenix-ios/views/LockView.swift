@@ -8,6 +8,8 @@ struct LockView : View {
 	@State var isFaceID = false
 	@State var errorMsg: String? = nil
 	
+	@State var biometricsAttemptInProgress = false
+	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
 	)
@@ -65,31 +67,20 @@ struct LockView : View {
 		.background(Color(UIColor.systemBackground))
 		.edgesIgnoringSafeArea(.all)
 		.onAppear {
-			onAppear()
+			checkStatusAndMaybePrompt()
 		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
-			onWillEnterForeground()
+			checkStatusAndMaybePrompt()
 		})
 	}
 	
-	func onAppear() -> Void {
+	func checkStatusAndMaybePrompt() -> Void {
 		
 		// This function is called when:
 		// - app is launched for the first time
-		// - app has just been backgrounded
-		
-		let status = AppSecurity.shared.biometricStatus()
-		updateBiometricsStatus(status)
-		
-		if (status != .notAvailable) && (UIApplication.shared.applicationState == .active) {
-			tryBiometricsLogin()
-		}
-	}
-	
-	func onWillEnterForeground() -> Void {
-		print("onWillEnterForeground()")
-		
-		// When the app returns from being in the background, the biometric status may have changed.
+		// - app returns from being in the background
+		//
+		// Note that after returning background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
 		let status = AppSecurity.shared.biometricStatus()
@@ -107,6 +98,12 @@ struct LockView : View {
 			case .touchID_notEnrolled  : fallthrough
 			case .touchID_notAvailable : isTouchID = true
 			default                    : isTouchID = false
+		}
+		switch status {
+			case .faceID_available    : fallthrough
+			case .faceID_notEnrolled  : fallthrough
+			case .faceID_notAvailable : isFaceID = true
+			default                   : isFaceID = false
 		}
 		
 		switch status {
@@ -130,7 +127,14 @@ struct LockView : View {
 	
 	func tryBiometricsLogin() -> Void {
 		
+		if biometricsAttemptInProgress {
+			return
+		}
+		biometricsAttemptInProgress = true
+		
 		AppSecurity.shared.tryUnlockWithBiometrics {(result: Result<[String], Error>) in
+			
+			biometricsAttemptInProgress = false
 			
 			switch result {
 				case .success(let mnemonics):
