@@ -1,5 +1,15 @@
 import SwiftUI
 import PhoenixShared
+import os.log
+
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "ContentView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 struct ContentView: View {
 
@@ -113,7 +123,7 @@ struct ContentView: View {
 
 
 	private func onAppLaunch() -> Void {
-		print("onAppLaunch()")
+		log.trace("onAppLaunch()")
 
 		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, enabledSecurity: EnabledSecurity) in
 
@@ -134,7 +144,7 @@ struct ContentView: View {
 	}
 
 	private func onDidEnterBackground() -> Void {
-		print("onDidEnterBackground()")
+		log.trace("onDidEnterBackground()")
 
 		let currentSecurity = AppSecurity.shared.enabledSecurity.value
 		enabledSecurity = currentSecurity

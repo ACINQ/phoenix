@@ -1,4 +1,14 @@
 import SwiftUI
+import os.log
+
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "LockView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 struct LockView : View {
 	
@@ -67,14 +77,40 @@ struct LockView : View {
 		.background(Color(UIColor.systemBackground))
 		.edgesIgnoringSafeArea(.all)
 		.onAppear {
-			checkStatusAndMaybePrompt()
+			onAppear()
 		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
-			checkStatusAndMaybePrompt()
+			willEnterForeground()
 		})
 	}
 	
-	func checkStatusAndMaybePrompt() -> Void {
+	func onAppear() -> Void {
+		log.trace("onAppear()")
+		
+		// This function may be called when:
+		//
+		// - The application has just finished launching.
+		//   In this case: applicationState == .active
+		//
+		// - The user is backgrounding the app, so the ContentView is switching in the LockView for security.
+		//   In this case: applicationState == .background
+		
+		log.debug("UIApplication.shared.applicationState = \(UIApplication.shared.applicationState)")
+		let canPrompt = UIApplication.shared.applicationState != .background
+		
+		checkStatus(canPrompt: canPrompt)
+	}
+	
+	func willEnterForeground() -> Void {
+		log.trace("willEnterForeground()")
+		
+		// NB: At this moment in time: UIApplication.shared.applicationState == .background
+		
+		checkStatus(canPrompt: true)
+	}
+	
+	func checkStatus(canPrompt: Bool) -> Void {
+		log.trace("checkStatusAndMaybePrompt()")
 		
 		// This function is called when:
 		// - app is launched for the first time
@@ -86,7 +122,7 @@ struct LockView : View {
 		let status = AppSecurity.shared.biometricStatus()
 		updateBiometricsStatus(status)
 		
-		if status != .notAvailable {
+		if (status != .notAvailable) && canPrompt {
 			tryBiometricsLogin()
 		}
 	}
@@ -126,8 +162,10 @@ struct LockView : View {
 	}
 	
 	func tryBiometricsLogin() -> Void {
+		log.trace("tryBiometricsLogin()")
 		
 		if biometricsAttemptInProgress {
+			log.debug("tryBiometricsLogin(): ignoring - already in progress")
 			return
 		}
 		biometricsAttemptInProgress = true
@@ -143,7 +181,7 @@ struct LockView : View {
 						isUnlocked = true
 					}
 				case .failure(let error):
-					print("error: \(error)")
+					log.debug("tryUnlockWithBiometrics: error: \(String(describing: error))")
 			}
 		}
 	}
