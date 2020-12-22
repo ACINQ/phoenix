@@ -1,5 +1,15 @@
 import SwiftUI
 import PhoenixShared
+import os.log
+
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "ElectrumConfigurationView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 struct ElectrumConfigurationView: View {
 	
@@ -148,6 +158,7 @@ struct NewLayout: View {
 		
 			ElectrumAddressPopup(
 				model: model,
+				postIntent: postIntent,
 				showing: $isModifying
 			).padding()
 		}
@@ -178,228 +189,285 @@ struct NewLayout: View {
 		}
 	}
 }
-/*
-struct OldLayout: View {
+
+struct ElectrumAddressPopup: View {
 	
 	let model: ElectrumConfiguration.Model
 	let postIntent: (ElectrumConfiguration.Intent) -> Void
 	
-	@State var isModifying = false
-	
-	init(
-		_ model: ElectrumConfiguration.Model,
-		_ postIntent: @escaping (ElectrumConfiguration.Intent) -> Void
-	) {
-		self.model = model
-		self.postIntent = postIntent
-	}
-	
-	var body: some View {
-		
-		VStack(spacing: 0) {
-			Text(
-				"By default Phoenix connects to random Electrum servers in order to access the" +
-				" Bitcoin blockchain. You can also choose to connect to your own Electrum server."
-			)
-			.padding()
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-			Divider()
-
-			CustomSection(header: "Server") {
-				VStack(alignment: .leading) {
-					if model.connection == .established {
-						Text("Connected to:")
-						Text(model.electrumServer.address()).bold()
-					} else if model.connection == .establishing {
-						Text("Connecting to:")
-						Text(model.electrumServer.address()).bold()
-					} else if model.electrumServer.customized {
-						Text(model.walletIsInitialized ? "Not connected" : "You will connect to:")
-						Text(model.electrumServer.address()).bold()
-					} else {
-						Text("Not connected")
-					}
-						
-					if model.error != nil {
-						Text(model.error?.message ?? "")
-							.foregroundColor(Color.red)
-					}
-
-					Button {
-					//	showPopover()
-					} label: {
-						HStack {
-							Image(systemName: "square.and.pencil")
-								.imageScale(.medium)
-							Text("Set server")
-						}
-					}
-					.buttonStyle(PlainButtonStyle())
-					.padding(8)
-					.background(Color.white)
-					.cornerRadius(16)
-					.overlay(
-						RoundedRectangle(cornerRadius: 16)
-							.stroke(Color.appHorizon, lineWidth: 2)
-					)
-				}
-			}
-
-			if model.walletIsInitialized {
-				CustomSection(header: "Block height") {
-					let blockHeight = model.electrumServer.blockHeight
-					Text("\(blockHeight > 0 ? blockHeight.formatInDecimalStyle() : "-")")
-				}
-
-				CustomSection(header: "Tip timestamp") {
-					let time = model.electrumServer.tipTimestamp
-					Text("\(time > 0 ? time.formatDateS() : "-")")
-				}
-
-				CustomSection(header: "Fee rate") {
-					if model.feeRate > 0 {
-						Text("\(model.feeRate.formatInDecimalStyle()) sat/byte")
-					} else {
-						Text("-")
-					}
-				}
-
-				CustomSection(header: "Master public key") {
-					if model.xpub == nil || model.path == nil {
-						Text("-")
-					} else {
-						VStack(alignment: .leading) {
-							Text(model.xpub!)
-							Text("Path: \(model.path!)").padding(.top)
-						}
-					}
-				}
-				
-			} // end: if model.walletIsInitialized
-				
-			Spacer()
-				
-		} // </VStack>
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.edgesIgnoringSafeArea(.bottom)
-		.sheet(isPresented: $isModifying) {
-		
-			ElectrumAddressPopup(
-				model: model,
-				showing: $isModifying
-			).padding()
-		}
-	}
-	
-	struct CustomSection<Content>: View where Content: View {
-		let header: String
-		let content: () -> Content
-
-		init(header: String, fullMode: Bool = true, @ViewBuilder content: @escaping () -> Content) {
-			self.header = header
-			self.content = content
-		}
-
-		var body: some View {
-			HStack(alignment: .top) {
-				Text(header).bold()
-					.frame(width: 90, alignment: .leading)
-					.font(.subheadline)
-					.foregroundColor(.primaryForeground)
-					.padding([.leading, .top, .bottom])
-
-				content()
-					.padding()
-					.frame(maxWidth: .infinity, alignment: .leading)
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-			Divider()
-		}
-	}
-}
-*/
-struct ElectrumAddressPopup: View {
-	
-	let model: ElectrumConfiguration.Model
-	
 	@Binding var showing: Bool
 	
 	@State var isCustomized: Bool
-	@State var addressInput: String
+	@State var host: String
+	@State var port: String
+	
+	@State var userHasMadeChanges: Bool = false
+	@State var invalidHost = false
+	@State var invalidPort = false
 	
 	init(
 		model: ElectrumConfiguration.Model,
+		postIntent: @escaping (ElectrumConfiguration.Intent) -> Void,
 		showing: Binding<Bool>
 	) {
 		self.model = model
+		self.postIntent = postIntent
 		_showing = showing
 		
 		_isCustomized = State(initialValue: model.electrumServer.customized)
 		
-		var initialAddr = ""
 		if model.electrumServer.customized && model.electrumServer.host.count > 0 {
-			initialAddr = model.electrumServer.address()
+			_host = State(initialValue: model.electrumServer.host)
+			_port = State(initialValue: String(model.electrumServer.port))
+		} else {
+			_host = State(initialValue: "")
+			_port = State(initialValue: "")
 		}
-		
-		_addressInput = State(initialValue: initialAddr)
 	}
 
 	var body: some View {
 		
-		VStack(alignment: .trailing) {
+		let titleWidth: CGFloat = 60
+		
+		VStack(alignment: .trailing, spacing: 0) {
 			
 			VStack(alignment: .leading) {
 				
-				Toggle(isOn: $isCustomized) {
+				Toggle(isOn: $isCustomized.animation()) {
 					Text("Use a custom server")
 				}
-				.padding(.bottom, 10)
-				.frame(maxWidth: .infinity)
-				
-			//	Text("Server address:")
-			//		.foregroundColor(Color.appHorizon)
-			//		.padding(.leading, 16)
-			//		.padding(.bottom, -8.0)
-
-				HStack {
-					TextField("ServerHost:Port", text: $addressInput)
-						.disableAutocorrection(true)
-					
-					Button {
-						addressInput = ""
-					} label: {
-						Image(systemName: "multiply.circle.fill")
-							.foregroundColor(.secondary)
-					}
-					.isHidden(!isCustomized || addressInput == "")
+				.onChange(of: isCustomized) { _ in
+					onToggleDidChange()
 				}
-				.disabled(!isCustomized)
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-				.background(
-					Capsule()
-						.stroke(Color(UIColor.separator))
-				)
-
-				Text("Note: Server must have a valid certificate")
-					.italic()
-					.font(.footnote)
-					.padding(.top, 10)
+				.padding(.trailing, 2) // Toggle draws outside its bounds
 			}
+			.padding(.bottom, 15)
+			.background(Color(UIColor.systemBackground))
+			.zIndex(1)
+			
+			if isCustomized { // animation control
+			
+				VStack(alignment: .leading) {
+		
+					// == Server: ([TextField][X]) ===
+					HStack(alignment: .firstTextBaseline) {
+						Text("Server")
+							.font(.subheadline)
+							.fontWeight(.thin)
+							.foregroundColor(invalidHost ? Color.appRed : Color.primary)
+							.frame(width: titleWidth)
+	
+						HStack {
+							TextField("example.com", text: $host,
+								onCommit: {
+									onHostDidCommit()
+								}
+							)
+							.keyboardType(.URL)
+							.disableAutocorrection(true)
+							.autocapitalization(.none)
+							.onChange(of: host) { _ in
+								onHostDidChange()
+							}
+	
+							Button {
+								host = ""
+							} label: {
+								Image(systemName: "multiply.circle.fill")
+									.foregroundColor(.secondary)
+							}
+							.isHidden(!isCustomized || host == "")
+						}
+						.disabled(!isCustomized)
+						.padding([.top, .bottom], 8)
+						.padding(.leading, 16)
+						.padding(.trailing, 8)
+						.background(
+							Capsule()
+								.strokeBorder(Color(UIColor.separator))
+						)
+					}
+					.frame(maxWidth: .infinity)
+					.padding(.bottom)
+					
+					// == Port: ([TextField][X]) ===
+					HStack(alignment: .firstTextBaseline) {
+						Text("Port")
+							.font(.subheadline)
+							.fontWeight(.thin)
+							.foregroundColor(invalidPort ? Color.appRed : Color.primary)
+							.frame(width: titleWidth)
+						
+						HStack {
+							HStack {
+								TextField("50002", text: $port,
+									onCommit: {
+										onPortDidCommit()
+									}
+								)
+								.keyboardType(.numberPad)
+								.disableAutocorrection(true)
+								.onChange(of: port) { _ in
+									onPortDidChange()
+								}
+		
+								Button {
+									port = ""
+								} label: {
+									Image(systemName: "multiply.circle.fill")
+										.foregroundColor(.secondary)
+								}
+								.isHidden(!isCustomized || port == "")
+							}
+							.disabled(!isCustomized)
+							.padding([.top, .bottom], 8)
+							.padding(.leading, 16)
+							.padding(.trailing, 8)
+							.background(
+								Capsule()
+									.strokeBorder(Color(UIColor.separator))
+							)
+						}
+					}
+					.frame(maxWidth: .infinity)
+					.padding(.bottom, 30)
+					
+					if invalidHost {
+						Text("Invalid server. Use format: domain.tld")
+							.italic()
+							.foregroundColor(Color.appRed)
+							.font(.footnote)
+					} else if invalidPort {
+						Text("Invalid port. Valid range: [1 - 65535]")
+							.italic()
+							.foregroundColor(Color.appRed)
+							.font(.footnote)
+					} else {
+						Text("Note: Server must have a valid certificate")
+							.italic()
+							.font(.footnote)
+					}
+			
+				} // </VStack>
+				.transition(.move(edge: .top))
+				.zIndex(0)
+				
+			} // </if isCustomized>
 			
 			Spacer()
 			
 			HStack {
-				Button("OK") {
-					showing = false
-				//	popoverState.close.send()
+				
+				Button("Cancel") {
+					onCancelButtonTapped()
+				}
+				.font(.title2)
+				.padding(.trailing, 30)
+				
+				Button("Save") {
+					onSaveButtonTapped()
 				}
 				.font(.title2)
 			}
 			
 		} // </VStack>
+		.clipped()
+		
+	} // </var body: some View>
+	
+	func onToggleDidChange() -> Void {
+		log.trace("onToggleDidChange()")
+		userHasMadeChanges = true
+	}
+	
+	func onHostDidChange() -> Void {
+		log.trace("onHostDidChange()")
+		userHasMadeChanges = true
+	}
+	
+	func onHostDidCommit() -> Void {
+		log.trace("onHostDidCommit()")
+		checkHost()
+	}
+	
+	func onPortDidChange() -> Void {
+		log.trace("onPortDidChange()")
+		userHasMadeChanges = true
+	}
+	
+	func onPortDidCommit() -> Void {
+		log.trace("onPortDidCommit()")
+		checkPort()
+	}
+	
+	func onCancelButtonTapped() -> Void {
+		log.trace("onCancelButtonTapped()")
+		showing = false
+	}
+	
+	func onSaveButtonTapped() -> Void {
+		log.trace("onSaveButtonTapped()")
+		
+		let checkedHost = checkHost()
+		let checkedPort = checkPort()
+		
+		if let checkedHost = checkedHost,
+		   let checkedPort = checkedPort
+		{
+			let address = "\(checkedHost):\(checkedPort)"
+			postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(customized: isCustomized, address: address))
+			
+			showing = false
+		}
+	}
+	
+	@discardableResult
+	func checkHost() -> String? {
+		log.trace("checkHost()")
+		
+		if isCustomized {
+			
+			let rawHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+			let urlStr = "http://\(rawHost)"
+			
+			// careful: URL(string: "http://") return non-nil
+			
+			if (rawHost.count > 0) && (URL(string: urlStr) != nil) {
+				invalidHost = false
+				return rawHost
+			} else {
+				invalidHost = true
+				return nil
+			}
+			
+		} else {
+			
+			invalidHost = false
+			return ""
+		}
+	}
+	
+	@discardableResult
+	func checkPort() -> UInt16? {
+		log.trace("checkPort()")
+		
+		if isCustomized {
+			
+			let rawPort = port.trimmingCharacters(in: .whitespacesAndNewlines)
+			
+			if let parsedPort = UInt16(rawPort), parsedPort != 0 {
+				invalidPort = false
+				return parsedPort
+			} else {
+				invalidPort = true
+				return nil
+			}
+			
+		} else {
+			
+			invalidPort = false
+			return 0
+		}
 	}
 }
 
@@ -434,20 +502,26 @@ class ElectrumConfigurationView_Previews: PreviewProvider {
 		path: "m/84'/1'/0'",
 		error: nil
 	)
+	
+	@State static var isShowing: Bool = true
 
 	static var previews: some View {
-		mockView(ElectrumConfigurationView())
-			.preferredColorScheme(.light)
-			.previewDevice("iPhone 8")
-		
-		mockView(ElectrumConfigurationView())
-			.preferredColorScheme(.dark)
-			.previewDevice("iPhone 8")
-		
-//		ElectrumAddressPopup(model: mockModel)
-//			.padding()
+//		mockView(ElectrumConfigurationView())
 //			.preferredColorScheme(.light)
 //			.previewDevice("iPhone 8")
+//
+//		mockView(ElectrumConfigurationView())
+//			.preferredColorScheme(.dark)
+//			.previewDevice("iPhone 8")
+		
+		ElectrumAddressPopup(
+			model: mockModel,
+			postIntent: { _ in },
+			showing: $isShowing
+		)
+		.padding()
+		.preferredColorScheme(.light)
+		.previewDevice("iPhone 8")
 //
 //		ElectrumAddressPopup(model: mockModel)
 //			.padding()
