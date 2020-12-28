@@ -1,5 +1,15 @@
 import SwiftUI
 import PhoenixShared
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "RecoverySeedView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 struct RecoverySeedView : View {
 	
@@ -62,7 +72,11 @@ struct RecoverySeedView : View {
 				
 		} // </ScrollView>
 		.sheet(isPresented: $revealSeed) {
-			RecoverySeedReveal(mnemonics: $mnemonics)
+			
+			RecoverySeedReveal(
+				isShowing: $revealSeed,
+				mnemonics: $mnemonics
+			)
 		}
 		.navigationBarTitle("Recovery Seed", displayMode: .inline)
 	}
@@ -107,6 +121,7 @@ struct RecoverySeedView : View {
 
 struct RecoverySeedReveal: View {
 	
+	@Binding var isShowing: Bool
 	@Binding var mnemonics: [String]
 	
 	func mnemonic(_ idx: Int) -> String {
@@ -114,6 +129,31 @@ struct RecoverySeedReveal: View {
 	}
 	
 	var body: some View {
+		
+		ZStack {
+			
+			// close button
+			// (required for landscapse mode, where swipe to dismiss isn't possible)
+			VStack {
+				HStack {
+					Spacer()
+					Button {
+						close()
+					} label: {
+						Image("ic_cross")
+							.resizable()
+							.frame(width: 30, height: 30)
+					}
+				}
+				Spacer()
+			}
+			.padding()
+			
+			main
+		}
+	}
+	
+	var main: some View {
 		
 		VStack {
 			
@@ -183,9 +223,16 @@ struct RecoverySeedReveal: View {
 		.padding([.leading, .trailing], 30)
 		.padding(.bottom, 20)
 	}
+	
+	func close() {
+		log.trace("[RecoverySeedReveal] close()")
+		isShowing = false
+	}
 }
 
 class RecoverySeedView_Previews: PreviewProvider {
+	
+	@State static var revealSeed = true
 	
 	@State static var testMnemonics = [
 		"witch", "collapse", "practice", "feed", "shame", "open",
@@ -202,11 +249,11 @@ class RecoverySeedView_Previews: PreviewProvider {
 			.preferredColorScheme(.dark)
 			.previewDevice("iPhone 8")
 		
-		RecoverySeedReveal(mnemonics: $testMnemonics)
+		RecoverySeedReveal(isShowing: $revealSeed, mnemonics: $testMnemonics)
 			.preferredColorScheme(.light)
 			.previewDevice("iPhone 8")
 		
-		RecoverySeedReveal(mnemonics: $testMnemonics)
+		RecoverySeedReveal(isShowing: $revealSeed, mnemonics: $testMnemonics)
 			.preferredColorScheme(.dark)
 			.previewDevice("iPhone 8")
 	}
