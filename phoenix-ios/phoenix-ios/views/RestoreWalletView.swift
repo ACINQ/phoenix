@@ -3,12 +3,12 @@ import PhoenixShared
 import os.log
 
 #if DEBUG && false
-fileprivate var logger = Logger(
+fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "RestoreWalletView"
 )
 #else
-fileprivate var logger = Logger(OSLog.disabled)
+fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 struct RestoreWalletView: View {
@@ -277,7 +277,7 @@ struct RestoreView: View {
 	}
 	
 	func onInput() -> Void {
-		logger.trace("onInput(): \"\(wordInput)\"")
+		log.trace("onInput(): \"\(wordInput)\"")
 		
 		// When the user hits space, we auto-accept the first mnemonic in the autocomplete list
 		if maybeSelectMnemonic(isAutocompleteTrigger: false) {
@@ -288,7 +288,7 @@ struct RestoreView: View {
 	}
 	
 	func updateAutocompleteList() {
-		logger.trace("updateAutocompleteList()")
+		log.trace("updateAutocompleteList()")
 		
 		// Some keyboards will inject the entire word plus a space.
 		//
@@ -307,7 +307,7 @@ struct RestoreView: View {
 	}
 	
 	func onAutocompleteListChanged() {
-		logger.trace("onAutocompleteListChanged()")
+		log.trace("onAutocompleteListChanged()")
 		
 		// Example flow that gets us here:
 		//
@@ -325,7 +325,7 @@ struct RestoreView: View {
 	@discardableResult
 	func maybeSelectMnemonic(isAutocompleteTrigger: Bool) -> Bool {
 		
-		logger.trace("maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
+		log.trace("maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
 		
 		if wordInput.hasSuffix(" "),
 		   let acceptedWord = autocomplete.first
@@ -366,7 +366,7 @@ struct RestoreView: View {
 						// - let's process each token until we reach the end or a non-match
 						
 						isProcessingPaste = true
-						logger.debug("isProcessingPaste = true")
+						log.debug("isProcessingPaste = true")
 					}
 					
 					if isProcessingPaste {
@@ -380,14 +380,14 @@ struct RestoreView: View {
 		
 		if isAutocompleteTrigger && isProcessingPaste {
 			isProcessingPaste = false
-			logger.debug("isProcessingPaste = false")
+			log.debug("isProcessingPaste = false")
 		}
 		
 		return false
 	}
 	
 	func selectMnemonic(_ word: String) -> Void {
-		logger.trace("selectMnemonic()")
+		log.trace("selectMnemonic()")
 		
 		if (mnemonics.count < 12) {
 			mnemonics.append(word)
@@ -404,7 +404,7 @@ struct RestoreView: View {
 			wordInput = ""
 		}
 		
-		logger.debug("remaining wordInput: \"\(wordInput)\"")
+		log.debug("remaining wordInput: \"\(wordInput)\"")
 		updateAutocompleteList()
 	}
 	
