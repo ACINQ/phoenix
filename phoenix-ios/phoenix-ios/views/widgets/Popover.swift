@@ -52,7 +52,7 @@ struct PopoverWrapper<Content: View>: View {
 				VStack {
 					content()
 				}
-				.padding(.all, 20)
+			//	.padding(.all, 20) // do NOT enforce padding here; not flexible enough
 				.background(Color(UIColor.systemBackground))
 				.cornerRadius(16)
 			}

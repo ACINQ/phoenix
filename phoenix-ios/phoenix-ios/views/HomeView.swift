@@ -333,6 +333,7 @@ struct ConnectionPopup : View {
 			}
 			.padding(.top)
 		}
+		.padding()
 	}
 }
 
