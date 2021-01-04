@@ -241,6 +241,8 @@ struct ValidateView: View {
 	@State var isInvalidAmount: Bool = false
 	@State var exceedsWalletCapacity: Bool = false
 	
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
 	@Environment(\.colorScheme) var colorScheme
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -254,6 +256,8 @@ struct ValidateView: View {
 	}
 	
 	var body: some View {
+		
+		let isDisconnected = connectionsMonitor.connections.global != .established
 		
 		VStack {
 			
@@ -316,7 +320,7 @@ struct ValidateView: View {
 				backgroundFill: Color.appHorizon,
 				disabledBackgroundFill: Color.gray
 			))
-			.disabled(isInvalidAmount || exceedsWalletCapacity)
+			.disabled(isInvalidAmount || exceedsWalletCapacity || isDisconnected)
 		}
 		.navigationBarTitle("Validate payment", displayMode: .inline)
 		.zIndex(1)

@@ -25,22 +25,6 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
 
     init {
         launch {
-            peer.connectionState.collect {
-                model { copy(connections = connections.copy(peer = it)) }
-            }
-        }
-        launch {
-            electrumClient.connectionState.collect {
-                model { copy(connections = connections.copy(electrum = it)) }
-            }
-        }
-        launch {
-            networkMonitor.networkState.collect {
-                model { copy(connections = connections.copy(internet = it)) }
-            }
-        }
-
-        launch {
             peer.channelsFlow.collect { channels ->
                 model {
                     copy(

@@ -25,10 +25,7 @@ import fr.acinq.phoenix.ctrl.config.*
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.createChannelsDbDriver
-import fr.acinq.phoenix.utils.LogMemory
-import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.PlatformContext
-import fr.acinq.phoenix.utils.getApplicationFilesDirectoryPath
+import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
@@ -176,6 +173,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val appConfigurationManager by lazy { AppConfigurationManager(appDB, electrumClient, chain, loggerFactory) }
 
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDB, httpClient) }
+    val connectionsMonitor by lazy { ConnectionsMonitor(peer, electrumClient, networkMonitor) }
     val util by lazy { Utilities(loggerFactory, chain) }
 
     init {

@@ -1,5 +1,6 @@
 import Foundation
 import PhoenixShared
+import Combine
 
 extension KotlinByteArray {
 	
@@ -21,6 +22,47 @@ extension KotlinByteArray {
 			data[Int(idx)] = UInt8(bitPattern: byte)
 		}
 		return data
+	}
+}
+
+extension ConnectionsMonitor {
+	
+	var currentValue: Connections {
+		return connections.value as! Connections
+	}
+	
+	var publisher: CurrentValueSubject<Connections, Never> {
+		
+		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
+		
+		let swiftFlow = SwiftFlow<Connections>(origin: connections)
+		swiftFlow.watch { (connections: Connections?) in
+			publisher.send(connections!)
+		}
+		
+		return publisher
+	}
+}
+
+class ObservableConnectionsMonitor: ObservableObject {
+	
+	@Published var connections: Connections
+	
+	private var watcher: Ktor_ioCloseable? = nil
+	
+	init() {
+		let monitor = PhoenixApplicationDelegate.get().business.connectionsMonitor
+		connections = monitor.currentValue
+		
+		let swiftFlow = SwiftFlow<Connections>(origin: monitor.connections)
+		
+		watcher = swiftFlow.watch {[weak self](newConnections: Connections?) in
+			self?.connections = newConnections!
+		}
+	}
+	
+	deinit {
+		watcher?.close()
 	}
 }
 

@@ -39,7 +39,7 @@ struct HomeView : View {
 				
 				// === Top-row buttons ===
 				HStack {
-					ConnectionStatusButton(model: model)
+					ConnectionStatusButton()
 					Spacer()
 					FaqButton()
 				}
@@ -162,20 +162,19 @@ struct TransactionCell : View {
 
 struct ConnectionStatusButton : View {
 	
-	let model: Home.Model
-
-	@Environment(\.popoverState) var popoverState: PopoverState
-	
 	@State var dimStatus = false
+	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
+	@Environment(\.popoverState) var popoverState: PopoverState
 
 	var body: some View {
-		let status = model.connections.global
+		let status = connectionsMonitor.connections.global
 		
 		Group {
 			Button {
 				popoverState.dismissable.send(true)
 				popoverState.displayContent.send(
-					ConnectionPopup(model: model).anyView
+					ConnectionPopup().anyView
 				)
 			} label: {
 				HStack {
@@ -249,7 +248,6 @@ struct BottomBar: View {
 
 	var body: some View {
 		
-		let canScan = model.connections.global == Eclair_kmpConnection.established
 		HStack {
 
 			NavigationLink(
@@ -290,10 +288,9 @@ struct BottomBar: View {
 						.resizable()
 						.frame(width: 22, height: 22)
 					Text("Send")
-						.foregroundColor(canScan ? .primaryForeground : .gray)
+						.foregroundColor(.primaryForeground)
 				}
 			}
-			.disabled(!canScan)
 
 			Spacer()
 		}
@@ -306,21 +303,22 @@ struct BottomBar: View {
 
 struct ConnectionPopup : View {
 
-	let model: Home.Model
+	@StateObject var monitor = ObservableConnectionsMonitor()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
 	var body: some View {
+		
 		VStack(alignment: .leading) {
 			Text("Connection status")
 				.font(.title3)
 				.padding(.bottom)
 			Divider()
-			ConnectionCell(label: "Internet", connection: model.connections.internet)
+			ConnectionCell(label: "Internet", connection: monitor.connections.internet)
 			Divider()
-			ConnectionCell(label: "Lightning peer", connection: model.connections.peer)
+			ConnectionCell(label: "Lightning peer", connection: monitor.connections.peer)
 			Divider()
-			ConnectionCell(label: "Electrum server", connection: model.connections.electrum)
+			ConnectionCell(label: "Electrum server", connection: monitor.connections.electrum)
 			Divider()
 			HStack {
 				Spacer()
@@ -374,7 +372,6 @@ class HomeView_Previews: PreviewProvider {
 	)
 	
 	static let mockModel = Home.Model(
-		connections: connections,
 		balanceSat: 123500,
 		history: [
 			mockSpendFailedTransaction,
