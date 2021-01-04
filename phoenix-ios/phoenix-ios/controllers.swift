@@ -20,6 +20,9 @@ class MockControllerFactory : ControllerFactory {
     func electrumConfiguration() -> MVIController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent> { MVIControllerMock(model: ElectrumConfigurationView_Previews.mockModel) }
     func channelsConfiguration() -> MVIController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent> { MVIControllerMock(model: ChannelsConfigurationView_Previews.mockModel) }
     func logsConfiguration() -> MVIController<LogsConfiguration.Model, LogsConfiguration.Intent> { MVIControllerMock(model: LogsConfigurationView_Previews.mockModel) }
+    func closeChannelsConfiguration() -> MVIController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent> {
+		MVIControllerMock(model: CloseChannelsView_Previews.mockModel)
+	}
 }
 
 func appView<V : View>(_ content: V) -> some View {

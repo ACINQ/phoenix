@@ -1,6 +1,10 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.channel.Aborted
+import fr.acinq.eclair.channel.Closed
+import fr.acinq.eclair.channel.Closing
+import fr.acinq.eclair.channel.ErrorInformationLeak
 import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.app.AppHistoryManager
 import fr.acinq.phoenix.ctrl.Home
@@ -40,7 +44,15 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
             peer.channelsFlow.collect { channels ->
                 model {
                     copy(
-                        balanceSat = channels.values.sumOf { it.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0 }
+                        balanceSat = channels.values.sumOf {
+                            when (it) {
+                                is Closing -> 0
+                                is Closed -> 0
+                                is Aborted -> 0
+                                is ErrorInformationLeak -> 0
+                                else -> it.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0
+                            }
+                        }
                     )
                 }
             }

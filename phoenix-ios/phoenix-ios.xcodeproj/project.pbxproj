@@ -63,6 +63,7 @@
 		DCACF70E256701870009B01E /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF70D256701870009B01E /* LockView.swift */; };
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
 /* End PBXBuildFile section */
@@ -167,6 +168,7 @@
 		DCACF7082566D0F00009B01E /* AppAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAccessView.swift; sourceTree = "<group>"; };
 		DCACF70D256701870009B01E /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
 		F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationViewerView.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -375,6 +377,7 @@
 			isa = PBXGroup;
 			children = (
 				53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */,
+				DCF360CF2591018300E92031 /* CloseChannelsView.swift */,
 			);
 			path = advanced;
 			sourceTree = "<group>";
@@ -666,6 +669,7 @@
 				53BEF3A684D4ADDE8F3DA8F9 /* mocks.swift in Sources */,
 				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
+				DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */,
 				C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */,
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */,

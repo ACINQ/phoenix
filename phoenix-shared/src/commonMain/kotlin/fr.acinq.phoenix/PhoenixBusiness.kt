@@ -62,7 +62,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         val keyManager = LocalKeyManager(wallet.seed.toByteVector32(), genesisBlock.hash)
         newLogger(loggerFactory).info { "nodeid=${keyManager.nodeId}" }
 
-        val params = NodeParams(
+        val nodeParams = NodeParams(
             keyManager = keyManager,
             alias = "phoenix",
             features = Features(
@@ -87,6 +87,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             maxAcceptedHtlcs = 30,
             expiryDeltaBlocks = CltvExpiryDelta(144),
             fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
+            checkHtlcTimeoutAfterStartupDelaySeconds = 15,
             htlcMinimum = 1000.msat,
             minDepthBlocks = 3,
             toRemoteDelayBlocks = CltvExpiryDelta(144),
@@ -111,20 +112,28 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
             minFundingSatoshis = 1000.sat,
             maxFundingSatoshis = 16777215.sat,
             maxPaymentAttempts = 5,
-            trampolineNode = acinqNodeUri,
             enableTrampolinePayment = true
         )
 
-        newLogger(loggerFactory).info { "params=$params" }
+        newLogger(loggerFactory).info { "nodeParams=$nodeParams" }
+
+        val trampolineFees = listOf(
+            TrampolineFees(0.sat, 0, CltvExpiryDelta(576)),
+            TrampolineFees(1.sat, 100, CltvExpiryDelta(576)),
+            TrampolineFees(3.sat, 100, CltvExpiryDelta(576)),
+            TrampolineFees(5.sat, 500, CltvExpiryDelta(576)),
+            TrampolineFees(5.sat, 1000, CltvExpiryDelta(576)),
+            TrampolineFees(5.sat, 1200, CltvExpiryDelta(576))
+        )
+
+        val walletParams = WalletParams(acinqNodeUri, trampolineFees)
 
         val databases = object : Databases {
             override val channels: ChannelsDb get() = channelsDb
             override val payments: PaymentsDb get() = paymentsDB
         }
 
-        val peer = Peer(tcpSocketBuilder, params, electrumWatcher, databases, MainScope())
-
-        return peer
+        return Peer(tcpSocketBuilder, nodeParams, walletParams, electrumWatcher, databases, MainScope())
     }
 
     private val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
@@ -206,5 +215,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         override fun  electrumConfiguration(): ElectrumConfigurationController = AppElectrumConfigurationController(loggerFactory, appConfigurationManager, chain, masterPubkeyPath, walletManager, electrumClient)
         override fun channelsConfiguration(): ChannelsConfigurationController = AppChannelsConfigurationController(loggerFactory, peer, chain)
         override fun logsConfiguration(): LogsConfigurationController = AppLogsConfigurationController(ctx, loggerFactory, logMemory)
+
+        override fun closeChannelsConfiguration(): CloseChannelsConfigurationController =
+            AppCloseChannelsConfigurationController(loggerFactory, peer, util)
     }
 }

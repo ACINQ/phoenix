@@ -54,11 +54,11 @@ struct ConfigurationView: View {
 					}
                     if fullMode {
 						NavigationLink(destination: ChannelsConfigurationView()) {
-							Label { Text("My payment channels") } icon: {
+							Label { Text("Payment channels") } icon: {
 								Image(systemName: "bolt")
 							}
 						}
-						NavigationLink(destination: EmptyView()) {
+						NavigationLink(destination: CloseChannelsView()) {
 							Label { Text("Close all channels") } icon: {
 								Image(systemName: "xmark.circle")
 							}

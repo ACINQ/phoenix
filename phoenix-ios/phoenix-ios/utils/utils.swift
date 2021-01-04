@@ -3,10 +3,10 @@ import PhoenixShared
 
 class Utils {
 	
-	private static var Millisatoshis_Per_Satoshi      =           1_000.0
-	private static var Millisatoshis_Per_Bit          =         100_000.0
-	private static var Millisatoshis_Per_Millibitcoin =     100_000_000.0
-	private static var Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
+	private static let Millisatoshis_Per_Satoshi      =           1_000.0
+	private static let Millisatoshis_Per_Bit          =         100_000.0
+	private static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
+	private static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
 	
 	static func toMsat(fromFiat amount: Double, exchangeRate: BitcoinPriceRate) -> Int64 {
 		
@@ -87,6 +87,12 @@ class Utils {
 		formatter.roundingMode = .floor
 		
 		return formatter
+	}
+
+	static func formatBitcoin(sat: Int64, bitcoinUnit: BitcoinUnit) -> FormattedAmount {
+		
+		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		return formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 	}
 	
 	static func formatBitcoin(

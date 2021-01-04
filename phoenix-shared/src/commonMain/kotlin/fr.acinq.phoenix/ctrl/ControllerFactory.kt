@@ -14,4 +14,5 @@ interface ControllerFactory {
     fun electrumConfiguration(): ElectrumConfigurationController
     fun channelsConfiguration(): ChannelsConfigurationController
     fun logsConfiguration(): LogsConfigurationController
+    fun closeChannelsConfiguration(): CloseChannelsConfigurationController
 }
