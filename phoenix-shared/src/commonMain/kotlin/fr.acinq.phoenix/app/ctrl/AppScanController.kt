@@ -1,5 +1,10 @@
 package fr.acinq.phoenix.app.ctrl
 
+import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.eclair.Feature
+import fr.acinq.eclair.Features
+import fr.acinq.eclair.channel.ChannelState
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.SendPayment
@@ -7,22 +12,49 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.UUID
 import fr.acinq.phoenix.ctrl.Scan
 import fr.acinq.phoenix.data.toMilliSatoshi
+import fr.acinq.phoenix.utils.localCommitmentSpec
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
 class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : AppController<Scan.Model, Scan.Intent>(loggerFactory, Scan.Model.Ready) {
 
+    init {
+        launch {
+            peer.channelsFlow.collect { channels ->
+                val balanceMsat = balanceMsat(channels)
+                model {
+                    if (this is Scan.Model.Validate) {
+                        this.copy(balanceMsat = balanceMsat)
+                    } else {
+                        this
+                    }
+                }
+            }
+        }
+    }
+
+    private fun balanceMsat(channels: Map<ByteVector32, ChannelState>): Long {
+        return channels.values.sumOf { it.localCommitmentSpec?.toLocal?.toLong() ?: 0 }
+    }
+
     override fun process(intent: Scan.Intent) {
         when (intent) {
             is Scan.Intent.Parse -> launch {
                 readPaymentRequest(intent.request)?.run {
-                    if (amount != null)
-                        validatePaymentRequest(intent.request, this)
+                    var isDangerous = if (amount != null) {
+                        false
+                    } else {
+                        // amountless invoice -> dangerous unless full trampoline is in effect
+                        !Features(features ?: ByteVector.empty).hasFeature(Feature.TrampolinePayment)
+                    }
+                    if (isDangerous)
+                        model(Scan.Model.DangerousRequest(intent.request))
                     else
-                        model(Scan.Model.RequestWithoutAmount(intent.request))
+                        validatePaymentRequest(intent.request, this)
                 }
             }
-            is Scan.Intent.ConfirmEmptyAmount -> launch {
+            is Scan.Intent.ConfirmDangerousRequest -> launch {
                 readPaymentRequest(intent.request)?.run {
                     validatePaymentRequest(intent.request, this)
                 }
@@ -52,11 +84,13 @@ class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : 
     }
 
     private suspend fun validatePaymentRequest(request: String, paymentRequest: PaymentRequest) {
+        val balanceMsat = balanceMsat(peer.channels)
         model(
             Scan.Model.Validate(
                 request = request,
                 amountMsat = paymentRequest.amount?.toLong(),
-                requestDescription = paymentRequest.description
+                requestDescription = paymentRequest.description,
+                balanceMsat = balanceMsat
             )
         )
     }

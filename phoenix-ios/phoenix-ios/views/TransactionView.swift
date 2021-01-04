@@ -84,7 +84,7 @@ struct TransactionView : View {
 				}
 
 				HStack(alignment: .bottom) {
-					let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat)
+					let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat, hideMsats: false)
 					
 					Text(amount.digits)
 						.font(.largeTitle)
