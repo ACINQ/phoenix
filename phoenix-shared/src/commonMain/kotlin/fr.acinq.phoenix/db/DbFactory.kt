@@ -20,3 +20,5 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.phoenix.utils.PlatformContext
 
 expect fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver
+
+expect fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver

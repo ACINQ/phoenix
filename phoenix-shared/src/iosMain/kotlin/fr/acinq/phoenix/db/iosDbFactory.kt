@@ -23,3 +23,7 @@ import fr.acinq.phoenix.utils.PlatformContext
 actual fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver {
     return NativeSqliteDriver(ChannelsDatabase.Schema, "channels.sqlite")
 }
+
+actual fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver {
+    return NativeSqliteDriver(PaymentsDatabase.Schema, "payments.sqlite")
+}

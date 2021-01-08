@@ -1,0 +1,43 @@
+import fr.acinq.eclair.MilliSatoshi;
+import fr.acinq.phoenix.db.SqlitePaymentsDb.IncomingOriginDbEnum;
+import fr.acinq.phoenix.db.SqlitePaymentsDb.IncomingReceivedWithDbEnum;
+
+-- incoming payments
+CREATE TABLE IF NOT EXISTS incoming_payments (
+    payment_hash BLOB NOT NULL PRIMARY KEY,
+    created_at INTEGER NOT NULL,
+    preimage BLOB NOT NULL,
+    -- origin
+    payment_type TEXT AS IncomingOriginDbEnum NOT NULL,
+    payment_request TEXT DEFAULT NULL,
+    swap_amount_msat INTEGER DEFAULT NULL,
+    swap_address TEXT DEFAULT NULL,
+    -- received
+    received_amount_msat INTEGER DEFAULT NULL,
+    received_at INTEGER DEFAULT NULL,
+    -- received with
+    received_with TEXT AS IncomingReceivedWithDbEnum DEFAULT NULL,
+    received_with_fees INTEGER DEFAULT NULL,
+    received_with_channel_id BLOB DEFAULT NULL
+);
+
+-- queries
+
+insert:
+INSERT INTO incoming_payments (payment_hash, preimage, payment_type, payment_request, swap_amount_msat, swap_address, created_at) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+receive:
+UPDATE incoming_payments SET received_amount_msat=? + COALESCE(received_amount_msat, 0), received_at=?, received_with=?, received_with_fees=?, received_with_channel_id=? WHERE payment_hash = ?;
+
+get:
+SELECT * FROM incoming_payments WHERE payment_hash=?;
+
+list:
+SELECT *
+FROM incoming_payments
+ORDER BY coalesce(received_at, created_at) DESC, payment_hash DESC
+LIMIT ?, ?;
+
+-- use this in a `transaction` block to know how many rows were changed after an UPDATE
+changes:
+SELECT changes();

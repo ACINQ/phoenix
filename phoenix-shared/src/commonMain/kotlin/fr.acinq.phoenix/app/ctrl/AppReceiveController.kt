@@ -8,9 +8,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.secure
 import fr.acinq.phoenix.ctrl.Receive
 import fr.acinq.phoenix.data.toMilliSatoshi
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.kodein.log.LoggerFactory
 import kotlin.random.Random
 

@@ -134,6 +134,11 @@ kotlin {
 sqldelight {
     database("ChannelsDatabase") {
         packageName = "fr.acinq.phoenix.db"
+        sourceFolders = listOf("channelsdb")
+    }
+    database("PaymentsDatabase") {
+        packageName = "fr.acinq.phoenix.db"
+        sourceFolders = listOf("paymentsdb")
     }
 }
 

@@ -1,0 +1,59 @@
+listAllPayments:
+SELECT *
+FROM (
+    SELECT
+        'outgoing' AS direction,
+        id AS outgoing_payment_id,
+        payment_hash,
+        payment.preimage,
+        SUM(CASE parts.preimage
+             WHEN NULL THEN 0
+             ELSE parts.amount_msat
+        END) AS parts_amount,
+        payment.recipient_amount_msat AS amount,
+
+        recipient_node_id AS outgoing_recipient,
+        normal_payment_request AS outgoing_normal_payment_request,
+        keysend_preimage AS outgoing_keysend_preimage,
+        swapout_address AS outgoing_swapout_address,
+        final_failure AS outgoing_failure,
+
+        NULL AS incoming_payment_type,
+        NULL AS incoming_payment_request,
+        NULL AS incoming_swap_address,
+        NULL AS incoming_received_with,
+        NULL AS incoming_received_with_fees,
+
+        payment.created_at,
+        payment.completed_at AS completed_at
+    FROM outgoing_payments AS payment
+    LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.parent_id = payment.id
+    GROUP BY payment.id
+UNION ALL
+    SELECT
+        'incoming' AS direction,
+        NULL AS outgoing_payment_id,
+        payment_hash,
+        preimage,
+        NULL AS parts_amount,
+        received_amount_msat AS amount,
+
+        NULL AS outgoing_recipient,
+        NULL AS outgoing_normal_payment_request,
+        NULL AS outgoing_keysend_preimage,
+        NULL AS outgoing_swapout_address,
+        NULL AS outgoing_failure,
+
+        payment_type AS incoming_payment_type,
+        payment_request AS incoming_payment_request,
+        swap_address AS incoming_swap_address,
+        received_with AS incoming_received_with,
+        received_with_fees AS incoming_received_with_fees,
+
+        created_at,
+        received_at AS completed_at
+    FROM incoming_payments
+    WHERE received_amount_msat > 0
+)
+ORDER BY COALESCE(completed_at, created_at) DESC
+LIMIT ?, ?;

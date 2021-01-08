@@ -24,3 +24,9 @@ actual fun testDriver(): SqlDriver {
     ChannelsDatabase.Schema.create(driver)
     return driver
 }
+
+actual fun testPaymentsDriver(): SqlDriver {
+    val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+    PaymentsDatabase.Schema.create(driver)
+    return driver
+}

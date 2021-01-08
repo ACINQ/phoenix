@@ -22,3 +22,7 @@ import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 actual fun testDriver(): SqlDriver {
     return NativeSqliteDriver(ChannelsDatabase.Schema, ":memory:")
 }
+
+actual fun testPaymentsDriver(): SqlDriver {
+    return NativeSqliteDriver(PaymentsDatabase.Schema, ":memory:")
+}
