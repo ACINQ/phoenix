@@ -108,43 +108,53 @@ struct ReadyView: View {
 
 	var body: some View {
 		
-		VStack {
-			Spacer()
-			Text("Scan a QR code")
-				.padding()
-				.font(.title2)
-
-			QrCodeScannerView { request in
-				if !isWarningDisplayed && !ignoreScanner {
-					postIntent(Scan.IntentParse(request: request))
-				}
-			}
-			.cornerRadius(10)
-			.overlay(
-				RoundedRectangle(cornerRadius: 10)
-					.stroke(Color.gray, lineWidth: 4)
-			)
-			.padding()
-
-			Divider()
-				.padding([.leading, .trailing])
-
-			Button {
-				if let request = UIPasteboard.general.string {
-					postIntent(Scan.IntentParse(request: request))
-				}
-			} label: {
-				Image(systemName: "arrow.right.doc.on.clipboard")
-				Text("Paste from clipboard")
-					.font(.title2)
-			}
-			.disabled(!UIPasteboard.general.hasStrings)
-			.padding()
+		ZStack {
+		
+			Image("testnet_bg")
+				.resizable(resizingMode: .tile)
 			
-			Spacer()
+			VStack {
+				Spacer()
+				
+				Text("Scan a QR code")
+					.padding()
+					.font(.title2)
+				
+				QrCodeScannerView { request in
+					if !isWarningDisplayed && !ignoreScanner {
+						postIntent(Scan.IntentParse(request: request))
+					}
+				}
+				.cornerRadius(10)
+				.overlay(
+					RoundedRectangle(cornerRadius: 10)
+						.stroke(Color.gray, lineWidth: 4)
+				)
+				.padding()
+				
+				Divider()
+					.padding([.leading, .trailing])
+				
+				Button {
+					if let request = UIPasteboard.general.string {
+						postIntent(Scan.IntentParse(request: request))
+					}
+				} label: {
+					Image(systemName: "arrow.right.doc.on.clipboard")
+					Text("Paste from clipboard")
+						.font(.title2)
+				}
+				.disabled(!UIPasteboard.general.hasStrings)
+				.padding()
+	
+				Spacer()
+			}
 		}
+		.frame(maxHeight: .infinity)
+		.background(Color.primaryBackground)
+		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Scan", displayMode: .inline)
-		.zIndex(2)
+		.zIndex(2) // [SendingView, ValidateView, ReadyView]
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -259,71 +269,82 @@ struct ValidateView: View {
 		
 		let isDisconnected = connectionsMonitor.connections.global != .established
 		
-		VStack {
+		ZStack {
+		
+			Image("testnet_bg")
+				.resizable(resizingMode: .tile)
 			
-			HStack(alignment: .firstTextBaseline) {
-				TextField("123", text: currencyStyler().amountProxy)
-					.keyboardType(.decimalPad)
-					.disableAutocorrection(true)
-					.fixedSize()
-					.font(.title)
-					.multilineTextAlignment(.trailing)
-					.foregroundColor(isInvalidAmount ? Color.appRed : Color.primaryForeground)
-
-				Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
-					let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
-					ForEach(0 ..< options.count) {
-						let option = options[$0]
-						Text(option.abbrev).tag(option)
-					}
-				}
-				.pickerStyle(MenuPickerStyle())
+			VStack {
+		
+				HStack(alignment: .firstTextBaseline) {
+					TextField("123", text: currencyStyler().amountProxy)
+						.keyboardType(.decimalPad)
+						.disableAutocorrection(true)
+						.fixedSize()
+						.font(.title)
+						.multilineTextAlignment(.trailing)
+						.foregroundColor(isInvalidAmount ? Color.appRed : Color.primaryForeground)
 				
-			} // </HStack>
-			.padding([.leading, .trailing])
-			.background(
-				VStack {
-					Spacer()
-					Line().stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 2, dash: [3]))
-						.frame(height: 1)
+					Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
+						let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+						ForEach(0 ..< options.count) {
+							let option = options[$0]
+							Text(option.abbrev).tag(option)
+						}
+					}
+					.pickerStyle(MenuPickerStyle())
+	
+				} // </HStack>
+				.padding([.leading, .trailing])
+				.background(
+					VStack {
+						Spacer()
+						Line().stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 2, dash: [3]))
+							.frame(height: 1)
+					}
+				)
+				
+				Text(altAmount)
+					.font(.caption)
+					.foregroundColor(isInvalidAmount ? Color.appRed : .secondary)
+					.padding(.top, 4)
+				
+				Text(model.requestDescription ?? "")
+					.padding()
+					.padding([.top, .bottom])
+				
+				Button {
+					sendPayment()
+				} label: {
+					HStack {
+						Image("ic_send")
+							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.foregroundColor(Color.white)
+							.frame(width: 22, height: 22)
+						Text("Pay")
+							.font(.title2)
+							.foregroundColor(Color.white)
+					}
+					.padding(.top, 4)
+					.padding(.bottom, 5)
+					.padding([.leading, .trailing], 24)
 				}
-			)
+				.buttonStyle(ScaleButtonStyle(
+					backgroundFill: Color.appHorizon,
+					disabledBackgroundFill: Color.gray
+				))
+				.disabled(isInvalidAmount || exceedsWalletCapacity || isDisconnected)
 			
-			Text(altAmount)
-				.font(.caption)
-				.foregroundColor(isInvalidAmount ? Color.appRed : .secondary)
-				.padding(.top, 4)
-
-			Text(model.requestDescription ?? "")
-				.padding()
-				.padding([.top, .bottom])
-
-			Button {
-				sendPayment()
-			} label: {
-				HStack {
-					Image("ic_send")
-						.renderingMode(.template)
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.foregroundColor(Color.white)
-						.frame(width: 22, height: 22)
-					Text("Pay")
-						.font(.title2)
-						.foregroundColor(Color.white)
-				}
-				.padding(.top, 4)
-				.padding(.bottom, 5)
-				.padding([.leading, .trailing], 24)
-			}
-			.buttonStyle(ScaleButtonStyle(
-				backgroundFill: Color.appHorizon,
-				disabledBackgroundFill: Color.gray
-			))
-			.disabled(isInvalidAmount || exceedsWalletCapacity || isDisconnected)
-		}
+			} // </VStack>
+			
+		}// </ZStack>
+		.frame(maxHeight: .infinity)
+		.background(Color.primaryBackground)
+		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Validate payment", displayMode: .inline)
-		.zIndex(1)
+		.zIndex(1) // [SendingView, ValidateView, ReadyView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
 			onAppear()
@@ -459,13 +480,23 @@ struct SendingView: View {
 	let model: Scan.ModelSending
 
 	var body: some View {
-		VStack {
-			Text("Sending Payment...")
-				.font(.title)
-				.padding()
+		
+		ZStack {
+		
+			Image("testnet_bg")
+				.resizable(resizingMode: .tile)
+			
+			VStack {
+				Text("Sending Payment...")
+					.font(.title)
+					.padding()
+			}
 		}
+		.frame(maxHeight: .infinity)
+		.background(Color.primaryBackground)
+		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Sending payment", displayMode: .inline)
-		.zIndex(0)
+		.zIndex(0) // [SendingView, ValidateView, ReadyView]
 	}
 }
 

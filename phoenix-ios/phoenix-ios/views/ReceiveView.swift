@@ -60,6 +60,9 @@ struct ReceiveView: View {
 		
 		ZStack {
 			
+			Image("testnet_bg")
+				.resizable(resizingMode: .tile)
+			
 			VStack {
 				qrCodeView(model)
 					.frame(width: 200, height: 200)
@@ -170,10 +173,14 @@ struct ReceiveView: View {
 				Spacer()
 				
 			} // </VStack>
+			.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
 			
 			toast.view()
 			
 		} // </ZStack>
+		.frame(maxHeight: .infinity)
+		.background(Color.primaryBackground)
+		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.onAppear {
 			onAppear()
 		}
