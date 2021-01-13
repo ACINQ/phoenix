@@ -26,6 +26,7 @@ struct ReceiveView: View {
 	@State var badgesDisabled = false
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
+	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
 	
 	@StateObject var toast = Toast()
 	
@@ -190,12 +191,12 @@ struct ReceiveView: View {
 		.sheet(isPresented: $editing) {
 		
 			if let m = model as? Receive.ModelGenerated {
-				ModifyInvoicePopup(
+				ModifyInvoiceSheet(
+					postIntent: postIntent,
+					initialUnit: m.unit,
+					initialAmount: m.amount,
 					show: $editing,
-					amount: m.amount?.description ?? "",
-					unit: m.unit,
-					desc: m.desc ?? "",
-					postIntent: postIntent
+					desc: m.desc ?? ""
 				)
 			}
 		}
@@ -249,8 +250,17 @@ struct ReceiveView: View {
 	func invoiceAmount(_ model: Receive.Model) -> String {
 		
 		if let m = model as? Receive.ModelGenerated {
-			if let amount = m.amount {
-				return "\(amount.description) \(m.unit.abbrev)"
+			if let amount = m.amount?.doubleValue {
+				let msat = Utils.toMsat(from: amount, bitcoinUnit: m.unit)
+				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+				
+				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+					let fiatAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+					return "\(btcAmt.string)  /  \(fiatAmt.string)"
+				} else {
+					return btcAmt.string
+				}
+				
 			} else {
 				return NSLocalizedString("any amount",
 					comment: "placeholder: invoice is amount-less"
@@ -420,47 +430,73 @@ struct ReceiveView: View {
 	}
 }
 
-struct ModifyInvoicePopup: View {
-
-	@Binding var show: Bool
-
-	@State var amount: String
-	@State var unit: BitcoinUnit
-	@State var desc: String
-
-	@State var invalidAmount: Bool = false
+struct ModifyInvoiceSheet: View {
 
 	let postIntent: (Receive.Intent) -> Void
+	
+	let initialUnit: BitcoinUnit
+	let initialAmount: KotlinDouble?
+	
+	@Binding var show: Bool
+	
+	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.satoshi)
+	@State var amount: String = ""
+	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
+	
+	@State var altAmount: String = ""
+	@State var isInvalidAmount: Bool = false
+	@State var isEmptyAmount: Bool = false
+	
+	@State var desc: String
+	
+	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
+	
+	func currencyStyler() -> TextFieldCurrencyStyler {
+		return TextFieldCurrencyStyler(
+			unit: $unit,
+			amount: $amount,
+			parsedAmount: $parsedAmount,
+			hideMsats: false
+		)
+	}
 
 	var body: some View {
+		
 		VStack(alignment: .leading) {
 			Text("Edit payment request")
 				.font(.title3)
-				.padding()
+				.padding([.top, .bottom])
 
 			HStack {
-				TextField("Amount (optional)", text: $amount)
+				TextField("Amount (optional)", text: currencyStyler().amountProxy)
 					.keyboardType(.decimalPad)
 					.disableAutocorrection(true)
-					.onChange(of: amount) {
-						invalidAmount = !$0.isEmpty && (Double($0) == nil || Double($0)! < 0)
-					}
-					.foregroundColor(invalidAmount ? Color.red : Color.primary)
+					.foregroundColor(isInvalidAmount ? Color.appRed : Color.primaryForeground)
 					.padding([.top, .bottom], 8)
 					.padding(.leading, 16)
 					.padding(.trailing, 0)
 
-				Picker(selection: $unit, label: Text(unit.abbrev).frame(width: 50)) {
-					ForEach(0..<BitcoinUnit.default().values.count) {
-						let u = BitcoinUnit.default().values[$0]
-						Text(u.abbrev).tag(u)
+				Picker(
+					selection: $unit,
+					label: Text(unit.abbrev).frame(minWidth: 40, alignment: Alignment.trailing)
+				) {
+					let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+					ForEach(0 ..< options.count) {
+						let option = options[$0]
+						Text(option.abbrev).tag(option)
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
-				.padding(.trailing, 2)
+				.padding(.trailing, 16)
 			}
 			.background(Capsule().stroke(Color(UIColor.separator)))
-			.padding([.leading, .trailing])
+
+			Text(altAmount)
+				.font(.caption)
+				.foregroundColor(isInvalidAmount && !isEmptyAmount ? Color.appRed : .secondary)
+				.padding(.top, 0)
+				.padding(.leading, 16)
+				.padding(.bottom, 4)
 
 			HStack {
 				TextField("Description (optional)", text: $desc)
@@ -468,8 +504,7 @@ struct ModifyInvoicePopup: View {
 					.padding([.leading, .trailing], 16)
 			}
 			.background(Capsule().stroke(Color(UIColor.separator)))
-			.padding([.leading, .trailing])
-			
+
 			Spacer()
 			HStack {
 				Spacer()
@@ -478,28 +513,174 @@ struct ModifyInvoicePopup: View {
 					withAnimation { show = false }
 				}
 				.font(.title2)
-				.disabled(invalidAmount)
+				.disabled(isInvalidAmount && !isEmptyAmount)
 			}
-			.padding()
+			.padding(.bottom)
 
 		} // </VStack>
+		.padding([.leading, .trailing])
+		.onAppear() {
+			onAppear()
+		}
+		.onChange(of: amount) { _ in
+			amountDidChange()
+		}
+		.onChange(of: unit) { _  in
+			unitDidChange()
+		}
 		
 	} // </body>
 	
-	// Question: Is it possible to call this if the user manually dismisses the view ?
-	func saveChanges() -> Void {
-		if !invalidAmount {
-			postIntent(
-				Receive.IntentAsk(
-					amount : amount.isEmpty ? nil : KotlinDouble(value: Double(amount)!),
-					unit   : unit,
-					desc   : desc.isEmpty ? nil : desc
-				)
-			)
+	func onAppear() -> Void {
+		log.trace("(ModifyInvoiceSheet) onAppear()")
+		
+		var msat: Int64? = nil
+		if let initialAmt = initialAmount?.doubleValue {
+			msat = Utils.toMsat(from: initialAmt, bitcoinUnit: initialUnit)
+		}
+		
+		// Regardless of whether or not the invoice currently has an amount,
+		// we should default to the user's preferred currency.
+		// In other words, we should default to fiat, if that's what the user prefers.
+		//
+		if currencyPrefs.currencyType == .fiat, let exchangeRate = currencyPrefs.fiatExchangeRate() {
+			
+			let fiatCurrency = currencyPrefs.fiatCurrency
+			unit = CurrencyUnit(fiatCurrency: fiatCurrency)
+			
+			if let msat = msat {
+				let targetAmt = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
+				parsedAmount = Result.success(targetAmt)
+				
+				let formattedAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+				amount = formattedAmt.digits
+			} else {
+				refreshAltAmount()
+			}
+			
+		} else {
+			
+			let bitcoinUnit = currencyPrefs.bitcoinUnit
+			unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+			
+			if let msat = msat {
+				let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+				parsedAmount = Result.success(targetAmt)
+				
+				let formattedAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
+				amount = formattedAmt.digits
+			} else {
+				refreshAltAmount()
+			}
 		}
 	}
 	
-} // </ModifyInvoicePopup>
+	func amountDidChange() -> Void {
+		log.trace("(ModifyInvoiceSheet) amountDidChange()")
+		
+		refreshAltAmount()
+	}
+	
+	func unitDidChange() -> Void {
+		log.trace("(ModifyInvoiceSheet) unitDidChange()")
+		
+		// We might want to apply a different formatter
+		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
+		parsedAmount = result.1
+		amount = result.0
+		
+		refreshAltAmount()
+	}
+	
+	func refreshAltAmount() -> Void {
+		log.trace("(ModifyInvoiceSheet) refreshAltAmount()")
+		
+		switch parsedAmount {
+		case .failure(let error):
+			isInvalidAmount = true
+			isEmptyAmount = error == .emptyInput
+			
+			switch error {
+			case .emptyInput:
+				altAmount = NSLocalizedString("Any amount", comment: "error message")
+			case .invalidInput:
+				altAmount = NSLocalizedString("Enter a valid amount", comment: "error message")
+			}
+			
+		case .success(let amt):
+			isInvalidAmount = false
+			isEmptyAmount = false
+			
+			if let bitcoinUnit = unit.bitcoinUnit {
+				// amt    => bitcoinUnit
+				// altAmt => fiatCurrency
+				
+				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
+					
+					let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+					altAmount = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate).string
+					
+				} else {
+					// We don't know the exchange rate, so we can't display fiat value.
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortLabel)"
+				}
+				
+			} else if let fiatCurrency = unit.fiatCurrency {
+				// amt    => fiatCurrency
+				// altAmt => bitcoinUnit
+				
+				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+					
+					let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+					altAmount = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit).string
+					
+				} else {
+					// We don't know the exchange rate !
+					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortLabel)"
+				}
+			}
+		}
+	}
+	
+	func saveChanges() -> Void {
+		log.trace("(ModifyInvoiceSheet) saveChanges()")
+		
+		if let amt = try? parsedAmount.get(), amt > 0 {
+			
+			if let bitcoinUnit = unit.bitcoinUnit {
+				postIntent(Receive.IntentAsk(
+					amount: KotlinDouble(value: amt),
+					unit: bitcoinUnit,
+					desc: desc
+				))
+				
+			} else if let fiatCurrency = unit.fiatCurrency,
+					  let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+			{
+				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+				
+				let bitcoinUnit = BitcoinUnit.satoshi
+				let sat = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+				
+				postIntent(Receive.IntentAsk(
+					amount: KotlinDouble(value: sat),
+					unit: bitcoinUnit,
+					desc: desc
+				))
+			}
+			
+		} else {
+			
+			postIntent(Receive.IntentAsk(
+				amount: nil,
+				unit: initialUnit,
+				desc: desc
+			))
+		}
+	}
+	
+} // </ModifyInvoiceSheet>
 
 
 struct BgAppRefreshDisabledWarning: View {

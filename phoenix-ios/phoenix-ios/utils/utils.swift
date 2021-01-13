@@ -8,12 +8,16 @@ class Utils {
 	private static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
 	private static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
 	
+	/// Converts to millisatoshi, the preferred unit for performing conversions.
+	///
 	static func toMsat(fromFiat amount: Double, exchangeRate: BitcoinPriceRate) -> Int64 {
 		
 		let btc = amount / exchangeRate.price
 		return toMsat(from: btc, bitcoinUnit: .bitcoin)
 	}
 	
+	/// Converts to millisatoshi, the preferred unit for performing conversions.
+	///
 	static func toMsat(from amount: Double, bitcoinUnit: BitcoinUnit) -> Int64 {
 		
 		var msat: Double
@@ -41,10 +45,29 @@ class Utils {
 		}
 	}
 	
+	static func convertToFiat(msat: Int64, exchangeRate: BitcoinPriceRate) -> Double {
+		
+		// exchangeRate.fiatCurrency: FiatCurrency { get }
+		// exchangeRate.price: Double { get }
+		//
+		// exchangeRate.price => value of 1.0 BTC in fiat
+		
+		let btc = Double(msat) / Millisatoshis_Per_Bitcoin
+		let fiat = btc * exchangeRate.price
+		
+		return fiat
+	}
+	
+	/// Formats the given amount of satoshis into a FormattedAmount struct,
+	/// which contains the various string values needed for display.
+	///
 	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64, hideMsats: Bool = true) -> FormattedAmount {
 		return format(currencyPrefs, msat: (sat * 1_000))
 	}
 	
+	/// Formats the given amount of millisatoshis into a FormattedAmount struct,
+	/// which contains the various string values needed for display.
+	///
 	static func format(_ currencyPrefs: CurrencyPrefs, msat: Int64, hideMsats: Bool = true) -> FormattedAmount {
 		
 		if currencyPrefs.currencyType == .bitcoin {
@@ -146,17 +169,10 @@ class Utils {
 	
 	static func formatFiat(msat: Int64, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
 		
-		// exchangeRate.fiatCurrency: FiatCurrency { get }
-		// exchangeRate.price: Double { get }
-		//
-		// exchangeRate.price => value of 1.0 BTC in fiat
-		
-		let btc = Double(msat) / Millisatoshis_Per_Bitcoin
-		let fiat = btc * exchangeRate.price
-		
+		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
 		let formatter = fiatFormatter()
 		
-		let digits = formatter.string(from: NSNumber(value: fiat)) ?? fiat.description
+		let digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
 		return FormattedAmount(
 			digits: digits,
 			type: exchangeRate.fiatCurrency.shortLabel,

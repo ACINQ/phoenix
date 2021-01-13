@@ -10,16 +10,16 @@ import PhoenixShared
 ///
 struct FormattedAmount {
 	
-	/// The number, formatted for the current locale. E.g.:
+	/// Only the digits. E.g. "12,345.6789"
+	///
+	/// The value will be formatted for the current locale. E.g.:
 	/// - "12,845.123456"
 	/// - "12 845.123456"
 	/// - "12.845,123456"
 	///
 	let digits: String
 	
-	/// The currency type. E.g.:
-	/// - "USD"
-	/// - "btc"
+	/// The currency type. E.g. "USD" or "btc"
 	///
 	let type: String
 	
@@ -29,8 +29,7 @@ struct FormattedAmount {
 	///
 	let decimalSeparator: String
 	
-	/// Returns the simple string value, as typically displayed in the app. E.g.:
-	/// - "42,526 sat"
+	/// The standard string value as typically displayed in the app. E.g.: "42,526 sat"
 	///
 	var string: String {
 		return "\(digits) \(type)"
