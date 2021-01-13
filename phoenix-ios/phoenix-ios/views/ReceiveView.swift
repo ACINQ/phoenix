@@ -25,8 +25,11 @@ struct ReceiveView: View {
 	@State var alertsDisabled = false
 	@State var badgesDisabled = false
 	
-	@Environment(\.popoverState) private var popoverState: PopoverState
-	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass
+	@Environment(\.verticalSizeClass) var verticalSizeClass
+	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@StateObject var toast = Toast()
 	
@@ -64,117 +67,11 @@ struct ReceiveView: View {
 			Image("testnet_bg")
 				.resizable(resizingMode: .tile)
 			
-			VStack {
-				qrCodeView(model)
-					.frame(width: 200, height: 200)
-					.padding()
-					.background(Color.white)
-					.cornerRadius(20)
-					.overlay(
-						RoundedRectangle(cornerRadius: 20)
-							.stroke(Color.appHorizon, lineWidth: 1)
-					)
-					.padding()
-				
-				VStack(alignment: .center) {
-				
-					Text(invoiceAmount(model))
-						.font(.caption2)
-						.foregroundColor(.secondary)
-						.padding(.bottom, 2)
-				
-					Text(invoiceDescription(model))
-						.lineLimit(1)
-						.font(.caption2)
-						.foregroundColor(.secondary)
-						.padding(.bottom, 2)
-				}
-				.padding([.leading, .trailing], 20)
-
-				HStack {
-					actionButton(image: Image(systemName: "square.on.square")) {
-						if let m = model as? Receive.ModelGenerated {
-							UIPasteboard.general.string = m.request
-							toast.toast(text: "Copied in pasteboard!")
-						}
-					}
-					.disabled(!(model is Receive.ModelGenerated))
-					
-					actionButton(image: Image(systemName: "square.and.arrow.up")) {
-						if let m = model as? Receive.ModelGenerated {
-							sharing = "lightning:\(m.request)"
-						}
-					}
-					.sharing($sharing)
-					.disabled(!(model is Receive.ModelGenerated))
-					
-					actionButton(image: Image(systemName: "square.and.pencil")) {
-						withAnimation {
-							editing = true
-						}
-					}
-					.disabled(!(model is Receive.ModelGenerated))
-				}
-				
-				// There are warnings we may want to display:
-				//
-				// 1. The user has disabled Background App Refresh.
-				//    In this case, we won't be able to receive payments
-				//    while the app is in the background.
-				//
-				// 2. When we first prompted them to enable push notifications,
-				//    the user said "no". Thus we have never tried to enable push notifications.
-				//
-				// 3. The user has totally disabled notifications for our app.
-				//    So if a payment is received while the app is in the background,
-				//    we won't be able to notify them (in any way, shape or form).
-				//
-				// 4. Similarly to above, the user didn't totally disable notifications,
-				//    but they effectively did. Because they disabled all alerts & badges.
-				
-				if bgAppRefreshDisabled {
-					Button {
-						showBgAppRefreshDisabledWarning()
-					} label: {
-						Image(systemName: "exclamationmark.octagon.fill")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.appRed)
-							.frame(width: 32, height: 32)
-					}
-					.padding(.top, 2)
-				}
-				else if !pushPermissionRequestedFromOS {
-					Button {
-						showRequestPushPermissionPopup()
-					} label: {
-						Image(systemName: "exclamationmark.bubble.fill")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: 32, height: 32)
-					}
-					.padding(.top, 2)
-				}
-				else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
-					Button {
-						showNotificationsDisabledWarning()
-					} label: {
-						Image(systemName: "exclamationmark.triangle.fill")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.appYellow)
-							.frame(width: 32, height: 32)
-					}
-					.padding(.top, 2)
-				}
-				
-				Spacer()
-				
-			} // </VStack>
-			.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
+			if verticalSizeClass == UserInterfaceSizeClass.compact {
+				mainLandscape(model: model, postIntent: postIntent)
+			} else {
+				mainPortrait(model: model, postIntent: postIntent)
+			}
 			
 			toast.view()
 			
@@ -200,6 +97,128 @@ struct ReceiveView: View {
 				)
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func mainPortrait(
+		model: Receive.Model,
+		postIntent: @escaping (Receive.Intent) -> Void
+	) -> some View {
+		
+		VStack {
+			qrCodeView(model)
+				.frame(width: 200, height: 200)
+				.padding()
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(Color.appHorizon, lineWidth: 1)
+				)
+				.padding()
+			
+			VStack(alignment: .center) {
+			
+				Text(invoiceAmount(model))
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 2)
+			
+				Text(invoiceDescription(model))
+					.lineLimit(1)
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 2)
+			}
+			.padding([.leading, .trailing], 20)
+
+			HStack {
+				actionButton(image: Image(systemName: "square.on.square")) {
+					didTapCopyButton(model)
+				}
+				.disabled(!(model is Receive.ModelGenerated))
+				
+				actionButton(image: Image(systemName: "square.and.arrow.up")) {
+					didTapShareButton(model)
+				}
+				.sharing($sharing)
+				.disabled(!(model is Receive.ModelGenerated))
+				
+				actionButton(image: Image(systemName: "square.and.pencil")) {
+					didTapEditButton()
+				}
+				.disabled(!(model is Receive.ModelGenerated))
+			}
+			
+			warningButton()
+			
+			Spacer()
+			
+		} // </VStack>
+		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
+	}
+	
+	@ViewBuilder
+	func mainLandscape(
+		model: Receive.Model,
+		postIntent: @escaping (Receive.Intent) -> Void
+	) -> some View {
+		
+		HStack {
+			
+			qrCodeView(model)
+				.frame(width: 200, height: 200)
+				.padding()
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.stroke(Color.appHorizon, lineWidth: 1)
+				)
+				.padding()
+			
+			VStack {
+				
+				actionButton(image: Image(systemName: "square.on.square")) {
+					didTapCopyButton(model)
+				}
+				.disabled(!(model is Receive.ModelGenerated))
+				
+				actionButton(image: Image(systemName: "square.and.arrow.up")) {
+					didTapShareButton(model)
+				}
+				.sharing($sharing)
+				.disabled(!(model is Receive.ModelGenerated))
+				
+				actionButton(image: Image(systemName: "square.and.pencil")) {
+					didTapEditButton()
+				}
+				.disabled(!(model is Receive.ModelGenerated))
+			}
+			
+			VStack(alignment: .center) {
+			
+				Spacer()
+				
+				Text(invoiceAmount(model))
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 6)
+			
+				Text(invoiceDescription(model))
+					.lineLimit(1)
+					.font(.caption2)
+					.foregroundColor(.secondary)
+				
+				warningButton()
+				
+				Spacer()
+			}
+			.frame(maxWidth: 200) // match width of QRcode box
+			.padding([.leading, .trailing], 20)
+			
+		} // </HStack>
+		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
 	}
 	
 	@ViewBuilder
@@ -245,6 +264,65 @@ struct ReceiveView: View {
 				)
 		}
 		.padding()
+	}
+	
+	@ViewBuilder
+	func warningButton() -> some View {
+		
+		// There are warnings we may want to display:
+		//
+		// 1. The user has disabled Background App Refresh.
+		//    In this case, we won't be able to receive payments
+		//    while the app is in the background.
+		//
+		// 2. When we first prompted them to enable push notifications,
+		//    the user said "no". Thus we have never tried to enable push notifications.
+		//
+		// 3. The user has totally disabled notifications for our app.
+		//    So if a payment is received while the app is in the background,
+		//    we won't be able to notify them (in any way, shape or form).
+		//
+		// 4. Similarly to above, the user didn't totally disable notifications,
+		//    but they effectively did. Because they disabled all alerts & badges.
+		
+		if bgAppRefreshDisabled {
+			Button {
+				showBgAppRefreshDisabledWarning()
+			} label: {
+				Image(systemName: "exclamationmark.octagon.fill")
+					.renderingMode(.template)
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.foregroundColor(Color.appRed)
+					.frame(width: 32, height: 32)
+			}
+			.padding(.top, 2)
+		}
+		else if !pushPermissionRequestedFromOS {
+			Button {
+				showRequestPushPermissionPopup()
+			} label: {
+				Image(systemName: "exclamationmark.bubble.fill")
+					.renderingMode(.template)
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.frame(width: 32, height: 32)
+			}
+			.padding(.top, 2)
+		}
+		else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
+			Button {
+				showNotificationsDisabledWarning()
+			} label: {
+				Image(systemName: "exclamationmark.triangle.fill")
+					.renderingMode(.template)
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.foregroundColor(Color.appYellow)
+					.frame(width: 32, height: 32)
+			}
+			.padding(.top, 2)
+		}
 	}
 	
 	func invoiceAmount(_ model: Receive.Model) -> String {
@@ -427,6 +505,31 @@ struct ReceiveView: View {
 		popoverState.displayContent.send(
 			RequestPushPermissionPopup(callback: callback).anyView
 		)
+	}
+	
+	func didTapCopyButton(_ model: Receive.Model) -> Void {
+		log.trace("didTapCopyButton()")
+		
+		if let m = model as? Receive.ModelGenerated {
+			UIPasteboard.general.string = m.request
+			toast.toast(text: "Copied in pasteboard!")
+		}
+	}
+	
+	func didTapShareButton(_ model: Receive.Model) -> Void {
+		log.trace("didTapShareButton()")
+		
+		if let m = model as? Receive.ModelGenerated {
+			sharing = "lightning:\(m.request)"
+		}
+	}
+	
+	func didTapEditButton() -> Void {
+		log.trace("didTapEditButton()")
+		
+		withAnimation {
+			editing = true
+		}
 	}
 }
 
