@@ -48,7 +48,6 @@ struct ReceiveView: View {
 		}) { model, postIntent in
 			
 			view(model: model, postIntent: postIntent)
-			//	.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.navigationBarTitle("Receive ", displayMode: .inline)
 				.onAppear {
 					postIntent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
@@ -168,14 +167,14 @@ struct ReceiveView: View {
 			
 			qrCodeView(model)
 				.frame(width: 200, height: 200)
-				.padding()
+				.padding(.all, 20)
 				.background(Color.white)
 				.cornerRadius(20)
 				.overlay(
 					RoundedRectangle(cornerRadius: 20)
-						.stroke(Color.appHorizon, lineWidth: 1)
+						.strokeBorder(Color.appHorizon, lineWidth: 1)
 				)
-				.padding()
+				.padding([.top, .bottom])
 			
 			VStack {
 				
@@ -214,8 +213,8 @@ struct ReceiveView: View {
 				
 				Spacer()
 			}
-			.frame(maxWidth: 200) // match width of QRcode box
-			.padding([.leading, .trailing], 20)
+			.frame(width: 240) // match width of QRcode box
+			.padding([.top, .bottom])
 			
 		} // </HStack>
 		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
