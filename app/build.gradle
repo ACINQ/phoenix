@@ -97,16 +97,16 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.2.0"
 
   // ANDROIDX - material
-  def material_version = "1.3.0-alpha03"
+  def material_version = "1.3.0-beta01"
   implementation "com.google.android.material:material:$material_version"
 
   // ANDROIDX - navigation
-  def nav_version = "2.3.0"
+  def nav_version = "2.3.2"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ANDROIDX - constraint layout
-  def constraint_version = "2.0.2"
+  def constraint_version = "2.0.4"
   implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
 
   // ANDROIDX - viewmodel + livedata
@@ -117,7 +117,7 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
   // ANDROIDX - biometric
-  def biometric_version = "1.1.0-beta01"
+  def biometric_version = "1.1.0-rc01"
   implementation "androidx.biometric:biometric:$biometric_version"
 
   // ANDROIDX - preferences
@@ -135,10 +135,10 @@ dependencies {
   implementation "androidx.viewpager2:viewpager2:$view_pager_version"
 
   // SQLDelight
-  implementation "com.squareup.sqldelight:android-driver:1.4.3"
+  implementation "com.squareup.sqldelight:android-driver:1.4.4"
 
   // logging
-  implementation 'org.slf4j:slf4j-api:1.7.29'
+  implementation 'org.slf4j:slf4j-api:1.7.30'
   implementation 'com.github.tony19:logback-android:2.0.0'
 
   // eclair core
@@ -159,7 +159,7 @@ dependencies {
 
   // tests
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-  testImplementation 'junit:junit:4.13'
+  testImplementation 'junit:junit:4.13.1'
   androidTestImplementation 'androidx.test:runner:1.3.0'
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
