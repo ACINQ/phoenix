@@ -303,6 +303,9 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
+  <string name="initwallet_terms"><![CDATA[
+    En procédant aux étapes suivantes, vous acceptez les <a href="https://phoenix.acinq.co/terms">conditions d\'utilisation de l\'application</a>.
+  ]]></string>
   <string name="initwallet_create">Créer un nouveau portefeuille</string>
   <string name="initwallet_restore">Restaurer un portefeuille existant</string>
 
@@ -546,6 +549,7 @@
   <br/><br/>
   Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
   ]]></string>
+  <string name="about_terms">Conditions d\'utilisation</string>
 
   <!-- //////////////// settings: options for payments //////////////// -->
 

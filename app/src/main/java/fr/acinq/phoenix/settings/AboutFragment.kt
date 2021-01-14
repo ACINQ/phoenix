@@ -16,6 +16,8 @@
 
 package fr.acinq.phoenix.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -50,6 +52,7 @@ class AboutFragment : BaseFragment() {
     mBinding.fiatRates.movementMethod = LinkMovementMethod.getInstance()
     mBinding.actionBar.setSubtitle(getString(R.string.about_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
+    mBinding.terms.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/terms"))) }
   }
 
 }
