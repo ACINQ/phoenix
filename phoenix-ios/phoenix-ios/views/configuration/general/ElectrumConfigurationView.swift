@@ -62,12 +62,7 @@ struct NewLayout: View {
 		
 		List {
 				
-			Section(header: Text("Info")) {
-				Text(
-					"By default Phoenix connects to random Electrum servers in order to access the" +
-					" Bitcoin blockchain. You can also choose to connect to your own Electrum server."
-				)
-			}
+			Section(header: ListHeader(), content: {}).textCase(nil)
 			
 			Section(header: Text("Configuration")) {
 			
@@ -161,6 +156,20 @@ struct NewLayout: View {
 				postIntent: postIntent,
 				showing: $isModifying
 			).padding()
+		}
+	}
+	
+	struct ListHeader: View {
+		
+		var body: some View {
+			
+			Text(
+				"By default Phoenix connects to random Electrum servers in order to access the" +
+				" Bitcoin blockchain. You can also choose to connect to your own Electrum server."
+			)
+			.font(.body)
+			.foregroundColor(Color.primary)
+			.padding(.top, 10)
 		}
 	}
 	
