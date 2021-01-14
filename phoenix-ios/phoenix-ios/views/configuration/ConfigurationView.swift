@@ -24,7 +24,7 @@ struct ConfigurationView: View {
 							Image(systemName: "link")
 						}
 					}
-					NavigationLink(destination:  EmptyView()) {
+					NavigationLink(destination: ComingSoonView()) {
 						Label { Text("Tor") } icon: {
 							Image(systemName: "shield.lefthalf.fill")
 						}
@@ -63,7 +63,7 @@ struct ConfigurationView: View {
 								Image(systemName: "xmark.circle")
 							}
 						}
-						NavigationLink(destination: EmptyView()) {
+						NavigationLink(destination: ComingSoonView()) {
 							Label { Text("Danger zone") } icon: {
 								Image(systemName: "exclamationmark.triangle")
 							}
