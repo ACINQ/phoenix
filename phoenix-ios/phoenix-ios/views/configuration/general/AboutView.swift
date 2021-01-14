@@ -9,16 +9,17 @@ struct AboutView: View {
 	}
 	
 	var body: some View {
-		VStack {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
 			LocalWebView()
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.padding(.trailing, 20)
-				.padding(.leading, 40)
+				.padding(.leading, 20)
+				.padding(.trailing, 20) // must match verticalScrollIndicatorInsets.right
 			
 			Text("Version \(versionString())")
 				.padding([.top, .bottom], 4)
-				.frame(height: 40)
-				.frame(maxWidth: .infinity)
+				.frame(maxWidth: .infinity, minHeight: 40)
 				.background(Color(.secondarySystemBackground))
 		}
 		.navigationBarTitle("About", displayMode: .inline)
@@ -44,6 +45,8 @@ struct LocalWebView: UIViewRepresentable {
 		webView.navigationDelegate = context.coordinator
 		webView.allowsBackForwardNavigationGestures = false
 		webView.scrollView.isScrollEnabled = true
+		webView.scrollView.verticalScrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -20)
+		webView.scrollView.clipsToBounds = false
 		return webView
 	}
 	
