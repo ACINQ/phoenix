@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.initwallet
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletBinding
+import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 
@@ -34,6 +36,8 @@ class InitWalletFragment : Fragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentInitWalletBinding.inflate(inflater, container, false)
+    mBinding.terms.text = Converter.html(getString(R.string.initwallet_terms))
+    mBinding.terms.movementMethod = LinkMovementMethod.getInstance()
     return mBinding.root
   }
 

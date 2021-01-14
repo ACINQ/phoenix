@@ -581,15 +581,15 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém, e tome cuidado com ataques phishing.
+  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros::
+    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros:
     <br />- Blockchain.info
     <br />- Bitso
-    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Distribuído por Coindesk</a>
   ]]></string>
 
   <!-- //////////////// background node service //////////////// -->
@@ -608,7 +608,7 @@
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
   <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal de pagamento Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido para cobrir os custos de abertura do canal.</string>
+  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido para cobrir os custos de abertura do canal.</string>
   <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
   <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
 
@@ -650,5 +650,10 @@
     <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
     <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
   ]]></string>
+
+  <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
+  <string name="paymentmode_onchain_desc">Transações na rede Bitcoin geralmente são mais lentas e mais caras</string>
+  <string name="paymentmode_lightning">Pagar usando a rede Lightning</string>
+  <string name="paymentmode_lightning_desc">Esta é a opção recomendada</string>
 
 </resources>

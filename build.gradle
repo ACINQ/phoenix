@@ -17,20 +17,20 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-  ext.kotlin_version = '1.4.10'
+  ext.kotlin_version = '1.4.21'
   ext.safeargs_version = '2.1.0-beta02'
   repositories {
     google()
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.0.2'
+    classpath 'com.android.tools.build:gradle:4.1.1'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     // plugin to generate args classes for the androidx navigation component
     classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safeargs_version"
     // plugin for firebase cloud messaging
     classpath "com.google.gms:google-services:4.3.4"
-    classpath 'com.squareup.sqldelight:gradle-plugin:1.4.3'
+    classpath 'com.squareup.sqldelight:gradle-plugin:1.4.4'
   }
 }
 
