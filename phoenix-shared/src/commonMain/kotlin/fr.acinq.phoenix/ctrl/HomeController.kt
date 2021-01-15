@@ -3,7 +3,6 @@ package fr.acinq.phoenix.ctrl
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.Transaction
 import fr.acinq.phoenix.utils.Connections
-import fr.acinq.phoenix.utils.plus
 
 
 typealias HomeController = MVI.Controller<Home.Model, Home.Intent>

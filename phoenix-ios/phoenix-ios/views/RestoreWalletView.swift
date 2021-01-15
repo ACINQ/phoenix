@@ -63,7 +63,7 @@ struct RestoreWalletView: View {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
-				PhoenixApplicationDelegate.get().loadWallet(seed: model.seed)
+				AppDelegate.get().loadWallet(seed: model.seed)
 			}
 		}
 	}

@@ -21,7 +21,11 @@ import org.kodein.log.LoggerFactory
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, private val electrumClient: ElectrumClient, private val networkMonitor: NetworkMonitor, private val historyManager: AppHistoryManager) : AppController<Home.Model, Home.Intent>(loggerFactory, Home.emptyModel) {
+class AppHomeController(
+    loggerFactory: LoggerFactory,
+    private val peer: Peer,
+    private val historyManager: AppHistoryManager
+) : AppController<Home.Model, Home.Intent>(loggerFactory, Home.emptyModel) {
 
     init {
         launch {
@@ -43,7 +47,7 @@ class AppHomeController(loggerFactory: LoggerFactory, private val peer: Peer, pr
         }
 
         launch {
-            historyManager.openTransactionsSubscriptions()
+            historyManager.openTransactionsSubscription()
                 .consumeAsFlow()
                 .collectIndexed { nth, list ->
                     model {

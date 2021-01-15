@@ -26,7 +26,7 @@ class MockControllerFactory : ControllerFactory {
 }
 
 func appView<V : View>(_ content: V) -> some View {
-    content.environmentObject(ObservableControllerFactory(PhoenixApplicationDelegate.get().business.controllers))
+    content.environmentObject(ObservableControllerFactory(AppDelegate.get().business.controllers))
 }
 
 func mockView<V : View>(_ content: V, nav: NavigationBarItem.TitleDisplayMode? = nil) -> some View {

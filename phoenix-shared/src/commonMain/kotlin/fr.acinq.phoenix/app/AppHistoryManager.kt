@@ -34,8 +34,23 @@ class AppHistoryManager(
 
     private fun getList() = appDb.find<Transaction>().byIndex("timestamp").useModels(reverse = true) { it.toList() }
 
+    // Broadcasts the entire transaction history (every single record in the database),
+    // everytime the database changes.
+    // This is less than ideal, and is slated to be replaced by the new database interface.
     private val transactions = ConflatedBroadcastChannel(getList())
 
+    // Broadcasts the most recent incoming transaction since the app was launched.
+    // If we haven't received any payments since app launch, the value will be null.
+    // This is currently used for push notification handling on iOS.
+    // On iOS, when the app is in the background, and a push notification is received,
+    // the app is required to tell the OS when it has finished processing the notification.
+    // That is, the app is expected to go off and do some stuff, clean up,
+    // and then tell the OS "hey thanks, I'm done". At which point, the app will be
+    // suspended again (network connections severed, CPU suspended, etc).
+    // So the iOS app just needs some way of being notified that it has received
+    // the pending payment.
+    private val incomingTransaction = ConflatedBroadcastChannel<Transaction?>(null)
+    
     private val logger = newLogger(loggerFactory)
 
     init {
@@ -110,7 +125,16 @@ class AppHistoryManager(
             didPut { updateChannel() }
             didDelete { updateChannel() }
         }
+
+        appDb.on<Transaction>().register {
+            didPut {
+                if (it.amountMsat > 0) { // is PaymentReceived
+                    launch { incomingTransaction.send(it) }
+                }
+            }
+        }
     }
 
-    fun openTransactionsSubscriptions() = transactions.openSubscription()
+    fun openTransactionsSubscription() = transactions.openSubscription()
+    fun openIncomingTransactionSubscription() = incomingTransaction.openSubscription()
 }

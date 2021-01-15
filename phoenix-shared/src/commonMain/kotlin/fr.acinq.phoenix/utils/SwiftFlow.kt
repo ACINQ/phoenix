@@ -11,15 +11,19 @@ import kotlinx.coroutines.flow.*
  * (See file in project called FlowUtils.kt)
  */
 
-public fun <T> ConflatedBroadcastChannel<T>.wrap(): SwiftFlow<T> = SwiftFlow(asFlow())
+@FlowPreview
+@ExperimentalCoroutinesApi
+fun <T> ConflatedBroadcastChannel<T>.wrap() = SwiftFlow(asFlow())
 
 // This doesn't work in Swift.
 // For some reason, in Swift, it is exposed as a function within SwiftFlow itself.
 //
-public fun <T> Flow<T>.wrap(): SwiftFlow<T> = SwiftFlow(this)
+@ExperimentalCoroutinesApi
+fun <T> Flow<T>.wrap() = SwiftFlow(this)
 
-public class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
-    public fun watch(block: (T) -> Unit): Closeable {
+@ExperimentalCoroutinesApi
+class SwiftFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
+    fun watch(block: (T) -> Unit): Closeable {
         val job = Job()
 
         onEach {

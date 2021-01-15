@@ -181,7 +181,7 @@ struct ConnectionStatusButton : View {
 					Image("ic_connection_lost")
 						.resizable()
 						.frame(width: 16, height: 16)
-					Text(status.text())
+					Text(status.localizedText())
 						.font(.caption2)
 				}
 			}
@@ -355,7 +355,7 @@ struct ConnectionCell : View {
 
 			Text("\(label):")
 			Spacer()
-			Text(connection.text())
+			Text(connection.localizedText())
 		}
 		.padding([.top, .bottom], 8)
 	}

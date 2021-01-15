@@ -63,17 +63,28 @@ extension Color {
     }
 }
 
-
+/*
 extension Image {
-    init(vector: String) {
-        let uiImage = UIImage(named: vector)!
-        let size = CGSize(width: 500, height: 500)
-        let scaled = UIGraphicsImageRenderer(size: size).image { _ in
-            uiImage.draw(in: CGRect(origin: .zero, size: size))
-        }
-        self.init(uiImage: scaled)
-    }
+
+	// DO NOT USE.
+	//
+	// This technique results in images that look pixelated.
+	// The original problem has been solved by importing the images via the Asset catalog,
+	// and enabling the "preserve vector data" option.
+	// So now you can just:
+	//
+	// Image("name_of_image") // <- use this instead
+	//
+	init(vector: String) {
+		let uiImage = UIImage(named: vector)!
+		let size = CGSize(width: 500, height: 500)
+		let scaled = UIGraphicsImageRenderer(size: size).image { _ in
+			uiImage.draw(in: CGRect(origin: .zero, size: size))
+		}
+		self.init(uiImage: scaled)
+	}
 }
+*/
 
 struct ActivityView: UIViewControllerRepresentable {
 

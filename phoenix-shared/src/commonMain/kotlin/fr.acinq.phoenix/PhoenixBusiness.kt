@@ -34,6 +34,7 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.serialization.json.Json
 import org.kodein.db.DB
 import org.kodein.db.impl.factory
@@ -172,6 +173,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     private val peer by lazy { buildPeer() }
 
+    private var appConnectionsDaemon: AppConnectionsDaemon? = null
+
     private val walletManager by lazy { WalletManager() }
     private val appHistoryManager by lazy { AppHistoryManager(loggerFactory, appDB, peer) }
     private val appConfigurationManager by lazy { AppConfigurationManager(appDB, electrumClient, chain, loggerFactory) }
@@ -185,14 +188,24 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     }
 
     fun start() {
-        AppConnectionsDaemon(
-            appConfigurationManager,
-            walletManager,
-            currencyManager,
-            networkMonitor,
-            electrumClient,
-            loggerFactory
-        ) { peer }
+        if (appConnectionsDaemon == null) {
+            appConnectionsDaemon = AppConnectionsDaemon(
+                appConfigurationManager,
+                walletManager,
+                currencyManager,
+                networkMonitor,
+                electrumClient,
+                loggerFactory,
+                getPeer = { peer } // lazy getter
+            )
+        }
+    }
+
+    // Converts a mnemonics list to a seed.
+    // This is generally called with a mnemonics list that has been previously saved.
+    fun prepWallet(mnemonics: List<String>, passphrase: String = ""): ByteArray {
+        MnemonicCode.validate(mnemonics)
+        return MnemonicCode.toSeed(mnemonics, passphrase)
     }
 
     fun loadWallet(seed: ByteArray): Unit {
@@ -201,15 +214,31 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         }
     }
 
-    fun prepWallet(mnemonics: List<String>, passphrase: String = ""): ByteArray {
-        MnemonicCode.validate(mnemonics)
-        return MnemonicCode.toSeed(mnemonics, passphrase)
+    fun incrementDisconnectCount(): Unit {
+        appConnectionsDaemon?.incrementDisconnectCount()
     }
+
+    fun decrementDisconnectCount(): Unit {
+        appConnectionsDaemon?.decrementDisconnectCount()
+    }
+
+    fun nodeID(): String {
+        return peer.nodeParams.nodeId.toString()
+    }
+
+    // The (node_id, fcm_token) tuple only needs to be registered once.
+    // And after that, only if the tuple changes (e.g. different fcm_token).
+    fun registerFcmToken(token: String?) {
+        peer.registerFcmToken(token)
+    }
+
+    fun incomingTransactionFlow() =
+        appHistoryManager.openIncomingTransactionSubscription().consumeAsFlow()
 
     val controllers: ControllerFactory = object : ControllerFactory {
         override fun content(): ContentController = AppContentController(loggerFactory, walletManager)
         override fun initialization(): InitializationController = AppInitController(loggerFactory, walletManager)
-        override fun home(): HomeController = AppHomeController(loggerFactory, peer, electrumClient, networkMonitor, appHistoryManager)
+        override fun home(): HomeController = AppHomeController(loggerFactory, peer, appHistoryManager)
         override fun receive(): ReceiveController = AppReceiveController(loggerFactory, peer)
         override fun scan(): ScanController = AppScanController(loggerFactory, peer)
         override fun restoreWallet(): RestoreWalletController = AppRestoreWalletController(loggerFactory, walletManager)

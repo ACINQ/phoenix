@@ -3,14 +3,12 @@ package fr.acinq.phoenix.utils
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import plus
 
 data class Connections(
     val internet: Connection = Connection.CLOSED,
@@ -21,6 +19,7 @@ data class Connections(
         get() = internet + peer + electrum
 }
 
+@ExperimentalCoroutinesApi
 class ConnectionsMonitor(peer: Peer, electrumClient: ElectrumClient, networkMonitor: NetworkMonitor): CoroutineScope {
 
     private val job = Job()
@@ -39,7 +38,10 @@ class ConnectionsMonitor(peer: Peer, electrumClient: ElectrumClient, networkMoni
                 Connections(
                     peer = peerState,
                     electrum = electrumState,
-                    internet = internetState
+                    internet = when (internetState) {
+                        NetworkState.Available -> Connection.ESTABLISHED
+                        NetworkState.NotAvailable -> Connection.CLOSED
+                    }
                 )
             }.collect {
                 _connections.value = it

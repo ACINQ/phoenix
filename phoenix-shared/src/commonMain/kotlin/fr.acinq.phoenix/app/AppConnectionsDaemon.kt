@@ -7,13 +7,12 @@ import fr.acinq.phoenix.data.ElectrumServer
 import fr.acinq.phoenix.data.address
 import fr.acinq.phoenix.data.asServerAddress
 import fr.acinq.phoenix.utils.NetworkMonitor
+import fr.acinq.phoenix.utils.NetworkState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
@@ -34,29 +33,75 @@ class AppConnectionsDaemon(
 
     private val logger = newLogger(loggerFactory)
 
-    private val electrumConnectionOrder = Channel<ConnectionOrder>()
-    private val peerConnectionOrder = Channel<ConnectionOrder>()
-
     private var peerConnectionJob :Job? = null
     private var electrumConnectionJob: Job? = null
     private var networkMonitorJob: Job? = null
 
-    private var networkStatus = Connection.CLOSED
+    private var networkStatus = NetworkState.NotAvailable
+
+    private data class TrafficControl(
+        val networkIsAvailable: Boolean = false,
+
+        // Under normal circumstances, the connections are automatically managed based on whether
+        // or not an Internet connection is available. However, the app may need to influence
+        // this in one direction or another.
+        // For example, the app may want us to disconnect.
+        // This variable allows different parts of the app to "vote" towards various overrides.
+        //
+        // if > 0, triggers disconnect & prevents future connection attempts.
+        // if <= 0, allows connection based on available Internet connection (as usual).
+        // Any part of the app that "votes" is expected to properly balance their calls.
+        // For example, on iOS, when the app goes into background mode,
+        // it votes by incrementing this value. Therefore it must balance that call by
+        // decrementing the value when the app goes into the foreground again.
+        val disconnectCount: Int = 0
+    ) {
+        fun incrementDisconnectCount(): TrafficControl {
+            val safeInc = disconnectCount.let { if (it == Int.MAX_VALUE) it else it + 1 }
+            return copy(disconnectCount = safeInc)
+        }
+        fun decrementDisconnectCount(): TrafficControl {
+            val safeDec = disconnectCount.let { if (it == Int.MIN_VALUE) it else it - 1 }
+            return copy(disconnectCount = safeDec)
+        }
+    }
+
+    private val peerControlFlow = MutableStateFlow(TrafficControl())
+    private val peerControlChanges = Channel<TrafficControl.() -> TrafficControl>()
+
+    private val electrumControlFlow = MutableStateFlow(TrafficControl())
+    private val electrumControlChanges = Channel<TrafficControl.() -> TrafficControl>()
 
     init {
+        launch {
+            peerControlChanges.consumeEach { change ->
+                val newState = peerControlFlow.value.change()
+                logger.debug { "peerControlFlow = $newState" }
+                peerControlFlow.value = newState
+            }
+        }
+        launch {
+            electrumControlChanges.consumeEach { change ->
+                val newState = electrumControlFlow.value.change()
+                logger.debug { "electrumControlFlow = $newState" }
+                electrumControlFlow.value = newState
+            }
+        }
         // Electrum
         launch {
-            electrumConnectionOrder.consumeEach {
+            electrumControlFlow.collect {
                 when {
-                    it == ConnectionOrder.CONNECT && networkStatus != Connection.CLOSED -> {
+                    it.networkIsAvailable && it.disconnectCount == 0 -> {
                         electrumConnectionJob = connectionLoop("Electrum", electrumClient.connectionState) {
                             val electrumServer = configurationManager.getElectrumServer()
                             electrumClient.connect(electrumServer.asServerAddress())
                         }
                     }
                     else -> {
-                        electrumConnectionJob?.cancel()
-                        electrumClient.disconnect()
+                        electrumConnectionJob?.let {
+                            it.cancel()
+                            electrumClient.disconnect()
+                        }
                     }
                 }
             }
@@ -71,8 +116,8 @@ class AppConnectionsDaemon(
                 openElectrumServerUpdateSubscription().consumeEach {
                     if (previousElectrumServer?.address() != it.address()) {
                         logger.info { "Electrum server has changed. We need to refresh the connection." }
-                        electrumConnectionOrder.send(ConnectionOrder.CLOSE)
-                        electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                        electrumControlChanges.send { incrementDisconnectCount() }
+                        electrumControlChanges.send { decrementDisconnectCount() }
                     }
 
                     previousElectrumServer = it
@@ -81,16 +126,18 @@ class AppConnectionsDaemon(
         }
         // Peer
         launch {
-            peerConnectionOrder.consumeEach {
+            peerControlFlow.collect {
                 when {
-                    it == ConnectionOrder.CONNECT  && networkStatus != Connection.CLOSED -> {
+                    it.networkIsAvailable && it.disconnectCount == 0 -> {
                         peerConnectionJob = connectionLoop("Peer", getPeer().connectionState) {
                             getPeer().connect()
                         }
                     }
                     else -> {
-                        peerConnectionJob?.cancel()
-                        getPeer().disconnect()
+                        peerConnectionJob?.let {
+                            it.cancel()
+                            getPeer().disconnect()
+                        }
                     }
                 }
             }
@@ -103,25 +150,38 @@ class AppConnectionsDaemon(
         }
     }
 
+    fun incrementDisconnectCount(): Unit {
+        launch {
+            peerControlChanges.send { incrementDisconnectCount() }
+            electrumControlChanges.send { incrementDisconnectCount() }
+        }
+    }
+
+    fun decrementDisconnectCount(): Unit {
+        launch {
+            peerControlChanges.send { decrementDisconnectCount() }
+            electrumControlChanges.send { decrementDisconnectCount() }
+        }
+    }
+
     private fun networkStateMonitoring() = launch {
         monitor.start()
         monitor.networkState.filter { it != networkStatus }.collect {
             logger.info { "New internet status: $it" }
 
+            networkStatus = it
             when(it) {
-                Connection.CLOSED -> {
-                    peerConnectionOrder.send(ConnectionOrder.CLOSE)
-                    electrumConnectionOrder.send(ConnectionOrder.CLOSE)
-                    currencyManager.stop()
-                }
-                else -> {
-                    peerConnectionOrder.send(ConnectionOrder.CONNECT)
-                    electrumConnectionOrder.send(ConnectionOrder.CONNECT)
+                NetworkState.Available -> {
+                    peerControlChanges.send { copy(networkIsAvailable = true) }
+                    electrumControlChanges.send { copy(networkIsAvailable = true) }
                     currencyManager.start()
                 }
+                NetworkState.NotAvailable -> {
+                    peerControlChanges.send { copy(networkIsAvailable = false) }
+                    electrumControlChanges.send { copy(networkIsAvailable = false) }
+                    currencyManager.stop()
+                }
             }
-
-            networkStatus = it
         }
     }
 
@@ -144,6 +204,4 @@ class AppConnectionsDaemon(
         8.0 -> delay
         else -> delay * 2.0
     }.seconds
-
-    enum class ConnectionOrder { CONNECT, CLOSE }
 }

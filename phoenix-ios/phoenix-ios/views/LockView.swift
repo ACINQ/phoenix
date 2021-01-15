@@ -176,7 +176,7 @@ struct LockView : View {
 			
 			switch result {
 				case .success(let mnemonics):
-					PhoenixApplicationDelegate.get().loadWallet(mnemonics: mnemonics)
+					AppDelegate.get().loadWallet(mnemonics: mnemonics)
 					withAnimation(.easeInOut) {
 						isUnlocked = true
 					}

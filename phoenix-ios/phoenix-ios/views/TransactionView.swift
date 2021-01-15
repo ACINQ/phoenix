@@ -47,7 +47,7 @@ struct TransactionView : View {
 					.padding()
 					
 				case .pending:
-					Image(vector: "ic_send")
+					Image("ic_send")
 						.renderingMode(.template)
 						.resizable()
 						.foregroundColor(Color(UIColor.systemGray))
@@ -57,7 +57,7 @@ struct TransactionView : View {
 						.padding()
 					
 				case .failure:
-				//	Image(vector: "ic_cross")
+				//	Image(vector: "ic_cross") // looks pixelated
 					Image(systemName: "xmark.circle")
 						.renderingMode(.template)
 						.resizable()

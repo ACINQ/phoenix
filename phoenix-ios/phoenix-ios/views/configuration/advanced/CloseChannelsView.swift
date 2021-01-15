@@ -186,7 +186,7 @@ fileprivate struct StandardWalletView : View {
 	func checkBitcoinAddress() -> Void {
 		logger.trace("checkBitcoinAddress()")
 		
-		let business = PhoenixApplicationDelegate.get().business
+		let business = AppDelegate.get().business
 		let result = business.util.parseBitcoinAddress(addr: bitcoinAddress)
 		
 		if let error = result.left {

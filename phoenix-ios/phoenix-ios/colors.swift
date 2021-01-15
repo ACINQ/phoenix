@@ -19,7 +19,8 @@ extension Color {
     static let appGreen = Color("appGreen")
     static let appYellow = Color("appYellow")
 	
-	static let accent = Color("accent")
+//	static let accent = Color("accent") // on hold until we decide on theme colors for dark mode
+	
 	static let buttonFill = Color("buttonFill")
 	static let primaryBackground = Color("primaryBackground")
 	static let primaryForeground = Color("primaryForeground")

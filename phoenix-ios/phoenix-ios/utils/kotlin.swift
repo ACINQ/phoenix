@@ -2,6 +2,18 @@ import Foundation
 import PhoenixShared
 import Combine
 
+extension Eclair_kmpConnection {
+	
+	func localizedText() -> String {
+		switch self {
+		case .closed       : return NSLocalizedString("Offline", comment: "Connection state")
+		case .establishing : return NSLocalizedString("Connecting...", comment: "Connection state")
+		case .established  : return NSLocalizedString("Connected", comment: "Connection state")
+		default            : return NSLocalizedString("Unknown", comment: "Connection state")
+		}
+	}
+}
+
 extension KotlinByteArray {
 	
 	static func fromSwiftData(_ data: Data) -> KotlinByteArray {
@@ -31,17 +43,17 @@ extension ConnectionsMonitor {
 		return connections.value as! Connections
 	}
 	
-	var publisher: CurrentValueSubject<Connections, Never> {
-		
-		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
-		
-		let swiftFlow = SwiftFlow<Connections>(origin: connections)
-		swiftFlow.watch { (connections: Connections?) in
-			publisher.send(connections!)
-		}
-		
-		return publisher
-	}
+//	var publisher: CurrentValueSubject<Connections, Never> {
+//
+//		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
+//
+//		let swiftFlow = SwiftFlow<Connections>(origin: connections)
+//		swiftFlow.watch {[weak publisher](connections: Connections?) in
+//			publisher?.send(connections!)
+//		}
+//
+//		return publisher
+//	}
 }
 
 class ObservableConnectionsMonitor: ObservableObject {
@@ -51,7 +63,7 @@ class ObservableConnectionsMonitor: ObservableObject {
 	private var watcher: Ktor_ioCloseable? = nil
 	
 	init() {
-		let monitor = PhoenixApplicationDelegate.get().business.connectionsMonitor
+		let monitor = AppDelegate.get().business.connectionsMonitor
 		connections = monitor.currentValue
 		
 		let swiftFlow = SwiftFlow<Connections>(origin: monitor.connections)
