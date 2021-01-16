@@ -328,7 +328,7 @@
   <!-- //////////////// init wallet //////////////// -->
   
    <string name="initwallet_terms"><![CDATA[
-    Ao prosseguir, você está concordando com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
+    Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
   ]]></string>
   <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
