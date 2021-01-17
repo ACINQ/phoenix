@@ -44,10 +44,18 @@ struct Popup<Content: View>: View {
 				.transition(.opacity)
 			}
 		}
-		.onReceive(Publishers.keyboardHeight) { kh in
+		.onReceive(Publishers.keyboardInfo) { keyboardInfo in
 			
-			withAnimation(.easeOut(duration: 0.3)) {
-				keyboardHeight = kh
+			var animation: Animation
+			switch keyboardInfo.animationCurve {
+				case .linear  : animation = Animation.linear(duration: keyboardInfo.animationDuration)
+				case .easeIn  : animation = Animation.easeIn(duration: keyboardInfo.animationDuration)
+				case .easeOut : animation = Animation.easeOut(duration: keyboardInfo.animationDuration)
+				default       : animation = Animation.easeInOut(duration: keyboardInfo.animationDuration)
+			}
+			
+			withAnimation(animation) {
+				keyboardHeight = keyboardInfo.height
 			}
 		}
 	}

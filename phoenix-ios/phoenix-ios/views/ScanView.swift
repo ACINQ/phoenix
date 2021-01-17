@@ -271,8 +271,22 @@ struct ValidateView: View {
 		
 		ZStack {
 		
+			Color.primaryBackground
+				.ignoresSafeArea(.all, edges: .all)
+			
 			Image("testnet_bg")
 				.resizable(resizingMode: .tile)
+				.ignoresSafeArea(.all, edges: .all)
+				.onTapGesture {
+					// dismiss keyboard (number pad) if visible
+					let keyWindow = UIApplication.shared.connectedScenes
+						.filter({ $0.activationState == .foregroundActive })
+						.map({ $0 as? UIWindowScene })
+						.compactMap({ $0 })
+						.first?.windows
+						.filter({ $0.isKeyWindow }).first
+					keyWindow?.endEditing(true)
+				}
 			
 			VStack {
 		
@@ -340,9 +354,6 @@ struct ValidateView: View {
 			} // </VStack>
 			
 		}// </ZStack>
-		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
-		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Validate payment", displayMode: .inline)
 		.zIndex(1) // [SendingView, ValidateView, ReadyView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
