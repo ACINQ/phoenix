@@ -38,6 +38,7 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitializationView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
+		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC18C418256FE22300A2D083 /* preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C417256FE22300A2D083 /* preferences.swift */; };
 		DC18C41D256FF91100A2D083 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* utils.swift */; };
 		DC1D2B4B2593EB860036AD38 /* CurrencyUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */; };
@@ -148,6 +149,7 @@
 		C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
+		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC18C417256FE22300A2D083 /* preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preferences.swift; sourceTree = "<group>"; };
 		DC18C41C256FF91100A2D083 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyUnit.swift; sourceTree = "<group>"; };
@@ -427,6 +429,7 @@
 				DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */,
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
 				DC72C32E25A51797008A927A /* UserDefaults+Codable.swift */,
+				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -674,6 +677,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */,
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
