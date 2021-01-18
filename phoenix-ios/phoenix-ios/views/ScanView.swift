@@ -254,6 +254,7 @@ struct ValidateView: View {
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
 	@Environment(\.colorScheme) var colorScheme
+	@Environment(\.popoverState) var popoverState: PopoverState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -265,10 +266,23 @@ struct ValidateView: View {
 		)
 	}
 	
+	func disconnectedText() -> String {
+		
+		if connectionsMonitor.connections.internet != Eclair_kmpConnection.established {
+			return NSLocalizedString("waiting for internet", comment: "button text")
+		}
+		if connectionsMonitor.connections.peer != Eclair_kmpConnection.established {
+			return NSLocalizedString("connecting to peer", comment: "button text")
+		}
+		if connectionsMonitor.connections.electrum != Eclair_kmpConnection.established {
+			return NSLocalizedString("connecting to electrum", comment: "button text")
+		}
+		return ""
+	}
+	
 	var body: some View {
 		
 		let isDisconnected = connectionsMonitor.connections.global != .established
-		
 		ZStack {
 		
 			Color.primaryBackground
@@ -351,6 +365,21 @@ struct ValidateView: View {
 				))
 				.disabled(isInvalidAmount || exceedsWalletCapacity || isDisconnected)
 			
+				if !isInvalidAmount && !exceedsWalletCapacity && isDisconnected {
+					
+					Button {
+						showConnectionsPopover()
+					} label: {
+						HStack {
+							ProgressView()
+								.progressViewStyle(CircularProgressViewStyle())
+								.padding(.trailing, 1)
+							Text(disconnectedText())
+						}
+					}
+					.padding(.top, 4)
+				}
+				
 			} // </VStack>
 			
 		}// </ZStack>
@@ -465,6 +494,7 @@ struct ValidateView: View {
 	}
 	
 	func sendPayment() -> Void {
+		log.trace("(ValidateView) sendPayment()")
 		
 		guard
 			let amt = try? parsedAmount.get(),
@@ -484,6 +514,15 @@ struct ValidateView: View {
 			
 			postIntent(Scan.IntentSend(request: model.request, amount: sat, unit: .satoshi))
 		}
+	}
+	
+	func showConnectionsPopover() -> Void {
+		log.trace("(ValidateView) showConnectionsPopover()")
+		
+		popoverState.dismissable.send(true)
+		popoverState.displayContent.send(
+			ConnectionsPopover().anyView
+		)
 	}
 }
 

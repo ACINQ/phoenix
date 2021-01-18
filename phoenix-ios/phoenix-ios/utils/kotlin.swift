@@ -73,6 +73,12 @@ class ObservableConnectionsMonitor: ObservableObject {
 		}
 	}
 	
+	#if DEBUG // For debugging UI: Force connection state
+	init(fakeConnections: Connections) {
+		self.connections = fakeConnections
+	}
+	#endif
+	
 	deinit {
 		watcher?.close()
 	}
