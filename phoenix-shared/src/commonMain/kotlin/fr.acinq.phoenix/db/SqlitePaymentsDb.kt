@@ -86,7 +86,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         }
     }
 
-    private val hopDescAdapter = object : ColumnAdapter<List<HopDesc>, String> {
+    private val hopDescAdapter: ColumnAdapter<List<HopDesc>, String> = object : ColumnAdapter<List<HopDesc>, String> {
         override fun decode(databaseValue: String): List<HopDesc> = databaseValue.split(";").map { hop ->
             val els = hop.split(":")
             val n1 = PublicKey(ByteVector(els[0]))

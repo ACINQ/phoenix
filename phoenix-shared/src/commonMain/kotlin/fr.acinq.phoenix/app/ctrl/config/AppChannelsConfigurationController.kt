@@ -3,9 +3,9 @@ package fr.acinq.phoenix.app.ctrl.config
 import fr.acinq.eclair.channel.ChannelState
 import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.channel.Normal
-import fr.acinq.eclair.io.ByteVector32KSerializer
+import fr.acinq.eclair.serialization.ByteVector32KSerializer
 import fr.acinq.eclair.io.Peer
-import fr.acinq.eclair.io.eclairSerializersModule
+import fr.acinq.eclair.serialization.Serialization.eclairSerializersModule
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
 import fr.acinq.phoenix.data.Chain
@@ -36,7 +36,11 @@ class AppChannelsConfigurationController(
             peer.channelsFlow.collect {
                 model(ChannelsConfiguration.Model(
                     peer.nodeParams.keyManager.nodeId.toString(),
-                    json.encodeToString(MapSerializer(ByteVector32KSerializer, ChannelState.serializer()), it),
+                    json.encodeToString(MapSerializer(
+                        ByteVector32KSerializer,
+                        fr.acinq.eclair.serialization.v1.ChannelState.serializer()
+                    ),
+                    it.mapValues { m ->  fr.acinq.eclair.serialization.v1.ChannelState.import(m.value) } ),
                     it.map { (id, state) ->
                         ChannelsConfiguration.Model.Channel(
                             id.toHex(),
@@ -46,7 +50,10 @@ class AppChannelsConfigurationController(
                                 it.toLocal.truncateToSatoshi()
                                     .toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong()
                             },
-                            json.encodeToString(ChannelState.serializer(), state),
+                            json.encodeToString(
+                                fr.acinq.eclair.serialization.v1.ChannelState.serializer(),
+                                fr.acinq.eclair.serialization.v1.ChannelState.import(state)
+                            ),
                             if (state is ChannelStateWithCommitments) {
                                 val prefix = when (chain) {
                                     Chain.MAINNET -> ""

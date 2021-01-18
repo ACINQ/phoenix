@@ -34,7 +34,7 @@ import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.msat
 import fr.acinq.eclair.utils.toByteVector32
 import fr.acinq.eclair.wire.TemporaryNodeFailure
-import runTest
+import fr.acinq.phoenix.runTest
 import kotlin.test.*
 
 class SqlitePaymentsDatabaseTest {

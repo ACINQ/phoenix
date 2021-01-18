@@ -19,19 +19,21 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.CltvExpiry
+import fr.acinq.eclair.NodeParams
 import fr.acinq.eclair.channel.ChannelStateWithCommitments
 import fr.acinq.eclair.db.ChannelsDb
+import fr.acinq.eclair.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
+internal class SqliteChannelsDb(private val driver: SqlDriver, private val nodeParams: NodeParams) : ChannelsDb {
 
     private val database = ChannelsDatabase(driver)
     private val queries = database.channelsDatabaseQueries
 
     override suspend fun addOrUpdateChannel(state: ChannelStateWithCommitments) {
         val channelId = state.channelId.toByteArray()
-        val data = ChannelStateWithCommitments.serialize(state)
+        val data = Serialization.serialize(state)
         withContext(Dispatchers.Default) {
             queries.transaction {
                 queries.getChannel(channelId).executeAsOneOrNull()?.run {
@@ -54,7 +56,7 @@ internal class SqliteChannelsDb(private val driver: SqlDriver) : ChannelsDb {
         val bytes = withContext(Dispatchers.Default) {
             queries.listLocalChannels().executeAsList()
         }
-        return bytes.map { ChannelStateWithCommitments.deserialize(it) }
+        return bytes.map { Serialization.deserialize(it, nodeParams) }
     }
 
     override suspend fun addHtlcInfo(channelId: ByteVector32, commitmentNumber: Long, paymentHash: ByteVector32, cltvExpiry: CltvExpiry) {

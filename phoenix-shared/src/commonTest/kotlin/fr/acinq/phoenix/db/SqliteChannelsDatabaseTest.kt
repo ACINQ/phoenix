@@ -21,6 +21,7 @@ import fr.acinq.phoenix.TestConstants.channel2
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.CltvExpiry
+import fr.acinq.phoenix.TestConstants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -28,7 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFails
 
 class SqliteChannelsDatabaseTest {
-    private val db = SqliteChannelsDb(testDriver())
+    private val db = SqliteChannelsDb(testDriver(), TestConstants.nodeParams)
 
     @ExperimentalCoroutinesApi
     @Test

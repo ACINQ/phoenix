@@ -159,7 +159,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     }
     private val dbFactory by lazy { DB.factory.inDir(getApplicationFilesDirectoryPath(ctx)) }
     private val appDB by lazy { dbFactory.open("application", KotlinxSerializer()) }
-    private val channelsDb by lazy { SqliteChannelsDb(createChannelsDbDriver(ctx)) }
+    private val channelsDb by lazy { SqliteChannelsDb(createChannelsDbDriver(ctx), peer.nodeParams) }
     private val paymentsDb by lazy { SqlitePaymentsDb(createPaymentsDbDriver(ctx)) }
 
     // TestNet
