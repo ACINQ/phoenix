@@ -155,18 +155,20 @@ struct ContentView: View {
 		
 		// Upgrade check(s)
 		//
-		// v1.7.3
+		// v0.7.3 (build 4)
 		// - serialization change for Channels
 		// - attempting to deserialize old version causes crash
 		// - we decided to delete old channels database (due to low number of test users)
 		
 		let key = "lastVersionCheck"
-		let str = UserDefaults.standard.string(forKey: key) ?? "1.7.2"
+		let str = UserDefaults.standard.string(forKey: key) ?? "3"
 		
-		if str.isVersion(lessThan: "1.7.3") {
+		if str.isVersion(lessThan: "4") {
 		
 			migrateChannelsDbFiles()
-			UserDefaults.standard.set("1.7.3", forKey: key)
+			
+			let version = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "4"
+			UserDefaults.standard.set(version, forKey: key)
 		}
 	}
 	
