@@ -6,8 +6,9 @@ FROM (
         id AS outgoing_payment_id,
         payment_hash,
         payment.preimage,
-        SUM(CASE parts.preimage
-             WHEN NULL THEN 0
+
+        SUM(CASE
+             WHEN parts.preimage IS NULL THEN 0
              ELSE parts.amount_msat
         END) AS parts_amount,
         payment.recipient_amount_msat AS amount,

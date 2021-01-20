@@ -292,7 +292,7 @@ class SqlitePaymentsDatabaseTest {
         val outgoing3Parts = listOf(
             OutgoingPayment.Part(UUID.randomUUID(), 60_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
             OutgoingPayment.Part(UUID.randomUUID(), 45_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-            OutgoingPayment.Part(UUID.randomUUID(), 15_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(43))), OutgoingPayment.Part.Status.Pending, 100)
+            OutgoingPayment.Part(UUID.randomUUID(), 17_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(43))), OutgoingPayment.Part.Status.Pending, 100)
         )
         val outgoing3 =
             OutgoingPayment(UUID.randomUUID(), 60_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.SwapOut("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", Eclair.randomBytes32()), outgoing3Parts, OutgoingPayment.Status.Pending)
@@ -347,11 +347,13 @@ class SqlitePaymentsDatabaseTest {
         // outgoing4 and incoming3 are still pending.
         val last10 = db.listPayments(count = 10, skip = 0)
         assertEquals(8, last10.size)
-        assertEquals(outgoing4, last10[0])
+        assertEquals(outgoing4.id, (last10[0] as OutgoingPayment).id)
+        assertEquals(0.msat, (last10[0] as OutgoingPayment).recipientAmount) // this payment is still pending!
         assertEquals(expectedOutgoing5!!.id, (last10[1] as OutgoingPayment).id)
         assertEquals(55_000.msat, (last10[1] as OutgoingPayment).recipientAmount)
         assertEquals(expectedIncoming4.paymentHash, (last10[2] as IncomingPayment).paymentHash)
         assertEquals(expectedOutgoing3.id, (last10[3] as OutgoingPayment).id)
+        assertEquals(62_000.msat, (last10[3] as OutgoingPayment).recipientAmount)
         assertEquals(expectedOutgoing2.id, (last10[4] as OutgoingPayment).id)
         assertEquals(expectedIncoming2.paymentHash, (last10[5] as IncomingPayment).paymentHash)
         assertEquals(expectedOutgoing1.id, (last10[6] as OutgoingPayment).id)
