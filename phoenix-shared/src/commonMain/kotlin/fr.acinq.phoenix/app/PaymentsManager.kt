@@ -106,3 +106,11 @@ fun WalletPayment.status(): WalletPaymentStatus = when (this) {
 }
 
 fun WalletPayment.timestamp(): Long = WalletPayment.completedAt(this)
+
+fun WalletPayment.errorMessage(): String? = when (this) {
+    is OutgoingPayment -> when (val s = status) {
+        is OutgoingPayment.Status.Failed -> s.reason.toString()
+        else -> null
+    }
+    is IncomingPayment -> null
+}

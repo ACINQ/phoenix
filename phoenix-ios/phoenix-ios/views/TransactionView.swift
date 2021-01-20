@@ -103,22 +103,42 @@ struct PaymentView : View {
 							.frame(height: 4)
 					}
 				)
-				
-				HStack(alignment: .top) {
-					let desc = payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text")
-					
-					Text("Desc")
-						.foregroundColor(.secondary)
-					Text(desc)
-						.contextMenu {
-							Button(action: {
-								UIPasteboard.general.string = desc
-							}) {
-								Text("Copy")
-							}
-						}
+
+                VStack(alignment: .leading){
+                    HStack(alignment: .top) {
+                        let desc = payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text")
+
+                        Text("Desc")
+                            .foregroundColor(.secondary)
+                        Text(desc)
+                            .contextMenu {
+                                Button(action: {
+                                    UIPasteboard.general.string = desc
+                                }) {
+                                    Text("Copy")
+                                }
+                            }
+                    }
+                    .padding([.leading, .trailing])
+
+                    let errorMessage = payment.errorMessage()
+                    if errorMessage != nil {
+                        HStack(alignment: .top) {
+                            Text("Error")
+                                .foregroundColor(.secondary)
+                            Text(errorMessage!)
+                                .contextMenu {
+                                    Button(action: {
+                                        UIPasteboard.general.string = errorMessage
+                                    }) {
+                                        Text("Copy")
+                                    }
+                                }
+                        }
+                        .padding(.top, 10)
+                        .padding([.leading, .trailing])
+                    }
 				}
-				.padding(.top, 40)
 				.padding([.leading, .trailing])
 			}
 		}
