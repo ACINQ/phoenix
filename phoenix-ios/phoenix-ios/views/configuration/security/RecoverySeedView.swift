@@ -214,7 +214,7 @@ struct RecoverySeedReveal: View {
 			Spacer()
 			Spacer()
 			
-			Text("BIP39 seed with standard BIP85 derivation path")
+			Text("BIP39 seed with standard BIP84 derivation path")
 				.font(.footnote)
 				.foregroundColor(.secondary)
 			

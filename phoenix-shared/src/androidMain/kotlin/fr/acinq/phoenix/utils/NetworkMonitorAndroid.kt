@@ -22,6 +22,6 @@ actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, ctx
         logger.error { "Not yet implemented!" }
     }
 
-    actual val networkState: StateFlow<Connection>
+    actual val networkState: StateFlow<NetworkState>
         get() = TODO("Not yet implemented")
 }

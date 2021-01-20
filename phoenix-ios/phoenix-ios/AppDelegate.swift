@@ -223,20 +223,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		totalTimer = Timer.scheduledTimer(withTimeInterval: 15.0, repeats: false, block: Finish)
 		
 		var isCurrentValue = true
-		let flow = SwiftFlow<Transaction>(origin: business.incomingTransactionFlow())
-		watcher = flow.watch { (transaction: Transaction?) in
+		let flow = SwiftFlow<Eclair_kmpWalletPayment>(origin: business.incomingPaymentFlow())
+		watcher = flow.watch { (payment: Eclair_kmpWalletPayment?) in
 			assertMainThread()
 			if isCurrentValue {
 				isCurrentValue = false
 				return // from block
 			}
-			if let transaction = transaction {
+			if let payment = payment {
 				log.info("Background fetch: Payment received !")
 				
 				didReceivePayment = true
 				postPaymentTimer?.invalidate()
 				postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
-				self.displayLocalNotification(transaction)
+				self.displayLocalNotification(payment)
 			}
 		}
 	}
@@ -271,22 +271,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 	}
 	
-	func displayLocalNotification(_ transaction: Transaction) {
+	func displayLocalNotification(_ payment: Eclair_kmpWalletPayment) {
 		
 		let handler = {(settings: UNNotificationSettings) -> Void in
 			
-			// We are having problems interacting with the Transaction instance outside the main thread.
+			// We are having problems interacting with the payment instance outside the main thread.
 			
 			guard settings.authorizationStatus == .authorized else {
 				return
 			}
 			
 			let currencyPrefs = CurrencyPrefs()
-			let formattedAmt = Utils.format(currencyPrefs, msat: transaction.amountMsat)
+			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amountMsat())
 
 			var body: String
-			if transaction.desc.count > 0 {
-				body = "\(formattedAmt.string): \(transaction.desc)"
+			if payment.desc() != nil {
+				body = "\(formattedAmt.string): \(payment.desc())"
 			} else {
 				body = formattedAmt.string
 			}
@@ -303,7 +303,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			content.badge = NSNumber(value: self.badgeCount)
 			
 			let request = UNNotificationRequest(
-				identifier: transaction.id,
+				identifier: payment.id(),
 				content: content,
 				trigger: nil
 			)

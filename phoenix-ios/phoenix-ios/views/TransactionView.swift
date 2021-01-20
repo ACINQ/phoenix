@@ -1,9 +1,9 @@
 import SwiftUI
 import PhoenixShared
 
-struct TransactionView : View {
+struct PaymentView : View {
 
-	let transaction: PhoenixShared.Transaction
+	let payment: PhoenixShared.Eclair_kmpWalletPayment
 	let close: () -> Void
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -27,7 +27,7 @@ struct TransactionView : View {
 			}
 
 			VStack {
-				switch (transaction.status) {
+				switch (payment.status()) {
 				case .success:
 				//	Image(vector: "ic_payment_success_static") // looks pixelated
 					Image(systemName: "checkmark.circle")
@@ -37,10 +37,10 @@ struct TransactionView : View {
 						.frame(width: 100, height: 100)
 						.foregroundColor(.appGreen)
 					VStack {
-						Text(transaction.amountMsat < 0 ? "SENT" : "RECEIVED")
+						Text(payment.amountMsat() < 0 ? "SENT" : "RECEIVED")
 							.font(Font.title2.bold())
 							.padding(.bottom, 2)
-						Text(transaction.timestamp.formatDateMS())
+						Text(payment.timestamp().formatDateMS())
 							.font(.subheadline)
 							.foregroundColor(.secondary)
 					}
@@ -72,7 +72,7 @@ struct TransactionView : View {
 							.font(Font.title2.uppercaseSmallCaps())
 							.padding(.bottom, 6)
 						
-						Text(transaction.timestamp.formatDateMS())
+						Text(payment.timestamp().formatDateMS())
 							.font(Font.subheadline)
 							.foregroundColor(.secondary)
 						
@@ -84,7 +84,7 @@ struct TransactionView : View {
 				}
 
 				HStack(alignment: .bottom) {
-					let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat, hideMsats: false)
+					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat(), hideMsats: false)
 					
 					Text(amount.digits)
 						.font(.largeTitle)
@@ -105,9 +105,7 @@ struct TransactionView : View {
 				)
 				
 				HStack(alignment: .top) {
-					let desc = (transaction.desc.count > 0)
-						? transaction.desc
-						: NSLocalizedString("No description", comment: "placeholder text")
+					let desc = payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text")
 					
 					Text("Desc")
 						.foregroundColor(.secondary)
@@ -132,29 +130,29 @@ struct TransactionView : View {
 	}
 }
 
-class TransactionView_Previews : PreviewProvider {
+//class PaymentView_Previews : PreviewProvider {
 	
-    static var previews: some View {
-		TransactionView(transaction: mockPendingTransaction, close: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-		
-		TransactionView(transaction: mockSpendTransaction, close: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-		
-		TransactionView(transaction: mockSpendFailedTransaction, close: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-		
-		TransactionView(transaction: mockReceiveTransaction, close: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-	}
-
-	#if DEBUG
-	@objc class func injected() {
-		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-	}
-	#endif
-}
+//    static var previews: some View {
+//        PaymentView(payment: PhoenixShared.Mock.outgoingPending(), close: {})
+//			.preferredColorScheme(.dark)
+//			.environmentObject(CurrencyPrefs.mockEUR())
+//
+//        PaymentView(payment: PhoenixShared.Mock.outgoingSuccessful(), close: {})
+//			.preferredColorScheme(.dark)
+//			.environmentObject(CurrencyPrefs.mockEUR())
+//
+//        PaymentView(payment: PhoenixShared.Mock.outgoingFailed(), close: {})
+//			.preferredColorScheme(.dark)
+//			.environmentObject(CurrencyPrefs.mockEUR())
+//
+//        PaymentView(payment: PhoenixShared.Mock.incomingPaymentReceived(), close: {})
+//			.preferredColorScheme(.dark)
+//			.environmentObject(CurrencyPrefs.mockEUR())
+//	}
+//
+//	#if DEBUG
+//	@objc class func injected() {
+//		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
+//	}
+//	#endif
+//}

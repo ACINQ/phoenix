@@ -14,10 +14,10 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct HomeView : View {
 
-    @State var lastTransaction: PhoenixShared.Transaction? = nil
+    @State var lastPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
     @State var showConnections = false
 
-    @State var selectedTransaction: PhoenixShared.Transaction? = nil
+    @State var selectedPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
@@ -25,9 +25,9 @@ struct HomeView : View {
         MVIView({ $0.home() },
 			background: true,
 			onModel: { change in
-				if lastTransaction != change.newModel.lastTransaction {
-					lastTransaction = change.newModel.lastTransaction
-					selectedTransaction = lastTransaction
+				if lastPayment != change.newModel.lastPayment {
+                    lastPayment = change.newModel.lastPayment
+					selectedPayment = lastPayment
 				}
 			}
         ) { model, postIntent in
@@ -73,23 +73,23 @@ struct HomeView : View {
 					
 				} // </HStack>
 
-				// === Transaction List ====
+				// === Payments List ====
 				ScrollView {
 					LazyVStack {
-						ForEach(model.history.indices, id: \.self) { index in
+						ForEach(model.payments.indices, id: \.self) { index in
 							Button {
-								selectedTransaction = model.history[index]
+								selectedPayment = model.payments[index]
 							} label: {
-								TransactionCell(transaction: model.history[index])
+								PaymentCell(payment: model.payments[index])
 							}
 						}
 					}
-					.sheet(isPresented: .constant(selectedTransaction != nil)) {
-						selectedTransaction = nil
+					.sheet(isPresented: .constant(selectedPayment != nil)) {
+						selectedPayment = nil
 					} content: {
-						TransactionView(
-							transaction: selectedTransaction!,
-							close: { selectedTransaction = nil }
+						PaymentView(
+							payment: selectedPayment!,
+							close: { selectedPayment = nil }
 						)
 					}
 				}
@@ -111,15 +111,15 @@ struct HomeView : View {
 	}
 }
 
-struct TransactionCell : View {
+struct PaymentCell : View {
 
-	let transaction: PhoenixShared.Transaction
+	let payment: PhoenixShared.Eclair_kmpWalletPayment
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
 	var body: some View {
 		HStack {
-			switch (transaction.status) {
+			switch (payment.status()) {
 			case .success:
 				Image("payment_holder_def_success")
 					.padding(4)
@@ -137,22 +137,22 @@ struct TransactionCell : View {
 			}
 			
 			VStack(alignment: .leading) {
-				Text(transaction.desc)
+                Text(payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text"))
 					.lineLimit(1)
 					.truncationMode(.tail)
 					.foregroundColor(.primaryForeground)
-				Text(transaction.timestamp.formatDateMS())
+				Text(payment.timestamp().formatDateMS())
 					.font(.caption)
 					.foregroundColor(.secondary)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
 			
-			if transaction.status != .failure {
+			if payment.status() != .failure {
 				HStack(spacing: 0) {
 					
-					let amount = Utils.format(currencyPrefs, msat: transaction.amountMsat)
-					let isNegative = transaction.amountMsat < 0
+					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
+					let isNegative = payment.amountMsat() < 0
 					
 					Text(isNegative ? "" : "+")
 						.foregroundColor(isNegative ? .appRed : .appGreen)
@@ -331,13 +331,9 @@ class HomeView_Previews: PreviewProvider {
 	
 	static let mockModel = Home.Model(
 		balanceSat: 123500,
-		history: [
-			mockSpendFailedTransaction,
-			mockReceiveTransaction,
-			mockSpendTransaction,
-			mockPendingTransaction
+		payments: [
 		],
-		lastTransaction: nil
+		lastPayment: nil
 	)
 
 	static var previews: some View {

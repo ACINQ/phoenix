@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.eclair.utils.Connection
-import fr.acinq.phoenix.data.Transaction
-import fr.acinq.phoenix.utils.Connections
+import fr.acinq.eclair.db.WalletPayment
 
 
 typealias HomeController = MVI.Controller<Home.Model, Home.Intent>
@@ -11,10 +9,9 @@ object Home {
 
     data class Model(
         val balanceSat: Long,
-        val history: List<Transaction>,
-        val lastTransaction: Transaction?
-    ) : MVI.Model() {
-    }
+        val payments: List<WalletPayment>,
+        val lastPayment: WalletPayment?
+    ) : MVI.Model()
 
     val emptyModel = Model(0, emptyList(), null)
 
