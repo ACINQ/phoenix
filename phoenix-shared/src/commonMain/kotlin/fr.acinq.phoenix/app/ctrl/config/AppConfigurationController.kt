@@ -13,7 +13,7 @@ class AppConfigurationController(loggerFactory: LoggerFactory, private val walle
     init {
         launch {
             model(
-                if (walletManager.wallet == null)
+                if (walletManager.wallet.value == null)
                     Configuration.Model.SimpleMode
                 else
                     Configuration.Model.FullMode

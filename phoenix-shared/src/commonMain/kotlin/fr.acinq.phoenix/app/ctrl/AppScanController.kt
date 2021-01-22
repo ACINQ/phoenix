@@ -6,10 +6,10 @@ import fr.acinq.eclair.Feature
 import fr.acinq.eclair.Features
 import fr.acinq.eclair.channel.ChannelState
 import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.SendPayment
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.UUID
+import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Scan
 import fr.acinq.phoenix.data.toMilliSatoshi
 import fr.acinq.phoenix.utils.localCommitmentSpec
@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
-class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : AppController<Scan.Model, Scan.Intent>(loggerFactory, Scan.Model.Ready) {
+class AppScanController(loggerFactory: LoggerFactory, private val peerManager: PeerManager) : AppController<Scan.Model, Scan.Intent>(loggerFactory, Scan.Model.Ready) {
 
     init {
         launch {
-            peer.channelsFlow.collect { channels ->
+            peerManager.getPeer().channelsFlow.collect { channels ->
                 val balanceMsat = balanceMsat(channels)
                 model {
                     if (this is Scan.Model.Validate) {
@@ -65,7 +65,7 @@ class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : 
                         val paymentAmount = intent.amount.toMilliSatoshi(intent.unit)
                         val paymentId = UUID.randomUUID()
 
-                        peer.send(SendPayment(paymentId, paymentAmount, it.nodeId, OutgoingPayment.Details.Normal(it)))
+                        peerManager.getPeer().send(SendPayment(paymentId, paymentAmount, it.nodeId, OutgoingPayment.Details.Normal(it)))
 
                         model(Scan.Model.Sending)
                     }
@@ -84,7 +84,7 @@ class AppScanController(loggerFactory: LoggerFactory, private val peer: Peer) : 
     }
 
     private suspend fun validatePaymentRequest(request: String, paymentRequest: PaymentRequest) {
-        val balanceMsat = balanceMsat(peer.channels)
+        val balanceMsat = balanceMsat(peerManager.getPeer().channels)
         model(
             Scan.Model.Validate(
                 request = request,

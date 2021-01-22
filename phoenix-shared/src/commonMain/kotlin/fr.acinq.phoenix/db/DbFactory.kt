@@ -22,3 +22,5 @@ import fr.acinq.phoenix.utils.PlatformContext
 expect fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver
 
 expect fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver
+
+expect fun createAppDbDriver(ctx: PlatformContext): SqlDriver

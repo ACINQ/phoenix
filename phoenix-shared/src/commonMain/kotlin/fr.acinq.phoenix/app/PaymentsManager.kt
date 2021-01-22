@@ -21,7 +21,7 @@ import org.kodein.log.newLogger
 class PaymentsManager(
     loggerFactory: LoggerFactory,
     private val paymentsDb: PaymentsDb,
-    private val peer: Peer
+    private val peerManager: PeerManager
 ) : CoroutineScope by MainScope() {
     private val logger = newLogger(loggerFactory)
 
@@ -49,7 +49,7 @@ class PaymentsManager(
     init {
         launch {
             payments.value = listPayments() to null
-            peer.openListenerEventSubscription().consumeEach { event ->
+            peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
                 when (event) {
                     is PaymentReceived, is PaymentSent, is PaymentNotSent, is PaymentProgress -> {
                         logger.debug { "refreshing payment history with event=$event" }

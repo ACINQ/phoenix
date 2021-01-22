@@ -3,8 +3,8 @@ package fr.acinq.phoenix.app.ctrl.config
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.io.WrappedChannelEvent
+import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.Utilities
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.CloseChannelsConfiguration
@@ -15,7 +15,7 @@ import org.kodein.log.LoggerFactory
 
 class AppCloseChannelsConfigurationController(
     loggerFactory: LoggerFactory,
-    private val peer: Peer,
+    private val peerManager: PeerManager,
     private val util: Utilities
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory,
@@ -25,7 +25,7 @@ class AppCloseChannelsConfigurationController(
 
     init {
         launch {
-            peer.channelsFlow.collect { channels ->
+            peerManager.getPeer().channelsFlow.collect { channels ->
                 if (!isClosing) {
                     val filteredChannels = filteredChannels(channels)
                     val sats = totalSats(filteredChannels)
@@ -68,13 +68,13 @@ class AppCloseChannelsConfigurationController(
                 }
                 launch {
                     isClosing = true
-                    val filteredChannels = filteredChannels(peer.channels)
+                    val filteredChannels = filteredChannels(peerManager.getPeer().channels)
                     val sats = totalSats(filteredChannels)
                     filteredChannels.keys.forEach { channelId ->
                         val command = CMD_CLOSE(scriptPubKey = ByteVector(scriptPubKey))
                         val channelEvent = ChannelEvent.ExecuteCommand(command)
                         val peerEvent = WrappedChannelEvent(channelId, channelEvent)
-                        peer.send(peerEvent)
+                        peerManager.getPeer().send(peerEvent)
                     }
                     model(CloseChannelsConfiguration.Model.ChannelsClosed(filteredChannels.size, sats))
                 }

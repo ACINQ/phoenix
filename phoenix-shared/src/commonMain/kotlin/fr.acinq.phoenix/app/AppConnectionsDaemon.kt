@@ -1,16 +1,17 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.data.ElectrumServer
 import fr.acinq.phoenix.data.address
 import fr.acinq.phoenix.data.asServerAddress
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.NetworkState
+import fr.acinq.phoenix.utils.RETRY_DELAY
+import fr.acinq.phoenix.utils.increaseDelay
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
@@ -24,20 +25,19 @@ import kotlin.time.seconds
 class AppConnectionsDaemon(
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
+    private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
     private val monitor: NetworkMonitor,
     private val electrumClient: ElectrumClient,
     loggerFactory: LoggerFactory,
-    private val getPeer: () -> Peer // peer is lazy as it may not exist yet.
 ) : CoroutineScope by MainScope() {
 
     private val logger = newLogger(loggerFactory)
 
     private var peerConnectionJob :Job? = null
     private var electrumConnectionJob: Job? = null
-    private var networkMonitorJob: Job? = null
 
-    private var networkStatus = NetworkState.NotAvailable
+    private var networkStatus = MutableStateFlow(NetworkState.NotAvailable)
 
     private data class TrafficControl(
         val networkIsAvailable: Boolean = false,
@@ -72,21 +72,26 @@ class AppConnectionsDaemon(
     private val electrumControlFlow = MutableStateFlow(TrafficControl())
     private val electrumControlChanges = Channel<TrafficControl.() -> TrafficControl>()
 
+    private val httpApiControlFlow = MutableStateFlow(TrafficControl())
+    private val httpApiControlChanges = Channel<TrafficControl.() -> TrafficControl>()
+
     init {
-        launch {
-            peerControlChanges.consumeEach { change ->
-                val newState = peerControlFlow.value.change()
-                logger.debug { "peerControlFlow = $newState" }
-                peerControlFlow.value = newState
+        fun enableControlFlow(
+            label: String,
+            controlFlow: MutableStateFlow<TrafficControl>,
+            controlChanges: ReceiveChannel<TrafficControl.() -> TrafficControl>
+        ) = launch {
+            controlChanges.consumeEach { change ->
+                val newState = controlFlow.value.change()
+                logger.debug { "$label = $newState" }
+                controlFlow.value = newState
             }
         }
-        launch {
-            electrumControlChanges.consumeEach { change ->
-                val newState = electrumControlFlow.value.change()
-                logger.debug { "electrumControlFlow = $newState" }
-                electrumControlFlow.value = newState
-            }
-        }
+
+        enableControlFlow("peerControlFlow", peerControlFlow, peerControlChanges)
+        enableControlFlow("electrumControlFlow", electrumControlFlow, electrumControlChanges)
+        enableControlFlow("httpApiControlFlow", httpApiControlFlow, httpApiControlChanges)
+
         // Electrum
         launch {
             electrumControlFlow.collect {
@@ -127,25 +132,69 @@ class AppConnectionsDaemon(
         // Peer
         launch {
             peerControlFlow.collect {
+                val peer = peerManager.getPeer()
                 when {
                     it.networkIsAvailable && it.disconnectCount == 0 -> {
-                        peerConnectionJob = connectionLoop("Peer", getPeer().connectionState) {
-                            getPeer().connect()
+                        peerConnectionJob = connectionLoop("Peer", peer.connectionState) {
+                            peer.connect()
                         }
                     }
                     else -> {
                         peerConnectionJob?.let {
                             it.cancel()
-                            getPeer().disconnect()
+                            peer.disconnect()
                         }
                     }
                 }
             }
         }
-        // Internet connection
+        // HTTP APIs
         launch {
-            walletManager.walletState.filter { it != null }.collect {
-                if (networkMonitorJob == null) networkMonitorJob = networkStateMonitoring()
+            httpApiControlFlow.collect {
+                when {
+                    it.networkIsAvailable && it.disconnectCount == 0 -> {
+                        configurationManager.startWalletParamsLoop()
+                        currencyManager.start()
+                    }
+                    else -> {
+                        configurationManager.stopWalletParamsLoop()
+                        currencyManager.stop()
+                    }
+                }
+            }
+        }
+        // Internet connection monitor
+        launch {
+            monitor.start()
+            monitor.networkState.filter { it != networkStatus.value }.collect {
+                logger.info { "New internet status: $it" }
+                networkStatus.value = it
+            }
+        }
+        // Internet dependent flows - related to the app configuration
+        launch {
+            networkStatus.collect {
+                when(it) {
+                    NetworkState.Available -> httpApiControlChanges.send { copy(networkIsAvailable = true) }
+                    NetworkState.NotAvailable -> httpApiControlChanges.send { copy(networkIsAvailable = false) }
+                }
+            }
+        }
+        // Internet dependent flows - related to the Wallet
+        launch {
+            // Suspends until the wallet is initialized
+            walletManager.wallet.filterNotNull().first()
+            networkStatus.collect {
+                when (it) {
+                    NetworkState.Available -> {
+                        peerControlChanges.send { copy(networkIsAvailable = true) }
+                        electrumControlChanges.send { copy(networkIsAvailable = true) }
+                    }
+                    NetworkState.NotAvailable -> {
+                        peerControlChanges.send { copy(networkIsAvailable = false) }
+                        electrumControlChanges.send { copy(networkIsAvailable = false) }
+                    }
+                }
             }
         }
     }
@@ -154,6 +203,7 @@ class AppConnectionsDaemon(
         launch {
             peerControlChanges.send { incrementDisconnectCount() }
             electrumControlChanges.send { incrementDisconnectCount() }
+            httpApiControlChanges.send { incrementDisconnectCount() }
         }
     }
 
@@ -161,32 +211,12 @@ class AppConnectionsDaemon(
         launch {
             peerControlChanges.send { decrementDisconnectCount() }
             electrumControlChanges.send { decrementDisconnectCount() }
-        }
-    }
-
-    private fun networkStateMonitoring() = launch {
-        monitor.start()
-        monitor.networkState.filter { it != networkStatus }.collect {
-            logger.info { "New internet status: $it" }
-
-            networkStatus = it
-            when(it) {
-                NetworkState.Available -> {
-                    peerControlChanges.send { copy(networkIsAvailable = true) }
-                    electrumControlChanges.send { copy(networkIsAvailable = true) }
-                    currencyManager.start()
-                }
-                NetworkState.NotAvailable -> {
-                    peerControlChanges.send { copy(networkIsAvailable = false) }
-                    electrumControlChanges.send { copy(networkIsAvailable = false) }
-                    currencyManager.stop()
-                }
-            }
+            httpApiControlChanges.send { decrementDisconnectCount() }
         }
     }
 
     private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
-        var retryDelay = 0.5.seconds
+        var retryDelay = RETRY_DELAY
         statusStateFlow.collect {
             logger.debug { "New $name status $it" }
 
@@ -195,13 +225,8 @@ class AppConnectionsDaemon(
                 delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                retryDelay = 0.5.seconds
+                retryDelay = RETRY_DELAY
             }
         }
     }
-
-    private fun increaseDelay(retryDelay: Duration) = when (val delay = retryDelay.inSeconds) {
-        8.0 -> delay
-        else -> delay * 2.0
-    }.seconds
 }

@@ -60,19 +60,22 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("fr.acinq.eclair:eclair-kmp:1.0-beta2")
+                api("fr.acinq.eclair:eclair-kmp:snapshot")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 api("org.kodein.db:kodein-db:$kodeinDBVersion")
                 api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")
                 api("org.kodein.memory:kodein-memory-files:0.4.0")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                    version { strictly(coroutinesVersion) }
+                }
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
                 api("io.ktor:ktor-client-core:$ktorVersion")
                 api("io.ktor:ktor-client-json:$ktorVersion")
                 api("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("com.squareup.sqldelight:runtime:$sqldelightVersion")
+                implementation("com.squareup.sqldelight:coroutines-extensions:$sqldelightVersion")
             }
         }
 
@@ -139,6 +142,10 @@ sqldelight {
     database("PaymentsDatabase") {
         packageName = "fr.acinq.phoenix.db"
         sourceFolders = listOf("paymentsdb")
+    }
+    database("AppDatabase") {
+        packageName = "fr.acinq.phoenix.db"
+        sourceFolders = listOf("appdb")
     }
 }
 

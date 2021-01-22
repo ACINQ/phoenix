@@ -4,8 +4,8 @@ import fr.acinq.eclair.channel.Aborted
 import fr.acinq.eclair.channel.Closed
 import fr.acinq.eclair.channel.Closing
 import fr.acinq.eclair.channel.ErrorInformationLeak
-import fr.acinq.eclair.io.Peer
 import fr.acinq.phoenix.app.PaymentsManager
+import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,13 +18,13 @@ import org.kodein.log.LoggerFactory
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppHomeController(
     loggerFactory: LoggerFactory,
-    private val peer: Peer,
+    private val peerManager: PeerManager,
     private val paymentsManager: PaymentsManager
 ) : AppController<Home.Model, Home.Intent>(loggerFactory, Home.emptyModel) {
 
     init {
         launch {
-            peer.channelsFlow.collect { channels ->
+            peerManager.getPeer().channelsFlow.collect { channels ->
                 model {
                     copy(balanceSat = channels.values.sumOf {
                         when (it) {
@@ -41,7 +41,7 @@ class AppHomeController(
 
         launch {
             paymentsManager.subscribeToPayments()
-                .collectIndexed { index, pair ->
+                .collectIndexed { _, pair ->
                     model {
                         copy(payments = pair.first, lastPayment = pair.second)
                     }

@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.utils
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.io.Peer
 import fr.acinq.eclair.utils.Connection
+import fr.acinq.phoenix.app.PeerManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +19,8 @@ data class Connections(
         get() = internet + peer + electrum
 }
 
-@ExperimentalCoroutinesApi
-class ConnectionsMonitor(peer: Peer, electrumClient: ElectrumClient, networkMonitor: NetworkMonitor): CoroutineScope {
+@OptIn(ExperimentalCoroutinesApi::class)
+class ConnectionsMonitor(peerManager: PeerManager, electrumClient: ElectrumClient, networkMonitor: NetworkMonitor): CoroutineScope {
 
     private val job = Job()
     override val coroutineContext = MainScope().coroutineContext + job
@@ -31,7 +31,7 @@ class ConnectionsMonitor(peer: Peer, electrumClient: ElectrumClient, networkMoni
     init {
         launch {
             combine(
-                peer.connectionState,
+                peerManager.getPeer().connectionState,
                 electrumClient.connectionState,
                 networkMonitor.networkState
             ) { peerState, electrumState, internetState ->

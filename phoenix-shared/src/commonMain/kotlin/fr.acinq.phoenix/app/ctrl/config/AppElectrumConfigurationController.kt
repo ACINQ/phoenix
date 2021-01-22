@@ -63,7 +63,7 @@ class AppElectrumConfigurationController(loggerFactory: LoggerFactory, private v
 
     private fun sendElectrumConfigurationModel(error: Error? = null) {
         launch {
-            val wallet = walletManager.wallet
+            val wallet = walletManager.wallet.value
 
             model(
                 if (wallet == null) {
