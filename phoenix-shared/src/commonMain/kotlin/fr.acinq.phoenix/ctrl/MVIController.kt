@@ -7,7 +7,9 @@ object MVI {
         override fun toString() = this::class.simpleName ?: super.toString()
     }
 
-    abstract class Model : Data()
+    abstract class Model : Data() {
+        override fun toString() = super.toString().lines().joinToString(" ") { it.trim() }.take(100)
+    }
     abstract class Intent : Data()
 
     abstract class Controller<M : Model, I : Intent>(val firstModel: M) {

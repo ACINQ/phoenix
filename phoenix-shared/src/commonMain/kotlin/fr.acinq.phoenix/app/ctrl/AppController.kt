@@ -16,21 +16,20 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
 
     override val coroutineContext = MainScope().coroutineContext + job
 
-    protected val logger = newLogger(loggerFactory)
+    protected val logger = loggerFactory.newLogger(this::class)
 
     private val models = ConflatedBroadcastChannel(firstModel)
 
     private val modelChanges = Channel<M.() -> M>()
 
     init {
-        fun Any.oneLineString() = toString().lines().map { it.trim() } .joinToString(" ")
 
-        logger.info { "First Model: ${firstModel.oneLineString()}" }
+        logger.info { "initial model=${firstModel}" }
 
         launch {
             modelChanges.consumeEach { change ->
                 val newModel = models.value.change()
-                logger.info { "Model: ${newModel.oneLineString()}" }
+                logger.info { "model=${newModel}" }
                 models.send(newModel)
             }
         }
@@ -55,7 +54,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
     protected abstract fun process(intent: I)
 
     final override fun intent(intent: I) {
-        logger.info { "${this::class.simpleName} Intent: $intent" }
+        logger.info { "intent=$intent" }
         process(intent)
     }
 

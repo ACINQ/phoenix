@@ -39,7 +39,10 @@ data class Wallet(val seed: ByteArray) {
 
         return true
     }
+
     override fun hashCode(): Int {
         return seed.contentHashCode()
     }
+
+    override fun toString(): String = "Wallet"
 }

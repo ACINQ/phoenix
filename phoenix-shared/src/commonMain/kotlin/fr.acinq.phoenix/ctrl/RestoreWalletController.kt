@@ -7,7 +7,9 @@ object RestoreWallet {
     sealed class Model : MVI.Model() {
         object Ready : Model()
 
-        data class FilteredWordlist(val words: List<String>) : Model()
+        data class FilteredWordlist(val words: List<String>) : Model() {
+            override fun toString(): String = "FilteredWordlist"
+        }
 
         object InvalidMnemonics : Model()
         data class ValidMnemonics(val seed: ByteArray) : Model() {
@@ -24,12 +26,18 @@ object RestoreWallet {
             override fun hashCode(): Int {
                 return seed.contentHashCode()
             }
+
+            override fun toString() = "ValidMnemonics"
         }
     }
 
     sealed class Intent : MVI.Intent() {
-        data class FilterWordList(val predicate: String) : Intent()
-        data class Validate(val mnemonics: List<String>) : Intent()
+        data class FilterWordList(val predicate: String) : Intent() {
+            override fun toString() = ".".repeat(predicate.length)
+        }
+        data class Validate(val mnemonics: List<String>) : Intent() {
+            override fun toString() = "Validate"
+        }
     }
 
 }
