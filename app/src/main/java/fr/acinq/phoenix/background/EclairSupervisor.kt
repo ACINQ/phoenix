@@ -152,7 +152,7 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
             payToOpen.payToOpenRequest().amountMsat()
             payToOpenMetaRepository.insert(
               paymentHash = event.paymentHash,
-              fee = payToOpen.payToOpenRequest().feeSatoshis(),
+              fee = payToOpen.payToOpenRequest().payToOpenFee(),
               amount = payToOpen.payToOpenRequest().amountMsat().truncateToSatoshi(),
               capacity = payToOpen.payToOpenRequest().fundingSatoshis())
             payToOpenMap.remove(event.paymentHash)
