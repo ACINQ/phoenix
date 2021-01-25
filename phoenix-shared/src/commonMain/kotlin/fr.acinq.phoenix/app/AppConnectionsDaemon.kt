@@ -118,7 +118,7 @@ class AppConnectionsDaemon(
                 }
 
                 var previousElectrumServer: ElectrumServer? = null
-                openElectrumServerUpdateSubscription().consumeEach {
+                subscribeToElectrumServer().collect {
                     if (previousElectrumServer?.address() != it.address()) {
                         logger.info { "Electrum server has changed. We need to refresh the connection." }
                         electrumControlChanges.send { incrementDisconnectCount() }

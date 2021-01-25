@@ -11,8 +11,6 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import org.kodein.db.*
@@ -39,7 +37,7 @@ class AppConfigurationManager(
         // Electrum Triggers
         noSqlDb.on<ElectrumServer>().register {
             didPut {
-                launch { electrumServerUpdates.send(it) }
+                launch { electrumServer.value = it }
             }
         }
         launch {
@@ -133,9 +131,8 @@ class AppConfigurationManager(
     //endregion
 
     //region Electrum configuration
-    private val electrumServerUpdates = ConflatedBroadcastChannel<ElectrumServer>()
-    fun openElectrumServerUpdateSubscription(): ReceiveChannel<ElectrumServer> =
-        electrumServerUpdates.openSubscription()
+    private val electrumServer by lazy { MutableStateFlow(getElectrumServer()) }
+    fun subscribeToElectrumServer(): StateFlow<ElectrumServer> = electrumServer
 
     private val electrumServerKey = noSqlDb.key<ElectrumServer>(0)
     private fun createElectrumConfiguration(): ElectrumServer {

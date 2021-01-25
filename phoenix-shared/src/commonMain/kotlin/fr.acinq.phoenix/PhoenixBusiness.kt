@@ -129,7 +129,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     }
 
     fun incomingPaymentFlow() =
-        paymentsManager.subscribeToLastIncomingPayment().consumeAsFlow()
+        paymentsManager.subscribeToLastIncomingPayment()
 
     val controllers: ControllerFactory = object : ControllerFactory {
         override fun content(): ContentController = AppContentController(loggerFactory, walletManager)

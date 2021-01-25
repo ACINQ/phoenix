@@ -10,11 +10,6 @@ import kotlinx.coroutines.flow.*
  *
  * (See file in project called FlowUtils.kt)
  */
-
-@FlowPreview
-@ExperimentalCoroutinesApi
-fun <T> ConflatedBroadcastChannel<T>.wrap() = SwiftFlow(asFlow())
-
 // This doesn't work in Swift.
 // For some reason, in Swift, it is exposed as a function within SwiftFlow itself.
 //
