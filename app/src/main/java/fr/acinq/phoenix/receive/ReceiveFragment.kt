@@ -31,7 +31,11 @@ import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.*
+import fr.acinq.eclair.channel.`NORMAL$`
+import fr.acinq.eclair.channel.`OFFLINE$`
+import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapInResponse
@@ -42,6 +46,7 @@ import fr.acinq.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -122,6 +127,15 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
+    appContext()?.payToOpenSettings?.value?.minFunding?.let { minFunding ->
+      context?.let { ctx ->
+        val min = Converter.printAmountPretty(minFunding, ctx, withUnit = true)
+        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, min))
+        mBinding.minFundingSwapIn.text = Converter.html(getString(R.string.receive_min_amount_swap_in, min))
+      }
+      checkMinFunding(minFunding)
+    }
+
     context?.let { mBinding.descValue.setText(Prefs.getDefaultPaymentDescription(it)) }
   }
 
@@ -189,7 +203,7 @@ class ReceiveFragment : BaseFragment() {
       findNavController().navigate(R.id.global_action_any_to_read_input)
     }
 
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { handleBackAction() })
+    mBinding.actionBar.setOnBackAction { handleBackAction() }
 
     if (model.state.value == PaymentGenerationState.INIT) {
       generatePaymentRequest()
@@ -232,6 +246,16 @@ class ReceiveFragment : BaseFragment() {
       val source = model.invoice.value!!.second ?: PaymentRequest.write(model.invoice.value!!.first)
       clipboard.setPrimaryClip(ClipData.newPlainText("Payment request", source))
       Toast.makeText(this, R.string.utils_copied, Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun checkMinFunding(minFunding: Satoshi) {
+    lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
+      log.error("could not list channels for min funding check: ", exception)
+    }) {
+      val channels = app.requireService.getChannels().filter { it.state() is `NORMAL$` || it.state() is `WAIT_FOR_FUNDING_CONFIRMED$` || it.state() is `OFFLINE$` }
+      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && minFunding.`$greater`(Satoshi(0)))
+      model.showMinFundingSwapIn.postValue(minFunding.`$greater`(Satoshi(0)))
     }
   }
 

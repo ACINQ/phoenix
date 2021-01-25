@@ -326,7 +326,10 @@
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
-
+  
+   <string name="initwallet_terms"><![CDATA[
+    Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
+  ]]></string>
   <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
 
@@ -589,8 +592,9 @@
     As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros:
     <br />- Blockchain.info
     <br />- Bitso
-    <br />- <a href="https://www.coindesk.com/price/bitcoin">Distribuído por Coindesk</a>
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Fornecido por Coindesk</a>
   ]]></string>
+  <string name="about_terms">Termos de uso</string>
 
   <!-- //////////////// background node service //////////////// -->
 
@@ -630,7 +634,7 @@
   <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
   <string name="ftue__pay_to_open__header">Abertura automática de canais</string>
   <string name="ftue__pay_to_open__body">Se necessário, canais de pagamento serão abertos automaticamente para você. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
-  <string name="ftue__backup_seed__header">Controlar</string>
+  <string name="ftue__backup_seed__header">Você no controle dos seus bitcoins</string>
   <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
   <string name="ftue__backup_seed__button">Começar</string>
 

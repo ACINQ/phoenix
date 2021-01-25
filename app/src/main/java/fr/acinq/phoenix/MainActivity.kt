@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
               amountMsat = it.payToOpen.amountMsat().toLong(),
               fundingSat = it.payToOpen.fundingSatoshis().toLong(),
-              feeSat = it.payToOpen.feeSatoshis().toLong(),
+              feeSat = it.payToOpen.payToOpenFee().toLong(),
               paymentHash = it.payToOpen.paymentHash().toString(),
               expireAt = it.payToOpen.expireAt())
             findNavController(R.id.nav_host_main).navigate(action)
