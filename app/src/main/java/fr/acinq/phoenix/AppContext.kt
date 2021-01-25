@@ -117,6 +117,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
   }
 
+  /** Settings for pay-to-open. */
+  val payToOpenSettings = MutableLiveData(Constants.DEFAULT_PAY_TO_OPEN_SETTINGS)
+
   /** Settings for the fees allocated to a trampoline node. */
   val trampolineFeeSettings = MutableLiveData(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
 
@@ -211,17 +214,22 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
     trampolineSettingsList.sortedWith(compareBy({ it.feeProportionalMillionths }, { it.feeBase }))
     trampolineFeeSettings.postValue(trampolineSettingsList)
-    log.info("trampoline settings set to $trampolineSettingsList")
+    log.info("trampoline settings=$trampolineSettingsList")
 
     // -- swap-in settings
     val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
     swapInSettings.postValue(remoteSwapInSettings)
-    log.info("swap-in settings set to $remoteSwapInSettings")
+    log.info("swap-in settings=$remoteSwapInSettings")
 
     // -- swap-out settings
     val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(0))
     swapOutSettings.postValue(remoteSwapOutSettings)
-    log.info("swap-out settings set to $remoteSwapOutSettings")
+    log.info("swap-out settings=$remoteSwapOutSettings")
+
+    // -- pay-to-open settings
+    val remotePayToOpenSettings = PayToOpenSettings(minFunding = Satoshi(json.getJSONObject("pay_to_open").getJSONObject("v1").getLong("min_funding_sat").coerceAtLeast(0)))
+    payToOpenSettings.postValue(remotePayToOpenSettings)
+    log.info("pay-to-open settings=$remotePayToOpenSettings")
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {
@@ -327,4 +335,5 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
 data class SwapInSettings(val feePercent: Double)
 data class SwapOutSettings(val minFeerateSatByte: Long)
 data class MempoolContext(val highUsageWarning: Boolean)
+data class PayToOpenSettings(val minFunding: Satoshi)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)

@@ -70,5 +70,6 @@ object Constants {
   val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(0.001)
   val DEFAULT_SWAP_OUT_SETTINGS = SwapOutSettings(1)
   val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false)
+  val DEFAULT_PAY_TO_OPEN_SETTINGS = PayToOpenSettings(Satoshi(0))
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
 }

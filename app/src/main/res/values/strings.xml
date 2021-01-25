@@ -118,6 +118,8 @@
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_swap_in"><![CDATA[Deposit must be at least <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Address</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 

@@ -19,7 +19,9 @@ package fr.acinq.phoenix.receive
 import android.graphics.Bitmap
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.phoenix.send.SendState
 import fr.acinq.phoenix.utils.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +47,8 @@ class ReceiveViewModel : ViewModel() {
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<ReceiveState>()
   val isPowerSavingMode = MutableLiveData<Boolean>()
+  val showMinFundingPayToOpen = MutableLiveData(false)
+  val showMinFundingSwapIn = MutableLiveData(false)
 
   init {
     invoice.value = null
