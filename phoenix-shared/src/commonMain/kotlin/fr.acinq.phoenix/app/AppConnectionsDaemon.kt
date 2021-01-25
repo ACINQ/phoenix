@@ -218,8 +218,6 @@ class AppConnectionsDaemon(
     private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
         var retryDelay = RETRY_DELAY
         statusStateFlow.collect {
-            logger.debug { "New $name status $it" }
-
             if (it == Connection.CLOSED) {
                 logger.debug { "Wait for $retryDelay before retrying connection on $name" }
                 delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
