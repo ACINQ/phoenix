@@ -51,7 +51,7 @@ kotlin {
 
     sourceSets {
 
-        val coroutinesVersion = "1.3.9-native-mt-2"
+        val coroutinesVersion = "1.4.2-native-mt"
         val serializationVersion = "1.0.0"
         val secp256k1Version = "0.4.1"
         val ktorVersion = "1.4.1"
