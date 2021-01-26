@@ -22,8 +22,8 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.CltvExpiry
 import fr.acinq.phoenix.TestConstants
+import fr.acinq.phoenix.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -34,7 +34,7 @@ class SqliteChannelsDatabaseTest {
     @ExperimentalCoroutinesApi
     @Test
     fun basic() {
-        runBlocking {
+        runTest {
             val commitNumber = 42L
             val paymentHash1 = ByteVector32.Zeroes
             val cltvExpiry1 = CltvExpiry(123)

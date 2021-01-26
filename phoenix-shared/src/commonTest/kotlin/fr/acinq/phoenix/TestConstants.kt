@@ -98,6 +98,103 @@ object TestConstants {
     )
 }
 
+val rawWalletParams = """
+    {
+      "testnet": {
+        "version": 4,
+        "latest_critical_version": 0,
+        "trampoline": {
+          "v1": {
+            "fee_base_sat": 2,
+            "fee_percent": 0.001,
+            "hops_count": 5,
+            "cltv_expiry": 143
+          },
+          "v2": {
+            "attempts": [
+              {
+                "fee_base_sat": 0,
+                "fee_percent": 0,
+                "fee_per_millionths": 0,
+                "cltv_expiry": 576
+              },
+              {
+                "fee_base_sat": 1,
+                "fee_percent": 0.0001,
+                "fee_per_millionths": 100,
+                "cltv_expiry": 576
+              }
+            ],
+            "nodes": [
+              {
+                "name": "ACINQ",
+                "uri": "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@13.248.222.197:9735"
+              }
+            ]
+          }
+        },
+        "swap_in": {
+          "v1": {
+            "fee_percent": 0.001
+          }
+        },
+        "swap_out": {
+          "v1": {
+            "min_feerate_sat_byte": 0
+          }
+        },
+        "mempool": {
+          "v1": {
+            "high_usage": true
+          }
+        }
+      },
+      "mainnet": {
+        "version": 4,
+        "latest_critical_version": 0,
+        "trampoline": {
+          "v1": {
+            "fee_base_sat": 2,
+            "fee_percent": 0.001,
+            "hops_count": 5,
+            "cltv_expiry": 143
+          },
+          "v2": {
+            "attempts": [
+              {
+                "fee_base_sat": 0,
+                "fee_percent": 0,
+                "fee_per_millionths": 0,
+                "cltv_expiry": 576
+              },
+              {
+                "fee_base_sat": 1,
+                "fee_percent": 0.0001,
+                "fee_per_millionths": 100,
+                "cltv_expiry": 576
+              }
+            ]
+          }
+        },
+        "swap_in": {
+          "v1": {
+            "fee_percent": 0.001
+          }
+        },
+        "swap_out": {
+          "v1": {
+            "min_feerate_sat_byte": 40
+          }
+        },
+        "mempool": {
+          "v1": {
+            "high_usage": false
+          }
+        }
+      }
+    }
+"""
+
 @OptIn(ExperimentalTime::class)
 fun runTest(timeout: Duration = 30.seconds, test: suspend CoroutineScope.() -> Unit) {
     runBlocking {

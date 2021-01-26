@@ -27,3 +27,7 @@ actual fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver {
 actual fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver {
     return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.application.applicationContext, "payments.sqlite")
 }
+
+actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
+    return AndroidSqliteDriver(AppDatabase.Schema, ctx.application.applicationContext, "app.sqlite")
+}

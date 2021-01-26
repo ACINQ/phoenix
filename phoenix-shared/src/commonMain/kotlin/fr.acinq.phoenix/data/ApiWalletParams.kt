@@ -2,7 +2,9 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.eclair.CltvExpiryDelta
+import fr.acinq.eclair.InvoiceDefaultRoutingFees
 import fr.acinq.eclair.WalletParams
+import fr.acinq.eclair.utils.msat
 import fr.acinq.eclair.utils.sat
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -24,7 +26,7 @@ object ApiWalletParams {
             val trampoline: TrampolineParams,
         ) {
             fun export(): WalletParams =  trampoline.v2.run {
-                WalletParams(nodes.first().export(), attempts.map { it.export() })
+                WalletParams(nodes.first().export(), attempts.map { it.export() }, InvoiceDefaultRoutingFees(1000.msat, 100, CltvExpiryDelta(144)))
             }
         }
 
