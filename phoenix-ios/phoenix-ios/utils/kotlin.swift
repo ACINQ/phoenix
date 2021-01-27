@@ -84,3 +84,24 @@ class ObservableConnectionsMonitor: ObservableObject {
 	}
 }
 
+class ObservableLastIncomingPayment: ObservableObject {
+	
+	@Published var value: Eclair_kmpWalletPayment? = nil
+	
+	private var watcher: Ktor_ioCloseable? = nil
+	
+	init() {
+		let incomingPaymentFlow = AppDelegate.get().business.incomingPaymentFlow()
+		value = incomingPaymentFlow.value as? Eclair_kmpWalletPayment
+		
+		let swiftFlow = SwiftFlow<Eclair_kmpWalletPayment>(origin: incomingPaymentFlow)
+		swiftFlow.watch {[weak self](payment: Eclair_kmpWalletPayment?) in
+			self?.value = payment
+		}
+	}
+	
+	deinit {
+		watcher?.close()
+	}
+}
+

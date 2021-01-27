@@ -10,7 +10,7 @@ object Receive {
     sealed class Model : MVI.Model() {
         object Awaiting : Model()
         object Generating: Model()
-        data class Generated(val request: String, val amount: Double?, val unit: BitcoinUnit, val desc: String?): Model()
+        data class Generated(val request: String, val paymentHash: String, val amount: Double?, val unit: BitcoinUnit, val desc: String?): Model()
     }
 
     sealed class Intent : MVI.Intent() {

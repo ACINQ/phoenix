@@ -39,7 +39,8 @@ class AppReceiveController(loggerFactory: LoggerFactory, private val peerManager
                         val request = deferred.await()
                         check(request.amount == intent.paymentAmountMsat) { "Payment request amount not corresponding to expected" }
                         check(request.description == intent.paymentDescription) { "Payment request description not corresponding to expected" }
-                        model(Receive.Model.Generated(request.write(), intent.amount, intent.unit, intent.desc))
+                        val paymentHash: String = request.paymentHash.toHex()
+                        model(Receive.Model.Generated(request.write(), paymentHash, intent.amount, intent.unit, intent.desc))
                     } catch (e: Throwable) {
                         logger.error(e) { "failed to process intent=$intent" }
                     }

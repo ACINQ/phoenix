@@ -11,8 +11,10 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ReceiveView: View {
+struct ReceiveView: AltMviView {
 
+	@StateObject var mvi = AltMVI({ $0.receive() })
+	
 	@StateObject var qrCode = QRCode()
 
 	@State var sharing: String? = nil
@@ -27,49 +29,31 @@ struct ReceiveView: View {
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 	@Environment(\.verticalSizeClass) var verticalSizeClass
+	@Environment(\.presentationMode) var mode: Binding<PresentationMode>
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	@StateObject var lastIncomingPayment = ObservableLastIncomingPayment()
 	@StateObject var toast = Toast()
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
 	)
 	
-	var body: some View {
-	
-		MVIView({ $0.receive() }, onModel: { change in
-			
-			if let m = change.newModel as? Receive.ModelGenerated {
-				qrCode.generate(value: m.request)
-			}
+	@ViewBuilder func view() -> some View {
 		
-		}) { model, postIntent in
-			
-			view(model: model, postIntent: postIntent)
-				.navigationBarTitle("Receive ", displayMode: .inline)
-				.onAppear {
-					postIntent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
-				}
-        }
-    }
+		let model = mvi.getModel()
 	
-	@ViewBuilder
-	func view(
-		model: Receive.Model,
-		postIntent: @escaping (Receive.Intent) -> Void
-	) -> some View {
-		
 		ZStack {
 			
 			Image("testnet_bg")
 				.resizable(resizingMode: .tile)
 			
 			if verticalSizeClass == UserInterfaceSizeClass.compact {
-				mainLandscape(model: model, postIntent: postIntent)
+				mainLandscape()
 			} else {
-				mainPortrait(model: model, postIntent: postIntent)
+				mainPortrait()
 			}
 			
 			toast.view()
@@ -81,6 +65,12 @@ struct ReceiveView: View {
 		.onAppear {
 			onAppear()
 		}
+		.onChange(of: mvi.model, perform: { model in
+			onModelChange(model: model!)
+		})
+		.onChange(of: lastIncomingPayment.value) { (payment: Eclair_kmpWalletPayment?) in
+			lastIncomingPaymentChanged(payment)
+		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			willEnterForeground()
 		})
@@ -88,7 +78,7 @@ struct ReceiveView: View {
 		
 			if let m = model as? Receive.ModelGenerated {
 				ModifyInvoiceSheet(
-					postIntent: postIntent,
+					postIntent: mvi.intent,
 					initialUnit: m.unit,
 					initialAmount: m.amount,
 					show: $editing,
@@ -96,13 +86,13 @@ struct ReceiveView: View {
 				)
 			}
 		}
+		.navigationBarTitle("Receive ", displayMode: .inline)
 	}
 	
 	@ViewBuilder
-	func mainPortrait(
-		model: Receive.Model,
-		postIntent: @escaping (Receive.Intent) -> Void
-	) -> some View {
+	func mainPortrait() -> some View {
+		
+		let model = mvi.getModel()
 		
 		VStack {
 			qrCodeView(model)
@@ -158,11 +148,9 @@ struct ReceiveView: View {
 	}
 	
 	@ViewBuilder
-	func mainLandscape(
-		model: Receive.Model,
-		postIntent: @escaping (Receive.Intent) -> Void
-	) -> some View {
+	func mainLandscape() -> some View {
 		
+		let model = mvi.getModel()
 		HStack {
 			
 			qrCodeView(model)
@@ -366,6 +354,8 @@ struct ReceiveView: View {
 	func onAppear() -> Void {
 		log.trace("[ReadyReceivePayment] onAppear()")
 		
+		mvi.intent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
+		
 		let query = Prefs.shared.pushPermissionQuery
 		if query == .neverAskedUser {
 			
@@ -382,6 +372,13 @@ struct ReceiveView: View {
 		} else {
 			
 			checkPushPermissions()
+		}
+	}
+	
+	func onModelChange(model: Receive.Model) -> Void {
+		
+		if let m = model as? Receive.ModelGenerated {
+			qrCode.generate(value: m.request)
 		}
 	}
 	
@@ -528,6 +525,25 @@ struct ReceiveView: View {
 		
 		withAnimation {
 			editing = true
+		}
+	}
+	
+	func lastIncomingPaymentChanged(_ payment: Eclair_kmpWalletPayment?) {
+		log.trace("lastIncomingPaymentChanged()")
+		
+		guard
+			let model = mvi.getModel() as? Receive.ModelGenerated,
+			let lastIncomingPayment = payment as? Eclair_kmpIncomingPayment
+		else {
+			return
+		}
+		
+		let status = lastIncomingPayment.status()
+		if status == WalletPaymentStatus.success {
+			
+			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
+				self.mode.wrappedValue.dismiss()
+			}
 		}
 	}
 }
@@ -1008,18 +1024,19 @@ struct FeePromptPopup : View {
 
 class ReceiveView_Previews: PreviewProvider {
 
-    static let mockModel = Receive.ModelGenerated(
-            request: "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm",
-            amount: 0.017,
-            unit: BitcoinUnit.millibitcoin,
-            desc: "1 Espresso Coin Panna"
-    )
-//    static let mockModel = Receive.ModelAwaiting()
+//	static let mockModel = Receive.ModelAwaiting()
+	static let mockModel = Receive.ModelGenerated(
+		request: "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm",
+		paymentHash: "foobar",
+		amount: 0.017,
+		unit: BitcoinUnit.millibitcoin,
+		desc: "1 Espresso Coin Panna"
+	)
 
-    static var previews: some View {
-        mockView(ReceiveView())
-                .previewDevice("iPhone 11")
-    }
+	static var previews: some View {
+		mockView(ReceiveView())
+			.previewDevice("iPhone 11")
+	}
 
     #if DEBUG
     @objc class func injected() {

@@ -285,8 +285,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amountMsat())
 
 			var body: String
-			if payment.desc() != nil {
-				body = "\(formattedAmt.string): \(payment.desc())"
+			if let desc = payment.desc(), desc.count > 0 {
+				body = "\(formattedAmt.string): \(desc)"
 			} else {
 				body = formattedAmt.string
 			}
