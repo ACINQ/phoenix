@@ -11,38 +11,31 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct RestoreWalletView: View {
 
+struct RestoreWalletView: AltMviView {
+
+	@StateObject var mvi = AltMVI({ $0.restoreWallet() })
+	
 	@State var acceptedWarning = false
 	@State var mnemonics = [String]()
 	@State var autocomplete = [String]()
 	
-	var body: some View {
-		MVIView({ $0.restoreWallet() },
-			onModel: { change in
-			
-				if let model = change.newModel as? RestoreWallet.ModelFilteredWordlist {
-					autocomplete = model.words
-				}
-				else if let model = change.newModel as? RestoreWallet.ModelValidMnemonics {
-					finishAndRestoreWallet(model: model)
-				}
-				
-			}) { model, postIntent in
-			
-				main(model: model, postIntent: postIntent)
-					.padding(.top, keyWindow?.safeAreaInsets.bottom)
-					.padding(.bottom, keyWindow?.safeAreaInsets.top)
-					.padding([.leading, .trailing], 10)
-					.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
-		}
-		.navigationBarTitle("Restore my wallet", displayMode: .inline)
-    }
+	@ViewBuilder
+	var view: some View {
+		
+		main()
+			.padding(.top, keyWindow?.safeAreaInsets.bottom)
+			.padding(.bottom, keyWindow?.safeAreaInsets.top)
+			.padding([.leading, .trailing], 10)
+			.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
+			.navigationBarTitle("Restore my wallet", displayMode: .inline)
+			.onChange(of: mvi.model, perform: { model in
+				onModelChange(model: model)
+			})
+	}
 
-	@ViewBuilder func main(
-		model: RestoreWallet.Model,
-		postIntent: @escaping (RestoreWallet.Intent) -> Void
-	) -> some View {
+	@ViewBuilder
+	func main() -> some View {
 		
 		if !acceptedWarning {
 			WarningView(acceptedWarning: $acceptedWarning)
@@ -50,8 +43,7 @@ struct RestoreWalletView: View {
 				.transition(.move(edge: .bottom))
 		} else {
 			RestoreView(
-				model: model,
-				postIntent: postIntent,
+				mvi: mvi,
 				mnemonics: $mnemonics,
 				autocomplete: $autocomplete
 			)
@@ -59,7 +51,16 @@ struct RestoreWalletView: View {
 		}
 	}
 	
+	func onModelChange(model: RestoreWallet.Model) -> Void {
+		log.trace("onModelChange()")
+		
+		if let model = model as? RestoreWallet.ModelValidMnemonics {
+			finishAndRestoreWallet(model: model)
+		}
+	}
+	
 	func finishAndRestoreWallet(model: RestoreWallet.ModelValidMnemonics) -> Void {
+		log.trace("finishAndRestoreWallet()")
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
@@ -124,8 +125,7 @@ struct WarningView: View {
 
 struct RestoreView: View {
 	
-	let model: RestoreWallet.Model
-	let postIntent: (RestoreWallet.Intent) -> Void
+	@ObservedObject var mvi: AltMVI<RestoreWallet.Model, RestoreWallet.Intent>
 
 	@Binding var mnemonics: [String]
 	@Binding var autocomplete: [String]
@@ -136,7 +136,7 @@ struct RestoreView: View {
 	var body: some View {
 	
 		VStack {
-			
+
 			Text("Your wallet's seed is a list of 12 english words.")
 				.font(.title3)
 				.padding(.top, 20)
@@ -232,7 +232,7 @@ struct RestoreView: View {
 				} // </VStack>
 			} // </ForEach>
 
-			if model is RestoreWallet.ModelInvalidMnemonics {
+			if mvi.model is RestoreWallet.ModelInvalidMnemonics {
 				Text(
 					"This seed is invalid and cannot be imported.\n\n" +
 					"Please try again"
@@ -267,6 +267,9 @@ struct RestoreView: View {
 			.padding(.bottom, 20)
 		}
 		.frame(maxHeight: .infinity)
+		.onChange(of: mvi.model, perform: { model in
+			onModelChange(model: model)
+		})
 		.onChange(of: autocomplete) { _ in
 			onAutocompleteListChanged()
 		}
@@ -276,19 +279,39 @@ struct RestoreView: View {
 		return (mnemonics.count > idx) ? mnemonics[idx] : " "
 	}
 	
+	func onModelChange(model: RestoreWallet.Model) -> Void {
+		log.trace("[RestoreView] onModelChange()")
+		
+		if let model = model as? RestoreWallet.ModelFilteredWordlist {
+			log.debug("ModelFilteredWordlist.words = \(model.words)")
+			if autocomplete == model.words {
+				// Careful:
+				// autocomplete = model.words
+				// ^ this won't do anything. Will not call: onAutocompleteListChanged()
+				//
+				// So we need to do it manually.
+				// For more info, see issue #109
+				//
+				onAutocompleteListChanged()
+			} else {
+				autocomplete = model.words
+			}
+		}
+	}
+	
 	func onInput() -> Void {
-		log.trace("onInput(): \"\(wordInput)\"")
+		log.trace("[RestoreView] onInput(): \"\(wordInput)\"")
 		
 		// When the user hits space, we auto-accept the first mnemonic in the autocomplete list
 		if maybeSelectMnemonic(isAutocompleteTrigger: false) {
 			return
+		} else {
+			updateAutocompleteList()
 		}
-		
-		updateAutocompleteList()
 	}
 	
 	func updateAutocompleteList() {
-		log.trace("updateAutocompleteList()")
+		log.trace("[RestoreView] updateAutocompleteList()")
 		
 		// Some keyboards will inject the entire word plus a space.
 		//
@@ -300,14 +323,22 @@ struct RestoreView: View {
 		
 		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
 		if let firstToken = tokens.first {
-			postIntent(RestoreWallet.IntentFilterWordList(predicate: String(firstToken)))
+			log.debug("[RestoreView] Requesting autocomplete for: '\(firstToken)'")
+			mvi.intent(RestoreWallet.IntentFilterWordList(
+				predicate: String(firstToken),
+				uuid: UUID().uuidString
+			))
 		} else {
-			autocomplete = []
+			log.debug("[RestoreView] Clearing autocomplete list")
+			mvi.intent(RestoreWallet.IntentFilterWordList(
+				predicate: "",
+				uuid: UUID().uuidString
+			))
 		}
 	}
 	
 	func onAutocompleteListChanged() {
-		log.trace("onAutocompleteListChanged()")
+		log.trace("[RestoreView] onAutocompleteListChanged()")
 		
 		// Example flow that gets us here:
 		//
@@ -324,27 +355,7 @@ struct RestoreView: View {
 	
 	@discardableResult
 	func maybeSelectMnemonic(isAutocompleteTrigger: Bool) -> Bool {
-		
-		log.trace("maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
-		
-		if wordInput.hasSuffix(" "),
-		   let acceptedWord = autocomplete.first
-		{
-			// Example:
-			// The input is "Bacon ", and the autocomplete list is ["bacon"],
-			// so we should automatically select the mnemonic.
-			//
-			// This needs to happen if:
-			//
-			// - the user hits space when typing, so we want to automatically accept
-			//   the first entry in the autocomplete list
-			//
-			// - the user is using a fancy keyboard (e.g. SwiftKey),
-			//   and the input was injected at one time as a word plus space: "Bacon "
-			
-			selectMnemonic(acceptedWord)
-			return true
-		}
+		log.trace("[RestoreView] maybeSelectMnemonic(isAutocompleteTrigger = \(isAutocompleteTrigger))")
 		
 		if isAutocompleteTrigger && autocomplete.count >= 1 {
 			
@@ -366,7 +377,7 @@ struct RestoreView: View {
 						// - let's process each token until we reach the end or a non-match
 						
 						isProcessingPaste = true
-						log.debug("isProcessingPaste = true")
+						log.debug("[RestoreView] isProcessingPaste = true")
 					}
 					
 					if isProcessingPaste {
@@ -380,37 +391,58 @@ struct RestoreView: View {
 		
 		if isAutocompleteTrigger && isProcessingPaste {
 			isProcessingPaste = false
-			log.debug("isProcessingPaste = false")
+			log.debug("[RestoreView] isProcessingPaste = false")
+		}
+		
+		if wordInput.hasSuffix(" "),
+		   let acceptedWord = autocomplete.first
+		{
+			// Example:
+			// The input is "Bacon ", and the autocomplete list is ["bacon"],
+			// so we should automatically select the mnemonic.
+			//
+			// This needs to happen if:
+			//
+			// - the user hits space when typing, so we want to automatically accept
+			//   the first entry in the autocomplete list
+			//
+			// - the user is using a fancy keyboard (e.g. SwiftKey),
+			//   and the input was injected at one time as a word plus space: "Bacon "
+			
+			selectMnemonic(acceptedWord)
+			return true
 		}
 		
 		return false
 	}
 	
 	func selectMnemonic(_ word: String) -> Void {
-		log.trace("selectMnemonic()")
+		log.trace("[RestoreView] selectMnemonic()")
 		
 		if (mnemonics.count < 12) {
 			mnemonics.append(word)
 		}
 		
-		let tokens = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ")
-		if let token = tokens.first,
+		if let token = wordInput.trimmingCharacters(in: .whitespaces).split(separator: " ").first,
 		   let range = wordInput.range(of: token)
 		{
-			wordInput.removeSubrange(wordInput.startIndex ..< range.upperBound)
-			wordInput = wordInput.trimmingCharacters(in: .whitespaces)
+			var input = wordInput
+			input.removeSubrange(wordInput.startIndex ..< range.upperBound)
+			input = input.trimmingCharacters(in: .whitespaces)
+			
+			log.debug("[RestoreView] Remaining wordInput: \"\(input)\"")
+			wordInput = input
 			
 		} else {
+			log.debug("[RestoreView] Remaining wordInput: \"\"")
 			wordInput = ""
 		}
-		
-		log.debug("remaining wordInput: \"\(wordInput)\"")
-		updateAutocompleteList()
 	}
 	
 	func onImportButtonTapped() -> Void {
+		log.trace("[RestoreView] onImportButtonTapped()")
 		
-		postIntent(RestoreWallet.IntentValidate(mnemonics: self.mnemonics))
+		mvi.intent(RestoreWallet.IntentValidate(mnemonics: self.mnemonics))
 	}
 }
 

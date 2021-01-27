@@ -9,8 +9,7 @@ import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppRestoreWalletController(
-    loggerFactory: LoggerFactory,
-    private val walletManager: WalletManager
+    loggerFactory: LoggerFactory
 ) : AppController<RestoreWallet.Model, RestoreWallet.Intent>(
     loggerFactory,
     RestoreWallet.Model.Ready
@@ -20,16 +19,21 @@ class AppRestoreWalletController(
         when (intent) {
             is RestoreWallet.Intent.FilterWordList -> when {
                 intent.predicate.length > 1 -> launch {
-                    model(
-                        RestoreWallet.Model.FilteredWordlist(
-                            MnemonicCode.englishWordlist.filter {
-                                it.startsWith(intent.predicate, ignoreCase = true)
-                            }
-                        )
-                    )
+                    val words = MnemonicCode.englishWordlist.filter {
+                        it.startsWith(intent.predicate, ignoreCase = true)
+                    }
+                    model(RestoreWallet.Model.FilteredWordlist(
+                        uuid = intent.uuid,
+                        predicate = intent.predicate,
+                        words = words
+                    ))
                 }
                 else -> launch {
-                    model(RestoreWallet.Model.FilteredWordlist(emptyList()))
+                    model(RestoreWallet.Model.FilteredWordlist(
+                        uuid = intent.uuid,
+                        predicate = intent.predicate,
+                        words = emptyList()
+                    ))
                 }
             }
             is RestoreWallet.Intent.Validate -> {

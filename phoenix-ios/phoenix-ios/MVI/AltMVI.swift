@@ -15,7 +15,11 @@ fileprivate var log = Logger(OSLog.disabled)
 
 class AltMVI<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	
-	@Published var model: Model? = nil
+	@Published private var _model: Model? = nil
+	
+	var model: Model {
+		return _model!
+	}
 	
 	private let getController: (ControllerFactory) -> MVIController<Model, Intent>
 	private var controller: MVIController<Model, Intent>? = nil
@@ -36,25 +40,24 @@ class AltMVI<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 		}
 	}
 	
-	func getModel() -> Model {
+	fileprivate func initializeControllerIfNeeded() -> Void {
 		if controller == nil {
 			let factory = AppDelegate.get().business.controllers
 			controller = getController(factory)
-			model = controller!.firstModel
+			_model = controller!.firstModel
 		}
-		return model!
 	}
 
-	func subscribe() {
+	fileprivate func subscribe() {
 		if unsub == nil {
 			unsub = controller!.subscribe {[weak self](newModel: Model) in
-				self?.model = newModel
+				self?._model = newModel
 			}
 		}
 		subCount += 1
 	}
 
-	func unsubscribe() {
+	fileprivate func unsubscribe() {
 		subCount -= 1
 		if subCount < 0 { fatalError("subCount < 0") }
 		if subCount == 0 {
@@ -82,13 +85,14 @@ protocol AltMviView : View {
 	associatedtype ViewBody : View
 	
 	/// The content and behavior of the view.
-	@ViewBuilder func view() -> Self.ViewBody
+	@ViewBuilder var view: Self.ViewBody { get }
 }
 
 extension AltMviView {
 	
 	var body: some View {
-		return view().onAppear {
+		mvi.initializeControllerIfNeeded()
+		return view.onAppear {
 			mvi.subscribe()
 		}.onDisappear {
 			mvi.unsubscribe()

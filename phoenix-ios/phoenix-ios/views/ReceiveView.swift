@@ -41,10 +41,9 @@ struct ReceiveView: AltMviView {
 		UIApplication.willEnterForegroundNotification
 	)
 	
-	@ViewBuilder func view() -> some View {
+	@ViewBuilder var view: some View {
 		
-		let model = mvi.getModel()
-	
+		let model = mvi.model
 		ZStack {
 			
 			Image("testnet_bg")
@@ -66,7 +65,7 @@ struct ReceiveView: AltMviView {
 			onAppear()
 		}
 		.onChange(of: mvi.model, perform: { model in
-			onModelChange(model: model!)
+			onModelChange(model: model)
 		})
 		.onChange(of: lastIncomingPayment.value) { (payment: Eclair_kmpWalletPayment?) in
 			lastIncomingPaymentChanged(payment)
@@ -92,8 +91,7 @@ struct ReceiveView: AltMviView {
 	@ViewBuilder
 	func mainPortrait() -> some View {
 		
-		let model = mvi.getModel()
-		
+		let model = mvi.model
 		VStack {
 			qrCodeView(model)
 				.frame(width: 200, height: 200)
@@ -150,7 +148,7 @@ struct ReceiveView: AltMviView {
 	@ViewBuilder
 	func mainLandscape() -> some View {
 		
-		let model = mvi.getModel()
+		let model = mvi.model
 		HStack {
 			
 			qrCodeView(model)
@@ -532,7 +530,7 @@ struct ReceiveView: AltMviView {
 		log.trace("lastIncomingPaymentChanged()")
 		
 		guard
-			let model = mvi.getModel() as? Receive.ModelGenerated,
+			let model = mvi.model as? Receive.ModelGenerated,
 			let lastIncomingPayment = payment as? Eclair_kmpIncomingPayment
 		else {
 			return
