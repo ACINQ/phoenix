@@ -35,6 +35,12 @@ struct DisplayConfigurationView: View {
 						bitcoinUnitText(bitcoinUnit).tag(bitcoinUnit)
 					}
 				}
+				
+				Text("Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat.")
+					.font(.callout)
+					.foregroundColor(Color.secondary)
+					.padding(.top, 8)
+					.padding(.bottom, 4) // visible in dark mode
 			}
 			
 			Section {
@@ -89,7 +95,15 @@ struct DisplayConfigurationView: View {
 class DisplayConfigurationView_Previews: PreviewProvider {
 
 	static var previews: some View {
+		
 		DisplayConfigurationView()
+			.preferredColorScheme(.light)
 			.previewDevice("iPhone 11")
+			.environmentObject(CurrencyPrefs.mockEUR())
+		
+		DisplayConfigurationView()
+			.preferredColorScheme(.dark)
+			.previewDevice("iPhone 11")
+			.environmentObject(CurrencyPrefs.mockEUR())
 	}
 }
