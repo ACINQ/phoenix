@@ -24,10 +24,10 @@ struct RestoreWalletView: AltMviView {
 	var view: some View {
 		
 		main()
-			.padding(.top, keyWindow?.safeAreaInsets.bottom)
-			.padding(.bottom, keyWindow?.safeAreaInsets.top)
-			.padding([.leading, .trailing], 10)
-			.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
+		//	.padding(.top, keyWindow?.safeAreaInsets.bottom)
+		//	.padding(.bottom, keyWindow?.safeAreaInsets.top)
+		//	.padding([.leading, .trailing], 10)
+		//	.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
 			.navigationBarTitle("Restore my wallet", displayMode: .inline)
 			.onChange(of: mvi.model, perform: { model in
 				onModelChange(model: model)
@@ -84,12 +84,16 @@ struct WarningView: View {
 			)
 			.font(.title3)
 			.padding(.top, 20)
-
-			Toggle(isOn: $iUnderstand) {
-				Text("I understand.").font(.title3)
+			
+			HStack {
+				Spacer()
+				Text("I understand.")
+					.font(.title3)
+					.padding(.trailing, 10)
+				Toggle("", isOn: $iUnderstand).labelsHidden()
+				Spacer()
 			}
 			.padding([.top, .bottom], 16)
-			.padding([.leading, .trailing], 88)
 
 			Button {
 				withAnimation {
@@ -119,7 +123,7 @@ struct WarningView: View {
 			Spacer()
 			
 		} // </VStack>
-		.background(Color(UIColor.systemBackground))
+		.padding([.leading, .trailing])
 	}
 }
 
@@ -133,19 +137,52 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
+	let inputID = "input"
+	let keyboardWillShow = NotificationCenter.default.publisher(for:
+		UIApplication.keyboardWillShowNotification
+	)
+	
 	var body: some View {
+		
+		ScrollViewReader { scrollViewProxy in
+			ScrollView {
+				ZStack {
+					
+					Color.clear
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						.contentShape(Rectangle())
+						.onTapGesture {
+							// dismiss keyboard if visible
+							let keyWindow = UIApplication.shared.connectedScenes
+								.filter({ $0.activationState == .foregroundActive })
+								.map({ $0 as? UIWindowScene })
+								.compactMap({ $0 })
+								.first?.windows
+								.filter({ $0.isKeyWindow }).first
+							keyWindow?.endEditing(true)
+						}
+					
+					main(scrollViewProxy)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func main(_ scrollViewProxy: ScrollViewProxy) -> some View {
 	
 		VStack {
 
 			Text("Your wallet's seed is a list of 12 english words.")
 				.font(.title3)
-				.padding(.top, 20)
-
+				.padding(.top)
+			
 			TextField("Enter keywords from your seed", text: $wordInput)
 				.onChange(of: wordInput) { _ in
 					onInput()
 				}
-				.padding()
+				.id(inputID)
+				.padding([.top, .bottom])
 				.disableAutocorrection(true)
 				.disabled(mnemonics.count == 12)
 
@@ -166,82 +203,20 @@ struct RestoreView: View {
 				}
 			}
 			.frame(height: 32)
-			.padding([.leading, .trailing])
 
-			Divider()
-				.padding()
+			Divider().padding([.top, .bottom])
 
-			// List of mnemonics:
-			// #1   #7
-			// #2   #8
-			// ...  ...
-			ForEach(0..<6, id: \.self) { idx in
-
-				let idxLeftColumn = idx
-				let idxRightColumn = idx + 6
-
-				VStack(spacing: 2) {
-					HStack(alignment: .center, spacing: 0) {
-
-						Text("#\(idxLeftColumn + 1) ")
-							.font(.headline)
-							.foregroundColor(.secondary)
-							.padding(.trailing, 2)
-
-						HStack {
-							Text(mnemonic(idxLeftColumn))
-								.font(.headline)
-								.frame(maxWidth: .infinity, alignment: .leading)
-
-							Button {
-								mnemonics.removeSubrange(idxLeftColumn..<mnemonics.count)
-							} label: {
-								Image("ic_cross")
-									.resizable()
-									.frame(width: 24, height: 24)
-									.foregroundColor(Color.appRed)
-							}
-							.isHidden(mnemonics.count <= idxLeftColumn)
-						}
-						.padding(.trailing, 8)
-
-						Text("#\(idxRightColumn + 1) ")
-							.font(.headline)
-							.foregroundColor(.secondary)
-							.padding(.trailing, 2)
-
-						HStack {
-							Text(mnemonic(idxRightColumn ))
-								.font(.headline)
-								.frame(maxWidth: .infinity, alignment: .leading)
-
-							Button {
-								mnemonics.removeSubrange(idxRightColumn..<mnemonics.count)
-							} label: {
-								Image("ic_cross")
-									.resizable()
-									.frame(width: 24, height: 24)
-									.foregroundColor(Color.appRed)
-							}
-							.isHidden(mnemonics.count <= idxRightColumn)
-						}
-
-					} // </HStack>
-					.padding([.leading, .trailing], 16)
-
-				} // </VStack>
-			} // </ForEach>
+			
+			mnemonicsList_v0()
 
 			if mvi.model is RestoreWallet.ModelInvalidMnemonics {
 				Text(
 					"This seed is invalid and cannot be imported.\n\n" +
 					"Please try again"
 				)
-				.padding()
+				.padding([.top, .bottom])
 				.foregroundColor(Color.red)
 			}
-
-			Spacer()
 
 			Button {
 				onImportButtonTapped()
@@ -264,15 +239,85 @@ struct RestoreView: View {
 				RoundedRectangle(cornerRadius: 16)
 					.stroke(Color.appHorizon, lineWidth: 2)
 			)
-			.padding(.bottom, 20)
+			.padding([.top, .bottom]) // buffer space at bottom of scrollView
 		}
-		.frame(maxHeight: .infinity)
+		.padding([.leading, .trailing], 20)
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
 		})
 		.onChange(of: autocomplete) { _ in
 			onAutocompleteListChanged()
 		}
+		.onReceive(keyboardWillShow) { notification in
+			withAnimation {
+				scrollViewProxy.scrollTo("input", anchor: .top)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func mnemonicsList_v0() -> some View {
+		
+		// List of mnemonics:
+		// #1   #7
+		// #2   #8
+		// ...  ...
+		ForEach(0..<6, id: \.self) { idx in
+
+			let idxLeftColumn = idx
+			let idxRightColumn = idx + 6
+
+			VStack(alignment: HorizontalAlignment.leading, spacing: 2) {
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+
+					Text("#\(idxLeftColumn + 1) ")
+						.font(.headline)
+						.foregroundColor(.secondary)
+						.padding(.trailing, 2)
+
+					HStack(alignment: VerticalAlignment.center) {
+						Text(mnemonic(idxLeftColumn))
+							.font(.headline)
+							.frame(maxWidth: .infinity, alignment: .leading)
+
+						Button {
+							mnemonics.removeSubrange(idxLeftColumn..<mnemonics.count)
+						} label: {
+							Image("ic_cross")
+								.resizable()
+								.frame(width: 24, height: 24)
+								.foregroundColor(Color.appRed)
+						}
+						.isHidden(mnemonics.count <= idxLeftColumn)
+					}
+					.padding(.trailing, 8)
+
+					Text("#\(idxRightColumn + 1) ")
+						.font(.headline)
+						.foregroundColor(.secondary)
+						.padding(.trailing, 2)
+
+					HStack {
+						Text(mnemonic(idxRightColumn ))
+							.font(.headline)
+							.frame(maxWidth: .infinity, alignment: .leading)
+
+						Button {
+							mnemonics.removeSubrange(idxRightColumn..<mnemonics.count)
+						} label: {
+							Image("ic_cross")
+								.resizable()
+								.frame(width: 24, height: 24)
+								.foregroundColor(Color.appRed)
+						}
+						.isHidden(mnemonics.count <= idxRightColumn)
+					}
+
+				} // </HStack>
+				.padding([.leading, .trailing], 16)
+
+			} // </VStack>
+		} // </ForEach>
 	}
 	
 	func mnemonic(_ idx: Int) -> String {
