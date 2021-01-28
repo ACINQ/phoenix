@@ -24,10 +24,6 @@ struct RestoreWalletView: AltMviView {
 	var view: some View {
 		
 		main()
-		//	.padding(.top, keyWindow?.safeAreaInsets.bottom)
-		//	.padding(.bottom, keyWindow?.safeAreaInsets.top)
-		//	.padding([.leading, .trailing], 10)
-		//	.edgesIgnoringSafeArea([.bottom, .leading, .trailing])
 			.navigationBarTitle("Restore my wallet", displayMode: .inline)
 			.onChange(of: mvi.model, perform: { model in
 				onModelChange(model: model)
@@ -124,6 +120,7 @@ struct WarningView: View {
 			
 		} // </VStack>
 		.padding([.leading, .trailing])
+		.background(Color(UIColor.systemBackground)) // needed for animation (on dismissal)
 	}
 }
 
@@ -137,10 +134,16 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
+	let topID = "top"
 	let inputID = "input"
 	let keyboardWillShow = NotificationCenter.default.publisher(for:
 		UIApplication.keyboardWillShowNotification
 	)
+	let keyboardDidHide = NotificationCenter.default.publisher(for:
+		UIApplication.keyboardDidHideNotification
+	)
+	
+	let maxAutocompleteCount = 12
 	
 	var body: some View {
 		
@@ -148,34 +151,43 @@ struct RestoreView: View {
 			ScrollView {
 				ZStack {
 					
-					Color.clear
-						.frame(maxWidth: .infinity, maxHeight: .infinity)
-						.contentShape(Rectangle())
-						.onTapGesture {
-							// dismiss keyboard if visible
-							let keyWindow = UIApplication.shared.connectedScenes
-								.filter({ $0.activationState == .foregroundActive })
-								.map({ $0 as? UIWindowScene })
-								.compactMap({ $0 })
-								.first?.windows
-								.filter({ $0.isKeyWindow }).first
-							keyWindow?.endEditing(true)
-						}
+					// This interfers with tapping on buttons.
+					// It only seems to affect the device (not the simulator)
+					//
+					// A better solution is to use keyboardDismissMode, as below.
+					//
+//					Color(UIColor.clear)
+//						.frame(maxWidth: .infinity, maxHeight: .infinity)
+//						.contentShape(Rectangle())
+//						.onTapGesture {
+//							// dismiss keyboard if visible
+//							let keyWindow = UIApplication.shared.connectedScenes
+//								.filter({ $0.activationState == .foregroundActive })
+//								.map({ $0 as? UIWindowScene })
+//								.compactMap({ $0 })
+//								.first?.windows
+//								.filter({ $0.isKeyWindow }).first
+//							keyWindow?.endEditing(true)
+//						}
 					
 					main(scrollViewProxy)
 				}
 			}
+		}
+		.onAppear {
+			UIScrollView.appearance().keyboardDismissMode = .interactive
 		}
 	}
 	
 	@ViewBuilder
 	func main(_ scrollViewProxy: ScrollViewProxy) -> some View {
 	
-		VStack {
+		VStack(alignment: HorizontalAlignment.leading) {
 
 			Text("Your wallet's seed is a list of 12 english words.")
 				.font(.title3)
 				.padding(.top)
+				.id(topID)
 			
 			TextField("Enter keywords from your seed", text: $wordInput)
 				.onChange(of: wordInput) { _ in
@@ -189,25 +201,25 @@ struct RestoreView: View {
 			// Autocomplete suggestions for mnemonics
 			ScrollView(.horizontal) {
 				LazyHStack {
-					if autocomplete.count < 12 {
+					if autocomplete.count < maxAutocompleteCount {
 						ForEach(autocomplete, id: \.self) { word in
 
-							Text(word)
-								.underline()
-								.frame(maxWidth: .infinity) // Hack to be able to tap ...
-								.onTapGesture {
-									selectMnemonic(word)
-								}
+							Button {
+								selectMnemonic(word)
+							} label: {
+								Text(word)
+									.underline()
+									.foregroundColor(Color.primary)
+							}
 						}
 					}
 				}
 			}
 			.frame(height: 32)
 
-			Divider().padding([.top, .bottom])
-
+			Divider().padding(.bottom)
 			
-			mnemonicsList_v0()
+			mnemonicsList()
 
 			if mvi.model is RestoreWallet.ModelInvalidMnemonics {
 				Text(
@@ -218,28 +230,34 @@ struct RestoreView: View {
 				.foregroundColor(Color.red)
 			}
 
-			Button {
-				onImportButtonTapped()
-			} label: {
-				HStack {
-					Image(systemName: "checkmark.circle")
-						.imageScale(.small)
+			HStack { // Center button using: HStack {[space, button, space]}
+				Spacer()
+				
+				Button {
+					onImportButtonTapped()
+				} label: {
+					HStack {
+						Image(systemName: "checkmark.circle")
+							.imageScale(.small)
 
-					Text("Import")
+						Text("Import")
+					}
+					.font(.title2)
 				}
-				.font(.title2)
+				.disabled(mnemonics.count != 12)
+				.buttonStyle(PlainButtonStyle())
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.background(Color(UIColor.systemFill))
+				.cornerRadius(16)
+				.overlay(
+					RoundedRectangle(cornerRadius: 16)
+						.stroke(Color.appHorizon, lineWidth: 2)
+				)
+				.padding([.top, .bottom]) // buffer space at bottom of scrollView
+				
+				Spacer()
 			}
-			.disabled(mnemonics.count != 12)
-			.buttonStyle(PlainButtonStyle())
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-			.background(Color(UIColor.systemFill))
-			.cornerRadius(16)
-			.overlay(
-				RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.appHorizon, lineWidth: 2)
-			)
-			.padding([.top, .bottom]) // buffer space at bottom of scrollView
 		}
 		.padding([.leading, .trailing], 20)
 		.onChange(of: mvi.model, perform: { model in
@@ -250,74 +268,166 @@ struct RestoreView: View {
 		}
 		.onReceive(keyboardWillShow) { notification in
 			withAnimation {
-				scrollViewProxy.scrollTo("input", anchor: .top)
+				scrollViewProxy.scrollTo(inputID, anchor: .top)
+			}
+		}
+		.onReceive(keyboardDidHide) { _ in
+			withAnimation {
+				scrollViewProxy.scrollTo(topID, anchor: .top)
 			}
 		}
 	}
 	
 	@ViewBuilder
-	func mnemonicsList_v0() -> some View {
+	func mnemonicsList() -> some View {
 		
-		// List of mnemonics:
-		// #1   #7
-		// #2   #8
-		// ...  ...
-		ForEach(0..<6, id: \.self) { idx in
-
-			let idxLeftColumn = idx
-			let idxRightColumn = idx + 6
-
-			VStack(alignment: HorizontalAlignment.leading, spacing: 2) {
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-
-					Text("#\(idxLeftColumn + 1) ")
-						.font(.headline)
-						.foregroundColor(.secondary)
-						.padding(.trailing, 2)
-
-					HStack(alignment: VerticalAlignment.center) {
-						Text(mnemonic(idxLeftColumn))
+		// Design:
+		//
+		// #1 hammer  (x) #7 bacon  (x)
+		// #2 fat     (x) #8 animal (x)
+		// ...
+		//
+		// Architecture:
+		//
+		// There are 3 ways to layout the design:
+		//
+		// 1) VStack of HStack's
+		//
+		// So each row is its own HStack.
+		// And VStack puts all the rows together.
+		//
+		// VStack {
+		//   ForEach {
+		//     HStack {
+		//       {} #1
+		//       {} hammer (x)
+		//       {} #7
+		//       {} bacon (x)
+		//     }
+		//   }
+		// }
+		//
+		// The problem with this design is that items aren't aligned vertically.
+		// For example, it will end up looking like this:
+		//
+		// #9 bacon
+		// #10 animal
+		//
+		// What we want is for "bacon" & "animal" to be aligned vertically.
+		// But we can't get that with this design unless we:
+		// - hardcode the width of the number-row (difficult to do with adaptive text sizes)
+		// - use some hack to calculate the proper width based on current font size (possible option)
+		//
+		// 2) HStack of VStack's
+		//
+		// So each column is its own VStack.
+		// And HStack puts all the columns together.
+		//
+		// HStack {
+		//   VStack { ForEach{} } // column: #1
+		//   VStack { ForEach{} } // column: hammer (x)
+		//   VStack { ForEach{} } // column: #7
+		//   VStack { ForEach{} } // column: bacon (x)
+		// }
+		//
+		// This fixes the vertical alignment problem with the previous design.
+		// But we have to be very careful to ensure that each VStack is the same height.
+		// This works if:
+		// - we use the same font size for all text
+		// - the button size is <= the font size
+		//
+		// 3) Use a LazyVGrid and design the columns manually
+		//
+		// let columns: [GridItem] = [
+		//   GridItem(.flexible(?), spacing: 2),
+		//   GridItem(.flexible(?), spacing: 8),
+		//   GridItem(.flexible(?), spacing: 2),
+		//   GridItem(.flexible(?), spacing: 0)
+		// ]
+		//
+		// The problem is that GridItem isn't very flexible.
+		// What we want to say is:
+		// - make columns [0, 2] the minimum possible size
+		// - make columns [1, 3] the remainder
+		//
+		// But that's not an option. We have to define the min & max width.
+		// So we're back to the exact same problem we had with design #1.
+		//
+		// Thus, we're going with design #2 for now.
+		
+		let row_bottomSpacing: CGFloat = 6
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			// #1
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0..<6, id: \.self) { idx in
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						Text("#\(idx + 1) ")
+							.font(Font.headline.weight(.regular))
+							.foregroundColor(Color(UIColor.tertiaryLabel))
+					}
+					.padding(.bottom, row_bottomSpacing)
+				}
+			}
+			.padding(.trailing, 2)
+			
+			// hammer (x)
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(0..<6, id: \.self) { idx in
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						Text(mnemonic(idx))
 							.font(.headline)
 							.frame(maxWidth: .infinity, alignment: .leading)
-
+						
 						Button {
-							mnemonics.removeSubrange(idxLeftColumn..<mnemonics.count)
+							mnemonics.removeSubrange(idx..<mnemonics.count)
 						} label: {
-							Image("ic_cross")
-								.resizable()
-								.frame(width: 24, height: 24)
-								.foregroundColor(Color.appRed)
+							Image(systemName: "xmark")
+								.font(Font.caption.weight(.thin))
+								.foregroundColor(Color(UIColor.tertiaryLabel))
 						}
-						.isHidden(mnemonics.count <= idxLeftColumn)
+						.isHidden(mnemonics.count <= idx)
 					}
-					.padding(.trailing, 8)
-
-					Text("#\(idxRightColumn + 1) ")
-						.font(.headline)
-						.foregroundColor(.secondary)
-						.padding(.trailing, 2)
-
-					HStack {
-						Text(mnemonic(idxRightColumn ))
+					.padding(.bottom, row_bottomSpacing)
+				}
+			}
+			.padding(.trailing, 8)
+			
+			// #7
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(6..<12, id: \.self) { idx in
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						Text("#\(idx + 1) ")
+							.font(Font.headline.weight(.regular))
+							.foregroundColor(Color(UIColor.tertiaryLabel))
+					}
+					.padding(.bottom, row_bottomSpacing)
+				}
+			}
+			.padding(.trailing, 2)
+			
+			// bacon (x)
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				ForEach(6..<12, id: \.self) { idx in
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						Text(mnemonic(idx ))
 							.font(.headline)
 							.frame(maxWidth: .infinity, alignment: .leading)
-
+						
 						Button {
-							mnemonics.removeSubrange(idxRightColumn..<mnemonics.count)
+							mnemonics.removeSubrange(idx..<mnemonics.count)
 						} label: {
-							Image("ic_cross")
-								.resizable()
-								.frame(width: 24, height: 24)
-								.foregroundColor(Color.appRed)
+							Image(systemName: "xmark")
+								.font(Font.caption.weight(.thin))
+								.foregroundColor(Color(UIColor.tertiaryLabel))
 						}
-						.isHidden(mnemonics.count <= idxRightColumn)
+						.isHidden(mnemonics.count <= idx)
 					}
-
-				} // </HStack>
-				.padding([.leading, .trailing], 16)
-
-			} // </VStack>
-		} // </ForEach>
+					.padding(.bottom, row_bottomSpacing)
+				}
+			}
+		}
 	}
 	
 	func mnemonic(_ idx: Int) -> String {
@@ -440,7 +550,8 @@ struct RestoreView: View {
 		}
 		
 		if wordInput.hasSuffix(" "),
-		   let acceptedWord = autocomplete.first
+		   let acceptedWord = autocomplete.first,
+		   autocomplete.count < maxAutocompleteCount // only if autocomplete list is visible
 		{
 			// Example:
 			// The input is "Bacon ", and the autocomplete list is ["bacon"],
