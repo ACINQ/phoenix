@@ -11,16 +11,20 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ReceiveView: AltMviView {
+enum ReceiveViewSheet {
+	case sharing(url: String)
+	case editing(model: Receive.ModelGenerated)
+}
 
+struct ReceiveView: AltMviView {
+	
 	@StateObject var mvi = AltMVI({ $0.receive() })
 	
 	@StateObject var qrCode = QRCode()
 
-	@State var sharing: String? = nil
-	@State var editing: Bool = false
 	@State var unit: String = "sat"
-
+	@State var sheet: ReceiveViewSheet? = nil
+	
 	@State var pushPermissionRequestedFromOS = true
 	@State var bgAppRefreshDisabled = false
 	@State var notificationsDisabled = false
@@ -43,7 +47,6 @@ struct ReceiveView: AltMviView {
 	
 	@ViewBuilder var view: some View {
 		
-		let model = mvi.model
 		ZStack {
 			
 			Image("testnet_bg")
@@ -73,16 +76,24 @@ struct ReceiveView: AltMviView {
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			willEnterForeground()
 		})
-		.sheet(isPresented: $editing) {
-		
-			if let m = model as? Receive.ModelGenerated {
+		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
+			get: { sheet != nil },
+			set: { if !$0 { sheet = nil }}
+		)) {
+			switch sheet! {
+			case .sharing(let sharingUrl):
+				let items: [Any] = [sharingUrl]
+				ActivityView(activityItems: items, applicationActivities: nil)
+
+			case .editing(let model):
 				ModifyInvoiceSheet(
-					postIntent: mvi.intent,
-					initialUnit: m.unit,
-					initialAmount: m.amount,
-					show: $editing,
-					desc: m.desc ?? ""
+					mvi: mvi,
+					sheet: $sheet,
+					initialUnit: model.unit,
+					initialAmount: model.amount,
+					desc: model.desc ?? ""
 				)
+				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 			}
 		}
 		.navigationBarTitle("Receive ", displayMode: .inline)
@@ -128,7 +139,6 @@ struct ReceiveView: AltMviView {
 				actionButton(image: Image(systemName: "square.and.arrow.up")) {
 					didTapShareButton(model)
 				}
-				.sharing($sharing)
 				.disabled(!(model is Receive.ModelGenerated))
 				
 				actionButton(image: Image(systemName: "square.and.pencil")) {
@@ -172,7 +182,6 @@ struct ReceiveView: AltMviView {
 				actionButton(image: Image(systemName: "square.and.arrow.up")) {
 					didTapShareButton(model)
 				}
-				.sharing($sharing)
 				.disabled(!(model is Receive.ModelGenerated))
 				
 				actionButton(image: Image(systemName: "square.and.pencil")) {
@@ -514,15 +523,20 @@ struct ReceiveView: AltMviView {
 		log.trace("didTapShareButton()")
 		
 		if let m = model as? Receive.ModelGenerated {
-			sharing = "lightning:\(m.request)"
+			withAnimation {
+				let url = "lightning:\(m.request)"
+				sheet = ReceiveViewSheet.sharing(url: url)
+			}
 		}
 	}
 	
 	func didTapEditButton() -> Void {
 		log.trace("didTapEditButton()")
 		
-		withAnimation {
-			editing = true
+		if let model = mvi.model as? Receive.ModelGenerated {
+			withAnimation {
+				sheet = ReceiveViewSheet.editing(model: model)
+			}
 		}
 	}
 	
@@ -548,12 +562,11 @@ struct ReceiveView: AltMviView {
 
 struct ModifyInvoiceSheet: View {
 
-	let postIntent: (Receive.Intent) -> Void
+	@ObservedObject var mvi: AltMVI<Receive.Model, Receive.Intent>
+	@Binding var sheet: ReceiveViewSheet?
 	
 	let initialUnit: BitcoinUnit
 	let initialAmount: KotlinDouble?
-	
-	@Binding var show: Bool
 	
 	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.satoshi)
 	@State var amount: String = ""
@@ -624,9 +637,9 @@ struct ModifyInvoiceSheet: View {
 			Spacer()
 			HStack {
 				Spacer()
-				Button("Done") {
+				Button("Save") {
 					saveChanges()
-					withAnimation { show = false }
+					withAnimation { sheet = nil }
 				}
 				.font(.title2)
 				.disabled(isInvalidAmount && !isEmptyAmount)
@@ -765,7 +778,7 @@ struct ModifyInvoiceSheet: View {
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
 			if let bitcoinUnit = unit.bitcoinUnit {
-				postIntent(Receive.IntentAsk(
+				mvi.intent(Receive.IntentAsk(
 					amount: KotlinDouble(value: amt),
 					unit: bitcoinUnit,
 					desc: desc
@@ -779,7 +792,7 @@ struct ModifyInvoiceSheet: View {
 				let bitcoinUnit = BitcoinUnit.satoshi
 				let sat = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 				
-				postIntent(Receive.IntentAsk(
+				mvi.intent(Receive.IntentAsk(
 					amount: KotlinDouble(value: sat),
 					unit: bitcoinUnit,
 					desc: desc
@@ -788,7 +801,7 @@ struct ModifyInvoiceSheet: View {
 			
 		} else {
 			
-			postIntent(Receive.IntentAsk(
+			mvi.intent(Receive.IntentAsk(
 				amount: nil,
 				unit: initialUnit,
 				desc: desc

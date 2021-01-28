@@ -11,6 +11,15 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+struct GlobalEnvironment: ViewModifier {
+	static var currencyPrefs = CurrencyPrefs()
+	
+	func body(content: Self.Content) -> some View {
+		content
+			.environmentObject(Self.currencyPrefs)
+	}
+}
+
 struct ContentView: View {
 
     static func UIKitAppearance() {
@@ -79,7 +88,7 @@ struct ContentView: View {
 			}
 			
 		} // </ZStack>
-		.environmentObject(CurrencyPrefs())
+		.modifier(GlobalEnvironment())
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
 			onDidEnterBackground()
 		})

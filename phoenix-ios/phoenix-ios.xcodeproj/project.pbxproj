@@ -70,6 +70,7 @@
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */; };
+		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
@@ -193,6 +194,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */,
 				DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -490,7 +492,7 @@
 			);
 			name = "phoenix-ios";
 			packageProductDependencies = (
-				DC72C31825A3CF87008A927A,
+				DC72C31825A3CF87008A927A /* FirebaseMessaging */,
 			);
 			productName = "phoenix-ios";
 			productReference = 7555FF7B242A565900829871 /* Phoenix.app */;
@@ -590,7 +592,7 @@
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
-				DC72C2EA25A3CADC008A927A,
+				DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -780,7 +782,7 @@
 		};
 		DC72C32725A3D043008A927A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = DC72C32625A3D043008A927A;
+			productRef = DC72C32625A3D043008A927A /* FirebaseMessaging */;
 		};
 		DCB0DBB0255AEE0E005B29C8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1170,7 +1172,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		DC72C2EA25A3CADC008A927A = {
+		DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
@@ -1181,14 +1183,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DC72C31825A3CF87008A927A = {
+		DC72C31825A3CF87008A927A /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DC72C2EA25A3CADC008A927A;
+			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
-		DC72C32625A3D043008A927A = {
+		DC72C32625A3D043008A927A /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DC72C2EA25A3CADC008A927A;
+			package = DC72C2EA25A3CADC008A927A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
