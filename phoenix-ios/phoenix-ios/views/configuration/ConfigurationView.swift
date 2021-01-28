@@ -24,7 +24,7 @@ struct ConfigurationView: View {
 							Image(systemName: "link")
 						}
 					}
-					NavigationLink(destination: ComingSoonView()) {
+					NavigationLink(destination: TorConfigurationView()) {
 						Label { Text("Tor") } icon: {
 							Image(systemName: "shield.lefthalf.fill")
 						}

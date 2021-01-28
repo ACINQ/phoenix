@@ -16,6 +16,7 @@ class Prefs {
 		case theme
 		case fcmTokenInfo
 		case pushPermissionQuery
+		case isTorEnabled
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -95,6 +96,21 @@ class Prefs {
 			let key = Keys.theme.rawValue
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
 			themePublisher.send(newValue)
+		}
+	}
+
+	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
+		var value = self.isTorEnabled
+		return CurrentValueSubject<Bool, Never>(value)
+	}()
+
+	var isTorEnabled : Bool {
+		get {
+			 UserDefaults.standard.bool(forKey: Keys.isTorEnabled.rawValue)
+		}
+		set {
+			UserDefaults.standard.set(newValue, forKey: Keys.isTorEnabled.rawValue)
+			isTorEnabledPublisher.send(newValue)
 		}
 	}
 	

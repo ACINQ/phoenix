@@ -18,7 +18,6 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.serialization.json.Json
 import org.kodein.db.DB
 import org.kodein.db.impl.factory
@@ -130,6 +129,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     fun incomingPaymentFlow() =
         paymentsManager.subscribeToLastIncomingPayment()
+
+    fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
     val controllers: ControllerFactory = object : ControllerFactory {
         override fun content(): ContentController = AppContentController(loggerFactory, walletManager)

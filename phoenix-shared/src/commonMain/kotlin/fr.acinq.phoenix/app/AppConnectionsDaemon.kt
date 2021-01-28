@@ -210,6 +210,10 @@ class AppConnectionsDaemon(
                 }
             }
         }
+        // TODO Tor usage
+        launch { configurationManager.subscribeToIsTorEnabled().collect {
+            logger.info { "Tor is ${if (it) "enabled" else "disabled"}." }
+        } }
     }
 
     fun incrementDisconnectCount(): Unit {

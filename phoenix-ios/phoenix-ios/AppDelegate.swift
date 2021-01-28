@@ -85,6 +85,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		nc.publisher(for: UIApplication.willEnterForegroundNotification).sink { _ in
 			self._applicationWillEnterForeground(application)
 		}.store(in: &cancellables)
+
+		// Tor configuration observer
+		Prefs.shared.isTorEnabledPublisher.sink {[weak self](isTorEnabled: Bool) in
+			self?.business.updateTorUsage(isEnabled: isTorEnabled)
+		}.store(in: &cancellables)
 		
         return true
     }
