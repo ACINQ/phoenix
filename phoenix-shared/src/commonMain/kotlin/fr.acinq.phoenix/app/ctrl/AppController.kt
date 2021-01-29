@@ -25,12 +25,21 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
 
     init {
 
-        logger.info { "initial model=${firstModel}" }
+        fun truncateLog(m: M): String {
+            val s = m.toString().lines().joinToString(" ")
+            return if (s.length > 100) {
+                "${s.take(100)} (truncated)"
+            } else {
+                s
+            }
+        }
+
+        logger.info { "initial model=${truncateLog(firstModel)}" }
 
         launch {
             modelChanges.consumeEach { change ->
                 val newModel = models.value.change()
-                logger.info { "model=${newModel}" }
+                logger.info { "model=${truncateLog(newModel)}" }
                 models.value = newModel
             }
         }
