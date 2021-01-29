@@ -131,17 +131,29 @@ struct ReceiveView: AltMviView {
 			.padding([.leading, .trailing], 20)
 
 			HStack {
-				actionButton(image: Image(systemName: "square.on.square")) {
+				actionButton(
+					image: Image(systemName: "square.on.square"),
+					width: 20, height: 20,
+					xOffset: 0, yOffset: 0
+				) {
 					didTapCopyButton(model)
 				}
 				.disabled(!(model is Receive.ModelGenerated))
 				
-				actionButton(image: Image(systemName: "square.and.arrow.up")) {
+				actionButton(
+					image: Image(systemName: "square.and.arrow.up"),
+					width: 21, height: 21,
+					xOffset: 0, yOffset: -1
+				) {
 					didTapShareButton(model)
 				}
 				.disabled(!(model is Receive.ModelGenerated))
 				
-				actionButton(image: Image(systemName: "square.and.pencil")) {
+				actionButton(
+					image: Image(systemName: "square.and.pencil"),
+					width: 19, height: 19,
+					xOffset: 1, yOffset: -1
+				) {
 					didTapEditButton()
 				}
 				.disabled(!(model is Receive.ModelGenerated))
@@ -240,22 +252,30 @@ struct ReceiveView: AltMviView {
 	@ViewBuilder
 	func actionButton(
 		image: Image,
+		width: CGFloat = 20,
+		height: CGFloat = 20,
+		xOffset: CGFloat = 0,
+		yOffset: CGFloat = 0,
 		action: @escaping () -> Void
 	) -> some View {
 		
 		Button(action: action) {
-			image
-				.renderingMode(.template)
-				.resizable()
-				.scaledToFit()
-				.frame(width: 20, height: 20)
-				.padding(10)
-				.background(Color.buttonFill)
-				.cornerRadius(50)
-				.overlay(
-					RoundedRectangle(cornerRadius: 50)
-						.stroke(Color(UIColor.separator), lineWidth: 1)
-				)
+			ZStack {
+				Color.buttonFill
+					.frame(width: 40, height: 40)
+					.cornerRadius(50)
+					.overlay(
+						RoundedRectangle(cornerRadius: 50)
+							.stroke(Color(UIColor.separator), lineWidth: 1)
+					)
+				
+				image
+					.renderingMode(.template)
+					.resizable()
+					.scaledToFit()
+					.frame(width: width, height: height)
+					.offset(x: xOffset, y: yOffset)
+			}
 		}
 		.padding()
 	}
