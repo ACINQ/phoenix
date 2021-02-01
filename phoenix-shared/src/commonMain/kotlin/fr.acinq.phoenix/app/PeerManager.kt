@@ -128,6 +128,6 @@ class PeerManager(
             override val payments: PaymentsDb get() = paymentsDb
         }
 
-        return Peer(tcpSocketBuilder, nodeParams, walletParams, electrumWatcher, databases, MainScope())
+        return Peer(nodeParams, walletParams, electrumWatcher, databases, tcpSocketBuilder, MainScope())
     }
 }
