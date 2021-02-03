@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -42,6 +41,7 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
 import fr.acinq.phoenix.lnurl.LNUrlAuth
+import fr.acinq.phoenix.lnurl.LNUrlError
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.customviews.ButtonView
@@ -67,24 +67,27 @@ class ReadInputFragment : BaseFragment() {
     model = ViewModelProvider(this).get(ReadInputViewModel::class.java)
     mBinding.model = model
 
-    model.inputState.observe(viewLifecycleOwner, Observer {
+    model.inputState.observe(viewLifecycleOwner, {
       when (it) {
         is ReadInputState.Scanning -> mBinding.scanView.resume()
         is ReadInputState.Reading -> mBinding.scanView.pause()
         is ReadInputState.Error -> {
-          mBinding.errorMessage.text = getString(when (it) {
-            is ReadInputState.Error.PayToSelf -> R.string.scan_error_pay_to_self
-            is ReadInputState.Error.InvalidChain -> R.string.scan_error_invalid_chain
-            is ReadInputState.Error.PaymentExpired -> R.string.scan_error_expired
-            is ReadInputState.Error.UnhandledLNURL -> R.string.scan_error_lnurl_unsupported
-            is ReadInputState.Error.UnhandledInput -> R.string.scan_error_invalid_scan
-          })
-          mBinding.scanView.pause()
-          Handler().postDelayed({
-            if (model.inputState.value is ReadInputState.Error) {
-              model.inputState.value = ReadInputState.Scanning
+          mBinding.errorMessage.text = when (it) {
+            is ReadInputState.Error.PayToSelf -> getString(R.string.scan_error_pay_to_self)
+            is ReadInputState.Error.InvalidChain -> getString(R.string.scan_error_invalid_chain)
+            is ReadInputState.Error.PaymentExpired -> getString(R.string.scan_error_expired)
+            is ReadInputState.Error.ErrorInLNURLResponse -> when (it.error) {
+              is LNUrlError.RemoteFailure.Code -> Converter.html(getString(R.string.scan_error_lnurl_failure_code, it.error.origin, it.error.code))
+              is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.scan_error_lnurl_failure_detailed, it.error.origin, it.error.reason))
+              is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.scan_error_lnurl_failure_unreadable, it.error.origin))
+              is LNUrlError.RemoteFailure -> Converter.html(getString(R.string.scan_error_lnurl_failure_generic, it.error.origin))
+              is LNUrlError.UnhandledTag -> getString(R.string.scan_error_lnurl_unsupported)
+              else -> getString(R.string.scan_error_invalid_scan)
             }
-          }, 1750)
+            is ReadInputState.Error.UnhandledLNURL -> getString(R.string.scan_error_lnurl_unsupported)
+            is ReadInputState.Error.UnhandledInput -> getString(R.string.scan_error_invalid_scan)
+          }
+          mBinding.scanView.pause()
         }
         is ReadInputState.Done.Lightning -> {
           // check payment request chain
@@ -166,6 +169,12 @@ class ReadInputFragment : BaseFragment() {
     }
 
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
+
+    mBinding.errorButton.setOnClickListener {
+      if (model.inputState.value is ReadInputState.Error) {
+        model.inputState.value = ReadInputState.Scanning
+      }
+    }
 
     activity?.let { activity ->
       if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

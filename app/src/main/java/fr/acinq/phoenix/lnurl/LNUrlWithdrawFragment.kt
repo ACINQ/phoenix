@@ -52,7 +52,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
 
   private lateinit var unitList: List<String>
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentLnurlWithdrawBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
     return mBinding.root
@@ -66,16 +66,17 @@ class LNUrlWithdrawFragment : BaseFragment() {
       mBinding.model = model
 
       model.state.observe(viewLifecycleOwner, Observer { state ->
-        context?.let { _ ->
-          when (state) {
-            is LNUrlWithdrawState.Error.Internal -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_internal)
-            is LNUrlWithdrawState.Error.InvalidRequest -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_invalid)
-            is LNUrlWithdrawState.Error.RemoteGeneric -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, getString(R.string.utils_unknown))
-            is LNUrlWithdrawState.Error.RemoteUnreadable -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, getString(R.string.lnurl_withdraw_error_remote_invalid_response))
-            is LNUrlWithdrawState.Error.RemoteWithDetails -> mBinding.error.text = getString(R.string.lnurl_withdraw_error_remote, model.topDomain.value, state.details)
-            is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.topDomain.value)
-            else -> {}
+        when (state) {
+          is LNUrlWithdrawState.Error.Internal -> mBinding.errorMessage.text = getString(R.string.lnurl_withdraw_error_internal)
+          is LNUrlWithdrawState.Error.RemoteFailure -> mBinding.errorMessage.text = when (state.error) {
+            is LNUrlError.RemoteFailure.Code -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_code, state.error.origin, state.error.code))
+            is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_detailed, state.error.origin, state.error.reason))
+            is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_unreadable, state.error.origin))
+            is LNUrlError.RemoteFailure.Generic -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_generic, state.error.origin))
+            else -> getString(R.string.lnurl_withdraw_error_internal)
           }
+          is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.topDomain.value)
+          else -> {}
         }
       })
 
@@ -89,7 +90,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
 
     } ?: findNavController().navigate(R.id.action_lnurl_withdraw_to_main)
     model.url.value = args.url
-    model.topDomain.value = HttpUrl.get(args.url.callback).topPrivateDomain()
+    model.topDomain.value = HttpUrl.get(args.url.callback).run { topPrivateDomain() ?: host() }
   }
 
   override fun onStart() {
@@ -122,7 +123,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         model.editableAmount.value = it.maxWithdrawable.toLong() != it.minWithdrawable.toLong()
       } catch (e: Exception) {
         log.error("error when reading lnurl-withdraw=$it")
-        model.state.value = LNUrlWithdrawState.Error.InvalidRequest
+        model.state.value = LNUrlWithdrawState.Error.Internal
       }
     }
     mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_lnurl_withdraw_to_main) })
@@ -142,9 +143,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
       if (amountOpt.isDefined) {
         val amount = amountOpt.get()
         if (amount.`$less`(args.url.minWithdrawable)) {
-          throw LNUrlWithdrawAtLeastMinSat(args.url.minWithdrawable)
+          throw LNUrlError.WithdrawAtLeastMinSat(args.url.minWithdrawable)
         } else if (amount.`$greater`(args.url.maxWithdrawable)) {
-          throw LNUrlWithdrawAtMostMaxSat(args.url.maxWithdrawable)
+          throw LNUrlError.WithdrawAtMostMaxSat(args.url.maxWithdrawable)
         }
         if (unit == fiat) {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printAmountPretty(amount, requireContext(), withUnit = true))
@@ -158,8 +159,8 @@ class LNUrlWithdrawFragment : BaseFragment() {
     } catch (e: Exception) {
       mBinding.amountConverted.text = ""
       mBinding.amountError.text = when (e) {
-        is LNUrlWithdrawAtLeastMinSat -> getString(R.string.lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
-        is LNUrlWithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, it, withUnit = true) } ?: "")
+        is LNUrlError.WithdrawAtLeastMinSat -> getString(R.string.lnurl_withdraw_error_amount_min, context?.let { Converter.printAmountPretty(e.min, it, withUnit = true) } ?: "")
+        is LNUrlError.WithdrawAtMostMaxSat -> getString(R.string.lnurl_withdraw_error_amount_max, context?.let { Converter.printAmountPretty(e.max, it, withUnit = true) } ?: "")
         else -> getString(R.string.lnurl_withdraw_error_amount)
       }
       Option.empty()
@@ -176,13 +177,14 @@ class LNUrlWithdrawFragment : BaseFragment() {
         val amount = checkAmount()
         if (!amount.isEmpty) {
           model.state.value = LNUrlWithdrawState.InProgress
+          val domain = model.topDomain.value!!
           val pr = app.requireService.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
           Wallet.httpClient.newCall(Request.Builder().url(url).build()).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
               log.error("remote error when sending lnurl-withdraw callback: ", e)
-              model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
+              model.state.postValue(LNUrlWithdrawState.Error.RemoteFailure(LNUrlError.RemoteFailure.Generic(domain)))
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -192,11 +194,10 @@ class LNUrlWithdrawFragment : BaseFragment() {
                 model.state.postValue(LNUrlWithdrawState.Done)
               } catch (e: Exception) {
                 log.error("error in LNURL-withdraw callback remote: ", e)
-                when (e) {
-                  is JSONException -> model.state.postValue(LNUrlWithdrawState.Error.RemoteUnreadable)
-                  is LNUrlRemoteFailure -> model.state.postValue(LNUrlWithdrawState.Error.RemoteWithDetails(e.localizedMessage))
-                  else -> model.state.postValue(LNUrlWithdrawState.Error.RemoteGeneric)
-                }
+                model.state.postValue(when (e) {
+                  is LNUrlError.RemoteFailure -> LNUrlWithdrawState.Error.RemoteFailure(e)
+                  else -> LNUrlWithdrawState.Error.Internal
+                })
               }
             }
           })
@@ -212,10 +213,7 @@ sealed class LNUrlWithdrawState {
   object Done : LNUrlWithdrawState()
   sealed class Error : LNUrlWithdrawState() {
     object Internal : Error()
-    object InvalidRequest : Error()
-    object RemoteGeneric : Error()
-    object RemoteUnreadable : Error()
-    data class RemoteWithDetails(val details: String?) : Error()
+    data class RemoteFailure(val error: LNUrlError) : Error()
   }
 }
 

@@ -412,8 +412,6 @@
   <string name="lnurl_withdraw_error_amount">El importe no es válido.</string>
   <string name="lnurl_withdraw_error_amount_min">El importe debe ser de al menos %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">El importe no puede exceder %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s respondió con un error: %2$s.\n\nVuelve a intentarlo más tarde o contacta a su soporte.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Datos incorrectos</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

@@ -165,6 +165,14 @@
   <string name="scan_error_pay_to_self">Vous ne pouvez pas vous payer vous-même.</string>
   <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que vous.</string>
   <string name="scan_error_lnurl_unsupported">Ce type de LNURL n\'est pas encore supporté!</string>
+  <string name="scan_error_lnurl_failure_generic"><![CDATA[Le service <b>%1$s</b> retourne une erreur.]]></string>
+  <string name="scan_error_lnurl_failure_code"><![CDATA[The service LNURL <b>%1$s</b> retourne un code d\'erreur HTTP %2$d.]]></string>
+  <string name="scan_error_lnurl_failure_detailed"><![CDATA[
+    The service LNURL <b>%1$s</b> retourne l\'erreur suivante :
+    <br/><br/>
+    <em>%2$s</em>
+  ]]></string>
+  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[The service LNURL <b>%1$s</b> retourne un message invalide.]]></string>
   <string name="scan_error_invalid_scan">Cette donnée n\'est pas valide.\nVeuillez réessayer.</string>
 
   <string name="scan_amountless_legacy_title">Attention</string>
@@ -469,14 +477,34 @@
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Retirer des fonds depuis <br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Retirer</string>
   <string name="lnurl_withdraw_wait">Demande de fonds en cours…</string>
-  <string name="lnurl_withdraw_success">Veuillez patienter pendant que %1$s envoie les fonds.\n\nGardez bien l\'application en ligne.</string>
+  <string name="lnurl_withdraw_success">%1$s va vous envoyer les fonds, cela peut prendre un peu de temps.\n\nGardez bien l\'application en ligne.</string>
   <string name="lnurl_withdraw_error_internal">Cette demande de retrait n\'a pas pu être traitée. Veuillez réessayer.</string>
   <string name="lnurl_withdraw_error_invalid">Cette demande de retrait n\'est pas valide. Veuillez réessayer.</string>
   <string name="lnurl_withdraw_error_amount">Ce montant n\'est pas valide.</string>
   <string name="lnurl_withdraw_error_amount_min">Le montant doit être au moins %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Le montant ne doit pas excéder %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+  <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
+    <b>%1$s</b> retourne une erreur ou une réponse invalide. ou une réponse invalide.
+    <br/><br/>
+    Veuillez réessayer plus tard, ou contactez leur support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_unreadable"><![CDATA[
+    Le retrait a peut-être échoué. <b>%1$s</b> retourne une erreur.
+    <br/><br/>
+    Veuillez réessayer plus tard, ou contactez leur support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_code"><![CDATA[
+    Le retrait a échoué. <b>%1$s</b> retourne un code d\'erreur HTTP %2$d.
+    <br/><br/>
+    Veuillez réessayer plus tard, ou contactez leur support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_detailed"><![CDATA[
+    Le retrait a échoué. <b>%1$s</b> retourne le message d\'erreur suivant :
+    <br/><br/>
+    <em>%2$s</em>
+    <br/><br/>—<br/>
+    Veuillez réessayer plus tard, ou contactez leur support.
+  ]]></string>
 
   <!-- //////////////// display preferences //////////////// -->
 

@@ -117,7 +117,7 @@
   <string name="receive_share_subject">Pagamento solicitado</string>
   <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
   <string name="receive_share_button">Compartilhar…</string>
-  
+
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de pelo menos <b>%1$s</b>.]]></string>
   <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de pelo menos <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Endereço</string>
@@ -328,7 +328,7 @@
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
-  
+
    <string name="initwallet_terms"><![CDATA[
     Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
   ]]></string>
@@ -425,7 +425,7 @@
   ]]></string>
 
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
-  
+
   <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
   <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a cobrança já foi paga ou quando a cobrança contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
   <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
@@ -514,8 +514,6 @@
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
   <string name="lnurl_withdraw_error_amount_min">O valor não pode ser menor que %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">O valor não pode ser maior que %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s respondeu com um erro: %2$s.\n\nTente novamente mais tarde, ou entre em contato com o suporte.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Dado inválido</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
@@ -526,7 +524,7 @@
   <string name="prefs_display_explorer_label">Blockchain</string>
   <string name="prefs_display_balance_display">Mostrar saldo na tela inicial</string>
   <string name="prefs_display_balance_display_desc">Esconder o saldo ajuda a evitar olhares indiscretos</string>
-  
+
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
@@ -625,7 +623,7 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
-  
+
   <!-- ftue -->
 
   <string name="ftue__bullet_1" translatable="false">●○○</string>

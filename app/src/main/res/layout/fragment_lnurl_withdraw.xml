@@ -177,21 +177,41 @@
         app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
         app:text="@string/lnurl_withdraw_wait" />
 
-      <TextView
-        android:id="@+id/error"
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/error_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_lg"
-        android:layout_marginTop="@dimen/space_lg_p"
-        android:layout_marginEnd="@dimen/space_lg"
-        android:drawableStart="@drawable/ic_alert_triangle"
-        android:drawableTint="?attr/negativeColor"
-        android:padding="@dimen/space_sm"
+        android:layout_margin="@dimen/space_lg"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_md_p"
         android:visibility="@{model.state instanceof LNUrlWithdrawState.Error}"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
+        app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier"
+        app:layout_constraintWidth_max="@dimen/max_width_md">
+
+        <ImageView
+          android:id="@+id/error_icon"
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:src="@drawable/ic_alert_triangle"
+          android:contentDescription="@null"
+          app:layout_constraintBaseline_toBaselineOf="@id/error_message"
+          app:layout_constraintStart_toStartOf="parent"
+          app:tint="?attr/negativeColor" />
+
+        <TextView
+          android:id="@+id/error_message"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_sm"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/error_icon"
+          app:layout_constraintTop_toTopOf="parent" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
       <TextView
         android:id="@+id/success"
