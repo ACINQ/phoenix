@@ -25,6 +25,7 @@ import org.kodein.db.inDir
 import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
+import org.kodein.log.newLogger
 import org.kodein.log.withShortPackageKeepLast
 import org.kodein.memory.file.Path
 import org.kodein.memory.file.resolve
@@ -39,6 +40,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         defaultLogFrontend.withShortPackageKeepLast(1),
         logMemory.withShortPackageKeepLast(1)
     )
+
+    private val logger = loggerFactory.newLogger(this::class)
 
     private val tcpSocketBuilder = TcpSocket.Builder()
 
@@ -123,8 +126,9 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
     // And after that, only if the tuple changes (e.g. different fcm_token).
-    fun registerFcmToken(token: String?) {
-        peerManager.peerState.value?.registerFcmToken(token)
+    suspend fun registerFcmToken(token: String?) {
+        logger.info { "registering token=$token" }
+        peerManager.getPeer().registerFcmToken(token)
     }
 
     fun incomingPaymentFlow() =
