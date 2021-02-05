@@ -270,6 +270,9 @@
   <string name="notif_pay_to_open_title">Accept incoming payment</string>
   <string name="notif_pay_to_open_message">Tap to open the app</string>
 
+  <string name="notif__pay_to_open_missed_title">Missed payment (%1$s)</string>
+  <string name="notif__pay_to_open_missed_message">The amount incoming was too small to create a new payment channel.</string>
+
   <!-- //////////////// close all channels //////////////// -->
 
   <string name="closechannels_title">Close channels</string>

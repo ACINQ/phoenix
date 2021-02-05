@@ -422,6 +422,7 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
+    system.eventStream().subscribe(nodeSupervisor, MissedPayToOpenPayment::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     // this is only needed to create the peer when we don't yet have any channel, connection will be handled by the reconnection task
@@ -883,17 +884,30 @@ class EclairNodeService : Service() {
       } else {
         EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
         if (!appContext.isAppVisible) {
-          notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
+          notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN)
             .setSmallIcon(R.drawable.ic_phoenix_outline)
             .setContentTitle(getString(R.string.notif_pay_to_open_title))
             .setContentText(getString(R.string.notif_pay_to_open_message))
-            .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__CHANNELS_WATCHER,
+            .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__PAY_TO_OPEN,
               Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
             .setAutoCancel(true)
             .build())
         }
       }
     }
+  }
+
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: MissedPayToOpenPayment) {
+    notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN)
+      .setSmallIcon(R.drawable.ic_phoenix_outline)
+      .setContentTitle(getString(R.string.notif__pay_to_open_missed_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
+      .setContentText(getString(R.string.notif__pay_to_open_missed_message))
+      .setStyle(NotificationCompat.BigTextStyle().bigText(getString(R.string.notif__pay_to_open_missed_message)))
+      .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__PAY_TO_OPEN,
+        Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
+      .setAutoCancel(true)
+      .build())
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)

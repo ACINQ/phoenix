@@ -28,6 +28,7 @@ import fr.acinq.eclair.channel.*
 import fr.acinq.eclair.io.PayToOpenRequestEvent
 import fr.acinq.eclair.io.PeerConnected
 import fr.acinq.eclair.io.PeerDisconnected
+import fr.acinq.eclair.payment.MissedPayToOpenPayment
 import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
@@ -174,6 +175,10 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
       is PayToOpenRequestEvent -> {
         log.info("adding PendingPayToOpenRequest for payment_hash=${event.payToOpenRequest().paymentHash()}")
         payToOpenMap[event.payToOpenRequest().paymentHash()] = event
+        EventBus.getDefault().post(event)
+      }
+      is MissedPayToOpenPayment -> {
+        log.info("missed PayToOpen=$event")
         EventBus.getDefault().post(event)
       }
 
