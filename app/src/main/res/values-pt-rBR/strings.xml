@@ -193,7 +193,7 @@
   <string name="scan_error_lnurl_failure_generic"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um erro.]]></string>
   <string name="scan_error_lnurl_failure_code"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um código de erro HTTP %2$d.]]></string>
   <string name="scan_error_lnurl_failure_detailed"><![CDATA[
-    The LNURL Service <b>%1$s</b> retornou um erro:
+    O serviço LNURL <b>%1$s</b> retornou um erro:
     <br/><br/>
     <em>%2$s</em>
   ]]></string>
