@@ -77,16 +77,16 @@ class LNUrlAuthFragment : BaseFragment() {
       return
     }
     model = ViewModelProvider(this, LNUrlAuthViewModel.Factory(url)).get(LNUrlAuthViewModel::class.java)
-    model.state.observe(viewLifecycleOwner, Observer { state ->
+    model.state.observe(viewLifecycleOwner, { state ->
       when (state) {
         is LNUrlAuthState.Error -> {
           val details = when (state.cause) {
-            is LNUrlRemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
-            is LNUrlRemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
-            is LNUrlRemoteFailure.Code -> "HTTP ${state.cause.code}"
+            is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
+            is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
+            is LNUrlError.RemoteFailure.Code -> "HTTP ${state.cause.code}"
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
           }
-          mBinding.failure.text = getString(R.string.lnurl_auth_failure, details)
+          mBinding.errorMessage.text = getString(R.string.lnurl_auth_failure, details)
         }
         is LNUrlAuthState.Done -> Handler().postDelayed({
           if (model.state.value is LNUrlAuthState.Done) {
@@ -114,7 +114,8 @@ class LNUrlAuthFragment : BaseFragment() {
       model.state.postValue(LNUrlAuthState.Error(e))
     }) {
       model.state.postValue(LNUrlAuthState.InProgress)
-      val key = getAuthLinkingKey(model.domainToSignIn)
+      val domain = model.domainToSignIn
+      val key = getAuthLinkingKey(domain)
       val signedK1 = Crypto.compact2der(Crypto.sign(ByteVector32.fromValidHex(args.url.k1).bytes(), key)).toHex()
       val request = Request.Builder().url(model.url.newBuilder()
         .addQueryParameter("sig", signedK1)
@@ -125,8 +126,8 @@ class LNUrlAuthFragment : BaseFragment() {
       val response = try {
         LNUrl.httpClient.newCall(request).execute()
       } catch (e: IOException) {
-        log.error("io error when authenticating with lnurl:", e)
-        throw LNUrlRemoteFailure.CouldNotConnect
+        log.error("io error when authenticating with lnurl on domain=$domain: ", e)
+        throw LNUrlError.RemoteFailure.CouldNotConnect(domain)
       }
       val json = LNUrl.handleLNUrlRemoteResponse(response)
       // if no failure, let's try to map to a pertinent state, with a fallback to Done.Authed

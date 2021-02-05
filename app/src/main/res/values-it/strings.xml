@@ -379,8 +379,6 @@
   <string name="lnurl_withdraw_error_amount">Ammontare invalido.</string>
   <string name="lnurl_withdraw_error_amount_min">L\'importo deve essere almeno %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">L\'importo puo essere al massimo %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s ha risposto con un errore: %2$s.\n\nRiprova dopo o contatta il loro supporto.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Dati invalidi</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

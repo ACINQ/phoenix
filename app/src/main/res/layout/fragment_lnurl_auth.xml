@@ -126,19 +126,44 @@
         app:layout_constraintTop_toBottomOf="@id/success_image"
         app:text="@string/lnurl_auth_success" />
 
-      <TextView
-        android:id="@+id/failure"
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/error_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md_p"
-        android:text="@string/lnurl_auth_failure"
         android:layout_marginStart="@dimen/space_lg"
         android:layout_marginEnd="@dimen/space_lg"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_md_p"
         android:visibility="@{model.state instanceof LNUrlAuthState.Error}"
+        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
+        app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
-        app:text="@string/lnurl_auth_failure" />
+        app:layout_constraintWidth_max="@dimen/max_width_md">
+
+        <ImageView
+          android:id="@+id/error_icon"
+          android:layout_width="24dp"
+          android:layout_height="24dp"
+          android:src="@drawable/ic_alert_triangle"
+          android:contentDescription="@null"
+          app:layout_constraintBaseline_toBaselineOf="@id/error_message"
+          app:layout_constraintStart_toStartOf="parent"
+          app:tint="?attr/negativeColor" />
+
+        <TextView
+          android:id="@+id/error_message"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_sm"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/error_icon"
+          android:text="@string/lnurl_auth_failure"
+          app:layout_constraintTop_toTopOf="parent" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
   </ScrollView>
 </layout>

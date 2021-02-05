@@ -376,8 +376,6 @@
   <string name="lnurl_withdraw_error_amount">Bedrag is ongeldig.</string>
   <string name="lnurl_withdraw_error_amount_min">Bedrag moet minimaal %1$s zijn.</string>
   <string name="lnurl_withdraw_error_amount_max">Bedrag kan %1$s niet overschrijden.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s reageerde met een foutmelding: %2$s.\n\nProbeer opnieuw, of neem contact op met hun support.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Ongeldige data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

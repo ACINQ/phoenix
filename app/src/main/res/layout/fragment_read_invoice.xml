@@ -118,21 +118,56 @@
       app:text="@string/scan_request_camera_access"
       app:text_size="@dimen/text_lg" />
 
-    <TextView
-      android:id="@+id/error_message"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/error_layout"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="@dimen/space_lg"
       android:background="@drawable/rounded"
-      android:drawableStart="@drawable/ic_alert_triangle"
-      android:drawableTint="?attr/negativeColor"
-      android:padding="@dimen/space_md_p"
+      android:paddingTop="@dimen/space_md_p"
+      android:paddingBottom="@dimen/space_xs"
       android:visibility="@{model.inputState instanceof ReadInputState.Error}"
       app:layout_constrainedWidth="true"
       app:layout_constraintBottom_toBottomOf="@id/scan_view"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@id/scan_view" />
+      app:layout_constraintTop_toTopOf="@id/scan_view">
+
+      <ImageView
+        android:id="@+id/error_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="@dimen/space_md_p"
+        android:src="@drawable/ic_alert_triangle"
+        android:contentDescription="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/error_message"
+        app:tint="?attr/negativeColor" />
+
+      <TextView
+        android:id="@+id/error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_sm"
+        android:layout_marginEnd="@dimen/space_md_p"
+        android:text="@string/scan_error_invalid_scan"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/error_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/error_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:background="@drawable/button_bg_square"
+        android:layout_marginEnd="@dimen/space_xs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/error_message"
+        app:text="@string/btn_ok" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <fr.acinq.phoenix.utils.customviews.ProgressTextView
       android:layout_width="wrap_content"

@@ -118,6 +118,8 @@
   <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de pelo menos <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de pelo menos <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
@@ -188,6 +190,14 @@
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
   <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
   <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportada!</string>
+  <string name="scan_error_lnurl_failure_generic"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um erro.]]></string>
+  <string name="scan_error_lnurl_failure_code"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um código de erro HTTP %2$d.]]></string>
+  <string name="scan_error_lnurl_failure_detailed"><![CDATA[
+    O serviço LNURL <b>%1$s</b> retornou um erro:
+    <br/><br/>
+    <em>%2$s</em>
+  ]]></string>
+  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[O serviço LNURL <b>%1$s</b> retornou uma mensagem inválida.]]></string>
   <string name="scan_error_invalid_scan">Dado inválido.\nPor favor tente novamente.</string>
 
   <string name="scan_amountless_legacy_title">Advertência</string>
@@ -326,7 +336,7 @@
   <string name="menu_receive">Receber</string>
 
   <!-- //////////////// init wallet //////////////// -->
-  
+
    <string name="initwallet_terms"><![CDATA[
     Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
   ]]></string>
@@ -423,7 +433,7 @@
   ]]></string>
 
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
-  
+
   <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
   <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a cobrança já foi paga ou quando a cobrança contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
   <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
@@ -506,14 +516,34 @@
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Resgatar</string>
   <string name="lnurl_withdraw_wait">Resgatando valores…</string>
-  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores.\n\nMantenha o aplicativo aberto.</string>
+  <string name="lnurl_withdraw_success">Aguarde enquanto %1$s está enviando os valores, pode levar algum tempo\n\nMantenha o aplicativo aberto.</string>
   <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
   <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
   <string name="lnurl_withdraw_error_amount_min">O valor não pode ser menor que %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">O valor não pode ser maior que %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s respondeu com um erro: %2$s.\n\nTente novamente mais tarde, ou entre em contato com o suporte.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Dado inválido</string>
+  <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
+    <b>%1$s</b> retornou um erro, ou uma mensagem inválida.
+    <br/><br/>
+    Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_unreadable"><![CDATA[
+    O recebimento pode ter falhado. <b>%1$s</b> retornou uma resposta desconhecida.
+    <br/><br/>
+    Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_code"><![CDATA[
+    Falha no recebimento. <b>%1$s</b> retornou o código de erro HTTP %2$d.
+    <br/><br/>
+     Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_detailed"><![CDATA[
+    Falha no recebimento. <b>%1$s</b> retornou o seguinte erro:
+    <br/><br/>
+    <em>%2$s</em>
+    <br/><br/>—<br/>
+    Tente novamente mais tarde, ou entre em contato com o suporte do serviço.
+  ]]></string>
 
   <!-- //////////////// display preferences //////////////// -->
 
@@ -524,7 +554,7 @@
   <string name="prefs_display_explorer_label">Blockchain</string>
   <string name="prefs_display_balance_display">Mostrar saldo na tela inicial</string>
   <string name="prefs_display_balance_display_desc">Esconder o saldo ajuda a evitar olhares indiscretos</string>
-  
+
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
@@ -623,7 +653,7 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
-  
+
   <!-- ftue -->
 
   <string name="ftue__bullet_1" translatable="false">●○○</string>

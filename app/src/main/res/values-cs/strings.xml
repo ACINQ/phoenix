@@ -376,8 +376,6 @@
   <string name="lnurl_withdraw_error_amount">Neplatné množství.</string>
   <string name="lnurl_withdraw_error_amount_min">Množství musí být alespoň %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Množství nesmí překročit %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s odpověděl s chybou: %2$s.\n\nZkuste to znovu, nebo kontaktujte podporu.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Neplatná data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 
