@@ -45,13 +45,9 @@ class PatchNotesFragment : BaseFragment(stayIfNotStarted = true) {
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     log.info("displaying patch notes from version=${args.version} to version=${BuildConfig.VERSION_CODE}")
-
-
-
     val notes = Migration.listNotableChangesSince(args.version.toInt()).map {
       log.debug("adding patch note for version=$it")
-      val swapInFee = 100 * (appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
-      getString(R.string.patchnotes_v15, String.format("%.2f", swapInFee))
+      getPatchNoteForVersion(it)
     }.joinToString("<br />")
     log.info("notes=$notes")
     mBinding.content.text = Converter.html(notes)
@@ -67,5 +63,21 @@ class PatchNotesFragment : BaseFragment(stayIfNotStarted = true) {
       }
     }
   }
-}
 
+  private fun getPatchNoteForVersion(version: Int): String {
+    return when (version) {
+      15 -> {
+        val swapInFee = 100 * (appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+        getString(R.string.patchnotes_v15, String.format("%.2f", swapInFee))
+      }
+      23 -> {
+        getString(R.string.patchnotes_v23)
+      }
+      else -> {
+        log.warn("no patch note for version=$version")
+        "missing patch note..."
+      }
+    }
+  }
+
+}

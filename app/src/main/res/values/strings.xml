@@ -687,6 +687,11 @@
     <p>The app lock now uses the system\'s lock. No need to remember yet another PIN!</p>
     <p>Go to Settings > Security to enroll for the new screen lock feature.</p>
   ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Fee increase for new channels</h4>
+    <p>The fee rate for new channels stays the same (0.1 %), but there is now a <b>1000 sat</b> minimum fee.</p>
+    <p>If someone sends you 15 000 sat and you don\'t have any channels, a new channel will be created and you will receive 14 000 sat.</p>
+  ]]></string>
 
   <string name="paymentmode_onchain">Pay on-chain</string>
   <string name="paymentmode_onchain_desc">On-chain transactions are typically slower and more expensive</string>

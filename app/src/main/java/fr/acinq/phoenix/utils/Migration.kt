@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory
 object Migration {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  val VERSIONS_WITH_NOTABLE_CHANGES = listOf(15)
+  val VERSIONS_WITH_NOTABLE_CHANGES = listOf(15, 23)
 
   /** Apply migration scripts when needed. */
   fun doMigration(context: Context) {
@@ -44,7 +44,7 @@ object Migration {
     Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
   }
 
-  /** A patch note must be shown if the given version is below at least one version with a notable change*/
+  /** A patch note must be shown if the given version is below at least one version with a notable change */
   fun listNotableChangesSince(version: Int): List<Int> {
     return if (version > 0) {
       VERSIONS_WITH_NOTABLE_CHANGES.filter { it > version }

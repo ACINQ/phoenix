@@ -628,5 +628,10 @@
     <p>Le verrouillage de l\'application utilise maintenant celui du système Android. Plus besoin de se souvenir d\'un énième PIN !</p>
     <p>Allez dans Configuration > Sécurité pour activer le verrouillage écran.</p>
   ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Augmentation des frais pour les nouveaux canaux de paiement</h4>
+    <p>Les frais de création de nouveaux channels restent les mêmes (0.1 %), mais ils ont désormais un plancher minimal de <b>1000 sat</b>.</p>
+    <p>Si quelqu\'un vous envoie 15 000 sat et que vous n\'avez pas de canal de paiement, un nouveau canal sera créé et vous recevrez 14 000 sat.</p>
+  ]]></string>
 
 </resources>
