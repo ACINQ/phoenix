@@ -65,12 +65,33 @@
           android:text="@string/about_fiat_rates"
           app:layout_constraintTop_toBottomOf="@id/general" />
 
+        <View
+          android:id="@+id/terms_separator"
+          style="@style/HLineSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/fiat_rates" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/terms"
           android:layout_width="match_parent"
+          android:background="@drawable/button_bg_square"
           android:layout_height="wrap_content"
-          app:layout_constraintTop_toBottomOf="@id/fiat_rates"
+          app:layout_constraintTop_toBottomOf="@id/terms_separator"
           app:text="@string/about_terms" />
+
+        <View
+          android:id="@+id/privacy_separator"
+          style="@style/HLineSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/terms" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/privacy"
+          android:layout_width="match_parent"
+          android:background="@drawable/button_bg_square"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/privacy_separator"
+          app:text="@string/about_privacy" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

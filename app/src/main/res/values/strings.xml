@@ -340,9 +340,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_terms"><![CDATA[
-    By proceeding to the next steps, you agree to the <a href="https://phoenix.acinq.co/terms">terms of usage</a>.
-  ]]></string>
+  <string name="initwallet_terms"><![CDATA[I have read and agree with<br/>the <a href="https://phoenix.acinq.co/terms">terms of usage</a>.]]></string>
   <string name="initwallet_create">Create new wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
 
@@ -628,6 +626,7 @@
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
   ]]></string>
   <string name="about_terms">Terms of usage</string>
+  <string name="about_privacy">Privacy</string>
 
   <!-- //////////////// background node service //////////////// -->
 

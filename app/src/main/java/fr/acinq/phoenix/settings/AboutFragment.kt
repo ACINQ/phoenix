@@ -32,7 +32,7 @@ import fr.acinq.phoenix.utils.Converter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class AboutFragment : BaseFragment() {
+class AboutFragment : BaseFragment(stayIfNotStarted = true) {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -53,6 +53,7 @@ class AboutFragment : BaseFragment() {
     mBinding.actionBar.setSubtitle(getString(R.string.about_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE))
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.terms.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/terms"))) }
+    mBinding.privacy.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://phoenix.acinq.co/privacy"))) }
   }
 
 }
