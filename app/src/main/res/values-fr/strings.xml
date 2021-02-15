@@ -111,17 +111,6 @@
   Une commission de <b>%1$s%%</b> sera prélevée.
   ]]></string>
 
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Paiement entrant</string>
-  <string name="receive_with_open_help_desc">Qu\'est-ce que c\'est?</string>
-  <string name="receive_with_open_help">Afin de recevoir un paiement sur Lightning, vous devez avoir un canal de paiement avec suffisamment de liquidité entrante.\n\nSi vous n\'en avez pas, Phoenix va automatiquement créer un canal de paiement. La commission de création de ce canal de paiement couvre les frais de transaction on-chain et d\'allocation de liquidité.</string>
-  <string name="receive_with_open_amount_label">Vous pouvez recevoir un paiement de</string>
-  <string name="receive_with_open_cost"><![CDATA[Voulez-vous recevoir ce paiement ? Accepter ce paiement nécessite des frais de mise en place de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accepter (expire dans %1$ss)</string>
-  <string name="receive_with_open_decline">Refuser</string>
-  <string name="receive_with_open_expired">Ce paiement a expiré !</string>
-
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Coller les données du presse-papier</string>
@@ -587,11 +576,6 @@
   <string name="paymentsettings_defaultdesc_dialog_title">Description par défaut</string>
   <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Elle peut être changée au cas par cas.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
-
-  <string name="paymentsettings_paytoopen_auto_title">Création de canaux de paiement automatique</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Il est parfois nécessaire de créer un nouveau canal de paiement pour pouvoir recevoir des fonds.\n\nDans ce cas, des frais de %1$s%% sont déduits du montant reçu pour assurer la création du canal.</string>
-  <string name="paymentsettings_paytoopen_dialog_title">Confirmation</string>
-  <string name="paymentsettings_paytoopen_dialog_description">L\'application créera automatiquement un canal de paiement lorsque cela est nécessaire.\n\nDes frais de %1$s%% sont déduits du montant reçu pour couvrir le coût de création du canal.</string>
 
   <string name="paymentsettings_trampoline_fees_title">Frais max pour les paiements Lightning sortants</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>

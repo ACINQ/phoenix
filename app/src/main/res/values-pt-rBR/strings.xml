@@ -135,17 +135,6 @@
   Uma taxa de <b>%1$s%%</b> será cobrada.
   ]]></string>
 
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pagamento a receber</string>
-  <string name="receive_with_open_help_desc">O que é isso?</string>
-  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa é necessária para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
-  <string name="receive_with_open_amount_label">Você tem um pagamento a receber de</string>
-  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação/manutenção de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Aceitar (expira em %1$ss)</string>
-  <string name="receive_with_open_decline">Recusar</string>
-  <string name="receive_with_open_expired">Este pagamento expirou!</string>
-
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Colar dados da área de transferência</string>
@@ -269,7 +258,7 @@
 
   <string name="notif_pay_to_open_title">Aceitar pagamento</string>
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
-  
+
   <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
   <string name="notif__pay_to_open_missed_message">O valor não foi recebido por ser uma quantia insuficiente para criar um novo canal de pagamento.</string>
 
@@ -643,11 +632,6 @@
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
   <string name="paymentsettings_defaultdesc_dialog_description">As cobranças que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
-
-  <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido para cobrir os custos de abertura do canal.</string>
-  <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
-  <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
 
   <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>

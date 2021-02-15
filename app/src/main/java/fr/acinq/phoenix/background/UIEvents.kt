@@ -19,7 +19,6 @@ package fr.acinq.phoenix.background
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.wire.PayToOpenRequest
 import fr.acinq.phoenix.Balance
 import fr.acinq.phoenix.db.ClosingType
 
@@ -34,7 +33,5 @@ class ChannelStateChange
 object PeerConnectionChange
 
 class RemovePendingSwapIn(val address: String)
-
-class PayToOpenNavigationEvent(val payToOpen: PayToOpenRequest)
 
 data class FCMToken(val token: String)

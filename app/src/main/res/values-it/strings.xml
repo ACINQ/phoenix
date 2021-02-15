@@ -101,17 +101,6 @@
   Una commissione di <b>%1$s%%</b> verrà applicata.
   ]]></string>
 
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pagamento in ingresso</string>
-  <string name="receive_with_open_help_desc">Che cos\'è?</string>
-  <string name="receive_with_open_help">Per ricevere pagamenti Lightning devi avere un canale con abbastanza liquidita in ingresso.\n\nSe non ne hai uno, Phoenix lo creerà qualóra fosse necessario. Le commissioni di apertura coprono i costi di creazione del canale e della liquidità allocata su di esso.</string>
-  <string name="receive_with_open_amount_label">Hai un pagamento in arrivo di</string>
-  <string name="receive_with_open_cost"><![CDATA[L\'accettazione di questo pagamento comporta un costo aggiuntivo di <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accetta (scade in %1$ss)</string>
-  <string name="receive_with_open_decline">Declina</string>
-  <string name="receive_with_open_expired">Questo pagamento è scaduto!</string>
-
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Incolla una richiesta di pagamento</string>

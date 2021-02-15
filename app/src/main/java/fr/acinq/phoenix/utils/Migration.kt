@@ -33,9 +33,9 @@ object Migration {
     val version = Prefs.getLastVersionUsed(context)
     if (0 < version && version < BuildConfig.VERSION_CODE) {
       log.info("previously used version=$version, now using version=${BuildConfig.VERSION_CODE}, starting migration")
-      when {
-        version < 15 -> applyMigration_15(context)
-      }
+//      when {
+//        version < XX -> applyMigration_XX
+//      }
       log.info("end of migration from version=$version")
       Prefs.setMigratedFrom(context, version)
     } else {
@@ -58,7 +58,4 @@ object Migration {
   //   MigrationPrefs.saveMigrationDone(context, fromVersion, XX)
   // }
 
-  private fun applyMigration_15(context: Context) {
-    Prefs.setAutoAcceptPayToOpen(context, true)
-  }
 }
