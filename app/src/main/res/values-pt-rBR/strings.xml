@@ -118,8 +118,8 @@
   <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
-  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de pelo menos <b>%1$s</b>.]]></string>
-  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de pelo menos <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
@@ -259,8 +259,8 @@
   <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
 
   <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
-  <string name="notif__headless_title__missed_incoming">Falha ao receber um pagamento</string>
-  <string name="notif__headless_title__missed_fulfill">Concluir pagamento</string>
+  <string name="notif__headless_title__missed_incoming">Pagamento não recebido</string>
+  <string name="notif__headless_title__missed_fulfill">Um pagamento pendente foi realizado</string>
   <string name="notif__headless_title__received">Pagamento recebido</string>
   <string name="notif__headless_message__app_locked">O aplicativo está bloqueado</string>
   <string name="notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
@@ -269,6 +269,9 @@
 
   <string name="notif_pay_to_open_title">Aceitar pagamento</string>
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
+  
+  <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
+  <string name="notif__pay_to_open_missed_message">O valor não foi recebido por ser uma quantia insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
