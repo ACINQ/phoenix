@@ -91,6 +91,7 @@ struct HomeView : View {
 							payment: selectedPayment!,
 							close: { selectedPayment = nil }
 						)
+						.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 					}
 				}
 
@@ -119,7 +120,7 @@ struct PaymentCell : View {
 
 	var body: some View {
 		HStack {
-			switch (payment.status()) {
+			switch payment.state() {
 			case .success:
 				Image("payment_holder_def_success")
 					.padding(4)
@@ -148,7 +149,7 @@ struct PaymentCell : View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
 			
-			if payment.status() != .failure {
+			if payment.state() != .failure {
 				HStack(spacing: 0) {
 					
 					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())

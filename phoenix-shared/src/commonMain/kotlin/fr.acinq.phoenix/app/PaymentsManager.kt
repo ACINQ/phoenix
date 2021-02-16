@@ -8,6 +8,7 @@ import fr.acinq.eclair.io.PaymentNotSent
 import fr.acinq.eclair.io.PaymentProgress
 import fr.acinq.eclair.io.PaymentReceived
 import fr.acinq.eclair.io.PaymentSent
+import fr.acinq.eclair.payment.PaymentRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -84,7 +85,7 @@ fun WalletPayment.desc(): String? = when (this) {
     }
 }.takeIf { !it.isNullOrBlank() }
 
-enum class WalletPaymentStatus { Success, Pending, Failure }
+enum class WalletPaymentState { Success, Pending, Failure }
 
 fun WalletPayment.amountMsat(): Long = when (this) {
     is OutgoingPayment -> -recipientAmount.msat
@@ -95,15 +96,16 @@ fun WalletPayment.id(): String = when (this) {
     is OutgoingPayment -> this.id.toString()
     is IncomingPayment -> this.paymentHash.toHex()
 }
-fun WalletPayment.status(): WalletPaymentStatus = when (this) {
+
+fun WalletPayment.state(): WalletPaymentState = when (this) {
     is OutgoingPayment -> when (status) {
-        is OutgoingPayment.Status.Pending -> WalletPaymentStatus.Pending
-        is OutgoingPayment.Status.Succeeded -> WalletPaymentStatus.Success
-        is OutgoingPayment.Status.Failed -> WalletPaymentStatus.Failure
+        is OutgoingPayment.Status.Pending -> WalletPaymentState.Pending
+        is OutgoingPayment.Status.Succeeded -> WalletPaymentState.Success
+        is OutgoingPayment.Status.Failed -> WalletPaymentState.Failure
     }
     is IncomingPayment -> when (received) {
-        null -> WalletPaymentStatus.Pending
-        else -> WalletPaymentStatus.Success
+        null -> WalletPaymentState.Pending
+        else -> WalletPaymentState.Success
     }
 }
 
@@ -116,3 +118,70 @@ fun WalletPayment.errorMessage(): String? = when (this) {
     }
     is IncomingPayment -> null
 }
+
+// Class type IncomingPayment.Origin.Invoice is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun IncomingPayment.Origin.asInvoice(): IncomingPayment.Origin.Invoice? = when (this) {
+    is IncomingPayment.Origin.Invoice -> this
+    else -> null
+}
+
+// Class type IncomingPayment.Origin.KeySend is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun IncomingPayment.Origin.asKeySend(): IncomingPayment.Origin.KeySend? = when (this) {
+    is IncomingPayment.Origin.KeySend -> this
+    else -> null
+}
+
+// Class type IncomingPayment.Origin.SwapIn is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (this) {
+    is IncomingPayment.Origin.SwapIn -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Details.Normal is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Details.asNormal(): OutgoingPayment.Details.Normal? = when (this) {
+    is OutgoingPayment.Details.Normal -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Details.KeySend is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Details.asKeySend(): OutgoingPayment.Details.KeySend? = when (this) {
+    is OutgoingPayment.Details.KeySend -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Details.SwapOut is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Details.asSwapOut(): OutgoingPayment.Details.SwapOut? = when (this) {
+    is OutgoingPayment.Details.SwapOut -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Status.Pending is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Status.asPending(): OutgoingPayment.Status.Pending? = when (this) {
+    is OutgoingPayment.Status.Pending -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Status.Failed is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Status.asFailed(): OutgoingPayment.Status.Failed? = when (this) {
+    is OutgoingPayment.Status.Failed -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Status.Succeeded is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Status.asSucceeded(): OutgoingPayment.Status.Succeeded? = when (this) {
+    is OutgoingPayment.Status.Succeeded -> this
+    else -> null
+}
+
+// In Objective-C, the function name `description()` is already in use (part of NSObject).
+// So we need to alias it.
+fun PaymentRequest.desc(): String? = this.description

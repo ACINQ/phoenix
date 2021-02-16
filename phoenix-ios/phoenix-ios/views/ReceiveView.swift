@@ -570,8 +570,7 @@ struct ReceiveView: AltMviView {
 			return
 		}
 		
-		let status = lastIncomingPayment.status()
-		if status == WalletPaymentStatus.success {
+		if lastIncomingPayment.state() == WalletPaymentState.success {
 			
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
 				self.mode.wrappedValue.dismiss()
