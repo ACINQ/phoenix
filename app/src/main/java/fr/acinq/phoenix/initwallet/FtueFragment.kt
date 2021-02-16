@@ -127,7 +127,7 @@ class FtueLightningFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val swapInFee = 100 * ((parentFragment as FtueFragment).appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+    val swapInFee = 100 * ((parentFragment as FtueFragment).appContext()?.payToOpenSettings?.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
     mBinding.body.text = getString(R.string.ftue__pay_to_open__body, String.format("%.2f", swapInFee))
   }
 }

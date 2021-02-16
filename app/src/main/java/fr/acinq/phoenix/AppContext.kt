@@ -126,9 +126,6 @@ class AppContext : Application(), DefaultLifecycleObserver {
   /** List of in-app notifications. */
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
 
-  /** Fee settings for swap-in (on-chain -> LN). */
-  val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
-
   /** Fee settings for swap-out (LN -> on-chain). */
   val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
 
@@ -216,20 +213,22 @@ class AppContext : Application(), DefaultLifecycleObserver {
     trampolineFeeSettings.postValue(trampolineSettingsList)
     log.info("trampoline settings=$trampolineSettingsList")
 
-    // -- swap-in settings
-    val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
-    swapInSettings.postValue(remoteSwapInSettings)
-    log.info("swap-in settings=$remoteSwapInSettings")
-
     // -- swap-out settings
     val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(0))
     swapOutSettings.postValue(remoteSwapOutSettings)
     log.info("swap-out settings=$remoteSwapOutSettings")
 
     // -- pay-to-open settings
-    val remotePayToOpenSettings = PayToOpenSettings(minFunding = Satoshi(json.getJSONObject("pay_to_open").getJSONObject("v1").getLong("min_funding_sat").coerceAtLeast(0)))
+    val remotePayToOpenSettings = json.getJSONObject("pay_to_open").getJSONObject("v1").run {
+      PayToOpenSettings(
+        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+        feePercent = getDouble("fee_percent")
+      )
+    }
     payToOpenSettings.postValue(remotePayToOpenSettings)
     log.info("pay-to-open settings=$remotePayToOpenSettings")
+
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {
@@ -332,8 +331,7 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
   fun printFeeProportional(): String = Converter.perMillionthsToPercentageString(feeProportionalMillionths)
 }
 
-data class SwapInSettings(val feePercent: Double)
 data class SwapOutSettings(val minFeerateSatByte: Long)
 data class MempoolContext(val highUsageWarning: Boolean)
-data class PayToOpenSettings(val minFunding: Satoshi)
+data class PayToOpenSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)

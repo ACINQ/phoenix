@@ -132,7 +132,7 @@
   <br /><br />
   Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
-  Uma taxa de <b>%1$s%%</b> será cobrada.
+  Uma taxa de <b>%1$s%%</b> será cobrada (with a <b>%2$s</b> minimum).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->

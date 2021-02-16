@@ -98,7 +98,7 @@
   <br /><br />
   I fondi inviati a quest\'indirizzo saranno visibili sul tuo wallet dopo una conferma sulla chain.
   <br /><br />
-  Una commissione di <b>%1$s%%</b> verrà applicata.
+  Una commissione di <b>%1$s%%</b> verrà applicata (with a <b>%2$s</b> minimum).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->

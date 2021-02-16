@@ -108,7 +108,7 @@
   <br /><br />
   Les fonds envoyés vers cette adresse seront disponibles dans votre portefeuille Phoenix après 1 confirmation sur la chaîne.
   <br /><br />
-  Une commission de <b>%1$s%%</b> sera prélevée.
+  Une commission de <b>%1$s%%</b> sera prélevée (avec un minimum de <b>%2$s</b>).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->
@@ -613,7 +613,7 @@
   ]]></string>
   <string name="patchnotes_v23"><![CDATA[
     <h4>Augmentation des frais pour les nouveaux canaux de paiement</h4>
-    <p>Les frais de création de nouveaux channels restent les mêmes (0.1 %), mais ils ont désormais un plancher minimal de <b>1000 sat</b>.</p>
+    <p>Les frais de création de nouveaux channels restent les mêmes (%1$s%%), mais ils ont désormais un plancher minimal de <b>%2$s</b>.</p>
     <p>Si quelqu\'un vous envoie 15 000 sat et que vous n\'avez pas de canal de paiement, un nouveau canal sera créé et vous recevrez 14 000 sat.</p>
   ]]></string>
 

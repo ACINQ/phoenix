@@ -101,7 +101,7 @@
   <br /><br />
   Finance poslané na tuto adresu se zobrazí po jednom potvrzení.
   <br /><br />
-  Poplatek <b>%1$s%%</b> bude aplikován.
+  Poplatek <b>%1$s%%</b> bude aplikován (with a <b>%2$s</b> minimum).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->

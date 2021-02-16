@@ -102,7 +102,7 @@
   <br /><br />
   Geld dat naar dit adres wordt gestuurd zal na 1 bevestiging in je wallet zichtbaar zijn.
   <br /><br />
-  Een <b>%1$s%%</b> vergoeding zal worden toegepast.
+  Een <b>%1$s%%</b> vergoeding zal worden toegepast (with a <b>%2$s</b> minimum).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->

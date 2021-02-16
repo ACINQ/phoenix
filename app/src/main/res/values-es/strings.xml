@@ -103,7 +103,7 @@
   <br /><br />
   Los fondos enviados a esta dirección se mostrarán en tu cartera después de una confirmación.
   <br /><br />
-  Se aplicará el <b>%1$s%%</b> de comisión.
+  Se aplicará el <b>%1$s%%</b> de comisión (with a <b>%2$s</b> minimum).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->

@@ -67,11 +67,14 @@ class PatchNotesFragment : BaseFragment(stayIfNotStarted = true) {
   private fun getPatchNoteForVersion(version: Int): String {
     return when (version) {
       15 -> {
-        val swapInFee = 100 * (appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
+        val swapInFee = 100 * (appContext()?.payToOpenSettings?.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
         getString(R.string.patchnotes_v15, String.format("%.2f", swapInFee))
       }
       23 -> {
-        getString(R.string.patchnotes_v23)
+        val percentFee = 100 * (appContext()?.payToOpenSettings?.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
+        val minFee = appContext()?.payToOpenSettings?.value?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
+        getString(R.string.patchnotes_v23, String.format("%.2f", percentFee),
+          Converter.printAmountPretty(minFee, requireContext(), withUnit = true))
       }
       else -> {
         log.warn("no patch note for version=$version")
