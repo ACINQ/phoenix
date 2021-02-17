@@ -1,19 +1,8 @@
 import Foundation
 import CryptoKit
 
-/// Represents the security options enabled by the user.
-///
-struct EnabledSecurity: OptionSet {
-	let rawValue: Int
 
-	static let biometrics = EnabledSecurity(rawValue: 1 << 0)
-	static let passphrase = EnabledSecurity(rawValue: 1 << 1)
-
-	static let none: EnabledSecurity = []
-	static let both: EnabledSecurity = [.biometrics, .passphrase]
-}
-
-/// Represents the "security.json" file, where we store the wrapped credentials needed to decrypt the databaseKey.
+/// Represents the "security.json" file, where we store the wrapped/encrypted seed.
 ///
 struct SecurityFile: Codable {
 	
@@ -27,54 +16,29 @@ struct SecurityFile: Codable {
 	/// That is, the user has not enabled any additional security measures such as touchID or passphrase.
 	///
 	/// Here's how it works:
-	/// The databaseKey is wrapped with a randomly generated key (called the locking key).
+	/// The seed is wrapped with a randomly generated key (called the locking key).
 	/// The lockingKey is then stored in the iOS keychain.
-	/// And the SecurityFile contains the parameters needed to reproduce the databaseKey
+	/// And the SecurityFile contains the parameters needed to reproduce the seed
 	/// if given the lockingKey.
 	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
 	///
 	let keychain: KeyInfo?
 	
-	/// The `biometrics` option is created when the user enables Biometrics
-	/// (e.g. TouchID or FaceID) in the app-access settings screen.
+	/// The "biometrics" option represents advanced security.
 	///
 	/// Here's how it works:
-	/// The databaseKey is wrapped with a randomly generated key (called the locking key).
+	/// The seed is wrapped with a randomly generated key (called the locking key).
 	/// The lockingKey is then stored in the iOS keychain, and configured with access-control
 	/// settings that require biometrics to unlock/access the keychain item.
-	/// And the SecurityFile contains the parameters needed to reproduce the databaseKey
+	/// And the SecurityFile contains the parameters needed to reproduce the seed
 	/// if given the lockingKey.
 	/// E.g. the salt, nonce, IV, tag, rounds ... whatever the specific crypto algorithm needs
 	///
 	let biometrics: KeyInfo?
 	
+	/// Reserved for future use.
+	/// 
 	let passphrase: KeyInfo?
-	
-	var hasKeychain: Bool {
-		get { return self.keychain != nil }
-	}
-	var hasBiometrics: Bool {
-		get { return self.biometrics != nil }
-	}
-	var hasPassphrase: Bool {
-		get { return self.passphrase != nil }
-	}
-	
-	var enabledSecurity: EnabledSecurity {
-		get {
-			if self.hasBiometrics {
-				if self.hasPassphrase {
-					return EnabledSecurity.both
-				} else {
-					return EnabledSecurity.biometrics
-				}
-			}
-			if self.hasPassphrase {
-				return EnabledSecurity.passphrase
-			}
-			return EnabledSecurity.none
-		}
-	}
 	
 	init() {
 		self.keychain = nil

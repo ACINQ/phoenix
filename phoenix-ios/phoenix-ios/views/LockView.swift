@@ -119,30 +119,30 @@ struct LockView : View {
 		// Note that after returning background, the biometric status may have changed.
 		// For example: .touchID_notEnrolled => .touchID_available
 		
-		let status = AppSecurity.shared.biometricStatus()
-		updateBiometricsStatus(status)
+		let support = AppSecurity.shared.deviceBiometricSupport()
+		updateBiometricsSupport(support)
 		
-		if (status != .notAvailable) && canPrompt {
+		if (support != .notAvailable) && canPrompt {
 			tryBiometricsLogin()
 		}
 	}
 	
-	func updateBiometricsStatus(_ status: BiometricStatus) -> Void {
+	func updateBiometricsSupport(_ support: BiometricSupport) -> Void {
 		
-		switch status {
+		switch support {
 			case .touchID_available    : fallthrough
 			case .touchID_notEnrolled  : fallthrough
 			case .touchID_notAvailable : isTouchID = true
 			default                    : isTouchID = false
 		}
-		switch status {
+		switch support {
 			case .faceID_available    : fallthrough
 			case .faceID_notEnrolled  : fallthrough
 			case .faceID_notAvailable : isFaceID = true
 			default                   : isFaceID = false
 		}
 		
-		switch status {
+		switch support {
 			case .touchID_available    : errorMsg = nil
 			case .touchID_notEnrolled  : fallthrough
 			case .touchID_notAvailable : errorMsg = NSLocalizedString(

@@ -13,7 +13,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct GlobalEnvironment: ViewModifier {
 	static var currencyPrefs = CurrencyPrefs()
-	
+
 	func body(content: Self.Content) -> some View {
 		content
 			.environmentObject(Self.currencyPrefs)
@@ -35,9 +35,8 @@ struct ContentView: View {
 		UIApplication.didEnterBackgroundNotification
 	)
 
-
-	@State private var unlockedOnce = false
 	@State private var isUnlocked = false
+	@State private var unlockedOnce = false
 	@State private var enabledSecurity = EnabledSecurity()
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
@@ -144,48 +143,58 @@ struct ContentView: View {
 		
 		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, enabledSecurity: EnabledSecurity) in
 
+			// There are multiple potential configurations:
+			//
+			// - no security       => mnemonics are available, enabledSecurity is empty
+			// - standard security => mnemonics are available, enabledSecurity is non-empty
+			// - advanced security => mnemonics are not available, enabledSecurity is non-empty
+			//
+			// Another way to think about it:
+			// - standard security => touchID only protects the UI, wallet can immediately be loaded
+			// - advanced security => touchID required to unlock both the UI and the seed
+
 			if let mnemonics = mnemonics {
-				// wallet is unlocked
+				// unlock & load wallet
 				AppDelegate.get().loadWallet(mnemonics: mnemonics)
-				self.isUnlocked = true
-
-			} else if enabledSecurity.isEmpty {
-				// wallet not yet configured
-				self.isUnlocked = true
-
-			} else {
-				// wallet is locked
-				self.enabledSecurity = enabledSecurity
 			}
+
+			self.isUnlocked = enabledSecurity.isEmpty
+			self.enabledSecurity = enabledSecurity
 		}
 	}
 	
 	private func performVersionUpgradeChecks() -> Void {
 		
 		// Upgrade check(s)
-		
+
 		let key = "lastVersionCheck"
 		let previousBuild = UserDefaults.standard.string(forKey: key) ?? "3"
-		
+
 		// v0.7.3 (build 4)
 		// - serialization change for Channels
 		// - attempting to deserialize old version causes crash
 		// - we decided to delete old channels database (due to low number of test users)
 		//
 		if previousBuild.isVersion(lessThan: "4") {
-		
 			migrateChannelsDbFiles()
 		}
-		
-		// v0.7.3 (build 5)
+
+		// v0.7.4 (build 5)
 		// - serialization change for Channels
 		// - attempting to deserialize old version causes crash
 		//
 		if previousBuild.isVersion(lessThan: "5") {
-			
 			migrateChannelsDbFiles()
 		}
-		
+
+		// v0.7.6 (build 7)
+		// - adding support for both soft & hard biometrics
+		// - previously only supported hard biometics
+		//
+		if previousBuild.isVersion(lessThan: "7") {
+			AppSecurity.shared.performMigration(previousBuild: previousBuild)
+		}
+
 		let currentBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
 		if previousBuild.isVersion(lessThan: currentBuild) {
 
