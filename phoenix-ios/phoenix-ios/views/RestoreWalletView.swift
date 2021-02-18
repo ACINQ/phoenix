@@ -12,9 +12,9 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct RestoreWalletView: AltMviView {
+struct RestoreWalletView: MVIView {
 
-	@StateObject var mvi = AltMVI({ $0.restoreWallet() })
+	@StateObject var mvi = MVIState({ $0.restoreWallet() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
@@ -129,7 +129,7 @@ struct WarningView: View {
 
 struct RestoreView: View {
 	
-	@ObservedObject var mvi: AltMVI<RestoreWallet.Model, RestoreWallet.Intent>
+	@ObservedObject var mvi: MVIState<RestoreWallet.Model, RestoreWallet.Intent>
 
 	@Binding var mnemonics: [String]
 	@Binding var autocomplete: [String]
@@ -606,20 +606,44 @@ struct RestoreView: View {
 }
 
 class RestoreWalletView_Previews: PreviewProvider {
-//    static let mockModel = RestoreWallet.ModelReady()
-    static let mockModel = RestoreWallet.ModelInvalidMnemonics()
-//    static let mockModel = RestoreWallet.ModelFilteredWordlist(words: ["abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access"])
-//    static let mockModel = RestoreWallet.ModelFilteredWordlist(words: ["abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account"])
-//    static let mockModel = RestoreWallet.ModelFilteredWordlist(words: ["abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid"])
+	
+	static let filteredWordList1 = [
+		"abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access"
+	]
+	
+	static let filteredWordList2 = [
+		"abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account"
+	]
+	
+	static let filteredWordList3 = [
+		"abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid"
+	]
 
-    static var previews: some View {
-        mockView(RestoreWalletView())
-                .previewDevice("iPhone 11")
-    }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
+	static var previews: some View {
+		
+		RestoreWalletView().mock(
+			RestoreWallet.ModelReady()
+		)
+		.previewDevice("iPhone 11")
+		
+		RestoreWalletView().mock(
+			RestoreWallet.ModelInvalidMnemonics()
+		)
+		.previewDevice("iPhone 11")
+		
+		RestoreWalletView().mock(
+			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList1)
+		)
+		.previewDevice("iPhone 11")
+		
+		RestoreWalletView().mock(
+			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList2)
+		)
+		.previewDevice("iPhone 11")
+		
+		RestoreWalletView().mock(
+			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList3)
+		)
+		.previewDevice("iPhone 11")
+	}
 }

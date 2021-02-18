@@ -6,14 +6,14 @@ import os.log
 #if DEBUG && false
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "AltMVI"
+	category: "MVI"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-class AltMVI<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
+class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	
 	@Published private var _model: Model? = nil
 	
@@ -70,17 +70,17 @@ class AltMVI<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	}
 }
 
-protocol AltMviView : View {
+protocol MVIView : View {
 	
-	associatedtype AltMviModel: MVI.Model
-	associatedtype AltMviIntent: MVI.Intent
+	associatedtype MVIModel: MVI.Model
+	associatedtype MVIIntent: MVI.Intent
 	
-	var mvi: AltMVI<AltMviModel, AltMviIntent> { get }
+	var mvi: MVIState<MVIModel, MVIIntent> { get }
 	
 	/// The type of view represented in `view()`.
 	///
 	/// When you create a custom view, Swift infers this type from your
-	/// implementation of the required `view()` function.
+	/// implementation of the required `view` getter.
 	associatedtype ViewBody : View
 	
 	/// The content and behavior of the view.
@@ -93,7 +93,7 @@ protocol AltMviView : View {
 	var factory: ControllerFactory { get }
 }
 
-extension AltMviView {
+extension MVIView {
 	
 	var body: some View {
 		mvi.initializeControllerIfNeeded(self.factory)
@@ -118,41 +118,41 @@ extension EnvironmentValues {
 
 extension View {
 	func mock(_ mock: ChannelsConfiguration.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: CloseChannelsConfiguration.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Configuration.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Content.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: ElectrumConfiguration.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Home.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Initialization.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: LogsConfiguration.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Receive.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: RestoreWallet.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 	func mock(_ mock: Scan.Model) -> some View {
-		environment(\.controllerFactory, AltControllerFactory(mock))
+		environment(\.controllerFactory, MockControllerFactory(mock))
 	}
 }
 
-class AltControllerFactory : ControllerFactory {
+class MockControllerFactory : ControllerFactory {
 	
 	let base: ControllerFactory = AppDelegate.get().business.controllers
 	

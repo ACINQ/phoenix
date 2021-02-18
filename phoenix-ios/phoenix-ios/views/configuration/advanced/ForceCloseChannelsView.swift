@@ -15,9 +15,9 @@ fileprivate let CONTENT_PADDING_TOP: CGFloat = 30
 fileprivate let CONTENT_PADDING_LEFT_RIGHT: CGFloat = 30
 fileprivate let CONTENT_PADDING_BOTTOM: CGFloat = 20
 
-struct ForceCloseChannelsView : AltMviView {
+struct ForceCloseChannelsView : MVIView {
 	
-	@StateObject var mvi = AltMVI({ $0.forceCloseChannelsConfiguration() })
+	@StateObject var mvi = MVIState({ $0.forceCloseChannelsConfiguration() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
@@ -336,8 +336,6 @@ fileprivate struct ConfirmationPopover : View {
 }
 
 class ForceCloseChannelsView_Previews: PreviewProvider {
-	
-	static let mockModel = CloseChannelsConfiguration.ModelLoading() // deprecated
 	
 	static var previews: some View {
 		

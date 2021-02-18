@@ -1,54 +1,68 @@
 import SwiftUI
 import PhoenixShared
 
-struct LogsConfigurationView: View {
+struct LogsConfigurationView: MVIView {
+	
+	@StateObject var mvi = MVIState({ $0.logsConfiguration() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
 
-    @State var share: NSURL? = nil
+	@State var share: NSURL? = nil
 
-    var body: some View {
-        EmptyView()
-        MVIView({ $0.logsConfiguration() }) { model, postIntent in
-            VStack {
-                Text("Here you can extract and visualize application logs, as well as share them.")
-                        .foregroundColor(Color.primary)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.primaryBackground)
-                List {
-                    if let m = model as? LogsConfiguration.ModelReady {
-                        Button {
-                            share = NSURL(fileURLWithPath: m.path)
-                        } label: {
-                            Label { Text("Share the logs") } icon: {
-                                Image(systemName: "square.and.arrow.up")
-                            }
-                        }
-                                .sharing($share)
-                        NavigationLink(destination: LogsConfigurationViewerView(filePath: m.path)) {
-                            Label { Text("Look at the logs") } icon: {
-                                Image(systemName: "eye")
-                            }
-                        }
-                    }
-                }
-            }
-                    .navigationBarTitle("Logs")
-        }
-    }
+	@ViewBuilder
+	var view: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			Text("Here you can extract and visualize application logs, as well as share them.")
+				.foregroundColor(Color.primary)
+				.frame(maxWidth: .infinity)
+				.padding()
+				.background(Color.primaryBackground)
+			
+			List {
+				if let model = mvi.model as? LogsConfiguration.ModelReady {
+					Button {
+						share = NSURL(fileURLWithPath: model.path)
+					} label: {
+						Label {
+							Text("Share the logs")
+						} icon: {
+							Image(systemName: "square.and.arrow.up")
+						}
+					}
+					.sharing($share)
+					
+					NavigationLink(destination: LogsConfigurationViewerView(filePath: model.path)) {
+						Label {
+							Text("Look at the logs")
+						} icon: {
+							Image(systemName: "eye")
+						}
+					}
+				}
+			} // </List>
+			
+		} // </VStack>
+		.navigationBarTitle("Logs")
+	}
 }
 
 class LogsConfigurationView_Previews: PreviewProvider {
-//    static let mockModel = LogsConfiguration.ModelLoading()
-    static let mockModel = LogsConfiguration.ModelReady(path: "/tmp/fake-logs-file")
 
-    static var previews: some View {
-        mockView(LogsConfigurationView())
-                .previewDevice("iPhone 11")
-    }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
+	static var previews: some View {
+		
+		NavigationView {
+			LogsConfigurationView().mock(LogsConfiguration.ModelLoading())
+		}
+		.previewDevice("iPhone 11")
+		
+		NavigationView {
+			LogsConfigurationView().mock(LogsConfiguration.ModelReady(
+				path: "/tmp/fake-logs-file"
+			))
+		}
+		.previewDevice("iPhone 11")
+	}
 }

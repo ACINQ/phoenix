@@ -11,38 +11,19 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ElectrumConfigurationView: View {
+struct ElectrumConfigurationView: MVIView {
 	
-    var body: some View {
-		
-		MVIView({ $0.electrumConfiguration() }) { model, postIntent in
-			
-		//	OldLayout(model, postIntent)
-			NewLayout(model, postIntent)
-				.navigationBarTitle("Electrum server", displayMode: .inline)
-		}
-	}
-}
-
-struct NewLayout: View {
+	@StateObject var mvi = MVIState({ $0.electrumConfiguration() })
 	
-	let model: ElectrumConfiguration.Model
-	let postIntent: (ElectrumConfiguration.Intent) -> Void
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
 	
 	@State var isModifying = false
 	
-	init(
-		_ model: ElectrumConfiguration.Model,
-		_ postIntent: @escaping (ElectrumConfiguration.Intent) -> Void
-	) {
-		self.model = model
-		self.postIntent = postIntent
-	}
-	
 	func connectionStatus() -> String {
-		if model.connection == .established {
+		if mvi.model.connection == .established {
 			return NSLocalizedString("Connected to:", comment: "Connection status")
-		} else if model.connection == .establishing {
+		} else if mvi.model.connection == .establishing {
 			return NSLocalizedString("Connecting to:", comment: "Connection status")
 		} else {
 			return NSLocalizedString("Will connect to:", comment: "Connection status")
@@ -51,14 +32,21 @@ struct NewLayout: View {
 	
 	func connectionAddress() -> String {
 		
-		if model.connection == .established || model.electrumServer.customized {
-			return model.electrumServer.address()
+		if mvi.model.connection == .established || mvi.model.electrumServer.customized {
+			return mvi.model.electrumServer.address()
 		} else {
 			return NSLocalizedString("Random server", comment: "Connection info")
 		}
 	}
 	
-	var body: some View {
+	@ViewBuilder
+	var view: some View {
+		
+		main.navigationBarTitle("Electrum server", displayMode: .inline)
+	}
+
+	@ViewBuilder
+	var main: some View {
 		
 		List {
 				
@@ -87,7 +75,7 @@ struct NewLayout: View {
 					Text(connectionAddress()).bold()
 						.padding(.top, 2)
 					
-					if let errMsg = model.error?.message {
+					if let errMsg = mvi.model.error?.message {
 						Text(errMsg)
 							.foregroundColor(Color.appRed)
 							.padding(.top, 2)
@@ -100,26 +88,26 @@ struct NewLayout: View {
 				
 				ListItem(header: Text("Block height")) {
 
-					let height = model.electrumServer.blockHeight
+					let height = mvi.model.electrumServer.blockHeight
 					Text("\(height > 0 ? height.formatInDecimalStyle() : "-")")
 				}
 				
 				ListItem(header: Text("Tip timestamp")) {
 					
-					let time = model.electrumServer.tipTimestamp
+					let time = mvi.model.electrumServer.tipTimestamp
 					Text("\(time > 0 ? time.formatDateS() : "-")")
 				}
 				
 				ListItem(header: Text("Fee rate")) {
 					
-					if model.feeRate > 0 {
-						Text("\(model.feeRate.formatInDecimalStyle()) sat/byte")
+					if mvi.model.feeRate > 0 {
+						Text("\(mvi.model.feeRate.formatInDecimalStyle()) sat/byte")
 					} else {
 						Text("-")
 					}
 				}
 				
-				if let xpub = model.xpub {
+				if let xpub = mvi.model.xpub {
 					ListItem(header: Text("Master public key")) {
 						Text(xpub)
 							.contextMenu {
@@ -132,7 +120,7 @@ struct NewLayout: View {
 					}
 				}
 				
-				if let path = model.path {
+				if let path = mvi.model.path {
 					ListItem(header: Text("Path")) {
 						Text(path)
 							.contextMenu {
@@ -152,8 +140,8 @@ struct NewLayout: View {
 		.sheet(isPresented: $isModifying) {
 		
 			ElectrumAddressPopup(
-				model: model,
-				postIntent: postIntent,
+				model: mvi.model,
+				postIntent: mvi.intent,
 				showing: $isModifying
 			).padding()
 		}
@@ -502,45 +490,52 @@ class ElectrumConfigurationView_Previews: PreviewProvider {
 		tipTimestamp: 1599564210
 	)
 	
-	static let mockModel = ElectrumConfiguration.Model(
+	static let xpub = "vpub5ZqweUWHkV3Q5HrftL6c7L7rwvQdSPrQzPdFEd8tHU32EmduQqy1CgmAb4g1jQGoBFaGW4EcNhc1Bm9grBkV2hSUz787L7ALTfNbz3xNigS"
+	static let path = "m/84'/1'/0'"
+	
+	static let model1 = ElectrumConfiguration.Model(
+		walletIsInitialized: true,
+		connection: .closed,
+		electrumServer: electrumServer1,
+		feeRate: 9999,
+		xpub: xpub,
+		path: path,
+		error: nil
+	)
+	
+	static let model2 = ElectrumConfiguration.Model(
 		walletIsInitialized: true,
 		connection: .closed,
 		electrumServer: electrumServer2,
 		feeRate: 9999,
-		xpub: "vpub5ZqweUWHkV3Q5HrftL6c7L7rwvQdSPrQzPdFEd8tHU32EmduQqy1CgmAb4g1jQGoBFaGW4EcNhc1Bm9grBkV2hSUz787L7ALTfNbz3xNigS",
-		path: "m/84'/1'/0'",
+		xpub: xpub,
+		path: path,
 		error: nil
 	)
 	
 	@State static var isShowing: Bool = true
 
 	static var previews: some View {
-//		mockView(ElectrumConfigurationView())
-//			.preferredColorScheme(.light)
-//			.previewDevice("iPhone 8")
-//
-//		mockView(ElectrumConfigurationView())
-//			.preferredColorScheme(.dark)
-//			.previewDevice("iPhone 8")
 		
-		ElectrumAddressPopup(
-			model: mockModel,
-			postIntent: { _ in },
-			showing: $isShowing
-		)
-		.padding()
+		NavigationView {
+			ElectrumConfigurationView()//.mock(model1)
+		}
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
-//
-//		ElectrumAddressPopup(model: mockModel)
-//			.padding()
-//			.preferredColorScheme(.dark)
-//			.previewDevice("iPhone 8")
+		
+//		NavigationView {
+//			ElectrumConfigurationView().mock(model2)
+//		}
+//		.preferredColorScheme(.dark)
+//		.previewDevice("iPhone 8")
+		
+//		ElectrumAddressPopup(
+//			model: mockModel,
+//			postIntent: { _ in },
+//			showing: $isShowing
+//		)
+//		.padding()
+//		.preferredColorScheme(.light)
+//		.previewDevice("iPhone 8")
 	}
-
-#if DEBUG
-	@objc class func injected() {
-		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-	}
-#endif
 }

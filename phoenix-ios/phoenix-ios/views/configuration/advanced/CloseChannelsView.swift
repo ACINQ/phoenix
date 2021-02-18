@@ -11,9 +11,9 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloseChannelsView : AltMviView {
+struct CloseChannelsView : MVIView {
 	
-	@StateObject var mvi = AltMVI({ $0.closeChannelsConfiguration() })
+	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
@@ -351,8 +351,6 @@ fileprivate struct ConfirmationPopover : View {
 // MARK: -
 
 class CloseChannelsView_Previews: PreviewProvider {
-	
-	static let mockModel = CloseChannelsConfiguration.ModelLoading() // deprecated
 	
 	static var previews: some View {
 		

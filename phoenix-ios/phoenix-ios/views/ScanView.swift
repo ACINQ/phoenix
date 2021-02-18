@@ -13,72 +13,75 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ScanView: View {
+struct ScanView: MVIView {
 
+	@StateObject var mvi = MVIState({ $0.scan() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
 	@Binding var isShowing: Bool
 
 	@State var paymentRequest: String? = nil
 	@State var isWarningDisplayed: Bool = false
 	
-    @StateObject var toast = Toast()
+	@StateObject var toast = Toast()
 
-	var body: some View {
+	@ViewBuilder
+	var view: some View {
+		
 		ZStack {
-			MVIView({ $0.scan() }, onModel: { change in
-				
-				if change.newModel is Scan.ModelBadRequest {
-					toast.toast(text: "Unexpected request format!")
-				}
-				else if let model = change.newModel as? Scan.ModelDangerousRequest {
-					paymentRequest = model.request
-					isWarningDisplayed = true
-				}
-				else if let model = change.newModel as? Scan.ModelValidate {
-					paymentRequest = model.request
-				}
-				else if change.newModel is Scan.ModelSending {
-					isShowing = false
-				}
-				change.animateIfModelTypeChanged()
-				
-			}) { model, intent in
-				view(model: model, postIntent: intent)
-			}
+			main
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.onChange(of: mvi.model, perform: { newModel in
+
+			if newModel is Scan.ModelBadRequest {
+				toast.toast(text: "Unexpected request format!")
+			}
+			else if let model = newModel as? Scan.ModelDangerousRequest {
+				paymentRequest = model.request
+				isWarningDisplayed = true
+			}
+			else if let model = newModel as? Scan.ModelValidate {
+				paymentRequest = model.request
+			}
+			else if newModel is Scan.ModelSending {
+				isShowing = false
+			}
+		})
 	}
 
 	@ViewBuilder
-	func view(model: Scan.Model, postIntent: @escaping (Scan.Intent) -> Void) -> some View {
-		switch model {
+	var main: some View {
+		
+		switch mvi.model {
 		case _ as Scan.ModelReady,
 		     _ as Scan.ModelBadRequest,
-			 _ as Scan.ModelDangerousRequest:
-			
+		     _ as Scan.ModelDangerousRequest:
+
 			ReadyView(
-				model: model,
-				postIntent: postIntent,
+				mvi: mvi,
 				paymentRequest: $paymentRequest,
 				isWarningDisplayed: $isWarningDisplayed
 			)
-			
-        case let m as Scan.ModelValidate:
-			ValidateView(model: m, postIntent: postIntent)
-			
-        case let m as Scan.ModelSending:
+
+		case let model as Scan.ModelValidate:
+			ValidateView(model: model, postIntent: mvi.intent)
+
+		case let m as Scan.ModelSending:
 			SendingView(model: m)
-			
-        default:
-            fatalError("Unknown model \(model)")
-        }
-    }
+
+		default:
+			fatalError("Unknown model \(mvi.model)")
+		}
+	}
 }
 
 struct ReadyView: View {
 	
-	let model: Scan.Model
-	let postIntent: (Scan.Intent) -> Void
+	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@Binding var paymentRequest: String?
 	@Binding var isWarningDisplayed: Bool
@@ -122,7 +125,7 @@ struct ReadyView: View {
 				
 				QrCodeScannerView { request in
 					if !isWarningDisplayed && !ignoreScanner {
-						postIntent(Scan.IntentParse(request: request))
+						mvi.intent(Scan.IntentParse(request: request))
 					}
 				}
 				.cornerRadius(10)
@@ -137,7 +140,7 @@ struct ReadyView: View {
 				
 				Button {
 					if let request = UIPasteboard.general.string {
-						postIntent(Scan.IntentParse(request: request))
+						mvi.intent(Scan.IntentParse(request: request))
 					}
 				} label: {
 					Image(systemName: "arrow.right.doc.on.clipboard")
@@ -175,7 +178,7 @@ struct ReadyView: View {
 		popoverState.dismissable.send(false)
 		popoverState.displayContent.send(
 			PopupAlert(
-				postIntent: postIntent,
+				postIntent: mvi.intent,
 				paymentRequest: paymentRequest!,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
@@ -553,39 +556,37 @@ struct SendingView: View {
 // MARK:-
 
 class ScanView_Previews: PreviewProvider {
-
-	static let model_validate = Scan.ModelValidate(
-		request: "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9",
-		amountMsat: 1_500,
-		requestDescription: "1 Blockaccino",
-		balanceMsat: 300_000_000
-	)
-	static let model_sending = Scan.ModelSending()
 	
+	static let request = "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9"
 	
-	static let mockModel = model_validate
+	@State static var isShowing = true
 
 	static var previews: some View {
 		
-	//	mockView(ScanView(isShowing: .constant(true)))
-	//		.previewDevice("iPhone 11")
-		
 		NavigationView {
-			SendingView(model: model_sending)
+			ScanView(isShowing: $isShowing).mock(Scan.ModelValidate(
+				request: request,
+				amountMsat: 1_500,
+				requestDescription: "1 Blockaccino",
+				balanceMsat: 300_000_000
+			))
 		}
+		.modifier(GlobalEnvironment())
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
 		
 		NavigationView {
-			SendingView(model: model_sending)
+			SendingView(model: Scan.ModelSending())
 		}
+		.modifier(GlobalEnvironment())
+		.preferredColorScheme(.light)
+		.previewDevice("iPhone 8")
+
+		NavigationView {
+			SendingView(model: Scan.ModelSending())
+		}
+		.modifier(GlobalEnvironment())
 		.preferredColorScheme(.dark)
 		.previewDevice("iPhone 8")
 	}
-
-	#if DEBUG
-	@objc class func injected() {
-		UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-	}
-	#endif
 }

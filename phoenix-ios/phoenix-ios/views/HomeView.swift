@@ -12,36 +12,37 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct HomeView : View {
+struct HomeView : MVIView {
 
-    @State var lastPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
-    @State var showConnections = false
+	@StateObject var mvi = MVIState({ $0.home() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
+	@State var lastPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
+	@State var showConnections = false
 
-    @State var selectedPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
+	@State var selectedPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
-    var body: some View {
-        MVIView({ $0.home() },
-			background: true,
-			onModel: { change in
-				if lastPayment != change.newModel.lastPayment {
-                    lastPayment = change.newModel.lastPayment
+	@ViewBuilder
+	var view: some View {
+		
+		main
+			.navigationBarTitle("", displayMode: .inline)
+			.navigationBarHidden(true)
+			.onChange(of: mvi.model, perform: { newModel in
+				
+				if lastPayment != newModel.lastPayment {
+					lastPayment = newModel.lastPayment
 					selectedPayment = lastPayment
 				}
-			}
-        ) { model, postIntent in
-            
-			mainView(model, postIntent)
-				.navigationBarTitle("", displayMode: .inline)
-				.navigationBarHidden(true)
-    	}
+			})
 	}
 	
-	@ViewBuilder func mainView(
-		_ model: Home.Model,
-		_ postIntent: @escaping (Home.Intent) -> Void
-	) -> some View {
+	@ViewBuilder
+	var main: some View {
 		
 		ZStack {
 			
@@ -61,7 +62,7 @@ struct HomeView : View {
 				// === Total Balance ====
 				HStack(alignment: .bottom) {
 					
-					let amount = Utils.format(currencyPrefs, sat: model.balanceSat)
+					let amount = Utils.format(currencyPrefs, sat: mvi.model.balanceSat)
 					Text(amount.digits)
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
@@ -76,11 +77,11 @@ struct HomeView : View {
 				// === Payments List ====
 				ScrollView {
 					LazyVStack {
-						ForEach(model.payments.indices, id: \.self) { index in
+						ForEach(mvi.model.payments.indices, id: \.self) { index in
 							Button {
-								selectedPayment = model.payments[index]
+								selectedPayment = mvi.model.payments[index]
 							} label: {
-								PaymentCell(payment: model.payments[index])
+								PaymentCell(payment: mvi.model.payments[index])
 							}
 						}
 					}
@@ -95,7 +96,7 @@ struct HomeView : View {
 					}
 				}
 
-				BottomBar(model: model)
+				BottomBar(model: mvi.model)
 			
 			} // </VStack>
 			.padding(.top, keyWindow?.safeAreaInsets.top ?? 0) // bottom handled in BottomBar
@@ -329,34 +330,25 @@ class HomeView_Previews: PreviewProvider {
 		peer     : .established,
 		electrum : .closed
 	)
-	
-	static let mockModel = Home.Model(
-		balanceSat: 123500,
-		payments: [
-		],
-		lastPayment: nil
-	)
 
 	static var previews: some View {
-        mockView(HomeView())
-			.preferredColorScheme(.dark)
-			.previewDevice("iPhone 8")
-			.environmentObject(CurrencyPrefs.mockEUR())
 		
-		mockView(HomeView())
-			.preferredColorScheme(.light)
-			.previewDevice("iPhone 8")
-			.environmentObject(CurrencyPrefs.mockEUR())
+		HomeView().mock(Home.Model(
+			balanceSat: 123500,
+			payments: [],
+			lastPayment: nil
+		))
+		.preferredColorScheme(.dark)
+		.previewDevice("iPhone 8")
+		.environmentObject(CurrencyPrefs.mockEUR())
 		
-	//	mockView(HomeView())
-	//		.preferredColorScheme(.light)
-	//		.previewDevice("iPhone 11")
-	//		.environmentObject(CurrencyPrefs.mockEUR())
+		HomeView().mock(Home.Model(
+			balanceSat: 1000,
+			payments: [],
+			lastPayment: nil
+		))
+		.preferredColorScheme(.light)
+		.previewDevice("iPhone 8")
+		.environmentObject(CurrencyPrefs.mockEUR())
 	}
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
 }

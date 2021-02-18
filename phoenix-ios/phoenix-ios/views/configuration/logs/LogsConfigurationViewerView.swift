@@ -43,15 +43,12 @@ struct LogsConfigurationViewerView: View {
 }
 
 class LogsConfigurationViewerView_Previews: PreviewProvider {
-
-    static var previews: some View {
-        mockView(LogsConfigurationViewerView(filePath: "fake"), nav: .inline)
-                .previewDevice("iPhone 11")
-    }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
+	
+	static var previews: some View {
+		
+		NavigationView {
+			LogsConfigurationViewerView(filePath: "fake")
+		}
+		.previewDevice("iPhone 11")
+	}
 }

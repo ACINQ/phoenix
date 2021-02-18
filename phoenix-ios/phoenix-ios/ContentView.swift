@@ -20,7 +20,7 @@ struct GlobalEnvironment: ViewModifier {
 	}
 }
 
-struct ContentView: View {
+struct ContentView: MVIView {
 
     static func UIKitAppearance() {
         let appearance = UINavigationBarAppearance()
@@ -31,9 +31,10 @@ struct ContentView: View {
         UINavigationBar.appearance().standardAppearance = appearance
     }
 
-	let didEnterBackgroundPublisher = NotificationCenter.default.publisher(for:
-		UIApplication.didEnterBackgroundNotification
-	)
+	@StateObject var mvi = MVIState({ $0.content() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
 
 	@State private var isUnlocked = false
 	@State private var unlockedOnce = false
@@ -42,7 +43,12 @@ struct ContentView: View {
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	@State private var popoverContent: AnyView? = nil
 
-	var body: some View {
+	let didEnterBackgroundPublisher = NotificationCenter.default.publisher(for:
+		UIApplication.didEnterBackgroundNotification
+	)
+	
+	@ViewBuilder
+	var view: some View {
 
 		ZStack {
 			
@@ -107,21 +113,17 @@ struct ContentView: View {
 	@ViewBuilder
 	func primaryView() -> some View {
 
-		appView(MVIView({ $0.content() }) { model, intent in
+		NavigationView {
 
-			NavigationView {
-
-				if model is Content.ModelIsInitialized {
-					HomeView()
-				} else if model is Content.ModelNeedInitialization {
-					InitializationView()
-				} else {
-					loadingView()
-				}
-
-			} // </NavigationView>
-		})
-    }
+			if mvi.model is Content.ModelIsInitialized {
+				HomeView()
+			} else if mvi.model is Content.ModelNeedInitialization {
+				InitializationView()
+			} else {
+				loadingView()
+			}
+		}
+	}
 
 	@ViewBuilder
 	func loadingView() -> some View {
@@ -360,16 +362,16 @@ struct PardonOurMess: View {
 
 
 class ContentView_Previews: PreviewProvider {
-    static let mockModel = Content.ModelNeedInitialization()
 
-    static var previews: some View {
-        mockView(ContentView())
-                .previewDevice("iPhone 11")
-    }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
+	static var previews: some View {
+		
+		ContentView().mock(Content.ModelWaiting())
+			.previewDevice("iPhone 11")
+		
+//		ContentView().mock(Content.ModelNeedInitialization())
+//			.previewDevice("iPhone 11")
+//		
+//		ContentView().mock(Content.ModelIsInitialized())
+//			.previewDevice("iPhone 11")
+	}
 }

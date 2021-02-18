@@ -11,31 +11,26 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ChannelsConfigurationView: View {
+struct ChannelsConfigurationView: MVIView {
 
-	var body: some View {
+	@StateObject var mvi = MVIState({ $0.channelsConfiguration() })
+	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
+	@ViewBuilder
+	var view: some View {
 		
-		MVIView({ $0.channelsConfiguration() }) { model, postIntent in
-			
-			mainView(model, postIntent)
-		}
-	}
-	
-	@ViewBuilder func mainView(
-		_ model: ChannelsConfiguration.Model,
-		_ postIntent: @escaping (ChannelsConfiguration.Intent) -> Void
-	) -> some View {
-	
 		Group {
-			if (model.channels.isEmpty) {
-				NoChannelsView(model: model, postIntent: postIntent)
+			if (mvi.model.channels.isEmpty) {
+				NoChannelsView(model: mvi.model, postIntent: mvi.intent)
 			} else {
-				ChannelsView(model: model, postIntent: postIntent)
+				ChannelsView(model: mvi.model, postIntent: mvi.intent)
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("My payment channels", displayMode: .inline)
-    }
+	}
 }
 
 fileprivate struct NoChannelsView : View {
@@ -330,41 +325,29 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		json: "{Woops!}",
 		txUrl: nil
 	)
-	
-	static let model1 = ChannelsConfiguration.Model(
-		nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-		json: "{}",
-		channels: []
-	)
-	
-	static let model2 = ChannelsConfiguration.Model(
-		nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
-		json: "{}",
-		channels: [channel1, channel2]
-	)
-	
-	static let mockModel = model2
 
 	static var previews: some View {
 		
-//		NavigationView {
-//			mockView(ChannelsConfigurationView())
-//		}
-//		.preferredColorScheme(.light)
-//		.previewDevice("iPhone 8")
+		NavigationView {
+			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
+				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
+				json: "{}",
+				channels: []
+			))
+		}
+		.preferredColorScheme(.light)
+		.previewDevice("iPhone 8")
 
 		NavigationView {
-			mockView(ChannelsConfigurationView())
+			ChannelsConfigurationView().mock(ChannelsConfiguration.Model(
+				nodeId: "03af0ed6052cf28d670665549bc86f4b721c9fdb309d40c58f5811f63966e005d0",
+				json: "{}",
+				channels: [channel1, channel2]
+			))
 		}
 		.preferredColorScheme(.dark)
 		.previewDevice("iPhone 8")
-		
-//		NavigationView {
-//			mockView(ChannelsConfigurationView())
-//		}
-//		.preferredColorScheme(.light)
-//		.previewDevice("iPhone 11")
-    }
+	}
 
 	#if DEBUG
 	@objc class func injected() {

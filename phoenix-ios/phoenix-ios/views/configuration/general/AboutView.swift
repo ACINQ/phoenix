@@ -30,16 +30,9 @@ struct AboutView: View {
 }
 
 class AboutView_Previews : PreviewProvider {
-    static let mockModel = Configuration.ModelSimpleMode()
 
-    static var previews: some View {
-        AboutView()
-            .previewDevice("iPhone 11")
-    }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
+	static var previews: some View {
+		AboutView()
+			.previewDevice("iPhone 11")
+	}
 }

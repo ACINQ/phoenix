@@ -16,9 +16,9 @@ enum ReceiveViewSheet {
 	case editing(model: Receive.ModelGenerated)
 }
 
-struct ReceiveView: AltMviView {
+struct ReceiveView: MVIView {
 	
-	@StateObject var mvi = AltMVI({ $0.receive() })
+	@StateObject var mvi = MVIState({ $0.receive() })
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
@@ -48,7 +48,8 @@ struct ReceiveView: AltMviView {
 		UIApplication.willEnterForegroundNotification
 	)
 	
-	@ViewBuilder var view: some View {
+	@ViewBuilder
+	var view: some View {
 		
 		ZStack {
 			
@@ -584,7 +585,7 @@ struct ReceiveView: AltMviView {
 
 struct ModifyInvoiceSheet: View {
 
-	@ObservedObject var mvi: AltMVI<Receive.Model, Receive.Intent>
+	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@Binding var sheet: ReceiveViewSheet?
 	
 	let initialUnit: BitcoinUnit
@@ -1056,24 +1057,27 @@ struct FeePromptPopup : View {
 // MARK:-
 
 class ReceiveView_Previews: PreviewProvider {
-
-//	static let mockModel = Receive.ModelAwaiting()
-	static let mockModel = Receive.ModelGenerated(
-		request: "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm",
-		paymentHash: "foobar",
-		amount: 0.017,
-		unit: BitcoinUnit.millibitcoin,
-		desc: "1 Espresso Coin Panna"
-	)
+	
+	static let request = "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm"
 
 	static var previews: some View {
-		mockView(ReceiveView())
-			.previewDevice("iPhone 11")
+		
+		NavigationView {
+			ReceiveView().mock(Receive.ModelAwaiting())
+		}
+		.modifier(GlobalEnvironment())
+		.previewDevice("iPhone 11")
+		
+		NavigationView {
+			ReceiveView().mock(Receive.ModelGenerated(
+				request: request,
+				paymentHash: "foobar",
+				amount: 0.017,
+				unit: BitcoinUnit.millibitcoin,
+				desc: "1 Espresso Coin Panna"
+			))
+		}
+		.modifier(GlobalEnvironment())
+		.previewDevice("iPhone 11")
 	}
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
 }

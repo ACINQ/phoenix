@@ -1,25 +1,26 @@
 import SwiftUI
 import PhoenixShared
+import os.log
 
-struct InitializationView: View {
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "InitializationView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
+
+struct InitializationView: MVIView {
 	
-	var body: some View {
-		MVIView({ $0.initialization() }, onModel: { change in
-			
-			if let model = change.newModel as? Initialization.ModelGeneratedWallet {
-				createWallet(model: model)
-			}
-			
-		}) { model, postIntent in
-			
-			main(model, postIntent)
-		}
-	}
+	@StateObject var mvi = MVIState({ $0.initialization() })
 	
-	@ViewBuilder func main(
-		_ model: Initialization.Model,
-		_ postIntent: @escaping (Initialization.Intent) -> Void
-	) -> some View {
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
+	@ViewBuilder
+	var view: some View {
 		
 		ZStack {
 			
@@ -62,7 +63,7 @@ struct InitializationView: View {
 					.padding(.bottom, 80)
 
 				Button {
-					createMnemonics(postIntent)
+					createMnemonics()
 				} label: {
 					HStack {
 						Image(systemName: "flame")
@@ -110,20 +111,31 @@ struct InitializationView: View {
 			.navigationBarHidden(true)
 				
 		} // </ZStack>
+		.onChange(of: mvi.model, perform: { model in
+			onModelChange(model: model)
+		})
 	}
 	
-	func createMnemonics(
-		_ postIntent: @escaping (Initialization.Intent) -> Void
-	) -> Void {
+	func createMnemonics() -> Void {
+		log.trace("createMnemonics()")
 		
 		let swiftEntropy = AppSecurity.shared.generateEntropy()
 		let kotlinEntropy = KotlinByteArray.fromSwiftData(swiftEntropy)
 		
 		let intent = Initialization.IntentGenerateWallet(entropy: kotlinEntropy)
-		postIntent(intent)
+		mvi.intent(intent)
+	}
+	
+	func onModelChange(model: Initialization.Model) -> Void {
+		log.trace("onModelChange()")
+	
+		if let model = model as? Initialization.ModelGeneratedWallet {
+			createWallet(model: model)
+		}
 	}
 	
 	func createWallet(model: Initialization.ModelGeneratedWallet) -> Void {
+		log.trace("createWallet()")
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: model.mnemonics) { (error: Error?) in
 			if error == nil {
@@ -134,25 +146,18 @@ struct InitializationView: View {
 }
 
 class InitView_Previews : PreviewProvider {
-	static let mockModel = Initialization.ModelReady()
 
 	static var previews: some View {
-		mockView(InitializationView())
+		InitializationView()
 			.preferredColorScheme(.light)
 			.previewDevice("iPhone 8")
 			
-		mockView(InitializationView())
+		InitializationView()
 			.preferredColorScheme(.dark)
 			.previewDevice("iPhone 8")
 			
-		mockView(InitializationView())
+		InitializationView()
 			.preferredColorScheme(.light)
 			.previewDevice("iPhone 11")
     }
-
-    #if DEBUG
-    @objc class func injected() {
-        UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: previews)
-    }
-    #endif
 }
