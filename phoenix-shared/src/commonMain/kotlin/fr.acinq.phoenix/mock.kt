@@ -52,7 +52,6 @@ object Mock {
     }
 
     fun outgoingSuccessful(): WalletPayment {
-        val now = currentTimestampMillis()
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 200_000.msat,
@@ -68,7 +67,6 @@ object Mock {
     }
 
     fun outgoingFailed(): WalletPayment {
-        val now = currentTimestampMillis()
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 200_000.msat,
