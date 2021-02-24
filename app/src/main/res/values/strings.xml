@@ -645,11 +645,17 @@
   <string name="ftue__bullet_1" translatable="false">●○○</string>
   <string name="ftue__bullet_2" translatable="false">○●○</string>
   <string name="ftue__bullet_3" translatable="false">○○●</string>
-  <string name="ftue__skip_button">Skip</string>
   <string name="ftue__welcome__header">Welcome!</string>
   <string name="ftue__welcome__body">With Phoenix, receiving and sending bitcoins is safe, easy, and fast.</string>
   <string name="ftue__pay_to_open__header">Automatic channel creation</string>
-  <string name="ftue__pay_to_open__body">Payment channels will be automatically created for you if needed. There is a small cost: %1$s%%. For example, to receive $100, the fee would be 10 cents.</string>
+  <string name="ftue__pay_to_open__body"><![CDATA[
+    Payment channels are automatically created when needed.
+    <br /><br />
+    The fee is <b>%1$s%%</b><br/>with a minimum: not less than <b>%2$s</b>.
+    <br /><br />
+    For example, to receive 250 000 sat, the channel creation fee would be %2$s.
+  ]]></string>
+  <string name="ftue__pay_to_open__button">I understand</string>
   <string name="ftue__backup_seed__header">Keep control</string>
   <string name="ftue__backup_seed__body">A backup phrase is generated, storing all the information needed to recover your Bitcoin funds.\n\nKeep it safe and secret!</string>
   <string name="ftue__backup_seed__button">Get started</string>
