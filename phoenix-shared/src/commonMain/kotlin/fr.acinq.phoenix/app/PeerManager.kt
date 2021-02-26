@@ -83,6 +83,7 @@ class PeerManager(
                 )
             ),
             dustLimit = 546.sat,
+            maxRemoteDustLimit = 600.sat,
             onChainFeeConf = OnChainFeeConf(
                 closeOnOfflineMismatch = true,
                 updateFeeMinDiffRatio = 0.1,

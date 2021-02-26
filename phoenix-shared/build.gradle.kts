@@ -60,7 +60,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("fr.acinq.eclair:eclair-kmp:1.0-beta7")
+                api("fr.acinq.eclair:eclair-kmp:snapshot")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
