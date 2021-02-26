@@ -33,6 +33,7 @@ import fr.acinq.phoenix.databinding.FragmentFtueLightningBinding
 import fr.acinq.phoenix.databinding.FragmentFtueWelcomeBinding
 import fr.acinq.phoenix.utils.BindingHelpers
 import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -46,13 +47,13 @@ class FtueFragment : BaseFragment(stayIfNotStarted = true) {
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentFtueBinding.inflate(inflater, container, false)
     mBinding.lifecycleOwner = this
+    mBinding.viewPager.isUserInputEnabled = false
+    mBinding.viewPager.isEnabled = false
     adapter = FtueViewAdapter(this).apply {
       mBinding.viewPager.adapter = this
       mBinding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
-          BindingHelpers.show(mBinding.nextButton, position == 0 || position == 1)
-          BindingHelpers.show(mBinding.skipButton, position == 0 || position == 1)
           mBinding.indicators.text = getString(when (position) {
             0 -> R.string.ftue__bullet_1
             1 -> R.string.ftue__bullet_2
@@ -73,14 +74,14 @@ class FtueFragment : BaseFragment(stayIfNotStarted = true) {
         mBinding.viewPager.currentItem = mBinding.viewPager.currentItem - 1
       }
     }
-    mBinding.nextButton.setOnClickListener {
-      when (mBinding.viewPager.currentItem) {
-        0 -> mBinding.viewPager.currentItem = 1
-        1 -> mBinding.viewPager.currentItem = 2
-        else -> leave()
-      }
-    }
-    mBinding.skipButton.setOnClickListener { leave() }
+  }
+
+  fun goToPage2() {
+    mBinding.viewPager.currentItem = 1
+  }
+
+  fun goToPage3() {
+    mBinding.viewPager.currentItem = 2
   }
 
   fun leave() {
@@ -113,6 +114,11 @@ class FtueWelcomeFragment : Fragment() {
     mBinding.lifecycleOwner = this
     return mBinding.root
   }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    mBinding.nextButton.setOnClickListener { (parentFragment as? FtueFragment)?.goToPage2() }
+  }
 }
 
 class FtueLightningFragment : Fragment() {
@@ -127,8 +133,11 @@ class FtueLightningFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val swapInFee = 100 * ((parentFragment as FtueFragment).appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
-    mBinding.body.text = getString(R.string.ftue__pay_to_open__body, String.format("%.2f", swapInFee))
+    val payToOpenSettings = (parentFragment as? FtueFragment)?.appContext()?.payToOpenSettings?.value
+    val swapInFee = 100 * (payToOpenSettings?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
+    val minFee = payToOpenSettings?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
+    mBinding.body.text = Converter.html(getString(R.string.ftue__pay_to_open__body, String.format("%.2f", swapInFee), Converter.printAmountPretty(minFee, requireContext(), withUnit = true)))
+    mBinding.nextButton.setOnClickListener { (parentFragment as? FtueFragment)?.goToPage3() }
   }
 }
 
@@ -143,8 +152,6 @@ class FtueBackupFragment : Fragment() {
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    mBinding.finishButton.setOnClickListener {
-      (parentFragment as FtueFragment).leave()
-    }
+    mBinding.finishButton.setOnClickListener { (parentFragment as? FtueFragment)?.leave() }
   }
 }

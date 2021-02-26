@@ -535,18 +535,6 @@ class EclairNodeService : Service() {
     return successfullyClosed
   }
 
-  /** Accept a pay-to-open request for a given payment hash. */
-  @UiThread
-  fun acceptPayToOpen(paymentHash: ByteVector32) {
-    kit?.system()?.eventStream()?.publish(AcceptPayToOpen(paymentHash))
-  }
-
-  /** Reject a pay-to-open request for a given payment hash. */
-  @UiThread
-  fun rejectPayToOpen(paymentHash: ByteVector32) {
-    kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
-  }
-
   /** Extracts the worst case (fee, ctlv expiry delta) scenario from the routing hints in a payment request. If the payment request has no routing hints, return (0, 0). */
   private fun getPessimisticRouteSettingsFromHint(amount: MilliSatoshi, paymentRequest: PaymentRequest): Pair<MilliSatoshi, CltvExpiryDelta> {
     val aggregateByRoutes = JavaConverters.asJavaCollectionConverter(paymentRequest.routingInfo()).asJavaCollection().toList()
@@ -868,33 +856,6 @@ class EclairNodeService : Service() {
           ScalaList.empty<PaymentReceived.PartialPayment>().`$colon$colon`(PaymentReceived.PartialPayment(event.amount(), ByteVector32.Zeroes(), System.currentTimeMillis()))))
       }
     } ?: log.error("could not create and settle placeholder for on-chain payment because kit is not initialized")
-  }
-
-  @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: PayToOpenRequestEvent) {
-    val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
-    if (autoAcceptPayToOpen) {
-      log.info("automatically accepting pay-to-open=$event")
-      acceptPayToOpen(event.payToOpenRequest().paymentHash())
-    } else {
-      if (isHeadless) {
-        log.info("automatically rejecting pay-to-open=$event")
-        updateNotification(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__manual_pay_to_open))
-        rejectPayToOpen(event.payToOpenRequest().paymentHash())
-      } else {
-        EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
-        if (!appContext.isAppVisible) {
-          notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN)
-            .setSmallIcon(R.drawable.ic_phoenix_outline)
-            .setContentTitle(getString(R.string.notif_pay_to_open_title))
-            .setContentText(getString(R.string.notif_pay_to_open_message))
-            .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__PAY_TO_OPEN,
-              Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
-            .setAutoCancel(true)
-            .build())
-        }
-      }
-    }
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)

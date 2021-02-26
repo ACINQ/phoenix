@@ -51,11 +51,12 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.listAllChannelsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.mutualCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
     mBinding.forceCloseButton.visibility = if (isStarted) View.VISIBLE else View.GONE
+    mBinding.paymentSettingsButton.visibility = if (isStarted) View.VISIBLE else View.GONE
   }
 
   override fun onStart() {
     super.onStart()
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().popBackStack() })
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
     mBinding.prefsDisplayButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_prefs_display) }
     mBinding.electrumButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_electrum) }
     mBinding.mutualCloseButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_mutual_close) }

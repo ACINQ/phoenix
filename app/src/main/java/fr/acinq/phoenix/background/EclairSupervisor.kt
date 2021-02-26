@@ -19,7 +19,6 @@ package fr.acinq.phoenix.background
 import akka.actor.UntypedActor
 import android.content.Context
 import fr.acinq.bitcoin.Base58Check
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Script
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`package$`
@@ -38,16 +37,16 @@ import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.Balance
-import fr.acinq.phoenix.db.*
+import fr.acinq.phoenix.db.AppDb
+import fr.acinq.phoenix.db.ClosingType
+import fr.acinq.phoenix.db.PayToOpenMetaRepository
+import fr.acinq.phoenix.db.PaymentMetaRepository
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters
 
-interface PayToOpenResponse
-class AcceptPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
-class RejectPayToOpen(val paymentHash: ByteVector32) : PayToOpenResponse
 
 /**
  * This actor listens to events dispatched by eclair core.
@@ -64,9 +63,6 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
   }
 
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
-
-  // key is payment hash
-  private val payToOpenMap = HashMap<ByteVector32, PayToOpenRequestEvent>()
 
   override fun onReceive(event: Any?) {
     log.debug("received event $event")
@@ -146,39 +142,21 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
       is ElectrumClient.`ElectrumDisconnected$` -> EventBus.getDefault().post(event)
 
       // -------------- PAY TO OPEN -------------
-      is AcceptPayToOpen -> {
-        val payToOpen = payToOpenMap[event.paymentHash]
-        payToOpen?.let {
-          if (it.decision().trySuccess(true)) {
-            payToOpen.payToOpenRequest().amountMsat()
-            payToOpenMetaRepository.insert(
-              paymentHash = event.paymentHash,
-              fee = payToOpen.payToOpenRequest().payToOpenFee(),
-              amount = payToOpen.payToOpenRequest().amountMsat().truncateToSatoshi(),
-              capacity = payToOpen.payToOpenRequest().fundingSatoshis())
-            payToOpenMap.remove(event.paymentHash)
-          } else {
-            log.warn("success promise for $event has failed")
-          }
-        } ?: log.info("ignored $event because associated event for this payment_hash is unknown")
-      }
-      is RejectPayToOpen -> {
-        val payToOpen = payToOpenMap[event.paymentHash]
-        payToOpen?.let {
-          if (it.decision().trySuccess(false)) {
-            log.info("payToOpen event has been rejected by user")
-          } else {
-            log.warn("success promise for $event has failed")
-          }
-        } ?: log.info("ignored $event because associated event for this payment_hash is unknown")
-      }
       is PayToOpenRequestEvent -> {
-        log.info("adding PendingPayToOpenRequest for payment_hash=${event.payToOpenRequest().paymentHash()}")
-        payToOpenMap[event.payToOpenRequest().paymentHash()] = event
+        log.info("adding pay-to-open request=$event")
+        if (event.decision().trySuccess(true)) {
+          payToOpenMetaRepository.insert(
+            paymentHash = event.payToOpenRequest().paymentHash(),
+            fee = event.payToOpenRequest().payToOpenFee(),
+            amount = event.payToOpenRequest().amountMsat().truncateToSatoshi(),
+            capacity = event.payToOpenRequest().fundingSatoshis())
+        } else {
+          log.warn("failed to accept pay-to-open request, promise has failed for event=$event")
+        }
         EventBus.getDefault().post(event)
       }
       is MissedPayToOpenPayment -> {
-        log.info("missed PayToOpen=$event")
+        log.info("missed pay-to-open=$event")
         EventBus.getDefault().post(event)
       }
 

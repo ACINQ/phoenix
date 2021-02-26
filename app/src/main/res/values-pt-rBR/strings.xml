@@ -118,8 +118,8 @@
   <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
-  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de pelo menos <b>%1$s</b>.]]></string>
-  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de pelo menos <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
@@ -132,19 +132,8 @@
   <br /><br />
   Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
-  Uma taxa de <b>%1$s%%</b> será cobrada.
+  Uma taxa de <b>%1$s%%</b> será cobrada (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pagamento a receber</string>
-  <string name="receive_with_open_help_desc">O que é isso?</string>
-  <string name="receive_with_open_help">Para receber pagamentos na Lightning, você precisa de um canal com capacidade suficiente de recebimento.\n\nSe você não possui um, nós criamos conforme for necessário. A taxa é necessária para a Phoenix cobrir os custos de abertura e manutenção desses canais.</string>
-  <string name="receive_with_open_amount_label">Você tem um pagamento a receber de</string>
-  <string name="receive_with_open_cost"><![CDATA[Para receber este pagamento é necessário pagar uma taxa de instalação/manutenção de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Aceitar (expira em %1$ss)</string>
-  <string name="receive_with_open_decline">Recusar</string>
-  <string name="receive_with_open_expired">Este pagamento expirou!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -259,8 +248,8 @@
   <string name="notif_watcher_connection_message">O alerta de segundo plano precisa de internet para funcionar corretamente.</string>
 
   <string name="notif__headless_title__default">A Phoenix está rodando em segundo plano</string>
-  <string name="notif__headless_title__missed_incoming">Falha ao receber um pagamento</string>
-  <string name="notif__headless_title__missed_fulfill">Concluir pagamento</string>
+  <string name="notif__headless_title__missed_incoming">Pagamento não recebido</string>
+  <string name="notif__headless_title__missed_fulfill">Um pagamento pendente foi realizado</string>
   <string name="notif__headless_title__received">Pagamento recebido</string>
   <string name="notif__headless_message__app_locked">O aplicativo está bloqueado</string>
   <string name="notif__headless_message__pending_fulfill">Toque para iniciar o aplicativo</string>
@@ -269,6 +258,9 @@
 
   <string name="notif_pay_to_open_title">Aceitar pagamento</string>
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
+
+  <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
+  <string name="notif__pay_to_open_missed_message">O valor não foi recebido por ser uma quantia insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -641,11 +633,6 @@
   <string name="paymentsettings_defaultdesc_dialog_description">As cobranças que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
-  <string name="paymentsettings_paytoopen_auto_title">Permitir abertura de canais de forma automática</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Às vezes é necessário abrir um novo canal Lightning para receber um pagamento.\n\nNestes casos, uma taxa de %1$s%% é deduzida do valor recebido para cobrir os custos de abertura do canal.</string>
-  <string name="paymentsettings_paytoopen_dialog_title">Você tem certeza?</string>
-  <string name="paymentsettings_paytoopen_dialog_description">O aplicativo irá abrir automaticamente canais quando necessário para receber um pagamento.\n\nObserve que uma taxa de %1$s%% é deduzida do valor recebido para cobrir o custo de abertura do canal.</string>
-
   <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
   <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
@@ -659,11 +646,16 @@
   <string name="ftue__bullet_1" translatable="false">●○○</string>
   <string name="ftue__bullet_2" translatable="false">○●○</string>
   <string name="ftue__bullet_3" translatable="false">○○●</string>
-  <string name="ftue__skip_button">Pular</string>
   <string name="ftue__welcome__header">Bem-vindo!</string>
   <string name="ftue__welcome__body">Com a Phoenix, receber e enviar bitcoins é seguro, fácil e rápido.</string>
   <string name="ftue__pay_to_open__header">Abertura automática de canais</string>
-  <string name="ftue__pay_to_open__body">Se necessário, canais de pagamento serão abertos automaticamente para você. Há uma pequena taxa: %1$s%%. Por exemplo, para receber $100, a taxa seria de 10 centavos.\n\nVocê também pode controlar isso manualmente.</string>
+  <string name="ftue__pay_to_open__body"><![CDATA[
+  Se necessário, canais de pagamento serão abertos automaticamente para você.
+  <br /><br />
+  A taxa é <b>%1$s%%</b><br/>com um mínimo de <b>%2$s</b>.
+  <br /><br />
+  Por exemplo, para receber 250 000 sat, a taxa seria de %2$s.
+  ]]></string>
   <string name="ftue__backup_seed__header">Você no controle dos seus bitcoins</string>
   <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
   <string name="ftue__backup_seed__button">Começar</string>

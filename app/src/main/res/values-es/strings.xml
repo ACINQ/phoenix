@@ -103,19 +103,8 @@
   <br /><br />
   Los fondos enviados a esta dirección se mostrarán en tu cartera después de una confirmación.
   <br /><br />
-  Se aplicará el <b>%1$s%%</b> de comisión.
+  Se aplicará el <b>%1$s%%</b> de comisión (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pago entrante</string>
-  <string name="receive_with_open_help_desc">¿Qué es esto?</string>
-  <string name="receive_with_open_help">Para recibir pagos en Lightning, debes tener un canal con suficiente liquidez entrante.\n\nSi no tienes uno, Phoenix creará un canal automáticamente y al vuelo según sea necesario. La comisión cubre el coste de crear el canal y asignarle liquidez.</string>
-  <string name="receive_with_open_amount_label">Tienes pendiente un pago entrante de</string>
-  <string name="receive_with_open_cost"><![CDATA[Aceptar este pago requiere una comisión de apertura de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Aceptar (expira en %1$ss)</string>
-  <string name="receive_with_open_decline">Rechazar</string>
-  <string name="receive_with_open_expired">¡Este pago ha expirado!</string>
 
   <!-- //////////////// send //////////////// -->
 

@@ -108,19 +108,8 @@
   <br /><br />
   Les fonds envoyés vers cette adresse seront disponibles dans votre portefeuille Phoenix après 1 confirmation sur la chaîne.
   <br /><br />
-  Une commission de <b>%1$s%%</b> sera prélevée.
+  Une commission de <b>%1$s%%</b> sera prélevée (avec un minimum de <b>%2$s</b>).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Paiement entrant</string>
-  <string name="receive_with_open_help_desc">Qu\'est-ce que c\'est?</string>
-  <string name="receive_with_open_help">Afin de recevoir un paiement sur Lightning, vous devez avoir un canal de paiement avec suffisamment de liquidité entrante.\n\nSi vous n\'en avez pas, Phoenix va automatiquement créer un canal de paiement. La commission de création de ce canal de paiement couvre les frais de transaction on-chain et d\'allocation de liquidité.</string>
-  <string name="receive_with_open_amount_label">Vous pouvez recevoir un paiement de</string>
-  <string name="receive_with_open_cost"><![CDATA[Voulez-vous recevoir ce paiement ? Accepter ce paiement nécessite des frais de mise en place de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accepter (expire dans %1$ss)</string>
-  <string name="receive_with_open_decline">Refuser</string>
-  <string name="receive_with_open_expired">Ce paiement a expiré !</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -311,9 +300,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_terms"><![CDATA[
-    En procédant aux étapes suivantes, vous acceptez les <a href="https://phoenix.acinq.co/terms">conditions d\'utilisation de l\'application</a>.
-  ]]></string>
+  <string name="initwallet_terms"><![CDATA[J\'ai lu et accepte les <a href="https://phoenix.acinq.co/terms">conditions d\'utilisation de l\'application</a>.]]></string>
   <string name="initwallet_create">Créer un nouveau portefeuille</string>
   <string name="initwallet_restore">Restaurer un portefeuille existant</string>
 
@@ -578,6 +565,7 @@
   Si vous avez des questions, consultez <a href="https://phoenix.acinq.co/faq">la FAQ</a>. Vous pouvez aussi contacter <a href="https://phoenix.acinq.co/support">le support</a> si vous avez besoin d\'aide.
   ]]></string>
   <string name="about_terms">Conditions d\'utilisation</string>
+  <string name="about_privacy">Vie privée</string>
 
   <!-- //////////////// settings: options for payments //////////////// -->
 
@@ -589,11 +577,6 @@
   <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Elle peut être changée au cas par cas.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
 
-  <string name="paymentsettings_paytoopen_auto_title">Création de canaux de paiement automatique</string>
-  <string name="paymentsettings_paytoopen_auto_desc">Il est parfois nécessaire de créer un nouveau canal de paiement pour pouvoir recevoir des fonds.\n\nDans ce cas, des frais de %1$s%% sont déduits du montant reçu pour assurer la création du canal.</string>
-  <string name="paymentsettings_paytoopen_dialog_title">Confirmation</string>
-  <string name="paymentsettings_paytoopen_dialog_description">L\'application créera automatiquement un canal de paiement lorsque cela est nécessaire.\n\nDes frais de %1$s%% sont déduits du montant reçu pour couvrir le coût de création du canal.</string>
-
   <string name="paymentsettings_trampoline_fees_title">Frais max pour les paiements Lightning sortants</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
   <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Outrepasser les frais max de référence</string>
@@ -604,11 +587,17 @@
 
   <!-- ftue -->
 
-  <string name="ftue__skip_button">Passer</string>
   <string name="ftue__welcome__header">Bienvenue !</string>
   <string name="ftue__welcome__body">Avec Phoenix, recevoir et envoyer des bitcoins est facile, rapide, et sûr.</string>
   <string name="ftue__pay_to_open__header">Automatisation des canaux de paiement</string>
-  <string name="ftue__pay_to_open__body">Les canaux de paiement sont créés automatiquement si besoin, pour un coût faible (%1$s%%). Par exemple, pour recevoir 100€, les frais seraient 10 centimes.\n\nVous pouvez aussi gérer cela manuellement.</string>
+  <string name="ftue__pay_to_open__body"><![CDATA[
+    Un canal de paiement sera créé automatiquement quand nécessaire.
+    <br /><br />
+    Les frais sont de <b>%1$s%%</b><br/>avec un montant plancher minimum de <b>%2$s</b>.
+    <br /><br />
+    Par exemple, pour recevoir 250 000 sat, les frais seront de %2$s.
+  ]]></string>
+  <string name="ftue__pay_to_open__button">Je comprends</string>
   <string name="ftue__backup_seed__header">Gardez le contrôle</string>
   <string name="ftue__backup_seed__body">Une clé privée est associée à votre wallet, et permet de récupérer vos fonds si besoin.\n\nPrenez en soin et gardez la secrète !</string>
   <string name="ftue__backup_seed__button">Commencer</string>
@@ -627,6 +616,11 @@
     <h4>Amélioration du verrouillage</h4>
     <p>Le verrouillage de l\'application utilise maintenant celui du système Android. Plus besoin de se souvenir d\'un énième PIN !</p>
     <p>Allez dans Configuration > Sécurité pour activer le verrouillage écran.</p>
+  ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Augmentation des frais pour les nouveaux canaux de paiement</h4>
+    <p>Les frais de création de nouveaux channels restent les mêmes (%1$s%%), mais ils ont désormais un plancher minimal de <b>%2$s</b>.</p>
+    <p>Si quelqu\'un vous envoie 15 000 sat et que vous n\'avez pas de canal de paiement, un nouveau canal sera créé et vous recevrez 14 000 sat.</p>
   ]]></string>
 
 </resources>

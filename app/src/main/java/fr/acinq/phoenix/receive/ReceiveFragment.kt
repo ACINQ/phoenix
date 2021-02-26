@@ -191,12 +191,19 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      val swapInFee = 100 * (appContext()?.swapInSettings?.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent)
-      AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
-        Converter.html(getString(R.string.receive_swap_in_disclaimer_message, String.format("%.2f", swapInFee))))
-        .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
-        .setNegativeButton(R.string.btn_cancel, null)
-        .show()
+      context?.let { ctx ->
+        val percentFee = 100 * (appContext(ctx).payToOpenSettings.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
+        val minFee = appContext(ctx).payToOpenSettings.value?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
+        AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
+          Converter.html(getString(R.string.receive_swap_in_disclaimer_message,
+            String.format("%.2f", percentFee),
+            Converter.printAmountPretty(minFee, ctx, withUnit = true)
+          )))
+          .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
+          .setNegativeButton(R.string.btn_cancel, null)
+          .show()
+      }
+
     }
 
     mBinding.withdrawButton.setOnClickListener {

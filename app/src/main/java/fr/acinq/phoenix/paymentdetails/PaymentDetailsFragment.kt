@@ -457,8 +457,9 @@ class PaymentDetailsViewModel(
       }
       payments.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
         payments.filter { p -> p.status() is OutgoingPaymentStatus.Failed }.also {
-          val failure = JavaConverters.asJavaCollectionConverter((it.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList().last()
+          val failure = JavaConverters.asJavaCollectionConverter((it.last().status() as OutgoingPaymentStatus.Failed).failures()).asJavaCollection().toList().lastOrNull()
           val failureType = when {
+            failure == null -> OutgoingFailure.Generic("No details available")
             failure.failureMessage().contains(TrampolineFeeInsufficient.message(), ignoreCase = true) -> OutgoingFailure.TrampolineFee
             failure.failureMessage().contains(TemporaryNodeFailure.message(), ignoreCase = true)
               || failure.failureMessage().contains(UnknownNextPeer.message(), ignoreCase = true)
