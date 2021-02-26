@@ -33,7 +33,7 @@ android {
     minSdkVersion 24
     targetSdkVersion 30
     versionCode 23
-    versionName "${gitCommitHash}"
+    versionName "1.4.8"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
