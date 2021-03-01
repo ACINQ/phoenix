@@ -52,7 +52,7 @@ struct ConfigurationView: View {
 							Image(systemName: "doc.text")
 						}
 					}
-                    if fullMode {
+					if fullMode {
 						NavigationLink(destination: ChannelsConfigurationView()) {
 							Label { Text("Payment channels") } icon: {
 								Image(systemName: "bolt")
@@ -63,13 +63,13 @@ struct ConfigurationView: View {
 								Image(systemName: "xmark.circle")
 							}
 						}
-						NavigationLink(destination: ComingSoonView()) {
+						NavigationLink(destination: ForceCloseChannelsView()) {
 							Label { Text("Danger zone") } icon: {
 								Image(systemName: "exclamationmark.triangle")
 							}
 						}.foregroundColor(.appRed)
-                    }
-                }
+					}
+				}
 			}
 			.listStyle(GroupedListStyle())
 			.onAppear() {
@@ -81,7 +81,7 @@ struct ConfigurationView: View {
 			.navigationBarTitle("Settings", displayMode: .inline)
 			
 		} // end: mvi
-	} // end: func
+	} // end: body
 }
 
 class ConfigurationView_Previews: PreviewProvider {

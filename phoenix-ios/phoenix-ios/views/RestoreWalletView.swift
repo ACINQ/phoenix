@@ -16,6 +16,9 @@ struct RestoreWalletView: AltMviView {
 
 	@StateObject var mvi = AltMVI({ $0.restoreWallet() })
 	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
 	@State var acceptedWarning = false
 	@State var mnemonics = [String]()
 	@State var autocomplete = [String]()

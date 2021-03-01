@@ -20,6 +20,9 @@ struct ReceiveView: AltMviView {
 	
 	@StateObject var mvi = AltMVI({ $0.receive() })
 	
+	@Environment(\.controllerFactory) var factoryEnv
+	var factory: ControllerFactory { return factoryEnv }
+	
 	@StateObject var qrCode = QRCode()
 
 	@State var unit: String = "sat"
