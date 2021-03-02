@@ -58,17 +58,17 @@ extension ConnectionsMonitor {
 		return connections.value as! Connections
 	}
 	
-//	var publisher: CurrentValueSubject<Connections, Never> {
-//
-//		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
-//
-//		let swiftFlow = SwiftFlow<Connections>(origin: connections)
-//		swiftFlow.watch {[weak publisher](connections: Connections?) in
-//			publisher?.send(connections!)
-//		}
-//
-//		return publisher
-//	}
+	var publisher: CurrentValueSubject<Connections, Never> {
+
+		let publisher = CurrentValueSubject<Connections, Never>(currentValue)
+
+		let swiftFlow = SwiftFlow<Connections>(origin: connections)
+		swiftFlow.watch {[weak publisher](connections: Connections?) in
+			publisher?.send(connections!)
+		}
+
+		return publisher
+	}
 }
 
 class ObservableConnectionsMonitor: ObservableObject {
