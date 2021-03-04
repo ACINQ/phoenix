@@ -329,9 +329,7 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-   <string name="initwallet_terms"><![CDATA[
-    Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
-  ]]></string>
+  <string name="initwallet_terms"><![CDATA[Eu li e concordo com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.]]></string>
   <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
 
@@ -617,6 +615,7 @@
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Fornecido por Coindesk</a>
   ]]></string>
   <string name="about_terms">Termos de uso</string>
+  <string name="about_privacy">Privacidade</string>
 
   <!-- //////////////// background node service //////////////// -->
 
@@ -675,6 +674,11 @@
     <h4>Aprimoramento da função de bloqueio</h4>
     <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
     <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
+  ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Aumento de taxas para novos canais</h4>
+    <p>A % da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
+    <p>Se alguém te enviar 15 000 sat e você ainda não tiver canais abertos, um novo canal será criado e você receberá 14 000 sat.</p>
   ]]></string>
 
   <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
