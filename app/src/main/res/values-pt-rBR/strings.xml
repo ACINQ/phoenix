@@ -548,7 +548,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
   <string name="electrum_change_button">Definir servidor…</string>
 
   <string name="electrum_block_height_label">Altura do bloco</string>
