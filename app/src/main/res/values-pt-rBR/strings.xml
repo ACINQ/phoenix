@@ -651,7 +651,7 @@
   <string name="ftue__pay_to_open__body"><![CDATA[
   Se necessário, canais de pagamento serão abertos automaticamente para você.
   <br /><br />
-  A taxa é <b>%1$s%%</b><br/>com um mínimo de <b>%2$s</b>.
+  A taxa é <b>%1$s%%</b><br/>taxa mínima de <b>%2$s</b>.
   <br /><br />
   Por exemplo, para receber 250 000 sat, a taxa seria de %2$s.
   ]]></string>
