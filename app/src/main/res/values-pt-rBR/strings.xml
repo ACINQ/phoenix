@@ -260,7 +260,7 @@
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
 
   <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
-  <string name="notif__pay_to_open_missed_message">O valor não foi recebido por ser uma quantia insuficiente para criar um novo canal de pagamento.</string>
+  <string name="notif__pay_to_open_missed_message">Valor insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
