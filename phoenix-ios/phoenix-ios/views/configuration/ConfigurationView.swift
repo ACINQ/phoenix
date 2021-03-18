@@ -30,7 +30,7 @@ struct ConfigurationView: MVIView {
 						Image(systemName: "link")
 					}
 				}
-				NavigationLink(destination: TorConfigurationView()) {
+				NavigationLink(destination: ComingSoonView()) {
 					Label { Text("Tor") } icon: {
 						Image(systemName: "shield.lefthalf.fill")
 					}
