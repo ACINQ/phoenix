@@ -246,7 +246,7 @@ struct ValidateView: View {
 
 	@State var number: Double = 0.0
 	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.satoshi)
+	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -507,15 +507,15 @@ struct ValidateView: View {
 		}
 		
 		if let bitcoinUnit = unit.bitcoinUnit {
-			postIntent(Scan.IntentSend(request: model.request, amount: amt, unit: bitcoinUnit))
+
+            let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
+			postIntent(Scan.IntentSend(request: model.request, amount: msat))
 			
 		} else if let fiatCurrency = unit.fiatCurrency,
 		          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 		{
-			let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-			let sat = Utils.convertBitcoin(msat: msat, bitcoinUnit: .satoshi)
-			
-			postIntent(Scan.IntentSend(request: model.request, amount: sat, unit: .satoshi))
+            let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
+			postIntent(Scan.IntentSend(request: model.request, amount: msat))
 		}
 	}
 	

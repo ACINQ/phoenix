@@ -2,7 +2,7 @@ package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.*
 
-// @DefinitelyNotSerializable_DoNotPutMeInTheDatabase_Ever
+
 data class Wallet(val seed: ByteArray) {
 
     init {
@@ -20,6 +20,12 @@ data class Wallet(val seed: ByteArray) {
             input = publicKey,
             prefix = if (isMainnet) DeterministicWallet.zpub else DeterministicWallet.vpub
         )
+    }
+
+    /** Get the wallet (xpub, path) */
+    fun xpub(isMainnet: Boolean): Pair<String, String> {
+        val masterPubkeyPath = if (isMainnet) "m/84'/0'/0'" else "m/84'/1'/0'"
+        return masterPublicKey(masterPubkeyPath, isMainnet) to masterPubkeyPath
     }
 
     fun onchainAddress(path: String, isMainnet: Boolean): String {

@@ -1,9 +1,11 @@
 package fr.acinq.phoenix.app.ctrl
 
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.channel.Aborted
 import fr.acinq.eclair.channel.Closed
 import fr.acinq.eclair.channel.Closing
 import fr.acinq.eclair.channel.ErrorInformationLeak
+import fr.acinq.eclair.utils.sum
 import fr.acinq.phoenix.app.PaymentsManager
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Home
@@ -26,15 +28,15 @@ class AppHomeController(
         launch {
             peerManager.getPeer().channelsFlow.collect { channels ->
                 model {
-                    copy(balanceSat = channels.values.sumOf {
+                    copy(balance = channels.values.map {
                         when (it) {
-                            is Closing -> 0
-                            is Closed -> 0
-                            is Aborted -> 0
-                            is ErrorInformationLeak -> 0
-                            else -> it.localCommitmentSpec?.toLocal?.truncateToSatoshi()?.toLong() ?: 0
+                            is Closing -> MilliSatoshi(0)
+                            is Closed -> MilliSatoshi(0)
+                            is Aborted -> MilliSatoshi(0)
+                            is ErrorInformationLeak -> MilliSatoshi(0)
+                            else -> it.localCommitmentSpec?.toLocal ?: MilliSatoshi(0)
                         }
-                    })
+                    }.sum())
                 }
             }
         }

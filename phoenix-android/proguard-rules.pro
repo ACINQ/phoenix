@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# http://developer.android.com/guide/developing/tools/proguard.html
+-printconfiguration ~/tmp/full-r8-config.txt
+-dontoptimize
+-dontobfuscate
+-dontpreverify
+
+-keep class androidx.**
+-keep class fr.acinq.**
+-keepattributes *Annotation*, Signature, Exception
+
+# logback-android (https://github.com/tony19/logback-android/wiki#proguard)
+-keep class ch.qos.** { *; }
+-keep class org.slf4j.** { *; }
+-dontwarn ch.qos.logback.core.net.*

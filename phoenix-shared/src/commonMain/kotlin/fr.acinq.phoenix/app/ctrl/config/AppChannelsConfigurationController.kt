@@ -22,11 +22,15 @@ class AppChannelsConfigurationController(
     loggerFactory: LoggerFactory, 
     private val peerManager: PeerManager,
     private val chain: Chain
-) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(loggerFactory, ChannelsConfiguration.emptyModel) {
+) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(
+    loggerFactory,
+    firstModel = ChannelsConfiguration.emptyModel
+) {
 
     private val json = Json {
         prettyPrint = true
         serializersModule = eclairSerializersModule
+        allowStructuredMapKeys = true
     }
 
     init {

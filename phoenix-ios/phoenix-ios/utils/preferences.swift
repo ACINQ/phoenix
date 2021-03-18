@@ -71,7 +71,7 @@ class Prefs {
 			if let str = UserDefaults.standard.string(forKey: key) {
 				saved = BitcoinUnit.deserialize(str)
 			}
-			return saved ?? BitcoinUnit.satoshi
+			return saved ?? BitcoinUnit.sat
 		}
 		set {
 			let key = Keys.bitcoinUnit.rawValue
@@ -149,11 +149,11 @@ enum CurrencyType: String, CaseIterable, Codable {
 extension FiatCurrency {
 	
 	func serialize() -> String {
-		return self.shortLabel
+        return self.name
 	}
 	
 	static func deserialize(_ str: String) -> FiatCurrency? {
-		for value in FiatCurrency.default().values {
+        for value in FiatCurrency.default().values {
 			if str == value.serialize() {
 				return value
 			}
@@ -172,7 +172,7 @@ extension FiatCurrency {
 		
 		for fiat in FiatCurrency.default().values {
 			
-			let fiatCode = fiat.shortLabel // e.g. "AUD", "BRL"
+			let fiatCode = fiat.name // e.g. "AUD", "BRL"
 			
 			if currencyCode.caseInsensitiveCompare(fiatCode) == .orderedSame {
 				return fiat
@@ -186,7 +186,7 @@ extension FiatCurrency {
 extension BitcoinUnit {
 	
 	func serialize() -> String {
-		return self.abbrev
+		return self.name
 	}
 	
 	static func deserialize(_ str: String) -> BitcoinUnit? {

@@ -20,9 +20,9 @@ struct CurrencyUnit: Hashable {
 	
 	var abbrev: String {
 		if let bitcoinUnit = bitcoinUnit {
-			return bitcoinUnit.abbrev
+			return bitcoinUnit.name
 		} else {
-			return fiatCurrency!.shortLabel
+			return fiatCurrency!.name
 		}
 	}
 }

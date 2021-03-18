@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.log.LoggerFactory
 import org.kodein.memory.file.*
-import org.kodein.memory.io.putBytesBuffered
+import org.kodein.memory.io.*
 import org.kodein.memory.use
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -32,23 +32,36 @@ class AppLogsConfigurationController(ctx: PlatformContext, loggerFactory: Logger
     }
 
     override fun process(intent: LogsConfiguration.Intent) = error("Nothing to process")
-}
 
-private suspend fun mergeLogs(directory: Path, numberOfFiles: Int, ctx: PlatformContext): Path = withContext(Dispatchers.Default) {
-    val files = directory
-        .listDir()
-        .sortedByDescending { it.name }
-        .take(numberOfFiles)
-        .toList()
-    val fileName = files.last().name + "_" + files.first().name
-    val tmpDir = Path(getTemporaryDirectoryPath(ctx))
-    val tmpFile = tmpDir.resolve(fileName)
-    tmpFile.openWriteableFile().use { output ->
-        files.reversed().forEach { file ->
-            file.openReadableFile().use { input ->
-                output.putBytesBuffered(input)
+    private suspend fun mergeLogs(
+        directory: Path,
+        numberOfFiles: Int,
+        ctx: PlatformContext
+    ): Path = withContext(Dispatchers.Default) {
+        val files = directory
+            .listDir()
+            .sortedByDescending { it.name }
+            .take(numberOfFiles)
+            .toList()
+        val fileName = files.last().name + "_" + files.first().name
+        val tmpDir = Path(getTemporaryDirectoryPath(ctx))
+        val tmpFile = tmpDir.resolve(fileName)
+        tmpFile.openWriteableFile().use { output ->
+            files.reversed().forEach { file ->
+                file.openReadableFile().use { input ->
+                    val buffer = ByteArray(16384)
+                    var done = false
+                    do {
+                        val read = input.receive(dst = buffer)
+                        if (read > 0) {
+                            output.putBytes(src = buffer, srcOffset = 0, length = read)
+                        } else {
+                            done = true
+                        }
+                    } while (!done);
+                }
             }
         }
+        tmpFile
     }
-    tmpFile
 }

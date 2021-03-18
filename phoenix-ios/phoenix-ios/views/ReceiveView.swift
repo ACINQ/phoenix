@@ -19,7 +19,7 @@ enum ReceiveViewSheet {
 struct ReceiveView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.receive() })
-	
+
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
@@ -93,8 +93,7 @@ struct ReceiveView: MVIView {
 				ModifyInvoiceSheet(
 					mvi: mvi,
 					sheet: $sheet,
-					initialUnit: model.unit,
-					initialAmount: model.amount,
+                    initialAmount: model.amount,
 					desc: model.desc ?? ""
 				)
 				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
@@ -346,8 +345,7 @@ struct ReceiveView: MVIView {
 	func invoiceAmount(_ model: Receive.Model) -> String {
 		
 		if let m = model as? Receive.ModelGenerated {
-			if let amount = m.amount?.doubleValue {
-				let msat = Utils.toMsat(from: amount, bitcoinUnit: m.unit)
+			if let msat = m.amount?.msat {
 				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
 				
 				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
@@ -385,7 +383,7 @@ struct ReceiveView: MVIView {
 	func onAppear() -> Void {
 		log.trace("[ReadyReceivePayment] onAppear()")
 		
-		mvi.intent(Receive.IntentAsk(amount: nil, unit: BitcoinUnit.satoshi, desc: nil))
+		mvi.intent(Receive.IntentAsk(amount: nil, desc: nil))
 		
 		let query = Prefs.shared.pushPermissionQuery
 		if query == .neverAskedUser {
@@ -587,11 +585,10 @@ struct ModifyInvoiceSheet: View {
 
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@Binding var sheet: ReceiveViewSheet?
+
+	let initialAmount: Eclair_kmpMilliSatoshi?
 	
-	let initialUnit: BitcoinUnit
-	let initialAmount: KotlinDouble?
-	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.satoshi)
+	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -686,10 +683,7 @@ struct ModifyInvoiceSheet: View {
 	func onAppear() -> Void {
 		log.trace("(ModifyInvoiceSheet) onAppear()")
 		
-		var msat: Int64? = nil
-		if let initialAmt = initialAmount?.doubleValue {
-			msat = Utils.toMsat(from: initialAmt, bitcoinUnit: initialUnit)
-		}
+        let msat: Int64? = initialAmount?.msat
 		
 		// Regardless of whether or not the invoice currently has an amount,
 		// we should default to the user's preferred currency.
@@ -774,7 +768,7 @@ struct ModifyInvoiceSheet: View {
 					
 				} else {
 					// We don't know the exchange rate, so we can't display fiat value.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortLabel)"
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.name)"
 				}
 				
 			} else if let fiatCurrency = unit.fiatCurrency {
@@ -789,7 +783,7 @@ struct ModifyInvoiceSheet: View {
 				} else {
 					// We don't know the exchange rate !
 					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortLabel)"
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.name)"
 				}
 			}
 		}
@@ -801,23 +795,18 @@ struct ModifyInvoiceSheet: View {
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
 			if let bitcoinUnit = unit.bitcoinUnit {
+                let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
 				mvi.intent(Receive.IntentAsk(
-					amount: KotlinDouble(value: amt),
-					unit: bitcoinUnit,
+					amount: msat,
 					desc: desc
 				))
 				
 			} else if let fiatCurrency = unit.fiatCurrency,
 					  let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 			{
-				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-				
-				let bitcoinUnit = BitcoinUnit.satoshi
-				let sat = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-				
+                let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
 				mvi.intent(Receive.IntentAsk(
-					amount: KotlinDouble(value: sat),
-					unit: bitcoinUnit,
+					amount: msat,
 					desc: desc
 				))
 			}
@@ -826,7 +815,6 @@ struct ModifyInvoiceSheet: View {
 			
 			mvi.intent(Receive.IntentAsk(
 				amount: nil,
-				unit: initialUnit,
 				desc: desc
 			))
 		}
@@ -1057,23 +1045,22 @@ struct FeePromptPopup : View {
 // MARK:-
 
 class ReceiveView_Previews: PreviewProvider {
-	
+
 	static let request = "lntb17u1p0475jgpp5f69ep0f2202rqegjeddjxa3mdre6ke6kchzhzrn4rxzhyqakzqwqdpzxysy2umswfjhxum0yppk76twypgxzmnwvycqp2xqrrss9qy9qsqsp5nhhdgpz3549mll70udxldkg48s36cj05epp2cjjv3rrvs5hptdfqlq6h3tkkaplq4au9tx2k49tcp3gx7azehseq68jums4p0gt6aeu3gprw3r7ewzl42luhc3gyexaq37h3d73wejr70nvcw036cde4ptgpckmmkm"
 
 	static var previews: some View {
-		
+
 		NavigationView {
 			ReceiveView().mock(Receive.ModelAwaiting())
 		}
 		.modifier(GlobalEnvironment())
 		.previewDevice("iPhone 11")
-		
+
 		NavigationView {
 			ReceiveView().mock(Receive.ModelGenerated(
 				request: request,
 				paymentHash: "foobar",
-				amount: 0.017,
-				unit: BitcoinUnit.millibitcoin,
+				amount: Eclair_kmpMilliSatoshi(msat: 170000),
 				desc: "1 Espresso Coin Panna"
 			))
 		}

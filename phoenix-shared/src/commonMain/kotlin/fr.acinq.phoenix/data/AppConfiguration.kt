@@ -1,85 +1,62 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.eclair.utils.ServerAddress
 import kotlinx.serialization.Serializable
-import org.kodein.db.model.orm.Metadata
 import kotlin.math.roundToLong
 
 enum class Chain { MAINNET, TESTNET, REGTEST }
 
+interface CurrencyUnit
+
 @Serializable
-enum class BitcoinUnit(
-    val label: String,
-    val explanation: String,
-    val abbrev: String
-) {
-    Satoshi("Satoshi","0.00000001 BTC", "sat"),
-    Bits("Bits", "0.000001 BTC", "bits"),
-    MilliBitcoin("Milli-Bitcoin", "0.001 BTC", "mbtc"),
-    Bitcoin("Bitcoin", "", "btc"),
-    ;
+enum class BitcoinUnit : CurrencyUnit {
+    Sat, Bit, MBtc, Btc;
+
+    override fun toString(): String {
+        return super.toString().toLowerCase()
+    }
 
     companion object default {
         val values = BitcoinUnit.values().toList()
     }
 }
 
-fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi =
-    when (unit) {
-        BitcoinUnit.Satoshi -> MilliSatoshi((this * 1_000.0).roundToLong())
-        BitcoinUnit.Bits -> MilliSatoshi((this * 100_000.0).roundToLong())
-        BitcoinUnit.MilliBitcoin -> MilliSatoshi((this * 100_000_000.0).roundToLong())
-        BitcoinUnit.Bitcoin -> MilliSatoshi((this * 100_000_000_000.0).roundToLong())
-    }
+/** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in fiat. */
+fun Double.toMilliSatoshi(fiatRate: Double): MilliSatoshi = (this / fiatRate).toMilliSatoshi(BitcoinUnit.Btc)
 
-@Serializable
-enum class FiatCurrency(
-    val shortLabel: String,
-    val longLabel: String
-) {
+/** Converts a [Double] amount to [MilliSatoshi], assuming that this amount is in Bitcoin. */
+fun Double.toMilliSatoshi(unit: BitcoinUnit): MilliSatoshi = when (unit) {
+    BitcoinUnit.Sat -> MilliSatoshi((this * 1_000.0).roundToLong())
+    BitcoinUnit.Bit -> MilliSatoshi((this * 100_000.0).roundToLong())
+    BitcoinUnit.MBtc -> MilliSatoshi((this * 100_000_000.0).roundToLong())
+    BitcoinUnit.Btc -> MilliSatoshi((this * 100_000_000_000.0).roundToLong())
+}
 
-    AUD("AUD", "Australian Dollar"),
-    BRL("BRL", "Brazilian Real"),
-    CAD("CAD", "Canadian Dollar"),
-    CHF("CHF", "Swiss Franc"),
-    CLP("CLP", "Chilean Peso"),
-    CNY("CNY", "Chinese Yuan"),
-    DKK("DKK", "Danish Krone"),
-    EUR("EUR", "Euro"),
-    GBP("GBP", "Great British Pound"),
-    HKD("HKD", "Hong Kong Dollar"),
-    INR("INR", "Indian Rupee"),
-    ISK("ISK", "Icelandic Kròna"),
-    JPY("JPY", "Japanese Yen"),
-    KRW("KRW", "Korean Won"),
-    MXN("MXN", "Mexican Peso"),
-    NZD("NZD", "New Zealand Dollar"),
-    PLN("PLN", "Polish Zloty"),
-    RUB("RUB", "Russian Ruble"),
-    SEK("SEK", "Swedish Krona"),
-    SGD("SGD", "Singapore Dollar"),
-    THB("THB", "Thai Baht"),
-    TWD("TWD", "Taiwan New Dollar"),
-    USD("USD", "United States Dollar");
-
-    companion object default {
-        val values = FiatCurrency.values().toList()
-    }
+/** Converts [MilliSatoshi] to another Bitcoin unit. */
+fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
+    BitcoinUnit.Sat -> this.msat / 1_000.0
+    BitcoinUnit.Bit -> this.msat / 100_000.0
+    BitcoinUnit.MBtc -> this.msat / 100_000_000.0
+    BitcoinUnit.Btc -> this.msat / 100_000_000_000.0
 }
 
 @Serializable
-data class ElectrumServer(
-    // Unique ID a their is only one configuration per app
-    override val id: Int = 0,
-    // TODO if not customized, should be dynamic and random
-    val host: String,
-    val port: Int,
-    val customized: Boolean = false,
-    val blockHeight: Int = 0,
-    val tipTimestamp: Long = 0
-) : Metadata
+enum class FiatCurrency : CurrencyUnit {
+    AUD, BRL, CAD, CHF, CLP, CNY, DKK, EUR, GBP, HKD, INR, ISK, JPY, KRW, MXN, NZD, PLN, RUB, SEK, SGD, THB, TWD, USD;
 
-fun ElectrumServer.address(): String = "$host:$port"
-fun ElectrumServer.asServerAddress(tls: TcpSocket.TLS? = null): ServerAddress = ServerAddress(host, port, tls)
+    companion object default {
+        val values = FiatCurrency.values().toList()
+        fun valueOfOrNull(code: String): FiatCurrency? = try {
+            valueOf(code)
+        } catch (e: Exception) {
+            null
+        }
+    }
+}
+
+sealed class ElectrumConfig {
+    abstract val server: ServerAddress
+    data class Random(override val server: ServerAddress) : ElectrumConfig()
+    data class Custom(override val server: ServerAddress) : ElectrumConfig()
+}

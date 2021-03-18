@@ -73,22 +73,19 @@ struct DisplayConfigurationView: View {
 	
 	@ViewBuilder func fiatCurrencyText(_ fiatCurrency: FiatCurrency) -> some View {
 		
-		Text(fiatCurrency.shortLabel) +
-		Text(" (\(fiatCurrency.longLabel))")
+		Text(fiatCurrency.name) +
+		Text("  \(fiatCurrency.longName)")
 			.font(.footnote)
 			.foregroundColor(Color.secondary)
 	}
 	
 	@ViewBuilder func bitcoinUnitText(_ bitcoinUnit: BitcoinUnit) -> some View {
 		
-		if bitcoinUnit.explanation.count == 0 {
-			Text(bitcoinUnit.label)
-		} else {
-			Text(bitcoinUnit.label) +
-			Text(" (\(bitcoinUnit.explanation))")
-				.font(.footnote)
-				.foregroundColor(Color.secondary)
-		}
+		// TODO: Define explanation of what a bitcoin unit is client side
+		Text(bitcoinUnit.name) +
+		Text("  \(bitcoinUnit.explanation)")
+			.font(.footnote)
+			.foregroundColor(Color.secondary)
 	}
 }
 

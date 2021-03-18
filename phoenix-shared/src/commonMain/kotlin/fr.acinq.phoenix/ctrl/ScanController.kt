@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.ctrl
 
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.data.BitcoinUnit
 
 
@@ -23,7 +24,7 @@ object Scan {
     sealed class Intent : MVI.Intent() {
         data class Parse(val request: String) : Intent()
         data class ConfirmDangerousRequest(val request: String) : Intent()
-        data class Send(val request: String, val amount: Double, val unit: BitcoinUnit) : Intent()
+        data class Send(val request: String, val amount: MilliSatoshi) : Intent()
     }
 
 }

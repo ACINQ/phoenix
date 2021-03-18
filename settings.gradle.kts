@@ -1,3 +1,4 @@
+enableFeaturePreview("GRADLE_METADATA")
 rootProject.name = "phoenix-kmm"
 
 include(":phoenix-shared")

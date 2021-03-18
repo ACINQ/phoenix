@@ -14,13 +14,13 @@ fileprivate var log = Logger(OSLog.disabled)
 struct CloseChannelsView : MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.closeChannelsConfiguration() })
-	
+
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-	
+
 	@ViewBuilder
 	var view: some View {
-		
+
 		main
 			.padding(.top, 30)
 			.padding([.leading, .trailing], 30)
@@ -91,10 +91,10 @@ fileprivate struct EmptyWalletView : View {
 }
 
 fileprivate struct StandardWalletView : View {
-	
+
 	let model: CloseChannelsConfiguration.ModelReady
 	let postIntent: (CloseChannelsConfiguration.Intent) -> Void
-	
+
 	@State var bitcoinAddress: String = ""
 	@State var isValidAddress: Bool = false
 	@State var detailedErrorMsg: String? = nil
@@ -102,11 +102,10 @@ fileprivate struct StandardWalletView : View {
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	var body: some View {
-		
+
 		VStack(alignment: .leading) {
-			
 			let totalSats = model.channels.map { $0.balance }.reduce(0, +)
-			let formattedSats = Utils.formatBitcoin(sat: totalSats, bitcoinUnit: .satoshi)
+			let formattedSats = Utils.formatBitcoin(sat: totalSats, bitcoinUnit: .sat)
 			
 			if model.channels.count == 1 {
 				Text(
@@ -351,7 +350,7 @@ fileprivate struct ConfirmationPopover : View {
 // MARK: -
 
 class CloseChannelsView_Previews: PreviewProvider {
-	
+
 	static var previews: some View {
 		
 		NavigationView {
@@ -361,7 +360,7 @@ class CloseChannelsView_Previews: PreviewProvider {
 		}
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
-		
+
 		NavigationView {
 			CloseChannelsView().mock(
 				CloseChannelsConfiguration.ModelReady(channels: [

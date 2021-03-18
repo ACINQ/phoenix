@@ -2,7 +2,7 @@ plugins {
     val withAndroid = System.getProperty("withAndroid")!!.toBoolean()
     if (withAndroid) id("com.android.library")
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.10"
+    kotlin("plugin.serialization") version "1.4.31"
     id("com.squareup.sqldelight")
 }
 
@@ -29,6 +29,16 @@ if (withAndroid) {
         }
 
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
+        // workaround for https://youtrack.jetbrains.com/issue/KT-43944
+        configurations {
+            create("androidTestApi")
+            create("androidTestDebugApi")
+            create("androidTestReleaseApi")
+            create("testApi")
+            create("testDebugApi")
+            create("testReleaseApi")
+        }
     }
 }
 
@@ -52,10 +62,10 @@ kotlin {
     sourceSets {
 
         val coroutinesVersion = "1.4.2-native-mt"
-        val serializationVersion = "1.0.0"
+        val serializationVersion = "1.1.0"
         val secp256k1Version = "0.4.1"
-        val ktorVersion = "1.4.1"
-        val kodeinDBVersion = "0.2.0-beta"
+        val ktorVersion = "1.5.2"
+        val kodeinMemory = "0.8.0"
         val sqldelightVersion = "1.4.4"
 
         val commonMain by getting {
@@ -64,16 +74,14 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-                api("org.kodein.db:kodein-db:$kodeinDBVersion")
-                api("org.kodein.db:kodein-db-serializer-kotlinx:$kodeinDBVersion")
-                api("org.kodein.memory:kodein-memory-files:0.4.0")
+                api("org.kodein.memory:kodein-memory-files:$kodeinMemory")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                     version { strictly(coroutinesVersion) }
                 }
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
-                api("io.ktor:ktor-client-core:$ktorVersion")
-                api("io.ktor:ktor-client-json:$ktorVersion")
-                api("io.ktor:ktor-client-serialization:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-json:$ktorVersion")
+                implementation("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("com.squareup.sqldelight:runtime:$sqldelightVersion")
                 implementation("com.squareup.sqldelight:coroutines-extensions:$sqldelightVersion")
             }
@@ -91,8 +99,9 @@ kotlin {
                 dependencies {
                     api("androidx.core:core-ktx:1.3.2")
                     api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1Version")
-                    api("io.ktor:ktor-network:$ktorVersion")
-                    api("io.ktor:ktor-network-tls:$ktorVersion")
+                    implementation("io.ktor:ktor-network:$ktorVersion")
+                    implementation("io.ktor:ktor-network-tls:$ktorVersion")
+                    implementation("io.ktor:ktor-client-android:$ktorVersion")
                     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
                     implementation("com.squareup.sqldelight:android-driver:$sqldelightVersion")
                 }

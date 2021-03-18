@@ -11,7 +11,10 @@ import fr.acinq.phoenix.app.ctrl.config.*
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.*
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.db.*
+import fr.acinq.phoenix.db.SqliteAppDb
+import fr.acinq.phoenix.db.SqlitePaymentsDb
+import fr.acinq.phoenix.db.createAppDbDriver
+import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
@@ -19,10 +22,6 @@ import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
-import org.kodein.db.DB
-import org.kodein.db.impl.factory
-import org.kodein.db.inDir
-import org.kodein.db.orm.kotlinx.KotlinxSerializer
 import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
 import org.kodein.log.newLogger
@@ -56,16 +55,10 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         }
     }
 
-    // TODO to be remove
-    private val noSqlDbFactory by lazy { DB.factory.inDir(getApplicationFilesDirectoryPath(ctx)) }
-    private val noSqlAppDB by lazy { noSqlDbFactory.open("application", KotlinxSerializer()) }
     private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
     private val paymentsDb by lazy { SqlitePaymentsDb(createPaymentsDbDriver(ctx)) }
 
-    // TestNet
     private val chain = Chain.TESTNET
-
-    private val masterPubkeyPath = if (chain == Chain.MAINNET) "m/84'/0'/0'" else "m/84'/1'/0'"
 
     private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
     private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
@@ -75,9 +68,9 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val walletManager by lazy { WalletManager() }
     private val peerManager by lazy { PeerManager(loggerFactory, walletManager, appConfigurationManager, paymentsDb, tcpSocketBuilder, electrumWatcher, chain, ctx) }
     private val paymentsManager by lazy { PaymentsManager(loggerFactory, paymentsDb, peerManager) }
-    private val appConfigurationManager by lazy { AppConfigurationManager(noSqlAppDB, appDb, httpClient, electrumClient, chain, loggerFactory) }
+    val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
 
-    val currencyManager by lazy { CurrencyManager(loggerFactory, noSqlAppDB, httpClient) }
+    val currencyManager by lazy { CurrencyManager(loggerFactory, appDb, httpClient) }
     val connectionsMonitor by lazy { ConnectionsMonitor(peerManager, electrumClient, networkMonitor) }
     val util by lazy { Utilities(loggerFactory, chain) }
 
@@ -120,9 +113,9 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         appConnectionsDaemon?.decrementDisconnectCount()
     }
 
-    fun nodeID(): String {
-        return peerManager.peerState.value?.nodeParams?.nodeId?.toString() ?: error("Peer must be initialized!")
-    }
+    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain == Chain.MAINNET)
+
+    fun peerState() = peerManager.peerState
 
     // The (node_id, fcm_token) tuple only needs to be registered once.
     // And after that, only if the tuple changes (e.g. different fcm_token).
@@ -131,8 +124,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         peerManager.getPeer().registerFcmToken(token)
     }
 
-    fun incomingPaymentFlow() =
-        paymentsManager.subscribeToLastIncomingPayment()
+    fun incomingPaymentFlow() = paymentsManager.subscribeToLastIncomingPayment()
 
     fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
@@ -144,7 +136,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         override fun scan(): ScanController = AppScanController(loggerFactory, peerManager)
         override fun restoreWallet(): RestoreWalletController = AppRestoreWalletController(loggerFactory)
         override fun configuration(): ConfigurationController = AppConfigurationController(loggerFactory, walletManager)
-        override fun electrumConfiguration(): ElectrumConfigurationController = AppElectrumConfigurationController(loggerFactory, appConfigurationManager, chain, masterPubkeyPath, walletManager, electrumClient)
+        override fun electrumConfiguration(): ElectrumConfigurationController = AppElectrumConfigurationController(loggerFactory, appConfigurationManager, electrumClient)
         override fun channelsConfiguration(): ChannelsConfigurationController = AppChannelsConfigurationController(loggerFactory, peerManager, chain)
         override fun logsConfiguration(): LogsConfigurationController = AppLogsConfigurationController(ctx, loggerFactory, logMemory)
         override fun closeChannelsConfiguration(): CloseChannelsConfigurationController = AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, false)

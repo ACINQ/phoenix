@@ -13,7 +13,7 @@ class Utils {
 	static func toMsat(fromFiat amount: Double, exchangeRate: BitcoinPriceRate) -> Int64 {
 		
 		let btc = amount / exchangeRate.price
-		return toMsat(from: btc, bitcoinUnit: .bitcoin)
+		return toMsat(from: btc, bitcoinUnit: .btc)
 	}
 	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
@@ -22,9 +22,9 @@ class Utils {
 		
 		var msat: Double
 		switch bitcoinUnit {
-			case .satoshi      : msat = amount * Millisatoshis_Per_Satoshi
-			case .bits         : msat = amount * Millisatoshis_Per_Bit
-			case .millibitcoin : msat = amount * Millisatoshis_Per_Millibitcoin
+			case .sat          : msat = amount * Millisatoshis_Per_Satoshi
+			case .bit          : msat = amount * Millisatoshis_Per_Bit
+			case .mbtc         : msat = amount * Millisatoshis_Per_Millibitcoin
 			default/*.bitcoin*/: msat = amount * Millisatoshis_Per_Bitcoin
 		}
 		
@@ -38,9 +38,9 @@ class Utils {
 	static func convertBitcoin(msat: Int64, bitcoinUnit: BitcoinUnit) -> Double {
 		
 		switch bitcoinUnit {
-			case .satoshi      : return Double(msat) / Millisatoshis_Per_Satoshi
-			case .bits         : return Double(msat) / Millisatoshis_Per_Bit
-			case .millibitcoin : return Double(msat) / Millisatoshis_Per_Millibitcoin
+			case .sat          : return Double(msat) / Millisatoshis_Per_Satoshi
+			case .bit          : return Double(msat) / Millisatoshis_Per_Bit
+			case .mbtc         : return Double(msat) / Millisatoshis_Per_Millibitcoin
 			default/*.bitcoin*/: return Double(msat) / Millisatoshis_Per_Bitcoin
 		}
 	}
@@ -83,7 +83,7 @@ class Utils {
 			} else {
 				return FormattedAmount(
 					digits: "?.??",
-					type: selectedFiat.shortLabel,
+					type: selectedFiat.name,
 					decimalSeparator: NumberFormatter().currencyDecimalSeparator
 				)
 			}
@@ -97,9 +97,9 @@ class Utils {
 		formatter.usesGroupingSeparator = true // thousands separator (US="10,000", FR="10 000")
 		
 		switch bitcoinUnit {
-			case .satoshi      : formatter.maximumFractionDigits = 0
-			case .bits         : formatter.maximumFractionDigits = 2
-			case .millibitcoin : formatter.maximumFractionDigits = 5
+			case .sat          : formatter.maximumFractionDigits = 0
+			case .bit          : formatter.maximumFractionDigits = 2
+			case .mbtc         : formatter.maximumFractionDigits = 5
 			default/*.bitcoin*/: formatter.maximumFractionDigits = 8
 		}
 		
@@ -130,7 +130,7 @@ class Utils {
 		let digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
 		let formattedAmount = FormattedAmount(
 			digits: digits,
-			type: bitcoinUnit.abbrev,
+			type: bitcoinUnit.name,
 			decimalSeparator: formatter.decimalSeparator
 		)
 		
@@ -175,7 +175,7 @@ class Utils {
 		let digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
 		return FormattedAmount(
 			digits: digits,
-			type: exchangeRate.fiatCurrency.shortLabel,
+			type: exchangeRate.fiatCurrency.name,
 			decimalSeparator: formatter.currencyDecimalSeparator
 		)
 	}

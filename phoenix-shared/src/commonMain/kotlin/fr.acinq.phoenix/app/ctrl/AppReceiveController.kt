@@ -16,9 +16,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppReceiveController(loggerFactory: LoggerFactory, private val peerManager: PeerManager) : AppController<Receive.Model, Receive.Intent>(loggerFactory, Receive.Model.Awaiting) {
 
-    private val Receive.Intent.Ask.paymentAmountMsat: MilliSatoshi? get() = amount?.toMilliSatoshi(unit)
-
-    private val Receive.Intent.Ask.paymentDescription: String get() = desc ?: "Phoenix payment"
+    private val Receive.Intent.Ask.description: String get() = desc?.takeIf { it.isNotBlank() } ?: ""
 
     override fun process(intent: Receive.Intent) {
         when (intent) {
@@ -31,16 +29,16 @@ class AppReceiveController(loggerFactory: LoggerFactory, private val peerManager
                         peerManager.getPeer().send(
                             ReceivePayment(
                                 preimage,
-                                intent.paymentAmountMsat,
-                                intent.paymentDescription,
+                                intent.amount,
+                                intent.description,
                                 deferred
                             )
                         )
                         val request = deferred.await()
-                        check(request.amount == intent.paymentAmountMsat) { "Payment request amount not corresponding to expected" }
-                        check(request.description == intent.paymentDescription) { "Payment request description not corresponding to expected" }
+                        check(request.amount == intent.amount) { "payment request amount=${request.amount} does not match expected amount=${intent.amount}" }
+                        check(request.description == intent.description) { "payment request amount=${request.description} does not match expected amount=${intent.description}" }
                         val paymentHash: String = request.paymentHash.toHex()
-                        model(Receive.Model.Generated(request.write(), paymentHash, intent.amount, intent.unit, intent.desc))
+                        model(Receive.Model.Generated(request.write(), paymentHash, request.amount, request.description))
                     } catch (e: Throwable) {
                         logger.error(e) { "failed to process intent=$intent" }
                     }

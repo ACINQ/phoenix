@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 
         business = PhoenixBusiness(ctx: PlatformContext())
         business.start()
+        business.appConfigurationManager.updateElectrumConfig(server: nil) // start with random electrum. TODO: inject preference
     }
 	
 	// --------------------------------------------------

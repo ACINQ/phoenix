@@ -1,94 +1,80 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.phoenix.ctrl.EventBus
-import fr.acinq.phoenix.data.BitcoinPriceRate
-import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.MxnApiResponse
-import fr.acinq.phoenix.data.PriceRate
+import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
+import kotlinx.datetime.Clock
 import kotlinx.coroutines.*
-import org.kodein.db.DB
-import org.kodein.db.execBatch
-import org.kodein.db.find
-import org.kodein.db.get
-import org.kodein.db.key
-import org.kodein.db.useModels
+import kotlinx.coroutines.flow.Flow
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
-sealed class CurrencyEvent
-data class FiatExchangeRatesUpdated(val rates: List<BitcoinPriceRate>) : CurrencyEvent()
-
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
-    private val appDB: DB,
+    private val appDb: SqliteAppDb,
     private val httpClient: HttpClient
 ) : CoroutineScope by MainScope() {
 
-    private val logger = newLogger(loggerFactory)
+    private val log = newLogger(loggerFactory)
 
-    val events = EventBus<CurrencyEvent>()
+    val ratesFlow: Flow<List<BitcoinPriceRate>> = appDb.listBitcoinRates()
+    var priceRatesPollingJob: Job? = null
 
-    fun getBitcoinRates(): List<BitcoinPriceRate> {
-        return appDB.find<BitcoinPriceRate>().all().useModels { it.toList() }
+    fun start() {
+        priceRatesPollingJob = startRatesPollingJob()
     }
 
-    // Returns the exchange rate, if it exists in the database.
-    // Otherwise, returns a rate with a negative value.
-    fun getBitcoinRate(fiatCurrency: FiatCurrency): BitcoinPriceRate {
-
-        val key = appDB.key<BitcoinPriceRate>(fiatCurrency.name)
-        return appDB[key] ?: BitcoinPriceRate(fiatCurrency, -1.0)
+    fun stop() {
+        launch { priceRatesPollingJob?.cancelAndJoin() }
     }
 
-    public fun start() {
-        updateRatesJob = updateRates()
-    }
-    public fun stop() {
-        launch { updateRatesJob?.cancelAndJoin() }
-    }
-
-    var updateRatesJob: Job? = null
-    private fun updateRates() = launch {
+    private fun startRatesPollingJob() = launch {
         while (isActive) {
-            val priceRates = buildMap<String, Double> {
-                try {
-                    val rates = httpClient.get<Map<String, PriceRate>>("https://blockchain.info/ticker")
-                    rates.forEach {
-                        put(it.key, it.value.last)
-                    }
-
-                    val response = httpClient.get<MxnApiResponse>("https://api.bitso.com/v3/ticker/?book=btc_mxn")
-                    if (response.success) put(FiatCurrency.MXN.name, response.payload.last)
-                } catch (t: Throwable) {
-                    logger.error { "An issue occurred while retrieving exchange rates from API." }
-                    logger.error(t)
-                }
-            }
-
-            val exchangeRates =
-                FiatCurrency.values()
-                    .filter { it.name in priceRates.keys }
-                    .mapNotNull { fiatCurrency ->
-                        priceRates[fiatCurrency.name]?.let { priceRate ->
-                            BitcoinPriceRate(fiatCurrency, priceRate)
-                        }
-                    }
-
-            appDB.execBatch {
-                logger.debug { "Saving price rates: $exchangeRates" }
-                exchangeRates.forEach {
-                    appDB.put(it)
-                }
-            }
-
-            events.send(FiatExchangeRatesUpdated(exchangeRates))
+            refreshFromBlockchainInfo()
+            refreshFromBitso()
             yield()
-            delay(5.minutes)
+            delay(20.minutes)
         }
+    }
+
+    private suspend fun refreshFromBlockchainInfo() = try {
+        log.info { "fetching bitcoin prices from blockchain.info" }
+        httpClient.get<Map<String, BlockchainInfoPriceObject>>("https://blockchain.info/ticker")
+            .mapNotNull {
+                FiatCurrency.valueOfOrNull(it.key)?.let { fiatCurrency ->
+                    BitcoinPriceRate(
+                        fiatCurrency = fiatCurrency,
+                        price = it.value.last,
+                        source = "blockchain.info",
+                        timestampMillis = Clock.System.now().toEpochMilliseconds(),
+                    )
+                } ?: run {
+                    log.info { "Blockchain.info has new currency: ${it.key}" }
+                    null
+                }
+            }
+            .forEach { appDb.saveBitcoinRate(it) }
+    } catch (e: Exception) {
+        log.error(e) { "failed to refresh bitcoin price rates from blockchain.info ticker: $e" }
+    }
+
+    private suspend fun refreshFromBitso() = try {
+        log.info { "fetching bitcoin prices from bitso.com" }
+        httpClient.get<MxnApiResponse>("https://api.bitso.com/v3/ticker/?book=btc_mxn")
+            .takeIf { it.success }
+            ?.let {
+                BitcoinPriceRate(
+                    fiatCurrency = FiatCurrency.MXN,
+                    price = it.payload.last,
+                    source = "bitso.com",
+                    timestampMillis = Clock.System.now().toEpochMilliseconds(),
+                )
+            }?.let { appDb.saveBitcoinRate(it) }
+    } catch (e: Exception) {
+        log.error(e) { "failed to refresh MXN bitcoin price rates from bitso.com ticker" }
     }
 }

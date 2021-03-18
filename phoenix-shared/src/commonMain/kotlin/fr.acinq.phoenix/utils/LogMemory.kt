@@ -81,7 +81,11 @@ class LogMemory(val directory: Path) : LogFrontend {
 
 private fun writeLogs(lines: List<LogMemory.Line>, file: Path): Job = GlobalScope.launch(Dispatchers.Default) {
     val allLines = buildString {
-        lines.forEach { printLogIn(it.tag, it.entry, it.message, this::appendLine) }
+        lines.forEach { line ->
+            printLogIn(line.tag, line.entry, line.message, printer = {
+                this.appendLine(it)
+            })
+        }
     }
     file.openWriteableFile(append = true).use { wf ->
         wf.putString(allLines)

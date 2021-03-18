@@ -110,7 +110,8 @@ class ObservableLastIncomingPayment: ObservableObject {
 		value = incomingPaymentFlow.value as? Eclair_kmpWalletPayment
 		
 		let swiftFlow = SwiftFlow<Eclair_kmpWalletPayment>(origin: incomingPaymentFlow)
-		swiftFlow.watch {[weak self](payment: Eclair_kmpWalletPayment?) in
+		
+		watcher = swiftFlow.watch {[weak self](payment: Eclair_kmpWalletPayment?) in
 			self?.value = payment
 		}
 	}
@@ -120,3 +121,137 @@ class ObservableLastIncomingPayment: ObservableObject {
 	}
 }
 
+//class ObservableBitcoinRates: ObservableObject {
+//
+//    @Published var value: Array<BitcoinPriceRate> = []
+//
+//    private var watcher: Ktor_ioCloseable? = nil
+//
+//    init() {
+//        let ratesFlow = AppDelegate.get().business.currencyManager.ratesFlow
+//
+//        let swiftFlow = SwiftFlow<Array<BitcoinPriceRate>>(origin: ratesFlow)
+//        swiftFlow.watch {[weak self](rates: Array<BitcoinPriceRate>?) in
+//            self?.value = rates
+//        }
+//    }
+//
+//    deinit {
+//        watcher?.close()
+//    }
+//}
+
+class KotlinPassthroughSubject<Output: AnyObject>: Publisher {
+	
+	typealias Failure = Never
+	
+	private let wrapped: PassthroughSubject<Output, Failure>
+	private var watcher: Ktor_ioCloseable? = nil
+	
+	init(_ swiftFlow: SwiftFlow<Output>) {
+		
+		wrapped = PassthroughSubject<Output, Failure>()
+		
+		watcher = swiftFlow.watch {[weak self](value: Output?) in
+			self?.wrapped.send(value!)
+		}
+	}
+
+	deinit {
+	//	Swift.print("KotlinPassthroughSubject: deinit")
+		watcher?.close()
+	}
+	
+	func receive<Downstream: Subscriber>(subscriber: Downstream)
+		where Failure == Downstream.Failure, Output == Downstream.Input
+	{
+		wrapped.subscribe(subscriber)
+	}
+}
+
+class KotlinCurrentValueSubject<Output: AnyObject>: Publisher {
+	
+	typealias Failure = Never
+	
+	private let wrapped: CurrentValueSubject<Output, Failure>
+	private var watcher: Ktor_ioCloseable? = nil
+	
+	init(_ swiftStateFlow: SwiftStateFlow<Output>) {
+		
+		let initialValue = swiftStateFlow.value!
+		wrapped = CurrentValueSubject(initialValue)
+		
+		watcher = swiftStateFlow.watch {[weak self](value: Output?) in
+			self?.wrapped.send(value!)
+		}
+	}
+	
+	deinit {
+	//	Swift.print("KotlinCurrentValueSubject: deinit")
+		watcher?.close()
+	}
+	
+	var value: Output {
+		get {
+			return wrapped.value
+		}
+	}
+
+	func receive<Downstream: Subscriber>(subscriber: Downstream)
+		where Failure == Downstream.Failure, Output == Downstream.Input
+	{
+		wrapped.subscribe(subscriber)
+	}
+}
+
+extension FiatCurrency {
+	
+	var longName: String {
+		
+		switch self {
+			case FiatCurrency.aud : return NSLocalizedString("Australian Dollar",    comment: "Currency name: AUD")
+			case FiatCurrency.brl : return NSLocalizedString("Brazilian Real",       comment: "Currency name: BRL")
+			case FiatCurrency.cad : return NSLocalizedString("Canadian Dollar",      comment: "Currency name: CAD")
+			case FiatCurrency.chf : return NSLocalizedString("Swiss Franc",          comment: "Currency name: CHF")
+			case FiatCurrency.clp : return NSLocalizedString("Chilean Peso",         comment: "Currency name: CLP")
+			case FiatCurrency.cny : return NSLocalizedString("Chinese Yuan",         comment: "Currency name: CNY")
+			case FiatCurrency.dkk : return NSLocalizedString("Danish Krone",         comment: "Currency name: DKK")
+			case FiatCurrency.eur : return NSLocalizedString("Euro",                 comment: "Currency name: EUR")
+			case FiatCurrency.gbp : return NSLocalizedString("Great British Pound",  comment: "Currency name: GBP")
+			case FiatCurrency.hkd : return NSLocalizedString("Hong Kong Dollar",     comment: "Currency name: HKD")
+			case FiatCurrency.inr : return NSLocalizedString("Indian Rupee",         comment: "Currency name: INR")
+			case FiatCurrency.isk : return NSLocalizedString("Icelandic Kròna",      comment: "Currency name: ISK")
+			case FiatCurrency.jpy : return NSLocalizedString("Japanese Yen",         comment: "Currency name: JPY")
+			case FiatCurrency.krw : return NSLocalizedString("Korean Won",           comment: "Currency name: KRW")
+			case FiatCurrency.mxn : return NSLocalizedString("Mexican Peso",         comment: "Currency name: MXN")
+			case FiatCurrency.nzd : return NSLocalizedString("New Zealand Dollar",   comment: "Currency name: NZD")
+			case FiatCurrency.pln : return NSLocalizedString("Polish Zloty",         comment: "Currency name: PLN")
+			case FiatCurrency.rub : return NSLocalizedString("Russian Ruble",        comment: "Currency name: RUB")
+			case FiatCurrency.sek : return NSLocalizedString("Swedish Krona",        comment: "Currency name: SEK")
+			case FiatCurrency.sgd : return NSLocalizedString("Singapore Dollar",     comment: "Currency name: SGD")
+			case FiatCurrency.thb : return NSLocalizedString("Thai Baht",            comment: "Currency name: THB")
+			case FiatCurrency.twd : return NSLocalizedString("Taiwan New Dollar",    comment: "Currency name: TWD")
+			case FiatCurrency.usd : return NSLocalizedString("United States Dollar", comment: "Currency name: USD")
+			default               : break
+		}
+		
+		return self.name
+	}
+}
+
+extension BitcoinUnit {
+	
+	var explanation: String {
+		
+		let s = FormattedAmount.fractionGroupingSeparator // narrow no-break space
+		switch (self) {
+			case BitcoinUnit.sat  : return "0.000\(s)000\(s)01 BTC"
+			case BitcoinUnit.bit  : return "0.000\(s)001 BTC"
+			case BitcoinUnit.mbtc : return "0.001 BTC"
+			case BitcoinUnit.btc  : return ""
+			default               : break
+		}
+		
+		return self.name
+	}
+}

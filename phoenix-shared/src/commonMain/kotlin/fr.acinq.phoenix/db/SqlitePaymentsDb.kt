@@ -45,7 +45,7 @@ import org.kodein.memory.text.toHexString
 class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
 
     enum class OutgoingFinalFailureDbEnum {
-        InvalidPaymentAmount, InsufficientBalance, InvalidPaymentId, NoAvailableChannels, NoRouteToRecipient, RetryExhausted, UnknownError, WalletRestarted;
+        InvalidPaymentAmount, InsufficientBalance, InvalidPaymentId, NoAvailableChannels, NoRouteToRecipient, RetryExhausted, UnknownError, WalletRestarted, RecipientUnreachable;
 
         companion object {
             fun toDb(failure: FinalFailure) = when (failure) {
@@ -57,6 +57,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
                 FinalFailure.RetryExhausted -> RetryExhausted
                 FinalFailure.UnknownError -> UnknownError
                 FinalFailure.WalletRestarted -> WalletRestarted
+                FinalFailure.RecipientUnreachable -> RecipientUnreachable
             }
         }
     }
@@ -384,6 +385,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         OutgoingFinalFailureDbEnum.RetryExhausted -> FinalFailure.RetryExhausted
         OutgoingFinalFailureDbEnum.UnknownError -> FinalFailure.UnknownError
         OutgoingFinalFailureDbEnum.WalletRestarted -> FinalFailure.WalletRestarted
+        OutgoingFinalFailureDbEnum.RecipientUnreachable -> FinalFailure.RecipientUnreachable
     }
 
     private fun mapIncomingPayment(

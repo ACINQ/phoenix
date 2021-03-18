@@ -15,10 +15,10 @@ fileprivate var log = Logger(OSLog.disabled)
 struct HomeView : MVIView {
 
 	@StateObject var mvi = MVIState({ $0.home() })
-	
+
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-	
+
 	@State var lastPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
 	@State var showConnections = false
 
@@ -28,12 +28,12 @@ struct HomeView : MVIView {
 
 	@ViewBuilder
 	var view: some View {
-		
+
 		main
 			.navigationBarTitle("", displayMode: .inline)
 			.navigationBarHidden(true)
 			.onChange(of: mvi.model, perform: { newModel in
-				
+
 				if lastPayment != newModel.lastPayment {
 					lastPayment = newModel.lastPayment
 					selectedPayment = lastPayment
@@ -62,7 +62,7 @@ struct HomeView : MVIView {
 				// === Total Balance ====
 				HStack(alignment: .bottom) {
 					
-					let amount = Utils.format(currencyPrefs, sat: mvi.model.balanceSat)
+					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
 					Text(amount.digits)
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
@@ -332,9 +332,9 @@ class HomeView_Previews: PreviewProvider {
 	)
 
 	static var previews: some View {
-		
+
 		HomeView().mock(Home.Model(
-			balanceSat: 123500,
+			balance: Eclair_kmpMilliSatoshi(msat: 123500),
 			payments: [],
 			lastPayment: nil
 		))
@@ -343,7 +343,7 @@ class HomeView_Previews: PreviewProvider {
 		.environmentObject(CurrencyPrefs.mockEUR())
 		
 		HomeView().mock(Home.Model(
-			balanceSat: 1000,
+			balance: Eclair_kmpMilliSatoshi(msat: 1000000),
 			payments: [],
 			lastPayment: nil
 		))

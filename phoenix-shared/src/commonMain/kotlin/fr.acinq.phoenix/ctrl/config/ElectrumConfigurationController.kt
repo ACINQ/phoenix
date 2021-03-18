@@ -2,24 +2,26 @@ package fr.acinq.phoenix.ctrl.config
 
 import fr.acinq.eclair.utils.Connection
 import fr.acinq.phoenix.ctrl.MVI
-import fr.acinq.phoenix.data.ElectrumServer
+import fr.acinq.phoenix.data.ElectrumConfig
 
 typealias ElectrumConfigurationController = MVI.Controller<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>
 
 object ElectrumConfiguration {
 
     data class Model(
-        val walletIsInitialized: Boolean = false,
+        val configuration: ElectrumConfig? = null,
         val connection: Connection = Connection.CLOSED,
-        val electrumServer: ElectrumServer = ElectrumServer(host = "", port = 0),
         val feeRate: Long = 0,
-        val xpub: String? = null,
-        val path: String? = null,
+        val blockHeight: Int = 0,
+        val tipTimestamp: Long = 0,
+        val walletIsInitialized: Boolean = false,
         val error: Error? = null
-    ) : MVI.Model()
+    ) : MVI.Model() {
+        fun isCustom() = configuration != null && configuration is ElectrumConfig.Custom
+    }
 
     sealed class Intent : MVI.Intent() {
-        data class UpdateElectrumServer(val customized: Boolean, val address: String) : Intent()
+        data class UpdateElectrumServer(val address: String?) : Intent()
     }
 
 }

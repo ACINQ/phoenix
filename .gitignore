@@ -20,3 +20,7 @@ xcuserdata/
 target/
 project/target
 DeleteMe*.scala
+
+# Android
+phoenix-android/debug/
+phoenix-android/release/

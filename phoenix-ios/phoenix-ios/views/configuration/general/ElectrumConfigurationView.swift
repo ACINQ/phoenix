@@ -19,7 +19,7 @@ struct ElectrumConfigurationView: MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 	
 	@State var isModifying = false
-	
+
 	func connectionStatus() -> String {
 		if mvi.model.connection == .established {
 			return NSLocalizedString("Connected to:", comment: "Connection status")
@@ -32,8 +32,8 @@ struct ElectrumConfigurationView: MVIView {
 	
 	func connectionAddress() -> String {
 		
-		if mvi.model.connection == .established || mvi.model.electrumServer.customized {
-			return mvi.model.electrumServer.address()
+		if mvi.model.connection == .established || mvi.model.isCustom() {
+			return mvi.model.configuration?.server.host ?? ""
 		} else {
 			return NSLocalizedString("Random server", comment: "Connection info")
 		}
@@ -41,7 +41,7 @@ struct ElectrumConfigurationView: MVIView {
 	
 	@ViewBuilder
 	var view: some View {
-		
+
 		main.navigationBarTitle("Electrum server", displayMode: .inline)
 	}
 
@@ -88,13 +88,13 @@ struct ElectrumConfigurationView: MVIView {
 				
 				ListItem(header: Text("Block height")) {
 
-					let height = mvi.model.electrumServer.blockHeight
+					let height = mvi.model.blockHeight
 					Text("\(height > 0 ? height.formatInDecimalStyle() : "-")")
 				}
 				
 				ListItem(header: Text("Tip timestamp")) {
 					
-					let time = mvi.model.electrumServer.tipTimestamp
+					let time = mvi.model.tipTimestamp
 					Text("\(time > 0 ? time.formatDateS() : "-")")
 				}
 				
@@ -107,7 +107,7 @@ struct ElectrumConfigurationView: MVIView {
 					}
 				}
 				
-				if let xpub = mvi.model.xpub {
+				/* if let xpub = mvi.model.xpub {
 					ListItem(header: Text("Master public key")) {
 						Text(xpub)
 							.contextMenu {
@@ -131,7 +131,7 @@ struct ElectrumConfigurationView: MVIView {
 								}
 							}
 					}
-				}
+				} */
 				
 			} // </Section: Status>
 			
@@ -211,11 +211,13 @@ struct ElectrumAddressPopup: View {
 		self.postIntent = postIntent
 		_showing = showing
 		
-		_isCustomized = State(initialValue: model.electrumServer.customized)
+		_isCustomized = State(initialValue: model.isCustom())
+        let host = model.configuration?.server.host ?? ""
+        let port = model.configuration?.server.port ?? 0
 		
-		if model.electrumServer.customized && model.electrumServer.host.count > 0 {
-			_host = State(initialValue: model.electrumServer.host)
-			_port = State(initialValue: String(model.electrumServer.port))
+        if model.isCustom() && host.count > 0 {
+            _host = State(initialValue: host)
+			_port = State(initialValue: String(port))
 		} else {
 			_host = State(initialValue: "")
 			_port = State(initialValue: "")
@@ -411,8 +413,12 @@ struct ElectrumAddressPopup: View {
 		if let checkedHost = checkedHost,
 		   let checkedPort = checkedPort
 		{
-			let address = "\(checkedHost):\(checkedPort)"
-			postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(customized: isCustomized, address: address))
+            if isCustomized {
+                let address = "\(checkedHost):\(checkedPort)"
+                postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: address))
+            } else {
+                postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: nil))
+            }
 			
 			showing = false
 		}
@@ -472,45 +478,26 @@ struct ElectrumAddressPopup: View {
 
 class ElectrumConfigurationView_Previews: PreviewProvider {
 	
-	static let electrumServer1 = ElectrumServer(
-		id: 0,
+	static let electrumServer1 = Eclair_kmpServerAddress(
 		host: "tn.not.fyi",
 		port: 55002,
-		customized: true,
-		blockHeight: 123456789,
-		tipTimestamp: 1599564210
+        tls: nil
 	)
 	
-	static let electrumServer2 = ElectrumServer(
-		id: 0,
+	static let electrumServer2 = Eclair_kmpServerAddress(
 		host: "",
 		port: 0,
-		customized: false,
-		blockHeight: 123456789,
-		tipTimestamp: 1599564210
+        tls: nil
 	)
 	
-	static let xpub = "vpub5ZqweUWHkV3Q5HrftL6c7L7rwvQdSPrQzPdFEd8tHU32EmduQqy1CgmAb4g1jQGoBFaGW4EcNhc1Bm9grBkV2hSUz787L7ALTfNbz3xNigS"
-	static let path = "m/84'/1'/0'"
-	
-	static let model1 = ElectrumConfiguration.Model(
-		walletIsInitialized: true,
-		connection: .closed,
-		electrumServer: electrumServer1,
+	static let mockModel = ElectrumConfiguration.Model(
+        configuration: ElectrumConfig.Custom(server: electrumServer2),
+        connection: Eclair_kmpConnection.closed,
 		feeRate: 9999,
-		xpub: xpub,
-		path: path,
-		error: nil
-	)
-	
-	static let model2 = ElectrumConfiguration.Model(
-		walletIsInitialized: true,
-		connection: .closed,
-		electrumServer: electrumServer2,
-		feeRate: 9999,
-		xpub: xpub,
-		path: path,
-		error: nil
+        blockHeight: 1234,
+        tipTimestamp: 1234567890,
+        walletIsInitialized: true,
+        error: nil
 	)
 	
 	@State static var isShowing: Bool = true
@@ -522,13 +509,13 @@ class ElectrumConfigurationView_Previews: PreviewProvider {
 		}
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")
-		
+
 //		NavigationView {
 //			ElectrumConfigurationView().mock(model2)
 //		}
 //		.preferredColorScheme(.dark)
 //		.previewDevice("iPhone 8")
-		
+
 //		ElectrumAddressPopup(
 //			model: mockModel,
 //			postIntent: { _ in },

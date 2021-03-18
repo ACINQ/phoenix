@@ -3,17 +3,16 @@ package fr.acinq.phoenix.app
 import fr.acinq.eclair.WalletParams
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.HeaderSubscriptionResponse
+import fr.acinq.eclair.utils.ServerAddress
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.RETRY_DELAY
 import fr.acinq.phoenix.utils.increaseDelay
 import io.ktor.client.*
 import io.ktor.client.request.*
-import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
-import org.kodein.db.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.math.max
@@ -21,7 +20,6 @@ import kotlin.time.*
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class AppConfigurationManager(
-    private val noSqlDb: DB, // TODO to be replaced by [appDb]
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient,
     private val electrumClient: ElectrumClient,
@@ -32,37 +30,15 @@ class AppConfigurationManager(
     private val logger = newLogger(loggerFactory)
 
     init {
-        // Wallet Params
         initWalletParams()
-        // Electrum Triggers
-        noSqlDb.on<ElectrumServer>().register {
-            didPut {
-                launch { electrumServer.value = it }
-            }
-        }
-        launch {
-            electrumClient.openNotificationsSubscription().consumeAsFlow()
-                .filterIsInstance<HeaderSubscriptionResponse>().collect { notification ->
-                    if (getElectrumServer().blockHeight == notification.height &&
-                        getElectrumServer().tipTimestamp == notification.header.time
-                    ) return@collect
-
-                    putElectrumServer(
-                        getElectrumServer().copy(
-                            blockHeight = notification.height,
-                            tipTimestamp = notification.header.time
-                        )
-                    )
-                }
-        }
+        watchElectrumMessages()
     }
 
-    //endregion WalletParams fetch / store / initialization
     private val currentWalletParamsVersion = ApiWalletParams.Version.V0
     private val _walletParams = MutableStateFlow<WalletParams?>(null)
     val walletParams: StateFlow<WalletParams?> = _walletParams
 
-    public fun initWalletParams() = launch {
+    private fun initWalletParams() = launch {
         val (instant, fallbackWalletParams) = appDb.getWalletParamsOrNull(currentWalletParamsVersion)
 
         val freshness = Clock.System.now() - instant
@@ -74,15 +50,14 @@ class AppConfigurationManager(
 
         // TODO are we using TOR? -> increase timeout
 
-        val walletParams =
-            try {
-                withTimeout(timeout) {
-                    fetchAndStoreWalletParams() ?: fallbackWalletParams
-                }
-            } catch (t: TimeoutCancellationException) {
-                logger.warning { "Unable to fetch WalletParams, using fallback values=$fallbackWalletParams" }
-                fallbackWalletParams
+        val walletParams = try {
+            withTimeout(timeout) {
+                fetchAndStoreWalletParams() ?: fallbackWalletParams
             }
+        } catch (t: TimeoutCancellationException) {
+            logger.warning { "Unable to fetch WalletParams, using fallback values=$fallbackWalletParams" }
+            fallbackWalletParams
+        }
 
         // _walletParams can be updated by [updateWalletParamsLoop] before we reach this block.
         // In that case, we don't update from here
@@ -92,12 +67,13 @@ class AppConfigurationManager(
         }
     }
 
-    private var updateParametersJob: Job? = null
+    private var updateWalletParamsJob: Job? = null
     public fun startWalletParamsLoop() {
-        updateParametersJob = updateWalletParamsLoop()
+        updateWalletParamsJob = updateWalletParamsLoop()
     }
+
     public fun stopWalletParamsLoop() {
-        launch { updateParametersJob?.cancelAndJoin() }
+        launch { updateWalletParamsJob?.cancelAndJoin() }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -119,7 +95,7 @@ class AppConfigurationManager(
         }
     }
 
-    private suspend fun fetchAndStoreWalletParams() : WalletParams? {
+    private suspend fun fetchAndStoreWalletParams(): WalletParams? {
         return try {
             val rawData = httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
             appDb.setWalletParams(currentWalletParamsVersion, rawData)
@@ -128,48 +104,37 @@ class AppConfigurationManager(
             null
         }
     }
-    //endregion
 
-    //region Electrum configuration
-    private val electrumServer by lazy { MutableStateFlow(getElectrumServer()) }
-    fun subscribeToElectrumServer(): StateFlow<ElectrumServer> = electrumServer
+    /** The flow containing the configuration to use for Electrum. If null, we do not know what conf to use. */
+    private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
+    fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
 
-    private val electrumServerKey = noSqlDb.key<ElectrumServer>(0)
-    private fun createElectrumConfiguration(): ElectrumServer {
-        if (noSqlDb[electrumServerKey] == null) {
-            logger.info { "Create ElectrumX configuration" }
-            setRandomElectrumServer()
-        }
-        return noSqlDb[electrumServerKey] ?: error("ElectrumServer must be initialized.")
+    /** Use this method to set a server to connect to. If null, will connect to a random server. */
+    fun updateElectrumConfig(server: ServerAddress?) {
+        _electrumConfig.value = server?.let { ElectrumConfig.Custom(it) } ?: ElectrumConfig.Random(randomElectrumServer())
     }
 
-    fun getElectrumServer(): ElectrumServer = noSqlDb[electrumServerKey] ?: createElectrumConfiguration()
+    private fun randomElectrumServer() = when (chain) {
+        Chain.MAINNET -> electrumMainnetConfigurations.random()
+        Chain.TESTNET -> electrumTestnetConfigurations.random()
+        Chain.REGTEST -> platformElectrumRegtestConf()
+    }.asServerAddress()
 
-    private fun putElectrumServer(electrumServer: ElectrumServer) {
-        logger.info { "Update electrum configuration [$electrumServer]" }
-        noSqlDb.put(electrumServerKey, electrumServer)
+    /** The flow containing the electrum header responses messages. */
+    private val _electrumMessages by lazy { MutableStateFlow<HeaderSubscriptionResponse?>(null) }
+    fun electrumMessages(): StateFlow<HeaderSubscriptionResponse?> = _electrumMessages
+
+    private fun watchElectrumMessages() = launch {
+        electrumClient.openNotificationsSubscription().consumeAsFlow().filterIsInstance<HeaderSubscriptionResponse>()
+            .collect {
+                _electrumMessages.value = it
+            }
     }
 
-    fun putElectrumServerAddress(host: String, port: Int, customized: Boolean = false) {
-        putElectrumServer(getElectrumServer().copy(host = host, port = port, customized = customized))
-    }
-
-    fun setRandomElectrumServer() {
-        putElectrumServer(
-            when (chain) {
-                Chain.MAINNET -> electrumMainnetConfigurations.random()
-                Chain.TESTNET -> electrumTestnetConfigurations.random()
-                Chain.REGTEST -> platformElectrumRegtestConf()
-            }.asElectrumServer()
-        )
-    }
-    //endregion
-
-    //region Tor configuration
+    // Tor configuration
     private val isTorEnabled = MutableStateFlow(false)
     fun subscribeToIsTorEnabled(): StateFlow<Boolean> = isTorEnabled
     fun updateTorUsage(enabled: Boolean): Unit {
         isTorEnabled.value = enabled
     }
-    //endregion
 }
