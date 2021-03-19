@@ -16,6 +16,7 @@ class Prefs {
 		case theme
 		case fcmTokenInfo
 		case pushPermissionQuery
+		case electrumConfig
 		case isTorEnabled
 	}
 	
@@ -137,14 +138,28 @@ class Prefs {
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
 		}
 	}
+	
+	var electrumConfig: ElectrumConfigPrefs? {
+		get {
+			let key = Keys.electrumConfig.rawValue
+			let saved: ElectrumConfigPrefs? = UserDefaults.standard.getCodable(forKey: key)
+			return saved
+		}
+		set {
+			let key = Keys.electrumConfig.rawValue
+			UserDefaults.standard.setCodable(value: newValue, forKey: key)
+		}
+	}
 }
 
 // MARK:-
-
-enum CurrencyType: String, CaseIterable, Codable {
-	case fiat
-	case bitcoin
-}
+/**
+ * We prefer to store Codable types in the UserDefaults system.
+ * The Codable system gives us Swift native tools for serialization & deserialization.
+ *
+ * But the Kotlin bridge is Objective-C. So we're choosing to provide custom
+ * serialization & deserialization routines for these.
+ */
 
 extension FiatCurrency {
 	
@@ -199,6 +214,13 @@ extension BitcoinUnit {
 	}
 }
 
+// MARK:-
+
+enum CurrencyType: String, CaseIterable, Codable {
+	case fiat
+	case bitcoin
+}
+
 enum Theme: String, CaseIterable, Codable {
 	case light
 	case dark
@@ -238,4 +260,21 @@ enum PushPermissionQuery: String, Codable {
 struct FcmTokenInfo: Equatable, Codable {
 	let nodeID: String
 	let fcmToken: String
+}
+
+struct ElectrumConfigPrefs: Codable {
+	let host: String
+	let port: UInt16
+	
+	private let version: Int // for potential future upgrades
+	
+	init(host: String, port: UInt16) {
+		self.host = host
+		self.port = port
+		self.version = 1
+	}
+	
+	var serverAddress: Eclair_kmpServerAddress {
+		return Eclair_kmpServerAddress(host: host, port: Int32(port), tls: Eclair_kmpTcpSocketTLS.safe)
+	}
 }

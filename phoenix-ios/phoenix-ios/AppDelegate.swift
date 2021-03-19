@@ -31,13 +31,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	private var didIncrementDisconnectCount = false
 
-    override init() {
-        setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
+	override init() {
+		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
 
-        business = PhoenixBusiness(ctx: PlatformContext())
-        business.start()
-        business.appConfigurationManager.updateElectrumConfig(server: nil) // start with random electrum. TODO: inject preference
-    }
+		business = PhoenixBusiness(ctx: PlatformContext())
+		business.start()
+		
+		let electrumConfig = Prefs.shared.electrumConfig
+		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+	}
 	
 	// --------------------------------------------------
 	// MARK: UIApplication Lifecycle

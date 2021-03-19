@@ -212,11 +212,11 @@ struct ElectrumAddressPopup: View {
 		_showing = showing
 		
 		_isCustomized = State(initialValue: model.isCustom())
-        let host = model.configuration?.server.host ?? ""
-        let port = model.configuration?.server.port ?? 0
+		let host = model.configuration?.server.host ?? ""
+		let port = model.configuration?.server.port ?? 0
 		
-        if model.isCustom() && host.count > 0 {
-            _host = State(initialValue: host)
+		if model.isCustom() && host.count > 0 {
+			_host = State(initialValue: host)
 			_port = State(initialValue: String(port))
 		} else {
 			_host = State(initialValue: "")
@@ -407,18 +407,20 @@ struct ElectrumAddressPopup: View {
 	func onSaveButtonTapped() -> Void {
 		log.trace("onSaveButtonTapped()")
 		
-		let checkedHost = checkHost()
-		let checkedPort = checkPort()
+		let checkedHost: String? = checkHost()
+		let checkedPort: UInt16? = checkPort()
 		
-		if let checkedHost = checkedHost,
-		   let checkedPort = checkedPort
+		if let checkedHost = checkedHost, // test not nil
+		   let checkedPort = checkedPort  // test not nil
 		{
-            if isCustomized {
-                let address = "\(checkedHost):\(checkedPort)"
-                postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: address))
-            } else {
-                postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: nil))
-            }
+			if isCustomized {
+				Prefs.shared.electrumConfig = ElectrumConfigPrefs(host: checkedHost, port: checkedPort)
+				let address = "\(checkedHost):\(checkedPort)"
+				postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: address))
+			} else {
+				Prefs.shared.electrumConfig = nil
+				postIntent(ElectrumConfiguration.IntentUpdateElectrumServer(address: nil))
+			}
 			
 			showing = false
 		}
@@ -491,13 +493,13 @@ class ElectrumConfigurationView_Previews: PreviewProvider {
 	)
 	
 	static let mockModel = ElectrumConfiguration.Model(
-        configuration: ElectrumConfig.Custom(server: electrumServer2),
-        connection: Eclair_kmpConnection.closed,
+		configuration: ElectrumConfig.Custom(server: electrumServer2),
+		connection: Eclair_kmpConnection.closed,
 		feeRate: 9999,
-        blockHeight: 1234,
-        tipTimestamp: 1234567890,
-        walletIsInitialized: true,
-        error: nil
+		blockHeight: 1234,
+		tipTimestamp: 1234567890,
+		walletIsInitialized: true,
+		error: nil
 	)
 	
 	@State static var isShowing: Bool = true
