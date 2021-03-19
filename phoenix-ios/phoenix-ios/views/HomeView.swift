@@ -46,8 +46,10 @@ struct HomeView : MVIView {
 		
 		ZStack {
 			
-			Image("testnet_bg")
-				.resizable(resizingMode: .tile)
+			if AppDelegate.get().business.chain == Chain.testnet {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+			}
 			
 			VStack {
 				

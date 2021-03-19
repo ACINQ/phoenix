@@ -113,8 +113,10 @@ struct ReadyView: View {
 		
 		ZStack {
 		
-			Image("testnet_bg")
-				.resizable(resizingMode: .tile)
+			if AppDelegate.get().business.chain == Chain.testnet {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+			}
 			
 			VStack {
 				Spacer()
@@ -291,19 +293,21 @@ struct ValidateView: View {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
-			Image("testnet_bg")
-				.resizable(resizingMode: .tile)
-				.ignoresSafeArea(.all, edges: .all)
-				.onTapGesture {
-					// dismiss keyboard (number pad) if visible
-					let keyWindow = UIApplication.shared.connectedScenes
-						.filter({ $0.activationState == .foregroundActive })
-						.map({ $0 as? UIWindowScene })
-						.compactMap({ $0 })
-						.first?.windows
-						.filter({ $0.isKeyWindow }).first
-					keyWindow?.endEditing(true)
-				}
+			if AppDelegate.get().business.chain == Chain.testnet {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.ignoresSafeArea(.all, edges: .all)
+					.onTapGesture {
+						dismissKeyboardIfVisible()
+					}
+			} else {
+				Color.clear
+					.ignoresSafeArea(.all, edges: .all)
+					.contentShape(Rectangle())
+					.onTapGesture {
+						dismissKeyboardIfVisible()
+					}
+			}
 			
 			VStack {
 		
@@ -415,6 +419,18 @@ struct ValidateView: View {
 			parsedAmount = Result.success(targetAmt) // do this first !
 			amount = formattedAmt.digits
 		}
+	}
+	
+	func dismissKeyboardIfVisible() -> Void {
+		log.trace("(ValidateView) dismissKeyboardIfVisible()")
+		
+		let keyWindow = UIApplication.shared.connectedScenes
+			.filter({ $0.activationState == .foregroundActive })
+			.map({ $0 as? UIWindowScene })
+			.compactMap({ $0 })
+			.first?.windows
+			.filter({ $0.isKeyWindow }).first
+		keyWindow?.endEditing(true)
 	}
 	
 	func amountDidChange() -> Void {
@@ -536,8 +552,10 @@ struct SendingView: View {
 		
 		ZStack {
 		
-			Image("testnet_bg")
-				.resizable(resizingMode: .tile)
+			if AppDelegate.get().business.chain == Chain.testnet {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+			}
 			
 			VStack {
 				Text("Sending Payment...")
