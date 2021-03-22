@@ -59,9 +59,9 @@ class PeerManager(
 
     private fun buildPeer(wallet: Wallet, walletParams: WalletParams): Peer {
         val genesisBlock = when (chain) {
-            Chain.MAINNET -> Block.LivenetGenesisBlock
-            Chain.TESTNET -> Block.TestnetGenesisBlock
-            Chain.REGTEST -> Block.RegtestGenesisBlock
+            Chain.Mainnet -> Block.LivenetGenesisBlock
+            Chain.Testnet -> Block.TestnetGenesisBlock
+            Chain.Regtest -> Block.RegtestGenesisBlock
         }
 
         val keyManager = LocalKeyManager(wallet.seed.toByteVector(), genesisBlock.hash)

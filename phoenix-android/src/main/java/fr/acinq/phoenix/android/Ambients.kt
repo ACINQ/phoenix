@@ -26,6 +26,7 @@ import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.ctrl.ControllerFactory
 import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.FiatCurrency
 
 
@@ -47,6 +48,14 @@ val navController: NavHostController
 val keyState
     @Composable
     get() = LocalKeyState.current
+
+val localUnit: CurrencyUnit
+    @Composable
+    get() = if (LocalShowInFiat.current) LocalFiatCurrency.current else LocalBitcoinUnit.current
+
+val localRate: BitcoinPriceRate?
+    @Composable
+    get() = LocalFiatCurrency.current.let { prefFiat -> LocalFiatRates.current.find { it.fiatCurrency == prefFiat } }
 
 val controllerFactory: ControllerFactory
     @Composable

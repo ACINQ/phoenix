@@ -19,7 +19,7 @@ abstract class AppController<M : MVI.Model, I : MVI.Intent>(loggerFactory: Logge
 
     protected val logger = loggerFactory.newLogger(this::class)
 
-    private val models = MutableStateFlow(firstModel)
+    internal val models = MutableStateFlow(firstModel)
 
     private val modelChanges = Channel<M.() -> M>()
 

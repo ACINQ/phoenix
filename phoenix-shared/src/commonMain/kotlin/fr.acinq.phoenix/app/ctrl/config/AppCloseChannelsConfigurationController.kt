@@ -87,13 +87,13 @@ class AppCloseChannelsConfigurationController(
                     }
 
                     val path = when (chain) {
-                        Chain.MAINNET -> "m/84'/0'/0'/0/0"
+                        Chain.Mainnet -> "m/84'/0'/0'/0/0"
                         else -> "m/84'/1'/0'/0/0"
                     }
                     val wallet = walletManager.wallet.value!!
                     val address = wallet.onchainAddress(
                         path = path,
-                        isMainnet = chain == Chain.MAINNET
+                        isMainnet = chain.isMainnet()
                     )
 
                     model(CloseChannelsConfiguration.Model.Ready(closableChannelsList, address))

@@ -28,11 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.phoenix.android.LocalBitcoinUnit
-import fr.acinq.phoenix.android.LocalFiatCurrency
-import fr.acinq.phoenix.android.LocalShowInFiat
-import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.Converter
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.CurrencyUnit
 
@@ -50,7 +46,6 @@ fun AmountView(
     } else {
         LocalBitcoinUnit.current
     }
-    val fiatRate = Converter.localBitcoinRate()
     Row(horizontalArrangement = Arrangement.Center, modifier = modifier) {
         if (isOutgoing != null && amount > MilliSatoshi(0)) {
             Text(
@@ -59,7 +54,7 @@ fun AmountView(
             )
         }
         Text(
-            text = amount.toPrettyString(unit, fiatRate),
+            text = amount.toPrettyString(unit, localRate),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )

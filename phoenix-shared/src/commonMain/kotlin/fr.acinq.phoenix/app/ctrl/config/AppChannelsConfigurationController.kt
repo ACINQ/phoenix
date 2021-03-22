@@ -60,9 +60,9 @@ class AppChannelsConfigurationController(
                             ),
                             if (state is ChannelStateWithCommitments) {
                                 val prefix = when (chain) {
-                                    Chain.MAINNET -> ""
-                                    Chain.TESTNET -> "testnet/"
-                                    Chain.REGTEST -> "_REGTEST_/"
+                                    Chain.Mainnet -> ""
+                                    Chain.Testnet -> "testnet/"
+                                    Chain.Regtest -> "_REGTEST_/"
                                 }
                                 val txId = state.commitments.localCommit.publishableTxs.commitTx.tx.txid
                                 "https://blockstream.info/$prefix/tx/$txId"

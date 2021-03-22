@@ -43,16 +43,20 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.WalletPayment
 import fr.acinq.eclair.utils.Connection
+import fr.acinq.eclair.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.Converter
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
@@ -86,9 +90,6 @@ private class HomeViewModel(val connectionsFlow: StateFlow<Connections>, control
 fun HomeView(appVM: AppViewModel) {
     requireWalletPresent(inScreen = Screen.Home) {
         val log = logger()
-        val context = LocalContext.current.applicationContext
-        val nc = navController
-
         val connectionsFlow = business.connectionsMonitor.connections
         val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(connectionsFlow, controllerFactory, CF::home))
         val connectionsState = vm.connectionsFlow.collectAsState()
@@ -103,76 +104,10 @@ fun HomeView(appVM: AppViewModel) {
         ModalDrawer(
             drawerState = drawerState,
             drawerShape = RectangleShape,
-            drawerContent = {
-                val peerState = business.peerState().collectAsState()
-                Column {
-                    Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
-                        val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
-                        Surface(shape = CircleShape, elevation = 2.dp) {
-                            Image(painter = painterResource(id = R.drawable.illus_phoenix), contentDescription = null, modifier = Modifier.size(64.dp))
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = "Phoenix Wallet",
-                            style = MaterialTheme.typography.subtitle2.copy(fontSize = 20.sp)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = nodeId,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
-                        )
-                        FilledButton(
-                            text = R.string.home__drawer__copy_nodeid,
-                            backgroundColor = Color.Unspecified,
-                            padding = PaddingValues(4.dp),
-                            space = 8.dp,
-                            textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                            modifier = Modifier.absoluteOffset(x = (-4).dp),
-                            onClick = { copyToClipboard(context, data = nodeId) }
-                        )
-                    }
-                    HSeparator()
-                    Button(
-                        text = stringResource(id = R.string.home__drawer__settings),
-                        icon = R.drawable.ic_settings,
-                        onClick = { nc.navigate(Screen.Settings) },
-                        padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Button(
-                        text = stringResource(id = R.string.home__drawer__notifications),
-                        icon = R.drawable.ic_notification,
-                        enabled = false,
-                        onClick = { nc.navigate(Screen.Settings) },
-                        padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Button(
-                        text = stringResource(id = R.string.home__drawer__faq),
-                        icon = R.drawable.ic_help_circle,
-                        onClick = { },
-                        padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    HSeparator()
-                    Button(
-                        text = stringResource(id = R.string.home__drawer__support),
-                        icon = R.drawable.ic_blank,
-                        onClick = { },
-                        padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
+            drawerContent = { SideMenu() },
             content = {
                 MVIView(CF::home) { model, _ ->
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                         TopBar(showConnectionsDialog, connectionsState)
                         Spacer(modifier = Modifier.height(16.dp))
                         AmountView(
@@ -183,6 +118,10 @@ fun HomeView(appVM: AppViewModel) {
                                 .align(Alignment.CenterHorizontally)
                                 .padding(horizontal = 16.dp)
                         )
+                        model.incomingBalance?.run {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            IncomingAmountNotif(this)
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                         Surface(
                             shape = CircleShape, color = MaterialTheme.colors.primary, modifier = Modifier
@@ -205,9 +144,81 @@ fun HomeView(appVM: AppViewModel) {
 }
 
 @Composable
+private fun SideMenu() {
+    val context = LocalContext.current
+    val peerState = business.peerState().collectAsState()
+    val nc = navController
+    Column {
+        Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
+            val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
+            Surface(shape = CircleShape, elevation = 2.dp) {
+                Image(painter = painterResource(id = R.drawable.illus_phoenix), contentDescription = null, modifier = Modifier.size(64.dp))
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Phoenix Wallet",
+                style = MaterialTheme.typography.subtitle2.copy(fontSize = 20.sp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = nodeId,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp)
+            )
+            FilledButton(
+                text = R.string.home__drawer__copy_nodeid,
+                backgroundColor = Color.Unspecified,
+                padding = PaddingValues(4.dp),
+                space = 8.dp,
+                textStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
+                modifier = Modifier.absoluteOffset(x = (-4).dp),
+                onClick = { copyToClipboard(context, data = nodeId) }
+            )
+        }
+        HSeparator()
+        Button(
+            text = stringResource(id = R.string.home__drawer__settings),
+            icon = R.drawable.ic_settings,
+            onClick = { nc.navigate(Screen.Settings) },
+            padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(
+            text = stringResource(id = R.string.home__drawer__notifications),
+            icon = R.drawable.ic_notification,
+            enabled = false,
+            onClick = { nc.navigate(Screen.Settings) },
+            padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(
+            text = stringResource(id = R.string.home__drawer__faq),
+            icon = R.drawable.ic_help_circle,
+            onClick = { },
+            padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        )
+        HSeparator()
+        Button(
+            text = stringResource(id = R.string.home__drawer__support),
+            icon = R.drawable.ic_blank,
+            onClick = { },
+            padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
 fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State<Connections>) {
     Row(
         Modifier
+            .fillMaxWidth()
             .padding(8.dp)
             .height(40.dp)
             .clipToBounds()
@@ -267,6 +278,14 @@ private fun ConnectionDialogLine(label: String, connection: Connection) {
 }
 
 @Composable
+private fun IncomingAmountNotif(amount: MilliSatoshi) {
+    Text(
+        text = stringResource(id = R.string.home__swapin_incoming, amount.toPrettyString(localUnit, localRate, withUnit = true)),
+        style = MaterialTheme.typography.caption
+    )
+}
+
+@Composable
 private fun PaymentLine(payment: WalletPayment) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -276,11 +295,7 @@ private fun PaymentLine(payment: WalletPayment) {
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Row {
-                Text(
-                    text = payment.desc() ?: stringResource(id = R.string.paymentline_no_desc),
-                    style = if (payment.desc() != null) MaterialTheme.typography.body1 else MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-                    modifier = Modifier.weight(1.0f)
-                )
+                PaymentDescription(payment = payment, modifier = Modifier.weight(1.0f))
                 Spacer(modifier = Modifier.width(8.dp))
                 if (!isPaymentFailed(payment)) {
                     val isOutgoing = payment is OutgoingPayment
@@ -296,6 +311,29 @@ private fun PaymentLine(payment: WalletPayment) {
             Text(text = WalletPayment.completedAt(payment).toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
+}
+
+@Composable
+private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modifier) {
+    val desc = when (payment) {
+        is OutgoingPayment -> when (val d = payment.details) {
+            is OutgoingPayment.Details.Normal -> d.paymentRequest.description
+            is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
+            is OutgoingPayment.Details.SwapOut -> d.address
+        }
+        is IncomingPayment -> when (val o = payment.origin) {
+            is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
+            is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
+            is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
+        }
+    }.takeIf { !it.isNullOrBlank() }
+    Text(
+        text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = if (desc != null) MaterialTheme.typography.body1 else MaterialTheme.typography.body1.copy(color = mutedTextColor()),
+        modifier = modifier
+    )
 }
 
 private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Failed)

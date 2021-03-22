@@ -19,6 +19,8 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
@@ -39,6 +41,8 @@ import fracinqphoenixdb.Incoming_payments
 import fracinqphoenixdb.Outgoing_payment_parts
 import fracinqphoenixdb.Outgoing_payments
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import org.kodein.memory.text.toHexString
 
@@ -251,7 +255,6 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
                 preimage = preimage.toByteArray(),
                 payment_type = IncomingOriginDbEnum.toDb(origin),
                 payment_request = if (origin is IncomingPayment.Origin.Invoice) origin.paymentRequest.write() else null,
-                swap_amount_msat = if (origin is IncomingPayment.Origin.SwapIn) origin.amount.msat else null,
                 swap_address = if (origin is IncomingPayment.Origin.SwapIn) origin.address else null,
                 created_at = createdAt
             )
@@ -266,11 +269,29 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
                     value = amount.msat,
                     received_at = receivedAt,
                     received_with = IncomingReceivedWithDbEnum.toDb(receivedWith),
-                    received_with_fees = receivedWith.fees.msat,
+                    received_with_fees = receivedWith.fees?.msat,
                     received_with_channel_id = if (receivedWith is IncomingPayment.ReceivedWith.NewChannel) receivedWith.channelId?.toByteArray() else null,
                     payment_hash = paymentHash.toByteArray())
                 if (inQueries.changes().executeAsOne() != 1L) throw IncomingPaymentNotFound(paymentHash)
             }
+        }
+    }
+
+    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, createdAt: Long, receivedAt: Long) {
+        withContext(Dispatchers.Default) {
+            inQueries.insertAndReceive(
+                payment_hash = Crypto.sha256(preimage).toByteVector32().toByteArray(),
+                preimage = preimage.toByteArray(),
+                payment_type = IncomingOriginDbEnum.toDb(origin),
+                payment_request = if (origin is IncomingPayment.Origin.Invoice) origin.paymentRequest.write() else null,
+                swap_address = if (origin is IncomingPayment.Origin.SwapIn) origin.address else null,
+                received_amount_msat = amount.msat,
+                received_at = receivedAt,
+                received_with = IncomingReceivedWithDbEnum.toDb(receivedWith),
+                received_with_fees = receivedWith.fees?.msat,
+                received_with_channel_id = if (receivedWith is IncomingPayment.ReceivedWith.NewChannel) receivedWith.channelId?.toByteArray() else null,
+                created_at = createdAt
+            )
         }
     }
 
@@ -291,6 +312,12 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> {
         return withContext(Dispatchers.Default) {
             aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).executeAsList()
+        }
+    }
+
+    suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).asFlow().mapToList()
         }
     }
 
@@ -394,7 +421,6 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         preimage: ByteArray,
         payment_type: IncomingOriginDbEnum,
         payment_request: String?,
-        swap_amount_msat: Long?,
         swap_address: String?,
         received_amount_msat: Long?,
         received_at: Long?,
@@ -404,27 +430,27 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     ): IncomingPayment {
         return IncomingPayment(
             preimage = ByteVector32(preimage),
-            origin = mapIncomingOrigin(payment_type, swap_amount_msat, swap_address, payment_request),
+            origin = mapIncomingOrigin(payment_type, swap_address, payment_request),
             received = mapIncomingReceived(received_amount_msat, received_at, received_with, received_with_fees, received_with_channel_id),
             createdAt = created_at
         )
     }
 
-    private fun mapIncomingOrigin(origin: IncomingOriginDbEnum, swapAmount: Long?, swapAddress: String?, paymentRequest: String?) = when {
+    private fun mapIncomingOrigin(origin: IncomingOriginDbEnum, swapAddress: String?, paymentRequest: String?) = when {
         origin == IncomingOriginDbEnum.KeySend -> IncomingPayment.Origin.KeySend
-        origin == IncomingOriginDbEnum.SwapIn && swapAmount != null && swapAddress != null -> IncomingPayment.Origin.SwapIn(MilliSatoshi(swapAmount), swapAddress, null)
+        origin == IncomingOriginDbEnum.SwapIn && swapAddress != null -> IncomingPayment.Origin.SwapIn(swapAddress)
         origin == IncomingOriginDbEnum.Invoice && paymentRequest != null -> IncomingPayment.Origin.Invoice(PaymentRequest.read(paymentRequest))
-        else -> throw UnreadableIncomingOriginInDatabase(origin, swapAmount, swapAddress, paymentRequest)
+        else -> throw UnreadableIncomingOriginInDatabase(origin, swapAddress, paymentRequest)
     }
 
-    private fun mapIncomingReceived(amount: Long?, receivedAt: Long?, receivedWithEnum: IncomingReceivedWithDbEnum?, receivedWithAmount: Long?, receivedWithChannelId: ByteArray?): IncomingPayment.Received? {
+    private fun mapIncomingReceived(amount: Long?, receivedAt: Long?, receivedWithEnum: IncomingReceivedWithDbEnum?, receivedWithFees: Long?, receivedWithChannelId: ByteArray?): IncomingPayment.Received? {
         return when {
             amount == null && receivedAt == null && receivedWithEnum == null -> null
             amount != null && receivedAt != null && receivedWithEnum == IncomingReceivedWithDbEnum.LightningPayment ->
                 IncomingPayment.Received(MilliSatoshi(amount), IncomingPayment.ReceivedWith.LightningPayment, receivedAt)
-            amount != null && receivedAt != null && receivedWithEnum == IncomingReceivedWithDbEnum.NewChannel && receivedWithAmount != null ->
-                IncomingPayment.Received(MilliSatoshi(amount), IncomingPayment.ReceivedWith.NewChannel(MilliSatoshi(receivedWithAmount), receivedWithChannelId?.run { ByteVector32(this) }), receivedAt)
-            else -> throw UnreadableIncomingPaymentStatusInDatabase(amount, receivedAt, receivedWithEnum, receivedWithAmount, receivedWithChannelId)
+            amount != null && receivedAt != null && receivedWithEnum == IncomingReceivedWithDbEnum.NewChannel ->
+                IncomingPayment.Received(MilliSatoshi(amount), IncomingPayment.ReceivedWith.NewChannel(MilliSatoshi(receivedWithFees ?: 0), receivedWithChannelId?.toByteVector32()), receivedAt)
+            else -> throw UnreadableIncomingPaymentStatusInDatabase(amount, receivedAt, receivedWithEnum, receivedWithFees, receivedWithChannelId)
         }
     }
 
@@ -460,7 +486,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
                 else -> OutgoingPayment.Status.Pending
             }
         )
-        "incoming" -> mapIncomingPayment(payment_hash, created_at, preimage!!, incoming_payment_type!!, incoming_payment_request, 0L, incoming_swap_address,
+        "incoming" -> mapIncomingPayment(payment_hash, created_at, preimage!!, incoming_payment_type!!, incoming_payment_request, incoming_swap_address,
             amount, completed_at, incoming_received_with, incoming_received_with_fees, null)
         else -> throw UnhandledDirection(direction)
     }
@@ -470,19 +496,19 @@ class UnreadableIncomingPaymentStatusInDatabase(
     amount: Long?,
     receivedAt: Long?,
     receivedWithEnum: SqlitePaymentsDb.IncomingReceivedWithDbEnum?,
-    receivedWithAmount: Long?,
+    receivedWithFees: Long?,
     receivedWithChannelId: ByteArray?
-) : RuntimeException("unreadable data [ amount=$amount, receivedAt=$receivedAt, receivedWithEnum=$receivedWithEnum, receivedWithAmount=$receivedWithAmount, receivedWithChannelId=${receivedWithChannelId?.toHexString()} ]")
+) : RuntimeException("unreadable data [ amount=$amount, receivedAt=$receivedAt, receivedWithEnum=$receivedWithEnum, receivedWithFees=$receivedWithFees, receivedWithChannelId=${receivedWithChannelId?.toHexString()} ]")
 
 class UnreadableIncomingOriginInDatabase(
-    origin: SqlitePaymentsDb.IncomingOriginDbEnum, swapAmount: Long?, swapAddress: String?, paymentRequest: String?
-) : RuntimeException("unreadable data [ origin=$origin, swapAmount=$swapAmount, swapAddress=$swapAddress, paymentRequest=$paymentRequest ]")
+    origin: SqlitePaymentsDb.IncomingOriginDbEnum, swapAddress: String?, paymentRequest: String?
+) : RuntimeException("unreadable data [ origin=$origin, swapAddress=$swapAddress, paymentRequest=$paymentRequest ]")
 
 object CannotReceiveZero : RuntimeException()
 class OutgoingPaymentNotFound(id: UUID) : RuntimeException("could not find outgoing payment with id=$id")
 class OutgoingPaymentPartNotFound(partId: UUID) : RuntimeException("could not find outgoing payment part with part_id=$partId")
 class IncomingPaymentNotFound(paymentHash: ByteVector32) : RuntimeException("missing payment for payment_hash=$paymentHash")
-class UnhandledIncomingOrigin(val origin: IncomingPayment.Origin) : RuntimeException("unhandled origin=$origin")
+class UnhandledIncomingOrigin(origin: IncomingPayment.Origin) : RuntimeException("unhandled origin=$origin")
 class UnhandledIncomingReceivedWith(receivedWith: IncomingPayment.ReceivedWith) : RuntimeException("unhandled receivedWith=$receivedWith")
 object UnhandledOutgoingDetails : RuntimeException("unhandled outgoing details")
 class UnhandledDirection(direction: String) : RuntimeException("unhandled direction=$direction")

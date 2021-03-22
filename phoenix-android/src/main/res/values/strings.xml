@@ -100,8 +100,10 @@
     <string name="paymentline_sent_prefix">-</string>
     <string name="paymentline_received_prefix">+</string>
     <string name="paymentline_no_desc">No description</string>
-    <string name="paymentline_closing_desc">Closing #%1$s</string>
-    <string name="paymentline_swap_in_desc">On-chain payment to %1$s</string>
+    <string name="paymentline_keysend_outgoing">Donation</string>
+    <string name="paymentline_keysend_incoming">Spontaneous payment</string>
+    <string name="paymentline_closing_desc">Payment channel closing</string>
+    <string name="paymentline_swap_in_desc">Incoming swap</string>
 
     <!-- //////////////// receive //////////////// -->
 

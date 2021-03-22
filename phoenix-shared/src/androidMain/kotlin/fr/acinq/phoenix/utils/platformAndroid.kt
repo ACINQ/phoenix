@@ -1,12 +1,12 @@
 package fr.acinq.phoenix.utils
 
-import android.app.Application
+import android.content.Context
 
 
-actual class PlatformContext(val application: Application)
+actual class PlatformContext(val applicationContext: Context)
 
 actual fun getApplicationFilesDirectoryPath(ctx: PlatformContext): String =
-    ctx.application.filesDir.absolutePath
+    ctx.applicationContext.filesDir.absolutePath
 
 actual fun getTemporaryDirectoryPath(ctx: PlatformContext): String =
-    ctx.application.cacheDir.absolutePath
+    ctx.applicationContext.cacheDir.absolutePath

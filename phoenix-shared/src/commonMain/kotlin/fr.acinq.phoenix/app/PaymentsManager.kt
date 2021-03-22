@@ -2,19 +2,15 @@ package fr.acinq.phoenix.app
 
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.PaymentsDb
 import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.io.PaymentNotSent
-import fr.acinq.eclair.io.PaymentProgress
 import fr.acinq.eclair.io.PaymentReceived
-import fr.acinq.eclair.io.PaymentSent
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.phoenix.db.SqlitePaymentsDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -23,16 +19,13 @@ import org.kodein.log.newLogger
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     loggerFactory: LoggerFactory,
-    private val paymentsDb: PaymentsDb,
+    private val paymentsDb: SqlitePaymentsDb,
     private val peerManager: PeerManager
 ) : CoroutineScope by MainScope() {
     private val logger = newLogger(loggerFactory)
 
-    /** Get a list of wallet payments from database, with hard coded parameters. */
-    private suspend fun listPayments(): List<WalletPayment> = paymentsDb.listPayments(150, 0)
-
-    /** Broadcasts an observable relevant list of payments. */
-    private val payments = MutableStateFlow<Pair<List<WalletPayment>, WalletPayment?>>(Pair(emptyList(), null))
+    /** A flow containing a list of payments, directly taken from the database and automatically refreshed when the database changes. */
+    internal val payments = MutableStateFlow<List<WalletPayment>>(emptyList())
 
     /**
      * Broadcasts the most recent incoming payment since the app was launched.
@@ -51,24 +44,20 @@ class PaymentsManager(
 
     init {
         launch {
-            payments.value = listPayments() to null
+            paymentsDb.listPaymentsFlow(150, 0, emptySet()).collect {
+                payments.value = it
+            }
+        }
+
+        launch {
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
-                when (event) {
-                    is PaymentReceived, is PaymentSent, is PaymentNotSent, is PaymentProgress -> {
-                        logger.debug { "refreshing payment history with event=$event" }
-                        if (event is PaymentReceived) {
-                            lastIncomingPayment.value = event.incomingPayment
-                        }
-                        val list = listPayments()
-                        payments.value = list to list.firstOrNull()?.takeIf { WalletPayment.completedAt(it) > 0 }
-                    }
-                    else -> Unit
+                if (event is PaymentReceived) {
+                    lastIncomingPayment.value = event.incomingPayment
                 }
             }
         }
     }
 
-    fun subscribeToPayments(): StateFlow<Pair<List<WalletPayment>, WalletPayment?>> = payments
     fun subscribeToLastIncomingPayment(): StateFlow<WalletPayment?> = lastIncomingPayment
 }
 

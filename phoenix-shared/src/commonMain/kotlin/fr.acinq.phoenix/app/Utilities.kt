@@ -56,12 +56,12 @@ class Utilities(
             // That `else` case is seemingly ignored by the compiler.
 
             val (addrChain, type) = when (prefix) {
-                Base58.Prefix.PubkeyAddress -> Pair(Chain.MAINNET, BitcoinAddressType.Base58PubKeyHash)
-                Base58.Prefix.ScriptAddress -> Pair(Chain.MAINNET, BitcoinAddressType.Base58ScriptHash)
-                Base58.Prefix.PubkeyAddressTestnet -> Pair(Chain.TESTNET, BitcoinAddressType.Base58PubKeyHash)
-                Base58.Prefix.ScriptAddressTestnet -> Pair(Chain.TESTNET, BitcoinAddressType.Base58ScriptHash)
-                Base58.Prefix.PubkeyAddressSegnet -> Pair(Chain.REGTEST, BitcoinAddressType.Base58PubKeyHash)
-                Base58.Prefix.ScriptAddressSegnet -> Pair(Chain.REGTEST, BitcoinAddressType.Base58ScriptHash)
+                Base58.Prefix.PubkeyAddress -> Pair(Chain.Mainnet, BitcoinAddressType.Base58PubKeyHash)
+                Base58.Prefix.ScriptAddress -> Pair(Chain.Mainnet, BitcoinAddressType.Base58ScriptHash)
+                Base58.Prefix.PubkeyAddressTestnet -> Pair(Chain.Testnet, BitcoinAddressType.Base58PubKeyHash)
+                Base58.Prefix.ScriptAddressTestnet -> Pair(Chain.Testnet, BitcoinAddressType.Base58ScriptHash)
+                Base58.Prefix.PubkeyAddressSegnet -> Pair(Chain.Regtest, BitcoinAddressType.Base58PubKeyHash)
+                Base58.Prefix.ScriptAddressSegnet -> Pair(Chain.Regtest, BitcoinAddressType.Base58ScriptHash)
                 else -> Pair(null, null)
             }
             if (addrChain == null || type == null) {
@@ -78,9 +78,9 @@ class Utilities(
         try { // is Bech32 ?
             val (hrp, version, bin) = Bech32.decodeWitnessAddress(addr)
             val addrChain = when (hrp) {
-                "bc" -> Chain.MAINNET
-                "tb" -> Chain.TESTNET
-                "bcrt" -> Chain.REGTEST
+                "bc" -> Chain.Mainnet
+                "tb" -> Chain.Testnet
+                "bcrt" -> Chain.Regtest
                 else -> null
             }
             if (addrChain == null) {

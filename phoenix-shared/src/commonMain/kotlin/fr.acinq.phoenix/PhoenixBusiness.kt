@@ -58,7 +58,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
     private val paymentsDb by lazy { SqlitePaymentsDb(createPaymentsDbDriver(ctx)) }
 
-    public val chain = Chain.TESTNET
+    public val chain = Chain.Testnet
 
     private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
     private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
@@ -113,7 +113,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         appConnectionsDaemon?.decrementDisconnectCount()
     }
 
-    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain == Chain.MAINNET)
+    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain.isMainnet())
 
     fun peerState() = peerManager.peerState
 
@@ -132,7 +132,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         override fun content(): ContentController = AppContentController(loggerFactory, walletManager)
         override fun initialization(): InitializationController = AppInitController(loggerFactory, walletManager)
         override fun home(): HomeController = AppHomeController(loggerFactory, peerManager, paymentsManager)
-        override fun receive(): ReceiveController = AppReceiveController(loggerFactory, peerManager)
+        override fun receive(): ReceiveController = AppReceiveController(loggerFactory, chain, peerManager)
         override fun scan(): ScanController = AppScanController(loggerFactory, peerManager)
         override fun restoreWallet(): RestoreWalletController = AppRestoreWalletController(loggerFactory)
         override fun configuration(): ConfigurationController = AppConfigurationController(loggerFactory, walletManager)

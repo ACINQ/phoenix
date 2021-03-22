@@ -116,9 +116,9 @@ class AppConfigurationManager(
     }
 
     private fun randomElectrumServer() = when (chain) {
-        Chain.MAINNET -> electrumMainnetConfigurations.random()
-        Chain.TESTNET -> electrumTestnetConfigurations.random()
-        Chain.REGTEST -> platformElectrumRegtestConf()
+        Chain.Mainnet -> electrumMainnetConfigurations.random()
+        Chain.Testnet -> electrumTestnetConfigurations.random()
+        Chain.Regtest -> platformElectrumRegtestConf()
     }.asServerAddress(tls = TcpSocket.TLS.SAFE)
 
     /** The flow containing the electrum header responses messages. */

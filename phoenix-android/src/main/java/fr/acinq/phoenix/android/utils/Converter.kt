@@ -23,8 +23,6 @@ import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.phoenix.android.LocalFiatCurrency
-import fr.acinq.phoenix.android.LocalFiatRates
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
@@ -56,12 +54,6 @@ object Converter {
         BitcoinUnit.Bit -> BIT_FORMAT
         BitcoinUnit.MBtc -> MBTC_FORMAT
         else -> BTC_FORMAT
-    }
-
-    @Composable
-    fun localBitcoinRate(): BitcoinPriceRate? {
-        val prefFiat = LocalFiatCurrency.current
-        return LocalFiatRates.current.find { it.fiatCurrency == prefFiat }
     }
 
     /** Returns a string representation of this Double. No scientific notation is used. Reuse [BigDecimal.toPlainString]. */

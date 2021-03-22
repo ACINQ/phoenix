@@ -50,6 +50,8 @@ class SqlitePaymentsDatabaseTest {
     val origin2 = IncomingPayment.Origin.KeySend
     val receivedWith2 = IncomingPayment.ReceivedWith.NewChannel(fees = MilliSatoshi(5000), channelId = Eclair.randomBytes32())
 
+    val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
+
     @Test
     fun incoming__empty() = runTest {
         assertNull(db.getIncomingPayment(paymentHash1))
@@ -114,6 +116,15 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(MilliSatoshi(100), db.getIncomingPayment(paymentHash1)?.received?.amount)
         db.receivePayment(paymentHash1, MilliSatoshi(50), receivedWith1, 20)
         assertEquals(MilliSatoshi(150), db.getIncomingPayment(paymentHash1)?.received?.amount)
+    }
+
+    @Test
+    fun incoming__add_and_receive() = runTest {
+        db.addAndReceivePayment(preimage1, origin3, MilliSatoshi(1234567), receivedWith2)
+        assertNotNull(db.getIncomingPayment(paymentHash1))
+        assertEquals(MilliSatoshi(1234567), db.getIncomingPayment(paymentHash1)?.received?.amount)
+        assertEquals(origin3, db.getIncomingPayment(paymentHash1)!!.origin)
+        assertEquals(receivedWith2, db.getIncomingPayment(paymentHash1)!!.received!!.receivedWith)
     }
 
     @Test
@@ -274,7 +285,7 @@ class SqlitePaymentsDatabaseTest {
         val (preimage1, preimage2, preimage3, preimage4) = listOf(Eclair.randomBytes32(), Eclair.randomBytes32(), Eclair.randomBytes32(), Eclair.randomBytes32())
 
         val incoming1 = IncomingPayment(preimage1, IncomingPayment.Origin.Invoice(createInvoice(preimage1)), null, createdAt = 20)
-        val incoming2 = IncomingPayment(preimage2, IncomingPayment.Origin.SwapIn(20_000.msat, "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", null), null, createdAt = 21)
+        val incoming2 = IncomingPayment(preimage2, IncomingPayment.Origin.SwapIn("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb"), null, createdAt = 21)
         val incoming3 = IncomingPayment(preimage3, IncomingPayment.Origin.Invoice(createInvoice(preimage3)), null, createdAt = 22)
         val incoming4 = IncomingPayment(preimage4, IncomingPayment.Origin.Invoice(createInvoice(preimage4)), null, createdAt = 23)
         listOf(incoming1, incoming2, incoming3, incoming4).forEach { db.addIncomingPayment(it.preimage, it.origin, it.createdAt) }
@@ -367,11 +378,9 @@ class SqlitePaymentsDatabaseTest {
 
     companion object {
         private val defaultFeatures = Features(
-            setOf(
-                ActivatedFeature(Feature.VariableLengthOnion, FeatureSupport.Optional),
-                ActivatedFeature(Feature.PaymentSecret, FeatureSupport.Optional),
-                ActivatedFeature(Feature.BasicMultiPartPayment, FeatureSupport.Optional)
-            )
+            Feature.VariableLengthOnion to FeatureSupport.Optional,
+            Feature.PaymentSecret to FeatureSupport.Optional,
+            Feature.BasicMultiPartPayment to FeatureSupport.Optional
         )
 
         private fun createInvoice(preimage: ByteVector32): PaymentRequest {

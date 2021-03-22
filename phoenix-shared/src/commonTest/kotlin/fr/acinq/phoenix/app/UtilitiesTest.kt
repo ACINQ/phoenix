@@ -35,31 +35,31 @@ class UtilitiesTest {
 
     val testInputs: List<TestInput> = listOf(
         TestInput("17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem",
-            Chain.MAINNET, BitcoinAddressType.Base58PubKeyHash
+            Chain.Mainnet, BitcoinAddressType.Base58PubKeyHash
         ),
         TestInput("3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX",
-            Chain.MAINNET, BitcoinAddressType.Base58ScriptHash
+            Chain.Mainnet, BitcoinAddressType.Base58ScriptHash
         ),
         TestInput("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
-            Chain.MAINNET, BitcoinAddressType.SegWitPubKeyHash
+            Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash
         ),
         TestInput("bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3",
-            Chain.MAINNET, BitcoinAddressType.SegWitScriptHash
+            Chain.Mainnet, BitcoinAddressType.SegWitScriptHash
         ),
         TestInput("mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn",
-            Chain.TESTNET, BitcoinAddressType.Base58PubKeyHash
+            Chain.Testnet, BitcoinAddressType.Base58PubKeyHash
         ),
         TestInput("2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc",
-            Chain.TESTNET, BitcoinAddressType.Base58ScriptHash
+            Chain.Testnet, BitcoinAddressType.Base58ScriptHash
         ),
         TestInput("tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx",
-            Chain.TESTNET, BitcoinAddressType.SegWitPubKeyHash
+            Chain.Testnet, BitcoinAddressType.SegWitPubKeyHash
         ),
         TestInput("tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
-            Chain.TESTNET, BitcoinAddressType.SegWitScriptHash,
+            Chain.Testnet, BitcoinAddressType.SegWitScriptHash,
         ),
         TestInput("17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe",
-            Chain.MAINNET, BitcoinAddressType.Base58PubKeyHash, isValid = false
+            Chain.Testnet, BitcoinAddressType.Base58PubKeyHash, isValid = false
         )
     )
 
@@ -68,7 +68,7 @@ class UtilitiesTest {
 
         val loggerFactory = LoggerFactory.default
 
-        val chains = listOf(Chain.MAINNET, Chain.TESTNET)
+        val chains = listOf(Chain.Mainnet, Chain.Testnet)
         for (chain in chains) {
 
             val util = Utilities(loggerFactory, chain)

@@ -48,7 +48,6 @@ import androidx.core.widget.doOnTextChanged
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.utils.Converter.localBitcoinRate
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
@@ -95,7 +94,7 @@ fun AmountInput(
     // get unit ambients
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
-    val rate = localBitcoinRate()
+    val rate = localRate
     val units = if (rate != null) {
         listOf<CurrencyUnit>(
             BitcoinUnit.Sat,

@@ -21,13 +21,13 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.phoenix.utils.PlatformContext
 
 actual fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.application.applicationContext, "channels.sqlite")
+    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels.sqlite")
 }
 
 actual fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.application.applicationContext, "payments.sqlite")
+    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments.sqlite")
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(AppDatabase.Schema, ctx.application.applicationContext, "appdb.sqlite")
+    return AndroidSqliteDriver(AppDatabase.Schema, ctx.applicationContext, "appdb.sqlite")
 }

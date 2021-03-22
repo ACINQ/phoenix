@@ -70,7 +70,7 @@ class ApiWalletParamsTest {
                 ),
                 InvoiceDefaultRoutingFees(1000.msat, 100, CltvExpiryDelta(144))
             ),
-            apiWalletParams.export(Chain.TESTNET))
+            apiWalletParams.export(Chain.Testnet))
     }
 
 }

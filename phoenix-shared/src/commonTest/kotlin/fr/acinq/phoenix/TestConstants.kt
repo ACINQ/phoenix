@@ -38,16 +38,14 @@ object TestConstants {
         keyManager = keyManager,
         alias = "phoenix",
         features = Features(
-            setOf(
-                ActivatedFeature(Feature.OptionDataLossProtect, FeatureSupport.Mandatory),
-                ActivatedFeature(Feature.VariableLengthOnion, FeatureSupport.Optional),
-                ActivatedFeature(Feature.PaymentSecret, FeatureSupport.Optional),
-                ActivatedFeature(Feature.BasicMultiPartPayment, FeatureSupport.Optional),
-                ActivatedFeature(Feature.Wumbo, FeatureSupport.Optional),
-                ActivatedFeature(Feature.StaticRemoteKey, FeatureSupport.Optional),
-                ActivatedFeature(Feature.TrampolinePayment, FeatureSupport.Optional),
-                ActivatedFeature(Feature.AnchorOutputs, FeatureSupport.Optional),
-            )
+            Feature.OptionDataLossProtect to FeatureSupport.Mandatory,
+            Feature.VariableLengthOnion to FeatureSupport.Optional,
+            Feature.PaymentSecret to FeatureSupport.Optional,
+            Feature.BasicMultiPartPayment to FeatureSupport.Optional,
+            Feature.Wumbo to FeatureSupport.Optional,
+            Feature.StaticRemoteKey to FeatureSupport.Optional,
+            Feature.TrampolinePayment to FeatureSupport.Optional,
+            Feature.AnchorOutputs to FeatureSupport.Optional
         ),
         dustLimit = 546.sat,
         onChainFeeConf = OnChainFeeConf(
@@ -84,7 +82,8 @@ object TestConstants {
         minFundingSatoshis = 1000.sat,
         maxFundingSatoshis = 16777215.sat,
         maxPaymentAttempts = 5,
-        enableTrampolinePayment = true
+        enableTrampolinePayment = true,
+        maxRemoteDustLimit = 600.sat
     )
 
     // 2 normal channels

@@ -59,7 +59,6 @@ import kotlinx.coroutines.launch
 sealed class ReceiveViewState {
     object Default : ReceiveViewState()
     object EditInvoice : ReceiveViewState()
-    object SwapIn : ReceiveViewState()
     data class Error(val e: Throwable) : ReceiveViewState()
 }
 
@@ -128,7 +127,6 @@ fun ReceiveView() {
                 onAmountChange = { vm.customAmount = it },
                 onSubmit = { vm.generateInvoice() },
                 onCancel = { vm.state = ReceiveViewState.Default })
-            is ReceiveViewState.SwapIn -> Text("Screen not ready yet...")
             is ReceiveViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
         }
     }
@@ -146,12 +144,10 @@ private fun DefaultView(vm: ReceiveViewModel) {
     ) {
         val nc = navController
         ScreenHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
-        MVIView(vm) { model, _ ->
+        MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
-                    SideEffect {
-                        vm.generateInvoice()
-                    }
+                    SideEffect { vm.generateInvoice() }
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generating -> {
@@ -160,56 +156,92 @@ private fun DefaultView(vm: ReceiveViewModel) {
                 is Receive.Model.Generated -> {
                     vm.generateQrCodeBitmap(invoice = model.request)
                     Spacer(modifier = Modifier.height(24.dp))
-                    Surface(
-                        Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(
-                                BorderStroke(1.dp, MaterialTheme.colors.primary),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .background(Color.White)
-                            .padding(24.dp)
-                    ) {
-                        vm.qrBitmap?.let {
-                            Image(
-                                bitmap = it,
-                                contentDescription = "invoice qr code",
-                                alignment = Alignment.Center,
-                                modifier = Modifier
-                                    .width(220.dp)
-                                    .height(220.dp)
-                            )
-                        }
-                    }
-                    // -- copy/share/edit
+                    vm.qrBitmap?.let { QRCode(it) }
                     Spacer(modifier = Modifier.height(24.dp))
-                    Row {
-                        BorderButton(
-                            icon = R.drawable.ic_copy,
-                            onClick = { copyToClipboard(context, data = model.request) })
-                        Spacer(modifier = Modifier.width(16.dp))
-                        BorderButton(
-                            icon = R.drawable.ic_share,
-                            onClick = { })
-                        Spacer(modifier = Modifier.width(16.dp))
-                        BorderButton(
-                            text = R.string.receive__edit_button,
-                            icon = R.drawable.ic_edit,
-                            onClick = { vm.state = ReceiveViewState.EditInvoice })
-                    }
-                    // -- swap-in/lnurl buttons
+                    CopyShareEditButtons(
+                        onCopy = { copyToClipboard(context, data = model.request) },
+                        onShare = { /*TODO*/ },
+                        onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(24.dp))
                     BorderButton(
                         text = R.string.receive__swapin_button,
                         icon = R.drawable.ic_swap,
-                        onClick = { })
+                        onClick = { postIntent(Receive.Intent.RequestSwapIn) })
                     Spacer(modifier = Modifier.height(8.dp))
                     BorderButton(
                         text = R.string.receive__lnurl_withdraw,
                         icon = R.drawable.ic_scan,
                         onClick = { })
                 }
+                is Receive.Model.SwapIn.Requesting -> Text(stringResource(id = R.string.receive__swapin__wait))
+                is Receive.Model.SwapIn.Generated -> {
+                    vm.generateQrCodeBitmap(invoice = model.address)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    vm.qrBitmap?.let { QRCode(it) }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(modifier = Modifier.padding(horizontal = 32.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(id = R.string.receive__swapin__address_label))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(model.address, style = monoTypo(), modifier = Modifier.widthIn(32.dp, 250.dp))
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    CopyShareEditButtons(
+                        onCopy = { copyToClipboard(context, data = model.address) },
+                        onShare = { /*TODO*/ },
+                        onEdit = null
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun QRCode(bitmap: ImageBitmap) {
+    Surface(
+        Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colors.primary),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .background(Color.White)
+            .padding(24.dp)
+    ) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = "invoice qr code",
+            alignment = Alignment.Center,
+            modifier = Modifier
+                .width(220.dp)
+                .height(220.dp)
+        )
+    }
+}
+
+@Composable
+fun CopyShareEditButtons(
+    onCopy: () -> Unit,
+    onShare: () -> Unit,
+    onEdit: (() -> Unit)?,
+) {
+    Row {
+        BorderButton(
+            icon = R.drawable.ic_copy,
+            onClick = onCopy
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        BorderButton(
+            icon = R.drawable.ic_share,
+            onClick = onShare
+        )
+        if (onEdit != null) {
+            Spacer(modifier = Modifier.width(16.dp))
+            BorderButton(
+                text = R.string.receive__edit_button,
+                icon = R.drawable.ic_edit,
+                onClick = onEdit
+            )
         }
     }
 }

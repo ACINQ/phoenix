@@ -28,7 +28,6 @@ import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Prefs
-import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.CoroutineExceptionHandler

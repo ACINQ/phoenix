@@ -23,7 +23,7 @@ actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val
     actual val networkState: StateFlow<NetworkState> = _networkState
 
     actual fun start() {
-        val connectivityManager = ctx.application.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        val connectivityManager = ctx.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         connectivityManager?.registerNetworkCallback(NetworkRequest.Builder().build(), object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)

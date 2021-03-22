@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     -- origin
     payment_type TEXT AS IncomingOriginDbEnum NOT NULL,
     payment_request TEXT DEFAULT NULL,
-    swap_amount_msat INTEGER DEFAULT NULL,
     swap_address TEXT DEFAULT NULL,
     -- received
     received_amount_msat INTEGER DEFAULT NULL,
@@ -24,10 +23,14 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
 -- queries
 
 insert:
-INSERT INTO incoming_payments (payment_hash, preimage, payment_type, payment_request, swap_amount_msat, swap_address, created_at) VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO incoming_payments (payment_hash, preimage, payment_type, payment_request, swap_address, created_at) VALUES (?, ?, ?, ?, ?, ?);
 
 receive:
 UPDATE incoming_payments SET received_amount_msat=? + COALESCE(received_amount_msat, 0), received_at=?, received_with=?, received_with_fees=?, received_with_channel_id=? WHERE payment_hash = ?;
+
+insertAndReceive:
+INSERT INTO incoming_payments (payment_hash, created_at, preimage, payment_type, payment_request, swap_address, received_amount_msat, received_at, received_with, received_with_fees, received_with_channel_id)
+VALUES (?,?,?,?,?,?,?,?,?,?,?);
 
 get:
 SELECT * FROM incoming_payments WHERE payment_hash=?;
