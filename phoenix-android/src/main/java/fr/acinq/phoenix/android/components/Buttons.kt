@@ -21,14 +21,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
@@ -40,7 +38,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.borderColor
-import fr.acinq.phoenix.android.mutedBgColor
 import fr.acinq.phoenix.android.mutedTextColor
 
 
@@ -67,7 +64,8 @@ fun BorderButton(
         border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor()),
         textStyle = textStyle,
         padding = padding,
-        modifier = modifier)
+        modifier = modifier
+    )
 }
 
 /** A rounded button with a solid background. */
@@ -94,7 +92,8 @@ fun FilledButton(
         backgroundColor = backgroundColor,
         textStyle = textStyle,
         padding = padding,
-        modifier = modifier)
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -110,7 +109,8 @@ fun PhoenixIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current
 ) {
-    Image(painter = painterResource(id = resourceId),
+    Image(
+        painter = painterResource(id = resourceId),
         contentDescription = "icon",
         modifier = modifier,
         colorFilter = ColorFilter.tint(tint)
@@ -129,7 +129,8 @@ fun SettingButton(
         icon = icon,
         iconTint = MaterialTheme.colors.onSurface,
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start)
+        horizontalArrangement = Arrangement.Start
+    )
 }
 
 /**
@@ -177,11 +178,13 @@ fun Button(
                 interactionSource = interactionSource,
                 indication = null, // use [LocalIndication.current] to ignore the button's shape.
             )
-            .then(if (text == null && icon != null) {
-                Modifier.defaultMinSize(42.dp)
-            } else {
-                Modifier
-            })
+            .then(
+                if (text == null && icon != null) {
+                    Modifier.defaultMinSize(42.dp)
+                } else {
+                    Modifier
+                }
+            )
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(value = textStyle) {
@@ -191,7 +194,7 @@ fun Button(
                             minWidth = ButtonDefaults.MinWidth,
                             minHeight = 0.dp
                         )
-                        .indication(interactionSource, rememberRipple(color = mutedTextColor()))
+                        .indication(interactionSource, LocalIndication.current)
                         .padding(padding),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,

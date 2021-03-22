@@ -36,6 +36,7 @@ import fr.acinq.phoenix.data.CurrencyUnit
 fun AmountView(
     amount: MilliSatoshi,
     modifier: Modifier = Modifier,
+    showUnit: Boolean = true,
     forceUnit: CurrencyUnit? = null,
     isOutgoing: Boolean? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
@@ -58,12 +59,14 @@ fun AmountView(
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )
-        Text(
-            text = unit.toString(),
-            style = unitTextStyle,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .alignBy(FirstBaseline)
-        )
+        if (showUnit) {
+            Text(
+                text = unit.toString(),
+                style = unitTextStyle,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .alignBy(FirstBaseline)
+            )
+        }
     }
 }

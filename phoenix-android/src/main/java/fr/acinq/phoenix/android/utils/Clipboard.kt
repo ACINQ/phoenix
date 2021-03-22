@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.utils
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -33,3 +34,11 @@ fun copyToClipboard(context: Context, data: String, dataLabel: String = "") {
 
 fun readClipboard(context: Context): String? = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
     .primaryClip?.getItemAt(0)?.text?.toString().takeIf { !it.isNullOrBlank() }
+
+fun share(context: Context, data: String, subject: String, chooserTitle: String? = null) {
+    val shareIntent = Intent(Intent.ACTION_SEND)
+    shareIntent.type = "text/plain"
+    shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+    shareIntent.putExtra(Intent.EXTRA_TEXT, data)
+    context.startActivity(Intent.createChooser(shareIntent, chooserTitle))
+}

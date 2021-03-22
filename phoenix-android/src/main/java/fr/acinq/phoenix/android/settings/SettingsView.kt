@@ -63,7 +63,7 @@ fun SettingsView() {
 
         // -- advanced
         SettingCategory(R.string.settings_advanced_title)
-        SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { })
+        SettingButton(text = R.string.settings_list_channels, icon = R.drawable.ic_zap, onClick = { nc.navigate(Screen.Channels) })
         SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { })
         SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { })
         SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { })

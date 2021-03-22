@@ -19,10 +19,14 @@ package fr.acinq.phoenix.android
 import android.content.Context
 import android.util.TypedValue
 import androidx.annotation.AttrRes
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -162,9 +166,13 @@ fun PhoenixAndroidTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Co
     MaterialTheme(
         colors = palette,
         typography = typography(palette),
-        shapes = shapes,
-        content = content
-    )
+        shapes = shapes
+    ) {
+        val rippleIndication = rememberRipple(color = if (isSystemInDarkTheme()) gray300 else gray600)
+        CompositionLocalProvider(LocalIndication provides rippleIndication) {
+            content()
+        }
+    }
 }
 
 @Composable

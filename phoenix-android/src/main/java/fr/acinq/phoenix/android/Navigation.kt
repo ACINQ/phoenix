@@ -42,6 +42,7 @@ sealed class Screen(val route: String, val arg: String? = null) {
     object Settings : Screen("settings")
     object DisplaySeed : Screen("settings/seed")
     object ElectrumServer : Screen("settings/electrum")
+    object Channels : Screen("settings/channels")
     object Receive : Screen("receive")
     object ReadData : Screen("readdata")
     object Send : Screen("send", "request")

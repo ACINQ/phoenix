@@ -37,6 +37,7 @@ import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.receive.ReceiveView
 import fr.acinq.phoenix.android.send.SendView
+import fr.acinq.phoenix.android.settings.ChannelsView
 import fr.acinq.phoenix.android.settings.ElectrumView
 import fr.acinq.phoenix.android.settings.SeedView
 import fr.acinq.phoenix.android.settings.SettingsView
@@ -102,6 +103,9 @@ fun AppView(appVM: AppViewModel) {
                 }
                 composable(Screen.ElectrumServer.fullRoute) {
                     ElectrumView()
+                }
+                composable(Screen.Channels.fullRoute) {
+                    ChannelsView()
                 }
             }
         }
