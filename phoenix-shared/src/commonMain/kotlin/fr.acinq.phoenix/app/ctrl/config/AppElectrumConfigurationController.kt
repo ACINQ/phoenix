@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
+import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
@@ -53,7 +54,11 @@ class AppElectrumConfigurationController(
                         intent.address.split(":").let {
                             val host = it.first()
                             val port = it.last()
-                            configurationManager.updateElectrumConfig(ElectrumAddress(host, port.toInt()).asServerAddress())
+                            val addr = ElectrumAddress(
+                                host = host,
+                                sslPort = port.toInt()
+                            ).asServerAddress(tls = TcpSocket.TLS.SAFE)
+                            configurationManager.updateElectrumConfig(addr)
                         }
                     }
                 }

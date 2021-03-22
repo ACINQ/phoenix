@@ -3,6 +3,7 @@ package fr.acinq.phoenix.app
 import fr.acinq.eclair.WalletParams
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.HeaderSubscriptionResponse
+import fr.acinq.eclair.io.TcpSocket
 import fr.acinq.eclair.utils.ServerAddress
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
@@ -118,7 +119,7 @@ class AppConfigurationManager(
         Chain.MAINNET -> electrumMainnetConfigurations.random()
         Chain.TESTNET -> electrumTestnetConfigurations.random()
         Chain.REGTEST -> platformElectrumRegtestConf()
-    }.asServerAddress()
+    }.asServerAddress(tls = TcpSocket.TLS.SAFE)
 
     /** The flow containing the electrum header responses messages. */
     private val _electrumMessages by lazy { MutableStateFlow<HeaderSubscriptionResponse?>(null) }

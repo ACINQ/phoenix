@@ -9,7 +9,8 @@ data class ElectrumAddress(
     val tcpPort: Int = 50001,
     val version: String = "1.4"
 ) {
-    fun asServerAddress(tls: TcpSocket.TLS? = null): ServerAddress = ServerAddress(host, port = if (tls != null) sslPort else tcpPort, tls)
+    fun asServerAddress(tls: TcpSocket.TLS?): ServerAddress =
+        ServerAddress(host, port = if (tls != null) sslPort else tcpPort, tls)
 }
 
 val electrumMainnetConfigurations = listOf(
