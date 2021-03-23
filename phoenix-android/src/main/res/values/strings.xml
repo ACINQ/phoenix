@@ -102,7 +102,8 @@
     <string name="paymentline_no_desc">No description</string>
     <string name="paymentline_keysend_outgoing">Donation</string>
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
-    <string name="paymentline_closing_desc">Payment channel closing</string>
+    <string name="paymentline_closing_desc_no_address">Channel closing</string>
+    <string name="paymentline_closing_desc">Channel closing to %1$s</string>
     <string name="paymentline_swap_in_desc">Incoming swap</string>
 
     <!-- //////////////// receive //////////////// -->
@@ -265,15 +266,12 @@
     <!-- //////////////// close all channels //////////////// -->
 
     <string name="closechannels_title">Close channels</string>
-    <string name="closechannels_checking_channels">Checking channels, please hold…</string>
-    <string name="closechannels_channels_recap">You currently have %1$d Lightning channels with an aggregated balance of %2$s.</string>
-    <string name="closechannels_channels_none">You currently don\'t have any channels that could be emptied.\n\nGo to the \'List channels\' page to see the state of your channels.</string>
-    <string name="closechannels_mutual_title">Empty wallet</string>
-    <string name="closechannels_mutual_instructions"><![CDATA[
-    Use this feature to empty your wallet to a Bitcoin address.
-  ]]></string>
-    <string name="closechannels_mutual_input_instructions">Funds can be sent to a Bitcoin wallet. Make sure that the address is correct before sending.</string>
-    <string name="closechannels_mutual_input_hint">Enter Bitcoin address</string>
+    <string name="closechannels_mutual_title">Close my channels</string>
+    <string name="closechannels_mutual_subtitle">Use this screen to close your payments channels and drain your funds to a Bitcoin address.</string>
+    <string name="closechannels_checking_channels">Checking your channels, please hold…</string>
+    <string name="closechannels_channels_recap">%1$d channel(s) holding an aggregated balance of %2$s can be closed. Funds will be sent to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
+    <string name="closechannels_channels_none">You currently don\'t have any channels that could be closed.</string>
+    <string name="closechannels_mutual_input_hint">Bitcoin address</string>
     <string name="closechannels_mutual_button">Empty my wallet</string>
     <string name="closechannels_force_title">Force close</string>
     <string name="closechannels_force_instructions"><![CDATA[
@@ -290,16 +288,15 @@
     <string name="closechannels_force_button">Force close channels</string>
     <string name="closechannels_confirm_dialog_message">Are you sure you want to proceed?</string>
     <string name="closechannels_message_error">There was a problem. Please try again later.</string>
-    <string name="closechannels_message_done">Funds sent.</string>
+    <string name="closechannels_message_done">%1$d channel(s) have been closed. You can find the details in the home screen.</string>
     <string name="closechannels_message_in_progress">Please wait…</string>
 
     <!-- //////////////// list all channels //////////////// -->
 
     <string name="listallchannels_title">Channels List</string>
     <string name="listallchannels_in_progress">Please hold…</string>
-    <string name="listallchannels_error">There was an error when retrieving the list of channels. Please try again.</string>
     <string name="listallchannels_node_id">Node id: %1$s</string>
-    <string name="listallchannels_no_channels">You don\'t have any channels yet.</string>
+    <string name="listallchannels_no_channels">You don\'t have any channels yet.\n\nPayments channels are created automatically when needed to receive payments.</string>
     <plurals name="listallchannels_channels_header">
         <item quantity="one">You have %1$d channel.</item>
         <item quantity="other">You have %1$d channels.</item>
@@ -394,12 +391,12 @@
     <string name="paymentdetails_loading">Retrieving payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment.\n\nPlease try again.</string>
 
-    <string name="paymentdetails_status_sent_successful"><![CDATA[<b>Sent</b> %1$s]]></string>
-    <string name="paymentdetails_status_sent_pending"><![CDATA[<b>Pending…</b>]]></string>
-    <string name="paymentdetails_status_sent_failed"><![CDATA[Payment <b>failed</b>.<br />No money has been sent.]]></string>
+    <string name="paymentdetails_status_sent_successful">Payment sent</string>
+    <string name="paymentdetails_status_sent_pending">Payment pending…</string>
+    <string name="paymentdetails_status_sent_failed">Payment failed, no money has been sent.</string>
 
     <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
-    <string name="paymentdetails_status_received_successful"><![CDATA[<b>Received</b> %1$s]]></string>
+    <string name="paymentdetails_status_received_successful">Payment has been received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>

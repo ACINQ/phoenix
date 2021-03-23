@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -49,6 +50,8 @@ import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.WalletPayment
 import fr.acinq.eclair.utils.Connection
+import fr.acinq.eclair.utils.msat
+import fr.acinq.eclair.utils.sum
 import fr.acinq.eclair.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -287,6 +290,7 @@ private fun IncomingAmountNotif(amount: MilliSatoshi) {
 
 @Composable
 private fun PaymentLine(payment: WalletPayment) {
+    val log = logger()
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -296,11 +300,19 @@ private fun PaymentLine(payment: WalletPayment) {
         Column {
             Row {
                 PaymentDescription(payment = payment, modifier = Modifier.weight(1.0f))
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 if (!isPaymentFailed(payment)) {
                     val isOutgoing = payment is OutgoingPayment
+                    val amount = when (payment) {
+                        is OutgoingPayment -> if (payment.details is OutgoingPayment.Details.ChannelClosing) {
+                            payment.recipientAmount
+                        } else {
+                            payment.parts.map { it.amount }.sum()
+                        }
+                        is IncomingPayment -> payment.received?.amount ?: 0.msat
+                    }
                     AmountView(
-                        amount = MilliSatoshi(payment.amountMsat()),
+                        amount = amount,
                         amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
                         unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
                         isOutgoing = isOutgoing
@@ -320,7 +332,7 @@ private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modi
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
             is OutgoingPayment.Details.SwapOut -> d.address
-            else -> stringResource(id = R.string.paymentline_closing_desc)
+            is OutgoingPayment.Details.ChannelClosing -> stringResource(R.string.paymentline_closing_desc, d.closingAddress)
         }
         is IncomingPayment -> when (val o = payment.origin) {
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
@@ -344,53 +356,61 @@ private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPaymen
 private fun PaymentIcon(payment: WalletPayment) {
     when (payment) {
         is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Completed.Failed -> Image(
-                painter = painterResource(R.drawable.ic_payment_failed),
-                contentDescription = stringResource(id = R.string.paymentdetails_status_sent_failed),
-                modifier = Modifier.size(18.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+            is OutgoingPayment.Status.Completed.Failed -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_failed,
+                description = stringResource(id = R.string.paymentdetails_status_sent_failed)
             )
-            is OutgoingPayment.Status.Pending -> Image(
-                painter = painterResource(R.drawable.ic_payment_pending),
-                contentDescription = stringResource(id = R.string.paymentdetails_status_sent_pending),
-                modifier = Modifier.size(18.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+            is OutgoingPayment.Status.Pending -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_pending,
+                description = stringResource(id = R.string.paymentdetails_status_sent_pending)
             )
-            is OutgoingPayment.Status.Completed.Succeeded -> Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colors.primary)
-                    .padding(4.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_payment_success),
-                    contentDescription = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                    modifier = Modifier.size(18.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
-                )
-            }
+            is OutgoingPayment.Status.Completed.Succeeded.OffChain -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_success,
+                description = stringResource(id = R.string.paymentdetails_status_sent_successful),
+                iconSize = 18.dp,
+                iconColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary
+            )
+            is OutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_success_onchain,
+                description = stringResource(id = R.string.paymentdetails_status_sent_successful),
+                iconSize = 12.dp,
+                iconColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary
+            )
         }
         is IncomingPayment -> when (payment.received) {
-            null -> Image(
-                painter = painterResource(R.drawable.ic_payment_pending),
-                contentDescription = stringResource(id = R.string.paymentdetails_status_received_pending),
-                modifier = Modifier.size(18.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+            null -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_pending,
+                description = stringResource(id = R.string.paymentdetails_status_received_pending)
             )
-            else -> Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colors.primary)
-                    .padding(4.dp)
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_payment_success),
-                    contentDescription = stringResource(id = R.string.paymentdetails_status_received_successful),
-                    modifier = Modifier.size(18.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
-                )
-            }
+            else -> PaymentIconComponent(
+                icon = R.drawable.ic_payment_success,
+                description = stringResource(id = R.string.paymentdetails_status_received_successful),
+                iconSize = 18.dp,
+                iconColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary
+            )
         }
+    }
+}
+
+@Composable
+private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 18.dp, iconColor: Color = MaterialTheme.colors.primary, backgroundColor: Color = Color.Unspecified) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(24.dp)
+            .background(color = backgroundColor)
+            .padding(4.dp)
+    ) {
+        Image(
+            painter = painterResource(icon),
+            contentDescription = description,
+            modifier = Modifier.size(iconSize),
+            colorFilter = ColorFilter.tint(iconColor)
+        )
     }
 }
 

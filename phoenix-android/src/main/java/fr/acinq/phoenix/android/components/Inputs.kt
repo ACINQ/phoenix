@@ -59,6 +59,7 @@ fun InputText(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
+    label: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     onTextChange: (String) -> Unit,
 ) {
@@ -71,6 +72,7 @@ fun InputText(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Text
         ),
+        label = label,
         enabled = enabled,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         colors = textFieldColors(),

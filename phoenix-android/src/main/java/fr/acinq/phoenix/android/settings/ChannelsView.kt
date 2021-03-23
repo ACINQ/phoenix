@@ -63,11 +63,17 @@ fun ChannelsView() {
         onBackClick = { nc.popBackStack() },
         title = stringResource(id = R.string.listallchannels_title),
     )
-    ScreenBody(padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)) {
-        MVIView(CF::channelsConfiguration) { model, _ ->
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(model.channels) {
-                    ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+    MVIView(CF::channelsConfiguration) { model, _ ->
+        if (model.channels.isEmpty()) {
+            ScreenBody {
+                Text(text = stringResource(id = R.string.listallchannels_no_channels))
+            }
+        } else {
+            ScreenBody(padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(model.channels) {
+                        ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+                    }
                 }
             }
         }

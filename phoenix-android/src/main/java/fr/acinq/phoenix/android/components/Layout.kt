@@ -132,14 +132,13 @@ fun Dialog(
             content()
             // buttons
             Row(
-                horizontalArrangement = Arrangement.End, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if (buttons != null) {
                     buttons()
                 } else {
-                    Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(8.dp))
+                    Button(onClick = onDismiss, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(16.dp))
                 }
             }
         }
