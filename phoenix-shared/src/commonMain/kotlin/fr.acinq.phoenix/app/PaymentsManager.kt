@@ -1,16 +1,24 @@
 package fr.acinq.phoenix.app
 
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.WalletPayment
 import fr.acinq.eclair.io.PaymentReceived
+import fr.acinq.eclair.io.SwapInConfirmedEvent
+import fr.acinq.eclair.io.SwapInPendingEvent
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.utils.getValue
+import fr.acinq.eclair.utils.setValue
+import fr.acinq.eclair.utils.toMilliSatoshi
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -22,10 +30,14 @@ class PaymentsManager(
     private val paymentsDb: SqlitePaymentsDb,
     private val peerManager: PeerManager
 ) : CoroutineScope by MainScope() {
-    private val logger = newLogger(loggerFactory)
+    private val log = newLogger(loggerFactory)
 
     /** A flow containing a list of payments, directly taken from the database and automatically refreshed when the database changes. */
     internal val payments = MutableStateFlow<List<WalletPayment>>(emptyList())
+
+    /** Flow of map of (bitcoinAddress -> amount) swap-ins. */
+    internal val incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
+    private var _incomingSwaps by incomingSwaps
 
     /**
      * Broadcasts the most recent incoming payment since the app was launched.
@@ -51,8 +63,17 @@ class PaymentsManager(
 
         launch {
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
-                if (event is PaymentReceived) {
-                    lastIncomingPayment.value = event.incomingPayment
+                when (event) {
+                    is PaymentReceived -> {
+                        lastIncomingPayment.value = event.incomingPayment
+                    }
+                    is SwapInPendingEvent -> {
+                        _incomingSwaps = _incomingSwaps + (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
+                    }
+                    is SwapInConfirmedEvent -> {
+                        _incomingSwaps = _incomingSwaps - event.swapInConfirmed.bitcoinAddress
+                    }
+                    else -> Unit
                 }
             }
         }
