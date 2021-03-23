@@ -13,6 +13,7 @@ sealed class Chain(val name: String, val chainHash: ByteVector32) {
     object Testnet: Chain("Testnet", Block.LivenetGenesisBlock.hash)
     object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock.hash)
     fun isMainnet(): Boolean = this is Mainnet
+    fun isTestnet(): Boolean = this is Testnet
 }
 
 interface CurrencyUnit

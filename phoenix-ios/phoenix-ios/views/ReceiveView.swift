@@ -53,7 +53,7 @@ struct ReceiveView: MVIView {
 		
 		ZStack {
 			
-			if AppDelegate.get().business.chain == Chain.testnet {
+			if AppDelegate.get().business.chain.isTestnet() {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 			}
