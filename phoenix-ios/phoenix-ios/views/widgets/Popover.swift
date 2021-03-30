@@ -2,21 +2,48 @@ import SwiftUI
 import Combine
 
 /// The PopoverState is exposed via an Environment variable:
-/// Just add this to your view:
 /// ```
 /// @Environment(\.popoverState) var popoverState: PopoverState
+/// ```
+///
+/// When you want to display a popover:
+/// ```
+/// popoverState.display.send(PopoverItem(
+///
+///    YourPopoverView().anyView,
+///    dismissable: false
+/// ))
+/// ```
+///
+/// When you want to dismiss the popover:
+/// ```
+/// popoverState.close.send()
 /// ```
 ///
 public class PopoverState: ObservableObject {
 
 	/// When you want to present a popover, just send it through this signal
-	public var displayContent = PassthroughSubject<AnyView, Never>()
-
-	/// Whether or not the popover is dimissable by clicking outside the popover.
-	public var dismissable = CurrentValueSubject<Bool, Never>(true)
+	public var display = PassthroughSubject<PopoverItem, Never>()
 	
 	/// When you want to close the popover, just send an update on this signal
 	public var close = PassthroughSubject<Void, Never>()
+}
+
+/// Encompasses the view & options for the popover.
+///
+public struct PopoverItem {
+	
+	/// The view to be displayed in the popover window.
+	/// (Use the View.anyView extension function.)
+	let view: AnyView
+	
+	/// Whether or not the popover is dimissable by clicking outside the popover.
+	let dismissable: Bool
+	
+	init(_ view: AnyView, dismissable: Bool/* purposefully non-optional parameter */) {
+		self.view = view
+		self.dismissable = dismissable
+	}
 }
 
 struct PopoverEnvironmentKey: EnvironmentKey {
@@ -42,7 +69,9 @@ public extension View {
 
 struct PopoverWrapper<Content: View>: View {
 
+	let dismissable: Bool
 	let content: () -> Content
+	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	
 	var body: some View {
@@ -69,7 +98,7 @@ struct PopoverWrapper<Content: View>: View {
 			Color.primary.opacity(0.4)
 				.edgesIgnoringSafeArea(.all)
 				.onTapGesture {
-					if popoverState.dismissable.value {
+					if dismissable {
 						popoverState.close.send()
 					}
 				}

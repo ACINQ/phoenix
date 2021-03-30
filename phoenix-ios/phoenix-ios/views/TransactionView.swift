@@ -48,6 +48,7 @@ struct PaymentView : View {
 				Spacer()
 			}
 			
+			// An invisible layer used to detect taps, and dismiss the DYPopoverView.
 			if explainFeesPopoverVisible {
 				Color.clear
 					.contentShape(Rectangle()) // required: https://stackoverflow.com/a/60151771/43522
@@ -56,7 +57,7 @@ struct PaymentView : View {
 					}
 			}
 		}
-		.popoverView(
+		.popoverView( // DYPopoverView
 			content: { ExplainFeesPopover(explanationText: $explainFeesText) },
 			background: { Color(.secondarySystemBackground) },
 			isPresented: $explainFeesPopoverVisible,
@@ -581,7 +582,7 @@ extension Eclair_kmpWalletPayment {
 		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
-				let val = NSLocalizedString("SwapIn", comment: "Transaction Info: Value")
+				let val = NSLocalizedString("Swap-In", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
 				return (val, exp)
 			}
@@ -594,7 +595,7 @@ extension Eclair_kmpWalletPayment {
 		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
-				let val = NSLocalizedString("SwapOut", comment: "Transaction Info: Value")
+				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
 				return (val, exp)
 			}

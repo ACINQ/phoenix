@@ -214,10 +214,11 @@ fileprivate struct StandardWalletView : View {
 	func drainWallet() -> Void {
 		log.trace("drainWallet()")
 		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
-			ConfirmationPopover(confirmAction: confirmDrainWallet).anyView
-		)
+		popoverState.display.send(PopoverItem(
+		
+			ConfirmationPopover(confirmAction: confirmDrainWallet).anyView,
+			dismissable: false
+		))
 	}
 	
 	func confirmDrainWallet() -> Void {

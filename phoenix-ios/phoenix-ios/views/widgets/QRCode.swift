@@ -3,6 +3,7 @@ import SwiftUI
 
 class QRCode : ObservableObject {
 	@Published var value: String? = nil
+	@Published var cgImage: CGImage? = nil
 	@Published var image: Image? = nil
 
 	func generate(value: String) {
@@ -20,11 +21,17 @@ class QRCode : ObservableObject {
 			guard let ciImage = qrFilter.outputImage?.transformed(by: cgTransform) else {
 				fatalError("Could not scale QRCode")
 			}
-			guard let cgImg = CIContext().createCGImage(ciImage, from: ciImage.extent) else { fatalError("Could not generate QRCode image") }
-			let image =  Image(decorative: cgImg, scale: 1.0)
+			guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+				fatalError("Could not generate QRCode image")
+			}
+			let image = Image(decorative: cgImage, scale: 1.0)
 			DispatchQueue.main.async {
-				if value != self.value { return }
-				self.image = image
+				if value == self.value {
+					self.cgImage = cgImage
+					self.image = image
+				} else {
+					// Ignore: qrCode value has changed since we started image generation
+				}
 			}
 		}
 	}

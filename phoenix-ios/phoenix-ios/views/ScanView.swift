@@ -176,16 +176,16 @@ struct ReadyView: View {
 	func showWarning() -> Void {
 		
 		ignoreScanner = true
-		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
+		popoverState.display.send(PopoverItem(
+			
 			PopupAlert(
 				postIntent: mvi.intent,
 				paymentRequest: paymentRequest!,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
-			).anyView
-		)
+			).anyView,
+			dismissable: false
+		))
 	}
 }
 
@@ -539,10 +539,11 @@ struct ValidateView: View {
 	func showConnectionsPopover() -> Void {
 		log.trace("(ValidateView) showConnectionsPopover()")
 		
-		popoverState.dismissable.send(true)
-		popoverState.displayContent.send(
-			ConnectionsPopover().anyView
-		)
+		popoverState.display.send(PopoverItem(
+			
+			ConnectionsPopover().anyView,
+			dismissable: true
+		))
 	}
 }
 

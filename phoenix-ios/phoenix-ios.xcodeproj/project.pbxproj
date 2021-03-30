@@ -70,6 +70,7 @@
 		DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */; };
 		DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF7082566D0F00009B01E /* AppAccessView.swift */; };
 		DCACF70E256701870009B01E /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF70D256701870009B01E /* LockView.swift */; };
+		DCB04685260D162C007FDA37 /* ViewName.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB04684260D162C007FDA37 /* ViewName.swift */; };
 		DCB0DB8A255AE42F005B29C8 /* PhoenixShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; };
 		DCB0DBB1255AEE22005B29C8 /* PhoenixShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */; };
@@ -189,6 +190,7 @@
 		DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordConvertible.swift; sourceTree = "<group>"; };
 		DCACF7082566D0F00009B01E /* AppAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAccessView.swift; sourceTree = "<group>"; };
 		DCACF70D256701870009B01E /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
+		DCB04684260D162C007FDA37 /* ViewName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewName.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 				DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */,
 				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
 				DC72C33325A51AAC008A927A /* CurrencyPrefs.swift */,
+				DCB04684260D162C007FDA37 /* ViewName.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -757,6 +760,7 @@
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
 				DC09086325B626B300A46136 /* ConnectionsPopover.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
+				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				53BEFB1356C4F01D3F7A692F /* Toast.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,

@@ -213,10 +213,13 @@ fileprivate struct StandardWalletView : View {
 	func forceCloseChannels() -> Void {
 		log.debug("forceCloseChannels()")
 		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
-			ConfirmationPopover(confirmAction: confirmForceCloseChannels).anyView
-		)
+		popoverState.display.send(PopoverItem(
+		
+			ConfirmationPopover(
+				confirmAction: confirmForceCloseChannels
+			).anyView,
+			dismissable: false
+		))
 	}
 	
 	func confirmForceCloseChannels() -> Void {

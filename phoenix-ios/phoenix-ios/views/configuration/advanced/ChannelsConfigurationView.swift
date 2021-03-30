@@ -174,15 +174,15 @@ fileprivate struct ChannelRowView: View {
 	func showChannelInfoPopover() {
 		log.trace("showChannelInfoPopover()")
 		
-		popoverState.dismissable.send(true)
-		popoverState.displayContent.send(
+		popoverState.display.send(PopoverItem(
 			
 			ChannelInfoPopup(
 				channel: channel,
 				sharing: $sharing,
 				toast: toast
-			).anyView
-		)
+			).anyView,
+			dismissable: true
+		))
 	}
 }
 

@@ -11,43 +11,14 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-enum ReceiveViewSheet {
-	case sharing(url: String)
-	case editing(model: Receive.ModelGenerated)
-}
-
 struct ReceiveView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.receive() })
-
+	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@StateObject var qrCode = QRCode()
-
-	@State var unit: String = "sat"
-	@State var sheet: ReceiveViewSheet? = nil
-	
-	@State var pushPermissionRequestedFromOS = true
-	@State var bgAppRefreshDisabled = false
-	@State var notificationsDisabled = false
-	@State var alertsDisabled = false
-	@State var badgesDisabled = false
-	@State var showRequestPushPermissionPopupTimer: Timer? = nil
-	
-	@Environment(\.horizontalSizeClass) var horizontalSizeClass
-	@Environment(\.verticalSizeClass) var verticalSizeClass
-	@Environment(\.presentationMode) var mode: Binding<PresentationMode>
-	@Environment(\.popoverState) var popoverState: PopoverState
-	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
-	@StateObject var lastIncomingPayment = ObservableLastIncomingPayment()
 	@StateObject var toast = Toast()
-	
-	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
-		UIApplication.willEnterForegroundNotification
-	)
 	
 	@ViewBuilder
 	var view: some View {
@@ -59,10 +30,16 @@ struct ReceiveView: MVIView {
 					.resizable(resizingMode: .tile)
 			}
 			
-			if verticalSizeClass == UserInterfaceSizeClass.compact {
-				mainLandscape()
+			if mvi.model is Receive.ModelSwapIn {
+				
+				// Receive.ModelSwapInRequesting : Receive.ModelSwapIn
+				// Receive.ModelSwapInGenerated : Receive.ModelSwapIn
+				
+				SwapInView(mvi: mvi, toast: toast)
+				
 			} else {
-				mainPortrait()
+			
+				ReceiveLightningView(mvi: mvi, toast: toast)
 			}
 			
 			toast.view()
@@ -71,195 +48,23 @@ struct ReceiveView: MVIView {
 		.frame(maxHeight: .infinity)
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.onAppear {
-			onAppear()
-		}
-		.onDisappear {
-			onDisappear()
-		}
-		.onChange(of: mvi.model, perform: { model in
-			onModelChange(model: model)
-		})
-		.onChange(of: lastIncomingPayment.value) { (payment: Eclair_kmpWalletPayment?) in
-			lastIncomingPaymentChanged(payment)
-		}
-		.onReceive(willEnterForegroundPublisher, perform: { _ in
-			willEnterForeground()
-		})
-		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
-			get: { sheet != nil },
-			set: { if !$0 { sheet = nil }}
-		)) {
-			switch sheet! {
-			case .sharing(let sharingUrl):
-				let items: [Any] = [sharingUrl]
-				ActivityView(activityItems: items, applicationActivities: nil)
-
-			case .editing(let model):
-				ModifyInvoiceSheet(
-					mvi: mvi,
-					sheet: $sheet,
-                    initialAmount: model.amount,
-					desc: model.desc ?? ""
-				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-			}
-		}
-		.navigationBarTitle("Receive ", displayMode: .inline)
 	}
 	
-	@ViewBuilder
-	func mainPortrait() -> some View {
+	/// Shared logic. Used by:
+	/// - ReceiveLightningView
+	/// - SwapInView
+	///
+	static func qrCodeBorderColor(_ colorScheme: ColorScheme) -> Color {
 		
-		let model = mvi.model
-		VStack {
-			qrCodeView(model)
-				.frame(width: 200, height: 200)
-				.padding()
-				.background(Color.white)
-				.cornerRadius(20)
-				.overlay(
-					RoundedRectangle(cornerRadius: 20)
-						.stroke(Color.appHorizon, lineWidth: 1)
-				)
-				.padding()
-			
-			VStack(alignment: .center) {
-			
-				Text(invoiceAmount(model))
-					.font(.caption2)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 2)
-			
-				Text(invoiceDescription(model))
-					.lineLimit(1)
-					.font(.caption2)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 2)
-			}
-			.padding([.leading, .trailing], 20)
-
-			HStack {
-				actionButton(
-					image: Image(systemName: "square.on.square"),
-					width: 20, height: 20,
-					xOffset: 0, yOffset: 0
-				) {
-					didTapCopyButton(model)
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-				
-				actionButton(
-					image: Image(systemName: "square.and.arrow.up"),
-					width: 21, height: 21,
-					xOffset: 0, yOffset: -1
-				) {
-					didTapShareButton(model)
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-				
-				actionButton(
-					image: Image(systemName: "square.and.pencil"),
-					width: 19, height: 19,
-					xOffset: 1, yOffset: -1
-				) {
-					didTapEditButton()
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-			}
-			
-			warningButton()
-			
-			Spacer()
-			
-		} // </VStack>
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
+		return (colorScheme == .dark) ? Color(UIColor.separator) : Color.appHorizon
 	}
 	
+	/// Shared button builder. Used by:
+	/// - ReceiveLightningView
+	/// - SwapInView
+	///
 	@ViewBuilder
-	func mainLandscape() -> some View {
-		
-		let model = mvi.model
-		HStack {
-			
-			qrCodeView(model)
-				.frame(width: 200, height: 200)
-				.padding(.all, 20)
-				.background(Color.white)
-				.cornerRadius(20)
-				.overlay(
-					RoundedRectangle(cornerRadius: 20)
-						.strokeBorder(Color.appHorizon, lineWidth: 1)
-				)
-				.padding([.top, .bottom])
-			
-			VStack {
-				
-				actionButton(image: Image(systemName: "square.on.square")) {
-					didTapCopyButton(model)
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-				
-				actionButton(image: Image(systemName: "square.and.arrow.up")) {
-					didTapShareButton(model)
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-				
-				actionButton(image: Image(systemName: "square.and.pencil")) {
-					didTapEditButton()
-				}
-				.disabled(!(model is Receive.ModelGenerated))
-			}
-			
-			VStack(alignment: .center) {
-			
-				Spacer()
-				
-				Text(invoiceAmount(model))
-					.font(.caption2)
-					.foregroundColor(.secondary)
-					.padding(.bottom, 6)
-			
-				Text(invoiceDescription(model))
-					.lineLimit(1)
-					.font(.caption2)
-					.foregroundColor(.secondary)
-				
-				warningButton()
-				
-				Spacer()
-			}
-			.frame(width: 240) // match width of QRcode box
-			.padding([.top, .bottom])
-			
-		} // </HStack>
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
-	}
-	
-	@ViewBuilder
-	func qrCodeView(_ model: Receive.Model) -> some View {
-		
-		if let m = model as? Receive.ModelGenerated,
-		   qrCode.value == m.request,
-		   let image = qrCode.image
-		{
-			image.resizable()
-		} else {
-			VStack {
-				// Remember: This view is on a white background. Even in dark mode.
-				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.appHorizon))
-					.padding(.bottom, 10)
-			
-				Text("Generating QRCode...")
-					.foregroundColor(Color(UIColor.darkGray))
-					.font(.caption)
-			}
-		}
-	}
-
-	@ViewBuilder
-	func actionButton(
+	static func actionButton(
 		image: Image,
 		width: CGFloat = 20,
 		height: CGFloat = 20,
@@ -286,29 +91,320 @@ struct ReceiveView: MVIView {
 					.offset(x: xOffset, y: yOffset)
 			}
 		}
-		.padding()
+	}
+	
+	/// Shared logic
+	@ViewBuilder
+	static func copyButton(action: @escaping () -> Void) -> some View {
+		
+		ReceiveView.actionButton(
+			image: Image(systemName: "square.on.square"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0,
+			action: action
+		)
+	}
+	
+	/// Shared logic
+	@ViewBuilder
+	static func shareButton(action: @escaping () -> Void) -> some View {
+		
+		ReceiveView.actionButton(
+			image: Image(systemName: "square.and.arrow.up"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: -1,
+			action: action
+		)
+	}
+}
+
+struct ReceiveLightningView: View, ViewName {
+	
+	enum ReceiveViewSheet {
+		case sharingUrl(url: String)
+		case sharingImg(img: UIImage)
+		case editing(model: Receive.ModelGenerated)
+	}
+	
+	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
+	@ObservedObject var toast: Toast
+	
+	@StateObject var qrCode = QRCode()
+
+	@State var unit: String = "sat"
+	@State var sheet: ReceiveViewSheet? = nil
+	
+	@State var pushPermissionRequestedFromOS = true
+	@State var bgAppRefreshDisabled = false
+	@State var notificationsDisabled = false
+	@State var alertsDisabled = false
+	@State var badgesDisabled = false
+	@State var showRequestPushPermissionPopupTimer: Timer? = nil
+	
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	@StateObject var lastIncomingPayment = ObservableLastIncomingPayment()
+	
+	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
+		UIApplication.willEnterForegroundNotification
+	)
+	
+	@ViewBuilder
+	var body: some View {
+		
+		Group {
+			
+			if verticalSizeClass == UserInterfaceSizeClass.compact {
+				mainLandscape()
+			} else {
+				mainPortrait()
+			}
+			
+		} // </Group>
+		.onAppear {
+			onAppear()
+		}
+		.onDisappear {
+			onDisappear()
+		}
+		.onChange(of: mvi.model, perform: { newModel in
+			onModelChange(model: newModel)
+		})
+		.onChange(of: lastIncomingPayment.value) { (payment: Eclair_kmpWalletPayment?) in
+			lastIncomingPaymentChanged(payment)
+		}
+		.onReceive(willEnterForegroundPublisher, perform: { _ in
+			willEnterForeground()
+		})
+		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
+			get: { sheet != nil },
+			set: { if !$0 { sheet = nil }}
+		)) {
+			switch sheet! {
+			case .sharingUrl(let sharingUrl):
+				
+				let items: [Any] = [sharingUrl]
+				ActivityView(activityItems: items, applicationActivities: nil)
+			
+			case .sharingImg(let sharingImg):
+				
+				let items: [Any] = [sharingImg]
+				ActivityView(activityItems: items, applicationActivities: nil)
+			
+			case .editing(let model):
+				
+				ModifyInvoiceSheet(
+					mvi: mvi,
+					dismissSheet: { sheet = nil },
+					initialAmount: model.amount,
+					desc: model.desc ?? ""
+				)
+				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+			
+			} // </switch>
+		}
+		.navigationBarTitle("Receive", displayMode: .inline)
 	}
 	
 	@ViewBuilder
-	func warningButton() -> some View {
+	func mainPortrait() -> some View {
 		
-		// There are warnings we may want to display:
-		//
-		// 1. The user has disabled Background App Refresh.
-		//    In this case, we won't be able to receive payments
-		//    while the app is in the background.
-		//
-		// 2. When we first prompted them to enable push notifications,
-		//    the user said "no". Thus we have never tried to enable push notifications.
-		//
-		// 3. The user has totally disabled notifications for our app.
-		//    So if a payment is received while the app is in the background,
-		//    we won't be able to notify them (in any way, shape or form).
-		//
-		// 4. Similarly to above, the user didn't totally disable notifications,
-		//    but they effectively did. Because they disabled all alerts & badges.
+		VStack {
+			qrCodeView()
+				.frame(width: 200, height: 200)
+				.padding()
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.strokeBorder(
+							ReceiveView.qrCodeBorderColor(colorScheme),
+							lineWidth: 1
+						)
+				)
+				.padding([.top, .bottom])
+			
+			VStack(alignment: .center) {
+			
+				Text(invoiceAmount())
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 2)
+			
+				Text(invoiceDescription())
+					.lineLimit(1)
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 2)
+			}
+			.padding([.leading, .trailing], 20)
+			.padding(.bottom)
+
+			HStack(alignment: VerticalAlignment.center, spacing: 30) {
+				copyButton()
+				shareButton()
+				editButton()
+			}
+			
+			warningButton(paddingTop: 8)
+			
+			Button {
+				didTapSwapInButton()
+			} label: {
+				HStack {
+					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
+						.imageScale(.small)
+
+					Text("Show a Bitcoin address")
+				}
+			}
+			.padding(.top)
+			
+			Spacer()
+			
+		} // </VStack>
+		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
+	}
+	
+	@ViewBuilder
+	func mainLandscape() -> some View {
+		
+		HStack {
+			
+			qrCodeView()
+				.frame(width: 200, height: 200)
+				.padding(.all, 20)
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.strokeBorder(
+							ReceiveView.qrCodeBorderColor(colorScheme),
+							lineWidth: 1
+						)
+				)
+				.padding([.top, .bottom])
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 20) {
+				copyButton()
+				shareButton()
+				editButton()
+			}
+			.padding()
+			
+			VStack(alignment: HorizontalAlignment.center) {
+			
+				Spacer()
+				
+				Text(invoiceAmount())
+					.font(.caption2)
+					.foregroundColor(.secondary)
+					.padding(.bottom, 6)
+			
+				Text(invoiceDescription())
+					.lineLimit(1)
+					.font(.caption2)
+					.foregroundColor(.secondary)
+				
+				warningButton(paddingTop: 8)
+				
+				Spacer()
+			}
+			.frame(width: 240) // match width of QRcode box
+			.padding([.top, .bottom])
+			
+		} // </HStack>
+		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
+	}
+	
+	@ViewBuilder
+	func qrCodeView() -> some View {
+		
+		if let m = mvi.model as? Receive.ModelGenerated,
+		   qrCode.value == m.request,
+			let qrCodeCgImage = qrCode.cgImage,
+		   let qrCodeImage = qrCode.image
+		{
+			qrCodeImage
+				.resizable()
+				.contextMenu {
+					Button(action: {
+						let uiImg = UIImage(cgImage: qrCodeCgImage)
+						UIPasteboard.general.image = uiImg
+						toast.toast(text: "Copied QR code image to pasteboard!")
+					}) {
+						Text("Copy")
+					}
+					Button(action: {
+						let uiImg = UIImage(cgImage: qrCodeCgImage)
+						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+					}) {
+						Text("Share")
+					}
+				}
+			
+		} else {
+			VStack {
+				// Remember: This view is on a white background. Even in dark mode.
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appHorizon))
+					.padding(.bottom, 10)
+			
+				Text("Generating QRCode...")
+					.foregroundColor(Color(UIColor.darkGray))
+					.font(.caption)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func copyButton() -> some View {
+		
+		ReceiveView.copyButton {
+			didTapCopyButton()
+		}
+		.disabled(!(mvi.model is Receive.ModelGenerated))
+	}
+	
+	@ViewBuilder
+	func shareButton() -> some View {
+		
+		ReceiveView.shareButton {
+			didTapShareButton()
+		}
+		.disabled(!(mvi.model is Receive.ModelGenerated))
+	}
+	
+	@ViewBuilder
+	func editButton() -> some View {
+		
+		ReceiveView.actionButton(
+			image: Image(systemName: "square.and.pencil"),
+			width: 19, height: 19,
+			xOffset: 1, yOffset: -1
+		) {
+			didTapEditButton()
+		}
+		.disabled(!(mvi.model is Receive.ModelGenerated))
+	}
+	
+	@ViewBuilder
+	func warningButton(paddingTop: CGFloat) -> some View {
+		
+		// There are several warnings we may want to display.
 		
 		if bgAppRefreshDisabled {
+			
+			// The user has disabled Background App Refresh.
+			// In this case, we won't be able to receive payments
+		 	// while the app is in the background.
+			
 			Button {
 				showBgAppRefreshDisabledWarning()
 			} label: {
@@ -319,9 +415,14 @@ struct ReceiveView: MVIView {
 					.foregroundColor(Color.appRed)
 					.frame(width: 32, height: 32)
 			}
-			.padding(.top, 2)
+			.padding(.top, paddingTop)
 		}
 		else if !pushPermissionRequestedFromOS {
+			
+			// When we first prompted them to enable push notifications,
+			// the user said "no". Or they otherwise dismissed the popover window.
+			// Thus we have never tried to enable push notifications.
+			
 			Button {
 				showRequestPushPermissionPopup()
 			} label: {
@@ -331,9 +432,17 @@ struct ReceiveView: MVIView {
 					.aspectRatio(contentMode: .fit)
 					.frame(width: 32, height: 32)
 			}
-			.padding(.top, 2)
+			.padding(.top, paddingTop)
 		}
 		else if notificationsDisabled || (alertsDisabled && badgesDisabled) {
+			
+			// The user has totally disabled notifications for our app.
+			// So if a payment is received while the app is in the background,
+		 	// we won't be able to notify them (in any way, shape or form).
+		 	//
+		 	// Or the user didn't totally disable notifications,
+		 	// but they effectively did. Because they disabled all alerts & badges.
+			
 			Button {
 				showNotificationsDisabledWarning()
 			} label: {
@@ -344,13 +453,13 @@ struct ReceiveView: MVIView {
 					.foregroundColor(Color.appYellow)
 					.frame(width: 32, height: 32)
 			}
-			.padding(.top, 2)
+			.padding(.top, paddingTop)
 		}
 	}
 	
-	func invoiceAmount(_ model: Receive.Model) -> String {
+	func invoiceAmount() -> String {
 		
-		if let m = model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.ModelGenerated {
 			if let msat = m.amount?.msat {
 				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
 				
@@ -371,9 +480,9 @@ struct ReceiveView: MVIView {
 		}
 	}
 	
-	func invoiceDescription(_ model: Receive.Model) -> String {
+	func invoiceDescription() -> String {
 		
-		if let m = model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.ModelGenerated {
 			if let desc = m.desc, desc.count > 0 {
 				return desc
 			} else {
@@ -387,7 +496,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func onAppear() -> Void {
-		log.trace("onAppear()")
+		log.trace("[\(viewName)] onAppear()")
 		
 		mvi.intent(Receive.IntentAsk(amount: nil, desc: nil))
 		
@@ -412,20 +521,22 @@ struct ReceiveView: MVIView {
 	}
 	
 	func onDisappear() -> Void {
-		log.trace("onDisappear()")
+		log.trace("[\(viewName)] onDisappear()")
 		
 		showRequestPushPermissionPopupTimer?.invalidate()
 	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
+		log.trace("[\(viewName)] onModelChange()")
 		
 		if let m = model as? Receive.ModelGenerated {
+			log.debug("[\(viewName)] updating qr code...")
 			qrCode.generate(value: m.request)
 		}
 	}
 	
 	func willEnterForeground() -> Void {
-		log.trace("willEnterForeground()")
+		log.trace("[\(viewName)] willEnterForeground()")
 		
 		let query = Prefs.shared.pushPermissionQuery
 		if query != .neverAskedUser {
@@ -435,7 +546,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func requestPushPermission() -> Void {
-		log.trace("requestPushPermission()")
+		log.trace("[\(viewName)] requestPushPermission()")
 		
 		AppDelegate.get().requestPermissionForLocalNotifications { (granted: Bool) in
 			
@@ -449,7 +560,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func checkPushPermissions() -> Void {
-		log.trace("checkPushPermission()")
+		log.trace("[\(viewName)] checkPushPermission()")
 		assert(Thread.isMainThread, "invoked from non-main thread")
 		
 		let query = Prefs.shared.pushPermissionQuery
@@ -500,25 +611,27 @@ struct ReceiveView: MVIView {
 	}
 	
 	func showBgAppRefreshDisabledWarning() -> Void {
-		log.trace("showBgAppRefreshDisabledWarning()")
+		log.trace("[\(viewName)] showBgAppRefreshDisabledWarning()")
 		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
-			BgAppRefreshDisabledWarning().anyView
-		)
+		popoverState.display.send(PopoverItem(
+			
+			BgAppRefreshDisabledWarning().anyView,
+			dismissable: false
+		))
 	}
 	
 	func showNotificationsDisabledWarning() -> Void {
-		log.trace("showNotificationsDisabledWarning()")
+		log.trace("[\(viewName)] showNotificationsDisabledWarning()")
 		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
-			NotificationsDisabledWarning().anyView
-		)
+		popoverState.display.send(PopoverItem(
+			
+			NotificationsDisabledWarning().anyView,
+			dismissable: false
+		))
 	}
 	
 	func showRequestPushPermissionPopup() -> Void {
-		log.trace("showRequestPushPermissionPopup()")
+		log.trace("[\(viewName)] showRequestPushPermissionPopup()")
 		
 		let callback = {(response: PushPermissionPopupResponse) -> Void in
 			
@@ -539,34 +652,35 @@ struct ReceiveView: MVIView {
 			}
 		}
 		
-		popoverState.dismissable.send(true)
-		popoverState.displayContent.send(
-			RequestPushPermissionPopup(callback: callback).anyView
-		)
+		popoverState.display.send(PopoverItem(
+		
+			RequestPushPermissionPopup(callback: callback).anyView,
+			dismissable: true
+		))
 	}
 	
-	func didTapCopyButton(_ model: Receive.Model) -> Void {
-		log.trace("didTapCopyButton()")
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
 		
-		if let m = model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.ModelGenerated {
 			UIPasteboard.general.string = m.request
-			toast.toast(text: "Copied in pasteboard!")
+			toast.toast(text: "Copied to pasteboard!")
 		}
 	}
 	
-	func didTapShareButton(_ model: Receive.Model) -> Void {
-		log.trace("didTapShareButton()")
+	func didTapShareButton() -> Void {
+		log.trace("[\(viewName)] didTapShareButton()")
 		
-		if let m = model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.ModelGenerated {
 			withAnimation {
 				let url = "lightning:\(m.request)"
-				sheet = ReceiveViewSheet.sharing(url: url)
+				sheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
 		}
 	}
 	
 	func didTapEditButton() -> Void {
-		log.trace("didTapEditButton()")
+		log.trace("[\(viewName)] didTapEditButton()")
 		
 		if let model = mvi.model as? Receive.ModelGenerated {
 			withAnimation {
@@ -576,7 +690,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func lastIncomingPaymentChanged(_ payment: Eclair_kmpWalletPayment?) {
-		log.trace("lastIncomingPaymentChanged()")
+		log.trace("[\(viewName)] lastIncomingPaymentChanged()")
 		
 		guard
 			let model = mvi.model as? Receive.ModelGenerated,
@@ -588,16 +702,32 @@ struct ReceiveView: MVIView {
 		if lastIncomingPayment.state() == WalletPaymentState.success {
 			
 			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
-				self.mode.wrappedValue.dismiss()
+				presentationMode.wrappedValue.dismiss()
 			}
 		}
 	}
+	
+	func didTapSwapInButton() -> Void {
+		log.trace("[\(viewName)] didTapSwapInButton()")
+		
+		let didAcceptFeesCallback = {() -> Void in
+			
+			log.debug("SwapInFeePopup: didAcceptFeesCallback")
+			mvi.intent(Receive.IntentRequestSwapIn())
+		}
+		
+		popoverState.display.send(PopoverItem(
+		
+			SwapInFeePopup(didAcceptFeesCallback: didAcceptFeesCallback).anyView,
+			dismissable: false
+		))
+	}
 }
 
-struct ModifyInvoiceSheet: View {
+struct ModifyInvoiceSheet: View, ViewName {
 
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
-	@Binding var sheet: ReceiveViewSheet?
+	let dismissSheet: () -> Void
 
 	let initialAmount: Eclair_kmpMilliSatoshi?
 	
@@ -671,8 +801,7 @@ struct ModifyInvoiceSheet: View {
 			HStack {
 				Spacer()
 				Button("Save") {
-					saveChanges()
-					withAnimation { sheet = nil }
+					didTapSaveButton()
 				}
 				.font(.title2)
 				.disabled(isInvalidAmount && !isEmptyAmount)
@@ -694,7 +823,7 @@ struct ModifyInvoiceSheet: View {
 	} // </body>
 	
 	func onAppear() -> Void {
-		log.trace("(ModifyInvoiceSheet) onAppear()")
+		log.trace("[\(viewName)] onAppear()")
 		
         let msat: Int64? = initialAmount?.msat
 		
@@ -735,13 +864,13 @@ struct ModifyInvoiceSheet: View {
 	}
 	
 	func amountDidChange() -> Void {
-		log.trace("(ModifyInvoiceSheet) amountDidChange()")
+		log.trace("[\(viewName)] amountDidChange()")
 		
 		refreshAltAmount()
 	}
 	
 	func unitDidChange() -> Void {
-		log.trace("(ModifyInvoiceSheet) unitDidChange()")
+		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
 		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
@@ -752,7 +881,7 @@ struct ModifyInvoiceSheet: View {
 	}
 	
 	func refreshAltAmount() -> Void {
-		log.trace("(ModifyInvoiceSheet) refreshAltAmount()")
+		log.trace("[\(viewName)] refreshAltAmount()")
 		
 		switch parsedAmount {
 		case .failure(let error):
@@ -802,25 +931,28 @@ struct ModifyInvoiceSheet: View {
 		}
 	}
 	
-	func saveChanges() -> Void {
-		log.trace("(ModifyInvoiceSheet) saveChanges()")
+	func didTapSaveButton() -> Void {
+		log.trace("[\(viewName)] didTapSaveButton()")
+		
+		let trimmedDesc = desc.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
 		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
 			if let bitcoinUnit = unit.bitcoinUnit {
-                let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
+				
+				let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
 				mvi.intent(Receive.IntentAsk(
 					amount: msat,
-					desc: desc
+					desc: trimmedDesc
 				))
 				
 			} else if let fiatCurrency = unit.fiatCurrency,
-					  let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+			          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 			{
-                let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
+				let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
 				mvi.intent(Receive.IntentAsk(
 					amount: msat,
-					desc: desc
+					desc: trimmedDesc
 				))
 			}
 			
@@ -828,9 +960,11 @@ struct ModifyInvoiceSheet: View {
 			
 			mvi.intent(Receive.IntentAsk(
 				amount: nil,
-				desc: desc
+				desc: trimmedDesc
 			))
 		}
+		
+		dismissSheet()
 	}
 	
 } // </ModifyInvoiceSheet>
@@ -854,7 +988,7 @@ struct BgAppRefreshDisabledWarning: View {
 					.padding(.bottom, 4)
 				
 				Text(
-					"This means you will not be able to receive payments when Phoenix is in the background.  To receive payments, Phoenix must be open and in the foreground."
+					"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground."
 				)
 				.lineLimit(nil)
 				.minimumScaleFactor(0.5) // problems with "foreground" being truncated
@@ -952,7 +1086,6 @@ struct RequestPushPermissionPopup: View {
 	let callback: (PushPermissionPopupResponse) -> Void
 	
 	@State private var userIsIgnoringPopover: Bool = true
-	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	
 	var body: some View {
@@ -1010,50 +1143,258 @@ struct RequestPushPermissionPopup: View {
 	}
 }
 
-struct FeePromptPopup : View {
+struct SwapInFeePopup : View {
 	
-	@Binding var show: Bool
-	let postIntent: (Receive.Intent) -> Void
+	let didAcceptFeesCallback: () -> Void
+	
+	@Environment(\.popoverState) private var popoverState: PopoverState
 	
 	var body: some View {
 		VStack(alignment: .leading) {
 			
 			Text("Receive with a Bitcoin address")
-				.font(.system(.title3, design: .serif))
+				.font(.headline)
 				.lineLimit(nil)
 				.padding(.bottom, 20)
 			
-			VStack(alignment: .leading, spacing: 14) {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
 			
-				Text("A standard Bitcoin address will be displayed next.")
-					
-				Text("Funds sent to this address will be shown on your wallet after one confirmation.")
+				Text("A standard Bitcoin address will be displayed next.") +
+				Text(" Funds sent to this address will arrive in your wallet after one confirmation.")
 				
-				Text("There is a small fee: ") +
-				Text("0.10%").bold() +
-				Text("\nFor example, to receive $100, the fee is 10 cents.")
+				let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
+				Group {
+					Text("There is a small fee of ") +
+					Text("0.10%").bold() +
+					Text(" with a minimum fee of ") +
+					Text(min.string).bold() + Text(".")
+				}
+				
+				Text("For example, if you send $750, the fee is $0.75.")
 			}
+			.font(.callout)
 			
 			HStack {
 				Spacer()
 				Button("Cancel") {
-					withAnimation { show = false }
+					didCancel()
 				}
-				.font(.title3)
 				.padding(.trailing, 8)
 				
 				Button("Proceed") {
-					withAnimation { show = false }
+					didAccept()
 				}
-				.font(.title3)
 			}
+			.font(.headline)
 			.padding(.top, 20)
 			
 		} // </VStack>
 		.padding()
 	}
 	
-} // </FeePromptPopup>
+	func didCancel() -> Void {
+		log.trace("[SwapInFeePopup] didCancel()")
+		
+		popoverState.close.send()
+	}
+	
+	func didAccept() -> Void {
+		log.trace("[SwapInFeePopup] didAccept()")
+		
+		didAcceptFeesCallback()
+		popoverState.close.send()
+	}
+}
+
+
+struct SwapInView: View, ViewName {
+	
+	enum ReceiveViewSheet {
+		case sharingUrl(url: String)
+		case sharingImg(img: UIImage)
+	}
+	
+	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
+	@ObservedObject var toast: Toast
+	
+	@StateObject var qrCode = QRCode()
+	
+	@State var sheet: ReceiveViewSheet? = nil
+	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack {
+			
+			qrCodeView()
+				.frame(width: 200, height: 200)
+				.padding(.all, 20)
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.strokeBorder(
+							ReceiveView.qrCodeBorderColor(colorScheme),
+							lineWidth: 1
+						)
+				)
+				.padding([.top, .bottom])
+			
+			HStack(alignment: VerticalAlignment.top, spacing: 8) {
+				
+				Text("Address")
+					.foregroundColor(.secondary)
+				
+				if let btcAddr = bitcoinAddress() {
+					
+					Text(btcAddr)
+						.contextMenu {
+							Button(action: {
+								UIPasteboard.general.string = btcAddr
+								toast.toast(text: "Copied to pasteboard!")
+							}) {
+								Text("Copy")
+							}
+						}
+				} else {
+					Text("…")
+				}
+			}
+			.padding([.leading, .trailing], 40)
+			.padding(.bottom)
+			
+			let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
+			Group {
+				Text("Deposit must be at least ") + Text(min.string).bold()
+			}
+			.font(.subheadline)
+			.padding(.bottom)
+			
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 30) {
+				
+				ReceiveView.copyButton {
+					didTapCopyButton()
+				}
+				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				
+				ReceiveView.shareButton {
+					didTapShareButton()
+				}
+				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				
+			} // </HStack>
+			
+			Spacer()
+			
+		} // </VStack>
+		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
+			get: { sheet != nil },
+			set: { if !$0 { sheet = nil }}
+		)) {
+			switch sheet! {
+			case .sharingUrl(let sharingUrl):
+
+				let items: [Any] = [sharingUrl]
+				ActivityView(activityItems: items, applicationActivities: nil)
+			
+			case .sharingImg(let sharingImg):
+
+				let items: [Any] = [sharingImg]
+				ActivityView(activityItems: items, applicationActivities: nil)
+				
+			} // </switch>
+		}
+		.navigationBarTitle("Swap In", displayMode: .inline)
+		.onChange(of: mvi.model, perform: { newModel in
+			onModelChange(model: newModel)
+		})
+	}
+	
+	@ViewBuilder
+	func qrCodeView() -> some View {
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+			qrCode.value == m.address,
+			let qrCodeCgImage = qrCode.cgImage,
+			let qrCodeImage = qrCode.image
+		{
+			qrCodeImage
+				.resizable()
+				.contextMenu {
+					Button(action: {
+						let uiImg = UIImage(cgImage: qrCodeCgImage)
+						UIPasteboard.general.image = uiImg
+						toast.toast(text: "Copied QR code image to pasteboard!")
+					}) {
+						Text("Copy")
+					}
+					Button(action: {
+						let uiImg = UIImage(cgImage: qrCodeCgImage)
+						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+					}) {
+						Text("Share")
+					}
+				}
+			
+		} else {
+			VStack {
+				// Remember: This view is on a white background. Even in dark mode.
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appHorizon))
+					.padding(.bottom, 10)
+			
+				Group {
+					if mvi.model is Receive.ModelSwapInRequesting {
+						Text("Requesting Swap-In Address...")
+					} else {
+						Text("Generating QRCode...")
+					}
+				}
+				.foregroundColor(Color(UIColor.darkGray))
+				.font(.caption)
+			}
+		}
+	}
+	
+	func bitcoinAddress() -> String? {
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+			return m.address
+		} else {
+			return nil
+		}
+	}
+	
+	func onModelChange(model: Receive.Model) -> Void {
+		log.trace("[\(viewName)] onModelChange()")
+		
+		if let m = model as? Receive.ModelSwapInGenerated {
+			log.debug("[\(viewName)] updating qr code...")
+			qrCode.generate(value: m.address)
+		}
+	}
+	
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+			UIPasteboard.general.string = m.address
+			toast.toast(text: "Copied to pasteboard!")
+		}
+	}
+	
+	func didTapShareButton() -> Void {
+		log.trace("[\(viewName)] didTapShareButton()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+			let url = "bitcoin:\(m.address)"
+			sheet = ReceiveViewSheet.sharingUrl(url: url)
+		}
+	}
+}
 
 // MARK:-
 

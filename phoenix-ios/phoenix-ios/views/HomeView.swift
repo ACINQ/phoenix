@@ -51,7 +51,7 @@ struct HomeView : MVIView {
 					.resizable(resizingMode: .tile)
 			}
 			
-			VStack {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 				
 				// === Top-row buttons ===
 				HStack {
@@ -62,19 +62,49 @@ struct HomeView : MVIView {
 				.padding()
 
 				// === Total Balance ====
-				HStack(alignment: .bottom) {
+				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+					HStack(alignment: VerticalAlignment.bottom) {
+						
+						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
+						Text(amount.digits)
+							.font(.largeTitle)
+							.onTapGesture { toggleCurrencyType() }
+						
+						Text(amount.type)
+							.font(.title2)
+							.padding(.bottom, 4)
+							.onTapGesture { toggleCurrencyType() }
+						
+					} // </HStack>
 					
-					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
-					Text(amount.digits)
-						.font(.largeTitle)
-						.onTapGesture { toggleCurrencyType() }
-					
-					Text(amount.type)
-						.font(.title2)
-						.padding(.bottom, 4)
-						.onTapGesture { toggleCurrencyType() }
-					
-				} // </HStack>
+					if let incoming = incomingAmount() {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							
+							Image(systemName: "link")
+								.padding(.trailing, 2)
+							
+							Text("+\(incoming.string) incoming".lowercased())
+								.onTapGesture { toggleCurrencyType() }
+						}
+						.font(.callout)
+						.foregroundColor(.secondary)
+						.padding(.top, 7)
+						.padding(.bottom, 2)
+					}
+				}
+				.padding([.top, .leading, .trailing])
+				.padding(.bottom, 25)
+				.background(
+					VStack {
+						Spacer()
+						Line()
+							.stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+							.frame(height: 4)
+					}
+				)
+				.padding(.bottom)
 
 				// === Payments List ====
 				ScrollView {
@@ -112,6 +142,14 @@ struct HomeView : MVIView {
 	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
+	}
+	
+	func incomingAmount() -> FormattedAmount? {
+		
+		if let incomingMsat = mvi.model.incomingBalance, incomingMsat.toLong() > 0 {
+			return Utils.format(currencyPrefs, msat: incomingMsat)
+		}
+		return nil
 	}
 }
 
@@ -228,10 +266,11 @@ struct ConnectionStatusButton : View {
 	func showConnectionsPopover() -> Void {
 		log.trace("(ConnectionStatusButton) showConnectionsPopover()")
 		
-		popoverState.dismissable.send(true)
-		popoverState.displayContent.send(
-			ConnectionsPopover().anyView
-		)
+		popoverState.display.send(PopoverItem(
+		
+			ConnectionsPopover().anyView,
+			dismissable: true
+		))
 	}
 }
 

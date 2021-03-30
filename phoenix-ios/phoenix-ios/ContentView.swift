@@ -41,7 +41,7 @@ struct ContentView: MVIView {
 	@State private var enabledSecurity = EnabledSecurity()
 	
 	@Environment(\.popoverState) private var popoverState: PopoverState
-	@State private var popoverContent: AnyView? = nil
+	@State private var popoverItem: PopoverItem? = nil
 
 	let didEnterBackgroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.didEnterBackgroundNotification
@@ -61,9 +61,9 @@ struct ContentView: MVIView {
 							unlockedOnce = true
 						}
 
-					if let popoverContent = popoverContent {
-						PopoverWrapper {
-							popoverContent
+					if let popoverItem = popoverItem {
+						PopoverWrapper(dismissable: popoverItem.dismissable) {
+							popoverItem.view
 						}
 						.zIndex(1) // needed for proper animation
 					}
@@ -97,15 +97,14 @@ struct ContentView: MVIView {
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
 			onDidEnterBackground()
 		})
-		.onReceive(popoverState.displayContent) {
-			let newPopoverContent = $0
+		.onReceive(popoverState.display) { (newPopoverItem: PopoverItem) in
 			withAnimation {
-				popoverContent = newPopoverContent
+				popoverItem = newPopoverItem
 			}
 		}
 		.onReceive(popoverState.close) { _ in
 			withAnimation {
-				popoverContent = nil
+				popoverItem = nil
 			}
 		}
 	}
@@ -271,10 +270,11 @@ struct ContentView: MVIView {
 		// Which means their existing channels are going to get force closed by the server.
 		// So we need to inform the user about what just happened.
 		
-		popoverState.dismissable.send(false)
-		popoverState.displayContent.send(
-			PardonOurMess().anyView
-		)
+		popoverState.display.send(PopoverItem(
+			
+			PardonOurMess().anyView,
+			dismissable: false
+		))
 	}
 
 	private func onDidEnterBackground() -> Void {

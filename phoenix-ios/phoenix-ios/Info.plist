@@ -23,7 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs to use the camera to scan payment requests.</string>
+	<string>Phoenix would like to use the camera to scan payment requests.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Phoenix would like to save a QR code image to the photo library.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Logging in with Face ID.</string>
 	<key>UIApplicationSceneManifest</key>
