@@ -107,10 +107,10 @@ struct InitializationView: MVIView {
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.offset(x: 0, y: -40) // move center upwards; focus is buttons, not logo
 			.edgesIgnoringSafeArea(.all)
-			.navigationBarTitle("", displayMode: .inline)
-			.navigationBarHidden(true)
 				
 		} // </ZStack>
+		.navigationBarTitle("", displayMode: .inline)
+		.navigationBarHidden(true)
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
 		})

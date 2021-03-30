@@ -118,7 +118,7 @@ struct ContentView: MVIView {
 			if mvi.model is Content.ModelIsInitialized {
 				HomeView()
 			} else if mvi.model is Content.ModelNeedInitialization {
-				InitializationView()
+				IntroContainer()
 			} else {
 				loadingView()
 			}
