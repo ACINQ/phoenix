@@ -1,5 +1,6 @@
 import SwiftUI
 import PhoenixShared
+import DYPopoverView
 import os.log
 
 #if DEBUG && false
@@ -11,13 +12,20 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
+
+
 struct PaymentView : View {
 
 	let payment: PhoenixShared.Eclair_kmpWalletPayment
 	let close: () -> Void
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-
+	
+	@State var explainFeesText: String = ""
+	@State var explainFeesPopoverVisible = false
+	@State var explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: 200, height:500)
+	
 	var body: some View {
 		
 		ZStack {
@@ -39,7 +47,31 @@ struct PaymentView : View {
 				}
 				Spacer()
 			}
+			
+			if explainFeesPopoverVisible {
+				Color.clear
+					.contentShape(Rectangle()) // required: https://stackoverflow.com/a/60151771/43522
+					.onTapGesture {
+						explainFeesPopoverVisible = false
+					}
+			}
 		}
+		.popoverView(
+			content: { ExplainFeesPopover(explanationText: $explainFeesText) },
+			background: { Color(.secondarySystemBackground) },
+			isPresented: $explainFeesPopoverVisible,
+			frame: $explainFeesPopoverFrame,
+			anchorFrame: nil,
+			popoverType: .popover,
+			position: .top,
+			viewId: explainFeesButtonViewId
+		)
+		.onPreferenceChange(ExplainFeesPopoverHeight.self) {
+			if let height = $0 {
+				explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: explainFeesPopoverFrame.width, height: height)
+			}
+		}
+		.onAppear { onAppear() }
 	}
 	
 	@ViewBuilder
@@ -65,7 +97,8 @@ struct PaymentView : View {
 				.padding()
 				
 			case .pending:
-				Image("ic_send")
+			//	Image("ic_send") // image is blurry for some reason
+				Image(systemName: "paperplane")
 					.renderingMode(.template)
 					.resizable()
 					.foregroundColor(Color(UIColor.systemGray))
@@ -122,12 +155,48 @@ struct PaymentView : View {
 			)
 			.padding(.bottom, 4)
 			
-			InfoGrid(payment: payment)
+			InfoGrid(
+				payment: payment,
+				explainFeesPopoverVisible: $explainFeesPopoverVisible
+			)
 		}
 	}
 	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
+	}
+	
+	func explainFeesPopoverText() -> String {
+		
+		let feesInfo = payment.paymentFees(currencyPrefs: currencyPrefs)
+		return feesInfo?.1 ?? ""
+	}
+	
+	func onAppear() -> Void {
+		log.trace("onAppear()")
+		
+		// Update text in explainFeesPopover
+		explainFeesText = payment.paymentFees(currencyPrefs: currencyPrefs)?.1 ?? ""
+		
+		if let outgoingPayment = payment as? PhoenixShared.Eclair_kmpOutgoingPayment {
+			
+			// If this is an outgoingPayment, then we don't have the proper parts list.
+			// That is, the outgoingPayment was fetched via listPayments(),
+			// which gives us a fake parts list.
+			//
+			// Let's fetch the full outgoingPayment (with parts list),
+			// so we can improve our fees description.
+			
+			let paymentId = outgoingPayment.component1()
+			AppDelegate.get().business.paymentsManager.getOutgoingPayment(id: paymentId) {
+				(fullOutgoingPayment: Eclair_kmpOutgoingPayment?, error: Error?) in
+				
+				if let fullOutgoingPayment = fullOutgoingPayment {
+					let feesInfo = fullOutgoingPayment.paymentFees(currencyPrefs: currencyPrefs)
+					explainFeesText = feesInfo?.1 ?? ""
+				}
+			}
+		}
 	}
 }
 
@@ -166,7 +235,7 @@ struct PaymentView : View {
 //
 // In SwiftUI, it's not that simple. But it's not that bad either.
 //
-// - we used InfoGrid_Column0 to measure the width of each key
+// - we use InfoGrid_Column0 to measure the width of each key
 // - we use InfoGrid_Column0_MeasuredWidth to communicate the width
 //   up the hierarchy to the InfoGrid.
 // - InfoGrid_Column0_MeasuredWidth.reduce is used to find the max width
@@ -179,15 +248,17 @@ struct PaymentView : View {
 // - This triggers InfoGrid.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self)
 // - Which triggers a second layout pass
 //
-struct InfoGrid: View {
+fileprivate struct InfoGrid: View {
 	
 	let payment: PhoenixShared.Eclair_kmpWalletPayment
+	
+	@Binding var explainFeesPopoverVisible: Bool
 	
 	@State private var widthColumn0: CGFloat? = nil
 	
 	private let cappedWidthColumn0: CGFloat = 200
 	
-	private let verticalSpacingBetweenRows: CGFloat = 8
+	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@Environment(\.openURL) var openURL
@@ -244,8 +315,8 @@ struct InfoGrid: View {
 					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 						
 						Text(pType.0)
-						+ Text(" (\(pType.1)")
-							.font(.subheadline)
+						+ Text(" (\(pType.1))")
+							.font(.footnote)
 							.foregroundColor(.secondary)
 						
 						if let link = payment.paymentLink() {
@@ -258,6 +329,43 @@ struct InfoGrid: View {
 					}
 				}
 			} // </if let pType>
+			
+			if let pClosingInfo = payment.channelClosing() {
+				
+				HStack(
+					alignment : VerticalAlignment.top,
+					spacing   : horizontalSpacingBetweenColumns
+				) {
+					HStack(alignment: VerticalAlignment.top, spacing: 0) {
+						Spacer(minLength: 0) // => HorizontalAlignment.trailing
+						InfoGrid_Column0 {
+							Text("Output")
+								.foregroundColor(.secondary)
+						}
+					}
+					.frame(width: widthColumn0)
+
+					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+						
+						// Bitcoin address (copyable)
+						Text(pClosingInfo.closingAddress)
+							.contextMenu {
+								Button(action: {
+									UIPasteboard.general.string = pClosingInfo.closingAddress
+								}) {
+									Text("Copy")
+								}
+							}
+						
+						if pClosingInfo.isSentToDefaultAddress {
+							Text("(This is your address - derived from your seed. You alone possess your seed.)")
+								.font(.footnote)
+								.foregroundColor(.secondary)
+								.padding(.top, 4)
+						}
+					}
+				}
+			} // </if let channelClosing>
 			
 			if let pFees = payment.paymentFees(currencyPrefs: currencyPrefs) {
 
@@ -274,8 +382,26 @@ struct InfoGrid: View {
 					}
 					.frame(width: widthColumn0)
 
-					Text(pFees.0.string) // pFees.0 => FormattedAmount
-						.onTapGesture { toggleCurrencyType() }
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+						
+						Text(pFees.0.string) // pFees.0 => FormattedAmount
+							.onTapGesture { toggleCurrencyType() }
+						
+						if pFees.1.count > 0 {
+							
+							Button {
+								explainFeesPopoverVisible = true
+							} label: {
+								Image(systemName: "questionmark.circle")
+									.renderingMode(.template)
+									.foregroundColor(.secondary)
+									.font(.body)
+							}
+							.anchorView(viewId: explainFeesButtonViewId)
+							.padding(.leading, 4)
+						}
+					}
+
 				}
 			} // </if let pFees>
 			
@@ -334,7 +460,6 @@ struct InfoGrid: View {
 			} else {
 				self.widthColumn0 = $0
 			}
-			
 		}
 	}
 	
@@ -343,7 +468,7 @@ struct InfoGrid: View {
 	}
 }
 
-struct InfoGrid_Column0<Content>: View where Content: View {
+fileprivate struct InfoGrid_Column0<Content>: View where Content: View {
 	let content: Content
 	
 	init(@ViewBuilder builder: () -> Content) {
@@ -361,7 +486,7 @@ struct InfoGrid_Column0<Content>: View where Content: View {
 	}
 }
 
-struct InfoGrid_Column0_MeasuredWidth: PreferenceKey {
+fileprivate struct InfoGrid_Column0_MeasuredWidth: PreferenceKey {
 	static let defaultValue: CGFloat? = nil
 	
 	static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
@@ -377,6 +502,51 @@ struct InfoGrid_Column0_MeasuredWidth: PreferenceKey {
 		} else {
 			value = nextValue()
 		}
+	}
+}
+
+fileprivate struct ExplainFeesPopover: View {
+	
+	@Binding var explanationText: String
+	
+	var body: some View {
+		
+		VStack {
+			Text(explanationText)
+				.padding()
+				.background(GeometryReader { proxy in
+					Color.clear.preference(
+						key: ExplainFeesPopoverHeight.self,
+						value: proxy.size.height
+					)
+				})
+		}.frame(minHeight: 500)
+		// ^^^ Why? ^^^
+		//
+		// We're trying to accomplish 2 things:
+		// - allow the explanationText to be dynamically changed
+		// - calculate the appropriate height for the text
+		//
+		// But there's a problem, which occurs like so:
+		// - explainFeesPopoverFrame starts with hard-coded frame of (150, 500)
+		// - SwiftUI performs layout of our body with inherited frame of (150, 500)
+		// - We calculate appropriate height (X) for our text,
+		//   and it gets reported via ExplainFeesPopoverHeight
+		// - explainFeesPopoverFrame is resized to (150, X)
+		// - explanationText is changed, triggering a view update
+		// - SwiftUI performs layout of our body with previous frame of (150, X)
+		// - Text cannot report appropriate height, as it's restricted to X
+		//
+		// So we force the height of our VStack to 500,
+		// giving the Text room to size itself appropriately.
+	}
+}
+
+fileprivate struct ExplainFeesPopoverHeight: PreferenceKey {
+	static let defaultValue: CGFloat? = nil
+	
+	static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
+		value = value ?? nextValue()
 	}
 }
 
@@ -402,30 +572,41 @@ extension Eclair_kmpWalletPayment {
 	
 	fileprivate func paymentType() -> (String, String)? {
 		
+		// Will be displayed in the UI as:
+		//
+		// Type : value (explanation)
+		//
+		// where return value is: (value, explanation)
+		
 		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
-				let ttl = NSLocalizedString("SwapIn", comment: "Transaction Info: Type - title")
-				let exp = NSLocalizedString("layer 0 -> 1", comment: "Transaction Info: Type - explanation")
-				return (ttl, exp)
+				let val = NSLocalizedString("SwapIn", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
+				return (val, exp)
 			}
 			if let _ = incomingPayment.origin.asKeySend() {
-				let ttl = NSLocalizedString("KeySend", comment: "Transaction Info: Type - title")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Type - explanation")
-				return (ttl, exp)
+				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
+				return (val, exp)
 			}
 			
 		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
-				let ttl = NSLocalizedString("SwapIn", comment: "Transaction Info: Type - title")
-				let exp = NSLocalizedString("layer 1 -> 0", comment: "Transaction Info: Type - explanation")
-				return (ttl, exp)
+				let val = NSLocalizedString("SwapOut", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
+				return (val, exp)
 			}
 			if let _ = outgoingPayment.details.asKeySend() {
-				let ttl = NSLocalizedString("KeySend", comment: "Transaction Info: Type - title")
-				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Type - explanation")
-				return (ttl, exp)
+				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
+				return (val, exp)
+			}
+			if let _ = outgoingPayment.details.asChannelClosing() {
+				let val = NSLocalizedString("Channel Closing", comment: "Transaction Info: Value")
+				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
+				return (val, exp)
 			}
 		}
 		
@@ -456,6 +637,17 @@ extension Eclair_kmpWalletPayment {
 		return nil
 	}
 	
+	fileprivate func channelClosing() -> Eclair_kmpOutgoingPayment.DetailsChannelClosing? {
+		
+		if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+			if let result = outgoingPayment.details.asChannelClosing() {
+				return result
+			}
+		}
+		
+		return nil
+	}
+	
 	fileprivate func paymentFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
 		
 		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
@@ -466,7 +658,7 @@ extension Eclair_kmpWalletPayment {
 				let msat = received.receivedWith.fees.msat
 				if msat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: msat)
+					let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
 					
 					let exp = NSLocalizedString(
 						"In order to receive this payment, a new payment channel was opened." +
@@ -476,37 +668,84 @@ extension Eclair_kmpWalletPayment {
 					
 					return (formattedAmt, exp)
 				}
+				else {
+					// I think it's nice to see "Fees: 0 sat" :)
+					
+					let formattedAmt = Utils.format(currencyPrefs, msat: 0, hideMsats: true)
+					let exp = ""
+					
+					return (formattedAmt, exp)
+				}
 			}
-			
 			
 		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
 			
-			// no fees for failed payments
 			if let _ = outgoingPayment.status.asFailed() {
-				return nil
-			}
-			
-			let msat = outgoingPayment.fees.msat
-			let formattedAmt = Utils.format(currencyPrefs, msat: msat)
-			
-			var parts = 0
-			var hops = 0
-			for part in outgoingPayment.parts {
 				
-				parts += 1
-				hops = part.route.count
+				// no fees for failed payments
+				return nil
+				
+			} else if let onChain = outgoingPayment.status.asOnChain() {
+				
+				// for on-chain payments, the fees are extracted from the mined transaction(s)
+				
+				let channelDrain: Eclair_kmpMilliSatoshi = outgoingPayment.recipientAmount
+				let claimed = Eclair_kmpMilliSatoshi(sat: onChain.claimed)
+				let fees = channelDrain.minus(other: claimed)
+				let formattedAmt = Utils.format(currencyPrefs, msat: fees, hideMsats: false)
+				
+				let txCount = onChain.component1().count
+				let exp: String
+				if txCount == 1 {
+					exp = NSLocalizedString(
+						"Bitcoin networks fees paid for on-chain transaction. Payment required 1 transaction.",
+						comment: "Fees explanation"
+					)
+				} else {
+					exp = NSLocalizedString(
+						"Bitcoin networks fees paid for on-chain transactions. Payment required \(txCount) transactions.",
+						comment: "Fees explanation"
+					)
+				}
+				
+				return (formattedAmt, exp)
+				
+			} else if let _ = outgoingPayment.status.asOffChain() {
+				
+				let msat = outgoingPayment.fees.msat
+				let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
+				
+				var parts = 0
+				var hops = 0
+				for part in outgoingPayment.parts {
+					
+					parts += 1
+					hops = part.route.count
+				}
+				
+				let exp: String
+				if parts == 1 {
+					if hops == 1 {
+						exp = NSLocalizedString(
+							"Lightning fees for routing the payment. Payment required 1 hop.",
+							comment: "Fees explanation"
+						)
+					} else {
+						exp = NSLocalizedString(
+							"Lightning fees for routing the payment. Payment required \(hops) hops.",
+							comment: "Fees explanation"
+						)
+					}
+					
+				} else {
+					exp = NSLocalizedString(
+						"Lightning fees for routing the payment. Payment was divided into \(parts) parts, using \(hops) hops.",
+						comment: "Fees explanation"
+					)
+				}
+				
+				return (formattedAmt, exp)
 			}
-			
-			let exp: String
-			if parts == 1 {
-				exp = NSLocalizedString("Paid in 1 part, using \(hops) hops",
-					comment: "Fees explanation")
-			} else {
-				exp = NSLocalizedString("Paid in \(parts) parts, using \(hops) hops",
-					comment: "Fees explanation")
-			}
-			
-			return (formattedAmt, exp)
 		}
 		
 		return nil

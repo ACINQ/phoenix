@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
 
-        UIKitAppearance()
+		UIKitAppearance()
 		
 		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
 			UIApplication.shared.registerForRemoteNotifications()
@@ -58,18 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
-
-        #if DEBUG
-            var injectionBundlePath = "/Applications/InjectionIII.app/Contents/Resources"
-            #if targetEnvironment(macCatalyst)
-                injectionBundlePath = "\(injectionBundlePath)/macOSInjection.bundle"
-            #elseif os(iOS)
-                injectionBundlePath = "\(injectionBundlePath)/iOSInjection.bundle"
-            #elseif os(tvOS)
-                injectionBundlePath = "\(injectionBundlePath)/tvOSInjection.bundle"
-            #endif
-            Bundle(path: injectionBundlePath)?.load()
-        #endif
 
 		let nc = NotificationCenter.default
 		
@@ -101,7 +89,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self?.business.updateTorUsage(isEnabled: isTorEnabled)
 		}.store(in: &cancellables)
 		
-        return true
+		return true
     }
 	
 	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
@@ -144,7 +132,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			didIncrementDisconnectCount = false
 		}
 	}
-	
 	
 	// --------------------------------------------------
 	// MARK: UISceneSession Lifecycle

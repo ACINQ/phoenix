@@ -8,6 +8,7 @@ import fr.acinq.eclair.io.PaymentReceived
 import fr.acinq.eclair.io.SwapInConfirmedEvent
 import fr.acinq.eclair.io.SwapInPendingEvent
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.getValue
 import fr.acinq.eclair.utils.setValue
 import fr.acinq.eclair.utils.toMilliSatoshi
@@ -79,6 +80,8 @@ class PaymentsManager(
         }
     }
 
+    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = paymentsDb.getOutgoingPayment(id)
+
     fun subscribeToLastIncomingPayment(): StateFlow<WalletPayment?> = lastIncomingPayment
 }
 
@@ -87,6 +90,7 @@ fun WalletPayment.desc(): String? = when (this) {
         is OutgoingPayment.Details.Normal -> d.paymentRequest.description
         is OutgoingPayment.Details.KeySend -> "donation"
         is OutgoingPayment.Details.SwapOut -> d.address
+        is OutgoingPayment.Details.ChannelClosing -> "channel closing"
     }
     is IncomingPayment -> when (val o = this.origin) {
         is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
@@ -98,7 +102,7 @@ fun WalletPayment.desc(): String? = when (this) {
 enum class WalletPaymentState { Success, Pending, Failure }
 
 fun WalletPayment.amountMsat(): Long = when (this) {
-    is OutgoingPayment -> -recipientAmount.msat
+    is OutgoingPayment -> -recipientAmount.msat - fees.msat
     is IncomingPayment -> received?.amount?.msat ?: 0
 }
 
@@ -110,8 +114,9 @@ fun WalletPayment.id(): String = when (this) {
 fun WalletPayment.state(): WalletPaymentState = when (this) {
     is OutgoingPayment -> when (status) {
         is OutgoingPayment.Status.Pending -> WalletPaymentState.Pending
-        is OutgoingPayment.Status.Succeeded -> WalletPaymentState.Success
-        is OutgoingPayment.Status.Failed -> WalletPaymentState.Failure
+        is OutgoingPayment.Status.Completed.Failed -> WalletPaymentState.Failure
+        is OutgoingPayment.Status.Completed.Succeeded.OnChain -> WalletPaymentState.Success
+        is OutgoingPayment.Status.Completed.Succeeded.OffChain -> WalletPaymentState.Success
     }
     is IncomingPayment -> when (received) {
         null -> WalletPaymentState.Pending
@@ -123,7 +128,7 @@ fun WalletPayment.timestamp(): Long = WalletPayment.completedAt(this)
 
 fun WalletPayment.errorMessage(): String? = when (this) {
     is OutgoingPayment -> when (val s = status) {
-        is OutgoingPayment.Status.Failed -> s.reason.toString()
+        is OutgoingPayment.Status.Completed.Failed -> s.reason.toString()
         else -> null
     }
     is IncomingPayment -> null
@@ -171,6 +176,13 @@ fun OutgoingPayment.Details.asSwapOut(): OutgoingPayment.Details.SwapOut? = when
     else -> null
 }
 
+// Class type OutgoingPayment.Details.ChannelClosing is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Details.asChannelClosing(): OutgoingPayment.Details.ChannelClosing? = when (this) {
+    is OutgoingPayment.Details.ChannelClosing -> this
+    else -> null
+}
+
 // Class type OutgoingPayment.Status.Pending is not exported to iOS unless
 // we explicitly reference it in PhoenixShared.
 fun OutgoingPayment.Status.asPending(): OutgoingPayment.Status.Pending? = when (this) {
@@ -180,15 +192,29 @@ fun OutgoingPayment.Status.asPending(): OutgoingPayment.Status.Pending? = when (
 
 // Class type OutgoingPayment.Status.Failed is not exported to iOS unless
 // we explicitly reference it in PhoenixShared.
-fun OutgoingPayment.Status.asFailed(): OutgoingPayment.Status.Failed? = when (this) {
-    is OutgoingPayment.Status.Failed -> this
+fun OutgoingPayment.Status.asFailed(): OutgoingPayment.Status.Completed.Failed? = when (this) {
+    is OutgoingPayment.Status.Completed.Failed -> this
     else -> null
 }
 
 // Class type OutgoingPayment.Status.Succeeded is not exported to iOS unless
 // we explicitly reference it in PhoenixShared.
-fun OutgoingPayment.Status.asSucceeded(): OutgoingPayment.Status.Succeeded? = when (this) {
-    is OutgoingPayment.Status.Succeeded -> this
+fun OutgoingPayment.Status.asSucceeded(): OutgoingPayment.Status.Completed.Succeeded? = when (this) {
+    is OutgoingPayment.Status.Completed.Succeeded -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Status.Succeeded.OffChain is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Status.asOffChain(): OutgoingPayment.Status.Completed.Succeeded.OffChain? = when (this) {
+    is OutgoingPayment.Status.Completed.Succeeded.OffChain -> this
+    else -> null
+}
+
+// Class type OutgoingPayment.Status.Succeeded.OnChain is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun OutgoingPayment.Status.asOnChain(): OutgoingPayment.Status.Completed.Succeeded.OnChain? = when (this) {
+    is OutgoingPayment.Status.Completed.Succeeded.OnChain -> this
     else -> null
 }
 

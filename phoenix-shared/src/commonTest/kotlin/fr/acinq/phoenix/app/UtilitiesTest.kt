@@ -77,11 +77,11 @@ class UtilitiesTest {
                 val result = util.parseBitcoinAddress(input.addr)
 
                 if (!input.isValid) {
-                    val error = result.right
+                    val error: BitcoinAddressError? = result.left
                     assertNotNull(error)
                 }
                 else if (input.chain != chain) {
-                    val error = result.left
+                    val error: BitcoinAddressError? = result.left
                     assertNotNull(error)
 
                     assertTrue { error is BitcoinAddressError.ChainMismatch }
@@ -91,7 +91,7 @@ class UtilitiesTest {
                     assertTrue { mismatch.addrChain == input.chain }
                 }
                 else {
-                    val info = result.right
+                    val info: Utilities.BitcoinAddressInfo? = result.right
                     assertNotNull(info)
 
                     assertTrue { info.chain == input.chain }

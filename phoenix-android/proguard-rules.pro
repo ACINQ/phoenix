@@ -34,3 +34,23 @@
 -keep class ch.qos.** { *; }
 -keep class org.slf4j.** { *; }
 -dontwarn ch.qos.logback.core.net.*
+
+# kotlinx serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keep,includedescriptorclasses class fr.acinq.phoenix.android.**$$serializer { *; }
+-keepclassmembers class fr.acinq.phoenix.android.** {
+    *** Companion;
+}
+-keepclasseswithmembers class fr.acinq.phoenix.android.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

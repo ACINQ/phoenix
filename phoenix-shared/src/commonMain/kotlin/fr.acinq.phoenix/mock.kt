@@ -1,5 +1,6 @@
 package fr.acinq.phoenix
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.Eclair
 import fr.acinq.eclair.Eclair.randomBytes32
 import fr.acinq.eclair.MilliSatoshi
@@ -60,7 +61,7 @@ object Mock {
                 paymentRequest = PaymentRequest.read("lntb19u1psqtnuspp5cmck9rzrt00wpggydwahplql258txejwlwjvn520txy84chq5ttqdp8xys9xcmpd3sjqsmgd9czq3njv9c8qatrvd5kumccqp7xqrrss9qy9qsqsp55psaxqvh3ayk7atgpneck8fxqfdg848vu5fkp5adp3359cnlu4aq73y3w0t2fcv9vexvq9lkj6gdkwqzk4agqwuzh9dkzczqqgva3fr8s8q6wcwucvcz3x9ycr5pllnhgxprdh4j0706ncvl48kq8uqh6egpdeekrz")
             ),
             parts = parts(200_000.msat, OutgoingPayment.Part.Status.Pending),
-            status = OutgoingPayment.Status.Succeeded(
+            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(
                 preimage = randomBytes32()
             )
         )
@@ -77,9 +78,39 @@ object Mock {
             parts = parts(200_000.msat, OutgoingPayment.Part.Status.Failed(
                 remoteFailureCode = null, details = "mocked payment part failure message"
             )),
-            status = OutgoingPayment.Status.Failed(
+            status = OutgoingPayment.Status.Completed.Failed(
                 reason = FinalFailure.InvalidPaymentAmount
             )
+        )
+    }
+
+    fun pendingChannelClosingLocal(): WalletPayment {
+        return OutgoingPayment(
+            id = UUID.randomUUID(),
+            recipientAmount = 350_000.msat,
+            recipient = Eclair.randomKey().publicKey(),
+            details = OutgoingPayment.Details.ChannelClosing(
+                channelId = ByteVector32.Zeroes,
+                closingAddress = "tb1q8rf6p595hp465pm2hhxfhyv5zdr6jgujwetraq",
+                isSentToDefaultAddress = true,
+            ),
+            parts = listOf(),
+            status = OutgoingPayment.Status.Pending
+        )
+    }
+
+    fun pendingChannelClosingNonLocal(): WalletPayment {
+        return OutgoingPayment(
+            id = UUID.randomUUID(),
+            recipientAmount = 350_000.msat,
+            recipient = Eclair.randomKey().publicKey(),
+            details = OutgoingPayment.Details.ChannelClosing(
+                channelId = ByteVector32.Zeroes,
+                closingAddress = "tb1q8rf6p595hp465pm2hhxfhyv5zdr6jgujwetraq",
+                isSentToDefaultAddress = false,
+            ),
+            parts = listOf(),
+            status = OutgoingPayment.Status.Pending
         )
     }
 }

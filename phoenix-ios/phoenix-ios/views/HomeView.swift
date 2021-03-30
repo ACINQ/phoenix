@@ -141,11 +141,17 @@ struct PaymentCell : View {
 			}
 			
 			VStack(alignment: .leading) {
-                Text(payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text"))
+				Text(payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text"))
 					.lineLimit(1)
 					.truncationMode(.tail)
 					.foregroundColor(.primaryForeground)
-				Text(payment.timestamp().formatDateMS())
+				
+				let timestamp = payment.timestamp()
+				let timestampStr = timestamp > 0
+					? timestamp.formatDateMS()
+					: NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+				
+				Text(timestampStr)
 					.font(.caption)
 					.foregroundColor(.secondary)
 			}

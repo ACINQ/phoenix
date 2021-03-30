@@ -3,7 +3,9 @@ package fr.acinq.phoenix
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
+import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.io.TcpSocket
+import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.setEclairLoggerFactory
 import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
@@ -67,7 +69,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     private val walletManager by lazy { WalletManager() }
     private val peerManager by lazy { PeerManager(loggerFactory, walletManager, appConfigurationManager, paymentsDb, tcpSocketBuilder, electrumWatcher, chain, ctx) }
-    private val paymentsManager by lazy { PaymentsManager(loggerFactory, paymentsDb, peerManager) }
+    val paymentsManager by lazy { PaymentsManager(loggerFactory, paymentsDb, peerManager) }
     val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
 
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb, httpClient) }

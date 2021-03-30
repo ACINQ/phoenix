@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "DYPopoverView",
+        "repositoryURL": "https://github.com/DominikButz/DYPopoverView.git",
+        "state": {
+          "branch": null,
+          "revision": "1dbd6cca68d4d833bbe7e0122913eecf39d41c2e",
+          "version": "1.1.1"
+        }
+      },
+      {
         "package": "Firebase",
         "repositoryURL": "https://github.com/firebase/firebase-ios-sdk.git",
         "state": {

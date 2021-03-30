@@ -128,7 +128,7 @@ fun RestoreWalletView(appVM: AppViewModel) {
                             InputText(
                                 text = wordsInput,
                                 onTextChange = { wordsInput = it },
-                                maxLines = 1,
+                                maxLines = 4,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 32.dp)

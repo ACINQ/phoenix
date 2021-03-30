@@ -61,8 +61,25 @@ class Utils {
 	/// Formats the given amount of satoshis into a FormattedAmount struct,
 	/// which contains the various string values needed for display.
 	///
-	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64, hideMsats: Bool = true) -> FormattedAmount {
+	static func format(_ currencyPrefs: CurrencyPrefs, sat: Bitcoin_kmpSatoshi) -> FormattedAmount {
+		return format(currencyPrefs, msat: (sat.toLong() * 1_000))
+	}
+	
+	/// Formats the given amount of satoshis into a FormattedAmount struct,
+	/// which contains the various string values needed for display.
+	///
+	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64) -> FormattedAmount {
 		return format(currencyPrefs, msat: (sat * 1_000))
+	}
+	
+	/// Formats the given amount of millisatoshis into a FormattedAmount struct,
+	/// which contains the various string values needed for display.
+	///
+	static func format(_ currencyPrefs: CurrencyPrefs,
+	                              msat: Eclair_kmpMilliSatoshi,
+	                         hideMsats: Bool = true
+	) -> FormattedAmount {
+		return format(currencyPrefs, msat: msat.toLong(), hideMsats: hideMsats)
 	}
 	
 	/// Formats the given amount of millisatoshis into a FormattedAmount struct,

@@ -320,6 +320,7 @@ private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modi
             is OutgoingPayment.Details.Normal -> d.paymentRequest.description
             is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
             is OutgoingPayment.Details.SwapOut -> d.address
+            else -> stringResource(id = R.string.paymentline_closing_desc)
         }
         is IncomingPayment -> when (val o = payment.origin) {
             is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
@@ -336,14 +337,14 @@ private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modi
     )
 }
 
-private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Failed)
+private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Completed.Failed)
         || (payment is IncomingPayment && payment.isExpired())
 
 @Composable
 private fun PaymentIcon(payment: WalletPayment) {
     when (payment) {
         is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Failed -> Image(
+            is OutgoingPayment.Status.Completed.Failed -> Image(
                 painter = painterResource(R.drawable.ic_payment_failed),
                 contentDescription = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 modifier = Modifier.size(18.dp),
@@ -355,7 +356,7 @@ private fun PaymentIcon(payment: WalletPayment) {
                 modifier = Modifier.size(18.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
             )
-            is OutgoingPayment.Status.Succeeded -> Box(
+            is OutgoingPayment.Status.Completed.Succeeded -> Box(
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(color = MaterialTheme.colors.primary)

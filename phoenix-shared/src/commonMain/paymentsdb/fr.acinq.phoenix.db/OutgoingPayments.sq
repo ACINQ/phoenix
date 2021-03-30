@@ -1,6 +1,7 @@
 import fr.acinq.eclair.db.HopDesc;
-import fr.acinq.phoenix.db.SqlitePaymentsDb.OutgoingFinalFailureDbEnum;
-import fr.acinq.phoenix.db.SqlitePaymentsDb.OutgoingPartFailureDbEnum;
+import fr.acinq.phoenix.db.payments.OutgoingDetailsTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion;
 import kotlin.collections.List;
 
 PRAGMA foreign_keys = 1;
@@ -14,76 +15,123 @@ CREATE TABLE IF NOT EXISTS outgoing_payments (
     payment_hash BLOB NOT NULL,
     created_at INTEGER NOT NULL,
     -- details
-    normal_payment_request TEXT DEFAULT NULL,
-    keysend_preimage BLOB DEFAULT NULL,
-    swapout_address TEXT DEFAULT NULL,
+    details_type TEXT AS OutgoingDetailsTypeVersion NOT NULL,
+    details_blob BLOB NOT NULL,
     -- status
-    final_failure TEXT AS OutgoingFinalFailureDbEnum DEFAULT NULL,
-    preimage BLOB DEFAULT NULL,
-    completed_at INTEGER DEFAULT NULL
+    completed_at INTEGER DEFAULT NULL,
+    status_type TEXT AS OutgoingStatusTypeVersion DEFAULT NULL,
+    status_blob BLOB DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
     part_id TEXT NOT NULL PRIMARY KEY,
-    parent_id TEXT NOT NULL,
-    amount_msat INTEGER NOT NULL,
-    route TEXT AS List<HopDesc> NOT NULL,
-    created_at INTEGER NOT NULL,
+    part_parent_id TEXT NOT NULL,
+    part_amount_msat INTEGER NOT NULL,
+    part_route TEXT AS List<HopDesc> NOT NULL,
+    part_created_at INTEGER NOT NULL,
     -- status
-    preimage BLOB DEFAULT NULL,
-    err_code INTEGER DEFAULT NULL,
-    err_message TEXT DEFAULT NULL,
-    completed_at INTEGER DEFAULT NULL,
+    part_completed_at INTEGER DEFAULT NULL,
+    part_status_type TEXT AS OutgoingPartStatusTypeVersion DEFAULT NULL,
+    part_status_blob BLOB DEFAULT NULL,
 
-    FOREIGN KEY(parent_id) REFERENCES outgoing_payments(id)
+    FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
 );
+
+-- A FOREIGN KEY does NOT create an implicit index.
+-- One would expect it to, but it doesn't.
+-- As per the docs (https://sqlite.org/foreignkeys.html):
+-- > Indices are not required for child key columns but they are almost always beneficial.
+-- > [...] So, in most real systems, an index should be created on the child key columns
+-- > of each foreign key constraint.
+CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_parts(part_parent_id);
 
 -- queries
 
 addOutgoingPayment:
-INSERT INTO outgoing_payments (id, recipient_amount_msat, recipient_node_id, payment_hash, created_at, normal_payment_request, keysend_preimage, swapout_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO outgoing_payments (id, recipient_amount_msat, recipient_node_id, payment_hash, created_at, details_type, details_blob) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+updateOutgoingPayment:
+UPDATE outgoing_payments SET completed_at=?, status_type=?, status_blob=? WHERE id=?;
 
 addOutgoingPart:
-INSERT INTO outgoing_payment_parts (part_id, parent_id, amount_msat, route, created_at) VALUES (?, ?, ?, ?, ?);
+INSERT INTO outgoing_payment_parts (part_id, part_parent_id, part_amount_msat, part_route, part_created_at) VALUES (?, ?, ?, ?, ?);
 
-succeedOutgoingPart:
-UPDATE outgoing_payment_parts SET preimage=?, completed_at=? WHERE part_id=?;
-succeedOutgoingPayment:
-UPDATE outgoing_payments SET preimage=?, completed_at=? WHERE id=?;
-
-failOutgoingPart:
-UPDATE outgoing_payment_parts SET err_code=?, err_message=?, completed_at=? WHERE part_id=?;
-failOutgoingPayment:
-UPDATE outgoing_payments SET final_failure=?, completed_at=? WHERE id=?;
+updateOutgoingPart:
+UPDATE outgoing_payment_parts SET part_status_type=?, part_status_blob=?, part_completed_at=? WHERE part_id=?;
 
 getOutgoingPart:
-SELECT *
-FROM outgoing_payment_parts
-WHERE part_id=?;
+SELECT * FROM outgoing_payment_parts WHERE part_id=?;
 
 deleteOutgoingPart:
-DELETE FROM outgoing_payment_parts
-WHERE part_id=?;
+DELETE FROM outgoing_payment_parts WHERE part_id=?;
 
 getOutgoingPayment:
-SELECT parent.id, parent.recipient_amount_msat, parent.recipient_node_id, parent.payment_hash, parent.created_at, parent.normal_payment_request, parent.keysend_preimage, parent.swapout_address, parent.final_failure, parent.preimage, parent.completed_at,
-       parts.part_id, parts.amount_msat, parts.route, parts.created_at AS part_created_at, parts.preimage AS part_preimage, parts.completed_at AS part_completed_at, parts.err_code, parts.err_message
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
 WHERE parent.id=?;
 
 listOutgoingForPaymentHash:
-SELECT parent.id, parent.recipient_amount_msat, parent.recipient_node_id, parent.payment_hash, parent.created_at, parent.normal_payment_request, parent.keysend_preimage, parent.swapout_address, parent.final_failure, parent.preimage, parent.completed_at,
-       parts.part_id, parts.amount_msat, parts.route, parts.created_at AS part_created_at, parts.preimage AS part_preimage, parts.completed_at AS part_completed_at, parts.err_code, parts.err_message
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
 WHERE payment_hash=?;
 
 listOutgoingInOffset:
-SELECT parent.id, parent.recipient_amount_msat, parent.recipient_node_id, parent.payment_hash, parent.created_at, parent.normal_payment_request, parent.keysend_preimage, parent.swapout_address, parent.final_failure, parent.preimage, parent.completed_at,
-       parts.part_id, parts.amount_msat, parts.route, parts.created_at AS part_created_at, parts.preimage AS part_preimage, parts.completed_at AS part_completed_at, parts.err_code, parts.err_message
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
 ORDER BY parent.completed_at DESC, parent.id DESC
 LIMIT ?, ?;
 

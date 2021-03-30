@@ -237,7 +237,8 @@ struct PopupAlert : View {
 				}
 				.font(.title3)
 			}
-		}
+		} // </VStack>
+		.padding()
 	}
 }
 
@@ -602,6 +603,13 @@ class ScanView_Previews: PreviewProvider {
 
 		NavigationView {
 			SendingView(model: Scan.ModelSending())
+		}
+		.modifier(GlobalEnvironment())
+		.preferredColorScheme(.dark)
+		.previewDevice("iPhone 8")
+		
+		NavigationView {
+			
 		}
 		.modifier(GlobalEnvironment())
 		.preferredColorScheme(.dark)
