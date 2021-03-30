@@ -33,6 +33,7 @@ struct ReceiveView: MVIView {
 	@State var notificationsDisabled = false
 	@State var alertsDisabled = false
 	@State var badgesDisabled = false
+	@State var showRequestPushPermissionPopupTimer: Timer? = nil
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 	@Environment(\.verticalSizeClass) var verticalSizeClass
@@ -72,6 +73,9 @@ struct ReceiveView: MVIView {
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.onAppear {
 			onAppear()
+		}
+		.onDisappear {
+			onDisappear()
 		}
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
@@ -383,7 +387,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func onAppear() -> Void {
-		log.trace("[ReadyReceivePayment] onAppear()")
+		log.trace("onAppear()")
 		
 		mvi.intent(Receive.IntentAsk(amount: nil, desc: nil))
 		
@@ -396,14 +400,21 @@ struct ReceiveView: MVIView {
 			// But let's show the popup after a brief delay,
 			// to allow the user to see what this view is about.
 			
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				showRequestPushPermissionPopup()
-			}
+			showRequestPushPermissionPopupTimer =
+				Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
+					showRequestPushPermissionPopup()
+				}
 			
 		} else {
 			
 			checkPushPermissions()
 		}
+	}
+	
+	func onDisappear() -> Void {
+		log.trace("onDisappear()")
+		
+		showRequestPushPermissionPopupTimer?.invalidate()
 	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
@@ -414,7 +425,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func willEnterForeground() -> Void {
-		log.trace("[ReadyReceivePayment] willEnterForeground()")
+		log.trace("willEnterForeground()")
 		
 		let query = Prefs.shared.pushPermissionQuery
 		if query != .neverAskedUser {
@@ -424,7 +435,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func requestPushPermission() -> Void {
-		log.trace("[ReadyReceivePayment] requestPushPermission()")
+		log.trace("requestPushPermission()")
 		
 		AppDelegate.get().requestPermissionForLocalNotifications { (granted: Bool) in
 			
@@ -438,7 +449,7 @@ struct ReceiveView: MVIView {
 	}
 	
 	func checkPushPermissions() -> Void {
-		log.trace("[ReadyReceivePayment] checkPushPermission()")
+		log.trace("checkPushPermission()")
 		assert(Thread.isMainThread, "invoked from non-main thread")
 		
 		let query = Prefs.shared.pushPermissionQuery
