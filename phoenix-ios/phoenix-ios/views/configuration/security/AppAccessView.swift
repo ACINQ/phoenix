@@ -27,6 +27,8 @@ struct AppAccessView : View {
 	
 	@State var showHelpSheet = false
 	
+	@Environment(\.colorScheme) var colorScheme
+	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
 	)
@@ -84,7 +86,7 @@ struct AppAccessView : View {
 				// Toggle {
 				//    HStack {
 				//       Text
-				//       Button
+				//       Button // <- disabled if toggle is disabled
 				// }
 				//
 				// HStack {
@@ -108,8 +110,9 @@ struct AppAccessView : View {
 						advancedSecurityHelpButtonTapped()
 					} label: {
 						Image(systemName: "questionmark.circle")
-							.renderingMode(.original)
+							.renderingMode(.template)
 							.imageScale(.large)
+							.foregroundColor(colorScheme == ColorScheme.light ? Color.black : Color.white)
 					}
 					Spacer()
 					Toggle("", isOn: $advancedSecurityEnabled)
