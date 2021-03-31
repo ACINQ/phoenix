@@ -14,19 +14,26 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 struct ScanView: MVIView {
-
-	@StateObject var mvi = MVIState({ $0.scan() })
+	
+	@StateObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
-	
-	@Binding var isShowing: Bool
 
 	@State var paymentRequest: String? = nil
 	@State var isWarningDisplayed: Bool = false
 	
 	@StateObject var toast = Toast()
-
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	init(firstModel: Scan.Model? = nil) {
+		
+		self._mvi = StateObject.init(wrappedValue: MVIState.init {
+			$0.scan(firstModel: firstModel ?? Scan.ModelReady())
+		})
+	}
+	
 	@ViewBuilder
 	var view: some View {
 		
@@ -48,8 +55,12 @@ struct ScanView: MVIView {
 				paymentRequest = model.request
 			}
 			else if newModel is Scan.ModelSending {
-				isShowing = false
+				// Pop self from NavigationStack; Back to HomeView
+				presentationMode.wrappedValue.dismiss()
 			}
+		})
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
+			didReceiveExternalLightningUrl(url)
 		})
 	}
 
@@ -76,6 +87,12 @@ struct ScanView: MVIView {
 		default:
 			fatalError("Unknown model \(mvi.model)")
 		}
+	}
+	
+	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+		log.trace("didReceiveExternalLightningUrl()")
+		
+		mvi.intent(Scan.IntentParse(request: url.absoluteString))
 	}
 }
 
@@ -242,7 +259,7 @@ struct PopupAlert : View {
 	}
 }
 
-struct ValidateView: View {
+struct ValidateView: View, ViewName {
 	
 	let model: Scan.ModelValidate
 	let postIntent: (Scan.Intent) -> Void
@@ -255,7 +272,7 @@ struct ValidateView: View {
 	
 	@State var altAmount: String = ""
 	@State var isInvalidAmount: Bool = false
-	@State var exceedsWalletCapacity: Bool = false
+	@State var isExpiredInvoice: Bool = false
 	
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
 	
@@ -342,7 +359,7 @@ struct ValidateView: View {
 				
 				Text(altAmount)
 					.font(.caption)
-					.foregroundColor(isInvalidAmount ? Color.appRed : .secondary)
+					.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appRed : .secondary)
 					.padding(.top, 4)
 				
 				Text(model.requestDescription ?? "")
@@ -371,9 +388,9 @@ struct ValidateView: View {
 					backgroundFill: Color.appHorizon,
 					disabledBackgroundFill: Color.gray
 				))
-				.disabled(isInvalidAmount || exceedsWalletCapacity || isDisconnected)
+				.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)
 			
-				if !isInvalidAmount && !exceedsWalletCapacity && isDisconnected {
+				if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
 					
 					Button {
 						showConnectionsPopover()
@@ -391,7 +408,7 @@ struct ValidateView: View {
 			} // </VStack>
 			
 		}// </ZStack>
-		.navigationBarTitle("Validate payment", displayMode: .inline)
+		.navigationBarTitle("Confirm Payment", displayMode: .inline)
 		.zIndex(1) // [SendingView, ValidateView, ReadyView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
@@ -406,7 +423,7 @@ struct ValidateView: View {
 	}
 	
 	func onAppear() -> Void {
-		log.trace("(ValidateView) onAppear()")
+		log.trace("[\(viewName)] onAppear()")
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
 		unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
@@ -423,7 +440,7 @@ struct ValidateView: View {
 	}
 	
 	func dismissKeyboardIfVisible() -> Void {
-		log.trace("(ValidateView) dismissKeyboardIfVisible()")
+		log.trace("[\(viewName)] dismissKeyboardIfVisible()")
 		
 		let keyWindow = UIApplication.shared.connectedScenes
 			.filter({ $0.activationState == .foregroundActive })
@@ -435,13 +452,13 @@ struct ValidateView: View {
 	}
 	
 	func amountDidChange() -> Void {
-		log.trace("(ValidateView) amountDidChange()")
+		log.trace("[\(viewName)] amountDidChange()")
 		
 		refreshAltAmount()
 	}
 	
 	func unitDidChange() -> Void {
-		log.trace("(ValidateView) unitDidChange()")
+		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
 		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
@@ -452,7 +469,7 @@ struct ValidateView: View {
 	}
 	
 	func refreshAltAmount() -> Void {
-		log.trace("(ValidateView) refreshAltAmount()")
+		log.trace("[\(viewName)] refreshAltAmount()")
 		
 		switch parsedAmount {
 		case .failure(let error):
@@ -501,20 +518,32 @@ struct ValidateView: View {
 				}
 			}
 			
-			if let msat = msat {
+			if let msat = msat, let alt = alt {
 				if msat > model.balanceMsat {
 					isInvalidAmount = true
-					altAmount = "Amount exceeds your balance"
+					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
 					
 				} else {
-					altAmount = "≈ \(alt!.string)"
+					altAmount = "≈ \(alt.string)"
 				}
 			}
-		}
+			
+			if let expiryTimestamp = model.expiryTimestamp?.doubleValue,
+			   Date(timeIntervalSince1970: expiryTimestamp) <= Date()
+			{
+				isExpiredInvoice = true
+				if !isInvalidAmount {
+					altAmount = NSLocalizedString("Invoice is expired", comment: "error message")
+				}
+			} else {
+				isExpiredInvoice = false
+			}
+			
+		} // </switch parsedAmount>
 	}
 	
 	func sendPayment() -> Void {
-		log.trace("(ValidateView) sendPayment()")
+		log.trace("[\(viewName)] sendPayment()")
 		
 		guard
 			let amt = try? parsedAmount.get(),
@@ -537,7 +566,7 @@ struct ValidateView: View {
 	}
 	
 	func showConnectionsPopover() -> Void {
-		log.trace("(ValidateView) showConnectionsPopover()")
+		log.trace("[\(viewName)] showConnectionsPopover()")
 		
 		popoverState.display.send(PopoverItem(
 			
@@ -578,15 +607,14 @@ struct SendingView: View {
 class ScanView_Previews: PreviewProvider {
 	
 	static let request = "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9"
-	
-	@State static var isShowing = true
 
 	static var previews: some View {
 		
 		NavigationView {
-			ScanView(isShowing: $isShowing).mock(Scan.ModelValidate(
+			ScanView().mock(Scan.ModelValidate(
 				request: request,
 				amountMsat: 1_500,
+				expiryTimestamp: nil,
 				requestDescription: "1 Blockaccino",
 				balanceMsat: 300_000_000
 			))

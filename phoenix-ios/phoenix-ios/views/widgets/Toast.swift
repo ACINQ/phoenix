@@ -1,28 +1,55 @@
 import SwiftUI
 
 class Toast: ObservableObject {
-    @Published private(set) var text: String? = nil
+	
+	enum ToastLocation {
+		case bottom
+		case middle
+	}
+	
+	@Published private var text: String? = nil
+	@Published private var location: ToastLocation = .bottom
 
-    func toast(text: String, duration: Double = 1.5) {
-        withAnimation(.linear(duration: 0.15)) { self.text = text }
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            withAnimation(.linear(duration: 0.15)) { self.text = nil }
-        }
-    }
+	func toast(text: String, duration: Double = 1.5, location: ToastLocation = .bottom) {
+		
+		withAnimation(.linear(duration: 0.15)) {
+			self.text = text
+			self.location = location
+		}
+		DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+			withAnimation(.linear(duration: 0.15)) {
+				self.text = nil
+			}
+		}
+	}
 
-    @ViewBuilder func view() -> some View {
-        if let text = text {
-            VStack {
-                Spacer()
-                Text(text)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.primaryForeground.opacity(0.4))
-                        .cornerRadius(42)
-                        .padding([.bottom], 42)
-            }
-                    .transition(.opacity)
-                    .zIndex(1001)
-        }
-    }
+	@ViewBuilder
+	func view() -> some View {
+		
+		if let text = text {
+			
+			VStack {
+				switch location {
+				case .bottom:
+					Spacer()
+					Text(text).padding([.bottom], 42)
+				case .middle:
+					Spacer()
+					textView(text)
+					Spacer()
+				}
+			}
+			.transition(.opacity)
+			.zIndex(1001)
+		}
+	}
+	
+	func textView(_ text: String) -> some View {
+		
+		Text(text)
+			.padding()
+			.foregroundColor(.white)
+			.background(Color.primaryForeground.opacity(0.4))
+			.cornerRadius(42)
+	}
 }

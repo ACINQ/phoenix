@@ -128,18 +128,41 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
-    val controllers: ControllerFactory = object : ControllerFactory {
-        override fun content(): ContentController = AppContentController(loggerFactory, walletManager)
-        override fun initialization(): InitializationController = AppInitController(loggerFactory, walletManager)
-        override fun home(): HomeController = AppHomeController(loggerFactory, peerManager, paymentsManager)
-        override fun receive(): ReceiveController = AppReceiveController(loggerFactory, chain, peerManager)
-        override fun scan(): ScanController = AppScanController(loggerFactory, peerManager)
-        override fun restoreWallet(): RestoreWalletController = AppRestoreWalletController(loggerFactory)
-        override fun configuration(): ConfigurationController = AppConfigurationController(loggerFactory, walletManager)
-        override fun electrumConfiguration(): ElectrumConfigurationController = AppElectrumConfigurationController(loggerFactory, appConfigurationManager, electrumClient)
-        override fun channelsConfiguration(): ChannelsConfigurationController = AppChannelsConfigurationController(loggerFactory, peerManager, chain)
-        override fun logsConfiguration(): LogsConfigurationController = AppLogsConfigurationController(ctx, loggerFactory, logMemory)
-        override fun closeChannelsConfiguration(): CloseChannelsConfigurationController = AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, false)
-        override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController = AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, true)
+    val controllers: ControllerFactory = object: ControllerFactory {
+        override fun content(): ContentController =
+            AppContentController(loggerFactory, walletManager)
+
+        override fun initialization(): InitializationController =
+            AppInitController(loggerFactory, walletManager)
+
+        override fun home(): HomeController =
+            AppHomeController(loggerFactory, peerManager, paymentsManager)
+
+        override fun receive(): ReceiveController =
+            AppReceiveController(loggerFactory, chain, peerManager)
+
+        override fun scan(firstModel: Scan.Model): ScanController =
+            AppScanController(loggerFactory, firstModel, peerManager)
+
+        override fun restoreWallet(): RestoreWalletController =
+            AppRestoreWalletController(loggerFactory)
+
+        override fun configuration(): ConfigurationController =
+            AppConfigurationController(loggerFactory, walletManager)
+
+        override fun electrumConfiguration(): ElectrumConfigurationController =
+            AppElectrumConfigurationController(loggerFactory, appConfigurationManager, electrumClient)
+
+        override fun channelsConfiguration(): ChannelsConfigurationController =
+            AppChannelsConfigurationController(loggerFactory, peerManager, chain)
+
+        override fun logsConfiguration(): LogsConfigurationController =
+            AppLogsConfigurationController(ctx, loggerFactory, logMemory)
+
+        override fun closeChannelsConfiguration(): CloseChannelsConfigurationController =
+            AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, false)
+
+        override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController =
+            AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, true)
     }
 }

@@ -30,6 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	private var cancellables = Set<AnyCancellable>()
 	
 	private var didIncrementDisconnectCount = false
+	
+	public var externalLightningUrlPublisher = PassthroughSubject<URL, Never>()
 
 	override init() {
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
@@ -275,9 +277,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	func displayLocalNotification(_ payment: Eclair_kmpWalletPayment) {
 		
+		// We are having problems interacting with the `payment` parameter outside the main thread.
+		// This might have to do with the goofy Kotlin freezing stuff.
+		// So let's be safe and always operate on the main thread here.
+		//
 		let handler = {(settings: UNNotificationSettings) -> Void in
-			
-			// We are having problems interacting with the payment instance outside the main thread.
 			
 			guard settings.authorizationStatus == .authorized else {
 				return

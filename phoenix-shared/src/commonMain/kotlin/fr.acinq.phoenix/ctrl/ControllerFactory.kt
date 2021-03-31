@@ -8,7 +8,7 @@ interface ControllerFactory {
     fun initialization(): InitializationController
     fun home(): HomeController
     fun receive(): ReceiveController
-    fun scan(): ScanController
+    fun scan(firstModel: Scan.Model = Scan.Model.Ready): ScanController
     fun restoreWallet(): RestoreWalletController
     fun configuration(): ConfigurationController
     fun electrumConfiguration(): ElectrumConfigurationController

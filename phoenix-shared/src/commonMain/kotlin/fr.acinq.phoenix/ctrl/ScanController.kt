@@ -15,6 +15,7 @@ object Scan {
         data class Validate(
             val request: String,
             val amountMsat: Long?,
+            val expiryTimestamp: Long?, // since unix epoch
             val requestDescription: String?,
             val balanceMsat: Long
         ): Model()

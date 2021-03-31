@@ -55,6 +55,7 @@
 		DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
+		DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9473F9261270B4008D7242 /* MVI+Mock.swift */; };
 		DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */; };
 		DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC99E93F25BA141000FB20F7 /* LocalWebView.swift */; };
 		DC99E94D25BA258C00FB20F7 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = DC99E94825BA258C00FB20F7 /* about.html */; };
@@ -175,6 +176,7 @@
 		DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySeedView.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
+		DC9473F9261270B4008D7242 /* MVI+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MVI+Mock.swift"; sourceTree = "<group>"; };
 		DC99E90825B78FA800FB20F7 /* EnabledSecurity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnabledSecurity.swift; sourceTree = "<group>"; };
 		DC99E93F25BA141000FB20F7 /* LocalWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalWebView.swift; sourceTree = "<group>"; };
 		DC99E94925BA258C00FB20F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/about.html; sourceTree = "<group>"; };
@@ -297,6 +299,7 @@
 			isa = PBXGroup;
 			children = (
 				DC81B79E25BF2AA200F5A52C /* MVI.swift */,
+				DC9473F9261270B4008D7242 /* MVI+Mock.swift */,
 			);
 			path = MVI;
 			sourceTree = "<group>";
@@ -754,6 +757,7 @@
 				C8D7A74B29EAFF2EBD73BC6B /* ConfigurationView.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
+				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,
 				DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */,
