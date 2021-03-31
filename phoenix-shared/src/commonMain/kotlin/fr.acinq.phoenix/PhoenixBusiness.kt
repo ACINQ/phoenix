@@ -59,7 +59,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
 
-    public val chain = Chain.Testnet
+    public val chain = Chain.Mainnet
 
     private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
     private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
