@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v.apps.googleusercontent.com</string>
+	<string>750755451299-6vgfkqcqki4shmkd4o90aa718n5645ls.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v</string>
+	<string>com.googleusercontent.apps.750755451299-6vgfkqcqki4shmkd4o90aa718n5645ls</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>358118532563-6mk6vj5juts2ek7on7c8ej3fpd5686mr.apps.googleusercontent.com</string>
+	<string>750755451299-d8nr439pf35oljj23u7fl34ms3g4bog6.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCThStqY87eRgaLzC1kTe0zrPCtGMRleow</string>
+	<string>AIzaSyBj0Ey6zA8sycG9lT_GgvZ2-6OUxDPoZGk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>358118532563</string>
+	<string>750755451299</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>co.acinq.phoenix</string>
 	<key>PROJECT_ID</key>
-	<string>phoenix-testnet-dc948</string>
+	<string>phoenix-mainnet</string>
 	<key>STORAGE_BUCKET</key>
-	<string>phoenix-testnet-dc948.appspot.com</string>
+	<string>phoenix-mainnet.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +31,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:358118532563:ios:2312a2c09fd90a9ae4fb26</string>
+	<string>1:750755451299:ios:0c80bfa73f0d7a5e0b8a16</string>
 	<key>DATABASE_URL</key>
-	<string>https://phoenix-testnet-dc948.firebaseio.com</string>
+	<string>https://phoenix-mainnet.firebaseio.com</string>
 </dict>
 </plist>
