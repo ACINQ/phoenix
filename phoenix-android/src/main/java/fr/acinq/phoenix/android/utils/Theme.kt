@@ -70,11 +70,11 @@ val gray40 = Color(0xfff0f5f7)
 
 private val LightColorPalette = lightColors(
     // primary
-    primary = horizon,
-    primaryVariant = horizon,
+    primary = applegreen,
+    primaryVariant = applegreen,
     onPrimary = white,
     // secondary = primary
-    secondary = horizon,
+    secondary = applegreen,
     onSecondary = white,
     // app background
     background = white,
@@ -89,11 +89,11 @@ private val LightColorPalette = lightColors(
 
 private val DarkColorPalette = darkColors(
     // primary
-    primary = horizon,
-    primaryVariant = horizon,
+    primary = green,
+    primaryVariant = green,
     onPrimary = white,
     // secondary = primary
-    secondary = horizon,
+    secondary = green,
     onSecondary = white,
     // app background
     background = gray900,
