@@ -96,9 +96,20 @@ class AppSecurity {
 	///
 	private func writeToDisk(securityFile: SecurityFile) throws {
 		
-		let jsonData = try JSONEncoder().encode(securityFile)
+		var url = self.securityJsonUrl
 		
-		try jsonData.write(to: self.securityJsonUrl, options: [.atomic])
+		let jsonData = try JSONEncoder().encode(securityFile)
+		try jsonData.write(to: url, options: [.atomic])
+		
+		do {
+			var resourceValues = URLResourceValues()
+			resourceValues.isExcludedFromBackup = true
+			try url.setResourceValues(resourceValues)
+			
+		} catch {
+			// Don't throw from this error as it's an optimization
+			log.error("Error excluding \(url.lastPathComponent) from backup \(String(describing: error))")
+		}
 	}
 	
 	private func validateParameter(mnemonics: [String]) -> Data {
