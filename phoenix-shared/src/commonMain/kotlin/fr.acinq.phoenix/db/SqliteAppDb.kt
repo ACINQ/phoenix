@@ -79,7 +79,7 @@ class SqliteAppDb(driver: SqlDriver) {
             ApiWalletParams.Version.V0 -> json.decodeFromString(
                 ApiWalletParams.V0.serializer(),
                 data
-            ).export(Chain.Testnet)
+            ).export(Chain.Mainnet)
         }
 
         return Instant.fromEpochSeconds(updated_at) to walletParams
