@@ -61,6 +61,7 @@ kotlin {
 
     sourceSets {
 
+        val eclairkmpVersion = "1.0-beta8"
         val coroutinesVersion = "1.4.2-native-mt"
         val serializationVersion = "1.1.0"
         val secp256k1Version = "0.4.1"
@@ -70,7 +71,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                api("fr.acinq.eclair:eclair-kmp:snapshot")
+                api("fr.acinq.eclair:eclair-kmp:$eclairkmpVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
