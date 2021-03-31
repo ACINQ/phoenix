@@ -118,7 +118,7 @@ struct IntroView2: View {
 				
 				Text("Payment channels are automatically created when needed.")
 				
-				let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
+				let min = Utils.formatBitcoin(sat: 1_000, bitcoinUnit: .sat)
 				Group {
 					Text("The fee is ") +
 					Text("0.10%").bold() +

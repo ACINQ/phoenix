@@ -1162,7 +1162,7 @@ struct SwapInFeePopup : View {
 				Text("A standard Bitcoin address will be displayed next.") +
 				Text(" Funds sent to this address will arrive in your wallet after one confirmation.")
 				
-				let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
+				let min = Utils.formatBitcoin(sat: 1_000, bitcoinUnit: .sat)
 				Group {
 					Text("There is a small fee of ") +
 					Text("0.10%").bold() +
