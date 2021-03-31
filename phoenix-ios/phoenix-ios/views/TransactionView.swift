@@ -88,7 +88,7 @@ struct PaymentView : View {
 					.frame(width: 100, height: 100)
 					.foregroundColor(.appGreen)
 				VStack {
-					Text(payment.amountMsat() < 0 ? "SENT" : "RECEIVED")
+					Text(payment is Eclair_kmpOutgoingPayment ? "SENT" : "RECEIVED")
 						.font(Font.title2.bold())
 						.padding(.bottom, 2)
 					Text(payment.timestamp().formatDateMS())
