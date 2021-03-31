@@ -634,7 +634,12 @@ extension Eclair_kmpWalletPayment {
 		}
 		
 		if let address = address {
-			let str = "https://mempool.space/testnet/address/\(address)"
+			let str: String
+			if AppDelegate.get().business.chain.isTestnet() {
+				str = "https://mempool.space/testnet/address/\(address)"
+			} else {
+				str = "https://mempool.space/address/\(address)"
+			}
 			return URL(string: str)
 		}
 		
