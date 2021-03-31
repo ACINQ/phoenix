@@ -115,7 +115,6 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     }
 
     override suspend fun receivePayment(paymentHash: ByteVector32, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, receivedAt: Long) {
-        if (amount == MilliSatoshi(0)) throw CannotReceiveZero
         withContext(Dispatchers.Default) {
             inQueries.receivePayment(paymentHash, amount, receivedWith, receivedAt)
         }
@@ -236,14 +235,6 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     }
 }
 
-
-object CannotReceiveZero : RuntimeException()
-class OutgoingPaymentNotFound(id: UUID) : RuntimeException("could not find outgoing payment with id=$id")
 class OutgoingPaymentPartNotFound(partId: UUID) : RuntimeException("could not find outgoing payment part with part_id=$partId")
 class IncomingPaymentNotFound(paymentHash: ByteVector32) : RuntimeException("missing payment for payment_hash=$paymentHash")
-class UnhandledIncomingOrigin(origin: IncomingPayment.Origin) : RuntimeException("unhandled origin=$origin")
-class UnhandledIncomingReceivedWith(receivedWith: IncomingPayment.ReceivedWith) : RuntimeException("unhandled receivedWith=$receivedWith")
-object UnhandledOutgoingDetails : RuntimeException("unhandled outgoing details")
-
-
 class UnhandledDirection(direction: String) : RuntimeException("unhandled direction=$direction")
