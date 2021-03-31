@@ -225,7 +225,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		totalTimer = Timer.scheduledTimer(withTimeInterval: 29.0, repeats: false, block: Finish)
 		
 		var isCurrentValue = true
-		let flow = SwiftFlow<Eclair_kmpWalletPayment>(origin: business.incomingPaymentFlow())
+		let flow = SwiftFlow<Eclair_kmpWalletPayment>(origin: business.paymentsManager.lastIncomingPayment)
 		watcher = flow.watch { (payment: Eclair_kmpWalletPayment?) in
 			assertMainThread()
 			if isCurrentValue {

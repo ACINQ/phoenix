@@ -22,7 +22,10 @@ class AppHomeController(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
     private val paymentsManager: PaymentsManager
-) : AppController<Home.Model, Home.Intent>(loggerFactory, Home.emptyModel) {
+) : AppController<Home.Model, Home.Intent>(
+    loggerFactory,
+    firstModel = Home.emptyModel
+) {
 
     init {
         launch {
@@ -50,13 +53,11 @@ class AppHomeController(
         launch {
             paymentsManager.payments.collect {
                 model {
-                    copy(payments = it, lastPayment = it.firstOrNull()?.takeIf { WalletPayment.completedAt(it) > 0 })
+                    copy(payments = it)
                 }
             }
         }
-
     }
 
     override fun process(intent: Home.Intent) {}
-
 }

@@ -126,8 +126,6 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         peerManager.getPeer().registerFcmToken(token)
     }
 
-    fun incomingPaymentFlow() = paymentsManager.subscribeToLastIncomingPayment()
-
     fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
     val controllers: ControllerFactory = object : ControllerFactory {

@@ -106,10 +106,10 @@ class ObservableLastIncomingPayment: ObservableObject {
 	private var watcher: Ktor_ioCloseable? = nil
 	
 	init() {
-		let incomingPaymentFlow = AppDelegate.get().business.incomingPaymentFlow()
-		value = incomingPaymentFlow.value as? Eclair_kmpWalletPayment
+		let lastIncomingPaymentFlow = AppDelegate.get().business.paymentsManager.lastIncomingPayment
+		value = lastIncomingPaymentFlow.value as? Eclair_kmpWalletPayment
 		
-		let swiftFlow = SwiftFlow<Eclair_kmpWalletPayment>(origin: incomingPaymentFlow)
+		let swiftFlow = SwiftFlow<Eclair_kmpWalletPayment>(origin: lastIncomingPaymentFlow)
 		
 		watcher = swiftFlow.watch {[weak self](payment: Eclair_kmpWalletPayment?) in
 			self?.value = payment
@@ -148,12 +148,23 @@ class KotlinPassthroughSubject<Output: AnyObject>: Publisher {
 	private let wrapped: PassthroughSubject<Output, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
+	convenience init(_ flow: Kotlinx_coroutines_coreFlow) {
+		
+		self.init(SwiftFlow(origin: flow))
+	}
+	
 	init(_ swiftFlow: SwiftFlow<Output>) {
+		
+		// There's no need to retain the SwiftFlow instance variable.
+		// Because the SwiftFlow instance itself doesn't maintain any state.
+		// All state is encapsulated in the watch method.
 		
 		wrapped = PassthroughSubject<Output, Failure>()
 		
 		watcher = swiftFlow.watch {[weak self](value: Output?) in
-			self?.wrapped.send(value!)
+			if let value = value {
+				self?.wrapped.send(value)
+			}
 		}
 	}
 
@@ -176,7 +187,16 @@ class KotlinCurrentValueSubject<Output: AnyObject>: Publisher {
 	private let wrapped: CurrentValueSubject<Output, Failure>
 	private var watcher: Ktor_ioCloseable? = nil
 	
+	convenience init(_ stateFlow: Kotlinx_coroutines_coreStateFlow) {
+		
+		self.init(SwiftStateFlow(origin: stateFlow))
+	}
+	
 	init(_ swiftStateFlow: SwiftStateFlow<Output>) {
+		
+		// There's no need to retain the SwiftStateFlow instance variable.
+		// Because the SwiftStateFlow instance itself doesn't maintain any state.
+		// All state is encapsulated in the watch method.
 		
 		let initialValue = swiftStateFlow.value!
 		wrapped = CurrentValueSubject(initialValue)

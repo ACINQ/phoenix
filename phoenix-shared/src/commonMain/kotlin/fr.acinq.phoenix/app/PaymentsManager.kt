@@ -4,9 +4,7 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.io.PaymentReceived
-import fr.acinq.eclair.io.SwapInConfirmedEvent
-import fr.acinq.eclair.io.SwapInPendingEvent
+import fr.acinq.eclair.io.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.getValue
@@ -40,6 +38,9 @@ class PaymentsManager(
     internal val incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
     private var _incomingSwaps by incomingSwaps
 
+    private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
+    val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
+
     /**
      * Broadcasts the most recent incoming payment since the app was launched.
      *
@@ -53,7 +54,8 @@ class PaymentsManager(
      *
      * As a side effect, this allows the app to show a notification when a payment has been received.
      */
-    private val lastIncomingPayment = MutableStateFlow<WalletPayment?>(null)
+    private val _lastIncomingPayment = MutableStateFlow<WalletPayment?>(null)
+    val lastIncomingPayment: StateFlow<WalletPayment?> = _lastIncomingPayment
 
     init {
         launch {
@@ -65,8 +67,17 @@ class PaymentsManager(
         launch {
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
                 when (event) {
+                    is PaymentSent -> {
+                        _lastCompletedPayment.value = event.payment
+                    }
+                    is PaymentNotSent -> {
+                        paymentsDb.getOutgoingPayment(event.request.paymentId)?.let {
+                            _lastCompletedPayment.value = it
+                        }
+                    }
                     is PaymentReceived -> {
-                        lastIncomingPayment.value = event.incomingPayment
+                        _lastCompletedPayment.value = event.incomingPayment
+                        _lastIncomingPayment.value = event.incomingPayment
                     }
                     is SwapInPendingEvent -> {
                         _incomingSwaps = _incomingSwaps + (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
@@ -81,8 +92,6 @@ class PaymentsManager(
     }
 
     suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = paymentsDb.getOutgoingPayment(id)
-
-    fun subscribeToLastIncomingPayment(): StateFlow<WalletPayment?> = lastIncomingPayment
 }
 
 fun WalletPayment.desc(): String? = when (this) {

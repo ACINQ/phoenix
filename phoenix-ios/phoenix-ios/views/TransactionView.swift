@@ -479,9 +479,12 @@ fileprivate struct InfoGrid_Column0<Content>: View where Content: View {
 	var body: some View {
 		content
 			.background(GeometryReader { proxy in
+				let width = proxy.size.width + 1
+				// "+ 1" => SwiftUI bug? "Desc" is sometimes rendered on 2 lines.
+				
 				Color.clear.preference(
 					key: InfoGrid_Column0_MeasuredWidth.self,
-					value: proxy.size.width
+					value: width
 				)
 			})
 	}
