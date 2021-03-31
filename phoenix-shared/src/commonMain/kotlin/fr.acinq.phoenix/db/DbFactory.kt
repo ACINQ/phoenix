@@ -17,10 +17,12 @@
 package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
+import fr.acinq.bitcoin.PublicKey
+import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 
-expect fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver
+expect fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver
 
-expect fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver
+expect fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver
 
 expect fun createAppDbDriver(ctx: PlatformContext): SqlDriver

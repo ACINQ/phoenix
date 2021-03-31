@@ -29,13 +29,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
+import org.kodein.memory.text.toHexString
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PeerManager(
     loggerFactory: LoggerFactory,
     private val walletManager: WalletManager,
     private val configurationManager: AppConfigurationManager,
-    private val paymentsDb: PaymentsDb,
     private val tcpSocketBuilder: TcpSocket.Builder,
     private val electrumWatcher: ElectrumWatcher,
     private val chain: Chain,
@@ -122,9 +122,10 @@ class PeerManager(
         logger.info { "nodeParams=$nodeParams" }
         logger.info { "walletParams=$walletParams" }
 
+        val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
         val databases = object : Databases {
-            override val channels: ChannelsDb get() = SqliteChannelsDb(createChannelsDbDriver(ctx), nodeParams.copy())
-            override val payments: PaymentsDb get() = paymentsDb
+            override val channels: ChannelsDb get() = SqliteChannelsDb(createChannelsDbDriver(ctx, chain, nodeIdHash), nodeParams.copy())
+            override val payments: PaymentsDb get() = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash))
         }
 
         return Peer(nodeParams, walletParams, electrumWatcher, databases, tcpSocketBuilder, MainScope())

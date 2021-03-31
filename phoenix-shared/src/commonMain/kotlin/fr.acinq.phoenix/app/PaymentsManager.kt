@@ -26,7 +26,6 @@ import org.kodein.log.newLogger
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     loggerFactory: LoggerFactory,
-    private val paymentsDb: SqlitePaymentsDb,
     private val peerManager: PeerManager
 ) : CoroutineScope by MainScope() {
     private val log = newLogger(loggerFactory)
@@ -59,7 +58,7 @@ class PaymentsManager(
 
     init {
         launch {
-            paymentsDb.listPaymentsFlow(150, 0, emptySet()).collect {
+            db().listPaymentsFlow(150, 0, emptySet()).collect {
                 payments.value = it
             }
         }
@@ -71,7 +70,7 @@ class PaymentsManager(
                         _lastCompletedPayment.value = event.payment
                     }
                     is PaymentNotSent -> {
-                        paymentsDb.getOutgoingPayment(event.request.paymentId)?.let {
+                        db().getOutgoingPayment(event.request.paymentId)?.let {
                             _lastCompletedPayment.value = it
                         }
                     }
@@ -91,7 +90,9 @@ class PaymentsManager(
         }
     }
 
-    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = paymentsDb.getOutgoingPayment(id)
+    suspend fun db() = peerManager.getPeer().db.payments as SqlitePaymentsDb
+
+    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = db().getOutgoingPayment(id)
 }
 
 fun WalletPayment.desc(): String? = when (this) {

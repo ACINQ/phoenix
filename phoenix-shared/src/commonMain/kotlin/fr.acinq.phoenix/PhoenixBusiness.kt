@@ -58,7 +58,6 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     }
 
     private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    private val paymentsDb by lazy { SqlitePaymentsDb(createPaymentsDbDriver(ctx)) }
 
     public val chain = Chain.Testnet
 
@@ -68,8 +67,8 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private var appConnectionsDaemon: AppConnectionsDaemon? = null
 
     private val walletManager by lazy { WalletManager() }
-    private val peerManager by lazy { PeerManager(loggerFactory, walletManager, appConfigurationManager, paymentsDb, tcpSocketBuilder, electrumWatcher, chain, ctx) }
-    val paymentsManager by lazy { PaymentsManager(loggerFactory, paymentsDb, peerManager) }
+    private val peerManager by lazy { PeerManager(loggerFactory, walletManager, appConfigurationManager, tcpSocketBuilder, electrumWatcher, chain, ctx) }
+    val paymentsManager by lazy { PaymentsManager(loggerFactory, peerManager) }
     val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
 
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb, httpClient) }

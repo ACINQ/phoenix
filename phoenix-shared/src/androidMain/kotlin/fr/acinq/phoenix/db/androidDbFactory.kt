@@ -18,14 +18,16 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
+import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.PlatformContext
+import java.util.*
 
-actual fun createChannelsDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels.sqlite")
+actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+    return AndroidSqliteDriver(ChannelsDatabase.Schema, ctx.applicationContext, "channels-${chain.name.toLowerCase(Locale.ROOT)}-$nodeIdHash.sqlite")
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext): SqlDriver {
-    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments.sqlite")
+actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
+    return AndroidSqliteDriver(PaymentsDatabase.Schema, ctx.applicationContext, "payments-${chain.name.toLowerCase(Locale.ROOT)}-$nodeIdHash.sqlite")
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {
