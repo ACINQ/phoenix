@@ -22,6 +22,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import fr.acinq.phoenix.android.LocalControllerFactory
 import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.*
+import fr.acinq.phoenix.ctrl.Scan
 
 @Suppress("UNREACHABLE_CODE")
 val MockControllers = object : ControllerFactory {
@@ -29,7 +30,7 @@ val MockControllers = object : ControllerFactory {
     override fun content(): ContentController = MVI.Controller.Mock(TODO())
     override fun home(): HomeController = MVI.Controller.Mock(TODO())
     override fun receive(): ReceiveController = MVI.Controller.Mock(TODO())
-    override fun scan(): ScanController = MVI.Controller.Mock(TODO())
+    override fun scan(firstModel: Scan.Model): ScanController = MVI.Controller.Mock(TODO())
     override fun restoreWallet(): RestoreWalletController = MVI.Controller.Mock(TODO())
     override fun configuration(): ConfigurationController = MVI.Controller.Mock(TODO())
     override fun electrumConfiguration(): ElectrumConfigurationController = MVI.Controller.Mock(TODO())
