@@ -56,7 +56,7 @@ struct ReceiveView: MVIView {
 	///
 	static func qrCodeBorderColor(_ colorScheme: ColorScheme) -> Color {
 		
-		return (colorScheme == .dark) ? Color(UIColor.separator) : Color.appHorizon
+		return (colorScheme == .dark) ? Color(UIColor.separator) : Color.appAccent
 	}
 	
 	/// Shared button builder. Used by:
@@ -353,7 +353,7 @@ struct ReceiveLightningView: View, ViewName {
 			VStack {
 				// Remember: This view is on a white background. Even in dark mode.
 				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.appHorizon))
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
 					.padding(.bottom, 10)
 			
 				Text("Generating QRCode...")
@@ -412,7 +412,7 @@ struct ReceiveLightningView: View, ViewName {
 					.renderingMode(.template)
 					.resizable()
 					.aspectRatio(contentMode: .fit)
-					.foregroundColor(Color.appRed)
+					.foregroundColor(Color.appNegative)
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
@@ -450,7 +450,7 @@ struct ReceiveLightningView: View, ViewName {
 					.renderingMode(.template)
 					.resizable()
 					.aspectRatio(contentMode: .fit)
-					.foregroundColor(Color.appYellow)
+					.foregroundColor(Color.appWarn)
 					.frame(width: 32, height: 32)
 			}
 			.padding(.top, paddingTop)
@@ -763,7 +763,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 				TextField("Amount (optional)", text: currencyStyler().amountProxy)
 					.keyboardType(.decimalPad)
 					.disableAutocorrection(true)
-					.foregroundColor(isInvalidAmount ? Color.appRed : Color.primaryForeground)
+					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
 					.padding([.top, .bottom], 8)
 					.padding(.leading, 16)
 					.padding(.trailing, 0)
@@ -785,7 +785,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 
 			Text(altAmount)
 				.font(.caption)
-				.foregroundColor(isInvalidAmount && !isEmptyAmount ? Color.appRed : .secondary)
+				.foregroundColor(isInvalidAmount && !isEmptyAmount ? Color.appNegative : .secondary)
 				.padding(.top, 0)
 				.padding(.leading, 16)
 				.padding(.bottom, 4)
@@ -1343,7 +1343,7 @@ struct SwapInView: View, ViewName {
 			VStack {
 				// Remember: This view is on a white background. Even in dark mode.
 				ProgressView()
-					.progressViewStyle(CircularProgressViewStyle(tint: Color.appHorizon))
+					.progressViewStyle(CircularProgressViewStyle(tint: Color.appAccent))
 					.padding(.bottom, 10)
 			
 				Group {

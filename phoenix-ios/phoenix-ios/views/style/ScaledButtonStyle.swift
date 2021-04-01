@@ -13,7 +13,7 @@ import SwiftUI
 ///   .padding(...)
 /// }
 /// .buttonStyle(ScaleButtonStyle(
-///   backgroundFill: Color.appHorizon,
+///   backgroundFill: Color.blue,
 ///   disabledBackgroundFill: Color.gray
 /// ))
 /// .disabled(stateVar)

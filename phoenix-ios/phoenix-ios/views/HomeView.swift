@@ -106,7 +106,7 @@ struct HomeView : MVIView {
 					VStack {
 						Spacer()
 						Line()
-							.stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+							.stroke(Color.appAccent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
 							.frame(height: 4)
 					}
 				)
@@ -175,7 +175,7 @@ struct PaymentCell : View {
 					.padding(4)
 					.background(
 						RoundedRectangle(cornerRadius: .infinity)
-							.fill(Color.appHorizon)
+							.fill(Color.appAccent)
 					)
 			case .pending:
 				Image("payment_holder_def_pending")
@@ -211,11 +211,11 @@ struct PaymentCell : View {
 					let isNegative = payment.amountMsat() < 0
 					
 					Text(isNegative ? "" : "+")
-						.foregroundColor(isNegative ? .appRed : .appGreen)
+						.foregroundColor(isNegative ? .appNegative : .appPositive)
 						.padding(.trailing, 1)
 					
 					Text(amount.digits)
-						.foregroundColor(isNegative ? .appRed : .appGreen)
+						.foregroundColor(isNegative ? .appNegative : .appPositive)
 						
 					Text(" " + amount.type)
 						.font(.caption)

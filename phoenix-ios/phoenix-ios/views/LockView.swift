@@ -68,7 +68,7 @@ struct LockView : View {
 			
 			if let errorMsg = errorMsg {
 				Text(errorMsg)
-					.foregroundColor(Color.appRed)
+					.foregroundColor(Color.appNegative)
 					.padding(.top, 10)
 			}
 		}

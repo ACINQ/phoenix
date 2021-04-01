@@ -336,7 +336,7 @@ struct ValidateView: View, ViewName {
 						.fixedSize()
 						.font(.title)
 						.multilineTextAlignment(.trailing)
-						.foregroundColor(isInvalidAmount ? Color.appRed : Color.primaryForeground)
+						.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
 				
 					Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
 						let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
@@ -352,14 +352,14 @@ struct ValidateView: View, ViewName {
 				.background(
 					VStack {
 						Spacer()
-						Line().stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 2, dash: [3]))
+						Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, dash: [3]))
 							.frame(height: 1)
 					}
 				)
 				
 				Text(altAmount)
 					.font(.caption)
-					.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appRed : .secondary)
+					.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appNegative : .secondary)
 					.padding(.top, 4)
 				
 				Text(model.requestDescription ?? "")
@@ -385,7 +385,7 @@ struct ValidateView: View, ViewName {
 					.padding([.leading, .trailing], 24)
 				}
 				.buttonStyle(ScaleButtonStyle(
-					backgroundFill: Color.appHorizon,
+					backgroundFill: Color.appAccent,
 					disabledBackgroundFill: Color.gray
 				))
 				.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)

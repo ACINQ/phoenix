@@ -86,7 +86,7 @@ struct PaymentView : View {
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.frame(width: 100, height: 100)
-					.foregroundColor(.appGreen)
+					.foregroundColor(.appPositive)
 				VStack {
 					Text(payment is Eclair_kmpOutgoingPayment ? "SENT" : "RECEIVED")
 						.font(Font.title2.bold())
@@ -113,7 +113,7 @@ struct PaymentView : View {
 					.renderingMode(.template)
 					.resizable()
 					.frame(width: 100, height: 100)
-					.foregroundColor(.appRed)
+					.foregroundColor(.appNegative)
 				VStack {
 					Text("FAILED")
 						.font(Font.title2.bold())
@@ -150,7 +150,7 @@ struct PaymentView : View {
 			.background(
 				VStack {
 					Spacer()
-					Line().stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+					Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
 						.frame(height: 4)
 				}
 			)

@@ -150,7 +150,7 @@ struct AppAccessView : View {
 				Image(systemName: "exclamationmark.triangle")
 					.renderingMode(.template)
 					.imageScale(.medium)
-					.foregroundColor(Color.appYellow)
+					.foregroundColor(Color.appWarn)
 				Text(
 					"Phoenix can be accessed without credentials." +
 					" Make sure that you have enabled adequate protections for iOS."

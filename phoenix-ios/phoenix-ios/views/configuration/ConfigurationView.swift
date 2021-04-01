@@ -141,7 +141,7 @@ struct ConfigurationView: MVIView {
 						Label { Text("Danger zone") } icon: {
 							Image(systemName: "exclamationmark.triangle")
 						}
-					}.foregroundColor(.appRed)
+					}.foregroundColor(.appNegative)
 				}
 			}
 		}

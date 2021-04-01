@@ -40,7 +40,7 @@ struct InitializationView: MVIView {
 					.cornerRadius(16)
 					.overlay(
 						RoundedRectangle(cornerRadius: 16)
-						.stroke(Color.appHorizon, lineWidth: 2)
+						.stroke(Color.appAccent, lineWidth: 2)
 					)
 					Spacer()
 				}
@@ -77,7 +77,7 @@ struct InitializationView: MVIView {
 				.buttonStyle(PlainButtonStyle())
 				.padding([.top, .bottom], 8)
 				.padding([.leading, .trailing], 16)
-				.background(Color.appHorizon)
+				.background(Color.appAccent)
 				.cornerRadius(16)
 				.padding(.bottom, 40)
 
@@ -97,7 +97,7 @@ struct InitializationView: MVIView {
 				.cornerRadius(16)
 				.overlay(
 					RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.appHorizon, lineWidth: 2)
+					.stroke(Color.appAccent, lineWidth: 2)
 				)
 				.padding([.top, .bottom], 0)
 
