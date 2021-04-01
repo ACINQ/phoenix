@@ -116,7 +116,7 @@ struct WarningView: View {
 			.cornerRadius(16)
 			.overlay(
 				RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.appHorizon, lineWidth: 2)
+					.stroke(Color.appAccent, lineWidth: 2)
 			)
 			
 			Spacer()
@@ -255,7 +255,7 @@ struct RestoreView: View {
 				.cornerRadius(16)
 				.overlay(
 					RoundedRectangle(cornerRadius: 16)
-						.stroke(Color.appHorizon, lineWidth: 2)
+						.stroke(Color.appAccent, lineWidth: 2)
 				)
 				.padding([.top, .bottom]) // buffer space at bottom of scrollView
 				

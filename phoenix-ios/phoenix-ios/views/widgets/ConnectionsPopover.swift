@@ -44,13 +44,13 @@ fileprivate struct ConnectionCell : View {
 			let bullet = Image("ic_bullet").resizable().frame(width: 10, height: 10)
 
 			if connection == .established {
-				bullet.foregroundColor(.appGreen)
+				bullet.foregroundColor(.appPositive)
 			}
 			else if connection == .establishing {
-				bullet.foregroundColor(.appYellow)
+				bullet.foregroundColor(.appWarn)
 			}
 			else if connection == .closed {
-				bullet.foregroundColor(.appRed)
+				bullet.foregroundColor(.appNegative)
 			}
 
 			Text("\(label):")

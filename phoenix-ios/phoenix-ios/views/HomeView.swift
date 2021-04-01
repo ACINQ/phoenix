@@ -79,7 +79,7 @@ struct HomeView : MVIView {
 						
 						Text(amount.type.lowercased())
 							.font(.title2)
-							.foregroundColor(Color.appHorizon)
+							.foregroundColor(Color.appAccent)
 							.padding(.bottom, 4)
 							.onTapGesture { toggleCurrencyType() }
 						
@@ -108,7 +108,7 @@ struct HomeView : MVIView {
 						Spacer()
 						RoundedRectangle(cornerRadius: 10)
 							.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-							.foregroundColor(Color.appHorizon)
+							.foregroundColor(Color.appAccent)
 					}
 				)
 				.padding(.bottom, 25)
@@ -120,7 +120,7 @@ struct HomeView : MVIView {
 						.padding(12)
 						.background(
 							RoundedRectangle(cornerRadius: 5)
-								.stroke(Color.appHorizon, lineWidth: 1)
+								.stroke(Color.appAccent, lineWidth: 1)
 						)
 				}.padding(12)
 
@@ -187,7 +187,7 @@ struct PaymentCell : View {
 					.padding(4)
 					.background(
 						RoundedRectangle(cornerRadius: .infinity)
-							.fill(Color.appHorizon)
+							.fill(Color.appAccent)
 					)
 			case .pending:
 				Image("payment_holder_def_pending")
@@ -223,11 +223,11 @@ struct PaymentCell : View {
 					let isNegative = payment.amountMsat() < 0
 					
 					Text(isNegative ? "" : "+")
-						.foregroundColor(isNegative ? .appRed : .appGreen)
+						.foregroundColor(isNegative ? .appNegative : .appPositive)
 						.padding(.trailing, 1)
 					
 					Text(amount.digits)
-						.foregroundColor(isNegative ? .appRed : .appGreen)
+						.foregroundColor(isNegative ? .appNegative : .appPositive)
 						
 					Text(" " + amount.type)
 						.font(.caption)

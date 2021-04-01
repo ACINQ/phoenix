@@ -149,7 +149,7 @@ fileprivate struct StandardWalletView : View {
 			
 			if let detailedErrorMsg = detailedErrorMsg {
 				Text(detailedErrorMsg)
-					.foregroundColor(Color.appRed)
+					.foregroundColor(Color.appNegative)
 			} else {
 				Button {
 					drainWallet()
@@ -165,7 +165,7 @@ fileprivate struct StandardWalletView : View {
 				}
 				.buttonStyle(
 					ScaleButtonStyle(
-						borderStroke: Color.appHorizon,
+						borderStroke: Color.appAccent,
 						disabledBorderStroke: Color(UIColor.separator)
 					)
 				)
@@ -245,7 +245,7 @@ fileprivate struct FundsSentView : View {
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.frame(width: 64, height: 64)
-					.foregroundColor(Color.appGreen)
+					.foregroundColor(Color.appPositive)
 
 				Text("Funds sent")
 					.font(.title)

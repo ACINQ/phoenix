@@ -150,7 +150,7 @@ fileprivate struct ChannelRowView: View {
 						.resizable()
 						.aspectRatio(contentMode: .fit)
 						.frame(width: 10, height: 10)
-						.foregroundColor(channel.isOk ? .appGreen : .appRed)
+						.foregroundColor(channel.isOk ? .appPositive : .appNegative)
 				
 					Text(channel.stateName)
 						.foregroundColor(Color.primary)

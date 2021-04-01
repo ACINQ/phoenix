@@ -92,7 +92,7 @@ struct IntroView1: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
-					borderStroke: Color.appHorizon,
+					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
@@ -146,7 +146,7 @@ struct IntroView2: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
-					borderStroke: Color.appHorizon,
+					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
@@ -192,7 +192,7 @@ struct IntroView3: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
-					borderStroke: Color.appHorizon,
+					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)

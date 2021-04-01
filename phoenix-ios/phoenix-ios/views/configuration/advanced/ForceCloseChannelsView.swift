@@ -149,7 +149,7 @@ fileprivate struct StandardWalletView : View {
 			} // </VStack>
 			
 			Line()
-				.stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+				.stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, lineCap: .round))
 				.frame(width: 40, height: 2)
 				.padding([.top, .bottom], 25)
 			
@@ -201,7 +201,7 @@ fileprivate struct StandardWalletView : View {
 			.padding([.top, .bottom], 8)
 			.padding(.leading, 8)
 			.padding(.trailing, 12)
-			.background(Color.appRed)
+			.background(Color.appNegative)
 			.cornerRadius(16)
 			
 		} // </VStack>
@@ -252,7 +252,7 @@ fileprivate struct FundsSentView : View {
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.frame(width: 64, height: 64)
-				.foregroundColor(Color.appGreen)
+				.foregroundColor(Color.appPositive)
 				.padding(.bottom, 10)
 
 			Text("Funds sent")

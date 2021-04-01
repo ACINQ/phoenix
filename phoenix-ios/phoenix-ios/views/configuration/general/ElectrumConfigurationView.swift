@@ -77,7 +77,7 @@ struct ElectrumConfigurationView: MVIView {
 					
 					if let errMsg = mvi.model.error?.message {
 						Text(errMsg)
-							.foregroundColor(Color.appRed)
+							.foregroundColor(Color.appNegative)
 							.padding(.top, 2)
 					}
 				}
@@ -253,7 +253,7 @@ struct ElectrumAddressPopup: View {
 						Text("Server")
 							.font(.subheadline)
 							.fontWeight(.thin)
-							.foregroundColor(invalidHost ? Color.appRed : Color.primary)
+							.foregroundColor(invalidHost ? Color.appNegative : Color.primary)
 							.frame(width: titleWidth)
 	
 						HStack {
@@ -294,7 +294,7 @@ struct ElectrumAddressPopup: View {
 						Text("Port")
 							.font(.subheadline)
 							.fontWeight(.thin)
-							.foregroundColor(invalidPort ? Color.appRed : Color.primary)
+							.foregroundColor(invalidPort ? Color.appNegative : Color.primary)
 							.frame(width: titleWidth)
 						
 						HStack {
@@ -334,12 +334,12 @@ struct ElectrumAddressPopup: View {
 					if invalidHost {
 						Text("Invalid server. Use format: domain.tld")
 							.italic()
-							.foregroundColor(Color.appRed)
+							.foregroundColor(Color.appNegative)
 							.font(.footnote)
 					} else if invalidPort {
 						Text("Invalid port. Valid range: [1 - 65535]")
 							.italic()
-							.foregroundColor(Color.appRed)
+							.foregroundColor(Color.appNegative)
 							.font(.footnote)
 					} else {
 						Text("Note: Server must have a valid certificate")
