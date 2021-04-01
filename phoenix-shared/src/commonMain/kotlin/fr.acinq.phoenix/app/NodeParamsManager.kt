@@ -125,13 +125,12 @@ class NodeParamsManager(
                     enableTrampolinePayment = true,
                 )
 
-                log.info { "nodeParams=$nodeParams" }
                 _nodeParams.value = nodeParams
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
                 val channelsDb = SqliteChannelsDb(createChannelsDbDriver(ctx, chain, nodeIdHash), nodeParams.copy())
                 val paymentsDb = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash))
-                log.info { "databases object created" }
+                log.debug { "databases object created" }
                 _databases.value = object : Databases {
                     override val channels: ChannelsDb get() = channelsDb
                     override val payments: PaymentsDb get() = paymentsDb
