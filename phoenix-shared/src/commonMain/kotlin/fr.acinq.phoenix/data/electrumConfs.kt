@@ -14,25 +14,7 @@ data class ElectrumAddress(
 }
 
 val electrumMainnetConfigurations = listOf(
-    ElectrumAddress(host = "electrum.acinq.co"),
-    ElectrumAddress(host = "helicarrier.bauerj.eu"),
-    ElectrumAddress(host = "e.keff.org"),
-    ElectrumAddress(host = "e2.keff.org"),
-    ElectrumAddress(host = "e3.keff.org"),
-    ElectrumAddress(host = "e8.keff.org"),
-    ElectrumAddress(host = "electrum-server.ninja"),
-    ElectrumAddress(host = "electrum-unlimited.criptolayer.net"),
-    ElectrumAddress(host = "electrum.qtornado.com"),
-    ElectrumAddress(host = "fortress.qtornado.com"),
-    ElectrumAddress(host = "enode.duckdns.org"),
-    ElectrumAddress(host = "bitcoin.dragon.zone", sslPort = 50004, tcpPort = 50003),
-    ElectrumAddress(host = "ecdsa.net", sslPort = 110),
-    ElectrumAddress(host = "e2.keff.org"),
-    ElectrumAddress(host = "electrum.hodlister.co"),
-    ElectrumAddress(host = "electrum3.hodlister.co"),
-    ElectrumAddress(host = "electrum4.hodlister.co"),
-    ElectrumAddress(host = "electrum5.hodlister.co"),
-    ElectrumAddress(host = "electrum6.hodlister.co")
+    ElectrumAddress(host = "electrum.acinq.co")
 )
 
 val electrumTestnetConfigurations = listOf(
