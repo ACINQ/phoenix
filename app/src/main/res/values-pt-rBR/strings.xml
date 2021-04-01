@@ -105,17 +105,17 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Solicitação de pagamento</string>
+  <string name="receive_edit_title">Invoice</string>
   <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
   <string name="receive_in_progress_message">Favor aguardar…</string>
-  <string name="receive_error_message">Ocorreu um erro ao gerar a solicitação de pagamento…\n\nTente novamente.</string>
+  <string name="receive_error_message">Ocorreu um erro ao gerar a invoice…\n\nTente novamente.</string>
   <string name="receive_amount_label">Quantidade (opcional)</string>
   <string name="receive_desc_label">Descrição do pagamento (opcional):</string>
   <string name="receive_default_desc">Pagamento Phoenix</string>
   <string name="receive_generate_button">Solicitar</string>
 
   <string name="receive_share_subject">Pagamento solicitado</string>
-  <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
+  <string name="receive_share_title">Compartilhe esta invoice com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
@@ -172,7 +172,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
+  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma invoice, endereço bitcoin ou LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_expired">O pagamento expirou.</string>
@@ -442,7 +442,7 @@
   <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
   <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
-  <string name="paymentdetails_payment_request_label">Solicitação de pagamento</string>
+  <string name="paymentdetails_payment_request_label">Invoice</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
