@@ -66,6 +66,8 @@ class AppConfigurationManager(
             logger.debug { "init WalletParams=$walletParams" }
             _walletParams.value = walletParams
         }
+
+        logger.info { "walletParams=$walletParams" }
     }
 
     private var updateWalletParamsJob: Job? = null

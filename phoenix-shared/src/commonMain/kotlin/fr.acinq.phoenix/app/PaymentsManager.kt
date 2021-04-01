@@ -15,9 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -26,7 +24,8 @@ import org.kodein.log.newLogger
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentsManager(
     loggerFactory: LoggerFactory,
-    private val peerManager: PeerManager
+    private val peerManager: PeerManager,
+    private val nodeParamsManager: NodeParamsManager,
 ) : CoroutineScope by MainScope() {
     private val log = newLogger(loggerFactory)
 
@@ -58,7 +57,8 @@ class PaymentsManager(
 
     init {
         launch {
-            db().listPaymentsFlow(150, 0, emptySet()).collect {
+            val db = nodeParamsManager.databases.filterNotNull().first()
+            (db.payments as SqlitePaymentsDb).listPaymentsFlow(150, 0, emptySet()).collect {
                 payments.value = it
             }
         }
@@ -70,7 +70,7 @@ class PaymentsManager(
                         _lastCompletedPayment.value = event.payment
                     }
                     is PaymentNotSent -> {
-                        db().getOutgoingPayment(event.request.paymentId)?.let {
+                        db()?.getOutgoingPayment(event.request.paymentId)?.let {
                             _lastCompletedPayment.value = it
                         }
                     }
@@ -90,9 +90,9 @@ class PaymentsManager(
         }
     }
 
-    suspend fun db() = peerManager.getPeer().db.payments as SqlitePaymentsDb
+    fun db() = nodeParamsManager.databases.value?.payments
 
-    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = db().getOutgoingPayment(id)
+    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? = db()?.getOutgoingPayment(id)
 }
 
 fun WalletPayment.desc(): String? = when (this) {
