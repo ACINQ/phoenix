@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:750755451299:ios:0c80bfa73f0d7a5e0b8a16</string>
+	<string>1:750755451299:ios:8d4dbd408bb5ea1c0b8a16</string>
 	<key>DATABASE_URL</key>
 	<string>https://phoenix-mainnet.firebaseio.com</string>
 </dict>
