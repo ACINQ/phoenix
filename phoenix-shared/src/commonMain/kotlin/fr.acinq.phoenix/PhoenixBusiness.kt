@@ -3,9 +3,7 @@ package fr.acinq.phoenix
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient
 import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
-import fr.acinq.eclair.db.OutgoingPayment
 import fr.acinq.eclair.io.TcpSocket
-import fr.acinq.eclair.utils.UUID
 import fr.acinq.eclair.utils.setEclairLoggerFactory
 import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
@@ -14,9 +12,7 @@ import fr.acinq.phoenix.ctrl.*
 import fr.acinq.phoenix.ctrl.config.*
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.createAppDbDriver
-import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
@@ -57,9 +53,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         }
     }
 
-    private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-
-    public val chain = Chain.Mainnet
+    val chain = Chain.Mainnet
 
     private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
     private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
@@ -67,11 +61,14 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private var appConnectionsDaemon: AppConnectionsDaemon? = null
 
     private val walletManager by lazy { WalletManager() }
-    private val peerManager by lazy { PeerManager(loggerFactory, walletManager, appConfigurationManager, tcpSocketBuilder, electrumWatcher, chain, ctx) }
-    val paymentsManager by lazy { PaymentsManager(loggerFactory, peerManager) }
-    val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
+    private val nodeParamsManager by lazy { NodeParamsManager(loggerFactory, ctx, chain, walletManager) }
+    private val peerManager by lazy { PeerManager(loggerFactory, nodeParamsManager, appConfigurationManager, tcpSocketBuilder, electrumWatcher) }
+    val paymentsManager by lazy { PaymentsManager(loggerFactory, peerManager, nodeParamsManager) }
 
+    private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
+    val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
     val currencyManager by lazy { CurrencyManager(loggerFactory, appDb, httpClient) }
+
     val connectionsMonitor by lazy { ConnectionsMonitor(peerManager, electrumClient, networkMonitor) }
     val util by lazy { Utilities(loggerFactory, chain) }
 
@@ -81,6 +78,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     fun start() {
         if (appConnectionsDaemon == null) {
+            logger.debug { "start business" }
             appConnectionsDaemon = AppConnectionsDaemon(
                 appConfigurationManager,
                 walletManager,
@@ -127,7 +125,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
-    val controllers: ControllerFactory = object: ControllerFactory {
+    val controllers: ControllerFactory = object : ControllerFactory {
         override fun content(): ContentController =
             AppContentController(loggerFactory, walletManager)
 

@@ -74,12 +74,16 @@ class SqliteAppDb(driver: SqlDriver) {
         version: String,
         data: String,
         updated_at: Long
-    ): Pair<Instant, WalletParams> {
+    ): Pair<Instant, WalletParams?> {
         val walletParams = when (ApiWalletParams.Version.valueOf(version)) {
-            ApiWalletParams.Version.V0 -> json.decodeFromString(
-                ApiWalletParams.V0.serializer(),
-                data
-            ).export(Chain.Mainnet)
+            ApiWalletParams.Version.V0 -> try {
+                json.decodeFromString(
+                    ApiWalletParams.V0.serializer(),
+                    data
+                ).export(Chain.Mainnet)
+            } catch (e: Exception) {
+                null
+            }
         }
 
         return Instant.fromEpochSeconds(updated_at) to walletParams
