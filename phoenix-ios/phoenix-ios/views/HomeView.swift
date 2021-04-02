@@ -184,6 +184,7 @@ struct PaymentCell : View {
 			switch payment.state() {
 			case .success:
 				Image("payment_holder_def_success")
+					.foregroundColor(Color.accentColor)
 					.padding(4)
 					.background(
 						RoundedRectangle(cornerRadius: .infinity)
@@ -269,7 +270,7 @@ struct ConnectionStatusButton : View {
 			.cornerRadius(30)
 			.overlay(
 				RoundedRectangle(cornerRadius: 30)
-					.stroke(Color.gray, lineWidth: 1)
+					.stroke(Color.borderColor, lineWidth: 1)
 			)
 			.opacity(dimStatus ? 0.2 : 1.0)
 			.isHidden(status == Eclair_kmpConnection.established)
@@ -320,7 +321,7 @@ struct FaqButton: View {
 		.cornerRadius(30)
 		.overlay(
 			RoundedRectangle(cornerRadius: 30)
-				.stroke(Color(UIColor.systemGray), lineWidth: 1)
+				.stroke(Color.borderColor, lineWidth: 1)
 		)
 	}
 }
@@ -353,11 +354,12 @@ struct BottomBar: View, ViewName {
 				Image("ic_settings")
 					.resizable()
 					.frame(width: 22, height: 22)
+					.foregroundColor(Color.appAccent)
 			}
 			.padding()
 			.padding(.leading, 8)
 
-			Divider().frame(height: 40)
+			Divider().frame(height: 40).background(Color.borderColor)
 			Spacer()
 			
 			NavigationLink(
@@ -369,13 +371,15 @@ struct BottomBar: View, ViewName {
 					Image("ic_receive")
 						.resizable()
 						.frame(width: 22, height: 22)
+						.foregroundColor(Color.appAccent)
+						.padding(4)
 					Text("Receive")
 						.foregroundColor(.primaryForeground)
 				}
 			}
 
 			Spacer()
-			Divider().frame(height: 40)
+			Divider().frame(height: 40).background(Color.borderColor)
 			Spacer()
 
 			NavigationLink(
@@ -387,6 +391,8 @@ struct BottomBar: View, ViewName {
 					Image("ic_scan")
 						.resizable()
 						.frame(width: 22, height: 22)
+						.foregroundColor(Color.appAccent)
+						.padding(4)
 					Text("Send")
 						.foregroundColor(.primaryForeground)
 				}
@@ -396,7 +402,7 @@ struct BottomBar: View, ViewName {
 		}
 		.padding(.top, 10)
 		.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
-		.background(colorScheme == .dark ? Color(UIColor.secondarySystemBackground) : Color.white)
+		.background(Color.mutedBackground)
 		.cornerRadius(15, corners: [.topLeft, .topRight])
 		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
 			didReceiveExternalLightningUrl(url)

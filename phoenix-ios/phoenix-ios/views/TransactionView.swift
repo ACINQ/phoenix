@@ -59,7 +59,7 @@ struct PaymentView : View {
 		}
 		.popoverView( // DYPopoverView
 			content: { ExplainFeesPopover(explanationText: $explainFeesText) },
-			background: { Color(.secondarySystemBackground) },
+			background: { Color.mutedBackground },
 			isPresented: $explainFeesPopoverVisible,
 			frame: $explainFeesPopoverFrame,
 			anchorFrame: nil,
@@ -81,12 +81,13 @@ struct PaymentView : View {
 		VStack {
 			switch payment.state() {
 			case .success:
-				Image(systemName: "checkmark.circle")
+				Image("ic_payment_sent")
 					.renderingMode(.template)
 					.resizable()
-					.aspectRatio(contentMode: .fit)
 					.frame(width: 100, height: 100)
-					.foregroundColor(.appPositive)
+					.aspectRatio(contentMode: .fit)
+					.foregroundColor(Color.appPositive)
+					.padding(.bottom, 16)
 				VStack {
 					Text(payment is Eclair_kmpOutgoingPayment ? "SENT" : "RECEIVED")
 						.font(Font.title2.bold())
@@ -95,18 +96,18 @@ struct PaymentView : View {
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 				}
-				.padding()
+				.padding(.bottom, 30)
 				
 			case .pending:
-			//	Image("ic_send") // image is blurry for some reason
-				Image(systemName: "paperplane")
+				Image("ic_payment_sending")
 					.renderingMode(.template)
 					.resizable()
-					.foregroundColor(Color(UIColor.systemGray))
+					.foregroundColor(Color.borderColor)
 					.frame(width: 100, height: 100)
+					.padding(.bottom, 16)
 				Text("PENDING")
 					.font(Font.title2.bold())
-					.padding()
+					.padding(.bottom, 30)
 				
 			case .failure:
 				Image(systemName: "xmark.circle")
@@ -114,6 +115,7 @@ struct PaymentView : View {
 					.resizable()
 					.frame(width: 100, height: 100)
 					.foregroundColor(.appNegative)
+					.padding(.bottom, 16)
 				VStack {
 					Text("FAILED")
 						.font(Font.title2.bold())
@@ -128,7 +130,7 @@ struct PaymentView : View {
 						.foregroundColor(.secondary)
 					
 				}
-				.padding()
+				.padding(.bottom, 30)
 				
 			default:
 				EmptyView()
@@ -140,21 +142,23 @@ struct PaymentView : View {
 				Text(amount.digits)
 					.font(.largeTitle)
 					.onTapGesture { toggleCurrencyType() }
-				Text(amount.type)
+				Text(amount.type.lowercased())
 					.font(.title3)
-					.foregroundColor(.gray)
+					.foregroundColor(Color.appAccent)
 					.padding(.bottom, 4)
 					.onTapGesture { toggleCurrencyType() }
 			}
-			.padding()
+			.padding([.top, .leading, .trailing], 8)
+			.padding(.bottom, 33)
 			.background(
 				VStack {
 					Spacer()
-					Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-						.frame(height: 4)
+					RoundedRectangle(cornerRadius: 10)
+						.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+						.foregroundColor(Color.appAccent)
 				}
 			)
-			.padding(.bottom, 4)
+			.padding(.bottom, 24)
 			
 			InfoGrid(
 				payment: payment,
@@ -286,8 +290,8 @@ fileprivate struct InfoGrid: View {
 						}
 					}
 					.frame(width: widthColumn0)
-					
-					Text(pDescription)
+
+					Text(pDescription.count > 0 ? pDescription : "No description")
 						.contextMenu {
 							Button(action: {
 								UIPasteboard.general.string = pDescription
