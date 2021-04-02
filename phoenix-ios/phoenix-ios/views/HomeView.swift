@@ -77,8 +77,9 @@ struct HomeView : MVIView {
 							.font(.largeTitle)
 							.onTapGesture { toggleCurrencyType() }
 						
-						Text(amount.type)
+						Text(amount.type.lowercased())
 							.font(.title2)
+							.foregroundColor(Color.appHorizon)
 							.padding(.bottom, 4)
 							.onTapGesture { toggleCurrencyType() }
 						
@@ -101,16 +102,27 @@ struct HomeView : MVIView {
 					}
 				}
 				.padding([.top, .leading, .trailing])
-				.padding(.bottom, 25)
+				.padding(.bottom, 33)
 				.background(
 					VStack {
 						Spacer()
-						Line()
-							.stroke(Color.appHorizon, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-							.frame(height: 4)
+						RoundedRectangle(cornerRadius: 10)
+							.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+							.foregroundColor(Color.appHorizon)
 					}
 				)
-				.padding(.bottom)
+				.padding(.bottom, 25)
+
+				// === Disclaimer ===
+				VStack {
+					Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
+						.font(.caption)
+						.padding(12)
+						.background(
+							RoundedRectangle(cornerRadius: 5)
+								.stroke(Color.appHorizon, lineWidth: 1)
+						)
+				}.padding(12)
 
 				// === Payments List ====
 				ScrollView {
@@ -251,12 +263,12 @@ struct ConnectionStatusButton : View {
 				}
 			}
 			.buttonStyle(PlainButtonStyle())
-			.padding([.leading, .top, .bottom], 4)
-			.padding([.trailing], 6)
+			.padding([.leading, .top, .bottom], 5)
+			.padding([.trailing], 10)
 			.background(Color.buttonFill)
-			.cornerRadius(10)
+			.cornerRadius(30)
 			.overlay(
-				RoundedRectangle(cornerRadius: 10)
+				RoundedRectangle(cornerRadius: 30)
 					.stroke(Color.gray, lineWidth: 1)
 			)
 			.opacity(dimStatus ? 0.2 : 1.0)
@@ -302,12 +314,12 @@ struct FaqButton: View {
 			}
 		}
 		.buttonStyle(PlainButtonStyle())
-		.padding([.top, .bottom], 4)
-		.padding([.leading, .trailing], 6)
+		.padding([.leading, .top, .bottom], 5)
+		.padding([.trailing], 10)
 		.background(Color.buttonFill)
-		.cornerRadius(10)
+		.cornerRadius(30)
 		.overlay(
-			RoundedRectangle(cornerRadius: 10)
+			RoundedRectangle(cornerRadius: 30)
 				.stroke(Color(UIColor.systemGray), lineWidth: 1)
 		)
 	}
