@@ -28,10 +28,10 @@ struct LockView : View {
 		
 		VStack {
 			
-			Image("logo")
-			.resizable()
-			.frame(width: 96, height: 96)
-			.padding([.top, .bottom], 0)
+			Image(logoImageName)
+				.resizable()
+				.frame(width: 96, height: 96)
+				.padding([.top, .bottom], 0)
 
 			Text("Phoenix")
 			.font(Font.title2)
@@ -82,6 +82,14 @@ struct LockView : View {
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			willEnterForeground()
 		})
+	}
+	
+	var logoImageName: String {
+		if AppDelegate.get().business.chain.isTestnet() {
+			return "logo_blue"
+		} else {
+			return "logo_green"
+		}
 	}
 	
 	func onAppear() -> Void {

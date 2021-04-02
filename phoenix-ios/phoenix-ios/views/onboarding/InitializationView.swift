@@ -50,7 +50,7 @@ struct InitializationView: MVIView {
 			// ZStack: layer 1 (foreground)
 			VStack {
 			
-				Image("logo")
+				Image(logoImageName)
 					.resizable()
 					.frame(width: 96, height: 96)
 				//	.overlay(Circle().stroke(Color.secondary, lineWidth: 1.5))
@@ -114,6 +114,14 @@ struct InitializationView: MVIView {
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
 		})
+	}
+	
+	var logoImageName: String {
+		if AppDelegate.get().business.chain.isTestnet() {
+			return "logo_blue"
+		} else {
+			return "logo_green"
+		}
 	}
 	
 	func createMnemonics() -> Void {
