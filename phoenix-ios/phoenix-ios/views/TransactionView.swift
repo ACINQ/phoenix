@@ -456,6 +456,23 @@ fileprivate struct InfoGrid: View {
 				
 			} // </if let pError>
 			
+			if let paymentHash = payment.paymentHashString() {
+				HStack(
+					alignment : VerticalAlignment.top,
+					spacing   : horizontalSpacingBetweenColumns
+				) {
+					HStack(alignment: VerticalAlignment.top, spacing: 0) {
+						Spacer(minLength: 0) // => HorizontalAlignment.trailing
+						InfoGrid_Column0 {
+							Text("Payment Hash")
+								.foregroundColor(.secondary)
+						}
+					}
+					.frame(width: widthColumn0)
+
+					Text(paymentHash)
+				}
+			} // </if let pError>
 		}
 		.padding([.leading, .trailing])
 		.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self) {

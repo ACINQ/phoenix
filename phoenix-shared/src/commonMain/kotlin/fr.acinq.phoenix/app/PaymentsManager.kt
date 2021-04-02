@@ -134,6 +134,11 @@ fun WalletPayment.state(): WalletPaymentState = when (this) {
     }
 }
 
+fun WalletPayment.paymentHashString(): String = when (this) {
+    is OutgoingPayment -> paymentHash.toString()
+    is IncomingPayment -> paymentHash.toString()
+}
+
 fun WalletPayment.timestamp(): Long = WalletPayment.completedAt(this)
 
 fun WalletPayment.errorMessage(): String? = when (this) {
