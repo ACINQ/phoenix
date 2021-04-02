@@ -77,8 +77,9 @@ struct HomeView : MVIView {
 							.font(.largeTitle)
 							.onTapGesture { toggleCurrencyType() }
 						
-						Text(amount.type)
+						Text(amount.type.lowercased())
 							.font(.title2)
+							.foregroundColor(Color.appAccent)
 							.padding(.bottom, 4)
 							.onTapGesture { toggleCurrencyType() }
 						
@@ -101,16 +102,27 @@ struct HomeView : MVIView {
 					}
 				}
 				.padding([.top, .leading, .trailing])
-				.padding(.bottom, 25)
+				.padding(.bottom, 33)
 				.background(
 					VStack {
 						Spacer()
-						Line()
-							.stroke(Color.appAccent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-							.frame(height: 4)
+						RoundedRectangle(cornerRadius: 10)
+							.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+							.foregroundColor(Color.appAccent)
 					}
 				)
-				.padding(.bottom)
+				.padding(.bottom, 25)
+
+				// === Disclaimer ===
+				VStack {
+					Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
+						.font(.caption)
+						.padding(12)
+						.background(
+							RoundedRectangle(cornerRadius: 5)
+								.stroke(Color.appAccent, lineWidth: 1)
+						)
+				}.padding(12)
 
 				// === Payments List ====
 				ScrollView {
@@ -172,6 +184,7 @@ struct PaymentCell : View {
 			switch payment.state() {
 			case .success:
 				Image("payment_holder_def_success")
+					.foregroundColor(Color.accentColor)
 					.padding(4)
 					.background(
 						RoundedRectangle(cornerRadius: .infinity)
@@ -251,13 +264,13 @@ struct ConnectionStatusButton : View {
 				}
 			}
 			.buttonStyle(PlainButtonStyle())
-			.padding([.leading, .top, .bottom], 4)
-			.padding([.trailing], 6)
+			.padding([.leading, .top, .bottom], 5)
+			.padding([.trailing], 10)
 			.background(Color.buttonFill)
-			.cornerRadius(10)
+			.cornerRadius(30)
 			.overlay(
-				RoundedRectangle(cornerRadius: 10)
-					.stroke(Color.gray, lineWidth: 1)
+				RoundedRectangle(cornerRadius: 30)
+					.stroke(Color.borderColor, lineWidth: 1)
 			)
 			.opacity(dimStatus ? 0.2 : 1.0)
 			.isHidden(status == Eclair_kmpConnection.established)
@@ -302,13 +315,13 @@ struct FaqButton: View {
 			}
 		}
 		.buttonStyle(PlainButtonStyle())
-		.padding([.top, .bottom], 4)
-		.padding([.leading, .trailing], 6)
+		.padding([.leading, .top, .bottom], 5)
+		.padding([.trailing], 10)
 		.background(Color.buttonFill)
-		.cornerRadius(10)
+		.cornerRadius(30)
 		.overlay(
-			RoundedRectangle(cornerRadius: 10)
-				.stroke(Color(UIColor.systemGray), lineWidth: 1)
+			RoundedRectangle(cornerRadius: 30)
+				.stroke(Color.borderColor, lineWidth: 1)
 		)
 	}
 }
@@ -341,11 +354,12 @@ struct BottomBar: View, ViewName {
 				Image("ic_settings")
 					.resizable()
 					.frame(width: 22, height: 22)
+					.foregroundColor(Color.appAccent)
 			}
 			.padding()
 			.padding(.leading, 8)
 
-			Divider().frame(height: 40)
+			Divider().frame(height: 40).background(Color.borderColor)
 			Spacer()
 			
 			NavigationLink(
@@ -357,13 +371,15 @@ struct BottomBar: View, ViewName {
 					Image("ic_receive")
 						.resizable()
 						.frame(width: 22, height: 22)
+						.foregroundColor(Color.appAccent)
+						.padding(4)
 					Text("Receive")
 						.foregroundColor(.primaryForeground)
 				}
 			}
 
 			Spacer()
-			Divider().frame(height: 40)
+			Divider().frame(height: 40).background(Color.borderColor)
 			Spacer()
 
 			NavigationLink(
@@ -375,6 +391,8 @@ struct BottomBar: View, ViewName {
 					Image("ic_scan")
 						.resizable()
 						.frame(width: 22, height: 22)
+						.foregroundColor(Color.appAccent)
+						.padding(4)
 					Text("Send")
 						.foregroundColor(.primaryForeground)
 				}
@@ -384,7 +402,7 @@ struct BottomBar: View, ViewName {
 		}
 		.padding(.top, 10)
 		.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
-		.background(colorScheme == .dark ? Color(UIColor.secondarySystemBackground) : Color.white)
+		.background(Color.mutedBackground)
 		.cornerRadius(15, corners: [.topLeft, .topRight])
 		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
 			didReceiveExternalLightningUrl(url)
