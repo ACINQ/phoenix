@@ -56,6 +56,9 @@ kotlin {
             framework {
                 baseName = "PhoenixShared"
             }
+            compilations.all {
+                kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
+            }
         }
     }
 
