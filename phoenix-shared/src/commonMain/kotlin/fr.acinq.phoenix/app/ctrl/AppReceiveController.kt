@@ -44,10 +44,11 @@ class AppReceiveController(loggerFactory: LoggerFactory, private val chain: Chai
                         val preimage = ByteVector32(Random.secure().nextBytes(32)) // must be different everytime
                         peerManager.getPeer().send(
                             ReceivePayment(
-                                preimage,
-                                intent.amount,
-                                intent.description,
-                                deferred
+                                paymentPreimage = preimage,
+                                amount = intent.amount,
+                                description = intent.description,
+                                expirySeconds = 3600 * 24 * 7, // one week
+                                result = deferred
                             )
                         )
                         val request = deferred.await()

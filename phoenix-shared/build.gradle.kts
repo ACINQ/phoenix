@@ -56,12 +56,15 @@ kotlin {
             framework {
                 baseName = "PhoenixShared"
             }
+            compilations.all {
+                kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
+            }
         }
     }
 
     sourceSets {
 
-        val eclairkmpVersion = "1.0-beta8"
+        val eclairkmpVersion = "1.0-beta10"
         val coroutinesVersion = "1.4.2-native-mt"
         val serializationVersion = "1.1.0"
         val secp256k1Version = "0.4.1"
