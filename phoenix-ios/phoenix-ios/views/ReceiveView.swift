@@ -910,7 +910,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					
 				} else {
 					// We don't know the exchange rate, so we can't display fiat value.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.name)"
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 				
 			} else if let fiatCurrency = unit.fiatCurrency {
@@ -925,7 +925,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 				} else {
 					// We don't know the exchange rate !
 					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.name)"
+					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 			}
 		}

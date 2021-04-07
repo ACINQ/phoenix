@@ -226,6 +226,10 @@ class KotlinCurrentValueSubject<Output: AnyObject>: Publisher {
 
 extension FiatCurrency {
 	
+	var shortName: String {
+		return name.uppercased()
+	}
+	
 	var longName: String {
 		
 		switch self {
@@ -260,6 +264,10 @@ extension FiatCurrency {
 }
 
 extension BitcoinUnit {
+	
+	var shortName: String {
+		return name.lowercased()
+	}
 	
 	var explanation: String {
 		

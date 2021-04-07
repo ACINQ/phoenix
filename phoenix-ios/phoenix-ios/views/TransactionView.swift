@@ -142,7 +142,7 @@ struct PaymentView : View {
 				Text(amount.digits)
 					.font(.largeTitle)
 					.onTapGesture { toggleCurrencyType() }
-				Text(amount.type.lowercased())
+				Text(amount.type)
 					.font(.title3)
 					.foregroundColor(Color.appAccent)
 					.padding(.bottom, 4)

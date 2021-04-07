@@ -164,11 +164,11 @@ class Prefs {
 extension FiatCurrency {
 	
 	func serialize() -> String {
-        return self.name
+		return self.name
 	}
 	
 	static func deserialize(_ str: String) -> FiatCurrency? {
-        for value in FiatCurrency.default().values {
+		for value in FiatCurrency.default().values {
 			if str == value.serialize() {
 				return value
 			}

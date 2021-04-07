@@ -77,7 +77,7 @@ struct HomeView : MVIView {
 							.font(.largeTitle)
 							.onTapGesture { toggleCurrencyType() }
 						
-						Text(amount.type.lowercased())
+						Text(amount.type)
 							.font(.title2)
 							.foregroundColor(Color.appAccent)
 							.padding(.bottom, 4)

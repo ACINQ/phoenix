@@ -73,7 +73,7 @@ struct DisplayConfigurationView: View {
 	
 	@ViewBuilder func fiatCurrencyText(_ fiatCurrency: FiatCurrency) -> some View {
 		
-		Text(fiatCurrency.name) +
+		Text(fiatCurrency.shortName) +
 		Text("  \(fiatCurrency.longName)")
 			.font(.footnote)
 			.foregroundColor(Color.secondary)
@@ -82,7 +82,7 @@ struct DisplayConfigurationView: View {
 	@ViewBuilder func bitcoinUnitText(_ bitcoinUnit: BitcoinUnit) -> some View {
 		
 		// TODO: Define explanation of what a bitcoin unit is client side
-		Text(bitcoinUnit.name) +
+		Text(bitcoinUnit.shortName) +
 		Text("  \(bitcoinUnit.explanation)")
 			.font(.footnote)
 			.foregroundColor(Color.secondary)
