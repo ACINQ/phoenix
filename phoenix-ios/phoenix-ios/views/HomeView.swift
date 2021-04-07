@@ -218,7 +218,7 @@ struct PaymentCell : View {
 			.padding([.leading, .trailing], 6)
 			
 			if payment.state() != .failure {
-				HStack(spacing: 0) {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 					
 					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
 					let isNegative = payment.amountMsat() < 0
