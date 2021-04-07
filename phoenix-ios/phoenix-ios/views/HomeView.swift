@@ -334,7 +334,7 @@ struct BottomBar: View, ViewName {
 	enum Tag: String {
 		case ConfigurationView
 		case ReceiveView
-		case ScanView
+		case SendView
 	}
 	
 	@State var temp: [AppScanController] = []
@@ -383,8 +383,8 @@ struct BottomBar: View, ViewName {
 			Spacer()
 
 			NavigationLink(
-				destination: ScanView(firstModel: externalLightningRequest),
-				tag: Tag.ScanView.rawValue,
+				destination: SendView(firstModel: externalLightningRequest),
+				tag: Tag.SendView.rawValue,
 				selection: $selectedTag
 			) {
 				HStack {
@@ -409,7 +409,7 @@ struct BottomBar: View, ViewName {
 		})
 		.onChange(of: selectedTag, perform: { tag in
 			if tag == nil {
-				// If we pushed the ScanView with a external lightning url,
+				// If we pushed the SendView with a external lightning url,
 				// we should nil out the url (since the user is finished with it now).
 				self.externalLightningRequest = nil
 			}
@@ -419,8 +419,8 @@ struct BottomBar: View, ViewName {
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
 		log.trace("[\(viewName)] didReceiveExternalLightningUrl()")
 		
-		if selectedTag == Tag.ScanView.rawValue {
-			log.debug("[\(viewName)] Ignoring: handled by ScanView")
+		if selectedTag == Tag.SendView.rawValue {
+			log.debug("[\(viewName)] Ignoring: handled by SendView")
 			return
 		}
 		
@@ -430,13 +430,13 @@ struct BottomBar: View, ViewName {
 		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
 		//
 		// In particular, we do **NOT** want the user experience to be:
-		// - switch to ScanView
+		// - switch to SendView
 		// - then again switch to ConfirmView
 		// This feels jittery :(
 		//
 		// So we need to:
 		// - get a Scan.ModelValidate instance
-		// - pass this to ScanView as the `firstModel` parameter
+		// - pass this to SendView as the `firstModel` parameter
 		
 		let controllers = AppDelegate.get().business.controllers
 		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
@@ -455,7 +455,7 @@ struct BottomBar: View, ViewName {
 			
 			if let model = model as? Scan.ModelValidate {
 				self.externalLightningRequest = model
-				self.selectedTag = Tag.ScanView.rawValue
+				self.selectedTag = Tag.SendView.rawValue
 				
 			} else if let _ = model as? Scan.ModelBadRequest {
 				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")

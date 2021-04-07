@@ -7,13 +7,13 @@ import os.log
 #if DEBUG && false
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "ScanView"
+	category: "SendView"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct ScanView: MVIView {
+struct SendView: MVIView {
 	
 	@StateObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
@@ -72,7 +72,7 @@ struct ScanView: MVIView {
 		     _ as Scan.ModelBadRequest,
 		     _ as Scan.ModelDangerousRequest:
 
-			ReadyView(
+			ScanView(
 				mvi: mvi,
 				paymentRequest: $paymentRequest,
 				isWarningDisplayed: $isWarningDisplayed
@@ -96,7 +96,7 @@ struct ScanView: MVIView {
 	}
 }
 
-struct ReadyView: View {
+struct ScanView: View {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
@@ -136,26 +136,12 @@ struct ReadyView: View {
 			}
 			
 			VStack {
-				Spacer()
-				
-				Text("Scan a QR code")
-					.padding()
-					.font(.title2)
 				
 				QrCodeScannerView { request in
 					if !isWarningDisplayed && !ignoreScanner {
 						mvi.intent(Scan.IntentParse(request: request))
 					}
 				}
-				.cornerRadius(10)
-				.overlay(
-					RoundedRectangle(cornerRadius: 10)
-						.stroke(Color.gray, lineWidth: 4)
-				)
-				.padding()
-				
-				Divider()
-					.padding([.leading, .trailing])
 				
 				Button {
 					if let request = UIPasteboard.general.string {
@@ -167,15 +153,14 @@ struct ReadyView: View {
 						.font(.title2)
 				}
 				.disabled(!UIPasteboard.general.hasStrings)
-				.padding()
-	
-				Spacer()
+				.padding([.top, .bottom])
+				.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			}
 		}
 		.frame(maxHeight: .infinity)
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle("Scan", displayMode: .inline)
+		.navigationBarTitle("Scan a QR code", displayMode: .inline)
 		.zIndex(2) // [SendingView, ValidateView, ReadyView]
 		.transition(
 			.asymmetric(
@@ -604,14 +589,14 @@ struct SendingView: View {
 
 // MARK:-
 
-class ScanView_Previews: PreviewProvider {
+class SendView_Previews: PreviewProvider {
 	
 	static let request = "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9"
 
 	static var previews: some View {
 		
 		NavigationView {
-			ScanView().mock(Scan.ModelValidate(
+			SendView().mock(Scan.ModelValidate(
 				request: request,
 				amountMsat: 1_500,
 				expiryTimestamp: nil,
