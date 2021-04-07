@@ -2,8 +2,8 @@ package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.io.WrappedChannelEvent
+import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.io.WrappedChannelEvent
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.Utilities
 import fr.acinq.phoenix.app.WalletManager

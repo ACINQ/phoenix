@@ -1,13 +1,13 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.io.*
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.secure
-import fr.acinq.eclair.wire.SwapInRequest
-import fr.acinq.eclair.wire.SwapInResponse
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.io.*
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.secure
+import fr.acinq.lightning.wire.SwapInRequest
+import fr.acinq.lightning.wire.SwapInResponse
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Receive
 import fr.acinq.phoenix.data.Chain

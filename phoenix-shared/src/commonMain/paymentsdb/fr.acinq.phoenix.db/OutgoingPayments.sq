@@ -1,4 +1,4 @@
-import fr.acinq.eclair.db.HopDesc;
+import fr.acinq.lightning.db.HopDesc;
 import fr.acinq.phoenix.db.payments.OutgoingDetailsTypeVersion;
 import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
 import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion;

@@ -17,14 +17,14 @@
 package fr.acinq.phoenix.db
 
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.Eclair.randomBytes32
-import fr.acinq.eclair.channel.InvalidFinalScript
-import fr.acinq.eclair.db.ChannelClosingType
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.payment.FinalFailure
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.wire.PermanentNodeFailure
+import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.channel.InvalidFinalScript
+import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.wire.PermanentNodeFailure
 import fr.acinq.phoenix.db.payments.*
 import kotlin.test.Test
 import kotlin.test.assertEquals

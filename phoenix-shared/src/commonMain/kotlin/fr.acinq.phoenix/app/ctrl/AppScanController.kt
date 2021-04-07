@@ -2,15 +2,15 @@ package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.Feature
-import fr.acinq.eclair.Features
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.channel.*
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.io.SendPayment
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.UUID
-import fr.acinq.eclair.utils.sum
+import fr.acinq.lightning.Feature
+import fr.acinq.lightning.Features
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.channel.*
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.io.SendPayment
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Scan
 import fr.acinq.phoenix.data.toMilliSatoshi

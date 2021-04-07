@@ -20,15 +20,15 @@ import com.squareup.sqldelight.ColumnAdapter
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.ShortChannelId
-import fr.acinq.eclair.channel.ChannelException
-import fr.acinq.eclair.db.HopDesc
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.payment.OutgoingPaymentFailure
-import fr.acinq.eclair.utils.Either
-import fr.acinq.eclair.utils.UUID
-import fr.acinq.eclair.wire.FailureMessage
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.ShortChannelId
+import fr.acinq.lightning.channel.ChannelException
+import fr.acinq.lightning.db.HopDesc
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.payment.OutgoingPaymentFailure
+import fr.acinq.lightning.utils.Either
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.db.OutgoingPaymentPartNotFound
 import fracinqphoenixdb.OutgoingPaymentsQueries
 

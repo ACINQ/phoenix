@@ -1,4 +1,3 @@
-import fr.acinq.eclair.MilliSatoshi;
 import fr.acinq.phoenix.db.payments.IncomingOriginTypeVersion;
 import fr.acinq.phoenix.db.payments.IncomingReceivedWithTypeVersion;
 

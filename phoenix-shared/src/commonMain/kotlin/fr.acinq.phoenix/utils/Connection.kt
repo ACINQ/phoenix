@@ -1,4 +1,4 @@
-import fr.acinq.eclair.utils.Connection
+import fr.acinq.lightning.utils.Connection
 
 operator fun Connection.plus(other: Connection) : Connection =
     when {

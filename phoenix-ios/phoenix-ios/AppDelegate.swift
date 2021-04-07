@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	private var walletLoaded = false
 	private var fcmToken: String? = nil
-	private var peerConnection: Eclair_kmpConnection? = nil
+	private var peerConnection: Lightning_kmpConnection? = nil
 	
 	private var badgeCount = 0
 	private var cancellables = Set<AnyCancellable>()
@@ -228,8 +228,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		totalTimer = Timer.scheduledTimer(withTimeInterval: 29.0, repeats: false, block: Finish)
 		
 		var isCurrentValue = true
-		let flow = SwiftFlow<Eclair_kmpWalletPayment>(origin: business.paymentsManager.lastIncomingPayment)
-		watcher = flow.watch { (payment: Eclair_kmpWalletPayment?) in
+		let flow = SwiftFlow<Lightning_kmpWalletPayment>(origin: business.paymentsManager.lastIncomingPayment)
+		watcher = flow.watch { (payment: Lightning_kmpWalletPayment?) in
 			assertMainThread()
 			if isCurrentValue {
 				isCurrentValue = false
@@ -276,7 +276,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 	}
 	
-	func displayLocalNotification(_ payment: Eclair_kmpWalletPayment) {
+	func displayLocalNotification(_ payment: Lightning_kmpWalletPayment) {
 		
 		// We are having problems interacting with the `payment` parameter outside the main thread.
 		// This might have to do with the goofy Kotlin freezing stuff.
@@ -360,8 +360,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let prvPeerConnection = peerConnection
 		peerConnection = connections.peer
 		
-		if prvPeerConnection != Eclair_kmpConnection.established &&
-		   peerConnection == Eclair_kmpConnection.established
+		if prvPeerConnection != Lightning_kmpConnection.established &&
+		   peerConnection == Lightning_kmpConnection.established
 		{
 			maybeRegisterFcmToken()
 		}
@@ -379,7 +379,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			log.debug("maybeRegisterFcmToken: no: !fcmToken")
 			return
 		}
-		if peerConnection != Eclair_kmpConnection.established {
+		if peerConnection != Lightning_kmpConnection.established {
 			log.debug("maybeRegisterFcmToken: no: !peerConnection")
 			return
 		}
@@ -414,7 +414,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		//
 		// When do we know for sure that the server has registered our fcm_token ?
 		//
-		// Currently we send off the request to eclair-kmp, and it will perform the registration
+		// Currently we send off the request to lightning-kmp, and it will perform the registration
 		// at some point. If the connection is currently established, it will send the
 		// LightningMessage right away. Otherwise, it will send the LightningMessage after
 		// establishing the connection.

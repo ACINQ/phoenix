@@ -1,10 +1,10 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eclair.WalletParams
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.blockchain.electrum.HeaderSubscriptionResponse
-import fr.acinq.eclair.io.TcpSocket
-import fr.acinq.eclair.utils.ServerAddress
+import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.RETRY_DELAY

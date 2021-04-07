@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.eclair.MilliSatoshi
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.data.BitcoinUnit
 
 

@@ -18,9 +18,9 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.utils.toByteVector32
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.phoenix.db.IncomingPaymentNotFound
 import fracinqphoenixdb.IncomingPaymentsQueries
 

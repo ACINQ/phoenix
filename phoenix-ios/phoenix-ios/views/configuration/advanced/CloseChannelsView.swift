@@ -284,7 +284,7 @@ fileprivate struct FooterView : View {
 	
 	var body: some View {
 		
-		// The "send to bitcoin address" functionality isn't available in eclair-kmp yet.
+		// The "send to bitcoin address" functionality isn't available in lightning-kmp yet.
 		// When added, and integrated into Send screen, the code below should be uncommented.
 		// 
 		Group {

@@ -1,11 +1,11 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eclair.NodeParams
-import fr.acinq.eclair.WalletParams
-import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
-import fr.acinq.eclair.db.Databases
-import fr.acinq.eclair.io.Peer
-import fr.acinq.eclair.io.TcpSocket
+import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.WalletParams
+import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.db.Databases
+import fr.acinq.lightning.io.Peer
+import fr.acinq.lightning.io.TcpSocket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope

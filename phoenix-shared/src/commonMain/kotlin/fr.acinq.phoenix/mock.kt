@@ -1,18 +1,18 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.Eclair
-import fr.acinq.eclair.Eclair.randomBytes32
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.HopDesc
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.payment.FinalFailure
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.UUID
-import fr.acinq.eclair.utils.currentTimestampMillis
-import fr.acinq.eclair.utils.msat
+import fr.acinq.lightning.Lightning
+import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.HopDesc
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.lightning.utils.msat
 
 object Mock {
     fun incomingPaymentReceived(): WalletPayment {
@@ -30,7 +30,7 @@ object Mock {
     }
 
     private fun parts(amount: MilliSatoshi, status: OutgoingPayment.Part.Status): List<OutgoingPayment.Part> {
-        val (a, b) = listOf(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey())
+        val (a, b) = listOf(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())
         return listOf(OutgoingPayment.Part(
             id = UUID.randomUUID(),
             amount = amount,
@@ -43,7 +43,7 @@ object Mock {
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 200_000.msat,
-            recipient = Eclair.randomKey().publicKey(),
+            recipient = Lightning.randomKey().publicKey(),
             details = OutgoingPayment.Details.Normal(
                 paymentRequest = PaymentRequest.read("lntb19u1psqtnuspp5cmck9rzrt00wpggydwahplql258txejwlwjvn520txy84chq5ttqdp8xys9xcmpd3sjqsmgd9czq3njv9c8qatrvd5kumccqp7xqrrss9qy9qsqsp55psaxqvh3ayk7atgpneck8fxqfdg848vu5fkp5adp3359cnlu4aq73y3w0t2fcv9vexvq9lkj6gdkwqzk4agqwuzh9dkzczqqgva3fr8s8q6wcwucvcz3x9ycr5pllnhgxprdh4j0706ncvl48kq8uqh6egpdeekrz")
             ),
@@ -56,7 +56,7 @@ object Mock {
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 200_000.msat,
-            recipient = Eclair.randomKey().publicKey(),
+            recipient = Lightning.randomKey().publicKey(),
             details = OutgoingPayment.Details.Normal(
                 paymentRequest = PaymentRequest.read("lntb19u1psqtnuspp5cmck9rzrt00wpggydwahplql258txejwlwjvn520txy84chq5ttqdp8xys9xcmpd3sjqsmgd9czq3njv9c8qatrvd5kumccqp7xqrrss9qy9qsqsp55psaxqvh3ayk7atgpneck8fxqfdg848vu5fkp5adp3359cnlu4aq73y3w0t2fcv9vexvq9lkj6gdkwqzk4agqwuzh9dkzczqqgva3fr8s8q6wcwucvcz3x9ycr5pllnhgxprdh4j0706ncvl48kq8uqh6egpdeekrz")
             ),
@@ -71,7 +71,7 @@ object Mock {
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 200_000.msat,
-            recipient = Eclair.randomKey().publicKey(),
+            recipient = Lightning.randomKey().publicKey(),
             details = OutgoingPayment.Details.Normal(
                 paymentRequest = PaymentRequest.read("lntb19u1psqtnuspp5cmck9rzrt00wpggydwahplql258txejwlwjvn520txy84chq5ttqdp8xys9xcmpd3sjqsmgd9czq3njv9c8qatrvd5kumccqp7xqrrss9qy9qsqsp55psaxqvh3ayk7atgpneck8fxqfdg848vu5fkp5adp3359cnlu4aq73y3w0t2fcv9vexvq9lkj6gdkwqzk4agqwuzh9dkzczqqgva3fr8s8q6wcwucvcz3x9ycr5pllnhgxprdh4j0706ncvl48kq8uqh6egpdeekrz")
             ),
@@ -88,7 +88,7 @@ object Mock {
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 350_000.msat,
-            recipient = Eclair.randomKey().publicKey(),
+            recipient = Lightning.randomKey().publicKey(),
             details = OutgoingPayment.Details.ChannelClosing(
                 channelId = ByteVector32.Zeroes,
                 closingAddress = "tb1q8rf6p595hp465pm2hhxfhyv5zdr6jgujwetraq",
@@ -103,7 +103,7 @@ object Mock {
         return OutgoingPayment(
             id = UUID.randomUUID(),
             recipientAmount = 350_000.msat,
-            recipient = Eclair.randomKey().publicKey(),
+            recipient = Lightning.randomKey().publicKey(),
             details = OutgoingPayment.Details.ChannelClosing(
                 channelId = ByteVector32.Zeroes,
                 closingAddress = "tb1q8rf6p595hp465pm2hhxfhyv5zdr6jgujwetraq",

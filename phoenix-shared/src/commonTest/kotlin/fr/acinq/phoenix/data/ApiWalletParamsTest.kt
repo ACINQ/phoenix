@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.PublicKey
-import fr.acinq.eclair.*
-import fr.acinq.eclair.utils.msat
-import fr.acinq.eclair.utils.sat
+import fr.acinq.lightning.*
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.rawWalletParams
 import kotlinx.serialization.json.Json
 import kotlin.test.Test

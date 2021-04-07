@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.eclair.Eclair
+import fr.acinq.lightning.Lightning
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
@@ -74,7 +74,7 @@ fun CreateWalletView(appVM: AppViewModel) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val entropy = remember { Eclair.randomBytes(16) }
+                val entropy = remember { Lightning.randomBytes(16) }
                 log.info { "generating wallet" }
                 postIntent(Initialization.Intent.GenerateWallet(entropy))
                 when (model) {

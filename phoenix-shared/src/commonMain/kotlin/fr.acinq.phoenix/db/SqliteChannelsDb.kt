@@ -18,11 +18,11 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.CltvExpiry
-import fr.acinq.eclair.NodeParams
-import fr.acinq.eclair.channel.ChannelStateWithCommitments
-import fr.acinq.eclair.db.ChannelsDb
-import fr.acinq.eclair.serialization.Serialization
+import fr.acinq.lightning.CltvExpiry
+import fr.acinq.lightning.NodeParams
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.db.ChannelsDb
+import fr.acinq.lightning.serialization.Serialization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -17,16 +17,16 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.eclair.*
-import fr.acinq.eclair.blockchain.fee.FeerateTolerance
-import fr.acinq.eclair.blockchain.fee.OnChainFeeConf
-import fr.acinq.eclair.crypto.LocalKeyManager
-import fr.acinq.eclair.db.ChannelsDb
-import fr.acinq.eclair.db.Databases
-import fr.acinq.eclair.db.PaymentsDb
-import fr.acinq.eclair.utils.msat
-import fr.acinq.eclair.utils.sat
-import fr.acinq.eclair.utils.toByteVector
+import fr.acinq.lightning.*
+import fr.acinq.lightning.blockchain.fee.FeerateTolerance
+import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
+import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.lightning.db.ChannelsDb
+import fr.acinq.lightning.db.Databases
+import fr.acinq.lightning.db.PaymentsDb
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb

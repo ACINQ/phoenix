@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.data
 
-import fr.acinq.eclair.io.TcpSocket
-import fr.acinq.eclair.utils.ServerAddress
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.ServerAddress
 
 data class ElectrumAddress(
     val host: String,

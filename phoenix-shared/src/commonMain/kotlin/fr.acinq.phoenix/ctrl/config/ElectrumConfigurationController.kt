@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.ctrl.config
 
-import fr.acinq.eclair.utils.Connection
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.ctrl.MVI
 import fr.acinq.phoenix.data.ElectrumConfig
 

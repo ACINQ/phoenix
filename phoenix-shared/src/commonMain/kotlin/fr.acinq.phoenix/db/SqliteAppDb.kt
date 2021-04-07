@@ -3,7 +3,7 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import fr.acinq.eclair.WalletParams
+import fr.acinq.lightning.WalletParams
 import fr.acinq.phoenix.data.ApiWalletParams
 import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.Chain

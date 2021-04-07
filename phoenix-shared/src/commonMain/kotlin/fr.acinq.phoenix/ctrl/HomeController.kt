@@ -1,8 +1,8 @@
 package fr.acinq.phoenix.ctrl
 
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.WalletPayment
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.WalletPayment
 
 
 typealias HomeController = MVI.Controller<Home.Model, Home.Intent>

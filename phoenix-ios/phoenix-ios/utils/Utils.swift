@@ -76,7 +76,7 @@ class Utils {
 	/// which contains the various string values needed for display.
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs,
-	                              msat: Eclair_kmpMilliSatoshi,
+	                              msat: Lightning_kmpMilliSatoshi,
 	                         hideMsats: Bool = true
 	) -> FormattedAmount {
 		return format(currencyPrefs, msat: msat.toLong(), hideMsats: hideMsats)
@@ -100,7 +100,7 @@ class Utils {
 			} else {
 				return FormattedAmount(
 					digits: "?.??",
-					type: selectedFiat.name,
+					type: selectedFiat.shortName,
 					decimalSeparator: NumberFormatter().currencyDecimalSeparator
 				)
 			}
@@ -147,7 +147,7 @@ class Utils {
 		let digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
 		let formattedAmount = FormattedAmount(
 			digits: digits,
-			type: bitcoinUnit.name,
+			type: bitcoinUnit.shortName,
 			decimalSeparator: formatter.decimalSeparator
 		)
 		
@@ -192,7 +192,7 @@ class Utils {
 		let digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
 		return FormattedAmount(
 			digits: digits,
-			type: exchangeRate.fiatCurrency.name,
+			type: exchangeRate.fiatCurrency.shortName,
 			decimalSeparator: formatter.currencyDecimalSeparator
 		)
 	}

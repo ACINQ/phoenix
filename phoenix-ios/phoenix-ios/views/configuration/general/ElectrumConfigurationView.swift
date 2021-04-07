@@ -480,13 +480,13 @@ struct ElectrumAddressPopup: View {
 
 class ElectrumConfigurationView_Previews: PreviewProvider {
 	
-	static let electrumServer1 = Eclair_kmpServerAddress(
+	static let electrumServer1 = Lightning_kmpServerAddress(
 		host: "tn.not.fyi",
 		port: 55002,
         tls: nil
 	)
 	
-	static let electrumServer2 = Eclair_kmpServerAddress(
+	static let electrumServer2 = Lightning_kmpServerAddress(
 		host: "",
 		port: 0,
         tls: nil
@@ -494,7 +494,7 @@ class ElectrumConfigurationView_Previews: PreviewProvider {
 	
 	static let mockModel = ElectrumConfiguration.Model(
 		configuration: ElectrumConfig.Custom(server: electrumServer2),
-		connection: Eclair_kmpConnection.closed,
+		connection: Lightning_kmpConnection.closed,
 		feeRate: 9999,
 		blockHeight: 1234,
 		tipTimestamp: 1234567890,

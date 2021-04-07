@@ -17,9 +17,9 @@
 package fr.acinq.phoenix.db
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.msat
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.payments.*
 import kotlin.test.Test
 import kotlin.test.assertEquals

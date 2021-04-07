@@ -164,11 +164,11 @@ class Prefs {
 extension FiatCurrency {
 	
 	func serialize() -> String {
-        return self.name
+		return self.name
 	}
 	
 	static func deserialize(_ str: String) -> FiatCurrency? {
-        for value in FiatCurrency.default().values {
+		for value in FiatCurrency.default().values {
 			if str == value.serialize() {
 				return value
 			}
@@ -274,7 +274,7 @@ struct ElectrumConfigPrefs: Codable {
 		self.version = 1
 	}
 	
-	var serverAddress: Eclair_kmpServerAddress {
-		return Eclair_kmpServerAddress(host: host, port: Int32(port), tls: Eclair_kmpTcpSocketTLS.safe)
+	var serverAddress: Lightning_kmpServerAddress {
+		return Lightning_kmpServerAddress(host: host, port: Int32(port), tls: Lightning_kmpTcpSocketTLS.safe)
 	}
 }

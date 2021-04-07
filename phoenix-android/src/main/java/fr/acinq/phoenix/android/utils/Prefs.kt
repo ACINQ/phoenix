@@ -18,7 +18,7 @@ package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import fr.acinq.eclair.utils.ServerAddress
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import org.slf4j.LoggerFactory
