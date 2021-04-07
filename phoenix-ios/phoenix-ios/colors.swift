@@ -30,3 +30,14 @@ extension Color {
 	static let borderColor = Color("borderColor")
 	static let mutedBackground = Color("mutedBackground")
 }
+
+extension UIColor {
+	
+	static var appAccent: UIColor {
+		if AppDelegate.get().business.chain.isTestnet() {
+			return UIColor(named: "appAccentBlue")!
+		} else {
+			return UIColor(named: "appAccentGreen")!
+		}
+	}
+}
