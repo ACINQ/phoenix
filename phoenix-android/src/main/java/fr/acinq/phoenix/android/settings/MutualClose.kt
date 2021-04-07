@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.utils.toMilliSatoshi
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.R

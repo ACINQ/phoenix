@@ -19,16 +19,16 @@ struct HomeView : MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@State var lastCompletedPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
+	@State var lastCompletedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
 	@State var showConnections = false
 
-	@State var selectedPayment: PhoenixShared.Eclair_kmpWalletPayment? = nil
+	@State var selectedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
 	
 	@StateObject var toast = Toast()
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Eclair_kmpWalletPayment>(
+	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
 		AppDelegate.get().business.paymentsManager.lastCompletedPayment
 	)
 
@@ -38,7 +38,7 @@ struct HomeView : MVIView {
 		main
 			.navigationBarTitle("", displayMode: .inline)
 			.navigationBarHidden(true)
-			.onReceive(lastCompletedPaymentPublisher) { (payment: Eclair_kmpWalletPayment) in
+			.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
 				
 				if lastCompletedPayment != payment {
 					lastCompletedPayment = payment
@@ -175,7 +175,7 @@ struct HomeView : MVIView {
 
 struct PaymentCell : View {
 
-	let payment: PhoenixShared.Eclair_kmpWalletPayment
+	let payment: PhoenixShared.Lightning_kmpWalletPayment
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
@@ -273,7 +273,7 @@ struct ConnectionStatusButton : View {
 					.stroke(Color.borderColor, lineWidth: 1)
 			)
 			.opacity(dimStatus ? 0.2 : 1.0)
-			.isHidden(status == Eclair_kmpConnection.established)
+			.isHidden(status == Lightning_kmpConnection.established)
 		}
 		.onAppear {
 			DispatchQueue.main.async {
@@ -486,8 +486,8 @@ class HomeView_Previews: PreviewProvider {
 	static var previews: some View {
 
 		HomeView().mock(Home.Model(
-			balance: Eclair_kmpMilliSatoshi(msat: 123500),
-			incomingBalance: Eclair_kmpMilliSatoshi(msat: 0),
+			balance: Lightning_kmpMilliSatoshi(msat: 123500),
+			incomingBalance: Lightning_kmpMilliSatoshi(msat: 0),
 			payments: []
 		))
 		.preferredColorScheme(.dark)
@@ -495,8 +495,8 @@ class HomeView_Previews: PreviewProvider {
 		.environmentObject(CurrencyPrefs.mockEUR())
 		
 		HomeView().mock(Home.Model(
-			balance: Eclair_kmpMilliSatoshi(msat: 1000000),
-			incomingBalance: Eclair_kmpMilliSatoshi(msat: 12000000),
+			balance: Lightning_kmpMilliSatoshi(msat: 1000000),
+			incomingBalance: Lightning_kmpMilliSatoshi(msat: 12000000),
 			payments: []
 		))
 		.preferredColorScheme(.light)

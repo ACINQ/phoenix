@@ -20,18 +20,18 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.eclair.*
-import fr.acinq.eclair.Eclair.randomBytes32
-import fr.acinq.eclair.channel.ChannelUnavailable
-import fr.acinq.eclair.channel.TooManyAcceptedHtlcs
-import fr.acinq.eclair.db.HopDesc
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.payment.FinalFailure
-import fr.acinq.eclair.payment.OutgoingPaymentFailure
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.*
-import fr.acinq.eclair.wire.TemporaryNodeFailure
+import fr.acinq.lightning.*
+import fr.acinq.lightning.Lightning.randomBytes32
+import fr.acinq.lightning.channel.ChannelUnavailable
+import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
+import fr.acinq.lightning.db.HopDesc
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.payment.OutgoingPaymentFailure
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.*
+import fr.acinq.lightning.wire.TemporaryNodeFailure
 import fr.acinq.phoenix.db.payments.IncomingQueries
 import fr.acinq.phoenix.runTest
 import kotlin.test.*
@@ -136,7 +136,7 @@ class SqlitePaymentsDatabaseTest {
     }
 
     private fun createOutgoing(): OutgoingPayment {
-        val (a, b, c) = listOf(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey())
+        val (a, b, c) = listOf(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())
         val pr = createInvoice(randomBytes32())
         return OutgoingPayment(
             UUID.randomUUID(),
@@ -182,8 +182,8 @@ class SqlitePaymentsDatabaseTest {
 
         // Other payment parts are added.
         val newParts = listOf(
-            OutgoingPayment.Part(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 115),
-            OutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 120),
+            OutgoingPayment.Part(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 115),
+            OutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 120),
         )
         // Parts need a valid parent.
         assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
@@ -294,26 +294,26 @@ class SqlitePaymentsDatabaseTest {
         assertTrue(db.listPayments(count = 10, skip = 0).isEmpty())
 
         // Will succeed
-        val outgoing1Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 50_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing1 = OutgoingPayment(UUID.randomUUID(), 50_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing1Parts, OutgoingPayment.Status.Pending)
+        val outgoing1Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 50_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
+        val outgoing1 = OutgoingPayment(UUID.randomUUID(), 50_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing1Parts, OutgoingPayment.Status.Pending)
         // Will fail
-        val outgoing2Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing2 = OutgoingPayment(UUID.randomUUID(), 55_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.KeySend(randomBytes32()), outgoing2Parts, OutgoingPayment.Status.Pending)
+        val outgoing2Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
+        val outgoing2 = OutgoingPayment(UUID.randomUUID(), 55_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.KeySend(randomBytes32()), outgoing2Parts, OutgoingPayment.Status.Pending)
         // Will succeed but first part will be a failure
         val outgoing3Parts = listOf(
-            OutgoingPayment.Part(UUID.randomUUID(), 60_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-            OutgoingPayment.Part(UUID.randomUUID(), 45_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-            OutgoingPayment.Part(UUID.randomUUID(), 17_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(43))), OutgoingPayment.Part.Status.Pending, 100)
+            OutgoingPayment.Part(UUID.randomUUID(), 60_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
+            OutgoingPayment.Part(UUID.randomUUID(), 45_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
+            OutgoingPayment.Part(UUID.randomUUID(), 17_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(43))), OutgoingPayment.Part.Status.Pending, 100)
         )
         val outgoing3 =
-            OutgoingPayment(UUID.randomUUID(), 60_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.SwapOut("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", randomBytes32()), outgoing3Parts, OutgoingPayment.Status.Pending)
+            OutgoingPayment(UUID.randomUUID(), 60_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.SwapOut("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", randomBytes32()), outgoing3Parts, OutgoingPayment.Status.Pending)
         // Will stay pending
-        val outgoing4 = OutgoingPayment(UUID.randomUUID(), 45_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())))
+        val outgoing4 = OutgoingPayment(UUID.randomUUID(), 45_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())))
         // Will succeed but is overpaid...
-        val outgoing5Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Eclair.randomKey().publicKey(), Eclair.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing5 = OutgoingPayment(UUID.randomUUID(), 35_000.msat, Eclair.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing5Parts, OutgoingPayment.Status.Pending)
+        val outgoing5Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
+        val outgoing5 = OutgoingPayment(UUID.randomUUID(), 35_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing5Parts, OutgoingPayment.Status.Pending)
         val closing6 = OutgoingPayment.Details.ChannelClosing(randomBytes32(), "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", true)
-        val outgoing6 = OutgoingPayment(UUID.randomUUID(), 100_000_000.msat, Eclair.randomKey().publicKey(), closing6, listOf(), OutgoingPayment.Status.Pending)
+        val outgoing6 = OutgoingPayment(UUID.randomUUID(), 100_000_000.msat, Lightning.randomKey().publicKey(), closing6, listOf(), OutgoingPayment.Status.Pending)
 
         // Add outgoing to database
         listOf(
@@ -396,7 +396,7 @@ class SqlitePaymentsDatabaseTest {
         )
 
         private fun createInvoice(preimage: ByteVector32): PaymentRequest {
-            return PaymentRequest.create(Block.LivenetGenesisBlock.hash, 150_000.msat, Crypto.sha256(preimage).toByteVector32(), Eclair.randomKey(), "invoice", CltvExpiryDelta(16), defaultFeatures)
+            return PaymentRequest.create(Block.LivenetGenesisBlock.hash, 150_000.msat, Crypto.sha256(preimage).toByteVector32(), Lightning.randomKey(), "invoice", CltvExpiryDelta(16), defaultFeatures)
         }
     }
 }

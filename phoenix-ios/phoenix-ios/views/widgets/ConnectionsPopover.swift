@@ -37,7 +37,7 @@ struct ConnectionsPopover: View {
 
 fileprivate struct ConnectionCell : View {
 	let label: String
-	let connection: Eclair_kmpConnection
+	let connection: Lightning_kmpConnection
 
 	var body : some View {
 		HStack {

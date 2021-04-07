@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountInput

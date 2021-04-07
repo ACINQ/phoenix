@@ -176,7 +176,7 @@ struct ReceiveLightningView: View, ViewName {
 		.onChange(of: mvi.model, perform: { newModel in
 			onModelChange(model: newModel)
 		})
-		.onChange(of: lastIncomingPayment.value) { (payment: Eclair_kmpWalletPayment?) in
+		.onChange(of: lastIncomingPayment.value) { (payment: Lightning_kmpWalletPayment?) in
 			lastIncomingPaymentChanged(payment)
 		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
@@ -689,12 +689,12 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func lastIncomingPaymentChanged(_ payment: Eclair_kmpWalletPayment?) {
+	func lastIncomingPaymentChanged(_ payment: Lightning_kmpWalletPayment?) {
 		log.trace("[\(viewName)] lastIncomingPaymentChanged()")
 		
 		guard
 			let model = mvi.model as? Receive.ModelGenerated,
-			let lastIncomingPayment = payment as? Eclair_kmpIncomingPayment
+			let lastIncomingPayment = payment as? Lightning_kmpIncomingPayment
 		else {
 			return
 		}
@@ -729,7 +729,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	let dismissSheet: () -> Void
 
-	let initialAmount: Eclair_kmpMilliSatoshi?
+	let initialAmount: Lightning_kmpMilliSatoshi?
 	
 	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
 	@State var amount: String = ""
@@ -940,7 +940,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 			
 			if let bitcoinUnit = unit.bitcoinUnit {
 				
-				let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
+				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
 				mvi.intent(Receive.IntentAsk(
 					amount: msat,
 					desc: trimmedDesc
@@ -949,7 +949,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 			} else if let fiatCurrency = unit.fiatCurrency,
 			          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 			{
-				let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
+				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
 				mvi.intent(Receive.IntentAsk(
 					amount: msat,
 					desc: trimmedDesc
@@ -1414,7 +1414,7 @@ class ReceiveView_Previews: PreviewProvider {
 			ReceiveView().mock(Receive.ModelGenerated(
 				request: request,
 				paymentHash: "foobar",
-				amount: Eclair_kmpMilliSatoshi(msat: 170000),
+				amount: Lightning_kmpMilliSatoshi(msat: 170000),
 				desc: "1 Espresso Coin Panna"
 			))
 		}

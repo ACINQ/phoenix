@@ -1,6 +1,6 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.eclair.utils.Connection
+import fr.acinq.lightning.utils.Connection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.StateFlow

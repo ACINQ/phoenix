@@ -1,15 +1,15 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.io.*
-import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.eclair.utils.UUID
-import fr.acinq.eclair.utils.getValue
-import fr.acinq.eclair.utils.setValue
-import fr.acinq.eclair.utils.toMilliSatoshi
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.io.*
+import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.getValue
+import fr.acinq.lightning.utils.setValue
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

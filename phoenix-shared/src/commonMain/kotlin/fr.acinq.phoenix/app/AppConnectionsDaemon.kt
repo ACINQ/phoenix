@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.utils.Connection
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.NetworkState

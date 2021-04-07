@@ -76,7 +76,7 @@ class Utils {
 	/// which contains the various string values needed for display.
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs,
-	                              msat: Eclair_kmpMilliSatoshi,
+	                              msat: Lightning_kmpMilliSatoshi,
 	                         hideMsats: Bool = true
 	) -> FormattedAmount {
 		return format(currencyPrefs, msat: msat.toLong(), hideMsats: hideMsats)

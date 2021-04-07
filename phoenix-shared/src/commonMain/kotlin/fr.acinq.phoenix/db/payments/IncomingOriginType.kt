@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.db.payments
 
-import fr.acinq.eclair.db.IncomingPayment
-import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.lightning.db.IncomingPayment
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*

@@ -50,10 +50,10 @@ object Logging {
     val localFileAppender = getLocalFileAppender(context, lc)
 
     // set level
-    lc.getLogger("fr.acinq.eclair").level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
+    lc.getLogger("fr.acinq.lightning").level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
     lc.getLogger("fr.acinq.phoenix").level = if (BuildConfig.DEBUG) Level.DEBUG else Level.INFO
-    lc.getLogger("fr.acinq.eclair.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
-    lc.getLogger("fr.acinq.eclair.db.BackupHandler").level = Level.WARN
+    lc.getLogger("fr.acinq.lightning.crypto").level = Level.WARN // ChaCha20Poly1305 spams a lot in debug
+    lc.getLogger("fr.acinq.lightning.db.BackupHandler").level = Level.WARN
     lc.getLogger("io.netty").level = if (BuildConfig.DEBUG) Level.INFO else Level.WARN
 
     val root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger

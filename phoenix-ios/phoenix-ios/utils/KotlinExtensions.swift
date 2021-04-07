@@ -3,7 +3,7 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
-extension Eclair_kmpConnection {
+extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {
 		switch self {
@@ -101,17 +101,17 @@ class ObservableConnectionsMonitor: ObservableObject {
 
 class ObservableLastIncomingPayment: ObservableObject {
 	
-	@Published var value: Eclair_kmpWalletPayment? = nil
+	@Published var value: Lightning_kmpWalletPayment? = nil
 	
 	private var watcher: Ktor_ioCloseable? = nil
 	
 	init() {
 		let lastIncomingPaymentFlow = AppDelegate.get().business.paymentsManager.lastIncomingPayment
-		value = lastIncomingPaymentFlow.value as? Eclair_kmpWalletPayment
+		value = lastIncomingPaymentFlow.value as? Lightning_kmpWalletPayment
 		
-		let swiftFlow = SwiftFlow<Eclair_kmpWalletPayment>(origin: lastIncomingPaymentFlow)
+		let swiftFlow = SwiftFlow<Lightning_kmpWalletPayment>(origin: lastIncomingPaymentFlow)
 		
-		watcher = swiftFlow.watch {[weak self](payment: Eclair_kmpWalletPayment?) in
+		watcher = swiftFlow.watch {[weak self](payment: Lightning_kmpWalletPayment?) in
 			self?.value = payment
 		}
 	}

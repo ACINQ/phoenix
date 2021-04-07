@@ -18,11 +18,11 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.db.ChannelClosingType
-import fr.acinq.eclair.db.OutgoingPayment
-import fr.acinq.eclair.payment.FinalFailure
-import fr.acinq.eclair.serialization.ByteVector32KSerializer
-import fr.acinq.eclair.serialization.SatoshiKSerializer
+import fr.acinq.lightning.db.ChannelClosingType
+import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.payment.FinalFailure
+import fr.acinq.lightning.serialization.ByteVector32KSerializer
+import fr.acinq.lightning.serialization.SatoshiKSerializer
 import fr.acinq.phoenix.db.payments.DbTypesHelper.decodeBlob
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*

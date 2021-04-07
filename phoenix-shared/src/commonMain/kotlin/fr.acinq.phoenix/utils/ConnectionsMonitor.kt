@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.utils.Connection
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.app.PeerManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -20,7 +20,7 @@ import fr.acinq.phoenix.TestConstants.channel1
 import fr.acinq.phoenix.TestConstants.channel2
 import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.eclair.CltvExpiry
+import fr.acinq.lightning.CltvExpiry
 import fr.acinq.phoenix.TestConstants
 import fr.acinq.phoenix.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi

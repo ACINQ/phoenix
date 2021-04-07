@@ -1,12 +1,12 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.eclair.MilliSatoshi
-import fr.acinq.eclair.channel.Aborted
-import fr.acinq.eclair.channel.Closed
-import fr.acinq.eclair.channel.Closing
-import fr.acinq.eclair.channel.ErrorInformationLeak
-import fr.acinq.eclair.db.WalletPayment
-import fr.acinq.eclair.utils.sum
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.channel.Aborted
+import fr.acinq.lightning.channel.Closed
+import fr.acinq.lightning.channel.Closing
+import fr.acinq.lightning.channel.ErrorInformationLeak
+import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.app.PaymentsManager
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Home

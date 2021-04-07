@@ -1,10 +1,10 @@
 package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.blockchain.electrum.ElectrumWatcher
-import fr.acinq.eclair.io.TcpSocket
-import fr.acinq.eclair.utils.setEclairLoggerFactory
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.setLightningLoggerFactory
 import fr.acinq.phoenix.app.*
 import fr.acinq.phoenix.app.ctrl.*
 import fr.acinq.phoenix.app.ctrl.config.*
@@ -73,7 +73,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     val util by lazy { Utilities(loggerFactory, chain) }
 
     init {
-        setEclairLoggerFactory(loggerFactory)
+        setLightningLoggerFactory(loggerFactory)
     }
 
     fun start() {

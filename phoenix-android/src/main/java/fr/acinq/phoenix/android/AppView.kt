@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.home.ReadDataView
 import fr.acinq.phoenix.android.home.StartupView

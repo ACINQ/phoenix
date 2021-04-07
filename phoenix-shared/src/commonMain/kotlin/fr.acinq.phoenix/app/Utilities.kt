@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.*
-import fr.acinq.eclair.utils.Either
+import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope

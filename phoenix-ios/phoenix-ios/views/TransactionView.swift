@@ -17,7 +17,7 @@ fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
 
 struct PaymentView : View {
 
-	let payment: PhoenixShared.Eclair_kmpWalletPayment
+	let payment: PhoenixShared.Lightning_kmpWalletPayment
 	let close: () -> Void
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -89,7 +89,7 @@ struct PaymentView : View {
 					.foregroundColor(Color.appPositive)
 					.padding(.bottom, 16)
 				VStack {
-					Text(payment is Eclair_kmpOutgoingPayment ? "SENT" : "RECEIVED")
+					Text(payment is Lightning_kmpOutgoingPayment ? "SENT" : "RECEIVED")
 						.font(Font.title2.bold())
 						.padding(.bottom, 2)
 					Text(payment.timestamp().formatDateMS())
@@ -183,7 +183,7 @@ struct PaymentView : View {
 		// Update text in explainFeesPopover
 		explainFeesText = payment.paymentFees(currencyPrefs: currencyPrefs)?.1 ?? ""
 		
-		if let outgoingPayment = payment as? PhoenixShared.Eclair_kmpOutgoingPayment {
+		if let outgoingPayment = payment as? PhoenixShared.Lightning_kmpOutgoingPayment {
 			
 			// If this is an outgoingPayment, then we don't have the proper parts list.
 			// That is, the outgoingPayment was fetched via listPayments(),
@@ -194,7 +194,7 @@ struct PaymentView : View {
 			
 			let paymentId = outgoingPayment.component1()
 			AppDelegate.get().business.paymentsManager.getOutgoingPayment(id: paymentId) {
-				(fullOutgoingPayment: Eclair_kmpOutgoingPayment?, error: Error?) in
+				(fullOutgoingPayment: Lightning_kmpOutgoingPayment?, error: Error?) in
 				
 				if let fullOutgoingPayment = fullOutgoingPayment {
 					let feesInfo = fullOutgoingPayment.paymentFees(currencyPrefs: currencyPrefs)
@@ -255,7 +255,7 @@ struct PaymentView : View {
 //
 fileprivate struct InfoGrid: View {
 	
-	let payment: PhoenixShared.Eclair_kmpWalletPayment
+	let payment: PhoenixShared.Lightning_kmpWalletPayment
 	
 	@Binding var explainFeesPopoverVisible: Bool
 	
@@ -575,17 +575,17 @@ fileprivate struct ExplainFeesPopoverHeight: PreferenceKey {
 	}
 }
 
-extension Eclair_kmpWalletPayment {
+extension Lightning_kmpWalletPayment {
 	
 	fileprivate func paymentDescription() -> String? {
 		
-		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 			
 			if let invoice = incomingPayment.origin.asInvoice() {
 				return invoice.paymentRequest.desc()
 			}
 			
-		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let normal = outgoingPayment.details.asNormal() {
 				return normal.paymentRequest.desc()
@@ -603,7 +603,7 @@ extension Eclair_kmpWalletPayment {
 		//
 		// where return value is: (value, explanation)
 		
-		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 			
 			if let _ = incomingPayment.origin.asSwapIn() {
 				let val = NSLocalizedString("Swap-In", comment: "Transaction Info: Value")
@@ -616,7 +616,7 @@ extension Eclair_kmpWalletPayment {
 				return (val, exp)
 			}
 			
-		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.details.asSwapOut() {
 				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
@@ -641,13 +641,13 @@ extension Eclair_kmpWalletPayment {
 	fileprivate func paymentLink() -> URL? {
 		
 		var address: String? = nil
-		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
 			if let swapIn = incomingPayment.origin.asSwapIn() {
 				address = swapIn.address
 			}
 			
-		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 		
 			if let swapOut = outgoingPayment.details.asSwapOut() {
 				address = swapOut.address
@@ -667,9 +667,9 @@ extension Eclair_kmpWalletPayment {
 		return nil
 	}
 	
-	fileprivate func channelClosing() -> Eclair_kmpOutgoingPayment.DetailsChannelClosing? {
+	fileprivate func channelClosing() -> Lightning_kmpOutgoingPayment.DetailsChannelClosing? {
 		
-		if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			if let result = outgoingPayment.details.asChannelClosing() {
 				return result
 			}
@@ -680,7 +680,7 @@ extension Eclair_kmpWalletPayment {
 	
 	fileprivate func paymentFees(currencyPrefs: CurrencyPrefs) -> (FormattedAmount, String)? {
 		
-		if let incomingPayment = self as? Eclair_kmpIncomingPayment {
+		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
 		
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
@@ -708,7 +708,7 @@ extension Eclair_kmpWalletPayment {
 				}
 			}
 			
-		} else if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let _ = outgoingPayment.status.asFailed() {
 				
@@ -719,8 +719,8 @@ extension Eclair_kmpWalletPayment {
 				
 				// for on-chain payments, the fees are extracted from the mined transaction(s)
 				
-				let channelDrain: Eclair_kmpMilliSatoshi = outgoingPayment.recipientAmount
-				let claimed = Eclair_kmpMilliSatoshi(sat: onChain.claimed)
+				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
+				let claimed = Lightning_kmpMilliSatoshi(sat: onChain.claimed)
 				let fees = channelDrain.minus(other: claimed)
 				let formattedAmt = Utils.format(currencyPrefs, msat: fees, hideMsats: false)
 				
@@ -785,9 +785,8 @@ extension Eclair_kmpWalletPayment {
 	/// The return value is in number of milliseconds.
 	///
 	fileprivate func paymentTimeElapsed() -> Int64? {
-		
-		
-		if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			let started = self.timestamp()
 			var finished: Int64? = nil
@@ -809,7 +808,7 @@ extension Eclair_kmpWalletPayment {
 	
 	fileprivate func paymentFinalError() -> String? {
 
-		if let outgoingPayment = self as? Eclair_kmpOutgoingPayment {
+		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
 			if let failed = outgoingPayment.status.asFailed() {
 				

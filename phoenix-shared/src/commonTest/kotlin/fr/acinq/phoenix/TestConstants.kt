@@ -18,22 +18,22 @@ package fr.acinq.phoenix
 
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.eclair.*
-import fr.acinq.eclair.blockchain.fee.FeerateTolerance
-import fr.acinq.eclair.blockchain.fee.OnChainFeeConf
-import fr.acinq.eclair.channel.ChannelStateWithCommitments
-import fr.acinq.eclair.crypto.LocalKeyManager
-import fr.acinq.eclair.serialization.Serialization
-import fr.acinq.eclair.utils.msat
-import fr.acinq.eclair.utils.sat
-import fr.acinq.eclair.utils.toByteVector32
+import fr.acinq.lightning.*
+import fr.acinq.lightning.blockchain.fee.FeerateTolerance
+import fr.acinq.lightning.blockchain.fee.OnChainFeeConf
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.crypto.LocalKeyManager
+import fr.acinq.lightning.serialization.Serialization
+import fr.acinq.lightning.utils.msat
+import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toByteVector32
 import kotlinx.coroutines.*
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
 object TestConstants {
-    val keyManager = LocalKeyManager(Eclair.randomBytes32(), Block.TestnetGenesisBlock.hash)
+    val keyManager = LocalKeyManager(Lightning.randomBytes32(), Block.TestnetGenesisBlock.hash)
     val nodeParams = NodeParams(
         keyManager = keyManager,
         alias = "phoenix",

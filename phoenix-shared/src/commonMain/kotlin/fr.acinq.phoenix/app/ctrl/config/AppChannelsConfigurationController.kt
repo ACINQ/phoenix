@@ -1,9 +1,9 @@
 package fr.acinq.phoenix.app.ctrl.config
 
-import fr.acinq.eclair.channel.ChannelStateWithCommitments
-import fr.acinq.eclair.channel.Normal
-import fr.acinq.eclair.serialization.ByteVector32KSerializer
-import fr.acinq.eclair.serialization.Serialization.eclairSerializersModule
+import fr.acinq.lightning.channel.ChannelStateWithCommitments
+import fr.acinq.lightning.channel.Normal
+import fr.acinq.lightning.serialization.ByteVector32KSerializer
+import fr.acinq.lightning.serialization.Serialization.lightningSerializersModule
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
@@ -29,7 +29,7 @@ class AppChannelsConfigurationController(
 
     private val json = Json {
         prettyPrint = true
-        serializersModule = eclairSerializersModule
+        serializersModule = lightningSerializersModule
         allowStructuredMapKeys = true
     }
 
@@ -42,9 +42,9 @@ class AppChannelsConfigurationController(
                     peer.nodeParams.keyManager.nodeId.toString(),
                     json.encodeToString(MapSerializer(
                         ByteVector32KSerializer,
-                        fr.acinq.eclair.serialization.v1.ChannelState.serializer()
+                        fr.acinq.lightning.serialization.v1.ChannelState.serializer()
                     ),
-                    it.mapValues { m ->  fr.acinq.eclair.serialization.v1.ChannelState.import(m.value) } ),
+                    it.mapValues { m ->  fr.acinq.lightning.serialization.v1.ChannelState.import(m.value) } ),
                     it.map { (id, state) ->
                         ChannelsConfiguration.Model.Channel(
                             id.toHex(),
@@ -55,8 +55,8 @@ class AppChannelsConfigurationController(
                                     .toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong()
                             },
                             json.encodeToString(
-                                fr.acinq.eclair.serialization.v1.ChannelState.serializer(),
-                                fr.acinq.eclair.serialization.v1.ChannelState.import(state)
+                                fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
+                                fr.acinq.lightning.serialization.v1.ChannelState.import(state)
                             ),
                             if (state is ChannelStateWithCommitments) {
                                 val prefix = when (chain) {

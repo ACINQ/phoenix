@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app.ctrl.config
 
-import fr.acinq.eclair.blockchain.electrum.ElectrumClient
-import fr.acinq.eclair.io.TcpSocket
+import fr.acinq.lightning.blockchain.electrum.ElectrumClient
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration

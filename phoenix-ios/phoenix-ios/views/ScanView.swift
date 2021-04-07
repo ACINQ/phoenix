@@ -291,13 +291,13 @@ struct ValidateView: View, ViewName {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsMonitor.connections.internet != Eclair_kmpConnection.established {
+		if connectionsMonitor.connections.internet != Lightning_kmpConnection.established {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsMonitor.connections.peer != Eclair_kmpConnection.established {
+		if connectionsMonitor.connections.peer != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsMonitor.connections.electrum != Eclair_kmpConnection.established {
+		if connectionsMonitor.connections.electrum != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
@@ -554,13 +554,13 @@ struct ValidateView: View, ViewName {
 		
 		if let bitcoinUnit = unit.bitcoinUnit {
 
-            let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
+            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
 			postIntent(Scan.IntentSend(request: model.request, amount: msat))
 			
 		} else if let fiatCurrency = unit.fiatCurrency,
 		          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 		{
-            let msat = Eclair_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
+            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
 			postIntent(Scan.IntentSend(request: model.request, amount: msat))
 		}
 	}
