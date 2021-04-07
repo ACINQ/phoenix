@@ -45,7 +45,7 @@ struct ReceiveView: MVIView {
 			toast.view()
 			
 		} // </ZStack>
-		.frame(maxHeight: .infinity)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 	}
