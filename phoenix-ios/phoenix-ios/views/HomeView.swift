@@ -359,7 +359,7 @@ struct BottomBar: View, ViewName {
 			.padding()
 			.padding(.leading, 8)
 
-			Divider().frame(height: 40).background(Color.borderColor)
+			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 			
 			NavigationLink(
@@ -379,7 +379,7 @@ struct BottomBar: View, ViewName {
 			}
 
 			Spacer()
-			Divider().frame(height: 40).background(Color.borderColor)
+			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 
 			NavigationLink(
