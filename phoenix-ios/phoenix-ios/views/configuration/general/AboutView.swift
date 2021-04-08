@@ -13,12 +13,12 @@ struct AboutView: View {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			LocalWebView(
-				filename: "about.html",
+				html: AboutHTML(),
 				scrollIndicatorInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -20)
 			)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.padding(.leading, 20)
-			.padding(.trailing, 20) // must match verticalScrollIndicatorInsets.right
+			.padding(.trailing, 20) // must match LocalWebView.scrollIndicatorInsets.right
 			
 			Text("Version \(versionString())")
 				.padding([.top, .bottom], 4)

@@ -5,7 +5,7 @@ import WebKit
 ///
 struct LocalWebView: UIViewRepresentable {
 	
-	let filename: String
+	@ObservedObject var html: AnyHTML
 	let scrollIndicatorInsets: UIEdgeInsets
 	
 	func makeCoordinator() -> Coordinator {
@@ -26,26 +26,15 @@ struct LocalWebView: UIViewRepresentable {
 		webView.scrollView.isScrollEnabled = true
 		webView.scrollView.verticalScrollIndicatorInsets = scrollIndicatorInsets
 		webView.scrollView.clipsToBounds = false
+		webView.isOpaque = false // prevents white flash in dark mode
 		return webView
 	}
 	
 	func updateUIView(_ webView: WKWebView, context: Context) {
 		
-		var resourceName = filename
-		
-		let pathExtension = (filename as NSString).pathExtension
-		if pathExtension.caseInsensitiveCompare("html") == .orderedSame {
-			resourceName = (filename as NSString).deletingPathExtension
-		}
-		
-		if let url = Bundle.main.url(forResource: resourceName, withExtension: "html") {
-			// The "*.html" file is localized, but "stylesheet.css" is not:
-			//
-			// - mainBundle/<someLanguage>.lproj/*.html
-			// - mainBundle/stylesheet.css
-			//
-			let stylesheetDir = url.deletingLastPathComponent().deletingLastPathComponent()
-			webView.loadFileURL(url, allowingReadAccessTo: stylesheetDir)
+		if let htmlString = html.htmlString {
+			
+			webView.loadHTMLString(htmlString, baseURL: Bundle.main.resourceURL)
 		}
 	}
 	
@@ -53,9 +42,10 @@ struct LocalWebView: UIViewRepresentable {
 		
 		private var firstURL: URL? = nil
 		
-		func webView(_ webView: WKWebView,
-					 decidePolicyFor navigationAction: WKNavigationAction,
-					decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+		func webView(
+			_ webView: WKWebView,
+			decidePolicyFor navigationAction: WKNavigationAction,
+			decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
 		) {
 			if let url = navigationAction.request.url {
 				// This function gets called twice for the first URL.

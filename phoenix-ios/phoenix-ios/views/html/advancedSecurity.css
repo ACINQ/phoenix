@@ -4,8 +4,9 @@
 **/
 
 :root {
-  color-scheme: light dark;
-  --link-color: blue;
+	background: [[background_color]];
+	color: [[foreground_color]];
+	--link-color: [[link_color]];
 }
 
 body {
@@ -26,10 +27,4 @@ p {
 ul {
 	margin-top: 0;
 	padding-top: 0;
-}
-
-@media screen and (prefers-color-scheme: dark) {
-  :root {
-	--link-color: #93d5ff;
-  }
 }
