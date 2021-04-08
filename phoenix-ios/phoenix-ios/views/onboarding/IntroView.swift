@@ -23,9 +23,13 @@ struct IntroView: View {
 		
 		ZStack {
 			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
 			if AppDelegate.get().business.chain.isTestnet() {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
 			
 			TabView(selection: $selectedPage) {
@@ -43,9 +47,7 @@ struct IntroView: View {
 			.indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
 			.padding(.bottom, 40)
 		}
-		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground) // smoother animation when dismissing
-		.edgesIgnoringSafeArea(.bottom)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
 	}
@@ -92,6 +94,7 @@ struct IntroView1: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)
@@ -146,6 +149,7 @@ struct IntroView2: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)
@@ -192,6 +196,7 @@ struct IntroView3: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
 				)

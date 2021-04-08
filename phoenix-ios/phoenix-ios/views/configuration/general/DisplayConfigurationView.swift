@@ -58,7 +58,6 @@ struct DisplayConfigurationView: View {
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.edgesIgnoringSafeArea(.bottom)
 		.navigationBarTitle("Display options", displayMode: .inline)
 		.onReceive(Prefs.shared.fiatCurrencyPublisher) { newValue in
 			fiatCurrency = newValue
@@ -71,7 +70,8 @@ struct DisplayConfigurationView: View {
 		}
 	}
 	
-	@ViewBuilder func fiatCurrencyText(_ fiatCurrency: FiatCurrency) -> some View {
+	@ViewBuilder
+	func fiatCurrencyText(_ fiatCurrency: FiatCurrency) -> some View {
 		
 		Text(fiatCurrency.shortName) +
 		Text("  \(fiatCurrency.longName)")
@@ -79,7 +79,8 @@ struct DisplayConfigurationView: View {
 			.foregroundColor(Color.secondary)
 	}
 	
-	@ViewBuilder func bitcoinUnitText(_ bitcoinUnit: BitcoinUnit) -> some View {
+	@ViewBuilder
+	func bitcoinUnitText(_ bitcoinUnit: BitcoinUnit) -> some View {
 		
 		// TODO: Define explanation of what a bitcoin unit is client side
 		Text(bitcoinUnit.shortName) +

@@ -35,129 +35,129 @@ struct HomeView : MVIView {
 	@ViewBuilder
 	var view: some View {
 
-		main
-			.navigationBarTitle("", displayMode: .inline)
-			.navigationBarHidden(true)
-			.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
-				
-				if lastCompletedPayment != payment {
-					lastCompletedPayment = payment
-					selectedPayment = payment
-				}
+		ZStack {
+			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if AppDelegate.get().business.chain.isTestnet() {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
+			
+			main
+			
+			toast.view()
+			
+		} // </ZStack>
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.navigationBarTitle("", displayMode: .inline)
+		.navigationBarHidden(true)
+		.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
+				
+			if lastCompletedPayment != payment {
+				lastCompletedPayment = payment
+				selectedPayment = payment
+			}
+		}
 	}
 	
 	@ViewBuilder
 	var main: some View {
 		
-		ZStack {
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if AppDelegate.get().business.chain.isTestnet() {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
+			// === Top-row buttons ===
+			HStack {
+				ConnectionStatusButton()
+				Spacer()
+				FaqButton()
 			}
-			
+			.padding(.all)
+
+			// === Total Balance ====
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				// === Top-row buttons ===
-				HStack {
-					ConnectionStatusButton()
-					Spacer()
-					FaqButton()
-				}
-				.padding()
-
-				// === Total Balance ====
-				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-					HStack(alignment: VerticalAlignment.bottom) {
-						
-						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
-						Text(amount.digits)
-							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
-						
-						Text(amount.type)
-							.font(.title2)
-							.foregroundColor(Color.appAccent)
-							.padding(.bottom, 4)
-							.onTapGesture { toggleCurrencyType() }
-						
-					} // </HStack>
+			
+				HStack(alignment: VerticalAlignment.bottom) {
 					
-					if let incoming = incomingAmount() {
+					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
+					Text(amount.digits)
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+					
+					Text(amount.type)
+						.font(.title2)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+					
+				} // </HStack>
+				
+				if let incoming = incomingAmount() {
+					
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
 						
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							
-							Image(systemName: "link")
-								.padding(.trailing, 2)
-							
-							Text("+\(incoming.string) incoming".lowercased())
-								.onTapGesture { toggleCurrencyType() }
-						}
-						.font(.callout)
-						.foregroundColor(.secondary)
-						.padding(.top, 7)
-						.padding(.bottom, 2)
+						Image(systemName: "link")
+							.padding(.trailing, 2)
+						
+						Text("+\(incoming.string) incoming".lowercased())
+							.onTapGesture { toggleCurrencyType() }
 					}
+					.font(.callout)
+					.foregroundColor(.secondary)
+					.padding(.top, 7)
+					.padding(.bottom, 2)
 				}
-				.padding([.top, .leading, .trailing])
-				.padding(.bottom, 33)
-				.background(
-					VStack {
-						Spacer()
-						RoundedRectangle(cornerRadius: 10)
-							.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-							.foregroundColor(Color.appAccent)
-					}
-				)
-				.padding(.bottom, 25)
-
-				// === Disclaimer ===
+			}
+			.padding([.top, .leading, .trailing])
+			.padding(.bottom, 33)
+			.background(
 				VStack {
-					Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
-						.font(.caption)
-						.padding(12)
-						.background(
-							RoundedRectangle(cornerRadius: 5)
-								.stroke(Color.appAccent, lineWidth: 1)
-						)
-				}.padding(12)
+					Spacer()
+					RoundedRectangle(cornerRadius: 10)
+						.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+						.foregroundColor(Color.appAccent)
+				}
+			)
+			.padding(.bottom, 25)
 
-				// === Payments List ====
-				ScrollView {
-					LazyVStack {
-						ForEach(mvi.model.payments.indices, id: \.self) { index in
-							Button {
-								selectedPayment = mvi.model.payments[index]
-							} label: {
-								PaymentCell(payment: mvi.model.payments[index])
-							}
+			// === Disclaimer ===
+			VStack {
+				Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
+					.font(.caption)
+					.padding(12)
+					.background(
+						RoundedRectangle(cornerRadius: 5)
+							.stroke(Color.appAccent, lineWidth: 1)
+					)
+			}.padding(12)
+
+			// === Payments List ====
+			ScrollView {
+				LazyVStack {
+					ForEach(mvi.model.payments.indices, id: \.self) { index in
+						Button {
+							selectedPayment = mvi.model.payments[index]
+						} label: {
+							PaymentCell(payment: mvi.model.payments[index])
 						}
 					}
-					.sheet(isPresented: .constant(selectedPayment != nil)) {
-						selectedPayment = nil
-					} content: {
-						PaymentView(
-							payment: selectedPayment!,
-							close: { selectedPayment = nil }
-						)
-						.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-					}
 				}
+				.sheet(isPresented: .constant(selectedPayment != nil)) {
+					selectedPayment = nil
+				} content: {
+					PaymentView(
+						payment: selectedPayment!,
+						close: { selectedPayment = nil }
+					)
+					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				}
+			}
 
-				BottomBar(toast: toast)
-			
-			} // </VStack>
-			.padding(.top, keyWindow?.safeAreaInsets.top ?? 0) // bottom handled in BottomBar
-			.padding(.top)
+			BottomBar(toast: toast)
 		
-			toast.view()
-			
-		} // </ZStack>
-		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
-		.edgesIgnoringSafeArea(.all)
+		} // </VStack>
 	}
 	
 	func toggleCurrencyType() -> Void {
@@ -401,9 +401,11 @@ struct BottomBar: View, ViewName {
 			Spacer()
 		}
 		.padding(.top, 10)
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
-		.background(Color.mutedBackground)
-		.cornerRadius(15, corners: [.topLeft, .topRight])
+		.background(
+			Color.mutedBackground
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+				.edgesIgnoringSafeArea([.horizontal, .bottom])
+		)
 		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
 			didReceiveExternalLightningUrl(url)
 		})

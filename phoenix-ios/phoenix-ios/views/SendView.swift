@@ -130,9 +130,13 @@ struct ScanView: View {
 		
 		ZStack {
 		
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
 			if AppDelegate.get().business.chain.isTestnet() {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
 			
 			VStack {
@@ -154,12 +158,9 @@ struct ScanView: View {
 				}
 				.disabled(!UIPasteboard.general.hasStrings)
 				.padding([.top, .bottom])
-				.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
-		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Scan a QR code", displayMode: .inline)
 		.zIndex(2) // [SendingView, ValidateView, ReadyView]
 		.transition(

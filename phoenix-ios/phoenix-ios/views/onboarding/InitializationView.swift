@@ -50,6 +50,8 @@ struct InitializationView: MVIView {
 			// ZStack: layer 1 (foreground)
 			VStack {
 			
+				Spacer()
+				
 				Image(logoImageName)
 					.resizable()
 					.frame(width: 96, height: 96)
@@ -100,14 +102,13 @@ struct InitializationView: MVIView {
 					.stroke(Color.appAccent, lineWidth: 2)
 				)
 				.padding([.top, .bottom], 0)
+				
+				Spacer() // 2 spacers at bottom
+				Spacer() // move center upwards; focus is buttons, not logo
 
 			} // </VStack>
-			.padding(.top, keyWindow?.safeAreaInsets.top)
-			.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.offset(x: 0, y: -40) // move center upwards; focus is buttons, not logo
-			.edgesIgnoringSafeArea(.all)
-				
+			
 		} // </ZStack>
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)

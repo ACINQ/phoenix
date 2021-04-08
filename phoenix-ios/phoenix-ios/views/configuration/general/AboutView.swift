@@ -4,10 +4,9 @@ import WebKit
 
 struct AboutView: View {
 	
-	func versionString() -> String {
-		return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-	}
+	@Environment(\.colorScheme) var colorScheme
 	
+	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
@@ -23,10 +22,21 @@ struct AboutView: View {
 			Text("Version \(versionString())")
 				.padding([.top, .bottom], 4)
 				.frame(maxWidth: .infinity, minHeight: 40)
-				.background(Color(.secondarySystemBackground))
+				.background(
+					Color(
+						colorScheme == ColorScheme.light
+						? UIColor.systemGroupedBackground
+						: UIColor.secondarySystemGroupedBackground
+					)
+					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+				)
 		}
 		.navigationBarTitle("About", displayMode: .inline)
-	}	
+	}
+	
+	func versionString() -> String {
+		return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+	}
 }
 
 class AboutView_Previews : PreviewProvider {

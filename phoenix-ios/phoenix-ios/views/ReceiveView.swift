@@ -25,9 +25,13 @@ struct ReceiveView: MVIView {
 		
 		ZStack {
 			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
 			if AppDelegate.get().business.chain.isTestnet() {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
 			
 			if mvi.model is Receive.ModelSwapIn {
@@ -46,8 +50,6 @@ struct ReceiveView: MVIView {
 			
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.background(Color.primaryBackground)
-		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 	}
 	
 	/// Shared logic. Used by:
@@ -269,7 +271,6 @@ struct ReceiveLightningView: View, ViewName {
 			Spacer()
 			
 		} // </VStack>
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
 	}
 	
 	@ViewBuilder
@@ -320,7 +321,6 @@ struct ReceiveLightningView: View, ViewName {
 			.padding([.top, .bottom])
 			
 		} // </HStack>
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom) // top is nav bar
 	}
 	
 	@ViewBuilder
