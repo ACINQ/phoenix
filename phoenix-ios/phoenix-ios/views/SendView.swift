@@ -141,10 +141,8 @@ struct ScanView: View {
 			
 			VStack {
 				
-				QrCodeScannerView { request in
-					if !isWarningDisplayed && !ignoreScanner {
-						mvi.intent(Scan.IntentParse(request: request))
-					}
+				QrCodeScannerView {(request: String) in
+					didScanQRCode(request)
 				}
 				
 				Button {
@@ -173,6 +171,13 @@ struct ScanView: View {
 			if newValue {
 				showWarning()
 			}
+		}
+	}
+	
+	func didScanQRCode(_ request: String) -> Void {
+		
+		if !isWarningDisplayed && !ignoreScanner {
+			mvi.intent(Scan.IntentParse(request: request))
 		}
 	}
 	
