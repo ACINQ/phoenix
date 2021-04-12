@@ -3,6 +3,20 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
+extension PaymentsManager {
+	
+	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
+		
+		return KotlinCurrentValueSubject<NSDictionary>(
+			AppDelegate.get().business.paymentsManager.incomingSwaps
+		)
+		.compactMap {
+			return $0 as? Dictionary<String, Lightning_kmpMilliSatoshi>
+		}
+		.eraseToAnyPublisher()
+	}
+}
+
 extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {
@@ -120,26 +134,6 @@ class ObservableLastIncomingPayment: ObservableObject {
 		watcher?.close()
 	}
 }
-
-//class ObservableBitcoinRates: ObservableObject {
-//
-//    @Published var value: Array<BitcoinPriceRate> = []
-//
-//    private var watcher: Ktor_ioCloseable? = nil
-//
-//    init() {
-//        let ratesFlow = AppDelegate.get().business.currencyManager.ratesFlow
-//
-//        let swiftFlow = SwiftFlow<Array<BitcoinPriceRate>>(origin: ratesFlow)
-//        swiftFlow.watch {[weak self](rates: Array<BitcoinPriceRate>?) in
-//            self?.value = rates
-//        }
-//    }
-//
-//    deinit {
-//        watcher?.close()
-//    }
-//}
 
 class KotlinPassthroughSubject<Output: AnyObject>: Publisher {
 	

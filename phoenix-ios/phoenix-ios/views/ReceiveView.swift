@@ -1222,6 +1222,9 @@ struct SwapInView: View, ViewName {
 	@State var sheet: ReceiveViewSheet? = nil
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	
 	@ViewBuilder
 	var body: some View {
@@ -1311,6 +1314,9 @@ struct SwapInView: View, ViewName {
 		.onChange(of: mvi.model, perform: { newModel in
 			onModelChange(model: newModel)
 		})
+		.onReceive(incomingSwapsPublisher) { incomingSwaps in
+			onIncomingSwapsChanged(incomingSwaps)
+		}
 	}
 	
 	@ViewBuilder
@@ -1374,6 +1380,25 @@ struct SwapInView: View, ViewName {
 		if let m = model as? Receive.ModelSwapInGenerated {
 			log.debug("[\(viewName)] updating qr code...")
 			qrCode.generate(value: m.address)
+		}
+	}
+	
+	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
+		log.trace("[\(viewName)] onIncomingSwapsChanged(): \(incomingSwaps)")
+		
+		guard let bitcoinAddress = bitcoinAddress() else {
+			return
+		}
+		
+		// incomingSwaps: [bitcoinAddress: pendingAmount]
+		//
+		// If incomingSwaps has an entry for the bitcoin address that we're displaying,
+		// then let's dismiss this sheet, and show the user the home screen.
+		// 
+		// Because the home screen has the "+X sat incoming" message
+		
+		if incomingSwaps[bitcoinAddress] != nil {
+			presentationMode.wrappedValue.dismiss()
 		}
 	}
 	
