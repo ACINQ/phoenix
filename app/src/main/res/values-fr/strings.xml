@@ -457,6 +457,30 @@
   <string name="lnurl_auth_failure_remote_io">La connexion au service %1$s a échoué.</string>
   <string name="lnurl_auth_failure_remote_details">Le service a renvoyé l\'erreur suivante: %1$s</string>
 
+  <!-- //////////////// ln url pay //////////////// -->
+
+  <string name="lnurl_pay_domain"><![CDATA[Paiement demandé par<br/><b>%1$s</b>]]></string>
+  <string name="lnurl_pay_meta_description">Description</string>
+  <string name="lnurl_pay_comment_title">Commentaire (optionnel)</string>
+  <string name="lnurl_pay_comment_message">Vous pouvez ajouter un commentaire au paiement si vous le souhaitez</string>
+  <string name="lnurl_pay_comment_hint">Aucun commentaire</string>
+  <string name="lnurl_pay_pay_button">Payer</string>
+  <string name="lnurl_pay_requesting_invoice">Récupèration du paiement…</string>
+  <string name="lnurl_pay_checking_invoice">Vérification du paiement…</string>
+  <string name="lnurl_pay_sending_payment">Envoi du paiement…</string>
+
+  <string name="lnurl_pay_amount_empty">Le montant ne doit pas être vide</string>
+  <string name="lnurl_pay_amount_below_min">Le montant doit être d\'au moins %1$s</string>
+  <string name="lnurl_pay_amount_above_max">Le montant ne peut excéder %1$s</string>
+  <string name="lnurl_pay_amount_above_balance">Le montant excède votre balance</string>
+  <string name="lnurl_pay_amount_invalid">Montant invalide</string>
+
+  <string name="lnurl_pay_error_header">Le paiement n\'a pas fonctionné</string>
+  <string name="lnurl_pay_error_unreachable">Le service %1$s n\'est pas joignable. Vérifiez votre connexion.</string>
+  <string name="lnurl_pay_error_invalid_invoice">Le service %1$s a fourni une requête de paiement invalide (%2$s).</string>
+  <string name="lnurl_pay_error_remote_error">Le service %1$s a retourné une erreur (%2$s).</string>
+  <string name="lnurl_pay_error_try_again_button">Réessayer.</string>
+
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">Montant à recevoir</string>

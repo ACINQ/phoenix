@@ -16,7 +16,10 @@
 
 package fr.acinq.phoenix.lnurl
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Parcelable
+import android.util.Base64
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.utils.Wallet
@@ -24,7 +27,7 @@ import kotlinx.android.parcel.Parcelize
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONException
+import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,12 +35,14 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 sealed class LNUrlError(message: String = "") : RuntimeException(message) {
+  data class PayInvalidMeta(val meta: String) : LNUrlError()
   object AuthMissingK1 : LNUrlError("missing parameter k1 in LNURL-auth url")
   data class WithdrawAtLeastMinSat(val min: MilliSatoshi) : LNUrlError()
   data class WithdrawAtMostMaxSat(val max: MilliSatoshi) : LNUrlError()
   data class UnhandledTag(val tag: String) : LNUrlError("unhandled LNURL tag=$tag")
   sealed class RemoteFailure : LNUrlError("service returned an error") {
     abstract val origin: String
+
     data class Generic(override val origin: String) : RemoteFailure()
     data class CouldNotConnect(override val origin: String) : RemoteFailure()
     data class Unreadable(override val origin: String) : RemoteFailure()
@@ -93,6 +98,13 @@ interface LNUrl {
             val desc = json.getString("defaultDescription")
             LNUrlWithdraw(url.toString(), callback.toString(), walletIdentifier, desc, minWithdrawable, maxWithdrawable)
           }
+          "payRequest" -> {
+            val minSendable = MilliSatoshi(json.getLong("minSendable"))
+            val maxSendable = MilliSatoshi(json.getLong("maxSendable"))
+            val rawMetadata = buildLNUrlPayMeta(json.getString("metadata"))
+            val maxCommentLength = json.optLong("commentAllowed").takeIf { it > 0 }
+            LNUrlPay(callback.toString(), minSendable, maxSendable, rawMetadata, maxCommentLength)
+          }
           else -> throw LNUrlError.UnhandledTag(tag)
         }
       }
@@ -106,7 +118,7 @@ interface LNUrl {
 
     fun handleLNUrlRemoteResponse(response: Response): JSONObject {
       val body = response.body()
-      val origin = response.request().url().run { topPrivateDomain() ?: host()}
+      val origin = response.request().url().run { topPrivateDomain() ?: host() }
       try {
         if (response.isSuccessful && body != null) {
           val json = JSONObject(body.string())
@@ -133,6 +145,37 @@ interface LNUrl {
         body?.close()
       }
     }
+
+    private fun buildLNUrlPayMeta(raw: String): LNUrlPayMetadata = try {
+      val array = JSONArray(raw)
+      var plainText: String? = null
+      var rawImage: String? = null
+      for (i in 0 until array.length()) {
+        val rawMeta = array.getJSONArray(i)
+        try {
+          when (rawMeta.getString(0)) {
+            "text/plain" -> plainText = rawMeta.getString(1)
+            "image/png;base64" -> rawImage = rawMeta.getString(1)
+            "image/jpeg;base64" -> rawImage = rawMeta.getString(1)
+            else -> throw RuntimeException("unhandled metadata type=${rawMeta[i]}")
+          }
+        } catch (e: Exception) {
+          log.warn("could not process raw meta=$rawMeta at index=$i: ${e.message}")
+        }
+      }
+      LNUrlPayMetadata(raw, plainText!!, rawImage?.let { decodeBase64Image(it) })
+    } catch (e: Exception) {
+      log.error("could not read raw meta=$raw: ", e)
+      throw LNUrlError.PayInvalidMeta(raw)
+    }
+
+    private fun decodeBase64Image(source: String): Bitmap? = try {
+      val imageBytes = Base64.decode(source, Base64.DEFAULT)
+      BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    } catch (e: Exception) {
+      log.debug("lnurl-pay service provided an unreadable image")
+      null
+    }
   }
 }
 
@@ -142,3 +185,9 @@ class LNUrlAuth(val url: String, val k1: String) : LNUrl, Parcelable
 @Parcelize
 class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,
   val description: String, val minWithdrawable: MilliSatoshi, val maxWithdrawable: MilliSatoshi) : LNUrl, Parcelable
+
+@Parcelize
+class LNUrlPay(val callbackUrl: String, val minSendable: MilliSatoshi, val maxSendable: MilliSatoshi, val rawMetadata: LNUrlPayMetadata, val maxCommentLength: Long?) : LNUrl, Parcelable
+
+@Parcelize
+data class LNUrlPayMetadata(val raw: String, val plainText: String, val image: Bitmap?) : Parcelable

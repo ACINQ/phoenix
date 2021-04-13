@@ -490,14 +490,31 @@
   <string name="lnurl_auth_success">Authentication success.</string>
   <string name="lnurl_auth_failure">Authentication failure.\n\nDetails: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Could not connect to %1$s</string>
-  <string name="lnurl_auth_failure_remote_details">Server responded with %1$s</string>
+  <string name="lnurl_auth_failure_remote_details">Service responded with %1$s</string>
 
   <!-- //////////////// ln url pay //////////////// -->
 
-  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
-  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
+  <string name="lnurl_pay_domain"><![CDATA[Payment requested by<br/><b>%1$s</b>]]></string>
+  <string name="lnurl_pay_meta_description">Description</string>
+  <string name="lnurl_pay_comment_title">Add optional comment</string>
+  <string name="lnurl_pay_comment_message">You can attach a comment to the payment if you want</string>
+  <string name="lnurl_pay_comment_hint">No comment</string>
+  <string name="lnurl_pay_pay_button">Pay</string>
+  <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
+  <string name="lnurl_pay_checking_invoice">Checking invoice…</string>
+  <string name="lnurl_pay_sending_payment">Sending payment…</string>
+
+  <string name="lnurl_pay_amount_empty">Amount must not be empty</string>
+  <string name="lnurl_pay_amount_below_min">Amount must be at least %1$s</string>
+  <string name="lnurl_pay_amount_above_max">Amount must be at most %1$s</string>
+  <string name="lnurl_pay_amount_above_balance">Amount exceeds your balance</string>
+  <string name="lnurl_pay_amount_invalid">Invalid amount</string>
+
+  <string name="lnurl_pay_error_header">No payment sent.</string>
+  <string name="lnurl_pay_error_unreachable">The service %1$s is not reachable, please check your connection.</string>
+  <string name="lnurl_pay_error_invalid_invoice">The service %1$s provided an invalid invoice (%2$s).</string>
+  <string name="lnurl_pay_error_remote_error">The service %1$s returned an error (%2$s).</string>
+  <string name="lnurl_pay_error_try_again_button">Try again.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

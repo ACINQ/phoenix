@@ -280,14 +280,19 @@
   </fragment>
 
   <!-- LNURL: pay -->
-  <dialog
+  <fragment
     android:id="@+id/lnurl_pay"
     android:name="fr.acinq.phoenix.lnurl.LNUrlPayFragment"
     android:label="LNUrlPayFragment">
     <argument
       android:name="url"
-      app:argType="string" />
-  </dialog>
+      app:argType="fr.acinq.phoenix.lnurl.LNUrlPay" />
+    <action
+      android:id="@+id/action_lnurl_pay_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
 
   <!-- LNURL: withdraw -->
   <fragment

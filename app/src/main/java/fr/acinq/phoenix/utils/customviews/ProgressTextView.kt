@@ -53,4 +53,8 @@ class ProgressTextView @JvmOverloads constructor(context: Context, attrs: Attrib
   fun setText(s: Spanned) {
     mBinding.label.text = s
   }
+
+  fun setText(s: String) {
+    mBinding.label.text = s
+  }
 }

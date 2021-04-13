@@ -83,7 +83,7 @@ class LNUrlAuthFragment : BaseFragment() {
           val details = when (state.cause) {
             is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_auth_failure_remote_io, model.domainToSignIn)
             is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_auth_failure_remote_details, state.cause.reason)
-            is LNUrlError.RemoteFailure.Code -> "HTTP ${state.cause.code}"
+            is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_auth_failure_remote_details, "HTTP ${state.cause.code}")
             else -> state.cause.localizedMessage ?: state.cause.javaClass.simpleName
           }
           mBinding.errorMessage.text = getString(R.string.lnurl_auth_failure, details)

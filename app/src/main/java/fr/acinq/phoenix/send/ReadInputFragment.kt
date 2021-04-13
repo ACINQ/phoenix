@@ -42,6 +42,7 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
 import fr.acinq.phoenix.lnurl.LNUrlAuth
 import fr.acinq.phoenix.lnurl.LNUrlError
+import fr.acinq.phoenix.lnurl.LNUrlPay
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.customviews.ButtonView
@@ -141,6 +142,7 @@ class ReadInputFragment : BaseFragment() {
           when (it.url) {
             is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))
             is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlAuth(it.url))
+            is LNUrlPay -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlPay(it.url))
             else -> model.inputState.value = ReadInputState.Error.UnhandledLNURL
           }
         }

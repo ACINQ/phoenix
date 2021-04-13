@@ -1,3 +1,5 @@
+import fr.acinq.phoenix.db.LNUrlPayActionTypeVersion;
+
 --
 -- Contain details/metadata that cannot be stored in the core payment database,
 -- such as the final closing transaction, or swap data.
@@ -25,7 +27,10 @@ CREATE TABLE PaymentMeta (
   closing_main_output_script TEXT DEFAULT NULL,
   closing_cause TEXT DEFAULT NULL,
 
-  custom_desc TEXT DEFAULT NULL
+  custom_desc TEXT DEFAULT NULL,
+
+  lnurlpay_action_typeversion TEXT AS LNUrlPayActionTypeVersion DEFAULT NULL,
+  lnurlpay_action_data TEXT DEFAULT NULL
 );
 
 CREATE INDEX IF NOT EXISTS payment_closing_channel_id_index ON PaymentMeta(closing_channel_id);
@@ -51,6 +56,11 @@ VALUES (?, ?, ?, ?);
 insertClosing:
 INSERT INTO PaymentMeta(id, closing_type, closing_channel_id, closing_spending_txs, closing_main_output_script)
 VALUES (?, ?, ?, ?, ?);
+
+setLNUrlPayAction:
+UPDATE PaymentMeta
+SET lnurlpay_action_typeversion=?, lnurlpay_action_data=?
+WHERE id=?;
 
 setDesc:
 UPDATE PaymentMeta

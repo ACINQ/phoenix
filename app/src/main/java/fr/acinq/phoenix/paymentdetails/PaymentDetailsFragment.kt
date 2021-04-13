@@ -77,8 +77,11 @@ class PaymentDetailsFragment : BaseFragment() {
   private val model: PaymentDetailsViewModel by navGraphViewModels(R.id.nav_graph_payment_details) {
     val appContext = appContext(requireContext())
     AppDb.getInstance(appContext.applicationContext).run {
-      PaymentDetailsViewModel.Factory(appContext.applicationContext, args.identifier, PaymentMetaRepository.getInstance(paymentMetaQueries),
-        PayToOpenMetaRepository.getInstance(payToOpenMetaQueries), NodeMetaRepository.getInstance(nodeMetaQueries))
+      PaymentDetailsViewModel.Factory(appContext.applicationContext,
+        paymentId = args.identifier,
+        paymentMetaRepository = PaymentMetaRepository.getInstance(paymentMetaQueries),
+        payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(payToOpenMetaQueries),
+        nodeMetaRepository = NodeMetaRepository.getInstance(nodeMetaQueries))
     }
   }
 
@@ -299,10 +302,10 @@ sealed class PaymentDetailsState {
 }
 
 sealed class OutgoingFailure {
-  data class Generic(val message: String): OutgoingFailure()
-  object RecipientUnknownOrNeedsLiquidity: OutgoingFailure()
-  object TrampolineFee: OutgoingFailure()
-  object IncorrectPaymentDetails: OutgoingFailure()
+  data class Generic(val message: String) : OutgoingFailure()
+  object RecipientUnknownOrNeedsLiquidity : OutgoingFailure()
+  object TrampolineFee : OutgoingFailure()
+  object IncorrectPaymentDetails : OutgoingFailure()
 }
 
 class PaymentDetailsViewModel(
@@ -524,6 +527,9 @@ class PaymentDetailsViewModel(
     }
   }
 
+  /**
+   * @param paymentId payment Hash if incoming, parentId if outgoing.
+   */
   class Factory(
     private val appContext: Context,
     private val paymentId: String,

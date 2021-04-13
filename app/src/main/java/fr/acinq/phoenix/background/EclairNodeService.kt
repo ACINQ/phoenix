@@ -56,6 +56,7 @@ import fr.acinq.eclair.payment.send.PaymentInitiator
 import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.*
 import fr.acinq.phoenix.db.AppDb
+import fr.acinq.phoenix.db.Database
 import fr.acinq.phoenix.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.db.PaymentMetaRepository
 import fr.acinq.phoenix.utils.*

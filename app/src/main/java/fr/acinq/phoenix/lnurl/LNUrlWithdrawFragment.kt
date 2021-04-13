@@ -126,7 +126,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         model.state.value = LNUrlWithdrawState.Error.Internal
       }
     }
-    mBinding.actionBar.setOnBackAction(View.OnClickListener { findNavController().navigate(R.id.action_lnurl_withdraw_to_main) })
+    mBinding.actionBar.setOnBackAction { findNavController().navigate(R.id.action_lnurl_withdraw_to_main) }
   }
 
   private fun checkAmount(): Option<MilliSatoshi> {
