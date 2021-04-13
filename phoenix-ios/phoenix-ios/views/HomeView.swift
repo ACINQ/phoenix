@@ -12,17 +12,17 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct HomeView : MVIView {
+struct HomeView : MVIView, ViewName {
 
 	@StateObject var mvi = MVIState({ $0.home() })
 
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@State var lastCompletedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
+	@State var lastCompletedPayment: Lightning_kmpWalletPayment? = nil
 	@State var showConnections = false
 
-	@State var selectedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
+	@State var selectedPayment: Lightning_kmpWalletPayment? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -31,6 +31,13 @@ struct HomeView : MVIView {
 	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
 		AppDelegate.get().business.paymentsManager.lastCompletedPayment
 	)
+	
+	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
+	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
+	@State var incomingSwapScaleFactor: CGFloat = 1.0
+	@State var incomingSwapAnimationsRemaining = 0
+	
+	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 
 	@ViewBuilder
 	var view: some View {
@@ -55,11 +62,10 @@ struct HomeView : MVIView {
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
 		.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
-				
-			if lastCompletedPayment != payment {
-				lastCompletedPayment = payment
-				selectedPayment = payment
-			}
+			lastCompletedPaymentChanged(payment)
+		}
+		.onReceive(incomingSwapsPublisher) { incomingSwaps in
+			onIncomingSwapsChanged(incomingSwaps)
 		}
 	}
 	
@@ -108,10 +114,14 @@ struct HomeView : MVIView {
 					.foregroundColor(.secondary)
 					.padding(.top, 7)
 					.padding(.bottom, 2)
+					.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+					.onAnimationCompleted(for: incomingSwapScaleFactor) {
+						incomingSwapAnimationCompleted()
+					}
 				}
 			}
 			.padding([.top, .leading, .trailing])
-			.padding(.bottom, 33)
+			.padding(.bottom, 30)
 			.background(
 				VStack {
 					Spacer()
@@ -160,16 +170,121 @@ struct HomeView : MVIView {
 		} // </VStack>
 	}
 	
-	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
-	}
-	
 	func incomingAmount() -> FormattedAmount? {
 		
-		if let incomingMsat = mvi.model.incomingBalance, incomingMsat.toLong() > 0 {
-			return Utils.format(currencyPrefs, msat: incomingMsat)
+		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
+			return sum + item.msat
 		}
-		return nil
+		if msatTotal > 0 {
+			return Utils.format(currencyPrefs, msat: msatTotal)
+		} else {
+			return Utils.format(currencyPrefs, sat: 100_000)
+			return nil
+		}
+	}
+	
+	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
+		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
+		
+		if lastCompletedPayment != payment {
+			lastCompletedPayment = payment
+			selectedPayment = payment
+		}
+	}
+	
+	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
+		log.trace("[\(viewName)] onIncomingSwapsChanged()")
+		
+		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
+			return sum + item.msat
+		}
+		let newSum = incomingSwaps.values.reduce(Int64(0)) { (sum, item) -> Int64 in
+			return sum + item.msat
+		}
+		
+		lastIncomingSwaps = incomingSwaps
+		if newSum > oldSum {
+			// Since the sum increased, there is a new incomingSwap for the user.
+			// This isn't added to the transaction list, but is instead displayed under the balance.
+			// So let's add a little animation to draw the user's attention to it.
+			startAnimatingIncomingSwapText()
+		}
+	}
+	
+	func startAnimatingIncomingSwapText() -> Void {
+		log.trace("[\(viewName)] startAnimatingIncomingSwapText()")
+		
+		// Here's what we want to happen:
+		// - text starts at normal scale (factor = 1.0)
+		// - text animates to bigger scale, and then back to normal
+		// - it repeats this animation a few times
+		// - and ends the animation at the normal scale
+		//
+		// This is annoyingly difficult to do with SwiftUI.
+		// That is, it's easy to do something like this:
+		//
+		// withAnimation(Animation.linear(duration: duration).repeatCount(4, autoreverses: true)) {
+		//     self.incomingSwapScaleFactor = 1.2
+		// }
+		//
+		// But this doesn't give us what we want.
+		// Because when the animation ends, the text is scaled at factor 1.2, and not at the normal 1.0.
+		//
+		// There are hacks that rely on doing something like this:
+		//
+		// DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+		//     withAnimation(Animation.linear(duration: duration)) {
+		//         self.incomingSwapScaleFactor = 1.0
+		//     }
+		// }
+		//
+		// But it has a tendancy to be jumpy.
+		// Because it depends on the animation timing to be exact, and the dispatch_after to also be exact.
+		//
+		// A smoother animation can be had by using a completion callback for the animation.
+		// The only caveat is that this callback will be invoked for each animation.
+		// That is, if we use the `animation.repeatCount(4)`, the callback will be invoked 4 times.
+		//
+		// So our solution is to use 2 state variables:
+		//
+		// incomingSwapAnimationsRemaining: Int
+		// incomingSwapScaleFactor: CGFloat
+		//
+		// We increment `incomingSwapAnimationsRemaining` by some even number.
+		// And then we animate the Text in a single direction (either bigger or smaller).
+		// After each animation completes, we decrement `incomingSwapAnimationsRemaining`.
+		// If the result is still greater than zero, then we reverse the direction of the animation.
+		
+		if incomingSwapAnimationsRemaining == 0 {
+			incomingSwapAnimationsRemaining += (4 * 2) // must be even
+			animateIncomingSwapText()
+		}
+	}
+	
+	func animateIncomingSwapText() -> Void {
+		log.trace("[\(viewName)] animateIncomingSwapText()")
+		
+		let duration = 0.5 // seconds
+		let nextScaleFactor = incomingSwapScaleFactor == 1.0 ? incomingSwapScaleFactor_BIG : 1.0
+		
+		withAnimation(Animation.linear(duration: duration)) {
+			self.incomingSwapScaleFactor = nextScaleFactor
+		}
+	}
+	
+	func incomingSwapAnimationCompleted() -> Void {
+		log.trace("[\(viewName)] incomingSwapAnimationCompleted()")
+		
+		incomingSwapAnimationsRemaining -= 1
+		log.debug("[\(viewName)]: incomingSwapAnimationsRemaining = \(incomingSwapAnimationsRemaining)")
+		
+		if incomingSwapAnimationsRemaining > 0 {
+			animateIncomingSwapText()
+		}
+	}
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
 	}
 }
 
