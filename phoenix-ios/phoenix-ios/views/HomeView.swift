@@ -178,7 +178,6 @@ struct HomeView : MVIView, ViewName {
 		if msatTotal > 0 {
 			return Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
-			return Utils.format(currencyPrefs, sat: 100_000)
 			return nil
 		}
 	}
@@ -332,23 +331,25 @@ struct PaymentCell : View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
 			
-			if payment.state() != .failure {
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				
+				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
+				
+				let isFailure = payment.state() == WalletPaymentState.failure
+				let isNegative = payment.amountMsat() < 0
+				
+				let color: Color = isFailure ? .secondary : (isNegative ? .appNegative : .appPositive)
+				
+				Text(isNegative ? "" : "+")
+					.foregroundColor(color)
+					.padding(.trailing, 1)
+				
+				Text(amount.digits)
+					.foregroundColor(color)
 					
-					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
-					let isNegative = payment.amountMsat() < 0
-					
-					Text(isNegative ? "" : "+")
-						.foregroundColor(isNegative ? .appNegative : .appPositive)
-						.padding(.trailing, 1)
-					
-					Text(amount.digits)
-						.foregroundColor(isNegative ? .appNegative : .appPositive)
-						
-					Text(" " + amount.type)
-						.font(.caption)
-						.foregroundColor(.gray)
-				}
+				Text(" " + amount.type)
+					.font(.caption)
+					.foregroundColor(.gray)
 			}
 		}
 		.padding([.top, .bottom], 14)
