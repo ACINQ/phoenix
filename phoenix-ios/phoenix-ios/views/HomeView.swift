@@ -12,17 +12,17 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct HomeView : MVIView {
+struct HomeView : MVIView, ViewName {
 
 	@StateObject var mvi = MVIState({ $0.home() })
 
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@State var lastCompletedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
+	@State var lastCompletedPayment: Lightning_kmpWalletPayment? = nil
 	@State var showConnections = false
 
-	@State var selectedPayment: PhoenixShared.Lightning_kmpWalletPayment? = nil
+	@State var selectedPayment: Lightning_kmpWalletPayment? = nil
 	
 	@StateObject var toast = Toast()
 	
@@ -31,145 +31,259 @@ struct HomeView : MVIView {
 	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
 		AppDelegate.get().business.paymentsManager.lastCompletedPayment
 	)
+	
+	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
+	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
+	@State var incomingSwapScaleFactor: CGFloat = 1.0
+	@State var incomingSwapAnimationsRemaining = 0
+	
+	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 
 	@ViewBuilder
 	var view: some View {
 
-		main
-			.navigationBarTitle("", displayMode: .inline)
-			.navigationBarHidden(true)
-			.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
-				
-				if lastCompletedPayment != payment {
-					lastCompletedPayment = payment
-					selectedPayment = payment
-				}
+		ZStack {
+			
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if AppDelegate.get().business.chain.isTestnet() {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
+			
+			main
+			
+			toast.view()
+			
+		} // </ZStack>
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.navigationBarTitle("", displayMode: .inline)
+		.navigationBarHidden(true)
+		.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
+			lastCompletedPaymentChanged(payment)
+		}
+		.onReceive(incomingSwapsPublisher) { incomingSwaps in
+			onIncomingSwapsChanged(incomingSwaps)
+		}
 	}
 	
 	@ViewBuilder
 	var main: some View {
 		
-		ZStack {
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			if AppDelegate.get().business.chain.isTestnet() {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
+			// === Top-row buttons ===
+			HStack {
+				ConnectionStatusButton()
+				Spacer()
+				FaqButton()
 			}
-			
+			.padding(.all)
+
+			// === Total Balance ====
 			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				// === Top-row buttons ===
-				HStack {
-					ConnectionStatusButton()
-					Spacer()
-					FaqButton()
-				}
-				.padding()
-
-				// === Total Balance ====
-				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-					HStack(alignment: VerticalAlignment.bottom) {
-						
-						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
-						Text(amount.digits)
-							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
-						
-						Text(amount.type)
-							.font(.title2)
-							.foregroundColor(Color.appAccent)
-							.padding(.bottom, 4)
-							.onTapGesture { toggleCurrencyType() }
-						
-					} // </HStack>
+			
+				HStack(alignment: VerticalAlignment.bottom) {
 					
-					if let incoming = incomingAmount() {
+					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat)
+					Text(amount.digits)
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+					
+					Text(amount.type)
+						.font(.title2)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+					
+				} // </HStack>
+				
+				if let incoming = incomingAmount() {
+					
+					HStack(alignment: VerticalAlignment.center, spacing: 0) {
 						
-						HStack(alignment: VerticalAlignment.center, spacing: 0) {
-							
-							Image(systemName: "link")
-								.padding(.trailing, 2)
-							
-							Text("+\(incoming.string) incoming".lowercased())
-								.onTapGesture { toggleCurrencyType() }
-						}
-						.font(.callout)
-						.foregroundColor(.secondary)
-						.padding(.top, 7)
-						.padding(.bottom, 2)
+						Image(systemName: "link")
+							.padding(.trailing, 2)
+						
+						Text("+\(incoming.string) incoming".lowercased())
+							.onTapGesture { toggleCurrencyType() }
+					}
+					.font(.callout)
+					.foregroundColor(.secondary)
+					.padding(.top, 7)
+					.padding(.bottom, 2)
+					.scaleEffect(incomingSwapScaleFactor, anchor: .top)
+					.onAnimationCompleted(for: incomingSwapScaleFactor) {
+						incomingSwapAnimationCompleted()
 					}
 				}
-				.padding([.top, .leading, .trailing])
-				.padding(.bottom, 33)
-				.background(
-					VStack {
-						Spacer()
-						RoundedRectangle(cornerRadius: 10)
-							.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-							.foregroundColor(Color.appAccent)
-					}
-				)
-				.padding(.bottom, 25)
-
-				// === Disclaimer ===
+			}
+			.padding([.top, .leading, .trailing])
+			.padding(.bottom, 30)
+			.background(
 				VStack {
-					Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
-						.font(.caption)
-						.padding(12)
-						.background(
-							RoundedRectangle(cornerRadius: 5)
-								.stroke(Color.appAccent, lineWidth: 1)
-						)
-				}.padding(12)
+					Spacer()
+					RoundedRectangle(cornerRadius: 10)
+						.frame(width: 70, height: 6, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+						.foregroundColor(Color.appAccent)
+				}
+			)
+			.padding(.bottom, 25)
 
-				// === Payments List ====
-				ScrollView {
-					LazyVStack {
-						ForEach(mvi.model.payments.indices, id: \.self) { index in
-							Button {
-								selectedPayment = mvi.model.payments[index]
-							} label: {
-								PaymentCell(payment: mvi.model.payments[index])
-							}
+			// === Disclaimer ===
+			VStack {
+				Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
+					.font(.caption)
+					.padding(12)
+					.background(
+						RoundedRectangle(cornerRadius: 5)
+							.stroke(Color.appAccent, lineWidth: 1)
+					)
+			}.padding(12)
+
+			// === Payments List ====
+			ScrollView {
+				LazyVStack {
+					ForEach(mvi.model.payments.indices, id: \.self) { index in
+						Button {
+							selectedPayment = mvi.model.payments[index]
+						} label: {
+							PaymentCell(payment: mvi.model.payments[index])
 						}
 					}
-					.sheet(isPresented: .constant(selectedPayment != nil)) {
-						selectedPayment = nil
-					} content: {
-						PaymentView(
-							payment: selectedPayment!,
-							close: { selectedPayment = nil }
-						)
-						.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-					}
 				}
+				.sheet(isPresented: .constant(selectedPayment != nil)) {
+					selectedPayment = nil
+				} content: {
+					PaymentView(
+						payment: selectedPayment!,
+						close: { selectedPayment = nil }
+					)
+					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+				}
+			}
 
-				BottomBar(toast: toast)
-			
-			} // </VStack>
-			.padding(.top, keyWindow?.safeAreaInsets.top ?? 0) // bottom handled in BottomBar
-			.padding(.top)
+			BottomBar(toast: toast)
 		
-			toast.view()
-			
-		} // </ZStack>
-		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
-		.edgesIgnoringSafeArea(.all)
-	}
-	
-	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
+		} // </VStack>
 	}
 	
 	func incomingAmount() -> FormattedAmount? {
 		
-		if let incomingMsat = mvi.model.incomingBalance, incomingMsat.toLong() > 0 {
-			return Utils.format(currencyPrefs, msat: incomingMsat)
+		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
+			return sum + item.msat
 		}
-		return nil
+		if msatTotal > 0 {
+			return Utils.format(currencyPrefs, msat: msatTotal)
+		} else {
+			return nil
+		}
+	}
+	
+	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
+		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
+		
+		if lastCompletedPayment != payment {
+			lastCompletedPayment = payment
+			selectedPayment = payment
+		}
+	}
+	
+	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
+		log.trace("[\(viewName)] onIncomingSwapsChanged()")
+		
+		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
+			return sum + item.msat
+		}
+		let newSum = incomingSwaps.values.reduce(Int64(0)) { (sum, item) -> Int64 in
+			return sum + item.msat
+		}
+		
+		lastIncomingSwaps = incomingSwaps
+		if newSum > oldSum {
+			// Since the sum increased, there is a new incomingSwap for the user.
+			// This isn't added to the transaction list, but is instead displayed under the balance.
+			// So let's add a little animation to draw the user's attention to it.
+			startAnimatingIncomingSwapText()
+		}
+	}
+	
+	func startAnimatingIncomingSwapText() -> Void {
+		log.trace("[\(viewName)] startAnimatingIncomingSwapText()")
+		
+		// Here's what we want to happen:
+		// - text starts at normal scale (factor = 1.0)
+		// - text animates to bigger scale, and then back to normal
+		// - it repeats this animation a few times
+		// - and ends the animation at the normal scale
+		//
+		// This is annoyingly difficult to do with SwiftUI.
+		// That is, it's easy to do something like this:
+		//
+		// withAnimation(Animation.linear(duration: duration).repeatCount(4, autoreverses: true)) {
+		//     self.incomingSwapScaleFactor = 1.2
+		// }
+		//
+		// But this doesn't give us what we want.
+		// Because when the animation ends, the text is scaled at factor 1.2, and not at the normal 1.0.
+		//
+		// There are hacks that rely on doing something like this:
+		//
+		// DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+		//     withAnimation(Animation.linear(duration: duration)) {
+		//         self.incomingSwapScaleFactor = 1.0
+		//     }
+		// }
+		//
+		// But it has a tendancy to be jumpy.
+		// Because it depends on the animation timing to be exact, and the dispatch_after to also be exact.
+		//
+		// A smoother animation can be had by using a completion callback for the animation.
+		// The only caveat is that this callback will be invoked for each animation.
+		// That is, if we use the `animation.repeatCount(4)`, the callback will be invoked 4 times.
+		//
+		// So our solution is to use 2 state variables:
+		//
+		// incomingSwapAnimationsRemaining: Int
+		// incomingSwapScaleFactor: CGFloat
+		//
+		// We increment `incomingSwapAnimationsRemaining` by some even number.
+		// And then we animate the Text in a single direction (either bigger or smaller).
+		// After each animation completes, we decrement `incomingSwapAnimationsRemaining`.
+		// If the result is still greater than zero, then we reverse the direction of the animation.
+		
+		if incomingSwapAnimationsRemaining == 0 {
+			incomingSwapAnimationsRemaining += (4 * 2) // must be even
+			animateIncomingSwapText()
+		}
+	}
+	
+	func animateIncomingSwapText() -> Void {
+		log.trace("[\(viewName)] animateIncomingSwapText()")
+		
+		let duration = 0.5 // seconds
+		let nextScaleFactor = incomingSwapScaleFactor == 1.0 ? incomingSwapScaleFactor_BIG : 1.0
+		
+		withAnimation(Animation.linear(duration: duration)) {
+			self.incomingSwapScaleFactor = nextScaleFactor
+		}
+	}
+	
+	func incomingSwapAnimationCompleted() -> Void {
+		log.trace("[\(viewName)] incomingSwapAnimationCompleted()")
+		
+		incomingSwapAnimationsRemaining -= 1
+		log.debug("[\(viewName)]: incomingSwapAnimationsRemaining = \(incomingSwapAnimationsRemaining)")
+		
+		if incomingSwapAnimationsRemaining > 0 {
+			animateIncomingSwapText()
+		}
+	}
+	
+	func toggleCurrencyType() -> Void {
+		currencyPrefs.toggleCurrencyType()
 	}
 }
 
@@ -217,23 +331,25 @@ struct PaymentCell : View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
 			
-			if payment.state() != .failure {
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				
+				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
+				
+				let isFailure = payment.state() == WalletPaymentState.failure
+				let isNegative = payment.amountMsat() < 0
+				
+				let color: Color = isFailure ? .secondary : (isNegative ? .appNegative : .appPositive)
+				
+				Text(isNegative ? "" : "+")
+					.foregroundColor(color)
+					.padding(.trailing, 1)
+				
+				Text(amount.digits)
+					.foregroundColor(color)
 					
-					let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
-					let isNegative = payment.amountMsat() < 0
-					
-					Text(isNegative ? "" : "+")
-						.foregroundColor(isNegative ? .appNegative : .appPositive)
-						.padding(.trailing, 1)
-					
-					Text(amount.digits)
-						.foregroundColor(isNegative ? .appNegative : .appPositive)
-						
-					Text(" " + amount.type)
-						.font(.caption)
-						.foregroundColor(.gray)
-				}
+				Text(" " + amount.type)
+					.font(.caption)
+					.foregroundColor(.gray)
 			}
 		}
 		.padding([.top, .bottom], 14)
@@ -334,7 +450,7 @@ struct BottomBar: View, ViewName {
 	enum Tag: String {
 		case ConfigurationView
 		case ReceiveView
-		case ScanView
+		case SendView
 	}
 	
 	@State var temp: [AppScanController] = []
@@ -359,7 +475,7 @@ struct BottomBar: View, ViewName {
 			.padding()
 			.padding(.leading, 8)
 
-			Divider().frame(height: 40).background(Color.borderColor)
+			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 			
 			NavigationLink(
@@ -379,12 +495,12 @@ struct BottomBar: View, ViewName {
 			}
 
 			Spacer()
-			Divider().frame(height: 40).background(Color.borderColor)
+			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 
 			NavigationLink(
-				destination: ScanView(firstModel: externalLightningRequest),
-				tag: Tag.ScanView.rawValue,
+				destination: SendView(firstModel: externalLightningRequest),
+				tag: Tag.SendView.rawValue,
 				selection: $selectedTag
 			) {
 				HStack {
@@ -401,15 +517,17 @@ struct BottomBar: View, ViewName {
 			Spacer()
 		}
 		.padding(.top, 10)
-		.padding(.bottom, keyWindow?.safeAreaInsets.bottom)
-		.background(Color.mutedBackground)
-		.cornerRadius(15, corners: [.topLeft, .topRight])
+		.background(
+			Color.mutedBackground
+				.cornerRadius(15, corners: [.topLeft, .topRight])
+				.edgesIgnoringSafeArea([.horizontal, .bottom])
+		)
 		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
 			didReceiveExternalLightningUrl(url)
 		})
 		.onChange(of: selectedTag, perform: { tag in
 			if tag == nil {
-				// If we pushed the ScanView with a external lightning url,
+				// If we pushed the SendView with a external lightning url,
 				// we should nil out the url (since the user is finished with it now).
 				self.externalLightningRequest = nil
 			}
@@ -419,8 +537,8 @@ struct BottomBar: View, ViewName {
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
 		log.trace("[\(viewName)] didReceiveExternalLightningUrl()")
 		
-		if selectedTag == Tag.ScanView.rawValue {
-			log.debug("[\(viewName)] Ignoring: handled by ScanView")
+		if selectedTag == Tag.SendView.rawValue {
+			log.debug("[\(viewName)] Ignoring: handled by SendView")
 			return
 		}
 		
@@ -430,13 +548,13 @@ struct BottomBar: View, ViewName {
 		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
 		//
 		// In particular, we do **NOT** want the user experience to be:
-		// - switch to ScanView
+		// - switch to SendView
 		// - then again switch to ConfirmView
 		// This feels jittery :(
 		//
 		// So we need to:
 		// - get a Scan.ModelValidate instance
-		// - pass this to ScanView as the `firstModel` parameter
+		// - pass this to SendView as the `firstModel` parameter
 		
 		let controllers = AppDelegate.get().business.controllers
 		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
@@ -455,7 +573,7 @@ struct BottomBar: View, ViewName {
 			
 			if let model = model as? Scan.ModelValidate {
 				self.externalLightningRequest = model
-				self.selectedTag = Tag.ScanView.rawValue
+				self.selectedTag = Tag.SendView.rawValue
 				
 			} else if let _ = model as? Scan.ModelBadRequest {
 				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")

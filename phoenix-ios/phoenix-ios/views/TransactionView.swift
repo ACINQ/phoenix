@@ -261,7 +261,7 @@ fileprivate struct InfoGrid: View {
 	
 	@State private var widthColumn0: CGFloat? = nil
 	
-	private let cappedWidthColumn0: CGFloat = 200
+	private let maxWidthColumn0: CGFloat = 200
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
@@ -269,6 +269,7 @@ fileprivate struct InfoGrid: View {
 	@Environment(\.openURL) var openURL
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	@ViewBuilder
 	var body: some View {
 		
 		VStack(
@@ -276,213 +277,224 @@ fileprivate struct InfoGrid: View {
 			spacing   : verticalSpacingBetweenRows
 		) {
 			
-			if let pDescription = payment.paymentDescription() {
-				
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Desc")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					Text(pDescription.count > 0 ? pDescription : "No description")
-						.contextMenu {
-							Button(action: {
-								UIPasteboard.general.string = pDescription
-							}) {
-								Text("Copy")
-							}
-						}
-				}
-			} // </if let pDescription>
+			// Splitting this up into separate ViewBuilders,
+			// because the compiler will sometimes choke while processing this method.
 			
-			if let pType = payment.paymentType() {
-				
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Type")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-					
-					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-						
-						Text(pType.0)
-						+ Text(" (\(pType.1))")
-							.font(.footnote)
-							.foregroundColor(.secondary)
-						
-						if let link = payment.paymentLink() {
-							Button {
-								openURL(link)
-							} label: {
-								Text("blockchain tx")
-							}
-						}
-					}
-				}
-			} // </if let pType>
-			
-			if let pClosingInfo = payment.channelClosing() {
-				
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Output")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
-						
-						// Bitcoin address (copyable)
-						Text(pClosingInfo.closingAddress)
-							.contextMenu {
-								Button(action: {
-									UIPasteboard.general.string = pClosingInfo.closingAddress
-								}) {
-									Text("Copy")
-								}
-							}
-						
-						if pClosingInfo.isSentToDefaultAddress {
-							Text("(This is your address - derived from your seed. You alone possess your seed.)")
-								.font(.footnote)
-								.foregroundColor(.secondary)
-								.padding(.top, 4)
-						}
-					}
-				}
-			} // </if let channelClosing>
-			
-			if let pFees = payment.paymentFees(currencyPrefs: currencyPrefs) {
-
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Fees")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						
-						Text(pFees.0.string) // pFees.0 => FormattedAmount
-							.onTapGesture { toggleCurrencyType() }
-						
-						if pFees.1.count > 0 {
-							
-							Button {
-								explainFeesPopoverVisible = true
-							} label: {
-								Image(systemName: "questionmark.circle")
-									.renderingMode(.template)
-									.foregroundColor(.secondary)
-									.font(.body)
-							}
-							.anchorView(viewId: explainFeesButtonViewId)
-							.padding(.leading, 4)
-						}
-					}
-
-				}
-			} // </if let pFees>
-			
-			if let pElapsed = payment.paymentTimeElapsed() {
-				
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Elapsed")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					if pElapsed < 1_000 {
-						Text("\(pElapsed) milliseconds")
-					} else {
-						let seconds = pElapsed / 1_000
-						let millis = pElapsed % 1_000
-						
-						Text("\(seconds).\(millis) seconds")
-					}
-				}
-			} // </if let pElapsed>
-			
-			if let pError = payment.paymentFinalError() {
-				
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Error")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					Text(pError)
-				}
-				
-			} // </if let pError>
-			
-			if let paymentHash = payment.paymentHashString() {
-				HStack(
-					alignment : VerticalAlignment.top,
-					spacing   : horizontalSpacingBetweenColumns
-				) {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Spacer(minLength: 0) // => HorizontalAlignment.trailing
-						InfoGrid_Column0 {
-							Text("Payment Hash")
-								.foregroundColor(.secondary)
-						}
-					}
-					.frame(width: widthColumn0)
-
-					Text(paymentHash)
-				}
-			} // </if let pError>
+			paymentDescriptionRow
+			paymentTypeRow
+			channelClosingRow
+			paymentFeesRow
+			timeElapsedRow
+			paymentErrorRow
+			paymentHashRow
 		}
 		.padding([.leading, .trailing])
 		.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self) {
 			log.debug("InfoGrid_Column0_MeasuredWidth => \($0 ?? CGFloat(-1))")
 			if let width = $0 {
-				self.widthColumn0 = min(width, cappedWidthColumn0)
+				self.widthColumn0 = min(width, maxWidthColumn0)
 			} else {
-				self.widthColumn0 = $0
+				self.widthColumn0 = nil
 			}
 		}
+	}
+	
+	@ViewBuilder
+	var paymentDescriptionRow: some View {
+		
+		if let pDescription = payment.paymentDescription() {
+			
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Desc", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				Text(pDescription.count > 0 ? pDescription : "No description")
+					.contextMenu {
+						Button(action: {
+							UIPasteboard.general.string = pDescription
+						}) {
+							Text("Copy")
+						}
+					}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var paymentTypeRow: some View {
+		
+		if let pType = payment.paymentType() {
+			
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Type", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					
+					Text(pType.0)
+					+ Text(" (\(pType.1))")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+					
+					if let link = payment.paymentLink() {
+						Button {
+							openURL(link)
+						} label: {
+							Text("blockchain tx")
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var channelClosingRow: some View {
+		
+		if let pClosingInfo = payment.channelClosing() {
+			
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Output", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					
+					// Bitcoin address (copyable)
+					Text(pClosingInfo.closingAddress)
+						.contextMenu {
+							Button(action: {
+								UIPasteboard.general.string = pClosingInfo.closingAddress
+							}) {
+								Text("Copy")
+							}
+						}
+					
+					if pClosingInfo.isSentToDefaultAddress {
+						Text("(This is your address - derived from your seed. You alone possess your seed.)")
+							.font(.footnote)
+							.foregroundColor(.secondary)
+							.padding(.top, 4)
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var paymentFeesRow: some View {
+		
+		if let pFees = payment.paymentFees(currencyPrefs: currencyPrefs) {
+
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Fees", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					
+					Text(pFees.0.string) // pFees.0 => FormattedAmount
+						.onTapGesture { toggleCurrencyType() }
+					
+					if pFees.1.count > 0 {
+						
+						Button {
+							explainFeesPopoverVisible = true
+						} label: {
+							Image(systemName: "questionmark.circle")
+								.renderingMode(.template)
+								.foregroundColor(.secondary)
+								.font(.body)
+						}
+						.anchorView(viewId: explainFeesButtonViewId)
+						.padding(.leading, 4)
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var timeElapsedRow: some View {
+		
+		if let pElapsed = payment.paymentTimeElapsed() {
+			
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Elapsed", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				if pElapsed < 1_000 {
+					Text("\(pElapsed) milliseconds")
+				} else {
+					let seconds = pElapsed / 1_000
+					let millis = pElapsed % 1_000
+					
+					Text("\(seconds).\(millis) seconds")
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var paymentErrorRow: some View {
+		
+		if let pError = payment.paymentFinalError() {
+			
+			InfoGrid_Row(
+				column0Width: calculatedWidthColumn0(),
+				column0Name: NSLocalizedString("Error", comment: "Label in TransactionView")
+			) { // column1Builder:
+				
+				Text(pError)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var paymentHashRow: some View {
+		
+		InfoGrid_Row(
+			column0Width: calculatedWidthColumn0(),
+			column0Name: NSLocalizedString("Payment Hash", comment: "Label in TransactionView")
+		) { // column1Builder:
+			
+			let paymentHash = payment.paymentHashString()
+			Text(paymentHash)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = paymentHash
+					}) {
+						Text("Copy")
+					}
+				}
+		}
+	}
+	
+	func calculatedWidthColumn0() -> CGFloat {
+		
+		// Normally what happens is:
+		// - During the first rendering pass,
+		//   all of the InfoGrid_Column0 items receive a proposed size.width=some_BIG_number
+		// - Each calculates it's desired width
+		// - That information is passed back up the view hierarchy, and stored in widthColumn0
+		// - The second rendering pass then uses widthColumn0 to lay out everything,
+		//   and it looks beautiful
+		//
+		// But what sometimes happens is:
+		// - During the first rendering pass,
+		//   all of the InfoGrid_Column0 items receive a proposed size.width=some_SMALL_number
+		// - Each calculates it's desired width, which ends up being too small
+		// - That information is passed back up the view hierarchy, and stored in widthColumn0
+		// - The second rendering pass then uses widthColumn0 to lay out everything,
+		//   and it looks horrible
+		//
+		// So during the first rendering pass, we need to ensure
+		// that proposed size.width is big enough to achieve our goals.
+		
+		return widthColumn0 ?? maxWidthColumn0
 	}
 	
 	func toggleCurrencyType() -> Void {
@@ -490,7 +502,43 @@ fileprivate struct InfoGrid: View {
 	}
 }
 
+fileprivate struct InfoGrid_Row<Content: View>: View {
+	
+	let column0Width: CGFloat
+	let column0Name: String
+	let column1: Content
+	
+	private let horizontalSpacingBetweenColumns: CGFloat = 8
+	
+	init(column0Width: CGFloat, column0Name: String, @ViewBuilder column1Builder: () -> Content) {
+		
+		self.column0Width = column0Width
+		self.column0Name = column0Name
+		self.column1 = column1Builder()
+	}
+	
+	var body: some View {
+		
+		HStack(
+			alignment : VerticalAlignment.top,
+			spacing   : horizontalSpacingBetweenColumns
+		) {
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer(minLength: 0) // => HorizontalAlignment.trailing
+				InfoGrid_Column0 {
+					Text(column0Name)
+						.foregroundColor(.secondary)
+				}
+			}
+			.frame(width: column0Width)
+
+			column1
+		}
+	}
+}
+
 fileprivate struct InfoGrid_Column0<Content>: View where Content: View {
+	
 	let content: Content
 	
 	init(@ViewBuilder builder: () -> Content) {
@@ -498,16 +546,13 @@ fileprivate struct InfoGrid_Column0<Content>: View where Content: View {
 	}
 	
 	var body: some View {
-		content
-			.background(GeometryReader { proxy in
-				let width = proxy.size.width + 1
-				// "+ 1" => SwiftUI bug? "Desc" is sometimes rendered on 2 lines.
+		content.background(GeometryReader { proxy in
 				
-				Color.clear.preference(
-					key: InfoGrid_Column0_MeasuredWidth.self,
-					value: width
-				)
-			})
+			Color.clear.preference(
+				key: InfoGrid_Column0_MeasuredWidth.self,
+				value: proxy.size.width
+			)
+		})
 	}
 }
 

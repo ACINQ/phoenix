@@ -47,25 +47,25 @@ class AppChannelsConfigurationController(
                     it.mapValues { m ->  fr.acinq.lightning.serialization.v1.ChannelState.import(m.value) } ),
                     it.map { (id, state) ->
                         ChannelsConfiguration.Model.Channel(
-                            id.toHex(),
-                            state is Normal,
-                            state::class.simpleName ?: "Unknown",
-                            state.localCommitmentSpec?.let {
+                            id = id.toHex(),
+                            isOk = state is Normal,
+                            stateName = state::class.simpleName ?: "Unknown",
+                            commitments = state.localCommitmentSpec?.let {
                                 it.toLocal.truncateToSatoshi()
                                     .toLong() to (it.toLocal + it.toRemote).truncateToSatoshi().toLong()
                             },
-                            json.encodeToString(
+                            json = json.encodeToString(
                                 fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
                                 fr.acinq.lightning.serialization.v1.ChannelState.import(state)
                             ),
-                            if (state is ChannelStateWithCommitments) {
-                                val prefix = when (chain) {
-                                    Chain.Mainnet -> ""
-                                    Chain.Testnet -> "testnet/"
-                                    Chain.Regtest -> "_REGTEST_/"
+                            txUrl = if (state is ChannelStateWithCommitments) {
+                                val txId = state.commitments.commitInput.outPoint.txid
+                                val base = "https://blockstream.info"
+                                when (chain) {
+                                    Chain.Mainnet -> "$base/tx/$txId"
+                                    Chain.Testnet -> "$base/testnet/tx/$txId"
+                                    Chain.Regtest -> "$base/_REGTEST_/tx/$txId"
                                 }
-                                val txId = state.commitments.localCommit.publishableTxs.commitTx.tx.txid
-                                "https://blockstream.info/$prefix/tx/$txId"
                             } else null
                         )
                     }

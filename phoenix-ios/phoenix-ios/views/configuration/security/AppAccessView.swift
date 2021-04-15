@@ -423,12 +423,12 @@ struct AdvancedSecurityHelp: View {
 		ZStack {
 		
 			LocalWebView(
-				filename: "advancedSecurity.html",
+				html: AdvancedSecurityHTML(),
 				scrollIndicatorInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -20)
 			)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.padding(.leading, 20)
-			.padding(.trailing, 20) // must match verticalScrollIndicatorInsets.right
+			.padding(.trailing, 20) // must match LocalWebView.scrollIndicatorInsets.right
 			
 			// close button
 			// (required for landscapse mode, where swipe-to-dismiss isn't possible)

@@ -31,14 +31,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			
 			let window = UIWindow(windowScene: windowScene)
 		   window.rootViewController = UIHostingController(rootView: contentView)
-			self.window = window
-			window.makeKeyAndVisible()
-			window.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle() // see note below
 			
-			Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
-				self?.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
-			}.store(in: &cancellables)
+			// Set the app-wide tint/accent color scheme.
+			//
+			// Credit for bug fix:
+			// https://adampaxton.com/how-to-globally-set-a-tint-or-accent-color-in-swiftui/
+			//
+			window.tintColor = UIColor.appAccent
 			
+			// Set the app-wide color scheme.
+			//
 			// There are other ways to accomplish this, but they are buggy.
 			//
 			// SwiftUI offers 2 similar methods:
@@ -50,6 +52,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// If you use only the preferredColorScheme, then passing it a non-nil value once will
 			// prevent your UI from supporting the system color prior to app re-launch.
 			// There may be other variations I didn't try, but this solution is currently the most stable.
+			//
+			window.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			
+			Prefs.shared.themePublisher.sink {[weak self](theme: Theme) in
+				
+				self?.window?.overrideUserInterfaceStyle = theme.toInterfaceStyle()
+				self?.window?.tintColor = UIColor.appAccent // might be customized for color theme
+				
+			}.store(in: &cancellables)
+			
+			self.window = window
+			window.makeKeyAndVisible()
 		}
 		
 		// From Apple docs:

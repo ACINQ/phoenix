@@ -33,8 +33,9 @@ class PaymentsManager(
     internal val payments = MutableStateFlow<List<WalletPayment>>(emptyList())
 
     /** Flow of map of (bitcoinAddress -> amount) swap-ins. */
-    internal val incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
-    private var _incomingSwaps by incomingSwaps
+    private val _incomingSwaps = MutableStateFlow<Map<String, MilliSatoshi>>(HashMap())
+    val incomingSwaps: StateFlow<Map<String, MilliSatoshi>> = _incomingSwaps
+    private var _incomingSwapsMap by _incomingSwaps
 
     private val _lastCompletedPayment = MutableStateFlow<WalletPayment?>(null)
     val lastCompletedPayment: StateFlow<WalletPayment?> = _lastCompletedPayment
@@ -79,10 +80,10 @@ class PaymentsManager(
                         _lastIncomingPayment.value = event.incomingPayment
                     }
                     is SwapInPendingEvent -> {
-                        _incomingSwaps = _incomingSwaps + (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
+                        _incomingSwapsMap += (event.swapInPending.bitcoinAddress to event.swapInPending.amount.toMilliSatoshi())
                     }
                     is SwapInConfirmedEvent -> {
-                        _incomingSwaps = _incomingSwaps - event.swapInConfirmed.bitcoinAddress
+                        _incomingSwapsMap -= event.swapInConfirmed.bitcoinAddress
                     }
                     else -> Unit
                 }
