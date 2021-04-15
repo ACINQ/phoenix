@@ -461,7 +461,15 @@ fileprivate struct InfoGrid: View {
 			column0Name: NSLocalizedString("Payment Hash", comment: "Label in TransactionView")
 		) { // column1Builder:
 			
-			Text(payment.paymentHashString())
+			let paymentHash = payment.paymentHashString()
+			Text(paymentHash)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = paymentHash
+					}) {
+						Text("Copy")
+					}
+				}
 		}
 	}
 	
