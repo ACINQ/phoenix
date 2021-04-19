@@ -60,7 +60,7 @@ class AppChannelsConfigurationController(
                             ),
                             txUrl = if (state is ChannelStateWithCommitments) {
                                 val txId = state.commitments.commitInput.outPoint.txid
-                                val base = "https://blockstream.info"
+                                val base = "https://mempool.space"
                                 when (chain) {
                                     Chain.Mainnet -> "$base/tx/$txId"
                                     Chain.Testnet -> "$base/testnet/tx/$txId"
