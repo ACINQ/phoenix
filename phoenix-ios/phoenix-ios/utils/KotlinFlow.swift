@@ -52,7 +52,11 @@ class KotlinPassthroughSubject<Output: AnyObject>: Publisher {
 
 	deinit {
 	//	Swift.print("KotlinPassthroughSubject: deinit")
-		watcher?.close()
+		let _watcher = watcher
+		DispatchQueue.main.async {
+			// have witnessed crashes when invoking `watcher?.close()` from  a non-main thread
+			_watcher?.close()
+		}
 	}
 	
 	func receive<Downstream: Subscriber>(subscriber: Downstream)
@@ -92,7 +96,11 @@ class KotlinCurrentValueSubject<Output: AnyObject>: Publisher {
 	
 	deinit {
 	//	Swift.print("KotlinCurrentValueSubject: deinit")
-		watcher?.close()
+		let _watcher = watcher
+		DispatchQueue.main.async {
+			// have witnessed crashes when invoking `watcher?.close()` from  a non-main thread
+			_watcher?.close()
+		}
 	}
 	
 	var value: Output {
