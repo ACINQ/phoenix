@@ -31,7 +31,7 @@ data class Wallet(val seed: ByteArray) {
     fun onchainAddress(path: String, isMainnet: Boolean): String {
         val chainHash = if (isMainnet) Block.LivenetGenesisBlock.hash else Block.TestnetGenesisBlock.hash
         val publicKey = DeterministicWallet.derivePrivateKey(master, path).publicKey
-        return computeBIP84Address(publicKey, chainHash)
+        return Bitcoin.computeBIP84Address(publicKey, chainHash)
     }
 
     // Recommended when data class props contain arrays
