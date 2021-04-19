@@ -28,9 +28,7 @@ struct HomeView : MVIView, ViewName {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
-		AppDelegate.get().business.paymentsManager.lastCompletedPayment
-	)
+	let lastCompletedPaymentPublisher = AppDelegate.get().business.paymentsManager.lastCompletedPaymentPublisher()
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()

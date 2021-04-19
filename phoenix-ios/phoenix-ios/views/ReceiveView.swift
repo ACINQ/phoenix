@@ -151,7 +151,7 @@ struct ReceiveLightningView: View, ViewName {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	@StateObject var lastIncomingPayment = ObservableLastIncomingPayment()
+	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -175,11 +175,11 @@ struct ReceiveLightningView: View, ViewName {
 		.onDisappear {
 			onDisappear()
 		}
-		.onChange(of: mvi.model, perform: { newModel in
+		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
-		})
-		.onChange(of: lastIncomingPayment.value) { (payment: Lightning_kmpWalletPayment?) in
-			lastIncomingPaymentChanged(payment)
+		}
+		.onReceive(lastIncomingPaymentPublisher) {
+			lastIncomingPaymentChanged($0)
 		}
 		.onReceive(willEnterForegroundPublisher, perform: { _ in
 			willEnterForeground()
@@ -689,21 +689,17 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func lastIncomingPaymentChanged(_ payment: Lightning_kmpWalletPayment?) {
+	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("[\(viewName)] lastIncomingPaymentChanged()")
 		
-		guard
-			let model = mvi.model as? Receive.ModelGenerated,
-			let lastIncomingPayment = payment as? Lightning_kmpIncomingPayment
-		else {
+		guard let model = mvi.model as? Receive.ModelGenerated else {
 			return
 		}
 		
-		if lastIncomingPayment.state() == WalletPaymentState.success {
-			
-			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
-				presentationMode.wrappedValue.dismiss()
-			}
+		if lastIncomingPayment.state() == WalletPaymentState.success &&
+		   lastIncomingPayment.paymentHash.toHex() == model.paymentHash
+		{
+			presentationMode.wrappedValue.dismiss()
 		}
 	}
 	
@@ -1311,9 +1307,9 @@ struct SwapInView: View, ViewName {
 			} // </switch>
 		}
 		.navigationBarTitle("Swap In", displayMode: .inline)
-		.onChange(of: mvi.model, perform: { newModel in
+		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
-		})
+		}
 		.onReceive(incomingSwapsPublisher) { incomingSwaps in
 			onIncomingSwapsChanged(incomingSwaps)
 		}

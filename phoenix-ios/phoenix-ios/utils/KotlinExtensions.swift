@@ -3,6 +3,7 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
+
 extension PaymentsManager {
 	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
@@ -14,6 +15,46 @@ extension PaymentsManager {
 			return $0 as? Dictionary<String, Lightning_kmpMilliSatoshi>
 		}
 		.eraseToAnyPublisher()
+	}
+	
+	func lastCompletedPaymentPublisher() -> KotlinPassthroughSubject<Lightning_kmpWalletPayment> {
+		
+		return KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
+			AppDelegate.get().business.paymentsManager.lastCompletedPayment
+		)
+	}
+	
+	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
+		
+		return KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
+			AppDelegate.get().business.paymentsManager.lastCompletedPayment
+		)
+		.compactMap {
+			return $0 as? Lightning_kmpIncomingPayment
+		}
+		.eraseToAnyPublisher()
+  }
+}
+
+extension Lightning_kmpIncomingPayment {
+	
+	var createdAtDate: Date {
+		
+		// createdAt: time in milliseconds since unix epoch
+		let secondsSince1970 = Double(createdAt) / Double(1_000)
+		
+		return Date(timeIntervalSince1970: secondsSince1970)
+	}
+}
+
+extension Lightning_kmpIncomingPayment.Received {
+	
+	var receivedAtDate: Date {
+		
+		// receivedAt: time in milliseconds since unix epoch
+		let secondsSince1970 = Double(receivedAt) / Double(1_000)
+		
+		return Date(timeIntervalSince1970: secondsSince1970)
 	}
 }
 
@@ -110,111 +151,6 @@ class ObservableConnectionsMonitor: ObservableObject {
 	
 	deinit {
 		watcher?.close()
-	}
-}
-
-class ObservableLastIncomingPayment: ObservableObject {
-	
-	@Published var value: Lightning_kmpWalletPayment? = nil
-	
-	private var watcher: Ktor_ioCloseable? = nil
-	
-	init() {
-		let lastIncomingPaymentFlow = AppDelegate.get().business.paymentsManager.lastIncomingPayment
-		value = lastIncomingPaymentFlow.value as? Lightning_kmpWalletPayment
-		
-		let swiftFlow = SwiftFlow<Lightning_kmpWalletPayment>(origin: lastIncomingPaymentFlow)
-		
-		watcher = swiftFlow.watch {[weak self](payment: Lightning_kmpWalletPayment?) in
-			self?.value = payment
-		}
-	}
-	
-	deinit {
-		watcher?.close()
-	}
-}
-
-class KotlinPassthroughSubject<Output: AnyObject>: Publisher {
-	
-	typealias Failure = Never
-	
-	private let wrapped: PassthroughSubject<Output, Failure>
-	private var watcher: Ktor_ioCloseable? = nil
-	
-	convenience init(_ flow: Kotlinx_coroutines_coreFlow) {
-		
-		self.init(SwiftFlow(origin: flow))
-	}
-	
-	init(_ swiftFlow: SwiftFlow<Output>) {
-		
-		// There's no need to retain the SwiftFlow instance variable.
-		// Because the SwiftFlow instance itself doesn't maintain any state.
-		// All state is encapsulated in the watch method.
-		
-		wrapped = PassthroughSubject<Output, Failure>()
-		
-		watcher = swiftFlow.watch {[weak self](value: Output?) in
-			if let value = value {
-				self?.wrapped.send(value)
-			}
-		}
-	}
-
-	deinit {
-	//	Swift.print("KotlinPassthroughSubject: deinit")
-		watcher?.close()
-	}
-	
-	func receive<Downstream: Subscriber>(subscriber: Downstream)
-		where Failure == Downstream.Failure, Output == Downstream.Input
-	{
-		wrapped.subscribe(subscriber)
-	}
-}
-
-class KotlinCurrentValueSubject<Output: AnyObject>: Publisher {
-	
-	typealias Failure = Never
-	
-	private let wrapped: CurrentValueSubject<Output, Failure>
-	private var watcher: Ktor_ioCloseable? = nil
-	
-	convenience init(_ stateFlow: Kotlinx_coroutines_coreStateFlow) {
-		
-		self.init(SwiftStateFlow(origin: stateFlow))
-	}
-	
-	init(_ swiftStateFlow: SwiftStateFlow<Output>) {
-		
-		// There's no need to retain the SwiftStateFlow instance variable.
-		// Because the SwiftStateFlow instance itself doesn't maintain any state.
-		// All state is encapsulated in the watch method.
-		
-		let initialValue = swiftStateFlow.value!
-		wrapped = CurrentValueSubject(initialValue)
-		
-		watcher = swiftStateFlow.watch {[weak self](value: Output?) in
-			self?.wrapped.send(value!)
-		}
-	}
-	
-	deinit {
-	//	Swift.print("KotlinCurrentValueSubject: deinit")
-		watcher?.close()
-	}
-	
-	var value: Output {
-		get {
-			return wrapped.value
-		}
-	}
-
-	func receive<Downstream: Subscriber>(subscriber: Downstream)
-		where Failure == Downstream.Failure, Output == Downstream.Input
-	{
-		wrapped.subscribe(subscriber)
 	}
 }
 
