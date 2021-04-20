@@ -23,6 +23,7 @@ class Utilities(
     }
 
     data class BitcoinAddressInfo(
+        val address: String, // may be different than input; e.g. input is "bitcoin:xyz"
         val chain: Chain,
         val type: BitcoinAddressType,
         val hash: ByteArray
@@ -37,8 +38,24 @@ class Utilities(
     }
 
     fun parseBitcoinAddress(
-        addr: String
+        input: String
     ): Either<BitcoinAddressError, BitcoinAddressInfo> {
+
+        var addr = input.replace("\\u00A0", "").trim() // \u00A0 = '\n'
+        val isUrl = when {
+            addr.startsWith("bitcoin://", true) -> { addr = addr.drop(10); true }
+            addr.startsWith("bitcoin:", true) -> { addr = addr.drop(8); true }
+            else -> false
+        }
+        if (isUrl) {
+            // The input might look like:
+            // bitcoin:tb1qla78tll0eua3l5f4nvfq3tx58u35yc3m44flfu?time=1618931109&exp=604800
+            // We want to trim any url parameters
+            val idx = addr.indexOf("?")
+            if (idx >= 0) {
+                addr = addr.dropLast(addr.length - idx)
+            }
+        }
 
         try { // is Base58 ?
             val (prefix, bin) = Base58Check.decode(addr)
@@ -70,7 +87,7 @@ class Utilities(
             if (addrChain != chain) {
                 return Either.Left(BitcoinAddressError.ChainMismatch(chain, addrChain))
             }
-            return Either.Right(BitcoinAddressInfo(addrChain, type, bin))
+            return Either.Right(BitcoinAddressInfo(addr, addrChain, type, bin))
         } catch (e: Throwable) {
             // Not Base58Check
         }
@@ -98,7 +115,7 @@ class Utilities(
                 if (type == null) {
                     return Either.Left(BitcoinAddressError.UnknownFormat)
                 }
-                return Either.Right(BitcoinAddressInfo(addrChain, type, bin))
+                return Either.Right(BitcoinAddressInfo(addr, addrChain, type, bin))
             } else {
                 // Unknown version - we don't have any validation logic in place for it
                 return Either.Left(BitcoinAddressError.UnknownBech32Version(version))
