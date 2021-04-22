@@ -44,8 +44,8 @@ struct SendView: MVIView {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model, perform: { newModel in
 
-			if newModel is Scan.ModelBadRequest {
-				toast.toast(text: "Unexpected request format!")
+			if let newModel = newModel as? Scan.ModelBadRequest {
+				showErrorToast(newModel)
 			}
 			else if let model = newModel as? Scan.ModelDangerousRequest {
 				paymentRequest = model.request
@@ -87,6 +87,51 @@ struct SendView: MVIView {
 		default:
 			fatalError("Unknown model \(mvi.model)")
 		}
+	}
+	
+	func showErrorToast(_ model: Scan.ModelBadRequest) -> Void {
+		log.trace("showErrorToast()")
+		
+		let msg: String
+		if let reason = model.reason as? Scan.BadRequestReasonChainMismatch {
+			
+			let requestChain = reason.requestChain?.name ?? "unknown"
+			msg = NSLocalizedString(
+				"The invoice is for \(requestChain), but you're on \(reason.myChain.name)",
+				comment: "Error message - scanning lightning invoice"
+			)
+		
+		} else if model.reason is Scan.BadRequestReasonIsLnUrl {
+			
+			msg = NSLocalizedString(
+				"Phoenix does not support the LNURL protocol yet",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		} else if model.reason is Scan.BadRequestReasonIsBitcoinAddress {
+			
+			msg = NSLocalizedString(
+				"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments." +
+				" You can use a third-party service to make the offchain->onchain swap.",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		} else {
+		
+			msg = NSLocalizedString(
+				"This doesn't appear to be a Lightning invoice",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+		
+		toast.toast(
+			text: msg,
+			duration: 30,
+			location: .middle,
+			showCloseButton: true,
+			backgroundColor: Color.black.opacity(0.9),
+			foregroundColor: Color.white
+		)
 	}
 	
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
@@ -186,7 +231,7 @@ struct ScanView: View {
 		ignoreScanner = true
 		popoverState.display.send(PopoverItem(
 			
-			PopupAlert(
+			DangerousInvoiceAlert(
 				postIntent: mvi.intent,
 				paymentRequest: paymentRequest!,
 				isShowing: $isWarningDisplayed,
@@ -197,7 +242,7 @@ struct ScanView: View {
 	}
 }
 
-struct PopupAlert : View {
+struct DangerousInvoiceAlert : View {
 
 	let postIntent: (Scan.Intent) -> Void
 	let paymentRequest: String
@@ -238,7 +283,7 @@ struct PopupAlert : View {
 					
 				Spacer()
 					
-				Button("Confirm") {
+				Button("Continue") {
 					isShowing = false
 					postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
 					popoverState.close.send()
