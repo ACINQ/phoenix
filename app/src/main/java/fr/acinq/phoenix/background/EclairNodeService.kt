@@ -675,6 +675,12 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+  suspend fun getSentPaymentsFromPaymentHash(paymentHash: ByteVector32): List<OutgoingPayment> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+    kit?.run {
+      JavaConverters.seqAsJavaListConverter(nodeParams().db().payments().listOutgoingPayments(paymentHash)).asJava()
+    } ?: throw KitNotInitialized
+  }
+
   suspend fun getSentPaymentsFromParentId(parentId: UUID): List<OutgoingPayment> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
       JavaConverters.seqAsJavaListConverter(nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()

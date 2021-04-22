@@ -138,6 +138,8 @@
   <string name="send_use_all_balance">Tout envoyer</string>
   <string name="send_loading">Vérification du paiement…</string>
   <string name="send_invalid_pr_generic">Ce paiement n\'est pas valide.\n\nVeuillez réessayer.</string>
+  <string name="send_invalid_pr_already_paid">Vous avez déjà réglé ce paiement.</string>
+  <string name="send_invalid_pr_already_paid_button">Ouvrir le paiement</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">10 000 sat minimum pour un paiement on-chain.</string>
