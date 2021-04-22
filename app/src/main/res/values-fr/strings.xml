@@ -96,12 +96,30 @@
   <string name="receive_share_title">Partager cette requête de paiement avec…</string>
   <string name="receive_share_button">Partager…</string>
 
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Votre portefeuille est vide. Votre premier versement doit être d\'au moins <b>%1$s</b>.]]></string>
+  <string name="receive_min_amount_swap_in"><![CDATA[Le versement doit être d\'au moins <b>%1$s</b>.]]></string>
+  <string name="receive_paytoopen_disabled">La création de canaux Lightning a été désactivée temporairement. Certains paiements ne pourront pas être reçus.</string>
+  <string name="receive_paytoopen_disabled_nochannels">La création de canaux Lightning a été désactivée temporairement. Vous ne pourrez pas recevoir de paiements.</string>
   <string name="receive_address_label">Adresse</string>
   <string name="receive_withdraw_button">Utiliser un lien LNURL</string>
 
   <string name="receive_swap_in_button">Afficher une adresse Bitcoin</string>
-  <string name="receive_swap_in_error_message">Il y a eu une erreur dans la permutation avec une adresse Bitcoin on-chain…\n\nVeuillez réessayer.</string>
-  <string name="receive_swap_in_progress_message">Permutation vers une adresse Bitcoin…</string>
+  <string name="receive_swap_in_error_message">Nous n\'avons pas pu récupérer d\'adresse Bitcoin pour effectuer le swap.\n\nVeuillez réessayer ultérieurement.</string>
+  <string name="receive_swap_in_disabled"><![CDATA[
+    <b>Swap entrant désactivés</b>
+    <br /><br />
+    Le service de swap vers des adresses Bitcoin a été temporairement désactivé.
+    <br /><br />
+    Veuillez réessayer ultérieurement.
+  ]]></string>
+  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+    <b>Swap entrant désactivés</b>
+    <br /><br />
+    Le réseau Bitcoin est saturé et les frais de transaction sont très élevés. Le service de swap vers des adresses Bitcoin a été temporairement désactivé.
+    <br /><br />
+    Veuillez réessayer ultérieurement.
+  ]]></string>
+  <string name="receive_swap_in_progress_message">Récupération d\'une adresse Bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Recevoir on-chain</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
   Une adresse Bitcoin standard va être affichée dans la page suivante.

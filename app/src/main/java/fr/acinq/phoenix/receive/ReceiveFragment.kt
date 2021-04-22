@@ -39,9 +39,7 @@ import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapInResponse
-import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.NavGraphMainDirections
-import fr.acinq.phoenix.R
+import fr.acinq.phoenix.*
 import fr.acinq.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.utils.*
@@ -127,13 +125,10 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    appContext()?.payToOpenSettings?.value?.minFunding?.let { minFunding ->
-      context?.let { ctx ->
-        val min = Converter.printAmountPretty(minFunding, ctx, withUnit = true)
-        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, min))
-        mBinding.minFundingSwapIn.text = Converter.html(getString(R.string.receive_min_amount_swap_in, min))
+    context?.let { ctx ->
+      appContext(ctx).payToOpenSettings.value?.let { payToOpenSettings ->
+        updatePayToOpenWarnings(ctx, payToOpenSettings)
       }
-      checkMinFunding(minFunding)
     }
 
     context?.let { mBinding.descValue.setText(Prefs.getDefaultPaymentDescription(it)) }
@@ -199,11 +194,10 @@ class ReceiveFragment : BaseFragment() {
             String.format("%.2f", percentFee),
             Converter.printAmountPretty(minFee, ctx, withUnit = true)
           )))
-          .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
+          .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn(ctx) }
           .setNegativeButton(R.string.btn_cancel, null)
           .show()
       }
-
     }
 
     mBinding.withdrawButton.setOnClickListener {
@@ -256,13 +250,27 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-  private fun checkMinFunding(minFunding: Satoshi) {
+  private fun updatePayToOpenWarnings(context: Context, payToOpenSettings: PayToOpenSettings) {
     lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
-      log.error("could not list channels for min funding check: ", exception)
+      log.error("could not list channels for pay-to-open check: ", exception)
     }) {
       val channels = app.requireService.getChannels().filter { it.state() is `NORMAL$` || it.state() is `WAIT_FOR_FUNDING_CONFIRMED$` || it.state() is `OFFLINE$` }
-      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && minFunding.`$greater`(Satoshi(0)))
-      model.showMinFundingSwapIn.postValue(minFunding.`$greater`(Satoshi(0)))
+      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && payToOpenSettings.minFunding.`$greater`(Satoshi(0)))
+      model.showMinFundingSwapIn.postValue(payToOpenSettings.minFunding.`$greater`(Satoshi(0)))
+      model.payToOpenDisabled.postValue(payToOpenSettings.status is ServiceStatus.Disabled)
+
+      launch(Dispatchers.Main) {
+        val prettyMinFunding = Converter.printAmountPretty(payToOpenSettings.minFunding, context, withUnit = true)
+        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, prettyMinFunding))
+        mBinding.minFundingSwapIn.text = Converter.html(getString(R.string.receive_min_amount_swap_in, prettyMinFunding))
+        if (payToOpenSettings.status is ServiceStatus.Disabled) {
+          if (channels.isEmpty()) {
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled_nochannels)
+          } else {
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled)
+          }
+        }
+      }
     }
   }
 
@@ -278,14 +286,31 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-  private fun generateSwapIn() {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when generating swap in: ", exception)
-      model.state.value = SwapInState.ERROR
-    }) {
-      Wallet.hideKeyboard(context, mBinding.amountValue)
-      model.state.value = SwapInState.IN_PROGRESS
-      app.requireService.sendSwapIn()
+  private fun generateSwapIn(context: Context) {
+    Wallet.hideKeyboard(context, mBinding.amountValue)
+    when (appContext(context).swapInSettings.value?.status ?: ServiceStatus.Unknown) {
+      ServiceStatus.Unknown -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_unknown))
+        return
+      }
+      ServiceStatus.Disabled.Generic -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled))
+        return
+      }
+      ServiceStatus.Disabled.MempoolFull -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled_mempool))
+        return
+      }
+      else -> lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+        log.error("error when generating swap in: ", exception)
+        model.state.value = SwapInState.ERROR
+      }) {
+        model.state.value = SwapInState.IN_PROGRESS
+        app.requireService.sendSwapIn()
+      }
     }
   }
 
