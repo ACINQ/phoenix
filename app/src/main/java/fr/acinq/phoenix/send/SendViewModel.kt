@@ -19,8 +19,9 @@ package fr.acinq.phoenix.send
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
 import fr.acinq.bitcoin.Satoshi
-import fr.acinq.eclair.blockchain.fee.FeeratesPerKB
+import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
+import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.SingleLiveEvent
@@ -28,10 +29,14 @@ import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import java.util.*
 
 sealed class SendState {
   object CheckingInvoice : SendState()
-  object InvalidInvoice : SendState()
+  sealed class InvalidInvoice : SendState() {
+    object Generic: InvalidInvoice()
+    data class AlreadyPaid(val parentId: UUID): InvalidInvoice()
+  }
 
   sealed class Lightning : SendState() {
     abstract val pr: PaymentRequest
@@ -107,18 +112,25 @@ class SendViewModel : ViewModel() {
   // ---- end of computed values
 
   @UiThread
-  fun checkAndSetPaymentRequest(input: String) {
+  fun checkAndSetPaymentRequest(service: EclairNodeService?, input: String) {
     viewModelScope.launch((Dispatchers.Default)) {
       try {
         val extract = Wallet.parseLNObject(input)
         when (extract) {
           is BitcoinURI -> state.postValue(SendState.Onchain.SwapRequired(extract))
-          is PaymentRequest -> state.postValue(SendState.Lightning.Ready(extract))
+          is PaymentRequest -> {
+            val matchingPaid = (service?.getSentPaymentsFromPaymentHash(extract.paymentHash()) ?: emptyList()).filter { it.status() is OutgoingPaymentStatus.Succeeded }
+            if (matchingPaid.isNotEmpty()) {
+              state.postValue(SendState.InvalidInvoice.AlreadyPaid(matchingPaid.first().parentId()))
+            } else {
+              state.postValue(SendState.Lightning.Ready(extract))
+            }
+          }
           else -> throw RuntimeException("unhandled invoice type")
         }
       } catch (e: Exception) {
         log.error("invalid invoice for input=$input: ${e.message}")
-        state.postValue(SendState.InvalidInvoice)
+        state.postValue(SendState.InvalidInvoice.Generic)
       }
     }
   }

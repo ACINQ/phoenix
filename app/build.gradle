@@ -32,8 +32,8 @@ android {
     applicationId "fr.acinq.phoenix.mainnet"
     minSdkVersion 24
     targetSdkVersion 30
-    versionCode 24
-    versionName "1.4.9"
+    versionCode 25
+    versionName "${gitCommitHash}"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {

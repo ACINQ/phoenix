@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import fr.acinq.bitcoin.Satoshi
@@ -35,9 +36,11 @@ import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.BaseFragment
+import fr.acinq.phoenix.NavGraphMainDirections
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSendBinding
 import fr.acinq.phoenix.db.AppDb
+import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
 import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -199,7 +202,7 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.checkAndSetPaymentRequest(args.payload)
+    model.checkAndSetPaymentRequest(app.service, args.payload)
 
     mBinding.amount.addTextChangedListener(object : TextWatcher {
       override fun afterTextChanged(s: Editable?) {
@@ -263,6 +266,13 @@ class SendFragment : BaseFragment() {
     }
 
     mBinding.showChainFeesButton.setOnClickListener { model.showFeeratesForm.value = true }
+
+    mBinding.alreadyPaidLayoutButton.setOnClickListener {
+      val state = model.state.value
+      if (state is SendState.InvalidInvoice.AlreadyPaid) {
+        findNavController().navigate(NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, state.parentId.toString(), false))
+      }
+    }
   }
 
   override fun onStop() {

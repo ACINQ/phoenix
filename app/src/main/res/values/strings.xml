@@ -120,11 +120,32 @@
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
   <string name="receive_min_amount_swap_in"><![CDATA[Deposit must be at least <b>%1$s</b>.]]></string>
+  <string name="receive_paytoopen_disabled">Channel creation has been temporarily disabled. You may not be able to receive some payments.</string>
+  <string name="receive_paytoopen_disabled_nochannels">Channel creation has been temporarily disabled. You will not be able to receive any payments.</string>
   <string name="receive_address_label">Address</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
-  <string name="receive_swap_in_error_message">There was an error when swapping to Bitcoin address…\n\nPlease try again.</string>
+  <string name="receive_swap_in_error_message">Could not get a Bitcoin address from the swap service.\n\nPlease try again later.</string>
+  <string name="receive_swap_in_unknown"><![CDATA[
+    <b>Unavailable</b>
+    <br /><br />
+    Please try again later.
+  ]]></string>
+  <string name="receive_swap_in_disabled"><![CDATA[
+    <b>Service disabled</b>
+    <br /><br />
+    The on-chain deposit swap service has been temporarily disabled.
+    <br /><br />
+    Try again later.
+  ]]></string>
+  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+    <b>Service disabled</b>
+    <br /><br />
+    The Bitcoin mempool is congested and fees are very high. The on-chain deposit swap service has been temporarily disabled.
+    <br /><br />
+    Try again later.
+  ]]></string>
   <string name="receive_swap_in_progress_message">Requesting a Bitcoin address…</string>
   <string name="receive_swap_in_disclaimer_title">Receive with a Bitcoin address</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -144,6 +165,8 @@
   <string name="send_use_all_balance">Send all</string>
   <string name="send_loading">Checking payment…</string>
   <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
+  <string name="send_invalid_pr_already_paid">This payment has already been paid.</string>
+  <string name="send_invalid_pr_already_paid_button">Open payment</string>
   <string name="send_amount_error">Please enter a valid amount.</string>
   <string name="send_amount_error_balance">Amount exceeds your balance.</string>
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>

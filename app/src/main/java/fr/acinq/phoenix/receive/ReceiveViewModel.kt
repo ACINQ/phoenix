@@ -37,7 +37,7 @@ enum class PaymentGenerationState : ReceiveState {
 
 // possible states when swapping to on-chain tx
 enum class SwapInState : ReceiveState {
-  IN_PROGRESS, ERROR, DONE
+  DISABLED, IN_PROGRESS, ERROR, DONE
 }
 
 class ReceiveViewModel : ViewModel() {
@@ -46,6 +46,7 @@ class ReceiveViewModel : ViewModel() {
   val invoice = MutableLiveData<Pair<PaymentRequest, String?>>()
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<ReceiveState>()
+  val payToOpenDisabled = MutableLiveData(false)
   val isPowerSavingMode = MutableLiveData<Boolean>()
   val showMinFundingPayToOpen = MutableLiveData(false)
   val showMinFundingSwapIn = MutableLiveData(false)
