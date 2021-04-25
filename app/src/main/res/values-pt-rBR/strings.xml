@@ -120,11 +120,32 @@
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
+  <string name="receive_paytoopen_disabled">A abertura de canais foi temporariamente desativada. Alguns pagamentos não poderão ser recebidos.</string>
+  <string name="receive_paytoopen_disabled_nochannels">A abertura de canais foi temporariamente desativada. Você não poderá receber pagamentos.</string>
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
-  <string name="receive_swap_in_error_message">Ocorreu um erro ao trocar para uma transação da rede Bitcoin…\n\nTente novamente.</string>
+ <string name="receive_swap_in_error_message">Não foi possível obter um endereço Bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
+  <string name="receive_swap_in_unknown"><![CDATA[
+    <b>Indisponível</b>
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
+  <string name="receive_swap_in_disabled"><![CDATA[
+    <b>Serviço desabilitado</b>
+    <br /><br />
+    O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
+  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+    <b>Serviço desabilitado</b>
+    <br /><br />
+    O mempool do Bitcoin está cheio e as taxas muito altas. O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
   <string name="receive_swap_in_progress_message">Solicitando um endereço Bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -144,6 +165,8 @@
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
   <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
+  <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
