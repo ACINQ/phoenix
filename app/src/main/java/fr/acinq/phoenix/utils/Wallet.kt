@@ -88,7 +88,7 @@ object Wallet {
     } else {
       DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
     }
-    return SingleAddressEclairWallet(fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash()))
+    return SingleAddressEclairWallet(getChainHash(), DeterministicWallet.derivePrivateKey(master, path).publicKey())
   }
 
   fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {
