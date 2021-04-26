@@ -3,7 +3,7 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, enable-static-remote-key ]
 
 jobs:
   build:
