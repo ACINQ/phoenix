@@ -95,7 +95,10 @@ class AppConnectionsDaemon(
                 when {
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (electrumConnectionJob == null) {
-                            electrumConnectionJob = connectionLoop("Electrum", electrumClient.connectionState) {
+                            electrumConnectionJob = connectionLoop(
+                                name = "Electrum",
+                                statusStateFlow = electrumClient.connectionState
+                            ) {
                                 val electrumConfig = configurationManager.electrumConfig().value
                                 if (electrumConfig == null) {
                                     logger.info { "ignored electrum connection opportunity because no server is configured yet" }
@@ -124,7 +127,10 @@ class AppConnectionsDaemon(
                 when {
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (peerConnectionJob == null) {
-                            peerConnectionJob = connectionLoop("Peer", peer.connectionState) {
+                            peerConnectionJob = connectionLoop(
+                                name = "Peer",
+                                statusStateFlow = peer.connectionState
+                            ) {
                                 peer.connect()
                             }
                         }
@@ -234,12 +240,24 @@ class AppConnectionsDaemon(
         }
     }
 
-    private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
+    private fun connectionLoop(
+        name: String,
+        statusStateFlow: StateFlow<Connection>,
+        connect: () -> Unit
+    ) = launch {
+
+        var disconnectCount = 0
         var retryDelay = RETRY_DELAY
         statusStateFlow.collect {
             if (it == Connection.CLOSED) {
-                logger.debug { "Wait for $retryDelay before retrying connection on $name" }
-                delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
+                if (disconnectCount > 0) {
+                    logger.debug { "Wait for $retryDelay before retrying connection on $name" }
+                    delay(retryDelay)
+                    retryDelay = increaseDelay(retryDelay)
+                } else {
+                    // First connection attempt in loop - no need for backoff
+                }
+                disconnectCount++
                 connect()
             } else if (it == Connection.ESTABLISHED) {
                 retryDelay = RETRY_DELAY
