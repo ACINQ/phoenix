@@ -32,17 +32,16 @@ class PeerManager(
 
     init {
         launch {
-            _peer.value = buildPeer(
+            _peer.value = Peer(
                 nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
-                walletParams = configurationManager.walletParams.filterNotNull().first(),
-                databases = nodeParamsManager.databases.filterNotNull().first(),
+                walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
+                watcher = electrumWatcher,
+                db = nodeParamsManager.databases.filterNotNull().first(),
+                socketBuilder = tcpSocketBuilder,
+                scope = MainScope()
             )
         }
     }
 
     suspend fun getPeer() = peerState.filterNotNull().first()
-
-    private fun buildPeer(nodeParams: NodeParams, walletParams: WalletParams, databases: Databases): Peer {
-        return Peer(nodeParams, walletParams, electrumWatcher, databases, tcpSocketBuilder, MainScope())
-    }
 }

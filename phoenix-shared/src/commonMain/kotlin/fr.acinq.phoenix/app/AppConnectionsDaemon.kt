@@ -147,14 +147,14 @@ class AppConnectionsDaemon(
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
-                            configurationManager.startWalletParamsLoop()
+                            configurationManager.startWalletContextLoop()
                             currencyManager.start()
                         }
                     }
                     else -> {
                         if (httpControlFlowEnabled) {
                             httpControlFlowEnabled = false
-                            configurationManager.stopWalletParamsLoop()
+                            configurationManager.stopWalletContextLoop()
                             currencyManager.stop()
                         }
                     }

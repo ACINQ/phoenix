@@ -136,12 +136,15 @@ struct ReceiveLightningView: View, ViewName {
 	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
+	@State var isSwapInEnabled = true
+	@State var isPayToOpenEnabled = true
+	
 	@State var pushPermissionRequestedFromOS = true
 	@State var bgAppRefreshDisabled = false
 	@State var notificationsDisabled = false
 	@State var alertsDisabled = false
 	@State var badgesDisabled = false
-	@State var showRequestPushPermissionPopupTimer: Timer? = nil
+	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -152,6 +155,7 @@ struct ReceiveLightningView: View, ViewName {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -181,9 +185,12 @@ struct ReceiveLightningView: View, ViewName {
 		.onReceive(lastIncomingPaymentPublisher) {
 			lastIncomingPaymentChanged($0)
 		}
-		.onReceive(willEnterForegroundPublisher, perform: { _ in
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
+		}
+		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
-		})
+		}
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
 			get: { sheet != nil },
 			set: { if !$0 { sheet = nil }}
@@ -230,7 +237,12 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
-				.padding([.top, .bottom])
+				.padding(.top)
+			
+			if !isPayToOpenEnabled {
+				payToOpenDisabledWarning()
+					.padding(.top, 8)
+			}
 			
 			VStack(alignment: .center) {
 			
@@ -246,8 +258,8 @@ struct ReceiveLightningView: View, ViewName {
 					.padding(.bottom, 2)
 			}
 			.padding([.leading, .trailing], 20)
-			.padding(.bottom)
-
+			.padding([.top, .bottom])
+			
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				copyButton()
 				shareButton()
@@ -424,7 +436,7 @@ struct ReceiveLightningView: View, ViewName {
 			// Thus we have never tried to enable push notifications.
 			
 			Button {
-				showRequestPushPermissionPopup()
+				showRequestPushPermissionPopover()
 			} label: {
 				Image(systemName: "exclamationmark.bubble.fill")
 					.renderingMode(.template)
@@ -457,6 +469,27 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
+	@ViewBuilder
+	func payToOpenDisabledWarning() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+			Text(
+				"Channel creation has been temporarily disabled." +
+				" You may not be able to receive some payments."
+			)
+		}
+		.font(.caption)
+		.padding(12)
+		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.stroke(Color.appAccent, lineWidth: 1)
+		)
+		.padding([.leading, .trailing], 10)
+	}
+	
 	func invoiceAmount() -> String {
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
@@ -476,7 +509,7 @@ struct ReceiveLightningView: View, ViewName {
 				)
 			}
 		} else {
-			return ""
+			return "..."
 		}
 	}
 	
@@ -491,7 +524,7 @@ struct ReceiveLightningView: View, ViewName {
 				)
 			}
 		} else {
-			return ""
+			return "..."
 		}
 	}
 	
@@ -509,9 +542,9 @@ struct ReceiveLightningView: View, ViewName {
 			// But let's show the popup after a brief delay,
 			// to allow the user to see what this view is about.
 			
-			showRequestPushPermissionPopupTimer =
+			showRequestPushPermissionPopoverTimer =
 				Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-					showRequestPushPermissionPopup()
+					showRequestPushPermissionPopover()
 				}
 			
 		} else {
@@ -523,7 +556,7 @@ struct ReceiveLightningView: View, ViewName {
 	func onDisappear() -> Void {
 		log.trace("[\(viewName)] onDisappear()")
 		
-		showRequestPushPermissionPopupTimer?.invalidate()
+		showRequestPushPermissionPopoverTimer?.invalidate()
 	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
@@ -630,10 +663,10 @@ struct ReceiveLightningView: View, ViewName {
 		))
 	}
 	
-	func showRequestPushPermissionPopup() -> Void {
-		log.trace("[\(viewName)] showRequestPushPermissionPopup()")
+	func showRequestPushPermissionPopover() -> Void {
+		log.trace("[\(viewName)] showRequestPushPermissionPopover()")
 		
-		let callback = {(response: PushPermissionPopupResponse) -> Void in
+		let callback = {(response: PushPermissionPopoverResponse) -> Void in
 			
 			log.debug("PushPermissionPopupResponse: \(response.rawValue)")
 			
@@ -654,7 +687,7 @@ struct ReceiveLightningView: View, ViewName {
 		
 		popoverState.display.send(PopoverItem(
 		
-			RequestPushPermissionPopup(callback: callback).anyView,
+			RequestPushPermissionPopover(callback: callback).anyView,
 			dismissable: true
 		))
 	}
@@ -703,20 +736,38 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		isSwapInEnabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
+		isPayToOpenEnabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
+	}
+	
 	func didTapSwapInButton() -> Void {
 		log.trace("[\(viewName)] didTapSwapInButton()")
 		
-		let didAcceptFeesCallback = {() -> Void in
+		if isSwapInEnabled {
 			
-			log.debug("SwapInFeePopup: didAcceptFeesCallback")
-			mvi.intent(Receive.IntentRequestSwapIn())
+			let didAcceptFeesCallback = {() -> Void in
+				
+				log.debug("[\(viewName)]: didAcceptFeesCallback")
+				mvi.intent(Receive.IntentRequestSwapIn())
+			}
+			
+			popoverState.display.send(PopoverItem(
+			
+				SwapInFeePopover(didAcceptFeesCallback: didAcceptFeesCallback).anyView,
+				dismissable: false
+			))
+			
+		} else {
+			
+			popoverState.display.send(PopoverItem(
+				
+				SwapInDisabledPopover().anyView,
+				dismissable: true
+			))
 		}
-		
-		popoverState.display.send(PopoverItem(
-		
-			SwapInFeePopup(didAcceptFeesCallback: didAcceptFeesCallback).anyView,
-			dismissable: false
-		))
 	}
 }
 
@@ -1071,15 +1122,15 @@ struct NotificationsDisabledWarning: View {
 	}
 }
 
-enum PushPermissionPopupResponse: String {
+enum PushPermissionPopoverResponse: String {
 	case ignored
 	case denied
 	case accepted
 }
 
-struct RequestPushPermissionPopup: View {
+struct RequestPushPermissionPopover: View, ViewName {
 	
-	let callback: (PushPermissionPopupResponse) -> Void
+	let callback: (PushPermissionPopoverResponse) -> Void
 	
 	@State private var userIsIgnoringPopover: Bool = true
 	@Environment(\.popoverState) private var popoverState: PopoverState
@@ -1115,7 +1166,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func didDeny() -> Void {
-		log.trace("[RequestPushPermissionPopup] didDeny()")
+		log.trace("[\(viewName)] didDeny()")
 		
 		callback(.denied)
 		userIsIgnoringPopover = false
@@ -1123,7 +1174,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func didAccept() -> Void {
-		log.trace("[RequestPushPermissionPopup] didAccept()")
+		log.trace("[\(viewName)] didAccept()")
 		
 		callback(.accepted)
 		userIsIgnoringPopover = false
@@ -1131,7 +1182,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func willClose() -> Void {
-		log.trace("[RequestPushPermissionPopup] willClose()")
+		log.trace("[\(viewName)] willClose()")
 		
 		if userIsIgnoringPopover {
 			callback(.ignored)
@@ -1139,7 +1190,7 @@ struct RequestPushPermissionPopup: View {
 	}
 }
 
-struct SwapInFeePopup : View {
+struct SwapInFeePopover : View, ViewName {
 	
 	let didAcceptFeesCallback: () -> Void
 	
@@ -1189,19 +1240,52 @@ struct SwapInFeePopup : View {
 	}
 	
 	func didCancel() -> Void {
-		log.trace("[SwapInFeePopup] didCancel()")
+		log.trace("[\(viewName)] didCancel()")
 		
 		popoverState.close.send()
 	}
 	
 	func didAccept() -> Void {
-		log.trace("[SwapInFeePopup] didAccept()")
+		log.trace("[\(viewName)] didAccept()")
 		
 		didAcceptFeesCallback()
 		popoverState.close.send()
 	}
 }
 
+fileprivate struct SwapInDisabledPopover: View, ViewName {
+	
+	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: .trailing) {
+			
+			VStack(alignment: .leading) {
+				Text("Some Services Disabled")
+					.font(.title3)
+					.padding(.bottom)
+				
+				Text(
+					"The bitcoin mempool is congested and fees are very high." +
+					" The on-chain swap service has been temporarily disabled."
+				)
+				.lineLimit(nil)
+			}
+			.padding(.bottom)
+			
+			HStack {
+				Button {
+					popoverState.close.send()
+				} label : {
+					Text("Try again later").font(.headline)
+				}
+			}
+		}
+		.padding()
+	}
+}
 
 struct SwapInView: View, ViewName {
 	

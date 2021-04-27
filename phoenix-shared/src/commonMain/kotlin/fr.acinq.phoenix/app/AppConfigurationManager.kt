@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.lightning.WalletParams
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.io.TcpSocket
@@ -31,19 +30,20 @@ class AppConfigurationManager(
     private val logger = newLogger(loggerFactory)
 
     init {
-        initWalletParams()
+        initWalletContext()
         watchElectrumMessages()
     }
 
-    private val currentWalletParamsVersion = ApiWalletParams.Version.V0
-    private val _walletParams = MutableStateFlow<WalletParams?>(null)
-    val walletParams: StateFlow<WalletParams?> = _walletParams
+    private val currentWalletContextVersion = WalletContext.Version.V0
 
-    private fun initWalletParams() = launch {
-        val (instant, fallbackWalletParams) = appDb.getWalletParamsOrNull(currentWalletParamsVersion)
+    private val _chainContext = MutableStateFlow<WalletContext.V0.ChainContext?>(null)
+    val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
+
+    private fun initWalletContext() = launch {
+        val (instant, fallbackWalletContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
         val freshness = Clock.System.now() - instant
-        logger.info { "local WalletParams loaded, not updated since=$freshness" }
+        logger.info { "local WalletContext loaded, not updated since=$freshness" }
 
         val timeout =
             if (freshness < 48.hours) 2.seconds
@@ -51,57 +51,59 @@ class AppConfigurationManager(
 
         // TODO are we using TOR? -> increase timeout
 
-        val walletParams = try {
+        val walletContext = try {
             withTimeout(timeout) {
-                fetchAndStoreWalletParams() ?: fallbackWalletParams
+                fetchAndStoreWalletContext() ?: fallbackWalletContext
             }
         } catch (t: TimeoutCancellationException) {
-            logger.warning { "Unable to fetch WalletParams, using fallback values=$fallbackWalletParams" }
-            fallbackWalletParams
+            logger.warning { "Unable to fetch WalletContext, using fallback values=$fallbackWalletContext" }
+            fallbackWalletContext
         }
 
-        // _walletParams can be updated by [updateWalletParamsLoop] before we reach this block.
+        // _chainContext can be updated by [updateWalletContextLoop] before we reach this block.
         // In that case, we don't update from here
-        if (_walletParams.value == null) {
-            logger.debug { "init WalletParams=$walletParams" }
-            _walletParams.value = walletParams
+        if (_chainContext.value == null) {
+            val chainContext = walletContext?.export(chain)
+            logger.debug { "init ChainContext=$chainContext" }
+            _chainContext.value = chainContext
+
         }
 
-        logger.info { "walletParams=$walletParams" }
+        logger.info { "chainContext=$chainContext" }
     }
 
-    private var updateWalletParamsJob: Job? = null
-    public fun startWalletParamsLoop() {
-        updateWalletParamsJob = updateWalletParamsLoop()
+    private var updateWalletContextJob: Job? = null
+    public fun startWalletContextLoop() {
+        updateWalletContextJob = updateWalletContextLoop()
     }
 
-    public fun stopWalletParamsLoop() {
-        launch { updateWalletParamsJob?.cancelAndJoin() }
+    public fun stopWalletContextLoop() {
+        launch { updateWalletContextJob?.cancelAndJoin() }
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun updateWalletParamsLoop() = launch {
+    private fun updateWalletContextLoop() = launch {
         var retryDelay = RETRY_DELAY
 
         while (isActive) {
-            val walletParams = fetchAndStoreWalletParams()
-            // _walletParams can be updated just once.
-            if (_walletParams.value == null) {
-                retryDelay = increaseDelay(retryDelay)
-                logger.debug { "update WalletParams=$walletParams" }
-                _walletParams.value = walletParams
-            } else {
+            val walletContext = fetchAndStoreWalletContext()
+            if (walletContext != null) {
+                val chainContext = walletContext.export(chain)
+                logger.debug { "update ChainContext=$chainContext" }
+                _chainContext.value = chainContext
                 retryDelay = 60.minutes
+            } else {
+                retryDelay = increaseDelay(retryDelay)
             }
 
             delay(retryDelay)
         }
     }
 
-    private suspend fun fetchAndStoreWalletParams(): WalletParams? {
+    private suspend fun fetchAndStoreWalletContext(): WalletContext.V0? {
         return try {
             val rawData = httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
-            appDb.setWalletParams(currentWalletParamsVersion, rawData)
+            appDb.setWalletContext(currentWalletContextVersion, rawData)
         } catch (t: Throwable) {
             logger.error(t) { "${t.message}" }
             null

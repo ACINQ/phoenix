@@ -8,25 +8,36 @@ extension PaymentsManager {
 	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
 		
-		return KotlinCurrentValueSubject<NSDictionary>(
+		// Transforming from Kotlin:
+		// ```
+		// incomingSwaps: StateFlow<Map<String, MilliSatoshi>>
+		// ```
+		return KotlinCurrentValueSubject<NSDictionary, [String: Lightning_kmpMilliSatoshi]>(
 			AppDelegate.get().business.paymentsManager.incomingSwaps
 		)
-		.compactMap {
-			return $0 as? Dictionary<String, Lightning_kmpMilliSatoshi>
-		}
 		.eraseToAnyPublisher()
 	}
 	
-	func lastCompletedPaymentPublisher() -> KotlinPassthroughSubject<Lightning_kmpWalletPayment> {
+	func lastCompletedPaymentPublisher() -> AnyPublisher<Lightning_kmpWalletPayment, Never> {
 		
-		return KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
+		// Transforming from Kotlin:
+		// ```
+		// lastCompletedPayment: StateFlow<WalletPayment?>
+		// ```
+		return KotlinCurrentValueSubject<Lightning_kmpWalletPayment, Lightning_kmpWalletPayment?>(
 			AppDelegate.get().business.paymentsManager.lastCompletedPayment
 		)
+		.compactMap { $0 }
+		.eraseToAnyPublisher()
 	}
 	
 	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
 		
-		return KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
+		// Transforming from Kotlin:
+		// ```
+		// lastCompletedPayment: StateFlow<WalletPayment?>
+		// ```
+		return KotlinCurrentValueSubject<Lightning_kmpWalletPayment, Lightning_kmpWalletPayment?>(
 			AppDelegate.get().business.paymentsManager.lastCompletedPayment
 		)
 		.compactMap {
@@ -34,6 +45,22 @@ extension PaymentsManager {
 		}
 		.eraseToAnyPublisher()
   }
+}
+
+extension AppConfigurationManager {
+	
+	// Transforming from Kotlin:
+	// ```
+	// chainContext: StateFlow<WalletContext.V0.ChainContext?>
+	// ```
+	func chainContextPublisher() -> AnyPublisher<WalletContext.V0ChainContext, Never> {
+		
+		return KotlinCurrentValueSubject<WalletContext.V0ChainContext, WalletContext.V0ChainContext?>(
+			AppDelegate.get().business.appConfigurationManager.chainContext
+		)
+		.compactMap { $0 }
+		.eraseToAnyPublisher()
+	}
 }
 
 extension Lightning_kmpIncomingPayment {
