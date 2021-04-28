@@ -1,0 +1,770 @@
+<!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+  <string name="app_name">Phoenix (Testnet)</string>
+
+  <!-- //////////////// system notification channels //////////////// -->
+
+  <string name="notification_channels_watcher_title">Hintergrundbeobachter</string>
+  <string name="notification_channels_watcher_desc">Benachrichtigt Sie, wenn Sie die Anwendung starten müssen. Sollte hohe Priorität haben.</string>
+  <string name="notification_pay_to_open_title">Eingehende Zahlung akzeptieren</string>
+  <string name="notification_pay_to_open_desc">Erscheint, wenn Ihnen jemand eine Zahlung sendet und Sie diese manuell akzeptieren müssen.</string>
+  <string name="notification_headless_title">Phoenix läuft im Hintergrund</string>
+  <string name="notification_headless_desc">Benachrichtigt Sie, dass Phoenix im Hintergrund läuft. Dies passiert, wenn Ihnen jemand Geld sendet und die App noch nicht gestartet ist.</string>
+
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+
+  <string name="autocreate_generating">Ihre Wallet wird erstellt…</string>
+  <string name="autocreate_error">Wir konnten Ihre Wallet nicht erstellen.\nGrund: %1$s</string>
+
+  <!-- //////////////// init wallet / automated wallet creation //////////////// -->
+
+  <string name="restore_disclaimer_message">Importieren Sie keinen Seed, der NICHT von dieser Anwendung erstellt wurde.\n\nStellen Sie außerdem sicher, dass Sie keine andere Phoenix-Wallet mit demselben Seed haben.</string>
+  <string name="restore_disclaimer_checkbox">Ich verstehe.</string>
+  <string name="restore_disclaimer_next">Nächstes</string>
+  <string name="restore_instructions">Der Seed Ihrer Wallet ist eine Liste von 12 englischen Wörtern.</string>
+  <string name="restore_mnemonics_label">Verwenden Sie die untere Tastatur, um den Seed einzugeben:</string>
+  <string name="restore_in_progress">Ihre Wallet wird wiederhergestellt…</string>
+  <string name="restore_import_button">Importieren</string>
+  <string name="restore_error">Dieser Seed ist ungültig und kann nicht importiert werden.\n\nVersuchen Sie es bitte erneut</string>
+
+  <!-- //////////////// Auth prompt (v2) //////////////////// -->
+
+  <string name="authprompt_title">Entsperren, um fortzufahren</string>
+  <string name="authprompt_hard_negative">Abbrechen</string>
+  <string name="authprompt_error_unsecure">Gerät ist nicht sicher (Code: %1$d)</string>
+
+  <!-- //////////////// Pin dialog //////////////////// -->
+
+  <string name="pindialog_title_default">Bitte geben Sie Ihre PIN ein</string>
+  <string name="pindialog_error">Die PIN muss eine 6-stellige Nummer sein.</string>
+  <string name="pindialog_error_donotmatch">PIN-Codes stimmen nicht überein.</string>
+
+  <!-- //////////////// Biometric dialog //////////////////// -->
+
+  <string name="biometricprompt_title">Wallet ist gesperrt</string>
+  <string name="biometricprompt_negative">Mit PIN entsperren</string>
+
+  <!-- //////////////// placeholders ////////////////-->
+
+  <!-- //////////////// Startup //////////////////// -->
+
+  <string name="startup_unlock_required">Phoenix is gesperrt.\nBitte authentifizieren Sie sich, um fortzufahren.</string>
+  <string name="startup_unlock_button">Entsperren</string>
+  <string name="startup_binding_service">Verbinde Service…</string>
+  <string name="startup_wait">Lädt…</string>
+  <string name="startup_wait_tor">Tor wird gestartet…</string>
+  <string name="startup_start_button">Neu starten</string>
+  <string name="startup_settings_button">Einstellungen</string>
+  <string name="startup_error_generic">Die Anwendung konnte nicht starten.\n\nFehlerdetails: %1$s</string>
+  <string name="startup_error_electrum_address">Die Anwendung konnte nicht starten. Die Addresse des benutzerdefinierten Electrum-Servers ist ungültig.\n\nGehen Sie zu Einstellungen > Electrum, um Ihre Einstellungen zu korrigieren.</string>
+  <string name="startup_error_tor">Der Tor-Service konnte nicht starten. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.\n\nFehlerdetails: %1$s</string>
+  <string name="startup_error_unreadable">Walletdaten konnten nicht gelesen werden, bitte starten Sie die Anwendung neu</string>
+  <string name="startup_error_network">Ihre Internetverbindung scheint nicht zu funktionieren. Bitte überprüfen Sie ihr WLAN oder Mobilfunknetz.</string>
+  <string name="startup_error_wrong_pwd">PIN is falsch</string>
+  <string name="startup_error_biometrics">Die biometrische Authentifizierung ist fehlgeschlagen.</string>
+  <string name="startup_error_no_biometrics_or_key_invalidated">Registrieren Sie zuerst einen Fingerabdruck in den Sicherheitseinstellungen Ihres Geräts, um die Wallet zu entsperren.\n\nAndernfalls stellen Sie Ihre Wallet mithilfe Ihres 12-Wörter-Seeds wieder her.</string>
+  <string name="startup_error_auth_failed">Authentifizierung fehlgeschlagen.</string>
+  <string name="startup_error_auth_failed_with_details">Authentifizierung fehlgeschlagen.\n—\n%1$s</string>
+
+  <!-- //////////////// payment holder //////////////// -->
+
+  <string name="paymentholder_sending">Senden…</string>
+  <string name="paymentholder_processing">Verarbeiten…</string>
+  <string name="paymentholder_waiting">Warten…</string>
+  <string name="paymentholder_failed">Fehlgeschlagen</string>
+  <string name="paymentholder_sent_prefix">-</string>
+  <string name="paymentholder_received_prefix">+</string>
+  <string name="paymentholder_no_desc">Keine Beschreibung</string>
+  <string name="paymentholder_closing_desc">Schließe #%1$s</string>
+  <string name="paymentholder_swap_in_desc">On-Chain Zahlung an %1$s</string>
+
+  <!-- //////////////// receive //////////////// -->
+
+  <string name="receive_edit_title">Bearbeite meine Zahlungsanforderung</string>
+  <string name="receive_edit_subtitle">Sie können den angeforderten Betrag und die Beschreibung der Zahlungsanforderung ändern.</string>
+  <string name="receive_in_progress_message">Bitte warten Sie…</string>
+  <string name="receive_error_message">Es ist ein Fehler bei der Generierung der Zahlungsanforderung aufgetreten…\n\nBitte versuchen Sie es erneut.</string>
+  <string name="receive_amount_label">Betrag (optional)</string>
+  <string name="receive_desc_label">Zahlungsbeschreibung (optional):</string>
+  <string name="receive_default_desc">Phoenix Zahlung</string>
+  <string name="receive_generate_button">Erstelle Zahlungsanforderung</string>
+
+  <string name="receive_share_subject">Zahlung angefordert</string>
+  <string name="receive_share_title">Teilen Sie diese Zahlungsanforderung mit…</string>
+  <string name="receive_share_button">Teilen…</string>
+
+  <string name="receive_min_amount_pay_to_open">
+    <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
+  </string>
+  <string name="receive_min_amount_swap_in">
+    <![CDATA[Einzahlung muss mindestens <b>%1$s</b> betragen.]]>
+  </string>
+  <string name="receive_paytoopen_disabled">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
+  <string name="receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
+  <string name="receive_address_label">Adresse</string>
+  <string name="receive_withdraw_button">Benutze LNURL Link</string>
+
+  <string name="receive_swap_in_button">Bitcoin Adresse anzeigen</string>
+  <string name="receive_swap_in_error_message">Es konnte keine Bitcoin Adresse vom Swap-Dienst abgerufen werden.\n\nBitte versuchen Sie es später erneut.</string>
+  <string name="receive_swap_in_unknown">
+    <![CDATA[
+    <b>Nicht verfügbar</b>
+    <br /><br />
+    Bitte versuchen Sie es später erneut.
+  ]]>
+  </string>
+  <string name="receive_swap_in_disabled">
+    <![CDATA[
+    <b>Dienst deaktiviert</b>
+    <br /><br />
+    Der on-Chain Einzahlungs-Swap-Dienst wurde vorübergehend deaktiviert.
+    <br /><br />
+    Versuchen Sie es später erneut.
+  ]]>
+  </string>
+  <string name="receive_swap_in_disabled_mempool">
+    <![CDATA[
+    <b>Dienst deaktiviert</b>
+    <br /><br />
+    Der Bitcoin-Mempool ist überlastet und die Netzwerkgebühren sind sehr hoch. Der on-Chain Einzahlungs-Swap-Dienst wurde vorübergehend deaktiviert.
+    <br /><br />
+    Versuchen Sie es später erneut.
+  ]]>
+  </string>
+  <string name="receive_swap_in_progress_message">Bitcoin Adresse anfragen…</string>
+  <string name="receive_swap_in_disclaimer_title">Mit einer Bitcoin Adresse erhalten</string>
+  <string name="receive_swap_in_disclaimer_message">
+    <![CDATA[
+  Eine Bitcoin Adresse wird als nächstes angezeigt.
+  <br /><br />
+  An diese Adresse gesendete Beträge werden nach einer Bestätigung in Ihrer Wallet angezeigt.
+  <br /><br />
+  Es wird eine Gebühr von <b>%1$s%%</b> erhoben (mit einem <b>%2$s</b> Minimum).
+  ]]>
+  </string>
+
+  <!-- //////////////// send //////////////// -->
+
+  <string name="send_init_paste">Daten aus der Zwischenablage einfügen</string>
+  <string name="send_init_reading">Scan lesen…</string>
+
+  <string name="send_balance_prefix">Betrag:</string>
+  <string name="send_use_all_balance">Sende alles</string>
+  <string name="send_loading">Zahlung überprüfen…</string>
+  <string name="send_invalid_pr_generic">Diese Zahlung ist ungültig. Möglicherweise haben Sie eine falsche Zahlungsanforderung gescannt.\n\nVersuchen Sie es später erneut.</string>
+  <string name="send_invalid_pr_already_paid">Diese Zahlung wurde bereits bezahlt.</string>
+  <string name="send_invalid_pr_already_paid_button">Offene Zahlung</string>
+  <string name="send_amount_error">Bitte geben Sie einen gültigen Betrag ein.</string>
+  <string name="send_amount_error_balance">Der Betrag übersteigt Ihr Kontostand.</string>
+  <string name="send_amount_error_swap_out_too_small">Mind. 10000 Sat für on-Chain Zahlungen.</string>
+  <string name="send_destination_label">Senden an</string>
+  <string name="send_description_label">Beschr.</string>
+  <string name="send_chain_fees_edit">Gebühren bearbeiten</string>
+  <string name="send_chain_fees_label">Gebührensatz</string>
+  <string name="send_chain_fees_unit">Sat/Byte</string>
+  <string name="send_chain_fees_description">Diese Zahlung ist eine on-Chain Transaktion, welche in der Regel langsamer ist und mehr kostet. Eine Netzwerkgebühr wird erhoben.</string>
+  <string name="send_chain_fees_feedback_invalid">Bitte verwenden Sie einen gültigen Gebührensatz.</string>
+  <string name="send_chain_fees_feedback_too_low">Dieser Gebührensatz ist zu niedrig. Es muss mindestens %1$s Sat/Byte sein.</string>
+  <string name="send_chain_fees_feedback_20min">Mit diesem Gebührensatz sollte die Transaktion innerhalb von 30 Minuten eingehen.</string>
+  <string name="send_chain_fees_feedback_1h">Mit diesem Gebührensatz sollte die Transaktion innerhalb einer Stunde eingehen.</string>
+  <string name="send_chain_fees_feedback_12h">Mit diesem Gebührensatz sollte die Transaktion innerhalb von 12 Stunden eingehen.</string>
+  <string name="send_chain_fees_feedback_inf">Mit diesem Gebührensatz wird die Transaktion in nicht weniger als 12 Stunden oder mehr eingehen.</string>
+  <string name="send_error_sending">Beim Versuch, diese Zahlung zu senden, ist ein interner Fehler aufgetreten. Es wurde kein Geld gesendet.</string>
+  <string name="send_pay_button">Bezahlen</string>
+  <string name="send_swap_in_progress">Transaktion wird vorbereitet</string>
+  <string name="send_swap_error">Swap in die Chain ist fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
+  <string name="send_swap_required_button">Transaktion vorbereiten</string>
+  <string name="send_swap_complete_recap_amount">Betrag</string>
+  <string name="send_swap_complete_recap_fee">Netzwerkgebühr</string>
+  <string name="send_swap_complete_recap_total">Gesamt</string>
+  <string name="send_swap_complete_cannot_afford">Die Summe nach Gebühren übersteigt Ihr Kontostand.</string>
+
+  <!-- //////////////// scan //////////////// -->
+
+  <string name="scan_request_camera_access">Kameraerlaubnis erteilen</string>
+  <string name="scan_instructions">Scannen Sie einen QR-Code, der eine Zahlungsanforderung, eine Bitcoin Adresse oder eine LNURL enthält</string>
+  <string name="scan_state_reading">Daten werden gelesen</string>
+
+  <string name="scan_error_expired">Zahlung ist abgelaufen.</string>
+  <string name="scan_error_pay_to_self">Du kannst dich nicht selbst bezahlen.</string>
+  <string name="scan_error_invalid_chain">Diese Zahlung verwendet nicht dieselbe Blockchain wie Ihre Wallet.</string>
+  <string name="scan_error_lnurl_unsupported">Diese Art von Lightning-URL wird noch nicht unterstützt!</string>
+  <string name="scan_error_lnurl_failure_generic">
+    <![CDATA[Der LNURL-Dienst <b>%1$s</b> hat einen Fehler zurückgegeben.]]>
+  </string>
+  <string name="scan_error_lnurl_failure_code">
+    <![CDATA[Der LNURL-Dienst <b>%1$s</b> hat einen %2$d HTTP-Fehlercode zurückgegeben.]]>
+  </string>
+  <string name="scan_error_lnurl_failure_detailed">
+    <![CDATA[
+    Der LNURL-Dienst <b>%1$s</b> hat einen Fehler zurückgegeben:
+    <br/><br/>
+    <em>%2$s</em>
+  ]]>
+  </string>
+  <string name="scan_error_lnurl_failure_unreadable">
+    <![CDATA[Der LNURL-Dienst <b>%1$s</b> hat eine ungültige Nachricht zurückgegeben.]]>
+  </string>
+  <string name="scan_error_invalid_scan">Ungültige Daten.\nBitte versuchen Sie es später erneut.</string>
+
+  <string name="scan_amountless_legacy_title">Warnung</string>
+  <string name="scan_amountless_legacy_message">
+    <![CDATA[
+    Diese Zahlungsanforderung enthält keinen Betrag. Dies kann gefährlich sein: Böswillige Nodes können möglicherweise Ihre Zahlung stehlen. Um sicher zu gehen, sollten Sie <b>den Zahlungsempfänger bitten, einen Betrag</b> in der Zahlungsanforderung anzugeben.
+    <br /><br />
+    Möchten Sie diese Zahlungsanforderung wirklich bezahlen?
+  ]]>
+  </string>
+  <string name="scan_amountless_legacy_confirm_button">Bestätigen</string>
+  <string name="scan_amountless_legacy_cancel_button">Abbrechen</string>
+
+  <!-- //////////////// utilities strings //////////////// -->
+
+  <!-- #1: sign / #2: integer part / #3: decimal part / #4: unit -->
+  <string name="utils_converted_amount">≈ %1$s</string>
+  <string name="utils_pretty_amount">
+    <![CDATA[%1$s%2$s<small>%3$s<small>]]>
+  </string>
+  <string name="utils_pretty_amount_with_unit">
+    <![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]>
+  </string>
+
+  <string name="utils_ok">Ok</string>
+  <string name="utils_proceed">Fortfahren</string>
+  <string name="utils_next">Nächstes</string>
+  <string name="utils_cancel">Abbrechen</string>
+  <string name="utils_date_just_now">jetzt</string>
+  <string name="utils_unknown">N/A</string>
+  <string name="utils_copied">In die Zwischenablage kopiert!</string>
+  <string name="btn_back">Zurück</string>
+  <string name="btn_ok">OK</string>
+  <string name="btn_confirm">Bestätigen</string>
+  <string name="btn_cancel">Abbrechen</string>
+  <string name="btn_close">Schließen</string>
+  <string name="btn_pause_connecting">Verbindung zum Peer herstellen…</string>
+  <string name="btn_pause_connecting_electrum">Verbindung zu Electrum herstellen…</string>
+
+  <!-- //////////////// settings //////////////// -->
+
+  <string name="settings_general_title">Allgemein</string>
+  <string name="settings_display_prefs">Anzeige</string>
+  <string name="settings_security_title">Sicherheit</string>
+  <string name="settings_display_seed">Wiederherstellungssatz</string>
+  <string name="settings_access_control">Zugriffseinstellungen</string>
+  <string name="settings_advanced_title">Erweitert</string>
+  <string name="settings_fees">Gebühreneinstellungen</string>
+  <string name="settings_list_channels">Kanalliste</string>
+  <string name="settings_logs">Protokolle</string>
+  <string name="settings_electrum">Electrum-Server</string>
+  <string name="settings_mutual_close">Schließe alle Kanäle</string>
+  <string name="settings_force_close">Gefahrenzone</string>
+  <string name="settings_tor">Tor</string>
+  <string name="settings_about">Über</string>
+  <string name="settings_payment_settings">Zahlungseinstellungen</string>
+
+  <!-- //////////////// notification - watcher //////////////// -->
+
+  <string name="notif_watcher_cheating_title">Bitte starten Sie Phoenix</string>
+  <string name="notif_watcher_cheating_message">Ein Betrugsversuch wurde erkannt.</string>
+
+  <string name="notif_watcher_connection_title">Phoenix benötigt Netzwerkzugriff</string>
+  <string name="notif_watcher_connection_message">Der Hintergrundbeobachter benötigt eine Internetverbindung, um ordnungsgemäß zu funktionieren.</string>
+
+  <string name="notif__headless_title__default">Phoenix läuft im Hintergrund</string>
+  <string name="notif__headless_title__missed_incoming">Eingehende Zahlung verpasst</string>
+  <string name="notif__headless_title__missed_fulfill">Eine ausstehende Zahlung wurde abgeschlossen</string>
+  <string name="notif__headless_title__received">Zahlung erhalten</string>
+  <string name="notif__headless_message__app_locked">Anwendung ist gesperrt</string>
+  <string name="notif__headless_message__pending_fulfill">Tippen Sie hier, um die App zu starten</string>
+  <string name="notif__headless_message__manual_pay_to_open">Die Erstellung von Kanälen erfordert eine manuelle Zustimmung</string>
+  <string name="notif__headless_message__received_payment">%1$s (%2$s) erhalten</string>
+
+  <string name="notif_pay_to_open_title">Akzeptiere eingehende Zahlung</string>
+  <string name="notif_pay_to_open_message">Tippen Sie hier, um die Anwendung zu starten</string>
+
+  <string name="notif__pay_to_open_missed_title">Zahlung verpasst (%1$s)</string>
+  <string name="notif__pay_to_open_missed_message">Der eingehende Betrag war zu gering, um einen neuen Zahlungskanal zu erstellen.</string>
+
+  <!-- //////////////// close all channels //////////////// -->
+
+  <string name="closechannels_title">Schließe Kanäle</string>
+  <string name="closechannels_checking_channels">Kanäle werden überprüft, bitte warten Sie…</string>
+  <string name="closechannels_channels_recap">Sie haben derzeit %1$d Lightning-Kanäle mit einem Gesamtguthaben von %2$s.</string>
+  <string name="closechannels_channels_none">Sie haben derzeit keine Kanäle die geleert werden könnten.\n\nGehen Sie zu der \"Kanalliste\" Seite, um den Status Ihrer Kanäle zu sehen.</string>
+  <string name="closechannels_mutual_title">Wallet leeren</string>
+  <string name="closechannels_mutual_instructions">
+    <![CDATA[
+    Verwenden Sie diese Funktion, um Ihre Wallet auf eine Bitcoin Adresse zu transferieren.
+  ]]>
+  </string>
+  <string name="closechannels_mutual_input_instructions">Gelder können an eine Bitcoin-Wallet gesendet werden. Stellen Sie vor dem Senden sicher, dass die Adresse korrekt ist.</string>
+  <string name="closechannels_mutual_input_hint">Bitcoin Adresse eingeben</string>
+  <string name="closechannels_mutual_button">Meine Wallet leeren</string>
+  <string name="closechannels_force_title">Schließung erzwingen</string>
+  <string name="closechannels_force_instructions">
+    <![CDATA[
+    Mit einer erzwungenen Schließung können Sie Ihre Kanäle einseitig schließen.
+    <br/><br/>
+    Diese Funktion ist kein &quot;magischer alles wird gut Knopf&quot;; Es dient als Sicherheitsmaßnahme und sollte <b>nur in extremen Szenarien verwendet werden</b>. Zum Beispiel, wenn Ihr Peer (ACINQ) dauerhaft verschwinden sollte und Sie Ihr Geld nicht mehr ausgeben können. In allen anderen Fällen, <b>wenn Sie Probleme mit Phoenix haben sollten, wenden Sie sich an den Support</b>.
+    <br/><br/>
+    Das Erzwingen der Schließung von Kanälen kostet Sie Geld (zur Deckung der Netzwerkgebühren) und führt dazu, dass Ihr Geld tagelang gesperrt sein wird. <b>Deinstallieren Sie die App erst, wenn Ihre Kanäle vollständig geschlossen sind. Andernfalls verlieren Sie Geld.</b>
+    <br/><br/>
+    <b>Verwenden Sie diese Funktion nicht, wenn Sie nicht genau verstehen, was sie bewirkt.</b>
+  ]]>
+  </string>
+  <string name="closechannels_force_destination">Gelder werden schließlich gesendet an:</string>
+  <string name="closechannels_force_destination_desc">Diese Adresse leitet sich von Ihrem Seed ab und gehört Ihnen.</string>
+  <string name="closechannels_force_button">Schließung von Kanälen erzwingen</string>
+  <string name="closechannels_confirm_dialog_message">Sind Sie sicher, dass Sie fortfahren möchten?</string>
+  <string name="closechannels_message_error">Es gab ein Problem. Bitte versuchen Sie es später erneut.</string>
+  <string name="closechannels_message_done">Gelder wurden gesendet.</string>
+  <string name="closechannels_message_in_progress">Bitte warten Sie…</string>
+
+  <!-- //////////////// list all channels //////////////// -->
+
+  <string name="listallchannels_title">Kanalliste</string>
+  <string name="listallchannels_in_progress">Bitte warten Sie…</string>
+  <string name="listallchannels_error">Beim Abrufen der Kanalliste ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+  <string name="listallchannels_node_id">Node-ID: %1$s</string>
+  <string name="listallchannels_no_channels">Sie haben noch keine Kanäle.</string>
+  <plurals name="listallchannels_channels_header">
+    <item quantity="one">Sie haben %1$d Kanal.</item>
+    <item quantity="other">Sie haben %1$d Kanäle.</item>
+  </plurals>
+  <string name="listallchannels_copy">Kopieren</string>
+  <string name="listallchannels_share_all">Teile alle Kanäle</string>
+  <string name="listallchannels_share">Teilen</string>
+  <string name="listallchannels_funding_tx">Tx</string>
+  <string name="listallchannels_funding_tx_desc">Finanzierungstransaktion anzeigen</string>
+  <string name="listallchannels_close">Schließen</string>
+  <string name="listallchannels_share_subject">Kanaldaten</string>
+  <string name="listallchannels_share_title">Teile Kanaldaten</string>
+  <string name="listallchannels_serialization_error">Kanaldaten konnten nicht abgerufen werden</string>
+
+  <!-- //////////////// channel details //////////////// -->
+
+  <string name="channel_loading">Kanaldaten werden abgerufen…</string>
+  <string name="channel_error">Die Details für diesen Kanal konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.</string>
+  <string name="channel_send">Senden</string>
+  <string name="channel_receive">Empfangen</string>
+
+  <!-- //////////////// menu //////////////// -->
+
+  <string name="menu_settings">Einstellungen</string>
+  <string name="menu_send">Senden</string>
+  <string name="menu_receive">Empfangen</string>
+
+  <!-- //////////////// init wallet //////////////// -->
+
+  <string name="initwallet_terms">
+    <![CDATA[Ich habe <br/> die <a href="https://phoenix.acinq.co/terms">Nutzungsbedingungen</a> gelesen und bin damit einverstanden.]]>
+  </string>
+  <string name="initwallet_create">Neue Wallet erstellen</string>
+  <string name="initwallet_restore">Meine Wallet wiederherstellen</string>
+
+  <!-- //////////////// main //////////////////// -->
+
+  <string name="main_alert_electrum_connecting">Verbindung zum Electrum-Server wird aufgebaut…</string>
+  <string name="main_alert_network_lost">Sie sind offline. Bitte überprüfen Sie ihre Netzwerkeinstellungen…</string>
+  <string name="main_alert_lightning_connection_lost">Das Lightning-Netzwerk konnte nicht erreicht werden…</string>
+  <string name="main_alert_settings_button">Einstellungen</string>
+  <string name="main_swapin_incoming">+%1$s gehen ein</string>
+  <string name="main_faq_button">FAQ</string>
+  <string name="main_connectivity_button">Verbindung wird aufgebaut…</string>
+  <string name="main_tor_connected_button">Tor aktiviert</string>
+  <string name="main_stores_button">Stores</string>
+
+  <!-- //////////////// notifications //////////////////// -->
+
+  <string name="inappnotif_mnemonics_never_seen">Vielen Dank, dass Sie Phoenix verwenden. Bitte sichern Sie Ihre Wallet, damit Sie Ihre Bitcoins nicht verlieren.</string>
+  <string name="inappnotif_mnemonics_never_seen_action">Meine Wallet sichern</string>
+  <string name="inappnotif_background_worker_cannot_run">Phoenix muss von Zeit zu Zeit im Hintergrund laufen können. Stellen Sie sicher, dass Ihr Gerät diese App nicht aggressiv beendet, um Energie zu sparen.</string>
+  <string name="inappnotif_upgrade">Ein Update für diese Anwendung ist verfügbar.</string>
+  <string name="inappnotif_upgrade_critical">Ein kritisches Update ist verfügbar. Die Wallet könnte fehlerhaft funktionieren, wenn sie nicht aktualisiert wird.</string>
+  <string name="inappnotif_mempool_high_usage">Bitcoin-Mempool ist voll und die Gebühren sind hoch.</string>
+  <string name="inappnotif_mempool_high_usage_action">Sehen Sie, wie Phoenix betroffen ist</string>
+
+  <!-- //////////////// display seed //////////////// -->
+
+  <string name="displayseed_title">Wiederherstellungssatz der Wallet</string>
+  <string name="displayseed_authenticate_button">Seed anzeigen</string>
+  <string name="displayseed_loading">Seed freigeben…</string>
+  <string name="displayseed_error_generic">Seed konnte nicht freigegeben werden, bitte versuchen Sie es erneut.</string>
+  <string name="displayseed_error_wrong_password">PIN ist falsch.</string>
+  <string name="displayseed_instructions">
+    <![CDATA[
+    Der Wiederherstellungssatz, auch Seed genannt, ist eine Liste aus 12 englischen Wörtern. Mit ihm können Sie, bei Bedarf, den vollständigen Zugriff auf ihre Gelder wiederherstellen.
+    <br /><br />
+    <strong>Nur Sie allein besitzen diesen Seed. Halten Sie ihn privat.</strong>
+    <br /><br />
+    <strong>Teilen Sie diesen Seed mit niemandem</strong>.
+    <br />
+    Nehmen Sie sich vor Phishing in Acht. Die Entwickler von Phoenix werden niemals nach Ihrem Seed fragen.
+    <br /><br />
+    <strong>Verlieren Sie diesen Seed nicht</strong>.
+    <br />
+    Sichern Sie es an einem sicheren Ort (nicht auf diesem Gerät). Wenn Sie Ihren Seed und Ihr Gerät verlieren, verlieren Sie auch Ihr Geld.
+  ]]>
+  </string>
+  <string name="displayseed_derivation_path">BIP39 Seed mit dem Standard BIP84-Ableitungspfad</string>
+  <string name="displayseed_words_td">
+    <![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]>
+  </string>
+  <string name="displayseed_has_saved_seed_checkbox">Ich habe eine Sicherungskopie meines Seeds erstellt, zum Beispiel auf einem Blatt Papier.</string>
+  <string name="displayseed_dialog_header">HALTEN SIE DIESEN SEED SICHER.\nTEILEN SIE IHN MIT NIEMANDEM.</string>
+
+  <!-- //////////////// logs settings //////////////// -->
+
+  <string name="logs_title">Anwendungsprotokolle</string>
+  <string name="logs_subtitle">Hier können Sie die Anwendungsprotokolle extrahieren und freigeben.</string>
+  <string name="logs_view_button">Protokolle anzeigen…</string>
+  <string name="logs_view_with">Protokolle anzeigen mit…</string>
+  <string name="logs_share_button">Protokolle teilen…</string>
+  <string name="logs_share_subject">Phoenix Anwendungsprotokolle</string>
+  <string name="logs_share_title">Phoenix Protokolle teilen…</string>
+
+  <!-- //////////////// payment details //////////////// -->
+
+  <string name="paymentdetails_loading">Zahlungsdetails abrufen…</string>
+  <string name="paymentdetails_error">Beim Abrufen der Zahlungdetails ist ein Fehler aufgetreten.\n\nVersuchen Sie es erneut.</string>
+
+  <string name="paymentdetails_status_sent_successful">
+    <![CDATA[<b>Gesendet</b> %1$s]]>
+  </string>
+  <string name="paymentdetails_status_sent_pending">
+    <![CDATA[<b>Anstehend…</b>]]>
+  </string>
+  <string name="paymentdetails_status_sent_failed">
+    <![CDATA[Zahlung <b>fehlgeschlagen</b>.<br />Es wurde kein Geld gesendet.]]>
+  </string>
+
+  <string name="paymentdetails_status_received_pending">Zahlung wurde noch nicht empfangen.</string>
+  <string name="paymentdetails_status_received_successful">
+    <![CDATA[<b>Erhalten</b> %1$s]]>
+  </string>
+
+  <string name="paymentdetails_desc_label">Beschr.</string>
+  <string name="paymentdetails_desc_custom_title">Notiz hinzufügen</string>
+  <string name="paymentdetails_desc_custom_info">Sie können dieser Zahlung eine Notiz hinzufügen.</string>
+  <string name="paymentdetails_destination_label">Gesendet an</string>
+  <string name="paymentdetails_relayer_label">Weitergeleitet von</string>
+  <string name="paymentdetails_fees_label">Gebühren</string>
+  <string name="paymentdetails_pay_to_open_label">Gebühren</string>
+  <string name="paymentdetails_pay_to_open_desc">Diese Gebühr deckt die Kosten für die Eröffnung eines neuen Zahlungskanals.</string>
+  <string name="paymentdetails_error_label">Fehler</string>
+  <string name="paymentdetails_closing_desc">Zahlung für die Schließung des Kanals %1$s…</string>
+  <string name="paymentdetails_swap_out_desc">Zahlung an on-Chain Adresse</string>
+  <string name="paymentdetails_no_description">Keine Beschreibung</string>
+  <string name="paymentdetails_address_label">Adresse</string>
+  <string name="paymentdetails_address_open_explorer">Im Explorer anzeigen</string>
+  <string name="paymentdetails_info_uniclose">
+    <![CDATA[
+    Diese Zahlung erfolgte nach einem Konflikt in einem Kanal. Das Geld wird an Ihre on-Chain Adresse gesendet: %1$s.
+    <br /><br />
+    Folgen Sie der <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money"> FAQ-Anleitung, um Ihr Geld zurückzuerlangen</a>.
+  ]]>
+  </string>
+
+  <string name="paymentdetails_technicals_button">Details anzeigen</string>
+
+  <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Der Empfänger ist nicht erreichbar oder verfügt nicht über genügend eingehende Liquidität.</string>
+  <string name="paymentdetails_failure_invalid_details">Zahlung vom Empfänger abgelehnt.\nDies tritt normalerweise auf, wenn die Rechnung bereits bezahlt wurde oder wenn sie ein Ablaufdatum enthält und Sie versucht haben, nach Ablauf eine Zahlung zu senden.</string>
+  <string name="paymentdetails_failure_trampoline_fees">Keine Route mit aktueller Gebühreneinstellung gefunden. Versuchen Sie es mit höheren Gebühren.</string>
+  <string name="paymentdetails_failure_trampoline_fees_action">Meine Gebühreneinstellung bearbeiten</string>
+
+  <!-- //////////////// payment details: technicals data //////////////// -->
+
+  <string name="paymentdetails_technicals_title">Zahlungsdaten</string>
+  <string name="paymentdetails_swap_out_feerate_label">Swap-Gebührensatz</string>
+  <string name="paymentdetails_closing_type_label">Art der Schließung</string>
+  <string name="paymentdetails_closing_type_mutual">Gegenseitiges Schließen</string>
+  <string name="paymentdetails_closing_type_local">Lokal</string>
+  <string name="paymentdetails_closing_type_remote">Remote</string>
+  <string name="paymentdetails_closing_type_other">Andere</string>
+  <string name="paymentdetails_closing_channel_label">Geschlossener Kanal</string>
+  <string name="paymentdetails_closing_spending_txs_label">Schließungstransaktion</string>
+  <string name="paymentdetails_pubkey_label">Ziel-Public-Key</string>
+  <string name="paymentdetails_payment_hash_label">Zahlungs-Hash</string>
+  <string name="paymentdetails_payment_request_label">Zahlungsanfrage</string>
+  <string name="paymentdetails_preimage_label">Preimage</string>
+  <string name="paymentdetails_created_at_label">Erstellt um</string>
+  <string name="paymentdetails_completed_at_label">Abgeschlossen um</string>
+
+  <!-- //////////////// channel state state //////////////// -->
+
+  <string name="state_wait_confirmed">Finanzierungstransaktion wird bestätigt</string>
+  <string name="state_closing">Kanal wird geschlossen</string>
+  <string name="state_closed">Kanal wurde geschlossen</string>
+  <string name="state_normal">In Betrieb</string>
+  <string name="state_sync">Synchronisierung mit Peer</string>
+  <string name="state_offline">Peer ist offline</string>
+  <string name="state_shutdown">Geschlossen</string>
+
+  <!-- //////////////// access control //////////////// -->
+
+  <string name="accessctrl_title">Sicherheit</string>
+  <string name="accessctrl_subtitle">Wir empfehlen, die Bildschirmsperre zu aktivieren, um eine unbeabsichtigte Verwendung Ihrer Wallet zu verhindern.</string>
+
+  <string name="accessctrl_auth_no_hw">Ihr Gerät unterstützt keine hardwaregestützte Benutzerauthentifizierung.</string>
+  <string name="accessctrl_auth_hw_unavailable">Ihre biometrische Hardware ist nicht verfügbar.</string>
+  <string name="accessctrl_auth_none_enrolled">Bitte registrieren Sie zuerst eine PIN, ein Muster oder einen Fingerabdruck in Android.</string>
+  <string name="accessctrl_auth_update_required">Ein Android-Sicherheitsupdate ist erforderlich.</string>
+  <string name="accessctrl_auth_unsupported">Wird von Ihrer Android-Version nicht unterstützt.</string>
+  <string name="accessctrl_auth_lockout">Zu viele Versuche, versuchen Sie es später erneut.</string>
+
+  <string name="accessctrl_error_cipher">Verschlüsselung nicht möglich: %1$s</string>
+  <string name="accessctrl_error_auth">Authentifizierung ist fehlgeschlagen.</string>
+
+  <string name="accessctrl_screen_lock_switch">Bildschirmsperre</string>
+  <string name="accessctrl_screen_lock_switch_desc">Sperren Sie den Zugriff auf die Anwendung mit der Bildschirmsperre / dem Fingerabdruck von Android</string>
+  <string name="accessctrl_full_lock_switch_unavailable">Registrieren Sie einen Fingerabdruck in Android für zusätzliche Sicherheitsfunktionen.</string>
+  <string name="accessctrl_full_lock_switch_backup_required">Bestätigen Sie, dass Sie Ihren Wiederherstellungssatz für zusätzliche Sicherheitsfunktionen gesichert haben.</string>
+  <string name="accessctrl_full_lock_switch_backup_required_button">Auf meinen Wiederherstellungssatz zugreifen</string>
+  <string name="accessctrl_full_lock_switch">Hintergrundausführung verhindern</string>
+  <string name="accessctrl_full_lock_switch_desc">Die Anwendung erfordert eine manuelle Entsperrung, um ausgeführt zu werden. Ein Zahlungsempfang im Hintergrund ist daher nicht möglich.\n\nEs wird nur die Authentifizierung per Fingerabdruck unterstützt.</string>
+  <string name="accessctrl_full_lock_confirm_title">Beachten Sie</string>
+  <string name="accessctrl_full_lock_confirm_message">Hintergrundfunktionen werden deaktiviert. Um Zahlungen zu erhalten, muss die Anwendung entsperrt werden.</string>
+
+  <!-- //////////////// ln url login //////////////// -->
+
+  <string name="lnurl_auth_instructions">
+    <![CDATA[Sie können Ihre Wallet verwenden, um eine Aktion anonym zu signieren und zu autorisieren:<br/><br/><b>%1$s</b><br/><br/>Mit diesem Dienst werden keine personenbezogenen Daten geteilt.]]>
+  </string>
+  <string name="lnurl_auth_button">Einloggen</string>
+  <string name="lnurl_auth_in_progress">
+    <![CDATA[Einloggen in\n<b>%1$s</b>]]>
+  </string>
+  <string name="lnurl_auth_success">Authentifizierungserfolg.</string>
+  <string name="lnurl_auth_failure">Authentifizierungsfehler.\n\nDetails: %1$s</string>
+  <string name="lnurl_auth_failure_remote_io">Konnte keine Verbindung zu %1$s herstellen</string>
+  <string name="lnurl_auth_failure_remote_details">Server antwortete mit %1$s</string>
+
+  <!-- //////////////// ln url pay //////////////// -->
+
+  <!-- //////////////// ln url withdraw //////////////// -->
+
+  <string name="lnurl_withdraw_amount_label">Zu empfangender Betrag</string>
+  <string name="lnurl_withdraw_description_label">Details</string>
+  <string name="lnurl_withdraw_service_host_label">
+    <![CDATA[Sie lösen Geld von <br/><b>%1$s</b> ein.]]>
+  </string>
+  <string name="lnurl_withdraw_confirm_button">Einlösen</string>
+  <string name="lnurl_withdraw_wait">Gelder werden eingelöst…</string>
+  <string name="lnurl_withdraw_success">%1$s wird Ihnen das Geld schicken, es kann einige Zeit in Anspruch nehmen.\n\nHalten Sie die App online.</string>
+  <string name="lnurl_withdraw_error_internal">Zahlung konnte nicht eingelöst werden. Bitte versuchen Sie es erneut.</string>
+  <string name="lnurl_withdraw_error_invalid">Diese Aufforderung zum Einlösen der Zahlung ist ungültig. Bitte versuchen Sie es erneut.</string>
+  <string name="lnurl_withdraw_error_amount">Betrag ist ungültig.</string>
+  <string name="lnurl_withdraw_error_amount_min">Betrag muss mindestens %1$s betragen.</string>
+  <string name="lnurl_withdraw_error_amount_max">Betrag darf nicht %1$s übersteigen.</string>
+  <string name="lnurl_withdraw_error_remote_generic">
+    <![CDATA[
+    <b>%1$s</b> hat einen Fehler oder eine ungültige Antwort zurückgegeben.
+    <br/><br/>
+    Versuchen Sie es später erneut oder wenden Sie sich an den Support.
+  ]]>
+  </string>
+  <string name="lnurl_withdraw_error_remote_unreadable">
+    <![CDATA[
+    Die Abhebung ist möglicherweise fehlgeschlagen. <b>%1$s</b> hat eine unlesbare Antwort zurückgegeben.
+    <br/><br/>
+    Versuchen Sie es später erneut oder wenden Sie sich an den Support.
+  ]]>
+  </string>
+  <string name="lnurl_withdraw_error_remote_code">
+    <![CDATA[
+    Die Abhebung ist fehlgeschlagen. <b>%1$s</b> hat einen %2$d HTTP-Fehlercode zurückgegeben.
+    <br/><br/>
+    Versuchen Sie es später erneut oder wenden Sie sich an den Support.
+  ]]>
+  </string>
+  <string name="lnurl_withdraw_error_remote_detailed">
+    <![CDATA[
+    Die Abhebung ist fehlgeschlagen. <b>%1$s</b> hat den folgenden Fehler zurückgegeben:
+    <br/><br/>
+    <em>%2$s</em>
+    <br/><br/>—<br/>
+    Versuchen Sie es später erneut oder wenden Sie sich an den Support.
+  ]]>
+  </string>
+
+  <!-- //////////////// display preferences //////////////// -->
+
+  <string name="prefs_display_title">Anzeigeoptionen</string>
+  <string name="prefs_display_coin_label">Bitcoin-Einheit</string>
+  <string name="prefs_display_fiat_label">Fiat Währung</string>
+  <string name="prefs_display_theme_label">Anwendungsthema</string>
+  <string name="prefs_display_explorer_label">Onchain Explorer</string>
+  <string name="prefs_display_balance_display">Guthaben im Startbildschirm anzeigen</string>
+  <string name="prefs_display_balance_display_desc">Das Ausblenden des Kontostandes hilft gegen neugierige Blicke</string>
+
+  <!-- //////////////// electrum server //////////////// -->
+
+  <string name="electrum_title">Electrum-Server</string>
+  <string name="electrum_subtitle">Phoenix stellt standardmäßig eine Verbindung zu zufälligen Electrum-Servern her, um auf die Bitcoin-Blockchain zuzugreifen. Sie können sich auch mit Ihrem eigenen Electrum-Server verbinden.</string>
+  <string name="electrum_change_button">Server einstellen…</string>
+
+  <string name="electrum_block_height_label">Blockhöhe</string>
+  <string name="electrum_tip_label">Führender Zeitstempel</string>
+  <string name="electrum_fee_rate_label">Gebührenrate</string>
+  <string name="electrum_xpub_label">Master-Public-Key</string>
+  <string name="electrum_xpub_value">%1$s\n\nPfad: %2$s</string>
+  <string name="electrum_fee_rate">%1$s Sat/Byte</string>
+  <string name="electrum_connection_label">Server</string>
+  <string name="electrum_not_connected">Nicht verbunden</string>
+  <string name="electrum_not_connected_to_custom">
+    <![CDATA[Sie werden sich mit <b>%1$s</b> verbinden]]>
+  </string>
+  <string name="electrum_connecting">Stelle Verbindung her…</string>
+  <string name="electrum_connecting_to_custom">
+    <![CDATA[Verbindung mit <b>%1$s…</b> herstellen]]>
+  </string>
+  <string name="electrum_connected">
+    <![CDATA[Verbunden mit: <b>%1$s</b>]]>
+  </string>
+
+  <string name="electrum_dialog_checkbox">Verwende einen benutzerdefinierten Server</string>
+  <string name="electrum_dialog_ssl">Der Server muss über ein gültiges Zertifikat verfügen</string>
+  <string name="electrum_dialog_ssl_tor">Überprüfe auch das Zertifikat für diese Onion-Adresse</string>
+  <string name="electrum_dialog_input">Serveradresse (Host:Port).</string>
+  <string name="electrum_empty_custom_address">Bitte geben Sie eine Electrum-Serveradresse ein</string>
+
+  <!-- ////////////// virtual keyboard hints //////////////// -->
+
+  <string name="key_space_desc">Leerzeichen hinzufügen</string>
+  <string name="key_delete_desc">Letztes Zeichen löschen</string>
+
+  <!-- //////////////// Tor setting //////////////// -->
+
+  <string name="tor_settings_title">Tor-Einstellungen</string>
+  <string name="tor_settings_subtitle">Sie können Ihre Privatsphäre verbessern, indem Sie nur Tor verwenden, wenn Sie eine Verbindung zu einem Electrum-Server oder zu Ihrem Lightning-Peer herstellen. Dadurch wird der Anwendungsstart etwas verlangsamt.</string>
+  <string name="tor_settings_enabled">Tor ist aktiviert</string>
+  <string name="tor_settings_disabled">Tor is deaktiviert</string>
+  <string name="tor_settings_confirm_disable_title">Sind Sie sicher, dass Sie Tor deaktivieren möchten?</string>
+  <string name="tor_settings_confirm_enable_title">Sind Sie sicher, dass Sie Tor aktivieren möchten? Beachten Sie, dass für ein optimales Ergebnis empfohlen wird, auch eine neue Wallet zu erstellen.</string>
+
+  <!-- ////////////// connection issues dialog //////////////// -->
+
+  <string name="conndialog_title">Verbindungsstatus</string>
+  <string name="conndialog_summary_not_ok">Sie haben einige Verbindungsprobleme. Die Anwendung wird nicht ordnungsgemäß funktionieren.</string>
+  <string name="conndialog_network">Internet</string>
+  <string name="conndialog_electrum">Electrum</string>
+  <string name="conndialog_tor">Tor</string>
+  <string name="conndialog_lightning">Lightning-Peer</string>
+  <string name="conndialog_ok">Verbunden</string>
+  <string name="conndialog_not_ok">Verbindung wird aufgebaut…</string>
+
+  <!-- //////////////// about screen //////////////// -->
+
+  <string name="about_title">Über</string>
+  <string name="about_version">Version: %1$s (%2$d)</string>
+  <string name="about_general">
+    <![CDATA[
+    Phoenix ist eine Bitcoin-Wallet, die das Lightning-Netzwerk zum Senden und Empfangen von Zahlungen verwendet.
+  <br/><br/>
+  Es ist eine kostenlose Open-Source-Software, die von <a href="https://phoenix.acinq.co">ACINQ</a> entwickelt wurde, unter der <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 Lizenz</a>.
+  <br/><br/>
+  Beachten Sie, dass diese Wallet nicht verwahrt wird: <strong>Sie allein sind im Besitz des 12-Wörter-Seeds der Wallet</strong>. Geben Sie diesen Seed niemandem und nehmen Sie sich vor Phishing in Acht.
+  <br/><br/>
+  Wenn Sie Fragen haben, konsultieren Sie das <a href="https://phoenix.acinq.co/faq">FAQ</a>. Sie können sich auch an den <a href="https://phoenix.acinq.co/support">Support</a> wenden, um Hilfe zu erhalten.
+  ]]>
+  </string>
+  <string name="about_fiat_rates">
+    <![CDATA[
+    Bitcoin/Fiat-Wechselkurse werden von verschiedenen APIs von Drittanbietern abgerufen:
+    <br />- Blockchain.info
+    <br />- Bitso
+    <br />- <a href="https://www.coindesk.com/price/bitcoin">Unterstützt von Coindesk</a>
+  ]]>
+  </string>
+  <string name="about_terms">Nutzungsbedingungen</string>
+  <string name="about_privacy">Privatsphäre</string>
+
+  <!-- //////////////// background node service //////////////// -->
+
+  <string name="nodeservice_desc">Dienst, der die Node der Wallet enthält.</string>
+
+  <!-- //////////////// settings: options for payments //////////////// -->
+
+  <string name="paymentsettings_title">Zahlungseinstellungen</string>
+  <string name="paymentsettings_subtitle">Legen Sie verschiedene Optionen für Zahlungen fest, die Sie senden oder empfangen.</string>
+
+  <string name="paymentsettings_defaultdesc_title">Standard-Zahlungsbeschreibung</string>
+  <string name="paymentsettings_defaultdesc_none">Keine Beschreibung festgelegt…</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Standardbeschreibung</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">Von Ihnen erstellte Zahlungsanforderungen werden diese Beschreibung verwenden. Sie können es von Fall zu Fall überschreiben.</string>
+  <string name="paymentsettings_defaultdesc_dialog_hint">Geben Sie eine Beschreibung ein</string>
+
+  <string name="paymentsettings_trampoline_fees_title">Maximale Gebühr für ausgehende Lightning-Zahlungen</string>
+  <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
+  <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Standardgebühr für ausgehende Zahlungen überschreiben</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Grundgebühr (Satoshi)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Geben Sie eine Grundgebühr in Satoshi ein</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Anteilige Gebühr (%)</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Geben Sie eine anteilige Gebühr in % ein</string>
+
+  <!-- ftue -->
+
+  <string name="ftue__welcome__header">Willkommen!</string>
+  <string name="ftue__welcome__body">Mit Phoenix ist das Empfangen und Senden von Bitcoins sicher, einfach und schnell.</string>
+  <string name="ftue__pay_to_open__header">Automatische Kanalerstellung</string>
+  <string name="ftue__pay_to_open__body">
+    <![CDATA[
+    Zahlungskanäle werden bei Bedarf automatisch erstellt.
+    <br /><br />
+    Die Gebühr ist <b>%1$s%%</b><br/>mit einem Minimum: nicht weniger als <b>%2$s</b>.
+    <br /><br />
+    Zum Beispiel, um 250 000 Sat zu erhalten, würde die Gebühr für die Erstellung des Kanals %2$s betragen.
+  ]]>
+  </string>
+  <string name="ftue__pay_to_open__button">Ich verstehe</string>
+  <string name="ftue__backup_seed__header">Behalte Kontrolle</string>
+  <string name="ftue__backup_seed__body">Es wird ein Wiederherstellungssatz generiert, der alle Informationen enthält, die zum Wiederherstellen Ihrer Bitcoins erforderlich sind.\n\nBewahren Sie es sicher auf und halten Sie es geheim!</string>
+  <string name="ftue__backup_seed__button">Loslegen</string>
+
+  <!-- patch notes -->
+
+  <string name="patchnotes_title">Phoenix wurde aktualisiert!</string>
+  <string name="patchnotes_v15">
+    <![CDATA[
+    <h4>Zahlungsempfang im Hintergrund</h4>
+    <p>Phoenix kann jetzt Zahlungen empfangen, auch wenn die App nicht gestartet wurde.</p>
+
+    <h4>Automatische Kanalerstellung</h4>
+    <p>Bei Bedarf werden automatisch Zahlungskanäle für Sie erstellt.</p>
+    <p>Diese Funktion ist erforderlich, damit der Zahlungsempfang im Hintergrund ordnungsgemäß funktioniert. Wenn Sie möchten, können Sie sie jedoch deaktivieren (unter Einstellungen > Zahlungseinstellungen).</p>
+    <p>Die Kosten für die Kanalerstellung gelten weiterhin (%1$s%%).</p>
+
+    <h4>Verbesserte Walletsperre</h4>
+    <p>Die Anwendungssperre verwendet jetzt die Systemsperre. Sie müssen sich keine weitere PIN merken!</p>
+    <p>Gehen Sie zu Einstellungen > Sicherheit, um sich für die neue Bildschirmsperrfunktion anzumelden.</p>
+  ]]>
+  </string>
+  <string name="patchnotes_v23">
+    <![CDATA[
+    <h4>Gebührenerhöhung für neue Kanäle</h4>
+    <p>Der Gebührensatz für neue Kanäle bleibt gleich (%1$s%%), aber es gibt jetzt eine Mindestgebühr von <b>%2$s</b>.</p>
+    <p>Wenn Ihnen jemand 15 000 Sat sendet und Sie keine Kanäle haben, wird ein neuer Kanal erstellt und Sie erhalten 14 000 Sat.</p>
+  ]]>
+  </string>
+
+  <string name="paymentmode_onchain">Bezahle on-Chain</string>
+  <string name="paymentmode_onchain_desc">On-Chain Transaktionen sind in der Regel langsamer und teurer</string>
+  <string name="paymentmode_lightning">Bezahle mit Lightning</string>
+  <string name="paymentmode_lightning_desc">Dies ist die empfohlene Option</string>
+
+</resources>
