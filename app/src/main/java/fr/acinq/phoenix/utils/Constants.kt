@@ -67,9 +67,9 @@ object Constants {
     TrampolineFeeSetting(Satoshi(7), 1000, CltvExpiryDelta(576)), // 7 sat + 0.1 %
     TrampolineFeeSetting(Satoshi(10), 1200, CltvExpiryDelta(576)), // 10 sat + 0.12 %
     TrampolineFeeSetting(Satoshi(12), 3000, CltvExpiryDelta(576))) // 12 sat + 0.3 %
-  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(ServiceStatus.Unknown)
+  val DEFAULT_SWAP_IN_SETTINGS = SwapInSettings(minFunding = Satoshi(1000), minFee = Satoshi(1000), feePercent = 0.005, ServiceStatus.Unknown)
   val DEFAULT_SWAP_OUT_SETTINGS = SwapOutSettings(1, ServiceStatus.Active)
   val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false)
-  val DEFAULT_PAY_TO_OPEN_SETTINGS = PayToOpenSettings(minFunding = Satoshi(1000), minFee = Satoshi(1000), feePercent = 0.001, ServiceStatus.Active)
+  val DEFAULT_PAY_TO_OPEN_SETTINGS = PayToOpenSettings(minFunding = Satoshi(1000), minFee = Satoshi(1000), feePercent = 0.005, ServiceStatus.Active)
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
 }

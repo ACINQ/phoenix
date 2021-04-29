@@ -229,6 +229,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
     // -- swap-in settings
     val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1").run {
       SwapInSettings(
+        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+        feePercent = getDouble("fee_percent"),
         status = ServiceStatus.valueOf(optInt("status"))
       )
     }
@@ -348,7 +351,7 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
   fun printFeeProportional(): String = Converter.perMillionthsToPercentageString(feeProportionalMillionths)
 }
 
-data class SwapInSettings(val status: ServiceStatus)
+data class SwapInSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)
 data class SwapOutSettings(val minFeerateSatByte: Long, val status: ServiceStatus)
 data class MempoolContext(val highUsageWarning: Boolean)
 data class PayToOpenSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)

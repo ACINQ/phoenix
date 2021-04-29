@@ -47,15 +47,12 @@ class ReceiveViewModel : ViewModel() {
   val bitmap = MutableLiveData<Bitmap>()
   val state = MutableLiveData<ReceiveState>()
   val payToOpenDisabled = MutableLiveData(false)
-  val isPowerSavingMode = MutableLiveData<Boolean>()
   val showMinFundingPayToOpen = MutableLiveData(false)
-  val showMinFundingSwapIn = MutableLiveData(false)
 
   init {
     invoice.value = null
     bitmap.value = null
     state.value = PaymentGenerationState.INIT
-    isPowerSavingMode.value = false
   }
 
   @UiThread
