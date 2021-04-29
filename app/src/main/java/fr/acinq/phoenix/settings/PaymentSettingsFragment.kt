@@ -68,9 +68,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
         AlertHelper.buildWithInput(layoutInflater,
           title = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_title),
           message = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_description),
-          callback = { value ->
-            context?.let { Prefs.setDefaultPaymentDescription(it, value) }
-          },
+          callback = { value -> context?.let { Prefs.setDefaultPaymentDescription(it, value) } },
           defaultValue = Prefs.getDefaultPaymentDescription(ctx),
           hint = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_hint))
           .setNegativeButton(getString(R.string.utils_cancel), null)
@@ -78,6 +76,11 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
       }
     }
     mBinding.trampolineFeesButton.setOnClickListener { context?.let { getMaxTrampolineFeeDialog(it)?.show() } }
+    mBinding.payToOpenFeesButton.setOnClickListener {
+      AlertHelper.build(layoutInflater, title = getString(R.string.paymentsettings_paytoopen_fees_dialog_title),
+        message = Converter.html(getString(R.string.paymentsettings_paytoopen_fees_dialog_message)))
+        .show()
+    }
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
 
@@ -89,11 +92,23 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
   private fun refreshUI() {
     context?.let { ctx ->
       mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
-      val feeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()
-      if (feeSetting != null) {
-        mBinding.trampolineFeesButton.setSubtitle(
-          getString(R.string.paymentsettings_trampoline_fees_desc, Converter.printAmountPretty(feeSetting.feeBase, ctx, withUnit = true), feeSetting.printFeeProportional())
-        )
+
+      val trampolineFeeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()
+      val payToOpenSettings = appContext(ctx).payToOpenSettings.value
+
+      if (trampolineFeeSetting != null) {
+        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.paymentsettings_trampoline_fees_desc,
+          Converter.printAmountPretty(trampolineFeeSetting.feeBase, ctx, withUnit = true), trampolineFeeSetting.printFeeProportional()))
+      } else {
+        mBinding.trampolineFeesButton.setSubtitle(getString(R.string.utils_unavailable))
+      }
+
+      if (payToOpenSettings != null) {
+        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.paymentsettings_paytoopen_fees_desc,
+          String.format("%.2f", 100 * (payToOpenSettings.feePercent)),
+          Converter.printAmountPretty(payToOpenSettings.minFee, ctx, withUnit = true)))
+      } else {
+        mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.utils_unavailable))
       }
     }
   }

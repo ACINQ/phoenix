@@ -97,7 +97,6 @@
   <string name="receive_share_button">Partager…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Votre portefeuille est vide. Votre premier versement doit être d\'au moins <b>%1$s</b>.]]></string>
-  <string name="receive_min_amount_swap_in"><![CDATA[Le versement doit être d\'au moins <b>%1$s</b>.]]></string>
   <string name="receive_paytoopen_disabled">La création de canaux Lightning a été désactivée temporairement. Certains paiements ne pourront pas être reçus.</string>
   <string name="receive_paytoopen_disabled_nochannels">La création de canaux Lightning a été désactivée temporairement. Vous ne pourrez pas recevoir de paiements.</string>
   <string name="receive_address_label">Adresse</string>
@@ -309,8 +308,8 @@
 
   <string name="channel_loading">Récupération des données…</string>
   <string name="channel_error">Échec lors de la récupération des données de ce canal de paiement.</string>
-  <string name="channel_send">Envoi</string>
-  <string name="channel_receive">Réception</string>
+  <string name="channel_balance">Solde</string>
+  <string name="channel_capacity">Capacité</string>
 
   <!-- //////////////// menu //////////////// -->
 

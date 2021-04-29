@@ -18,6 +18,7 @@ package fr.acinq.phoenix.utils
 
 import android.app.AlertDialog
 import android.text.InputType
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
@@ -80,6 +81,7 @@ object AlertHelper {
       if (message != null) {
         visibility = View.VISIBLE
         text = message
+        movementMethod = LinkMovementMethod.getInstance()
       }
     }
   }

@@ -304,23 +304,6 @@
           app:layout_constraintWidth_max="@dimen/max_width_sm"
           app:layout_goneMarginTop="@dimen/space_md" />
 
-        <TextView
-          android:id="@+id/min_funding_swap_in"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:layout_marginEnd="@dimen/space_lg"
-          android:text="@string/receive_min_amount_pay_to_open"
-          android:textAlignment="center"
-          android:textSize="@dimen/text_md"
-          android:visibility="@{model.state == SwapInState.DONE &amp;&amp; model.showMinFundingSwapIn}"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/min_funding_pay_to_open"
-          app:layout_constraintWidth_max="@dimen/max_width_sm"
-          app:layout_goneMarginTop="@dimen/space_md" />
-
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
@@ -331,7 +314,7 @@
           app:layout_constraintEnd_toStartOf="@id/share_button"
           app:layout_constraintHorizontal_chainStyle="packed"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/min_funding_swap_in" />
+          app:layout_constraintTop_toBottomOf="@id/min_funding_pay_to_open" />
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/share_button"
@@ -363,10 +346,50 @@
           android:layout_marginTop="@dimen/space_lg"
           android:background="@drawable/line_dots"
           android:layerType="software"
-          android:visibility="@{model.state == PaymentGenerationState.DONE}"
+          android:visibility="@{model.state == PaymentGenerationState.DONE || model.state == SwapInState.DONE}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/copy_button" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:background="@drawable/rounded"
+          android:padding="@dimen/space_md"
+          android:visibility="@{model.state == SwapInState.DONE}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_in_sep"
+          app:layout_constraintWidth_max="@dimen/max_width_sm"
+          app:layout_goneMarginTop="@dimen/space_md">
+
+          <ImageView
+            android:id="@+id/swap_in_icon"
+            android:layout_width="@dimen/button_height"
+            android:layout_height="@dimen/button_height"
+            android:contentDescription="@null"
+            android:layout_marginTop="@dimen/space_xxs"
+            app:layout_constraintEnd_toStartOf="@id/swap_in_info"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:src="@drawable/ic_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_in_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/receive_swap_in_info"
+            android:layout_marginStart="@dimen/space_sm"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/swap_in_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/swap_in_button"

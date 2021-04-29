@@ -65,16 +65,15 @@ class PatchNotesFragment : BaseFragment(stayIfNotStarted = true) {
   }
 
   private fun getPatchNoteForVersion(version: Int): String {
+    val payToOpenSettings = appContext()?.payToOpenSettings?.value
+    val prettyPayToOpenPercentFee = payToOpenSettings?.let { String.format("%.2f", 100 * (it.feePercent)) } ?: getString(R.string.utils_unknown)
+    val prettyPayToOpenMinFee = payToOpenSettings?.let { Converter.printAmountPretty(it.minFee, requireContext(), withUnit = true) } ?: getString(R.string.utils_unknown)
     return when (version) {
       15 -> {
-        val swapInFee = 100 * (appContext()?.payToOpenSettings?.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
-        getString(R.string.patchnotes_v15, String.format("%.2f", swapInFee))
+        getString(R.string.patchnotes_v15, prettyPayToOpenPercentFee)
       }
       23 -> {
-        val percentFee = 100 * (appContext()?.payToOpenSettings?.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
-        val minFee = appContext()?.payToOpenSettings?.value?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
-        getString(R.string.patchnotes_v23, String.format("%.2f", percentFee),
-          Converter.printAmountPretty(minFee, requireContext(), withUnit = true))
+        getString(R.string.patchnotes_v23, prettyPayToOpenPercentFee, prettyPayToOpenMinFee)
       }
       else -> {
         log.warn("no patch note for version=$version")
