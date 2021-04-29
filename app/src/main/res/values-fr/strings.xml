@@ -308,8 +308,8 @@
 
   <string name="channel_loading">Récupération des données…</string>
   <string name="channel_error">Échec lors de la récupération des données de ce canal de paiement.</string>
-  <string name="channel_send">Envoi</string>
-  <string name="channel_receive">Réception</string>
+  <string name="channel_balance">Solde</string>
+  <string name="channel_capacity">Capacité</string>
 
   <!-- //////////////// menu //////////////// -->
 
