@@ -242,7 +242,7 @@ class ReceiveFragment : BaseFragment() {
       launch(Dispatchers.Main) {
         val prettyPayToOpenMinFunding = Converter.printAmountPretty(payToOpenSettings.minFunding, context, withUnit = true)
         val prettySwapInMinFunding = Converter.printAmountPretty(swapInSettings.minFunding, context, withUnit = true)
-        val prettySwapInPercentFee = String.format("%.2f", 100 * (appContext(context).swapInSettings.value?.feePercent ?: Constants.DEFAULT_SWAP_IN_SETTINGS.feePercent))
+        val prettySwapInPercentFee = String.format("%.2f", 100 * (swapInSettings.feePercent))
         val prettySwapInMinFee = Converter.printAmountPretty(swapInSettings.minFee, context, withUnit = true)
 
         mBinding.swapInInfo.text = Converter.html(getString(R.string.receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))

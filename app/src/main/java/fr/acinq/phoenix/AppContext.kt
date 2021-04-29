@@ -118,7 +118,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
   }
 
   /** Settings for pay-to-open. */
-  val payToOpenSettings = MutableLiveData(Constants.DEFAULT_PAY_TO_OPEN_SETTINGS)
+  val payToOpenSettings = MutableLiveData<PayToOpenSettings?>()
 
   /** Settings for the fees allocated to a trampoline node. */
   val trampolineFeeSettings = MutableLiveData(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
@@ -130,7 +130,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
   val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
 
   /** Settings for swap-in (on-chain -> LN). */
-  val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
+  val swapInSettings = MutableLiveData<SwapInSettings?>()
 
   /** Context of the Bitcoin mempool, used to display notifications. */
   val mempoolContext = MutableLiveData(Constants.DEFAULT_MEMPOOL_CONTEXT)
