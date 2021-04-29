@@ -119,7 +119,6 @@
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
-  <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
