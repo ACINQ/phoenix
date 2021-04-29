@@ -18,36 +18,71 @@ fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
 struct PaymentView : View {
 
 	let payment: PhoenixShared.Lightning_kmpWalletPayment
-	let close: () -> Void
 	
-	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	// We need an explicit close operation here because:
+	// - we're going to use a NavigationView
+	// - we need to programmatically close the sheet from any layer in the navigation stack
+	// - the general API to pop a view from the nav stack is `presentationMode.wrappedValue.dismiss()`
+	// - the general API to dismiss a sheet is `presentationMode.wrappedValue.dismiss()`
+	// - thus we cannot use the general API
+	//
+	let closeSheet: () -> Void
+	
+	var body: some View {
+		
+		NavigationView {
+			
+			SummaryView(payment: payment, closeSheet: closeSheet)
+				.navigationBarTitle("", displayMode: .inline)
+				.navigationBarHidden(true)
+		}
+		.edgesIgnoringSafeArea(.all)
+	}
+}
+
+// --------------------------------------------------
+// MARK:-
+// --------------------------------------------------
+
+fileprivate struct SummaryView: View {
+	
+	@State var payment: PhoenixShared.Lightning_kmpWalletPayment
+	let closeSheet: () -> Void
 	
 	@State var explainFeesText: String = ""
 	@State var explainFeesPopoverVisible = false
 	@State var explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: 200, height:500)
 	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	init(payment: PhoenixShared.Lightning_kmpWalletPayment, closeSheet: @escaping () -> Void) {
+		self.payment = payment
+		self.closeSheet = closeSheet
+	}
+	
+	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
-			
-			main()
-			
+
+			self.main
+
 			// Close button in upper right-hand corner
 			VStack {
 				HStack {
 					Spacer()
 					Button {
-						close()
+						closeSheet()
 					} label: {
 						Image("ic_cross")
 							.resizable()
 							.frame(width: 30, height: 30)
 					}
-					.padding(32)
+					.padding()
 				}
 				Spacer()
 			}
-			
+
 			// An invisible layer used to detect taps, and dismiss the DYPopoverView.
 			if explainFeesPopoverVisible {
 				Color.clear
@@ -76,7 +111,7 @@ struct PaymentView : View {
 	}
 	
 	@ViewBuilder
-	func main() -> some View {
+	var main: some View {
 		
 		VStack {
 			switch payment.state() {
@@ -160,10 +195,15 @@ struct PaymentView : View {
 			)
 			.padding(.bottom, 24)
 			
-			InfoGrid(
-				payment: payment,
+			SummaryInfoGrid(
+				payment: $payment,
 				explainFeesPopoverVisible: $explainFeesPopoverVisible
 			)
+			
+			NavigationLink(destination: DetailsView(payment: $payment, closeSheet: closeSheet)) {
+				Text("Details")
+			}
+			.padding([.top, .bottom])
 		}
 	}
 	
@@ -197,6 +237,8 @@ struct PaymentView : View {
 				(fullOutgoingPayment: Lightning_kmpOutgoingPayment?, error: Error?) in
 				
 				if let fullOutgoingPayment = fullOutgoingPayment {
+					payment = fullOutgoingPayment
+					
 					let feesInfo = fullOutgoingPayment.paymentFees(currencyPrefs: currencyPrefs)
 					explainFeesText = feesInfo?.1 ?? ""
 				}
@@ -253,15 +295,16 @@ struct PaymentView : View {
 // - This triggers InfoGrid.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self)
 // - Which triggers a second layout pass
 //
-fileprivate struct InfoGrid: View {
+fileprivate struct SummaryInfoGrid: InfoGridView {
 	
-	let payment: PhoenixShared.Lightning_kmpWalletPayment
+	@Binding var payment: PhoenixShared.Lightning_kmpWalletPayment
 	
 	@Binding var explainFeesPopoverVisible: Bool
 	
-	@State private var widthColumn0: CGFloat? = nil
+	@State private var calculatedKeyColumnWidth: CGFloat? = nil
 	
-	private let maxWidthColumn0: CGFloat = 200
+	let minKeyColumnWidth: CGFloat = 50
+	let maxKeyColumnWidth: CGFloat = 200
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
@@ -270,7 +313,7 @@ fileprivate struct InfoGrid: View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
-	var body: some View {
+	var infoGridRows: some View {
 		
 		VStack(
 			alignment : HorizontalAlignment.leading,
@@ -286,17 +329,23 @@ fileprivate struct InfoGrid: View {
 			paymentFeesRow
 			timeElapsedRow
 			paymentErrorRow
-			paymentHashRow
+		//	paymentHashRow
 		}
 		.padding([.leading, .trailing])
-		.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self) {
-			log.debug("InfoGrid_Column0_MeasuredWidth => \($0 ?? CGFloat(-1))")
-			if let width = $0 {
-				self.widthColumn0 = min(width, maxWidthColumn0)
-			} else {
-				self.widthColumn0 = nil
-			}
-		}
+	}
+	
+	// Needed for InfoGridView protocol
+	func setCalculatedKeyColumnWidth(_ value: CGFloat?) -> Void {
+		calculatedKeyColumnWidth = value
+	}
+	func getCalculatedKeyColumnWidth() -> CGFloat? {
+		return calculatedKeyColumnWidth
+	}
+	
+	@ViewBuilder
+	func keyColumn(_ str: String) -> some View {
+		
+		Text(str).foregroundColor(.secondary)
 	}
 	
 	@ViewBuilder
@@ -304,10 +353,11 @@ fileprivate struct InfoGrid: View {
 		
 		if let pDescription = payment.paymentDescription() {
 			
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Desc", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				Text(pDescription.count > 0 ? pDescription : "No description")
 					.contextMenu {
@@ -326,10 +376,11 @@ fileprivate struct InfoGrid: View {
 		
 		if let pType = payment.paymentType() {
 			
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Type", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
@@ -355,10 +406,11 @@ fileprivate struct InfoGrid: View {
 		
 		if let pClosingInfo = payment.channelClosing() {
 			
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Output", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
@@ -388,10 +440,11 @@ fileprivate struct InfoGrid: View {
 		
 		if let pFees = payment.paymentFees(currencyPrefs: currencyPrefs) {
 
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Fees", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
@@ -421,10 +474,11 @@ fileprivate struct InfoGrid: View {
 		
 		if let pElapsed = payment.paymentTimeElapsed() {
 			
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Elapsed", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Elapsed", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				if pElapsed < 1_000 {
 					Text("\(pElapsed) milliseconds")
@@ -443,135 +497,40 @@ fileprivate struct InfoGrid: View {
 		
 		if let pError = payment.paymentFinalError() {
 			
-			InfoGrid_Row(
-				column0Width: calculatedWidthColumn0(),
-				column0Name: NSLocalizedString("Error", comment: "Label in TransactionView")
-			) { // column1Builder:
+			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
 				
 				Text(pError)
 			}
 		}
 	}
 	
-	@ViewBuilder
-	var paymentHashRow: some View {
-		
-		InfoGrid_Row(
-			column0Width: calculatedWidthColumn0(),
-			column0Name: NSLocalizedString("Payment Hash", comment: "Label in TransactionView")
-		) { // column1Builder:
-			
-			let paymentHash = payment.paymentHashString()
-			Text(paymentHash)
-				.contextMenu {
-					Button(action: {
-						UIPasteboard.general.string = paymentHash
-					}) {
-						Text("Copy")
-					}
-				}
-		}
-	}
-	
-	func calculatedWidthColumn0() -> CGFloat {
-		
-		// Normally what happens is:
-		// - During the first rendering pass,
-		//   all of the InfoGrid_Column0 items receive a proposed size.width=some_BIG_number
-		// - Each calculates it's desired width
-		// - That information is passed back up the view hierarchy, and stored in widthColumn0
-		// - The second rendering pass then uses widthColumn0 to lay out everything,
-		//   and it looks beautiful
-		//
-		// But what sometimes happens is:
-		// - During the first rendering pass,
-		//   all of the InfoGrid_Column0 items receive a proposed size.width=some_SMALL_number
-		// - Each calculates it's desired width, which ends up being too small
-		// - That information is passed back up the view hierarchy, and stored in widthColumn0
-		// - The second rendering pass then uses widthColumn0 to lay out everything,
-		//   and it looks horrible
-		//
-		// So during the first rendering pass, we need to ensure
-		// that proposed size.width is big enough to achieve our goals.
-		
-		return widthColumn0 ?? maxWidthColumn0
-	}
+//	@ViewBuilder
+//	var paymentHashRow: some View {
+//
+//		InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+//
+//			keyColumn(NSLocalizedString("Payment Hash", comment: "Label in SummaryInfoGrid"))
+//
+//		} valueColumn: {
+//
+//			let paymentHash = payment.paymentHashString()
+//			Text(paymentHash)
+//				.contextMenu {
+//					Button(action: {
+//						UIPasteboard.general.string = paymentHash
+//					}) {
+//						Text("Copy")
+//					}
+//				}
+//		}
+//	}
 	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
-	}
-}
-
-fileprivate struct InfoGrid_Row<Content: View>: View {
-	
-	let column0Width: CGFloat
-	let column0Name: String
-	let column1: Content
-	
-	private let horizontalSpacingBetweenColumns: CGFloat = 8
-	
-	init(column0Width: CGFloat, column0Name: String, @ViewBuilder column1Builder: () -> Content) {
-		
-		self.column0Width = column0Width
-		self.column0Name = column0Name
-		self.column1 = column1Builder()
-	}
-	
-	var body: some View {
-		
-		HStack(
-			alignment : VerticalAlignment.top,
-			spacing   : horizontalSpacingBetweenColumns
-		) {
-			HStack(alignment: VerticalAlignment.top, spacing: 0) {
-				Spacer(minLength: 0) // => HorizontalAlignment.trailing
-				InfoGrid_Column0 {
-					Text(column0Name)
-						.foregroundColor(.secondary)
-				}
-			}
-			.frame(width: column0Width)
-
-			column1
-		}
-	}
-}
-
-fileprivate struct InfoGrid_Column0<Content>: View where Content: View {
-	
-	let content: Content
-	
-	init(@ViewBuilder builder: () -> Content) {
-		content = builder()
-	}
-	
-	var body: some View {
-		content.background(GeometryReader { proxy in
-				
-			Color.clear.preference(
-				key: InfoGrid_Column0_MeasuredWidth.self,
-				value: proxy.size.width
-			)
-		})
-	}
-}
-
-fileprivate struct InfoGrid_Column0_MeasuredWidth: PreferenceKey {
-	static let defaultValue: CGFloat? = nil
-	
-	static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
-		
-		// This function is called with the measured width of each individual column0 item.
-		// We want to determine the maximum measured width here.
-		if let prv = value {
-			if let nxt = nextValue() {
-				value = prv >= nxt ? prv : nxt
-			} else {
-				value = prv
-			}
-		} else {
-			value = nextValue()
-		}
 	}
 }
 
@@ -619,6 +578,718 @@ fileprivate struct ExplainFeesPopoverHeight: PreferenceKey {
 		value = value ?? nextValue()
 	}
 }
+
+// --------------------------------------------------
+// MARK:-
+// --------------------------------------------------
+
+fileprivate struct DetailsView: View {
+	
+	@Binding var payment: Lightning_kmpWalletPayment
+	let closeSheet: () -> Void
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	var body: some View {
+		
+		Group {
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Button {
+						presentationMode.wrappedValue.dismiss()
+					} label: {
+						Image(systemName: "chevron.left")
+							.imageScale(.medium)
+					}
+					Spacer()
+					Button {
+						closeSheet()
+					} label: {
+						Image(systemName: "xmark") // must match size of chevron.left above
+							.imageScale(.medium)
+					}
+				}
+				.font(.title2)
+				.padding()
+				
+				ScrollView {
+					DetailsInfoGrid(payment: $payment)
+						.padding([.leading, .trailing])
+				}
+			}
+		}
+		.navigationBarTitle("Details", displayMode: .inline)
+		.navigationBarHidden(true)
+	}
+}
+
+fileprivate struct DetailsInfoGrid: InfoGridView {
+	
+	@Binding var payment: Lightning_kmpWalletPayment
+	
+	@State var calculatedKeyColumnWidth: CGFloat? = nil
+	
+	let minKeyColumnWidth: CGFloat = 50
+	let maxKeyColumnWidth: CGFloat = 140
+	
+	private let verticalSpacingBetweenRows: CGFloat = 12
+	private let horizontalSpacingBetweenColumns: CGFloat = 8
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	// Needed for InfoGridView protocol
+	func setCalculatedKeyColumnWidth(_ value: CGFloat?) -> Void {
+		calculatedKeyColumnWidth = value
+	}
+	func getCalculatedKeyColumnWidth() -> CGFloat? {
+		return calculatedKeyColumnWidth
+	}
+	
+	@ViewBuilder
+	var infoGridRows: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: verticalSpacingBetweenRows) {
+			
+			if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
+				
+				rows_incomingPayment(incomingPayment)
+				
+			} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+				
+				rows_outgoingPayment(outgoingPayment)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func rows_incomingPayment(_ incomingPayment: Lightning_kmpIncomingPayment) -> some View {
+		
+		if let paymentRequest = incomingPayment.origin.asInvoice()?.paymentRequest {
+			
+			header(NSLocalizedString("Payment Request", comment: "Title in DetailsView_IncomingPayment"))
+		
+			paymentRequest_invoiceCreated(paymentRequest)
+			paymentRequest_amountRequested(paymentRequest)
+			paymentRequest_paymentHash(paymentRequest)
+		}
+		
+		if let received = incomingPayment.received {
+
+			header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+			
+			paymentReceived_receivedAt(received)
+			paymentReceived_amountReceived(received)
+			paymentReceived_via(received)
+			paymentReceived_channelId(received)
+		}
+	}
+	
+	@ViewBuilder
+	func rows_outgoingPayment(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		
+		if let paymentRequest = outgoingPayment.details.asNormal()?.paymentRequest {
+		
+			header(NSLocalizedString("Payment Request", comment: "Title in DetailsView_IncomingPayment"))
+		
+			paymentRequest_invoiceCreated(paymentRequest)
+			paymentRequest_amountRequested(paymentRequest)
+			paymentRequest_paymentHash(paymentRequest)
+		
+		} else if let channelClosing = outgoingPayment.details.asChannelClosing() {
+			
+			header(NSLocalizedString("Channel Closing", comment: "Title in DetailsView_IncomingPayment"))
+			
+			channelClosing_channelId(channelClosing)
+			if let onChain = outgoingPayment.status.asOnChain() {
+				onChain_type(onChain) // this makes more sense in this section
+			}
+			channelClosing_btcAddress(channelClosing)
+			channelClosing_addrType(channelClosing)
+		}
+		
+		if let offChain = outgoingPayment.status.asOffChain() {
+			
+			header(NSLocalizedString("Payment Sent", comment: "Title in DetailsView_IncomingPayment"))
+			
+			offChain_completedAt(offChain)
+			offChain_totalAmount(outgoingPayment)
+			offChain_recipientPubkey(outgoingPayment)
+		
+		} else if let onChain = outgoingPayment.status.asOnChain() {
+			
+			header(NSLocalizedString("Closing Status", comment: "Title in DetailsView_IncomingPayment"))
+			
+			onChain_completedAt(onChain)
+			onChain_claimed(onChain)
+			onChain_btcTxids(onChain)
+			
+		} else if let failed = outgoingPayment.status.asFailed() {
+			
+			header(NSLocalizedString("Send Failed", comment: "Title in DetailsView_IncomingPayment"))
+			
+			failed_failedAt(failed)
+			failed_reason(failed)
+		}
+		
+		if outgoingPayment.parts.count > 0 && outgoingPayment.details.asChannelClosing() == nil {
+			
+			header(NSLocalizedString("Payment Parts", comment: "Title in DetailsView_IncomingPayment"))
+			
+			ForEach(outgoingPayment.parts.indices, id: \.self) { index in
+				part_row(outgoingPayment.parts[index])
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func header(_ title: String) -> some View {
+		
+		HStack {
+			Spacer()
+			Text(title)
+				.font(.title3)
+				.padding(.bottom, 12)
+				.background(
+					VStack {
+						Spacer()
+						RoundedRectangle(cornerRadius: 10)
+							.frame(height: 4, alignment: .center)
+							.foregroundColor(Color.appAccent)
+					}
+				)
+			Spacer()
+		}
+		.padding(.top, 24)
+		.padding(.bottom, 4)
+	}
+	
+	@ViewBuilder
+	func keyColumn(_ str: String) -> some View {
+		
+		Text(str)
+			.font(.subheadline)
+			.fontWeight(.thin)
+			.multilineTextAlignment(.trailing)
+			.foregroundColor(.secondary)
+	}
+	
+	@ViewBuilder
+	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("invoice created", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_date(date: paymentRequest.timestampDate)
+		}
+	}
+	
+	@ViewBuilder
+	func paymentRequest_amountRequested(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("amount requested", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			if let msat = paymentRequest.amount {
+				commonValue_amount(msat: msat)
+			} else {
+				Text("Any amount")
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentRequest_paymentHash(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("payment hash", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let paymentHash = payment.paymentHashString()
+			Text(paymentHash)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = paymentHash
+					}) {
+						Text("Copy")
+					}
+				}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentReceived_receivedAt(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+					
+			keyColumn(NSLocalizedString("received at", comment: "Label in DetailsView_IncomingPayment"))
+					
+		} valueColumn: {
+					
+			commonValue_date(date: received.receivedAtDate)
+		}
+	}
+	
+	@ViewBuilder
+	func paymentReceived_amountReceived(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("amount received", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			if let msat = received.amount {
+				commonValue_amount(msat: msat)
+			} else {
+				Text("Any amount")
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentReceived_via(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("via", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			if let _ = received.receivedWith.asLightningPayment() {
+				Text("Lightning network")
+				
+			} else if let _ = received.receivedWith.asNewChannel() {
+				Text("New Channel (auto-created)")
+				
+			} else {
+				Text("")
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentReceived_channelId(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+		
+		if let newChannel = received.receivedWith.asNewChannel() {
+			
+			InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+				
+				keyColumn(NSLocalizedString("channel id", comment: "Label in DetailsView_IncomingPayment"))
+				
+			} valueColumn: {
+				
+				let str = newChannel.channelId?.toHex() ?? "pending"
+				Text(str)
+					.contextMenu {
+						Button(action: {
+							UIPasteboard.general.string = str
+						}) {
+							Text("Copy")
+						}
+					}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func channelClosing_channelId(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("channel id", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let str = channelClosing.channelId.toHex()
+			Text(str)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = str
+					}) {
+						Text("Copy")
+					}
+				}
+		}
+	}
+	
+	@ViewBuilder
+	func channelClosing_btcAddress(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("bitcoin address", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let bitcoinAddr = channelClosing.closingAddress
+			Text(bitcoinAddr)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = bitcoinAddr
+					}) {
+						Text("Copy")
+					}
+				}
+		}
+	}
+	
+	@ViewBuilder
+	func channelClosing_addrType(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("address type", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				if channelClosing.isSentToDefaultAddress {
+					Text("Phoenix generated")
+					Text("(derived from your seed)")
+				} else {
+					Text("External")
+					Text("(you provided this address)")
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func offChain_completedAt(_ offChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOffChain) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+					
+			keyColumn(NSLocalizedString("sent at", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_date(date: offChain.completedAtDate)
+		}
+	}
+	
+	@ViewBuilder
+	func offChain_totalAmount(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("total amount", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_amount(msat: outgoingPayment.recipientAmount)
+		}
+	}
+	
+	@ViewBuilder
+	func offChain_recipientPubkey(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("recipient pubkey", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			Text(outgoingPayment.recipient.value.toHex())
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_type(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("type", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			switch onChain.closingType {
+				case Lightning_kmpChannelClosingType.local   : Text("Local")
+				case Lightning_kmpChannelClosingType.mutual  : Text("Mutual")
+				case Lightning_kmpChannelClosingType.remote  : Text("Remote")
+				case Lightning_kmpChannelClosingType.revoked : Text("Revoked")
+				case Lightning_kmpChannelClosingType.other   : Text("Other")
+				default                                      : Text("?")
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_completedAt(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("completed at", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_date(date: onChain.completedAtDate)
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_claimed(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("claimed amount", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let (display_sat, display_fiat) = displayAmounts(sat: onChain.claimed)
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				
+				Text(display_sat.string)
+				if let display_fiat = display_fiat {
+					Text(display_fiat.string)
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func onChain_btcTxids(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("bitcoin txids", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				
+				ForEach(onChain.txids.indices, id: \.self) { index in
+					
+					let txid = onChain.txids[index].toHex()
+					Text(txid)
+						.contextMenu {
+							Button(action: {
+								UIPasteboard.general.string = txid
+							}) {
+								Text("Copy")
+							}
+						}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func failed_failedAt(_ failed: Lightning_kmpOutgoingPayment.StatusCompletedFailed) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("timestamp", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_date(date: failed.completedAtDate)
+		}
+	}
+	
+	@ViewBuilder
+	func failed_reason(_ failed: Lightning_kmpOutgoingPayment.StatusCompletedFailed) -> some View {
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			keyColumn(NSLocalizedString("reason", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			Text(failed.reason.description)
+		}
+	}
+	
+	@ViewBuilder
+	func part_row(_ part: Lightning_kmpOutgoingPayment.Part) -> some View {
+		
+		let imgSize: CGFloat = 20
+		
+		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			
+			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+				keyColumn(shortDisplayTime(date: part_succeeded.completedAtDate))
+				
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+				keyColumn(shortDisplayTime(date: part_failed.completedAtDate))
+				
+			} else {
+				keyColumn(shortDisplayTime(date: part.createdAtDate))
+			}
+			
+		} valueColumn: {
+		
+			if let _ = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Image("ic_payment_sent")
+							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: imgSize, height: imgSize)
+							.foregroundColor(Color.appPositive)
+						
+						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
+						Text(formatted.string)
+					}
+				}
+				
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Image(systemName: "xmark.circle")
+							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: imgSize, height: imgSize)
+							.foregroundColor(.appNegative)
+						
+						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
+						Text(formatted.string)
+					}
+					
+					Text("\(part_failed.remoteFailureCode?.description ?? "local"): \(part_failed.details)")
+				}
+				
+			} else {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Image("ic_payment_sending")
+							.renderingMode(.template)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: imgSize, height: imgSize)
+							.foregroundColor(Color.borderColor)
+						
+						Text("pending")
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func commonValue_date(date: Date) -> some View {
+		
+		let (dayMonthYear, timeOfDay) = displayTimes(date: date)
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+			Text(dayMonthYear)
+			Text(timeOfDay)
+		}
+	}
+	
+	@ViewBuilder
+	func commonValue_amount(msat: Lightning_kmpMilliSatoshi) -> some View {
+		
+		let (display_msat, display_fiat) = displayAmounts(msat: msat)
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+			
+			Text(display_msat.string)
+			if let display_fiat = display_fiat {
+				Text(display_fiat.string)
+			}
+		}
+	}
+	
+	func displayTimes(date: Date) -> (String, String) {
+		
+		let df = DateFormatter()
+		df.dateStyle = .long
+		df.timeStyle = .none
+		let dayMonthYear = df.string(from: date)
+		
+		let tf = DateFormatter()
+		tf.dateStyle = .none
+		tf.timeStyle = .long
+		let timeOfDay = tf.string(from: date)
+		
+		return (dayMonthYear, timeOfDay)
+	}
+	
+	func shortDisplayTime(date: Date) -> String {
+		
+		let formatter = DateFormatter()
+		formatter.dateStyle = .none
+		formatter.timeStyle = .medium
+		
+		return formatter.string(from: date)
+	}
+	
+	func displayAmounts(msat: Lightning_kmpMilliSatoshi) -> (FormattedAmount, FormattedAmount?) {
+		
+		let display_msat = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, hideMsats: false)
+		var display_fiat: FormattedAmount? = nil
+
+		if let fiatExchangeRate = currencyPrefs.fiatExchangeRate() {
+			display_fiat = Utils.formatFiat(msat: msat, exchangeRate: fiatExchangeRate)
+		}
+		
+		return (display_msat, display_fiat)
+	}
+	
+	func displayAmounts(sat: Bitcoin_kmpSatoshi) -> (FormattedAmount, FormattedAmount?) {
+		
+		let display_sat = Utils.formatBitcoin(sat: sat, bitcoinUnit: .sat)
+		var display_fiat: FormattedAmount? = nil
+
+		if let fiatExchangeRate = currencyPrefs.fiatExchangeRate() {
+			display_fiat = Utils.formatFiat(sat: sat, exchangeRate: fiatExchangeRate)
+		}
+		
+		return (display_sat, display_fiat)
+	}
+	
+	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
+		
+		let hSpacing: CGFloat
+		let keyColumnWidth: CGFloat
+		let keyColumn: KeyColumn
+		let valueColumn: ValueColumn
+		
+		init(
+			hSpacing: CGFloat,
+			keyColumnWidth: CGFloat,
+			@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
+			@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
+		) {
+			self.hSpacing = hSpacing
+			self.keyColumnWidth = keyColumnWidth
+			self.keyColumn = keyColumnBuilder()
+			self.valueColumn = valueColumnBuilder()
+		}
+		
+		var body: some View {
+			
+			InfoGridRow(hSpacing: hSpacing, keyColumnWidth: keyColumnWidth) {
+				
+				keyColumn
+				
+			} valueColumn: {
+				
+				valueColumn.font(.callout)
+			}
+		}
+	}
+}
+
+// --------------------------------------------------
+// MARK:-
+// --------------------------------------------------
 
 extension Lightning_kmpWalletPayment {
 	
@@ -865,25 +1536,28 @@ extension Lightning_kmpWalletPayment {
 	}
 }
 
+// --------------------------------------------------
+// MARK:-
+// --------------------------------------------------
 
 class PaymentView_Previews : PreviewProvider {
 	
 	static var previews: some View {
 		let mock = PhoenixShared.Mock()
 		
-		PaymentView(payment: mock.outgoingPending(), close: {})
+		PaymentView(payment: mock.outgoingPending(), closeSheet: {})
 			.preferredColorScheme(.light)
 			.environmentObject(CurrencyPrefs.mockEUR())
 
-		PaymentView(payment: mock.outgoingSuccessful(), close: {})
+		PaymentView(payment: mock.outgoingSuccessful(), closeSheet: {})
 			.preferredColorScheme(.dark)
 			.environmentObject(CurrencyPrefs.mockEUR())
 
-		PaymentView(payment: mock.outgoingFailed(), close: {})
+		PaymentView(payment: mock.outgoingFailed(), closeSheet: {})
 			.preferredColorScheme(.dark)
 			.environmentObject(CurrencyPrefs.mockEUR())
 
-		PaymentView(payment: mock.incomingPaymentReceived(), close: {})
+		PaymentView(payment: mock.incomingPaymentReceived(), closeSheet: {})
 			.preferredColorScheme(.dark)
 			.environmentObject(CurrencyPrefs.mockEUR())
 	}

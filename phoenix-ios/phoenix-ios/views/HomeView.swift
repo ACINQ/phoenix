@@ -183,7 +183,7 @@ struct HomeView : MVIView, ViewName {
 				} content: {
 					PaymentView(
 						payment: selectedPayment!,
-						close: { selectedPayment = nil }
+						closeSheet: { selectedPayment = nil }
 					)
 					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 				}

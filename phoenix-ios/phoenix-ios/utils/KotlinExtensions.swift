@@ -66,22 +66,49 @@ extension AppConfigurationManager {
 extension Lightning_kmpIncomingPayment {
 	
 	var createdAtDate: Date {
-		
-		// createdAt: time in milliseconds since unix epoch
-		let secondsSince1970 = Double(createdAt) / Double(1_000)
-		
-		return Date(timeIntervalSince1970: secondsSince1970)
+		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
 	}
 }
 
 extension Lightning_kmpIncomingPayment.Received {
 	
 	var receivedAtDate: Date {
-		
-		// receivedAt: time in milliseconds since unix epoch
-		let secondsSince1970 = Double(receivedAt) / Double(1_000)
-		
-		return Date(timeIntervalSince1970: secondsSince1970)
+		return Date(timeIntervalSince1970: (Double(receivedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpOutgoingPayment.StatusCompleted {
+	
+	var completedAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpOutgoingPayment.Part {
+	
+	var createdAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+	
+	var completedAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpOutgoingPayment.PartStatusFailed {
+	
+	var completedAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpPaymentRequest {
+	
+	var timestampDate: Date {
+		return Date(timeIntervalSince1970: Double(timestampSeconds))
 	}
 }
 

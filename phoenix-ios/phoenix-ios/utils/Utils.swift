@@ -62,28 +62,36 @@ class Utils {
 	/// which contains the various string values needed for display.
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs, sat: Bitcoin_kmpSatoshi) -> FormattedAmount {
-		return format(currencyPrefs, msat: (sat.toLong() * 1_000))
+		
+		return format(currencyPrefs, sat: sat.toLong())
 	}
 	
 	/// Formats the given amount of satoshis into a FormattedAmount struct,
 	/// which contains the various string values needed for display.
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64) -> FormattedAmount {
+		
 		return format(currencyPrefs, msat: (sat * 1_000))
 	}
 	
-	/// Formats the given amount of millisatoshis into a FormattedAmount struct,
-	/// which contains the various string values needed for display.
+	/// Formats the given amount of millisatoshis into either a bitcoin or fiat amount,
+	/// depending on the configuration of the given currencyPrefs.
 	///
-	static func format(_ currencyPrefs: CurrencyPrefs,
-	                              msat: Lightning_kmpMilliSatoshi,
-	                         hideMsats: Bool = true
+	/// - Returns: a FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func format(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Lightning_kmpMilliSatoshi,
+		hideMsats       : Bool = true
 	) -> FormattedAmount {
+		
 		return format(currencyPrefs, msat: msat.toLong(), hideMsats: hideMsats)
 	}
 	
-	/// Formats the given amount of millisatoshis into a FormattedAmount struct,
-	/// which contains the various string values needed for display.
+	/// Formats the given amount of millisatoshis into either a bitcoin or fiat amount,
+	/// depending on the configuration of the given currencyPrefs.
+	///
+	/// - Returns: a FormattedAmount struct, which contains the various string values needed for display.
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs, msat: Int64, hideMsats: Bool = true) -> FormattedAmount {
 		
@@ -107,6 +115,8 @@ class Utils {
 		}
 	}
 	
+	/// Returns a formatter that's appropriate for the given BitcoinUnit & configuration.
+	///
 	static func bitcoinFormatter(bitcoinUnit: BitcoinUnit, hideMsats: Bool = true) -> NumberFormatter {
 		
 		let formatter = NumberFormatter()
@@ -129,16 +139,48 @@ class Utils {
 		return formatter
 	}
 
+	/// Converts from satoshis to the given BitcoinUnit.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatBitcoin(sat: Bitcoin_kmpSatoshi, bitcoinUnit: BitcoinUnit) -> FormattedAmount {
+		
+		return formatBitcoin(sat: sat.toLong(), bitcoinUnit: bitcoinUnit)
+	}
+	
+	/// Converts from satoshis to the given BitcoinUnit.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
 	static func formatBitcoin(sat: Int64, bitcoinUnit: BitcoinUnit) -> FormattedAmount {
 		
 		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
 		return formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 	}
 	
+	/// Converts from millisatoshis to the given BitcoinUnit.
+	/// By default sub-satoshi units are truncated, but this can be controlled with the `hideMsats` parameter.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
 	static func formatBitcoin(
-		msat: Int64,
-		bitcoinUnit: BitcoinUnit,
-		hideMsats: Bool = true
+		msat        : Lightning_kmpMilliSatoshi,
+		bitcoinUnit : BitcoinUnit,
+		hideMsats   : Bool = true
+	) -> FormattedAmount {
+		
+		return formatBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
+	}
+	
+	/// Converts from millisatoshis to the given BitcoinUnit.
+	/// By default sub-satoshi units are truncated, but this can be controlled with the `hideMsats` parameter.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatBitcoin(
+		msat        : Int64,
+		bitcoinUnit : BitcoinUnit,
+		hideMsats   : Bool = true
 	) -> FormattedAmount {
 		
 		let targetAmount: Double = convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
@@ -161,6 +203,8 @@ class Utils {
 		}
 	}
 	
+	/// Returns a formatter appropriate for any fiat currency.
+	///
 	static func fiatFormatter() -> NumberFormatter {
 		
 		let formatter = NumberFormatter()
@@ -184,6 +228,38 @@ class Utils {
 		return formatter
 	}
 	
+	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(sat: Bitcoin_kmpSatoshi, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+		
+		return formatFiat(sat: sat.toLong(), exchangeRate: exchangeRate)
+	}
+	
+	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(sat: Int64, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+		
+		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		return formatFiat(msat: msat, exchangeRate: exchangeRate)
+	}
+	
+	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(msat: Lightning_kmpMilliSatoshi, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+		
+		return formatFiat(msat: msat.toLong(), exchangeRate: exchangeRate)
+	}
+	
+	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
 	static func formatFiat(msat: Int64, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)

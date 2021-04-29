@@ -160,6 +160,20 @@ fun IncomingPayment.Origin.asSwapIn(): IncomingPayment.Origin.SwapIn? = when (th
     else -> null
 }
 
+// Class type IncomingPayment.ReceivedWith.LightningPayment is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun IncomingPayment.ReceivedWith.asLightningPayment(): IncomingPayment.ReceivedWith.LightningPayment? = when (this) {
+    is IncomingPayment.ReceivedWith.LightningPayment -> this
+    else -> null
+}
+
+// Class type IncomingPayment.ReceivedWith.NewChannel is not exported to iOS unless
+// we explicitly reference it in PhoenixShared.
+fun IncomingPayment.ReceivedWith.asNewChannel(): IncomingPayment.ReceivedWith.NewChannel? = when (this) {
+    is IncomingPayment.ReceivedWith.NewChannel -> this
+    else -> null
+}
+
 // Class type OutgoingPayment.Details.Normal is not exported to iOS unless
 // we explicitly reference it in PhoenixShared.
 fun OutgoingPayment.Details.asNormal(): OutgoingPayment.Details.Normal? = when (this) {
