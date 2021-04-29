@@ -41,22 +41,22 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val icon = itemView.findViewById<ImageView>(R.id.channel_icon)
     val state = itemView.findViewById<TextView>(R.id.channel_state)
     val channelBalanceLayout = itemView.findViewById<View>(R.id.channel_balance_layout)
-    val sendableValue = itemView.findViewById<CoinView>(R.id.channel_sendable_value)
-    val receivableValue = itemView.findViewById<CoinView>(R.id.channel_receivable_value)
+    val balanceValue = itemView.findViewById<CoinView>(R.id.channel_balance_value)
+    val capacityValue = itemView.findViewById<CoinView>(R.id.channel_capacity_value)
 
     state.text = Transcriber.readableState(itemView.context, channel.state())
     icon.imageTintList = ColorStateList.valueOf(Transcriber.colorForState(itemView.context, channel.state()))
 
     when (val data = channel.data()) {
       is HasCommitments -> {
-        sendableValue.setAmount(data.commitments().availableBalanceForSend())
-        receivableValue.setAmount(data.commitments().availableBalanceForReceive())
+        balanceValue.setAmount(data.commitments().availableBalanceForSend())
+        capacityValue.setAmount(data.commitments().localCommit().spec().totalFunds())
         channelBalanceLayout.visibility = View.VISIBLE
       }
       is DATA_PHOENIX_WAIT_REMOTE_CHANNEL_REESTABLISH -> {
         data.data().commitments().apply {
-          sendableValue.setAmount(data.commitments().availableBalanceForSend())
-          receivableValue.setAmount(data.commitments().availableBalanceForReceive())
+          balanceValue.setAmount(data.commitments().availableBalanceForSend())
+          capacityValue.setAmount(data.commitments().localCommit().spec().totalFunds())
         }
         channelBalanceLayout.visibility = View.VISIBLE
       }

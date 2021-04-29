@@ -317,8 +317,6 @@
 
   <string name="channel_loading">Recuperando dados do canal…</string>
   <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
-  <string name="channel_send">Enviar</string>
-  <string name="channel_receive">Receber</string>
 
   <!-- //////////////// menu //////////////// -->
 

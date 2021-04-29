@@ -345,8 +345,8 @@
 
   <string name="channel_loading">Retrieving channel data…</string>
   <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
-  <string name="channel_send">Send</string>
-  <string name="channel_receive">Receive</string>
+  <string name="channel_balance">Balance</string>
+  <string name="channel_capacity">Capacity</string>
 
   <!-- //////////////// menu //////////////// -->
 
