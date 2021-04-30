@@ -225,7 +225,7 @@ struct ReceiveLightningView: View, ViewName {
 	func mainPortrait() -> some View {
 		
 		VStack {
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding()
 				.background(Color.white)
@@ -290,7 +290,7 @@ struct ReceiveLightningView: View, ViewName {
 		
 		HStack {
 			
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -336,7 +336,7 @@ struct ReceiveLightningView: View, ViewName {
 	}
 	
 	@ViewBuilder
-	func qrCodeView() -> some View {
+	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
 		   qrCode.value == m.request,
@@ -748,17 +748,7 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if isSwapInEnabled {
 			
-			let didAcceptFeesCallback = {() -> Void in
-				
-				log.debug("[\(viewName)]: didAcceptFeesCallback")
-				mvi.intent(Receive.IntentRequestSwapIn())
-			}
-			
-			popoverState.display.send(PopoverItem(
-			
-				SwapInFeePopover(didAcceptFeesCallback: didAcceptFeesCallback).anyView,
-				dismissable: false
-			))
+			mvi.intent(Receive.IntentRequestSwapIn())
 			
 		} else {
 			
@@ -1190,69 +1180,6 @@ struct RequestPushPermissionPopover: View, ViewName {
 	}
 }
 
-struct SwapInFeePopover : View, ViewName {
-	
-	let didAcceptFeesCallback: () -> Void
-	
-	@Environment(\.popoverState) private var popoverState: PopoverState
-	
-	var body: some View {
-		VStack(alignment: .leading) {
-			
-			Text("Receive with a Bitcoin address")
-				.font(.headline)
-				.lineLimit(nil)
-				.padding(.bottom, 20)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
-			
-				Text("A standard Bitcoin address will be displayed next.") +
-				Text(" Funds sent to this address will arrive in your wallet after one confirmation.")
-				
-				let min = Utils.formatBitcoin(sat: 1_000, bitcoinUnit: .sat)
-				Group {
-					Text("There is a small fee of ") +
-					Text("0.10%").bold() +
-					Text(" with a minimum fee of ") +
-					Text(min.string).bold() + Text(".")
-				}
-				
-				Text("For example, if you send $750, the fee is $0.75.")
-			}
-			.font(.callout)
-			
-			HStack {
-				Spacer()
-				Button("Cancel") {
-					didCancel()
-				}
-				.padding(.trailing, 8)
-				
-				Button("Proceed") {
-					didAccept()
-				}
-			}
-			.font(.headline)
-			.padding(.top, 20)
-			
-		} // </VStack>
-		.padding()
-	}
-	
-	func didCancel() -> Void {
-		log.trace("[\(viewName)] didCancel()")
-		
-		popoverState.close.send()
-	}
-	
-	func didAccept() -> Void {
-		log.trace("[\(viewName)] didAccept()")
-		
-		didAcceptFeesCallback()
-		popoverState.close.send()
-	}
-}
-
 fileprivate struct SwapInDisabledPopover: View, ViewName {
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -1301,17 +1228,22 @@ struct SwapInView: View, ViewName {
 	
 	@State var sheet: ReceiveViewSheet? = nil
 	
+	@State var swapIn_feePercent: Double = 0.0
+	@State var swapIn_minFeeSat: Int64 = 0
+	@State var swapIn_minFundingSat: Int64 = 0
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	@ViewBuilder
 	var body: some View {
 		
 		VStack {
 			
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -1348,14 +1280,6 @@ struct SwapInView: View, ViewName {
 			.padding([.leading, .trailing], 40)
 			.padding(.bottom)
 			
-			let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
-			Group {
-				Text("Deposit must be at least ") + Text(min.string).bold()
-			}
-			.font(.subheadline)
-			.padding(.bottom)
-			
-			
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				
 				ReceiveView.copyButton {
@@ -1369,6 +1293,9 @@ struct SwapInView: View, ViewName {
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
 				
 			} // </HStack>
+			
+			feesInfoView
+				.padding([.top, .leading, .trailing])
 			
 			Spacer()
 			
@@ -1394,13 +1321,16 @@ struct SwapInView: View, ViewName {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(incomingSwapsPublisher) { incomingSwaps in
-			onIncomingSwapsChanged(incomingSwaps)
+		.onReceive(incomingSwapsPublisher) {
+			onIncomingSwapsChanged($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
 		}
 	}
 	
 	@ViewBuilder
-	func qrCodeView() -> some View {
+	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated,
 			qrCode.value == m.address,
@@ -1445,6 +1375,50 @@ struct SwapInView: View, ViewName {
 		}
 	}
 	
+	@ViewBuilder
+	var feesInfoView: some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 8) {
+			
+			Image(systemName: "exclamationmark.circle")
+				.imageScale(.large)
+			
+			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
+			
+			let feePercent = String(format:"%.2f", swapIn_feePercent)
+			let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				
+				Text(
+					"This is a swap address. It is not controlled by your wallet." +
+					" On-chain deposits sent to this address will be converted to Lightning channels."
+				)
+				.lineLimit(nil)
+				.multilineTextAlignment(.leading)
+				.padding(.bottom, 14)
+				
+				Group {
+					Text("Deposits must be at least ") +
+					Text(minFunding.string).bold() +
+					Text(". The fee is ") +
+					Text("\(feePercent)%").bold() +
+					Text(" (") +
+					Text("\(minFee.string)") +
+					Text(" minimum).")
+				}
+				.lineLimit(nil)
+				.multilineTextAlignment(.leading)
+			}
+		}
+		.font(.subheadline)
+		.padding()
+		.background(
+			RoundedRectangle(cornerRadius: 10)
+				.foregroundColor(Color.mutedBackground)
+		)
+	}
+	
 	func bitcoinAddress() -> String? {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
@@ -1480,6 +1454,14 @@ struct SwapInView: View, ViewName {
 		if incomingSwaps[bitcoinAddress] != nil {
 			presentationMode.wrappedValue.dismiss()
 		}
+	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		swapIn_feePercent = context.swapIn.v1.feePercent
+		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
+		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
 	func didTapCopyButton() -> Void {
