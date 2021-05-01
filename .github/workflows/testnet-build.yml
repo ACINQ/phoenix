@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: ACINQ/eclair
-        ref: android-phoenix
+        ref: android-phoenix-keysend
         path: eclair-core
 
     - name: Checkout Tor_Onion_Proxy_Library
