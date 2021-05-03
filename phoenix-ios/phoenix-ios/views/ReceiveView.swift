@@ -531,7 +531,8 @@ struct ReceiveLightningView: View, ViewName {
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
-		mvi.intent(Receive.IntentAsk(amount: nil, desc: nil))
+		let defaultDesc = Prefs.shared.defaultPaymentDescription
+		mvi.intent(Receive.IntentAsk(amount: nil, desc: defaultDesc))
 		
 		let query = Prefs.shared.pushPermissionQuery
 		if query == .neverAskedUser {

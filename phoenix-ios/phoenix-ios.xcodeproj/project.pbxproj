@@ -36,6 +36,7 @@
 		C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A2327BC90150A3E1493D /* AboutView.swift */; };
 		C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A209301A31C14A982ECD /* InitializationView.swift */; };
 		C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */; };
+		DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */; };
 		DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09085725B5E43900A46136 /* String+VersionComparison.swift */; };
 		DC09086325B626B300A46136 /* ConnectionsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09086225B626B300A46136 /* ConnectionsPopover.swift */; };
 		DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0994AF263A074C003031CA /* InfoGrid.swift */; };
@@ -163,6 +164,7 @@
 		C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7AFF1A7C09789C6CF2D06 /* ConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
+		DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentOptionsView.swift; sourceTree = "<group>"; };
 		DC09085725B5E43900A46136 /* String+VersionComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+VersionComparison.swift"; sourceTree = "<group>"; };
 		DC09086225B626B300A46136 /* ConnectionsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsPopover.swift; sourceTree = "<group>"; };
 		DC0994AF263A074C003031CA /* InfoGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoGrid.swift; sourceTree = "<group>"; };
@@ -452,6 +454,7 @@
 				C8D7A986A61CCD64FA661B88 /* DisplayConfigurationView.swift */,
 				C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */,
 				C8D7A2BD01ADA0DE6034AE0F /* TorConfigurationView.swift */,
+				DC0732EB263CA6C3004CB88D /* PaymentOptionsView.swift */,
 			);
 			path = general;
 			sourceTree = "<group>";
@@ -785,6 +788,7 @@
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
 				DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */,
 				DC09086325B626B300A46136 /* ConnectionsPopover.swift in Sources */,
+				DC0732EC263CA6C3004CB88D /* PaymentOptionsView.swift in Sources */,
 				DC142148261F5DCE0075857A /* AdvancedSecurityHTML.swift in Sources */,
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
