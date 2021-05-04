@@ -646,7 +646,12 @@ fileprivate struct BottomBar: View, ViewName {
 				
 			} else if let _ = model as? Scan.ModelBadRequest {
 				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
-				toast.toast(text: msg, duration: 4.0, location: .middle)
+				toast.pop(
+					Text(msg).anyView,
+					colorScheme: colorScheme.opposite,
+					duration: 4.0,
+					location: .middle
+				)
 			}
 			
 			// Cleanup

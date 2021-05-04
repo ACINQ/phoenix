@@ -5,119 +5,177 @@ class Toast: ObservableObject {
 	enum ToastLocation {
 		case bottom
 		case middle
+		case top
 	}
 	
-	@Published private var text: String? = nil
+	enum ToastStyle {
+		case ultraThin
+		case thin
+		case regular
+		case chrome
+		case thick
+	}
+	
+	private var contentId: Int = 0
+	
+	@Published private var content: AnyView? = nil
+	
+	@Published private var colorScheme: ColorScheme = ColorScheme.light
+	@Published private var style: ToastStyle = .regular
 	@Published private var location: ToastLocation = .bottom
 	@Published private var showCloseButton: Bool = false
-	@Published private var backgroundColor: Color = Color.primaryForeground.opacity(0.6)
-	@Published private var foregroundColor: Color = Color.white
-
-	func toast(
-		text: String,
+	
+	func pop(
+		_ content: AnyView,
+		colorScheme: ColorScheme,
+		style: ToastStyle = .regular,
 		duration: TimeInterval = 1.5,
 		location: ToastLocation = .bottom,
-		showCloseButton: Bool = false,
-		backgroundColor: Color = Color.primaryForeground.opacity(0.6),
-		foregroundColor: Color = Color.white
+		showCloseButton: Bool = false
 	) {
 		
+		self.contentId += 1
+		let prvContentId = contentId
+		
 		withAnimation(.linear(duration: 0.15)) {
-			self.text = text
+			self.content = content
+			self.colorScheme = colorScheme
+			self.style = style
 			self.location = location
 			self.showCloseButton = showCloseButton
-			self.backgroundColor = backgroundColor
-			self.foregroundColor = foregroundColor
 		}
 		DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
 			withAnimation(.linear(duration: 0.15)) {
-				self.text = nil
-			}
-		}
-	}
-
-	@ViewBuilder
-	func view() -> some View {
-		
-		if let text = text {
-			
-			VStack {
-				switch location {
-				case .bottom:
-					Spacer()
-					textView(text)
-						.padding(.bottom, showCloseButton ? (42 - 16) : 42)
-				case .middle:
-					Spacer()
-					textView(text)
-					Spacer()
+				if self.contentId == prvContentId {
+					self.content = nil
 				}
 			}
-			.transition(.opacity)
-			.zIndex(1001)
 		}
 	}
 	
 	@ViewBuilder
-	private func textView(_ text: String) -> some View {
+	func view() -> some View {
 		
-		Text(text)
-			.multilineTextAlignment(.center)
-			.foregroundColor(self.foregroundColor)
+		if let content = content {
+			aligned(content)
+				.transition(.opacity)
+				.zIndex(1001)
+		}
+	}
+	
+	@ViewBuilder
+	private func aligned(_ content: AnyView) -> some View {
+		
+		VStack {
+			switch location {
+			case .bottom:
+				Spacer()
+				wrapped(content).padding(.bottom, 45)
+			case .middle:
+				Spacer()
+				wrapped(content)
+				Spacer()
+			case .top:
+				wrapped(content).padding(.top, 45)
+				Spacer()
+			}
+		}
+	}
+	
+	@ViewBuilder
+	private func wrapped(_ content: AnyView) -> some View {
+		
+		if showCloseButton {
+			withBlurBackground(content)
+				.padding(.all, 18)
+				.background(closeButton())
+				.padding(.all, 4)
+			
+		} else {
+			withBlurBackground(content)
+				.padding()
+		}
+	}
+	
+	@ViewBuilder
+	private func withBlurBackground(_ content: AnyView) -> some View {
+		
+		content
+			.environment(\.colorScheme, self.colorScheme)
 			.padding()
 			.background(
-				RoundedRectangle(cornerRadius: .infinity)
-					.fill(self.backgroundColor)
+				VisualEffectView(style: blurEffectStyle())
+					.clipShape(Capsule())
 			)
-			.modifier(
-				CloseButtonModifier(
-					color: self.backgroundColor,
-					visible: showCloseButton,
-					onTap: {[weak self] in
-						self?.closeToast()
-					}
+	}
+	
+	@ViewBuilder
+	private func closeButton() -> some View {
+		
+		VStack {
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer()
+				CloseButtonView(
+					colorScheme: colorScheme,
+					blurEffectStyle: blurEffectStyle(),
+					onTap: closeToast
 				)
-			)
+			}
+			Spacer()
+		}
+	}
+	
+	private func blurEffectStyle() -> UIBlurEffect.Style {
+		
+		let isDark = self.colorScheme == .dark
+		switch self.style {
+			case .ultraThin : return isDark ? .systemUltraThinMaterialDark : .systemUltraThinMaterialLight
+			case .thin      : return isDark ? .systemThinMaterialDark      : .systemThinMaterialLight
+			case .regular   : return isDark ? .systemMaterialDark          : .systemMaterialLight
+			case .chrome    : return isDark ? .systemChromeMaterialDark    : .systemChromeMaterialLight
+			case .thick     : return isDark ? .systemThickMaterialDark     : .systemThickMaterialLight
+		}
 	}
 	
 	private func closeToast() -> Void {
 		
 		withAnimation(.linear(duration: 0.15)) {
-			self.text = nil
+			self.content = nil
 		}
 	}
 }
 
-struct CloseButtonModifier: ViewModifier {
+struct CloseButtonView: View {
 	
-	let color: Color
-	let visible: Bool
+	let colorScheme: ColorScheme
+	let blurEffectStyle: UIBlurEffect.Style
 	let onTap: () -> Void
 	
 	@ViewBuilder
-	func body(content: Content) -> some View {
+	var body: some View {
 		
-		if visible {
-			content
-				.padding(.all, 16)
+		Button {
+			onTap()
+		} label: {
+			Image(systemName: "multiply")
+				.resizable()
+				.foregroundColor(Color(UIColor.label))
+				.frame(width: 16, height: 16)
+				.environment(\.colorScheme, colorScheme)
+				.padding(.all, 8)
 				.background(
-					VStack {
-						HStack(alignment: VerticalAlignment.top) {
-							Spacer()
-							Button {
-								onTap()
-							} label: {
-								Image(systemName: "multiply.circle")
-									.resizable()
-									.foregroundColor(self.color)
-									.frame(width: 26, height: 26)
-							}
-						}
-						Spacer()
-					}
+					VisualEffectView(style: blurEffectStyle)
+						.clipShape(Capsule())
 				)
-		} else {
-			content
 		}
 	}
+}
+
+struct VisualEffectView: UIViewRepresentable {
+	let style: UIBlurEffect.Style
+	
+	func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView {
+		return UIVisualEffectView(effect: UIBlurEffect(style: style))
+	}
+	func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {}
 }

@@ -349,7 +349,10 @@ struct ReceiveLightningView: View, ViewName {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						UIPasteboard.general.image = uiImg
-						toast.toast(text: "Copied QR code image to pasteboard!")
+						toast.pop(
+							Text("Copied QR code image to pasteboard!").anyView,
+							colorScheme: colorScheme.opposite
+						)
 					}) {
 						Text("Copy")
 					}
@@ -698,7 +701,11 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			UIPasteboard.general.string = m.request
-			toast.toast(text: "Copied to pasteboard!")
+			toast.pop(
+				Text("Copied to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite,
+				style: .chrome
+			)
 		}
 	}
 	
@@ -1269,7 +1276,10 @@ struct SwapInView: View, ViewName {
 						.contextMenu {
 							Button(action: {
 								UIPasteboard.general.string = btcAddr
-								toast.toast(text: "Copied to pasteboard!")
+								toast.pop(
+									Text("Copied to pasteboard!").anyView,
+									colorScheme: colorScheme.opposite
+								)
 							}) {
 								Text("Copy")
 							}
@@ -1344,7 +1354,10 @@ struct SwapInView: View, ViewName {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						UIPasteboard.general.image = uiImg
-						toast.toast(text: "Copied QR code image to pasteboard!")
+						toast.pop(
+							Text("Copied QR code image to pasteboard!").anyView,
+							colorScheme: colorScheme.opposite
+						)
 					}) {
 						Text("Copy")
 					}
@@ -1470,7 +1483,10 @@ struct SwapInView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			UIPasteboard.general.string = m.address
-			toast.toast(text: "Copied to pasteboard!")
+			toast.pop(
+				Text("Copied to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
 		}
 	}
 	

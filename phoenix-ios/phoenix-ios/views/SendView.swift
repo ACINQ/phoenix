@@ -25,6 +25,7 @@ struct SendView: MVIView {
 	
 	@StateObject var toast = Toast()
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	init(firstModel: Scan.Model? = nil) {
@@ -116,6 +117,13 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 			
+		} else if model.reason is Scan.BadRequestReasonAlreadyPaidInvoice {
+			
+			msg = NSLocalizedString(
+				"You've already paid this invoice. Paying it again could result in stolen funds.",
+				comment: "Error message - scanning lightning invoice"
+			)
+		
 		} else {
 		
 			msg = NSLocalizedString(
@@ -123,14 +131,13 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 		}
-		
-		toast.toast(
-			text: msg,
-			duration: 30,
+		toast.pop(
+			Text(msg).multilineTextAlignment(.center).anyView,
+			colorScheme: colorScheme.opposite,
+			style: .chrome,
+			duration: 30.0,
 			location: .middle,
-			showCloseButton: true,
-			backgroundColor: Color.black.opacity(0.9),
-			foregroundColor: Color.white
+			showCloseButton: true
 		)
 	}
 	

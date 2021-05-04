@@ -12,6 +12,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sum
+import fr.acinq.phoenix.app.NodeParamsManager
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.Utilities
 import fr.acinq.phoenix.ctrl.Scan
@@ -19,6 +20,8 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.toMilliSatoshi
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
@@ -26,6 +29,7 @@ class AppScanController(
     loggerFactory: LoggerFactory,
     firstModel: Scan.Model?,
     private val peerManager: PeerManager,
+    private val nodeParamsManager: NodeParamsManager,
     private val utilities: Utilities,
     private val chain: Chain
 ) : AppController<Scan.Model, Scan.Intent>(
@@ -131,20 +135,13 @@ class AppScanController(
             else -> request
         }
 
-        try {
-            val paymentRequest = PaymentRequest.read(request) // <- throws
-            val requestChain = when (paymentRequest.prefix) {
-                "lnbc" -> Chain.Mainnet
-                "lntb" -> Chain.Testnet
-                "lnbcrt" -> Chain.Regtest
-                else -> null
-            }
-            return if (chain != requestChain) {
-                Either.Left(Scan.BadRequestReason.ChainMismatch(chain, requestChain))
-            } else {
-                Either.Right(paymentRequest)
-            }
+        val paymentRequest = try {
+            PaymentRequest.read(request) // <- throws
         } catch (t: Throwable) {
+            null
+        }
+
+        if (paymentRequest == null) {
             // The qrcode doesn't appear to be for a lightning invoice.
             // Is it a LNURL ?
             val isLnUrl = when {
@@ -165,10 +162,12 @@ class AppScanController(
                             // Two problems here:
                             // - they're scanning a bitcoin address, but we don't support swap-out yet
                             // - the bitcoin address is for the wrong chain
-                            Either.Left(Scan.BadRequestReason.ChainMismatch(
-                                myChain = reason.myChain,
-                                requestChain = reason.addrChain
-                            ))
+                            Either.Left(
+                                Scan.BadRequestReason.ChainMismatch(
+                                    myChain = reason.myChain,
+                                    requestChain = reason.addrChain
+                                )
+                            )
                         }
                         else -> {
                             Either.Left(Scan.BadRequestReason.UnknownFormat)
@@ -181,6 +180,26 @@ class AppScanController(
                     Either.Left(Scan.BadRequestReason.IsBitcoinAddress)
                 }
             }
+        }
+
+        val requestChain = when (paymentRequest.prefix) {
+            "lnbc" -> Chain.Mainnet
+            "lntb" -> Chain.Testnet
+            "lnbcrt" -> Chain.Regtest
+            else -> null
+        }
+        if (chain != requestChain) {
+            return Either.Left(Scan.BadRequestReason.ChainMismatch(chain, requestChain))
+        }
+
+        val db = nodeParamsManager.databases.filterNotNull().first()
+        val previousInvoicePayment = db.payments.listOutgoingPayments(paymentRequest.paymentHash).find {
+            it.status is OutgoingPayment.Status.Completed.Succeeded
+        }
+        return if (previousInvoicePayment != null) {
+            Either.Left(Scan.BadRequestReason.AlreadyPaidInvoice)
+        } else {
+            Either.Right(paymentRequest)
         }
     }
 

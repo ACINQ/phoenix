@@ -14,6 +14,7 @@ object Scan {
         object isLnUrl: BadRequestReason()
         object IsBitcoinAddress: BadRequestReason()
         object UnknownFormat: BadRequestReason()
+        object AlreadyPaidInvoice: BadRequestReason()
     }
 
     sealed class Model : MVI.Model() {

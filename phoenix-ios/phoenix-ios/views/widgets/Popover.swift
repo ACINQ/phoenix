@@ -59,14 +59,6 @@ public extension EnvironmentValues {
 	}
 }
 
-public extension View {
-
-	/// Helper to create `AnyView` from view
-	var anyView: AnyView {
-		AnyView(self)
-	}
-}
-
 struct PopoverWrapper<Content: View>: View {
 
 	let dismissable: Bool

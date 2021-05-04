@@ -15,7 +15,6 @@
 		53BEF98CDD61115030E87C12 /* uikitAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF9304C486A6B146ABE99 /* uikitAppearance.swift */; };
 		53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */; };
 		53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF648B3A03C66B611BC06 /* ChannelsConfigurationView.swift */; };
-		53BEFB1356C4F01D3F7A692F /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFB712EB39BF83E92E7DE /* Toast.swift */; };
 		53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEF60DF224046E5DE0FDCC /* publishers.swift */; };
 		53BEFD54160278C5E393E319 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFE171C182513A5762686 /* HomeView.swift */; };
 		53BEFF4EDB40975C2123C63D /* ui.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53BEFFB3CB63090BBCFF6A36 /* ui.swift */; };
@@ -82,6 +81,7 @@
 		DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */; };
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
 		DCD6FD17262A2DBB00B0A6E8 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD6FD16262A2DBB00B0A6E8 /* KotlinFlow.swift */; };
+		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
@@ -136,7 +136,6 @@
 		53BEF8EAA43946FC1C7A6E7E /* shapes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shapes.swift; sourceTree = "<group>"; };
 		53BEF9304C486A6B146ABE99 /* uikitAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = uikitAppearance.swift; sourceTree = "<group>"; };
 		53BEFA112E0701FFD6B84217 /* colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = colors.swift; sourceTree = "<group>"; };
-		53BEFB712EB39BF83E92E7DE /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveView.swift; sourceTree = "<group>"; };
 		53BEFCB8A24A5FAA785AFD03 /* SendView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendView.swift; sourceTree = "<group>"; };
 		53BEFE171C182513A5762686 /* HomeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -208,6 +207,7 @@
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCD6FD16262A2DBB00B0A6E8 /* KotlinFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
+		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
@@ -264,8 +264,8 @@
 			isa = PBXGroup;
 			children = (
 				53BEFFBC23EE5A309A3DF575 /* CustomTextField.swift */,
-				53BEFB712EB39BF83E92E7DE /* Toast.swift */,
 				C8D7A607F036B3184C3D6EED /* QRCodeScanner.swift */,
+				DCE1E5F926418183005465B8 /* Toast.swift */,
 				DC682FE7258175CE00CA1114 /* Popover.swift */,
 				DC72C33825A663CA008A927A /* QRCode.swift */,
 				DC09086225B626B300A46136 /* ConnectionsPopover.swift */,
@@ -746,6 +746,7 @@
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
 				DC649FDC2577002300853C46 /* KotlinExtensions.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
+				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,
@@ -793,7 +794,6 @@
 				DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */,
 				DCB04685260D162C007FDA37 /* ViewName.swift in Sources */,
 				DCD6FD17262A2DBB00B0A6E8 /* KotlinFlow.swift in Sources */,
-				53BEFB1356C4F01D3F7A692F /* Toast.swift in Sources */,
 				DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */,
 				C8D7A70EFE0F071ACA0AE246 /* QRCodeScanner.swift in Sources */,
 				53BEF2924096C8E7976D46E3 /* shapes.swift in Sources */,
