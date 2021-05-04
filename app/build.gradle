@@ -143,7 +143,7 @@ dependencies {
 
   // eclair core
   def libsecp256k1_version = "1.3"
-  def eclair_version = "0.4.10-android-phoenix"
+  def eclair_version = "0.4.11-android-phoenix-SNAPSHOT"
   implementation "fr.acinq.bitcoin:secp256k1-jni:$libsecp256k1_version"
   implementation("fr.acinq.eclair:eclair-core_2.11:$eclair_version") {
     exclude group: 'fr.acinq.bitcoin', module: 'secp256k1-jni'
