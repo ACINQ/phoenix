@@ -212,7 +212,7 @@ struct ScanView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.navigationBarTitle("Scan a QR code", displayMode: .inline)
-		.zIndex(2) // [SendingView, ValidateView, ReadyView]
+		.zIndex(2) // [SendingView, ValidateView, ScanView]
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -235,12 +235,20 @@ struct ScanView: View {
 	
 	func showWarning() -> Void {
 		
+		guard
+			let paymentRequest = paymentRequest,
+			let model = mvi.model as? Scan.ModelDangerousRequest
+		else {
+			return
+		}
+		
 		ignoreScanner = true
 		popoverState.display.send(PopoverItem(
 			
 			DangerousInvoiceAlert(
+				model: model,
 				postIntent: mvi.intent,
-				paymentRequest: paymentRequest!,
+				paymentRequest: paymentRequest,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
 			).anyView,
@@ -249,8 +257,9 @@ struct ScanView: View {
 	}
 }
 
-struct DangerousInvoiceAlert : View {
+struct DangerousInvoiceAlert : View, ViewName {
 
+	let model: Scan.ModelDangerousRequest
 	let postIntent: (Scan.Intent) -> Void
 	let paymentRequest: String
 
@@ -261,15 +270,50 @@ struct DangerousInvoiceAlert : View {
 
 	var body: some View {
 		
-		VStack(alignment: .leading) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 
 			Text("Warning")
 				.font(.title2)
 				.padding(.bottom)
+			
+			if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
+				content_amountlessInvoice
+			} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
+				content_ownInvoice
+			} else {
+				content_unknown
+			}
 
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				Spacer()
+				
+				Button("Cancel") {
+					didCancel()
+				}
+				.font(.title3)
+				.padding(.trailing)
+					
+				Button("Continue") {
+					didConfirm()
+				}
+				.font(.title3)
+				.disabled(isUnknownType())
+			}
+			.padding(.top, 30)
+			
+		} // </VStack>
+		.padding()
+	}
+	
+	@ViewBuilder
+	var content_amountlessInvoice: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
 			Group {
 				Text(
-					"This invoice doesn't include an amount. This may be dangerous:" +
+					"The invoice doesn't include an amount. This can be dangerous:" +
 					" malicious nodes may be able to steal your payment. To be safe, "
 				)
 				+ Text("ask the payee to specify an amount").fontWeight(.bold)
@@ -278,27 +322,52 @@ struct DangerousInvoiceAlert : View {
 			.padding(.bottom)
 
 			Text("Are you sure you want to pay this invoice?")
-				.padding(.bottom)
-
-			HStack {
-				Button("Cancel") {
-					isShowing = false
-					ignoreScanner = false
-					popoverState.close.send()
-				}
-				.font(.title3)
-					
-				Spacer()
-					
-				Button("Continue") {
-					isShowing = false
-					postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
-					popoverState.close.send()
-				}
-				.font(.title3)
-			}
-		} // </VStack>
-		.padding()
+		}
+	}
+	
+	@ViewBuilder
+	var content_ownInvoice: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("The invoice is for you. You are about to pay yourself.")
+		}
+	}
+	
+	@ViewBuilder
+	var content_unknown: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Something is amiss with this invoice...")
+		}
+	}
+	
+	func isUnknownType() -> Bool {
+		
+		if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
+			return false
+		} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
+			return false
+		} else {
+			return true
+		}
+	}
+	
+	func didCancel() -> Void {
+		log.trace("[\(viewName)] didCancel()")
+		
+		isShowing = false
+		ignoreScanner = false
+		popoverState.close.send()
+	}
+	
+	func didConfirm() -> Void {
+		log.trace("[\(viewName)] didConfirm()")
+		
+		isShowing = false
+		postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
+		popoverState.close.send()
 	}
 }
 
@@ -452,7 +521,7 @@ struct ValidateView: View, ViewName {
 			
 		}// </ZStack>
 		.navigationBarTitle("Confirm Payment", displayMode: .inline)
-		.zIndex(1) // [SendingView, ValidateView, ReadyView]
+		.zIndex(1) // [SendingView, ValidateView, ScanView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
 			onAppear()
@@ -641,7 +710,7 @@ struct SendingView: View {
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Sending payment", displayMode: .inline)
-		.zIndex(0) // [SendingView, ValidateView, ReadyView]
+		.zIndex(0) // [SendingView, ValidateView, ScanView]
 	}
 }
 
@@ -675,13 +744,6 @@ class SendView_Previews: PreviewProvider {
 
 		NavigationView {
 			SendingView(model: Scan.ModelSending())
-		}
-		.modifier(GlobalEnvironment())
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
-		
-		NavigationView {
-			
 		}
 		.modifier(GlobalEnvironment())
 		.preferredColorScheme(.dark)

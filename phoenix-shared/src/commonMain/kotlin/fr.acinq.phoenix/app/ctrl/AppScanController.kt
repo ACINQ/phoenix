@@ -73,17 +73,26 @@ class AppScanController(
                     }
                     is Either.Right -> {
                         val paymentRequest: PaymentRequest = result.value
-                        var isDangerous = if (paymentRequest.amount != null) {
+                        val isDangerousAmountless = if (paymentRequest.amount != null) {
                             false
                         } else {
                             // amountless invoice -> dangerous unless full trampoline is in effect
                             val features = Features(paymentRequest.features ?: ByteVector.empty)
                             !features.hasFeature(Feature.TrampolinePayment)
                         }
-                        if (isDangerous)
-                            model(Scan.Model.DangerousRequest(intent.request))
-                        else
+                        if (isDangerousAmountless) {
+                            model(Scan.Model.DangerousRequest(
+                                Scan.DangerousRequestReason.IsAmountlessInvoice,
+                                intent.request
+                            ))
+                        } else if (paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId) {
+                            model(Scan.Model.DangerousRequest(
+                                Scan.DangerousRequestReason.IsOwnInvoice,
+                                intent.request
+                            ))
+                        } else {
                             validatePaymentRequest(intent.request, paymentRequest)
+                        }
                     }
                 }
             }
@@ -151,7 +160,7 @@ class AppScanController(
                 else -> false
             }
             if (isLnUrl) {
-                return Either.Left(Scan.BadRequestReason.isLnUrl)
+                return Either.Left(Scan.BadRequestReason.IsLnUrl)
             }
             // Is it for a bitcoin address ?
             return when (val result = utilities.parseBitcoinAddress(input)) {
