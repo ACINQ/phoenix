@@ -82,6 +82,7 @@
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
 		DCD6FD17262A2DBB00B0A6E8 /* KotlinFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD6FD16262A2DBB00B0A6E8 /* KotlinFlow.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
+		DCE1E5FC26432B4C005465B8 /* KotlinPublishers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5FB26432B4C005465B8 /* KotlinPublishers.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
@@ -208,6 +209,7 @@
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCD6FD16262A2DBB00B0A6E8 /* KotlinFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinFlow.swift; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+		DCE1E5FB26432B4C005465B8 /* KotlinPublishers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinPublishers.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 				DC18C417256FE22300A2D083 /* Prefs.swift */,
 				DC18C41C256FF91100A2D083 /* Utils.swift */,
 				DC649FDB2577002300853C46 /* KotlinExtensions.swift */,
+				DCE1E5FB26432B4C005465B8 /* KotlinPublishers.swift */,
 				DCD6FD16262A2DBB00B0A6E8 /* KotlinFlow.swift */,
 				DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */,
 				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
@@ -765,6 +768,7 @@
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
 				53BEF981E71E3087871890F9 /* SendView.swift in Sources */,
 				DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */,
+				DCE1E5FC26432B4C005465B8 /* KotlinPublishers.swift in Sources */,
 				53BEF9D42E536E6A78FFD425 /* CustomTextField.swift in Sources */,
 				DC18C418256FE22300A2D083 /* Prefs.swift in Sources */,
 				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,

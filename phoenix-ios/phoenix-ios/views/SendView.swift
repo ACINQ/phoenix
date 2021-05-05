@@ -148,7 +148,7 @@ struct SendView: MVIView {
 	}
 }
 
-struct ScanView: View {
+struct ScanView: View, ViewName {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
@@ -198,9 +198,7 @@ struct ScanView: View {
 				}
 				
 				Button {
-					if let request = UIPasteboard.general.string {
-						mvi.intent(Scan.IntentParse(request: request))
-					}
+					pasteFromClipboard()
 				} label: {
 					Image(systemName: "arrow.right.doc.on.clipboard")
 					Text("Paste from clipboard")
@@ -233,7 +231,16 @@ struct ScanView: View {
 		}
 	}
 	
+	func pasteFromClipboard() -> Void {
+		log.trace("[\(viewName)] pasteFromClipboard()")
+		
+		if let request = UIPasteboard.general.string {
+			mvi.intent(Scan.IntentParse(request: request))
+		}
+	}
+	
 	func showWarning() -> Void {
+		log.trace("[\(viewName)] showWarning()")
 		
 		guard
 			let paymentRequest = paymentRequest,
