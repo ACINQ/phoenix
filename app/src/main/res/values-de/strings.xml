@@ -379,10 +379,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Verbindung zum Electrum-Server wird aufgebaut…</string>
-  <string name="main_alert_network_lost">Sie sind offline. Bitte überprüfen Sie ihre Netzwerkeinstellungen…</string>
-  <string name="main_alert_lightning_connection_lost">Das Lightning-Netzwerk konnte nicht erreicht werden…</string>
-  <string name="main_alert_settings_button">Einstellungen</string>
   <string name="main_swapin_incoming">+%1$s gehen ein</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Verbindung wird aufgebaut…</string>

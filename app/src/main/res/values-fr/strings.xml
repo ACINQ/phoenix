@@ -325,10 +325,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connexion à electrum…</string>
-  <string name="main_alert_network_lost">Vous êtes hors ligne. Merci de vérifier l\'état de votre connexion…</string>
-  <string name="main_alert_lightning_connection_lost">Échec de la connexion au réseau Lightning…</string>
-  <string name="main_alert_settings_button">Configuration</string>
   <string name="main_swapin_incoming">+%1$s entrant</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Connexion…</string>

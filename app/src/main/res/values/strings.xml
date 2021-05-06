@@ -363,10 +363,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connecting to Electrum server…</string>
-  <string name="main_alert_network_lost">You are offline. Please check your network settings…</string>
-  <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
-  <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Connecting…</string>
