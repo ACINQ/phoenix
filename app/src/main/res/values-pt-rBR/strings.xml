@@ -125,8 +125,13 @@
 
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
-
+  
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
+  <string name="receive_swap_in_info"><![CDATA[
+   Este endereço é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
+    <br /><br />
+    O depósito precisa ser de no mínimo <b>%1$s</b>. Taxa <b>%2$s%%</b> (<b>%3$s</b> taxa mínima).
+  ]]></string>
   <string name="receive_swap_in_error_message">Não foi possível obter um endereço Bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
   <string name="receive_swap_in_unknown"><![CDATA[
     <b>Indisponível</b>
@@ -342,6 +347,8 @@
 
   <string name="channel_loading">Recuperando dados do canal…</string>
   <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
+  <string name="channel_balance">Saldo</string>
+  <string name="channel_capacity">Capacidade</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -642,7 +649,7 @@
   <!-- //////////////// settings: options for payments //////////////// -->
 
   <string name="paymentsettings_title">Configurações de pagamento</string>
-  <string name="paymentsettings_subtitle">Defina opções em relação aos pagamentos que você envia ou recebe.</string>
+  <string name="paymentsettings_subtitle">Defina opções em relação as taxas e aos pagamentos que você envia ou recebe.</string>
 
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
@@ -657,6 +664,15 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
+  
+  <string name="paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+    Esta taxa se aplica quando você recebe um pagamento na Lightning e um novo canal precisa ser aberto.
+    <br /><br />
+    Acesse <a href="https://phoenix.acinq.co/faq#what-are-the-fees">the FAQ</a> para mais informações.
+  ]]></string>
 
   <!-- ftue -->
 
