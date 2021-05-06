@@ -45,6 +45,7 @@ import fr.acinq.phoenix.db.PaymentMetaRepository
 import fr.acinq.phoenix.utils.AlertHelper
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -124,6 +125,7 @@ class LNUrlPayFragment : BaseFragment() {
     model.state.observe(viewLifecycleOwner, { state ->
       when (state) {
         is LNUrlPayState.Error -> mBinding.errorMessage.text = when (state.cause) {
+          is InvoiceChainDoesNotMatch -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.topPrivateDomain(), getString(R.string.scan_error_invalid_chain))
           is LNUrlPayInvalidResponse -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.topPrivateDomain(), state.cause.message)
           is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_pay_error_unreachable, model.callbackUrl.topPrivateDomain())
           is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.topPrivateDomain(), state.cause.reason)
@@ -254,7 +256,9 @@ class LNUrlPayFragment : BaseFragment() {
         val json = LNUrl.handleLNUrlRemoteResponse(response)
         val pr = PaymentRequest.read(json.getString("pr"))
         val action = json.optJSONObject("successAction")?.run { extractAction(this) }
-        if (pr.amount().isEmpty) {
+        if (!Wallet.isSupportedPrefix(pr)) {
+          throw InvoiceChainDoesNotMatch(pr)
+        } else if (pr.amount().isEmpty) {
           throw IllegalArgumentException("invoice does not define an amount")
         } else if (!pr.amount().get().equals(amount)) {
           throw InvoiceAmountDoesNotMatch(pr, amount)
@@ -304,6 +308,7 @@ sealed class LNUrlPayInvalidResponse(override val message: String) : IllegalArgu
 data class UnhandledLNUrlPaySuccessAction(val json: String) : LNUrlPayInvalidResponse("unhandled success action=$json")
 data class InvoiceNoDescriptionHash(val pr: PaymentRequest) : LNUrlPayInvalidResponse("invoice must have a description hash")
 data class InvoiceDescriptionHashDoesNotMatch(val pr: PaymentRequest, val expected: String) : LNUrlPayInvalidResponse("invoice description does not match metadata")
+data class InvoiceChainDoesNotMatch(val pr: PaymentRequest) : LNUrlPayInvalidResponse("invoice does not match wallet's chain")
 data class InvoiceAmountDoesNotMatch(val pr: PaymentRequest, val expected: MilliSatoshi) :
   LNUrlPayInvalidResponse("invoice does not match expected amount [ expected=$expected actual=${pr.amount()} ]")
 

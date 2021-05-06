@@ -99,7 +99,7 @@ class ReadInputFragment : BaseFragment() {
             model.inputState.value = ReadInputState.Error.PayToSelf
           } else if (it.pr.isExpired) {
             model.inputState.value = ReadInputState.Error.PaymentExpired
-          } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.pr.prefix()) {
+          } else if (!Wallet.isSupportedPrefix(it.pr)) {
             model.inputState.value = ReadInputState.Error.InvalidChain
           } else if (it.pr.amount().isEmpty && !it.pr.features().allowTrampoline()) {
             // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.

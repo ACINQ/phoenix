@@ -55,6 +55,7 @@ object Wallet {
   private const val ECLAIR_BASE_DATADIR = "node-data"
   internal const val SEED_FILE = "seed.dat"
   private const val ECLAIR_DB_FILE = "eclair.sqlite"
+  private val acceptedLightningPrefix by lazy { PaymentRequest.prefixes().get(getChainHash()) }
 
   fun getDatadir(context: Context): File {
     return File(context.filesDir, ECLAIR_BASE_DATADIR)
@@ -77,6 +78,8 @@ object Wallet {
   fun getChainHash(): ByteVector32 {
     return if (isMainnet()) Block.LivenetGenesisBlock().hash() else Block.TestnetGenesisBlock().hash()
   }
+
+  fun isSupportedPrefix(paymentRequest: PaymentRequest): Boolean = acceptedLightningPrefix.isDefined && acceptedLightningPrefix.get() == paymentRequest.prefix()
 
   fun getScriptHashVersion(): Byte {
     return if (isMainnet()) Base58.`Prefix$`.`MODULE$`.ScriptAddress() else Base58.`Prefix$`.`MODULE$`.ScriptAddressTestnet()
@@ -102,13 +105,11 @@ object Wallet {
     return Xpub(xpub = xpub, path = path.toString())
   }
 
-  private fun cleanUpInvoice(input: String): String {
+  private fun trimInvoice(input: String): String {
     val trimmed = input.replace("\\u00A0", "").trim()
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
       trimmed.startsWith("lightning:", true) -> trimmed.drop(10)
-      trimmed.startsWith("bitcoin://", true) -> trimmed.drop(10)
-      trimmed.startsWith("bitcoin:", true) -> trimmed.drop(8)
       else -> trimmed
     }
   }
@@ -123,30 +124,21 @@ object Wallet {
    *
    * If the string cannot be read, throws an exception.
    */
-  fun parseLNObject(input: String): Any {
+  fun parseLNObject(source: String): Any {
+    val input = trimInvoice(source)
     return try {
-      when {
-        input.startsWith("lightning://", true) -> input.drop(12)
-        input.startsWith("lightning:", true) -> input.drop(10)
-        else -> input
-      }.run { PaymentRequest.read(this) }
+      PaymentRequest.read(input)
     } catch (e1: Exception) {
       try {
         BitcoinURI(input)
       } catch (e2: Exception) {
         try {
-          when {
-            input.startsWith("lightning://", true) -> input.drop(12)
-            input.startsWith("lightning:", true) -> input.drop(10)
-            else -> {
-              val uri = URI(input)
-              if (uri.scheme != null) {
-                uri.getParams()["lightning"] ?: throw RuntimeException("not a valid LNURL fallback scheme")
-              } else {
-                input
-              }
-            }
-          }.run { LNUrl.extractLNUrl(this) }
+          val uri = URI(input)
+          if (uri.scheme != null) {
+            uri.getParams()["lightning"] ?: throw RuntimeException("not a valid LNURL fallback scheme")
+          } else {
+            input
+          }.let { LNUrl.extractLNUrl(it) }
         } catch (e3: Exception) {
           when (e3) {
             is LNUrlError -> throw e3 // the input is correct, but the LNURL service returns an error that must be visible to the user.
