@@ -119,13 +119,17 @@
   <string name="receive_share_button">Share…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
-  <string name="receive_min_amount_swap_in"><![CDATA[Deposit must be at least <b>%1$s</b>.]]></string>
   <string name="receive_paytoopen_disabled">Channel creation has been temporarily disabled. You may not be able to receive some payments.</string>
   <string name="receive_paytoopen_disabled_nochannels">Channel creation has been temporarily disabled. You will not be able to receive any payments.</string>
   <string name="receive_address_label">Address</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
+  <string name="receive_swap_in_info"><![CDATA[
+    This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels.
+    <br /><br />
+    Deposits must be at least <b>%1$s</b>. The fee is <b>%2$s%%</b> (<b>%3$s</b> minimum).
+  ]]></string>
   <string name="receive_swap_in_error_message">Could not get a Bitcoin address from the swap service.\n\nPlease try again later.</string>
   <string name="receive_swap_in_unknown"><![CDATA[
     <b>Unavailable</b>
@@ -235,6 +239,7 @@
   <string name="utils_cancel">Cancel</string>
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
+  <string name="utils_unavailable">Unavailable</string>
   <string name="utils_copied">Copied to clipboard!</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
@@ -260,7 +265,7 @@
   <string name="settings_force_close">Danger zone</string>
   <string name="settings_tor">Tor</string>
   <string name="settings_about">About</string>
-  <string name="settings_payment_settings">Payment settings</string>
+  <string name="settings_payment_settings">Payment options and fees</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -341,8 +346,8 @@
 
   <string name="channel_loading">Retrieving channel data…</string>
   <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
-  <string name="channel_send">Send</string>
-  <string name="channel_receive">Receive</string>
+  <string name="channel_balance">Balance</string>
+  <string name="channel_capacity">Capacity</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -646,8 +651,8 @@
 
   <!-- //////////////// settings: options for payments //////////////// -->
 
-  <string name="paymentsettings_title">Payment settings</string>
-  <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
+  <string name="paymentsettings_title">Payment options and fees</string>
+  <string name="paymentsettings_subtitle">Set various options and fees for payments you send or receive.</string>
 
   <string name="paymentsettings_defaultdesc_title">Default payment description</string>
   <string name="paymentsettings_defaultdesc_none">No description set…</string>
@@ -662,6 +667,15 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Enter a base fee in satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
+
+  <string name="paymentsettings_paytoopen_fees_title">Fee for on the fly channel creation</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s minimum)</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">On the fly channels</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+    This fee applies when you receive a payment over Lightning and a new channel needs to be created.
+    <br /><br />
+    See <a href="https://phoenix.acinq.co/faq#what-are-the-fees">the FAQ</a> for more information.
+  ]]></string>
 
   <!-- ftue -->
 

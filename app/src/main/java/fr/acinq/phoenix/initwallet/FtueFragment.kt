@@ -134,9 +134,9 @@ class FtueLightningFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val payToOpenSettings = (parentFragment as? FtueFragment)?.appContext()?.payToOpenSettings?.value
-    val swapInFee = 100 * (payToOpenSettings?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
-    val minFee = payToOpenSettings?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
-    mBinding.body.text = Converter.html(getString(R.string.ftue__pay_to_open__body, String.format("%.2f", swapInFee), Converter.printAmountPretty(minFee, requireContext(), withUnit = true)))
+    val prettyPayToOpenPercentFee = payToOpenSettings?.let { String.format("%.2f", 100 * (it.feePercent)) } ?: getString(R.string.utils_unknown)
+    val prettyPayToOpenMinFee = payToOpenSettings?.let { Converter.printAmountPretty(it.minFee, requireContext(), withUnit = true) } ?: getString(R.string.utils_unknown)
+    mBinding.body.text = Converter.html(getString(R.string.ftue__pay_to_open__body, prettyPayToOpenPercentFee, prettyPayToOpenMinFee))
     mBinding.nextButton.setOnClickListener { (parentFragment as? FtueFragment)?.goToPage3() }
   }
 }

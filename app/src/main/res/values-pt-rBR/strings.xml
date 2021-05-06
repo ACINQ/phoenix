@@ -122,6 +122,7 @@
   <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_paytoopen_disabled">A abertura de canais foi temporariamente desativada. Alguns pagamentos não poderão ser recebidos.</string>
   <string name="receive_paytoopen_disabled_nochannels">A abertura de canais foi temporariamente desativada. Você não poderá receber pagamentos.</string>
+
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
@@ -341,8 +342,6 @@
 
   <string name="channel_loading">Recuperando dados do canal…</string>
   <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
-  <string name="channel_send">Enviar</string>
-  <string name="channel_receive">Receber</string>
 
   <!-- //////////////// menu //////////////// -->
 
