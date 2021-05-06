@@ -18,7 +18,6 @@ package fr.acinq.phoenix.receive
 
 import android.content.*
 import android.os.Bundle
-import android.os.PowerManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -39,12 +38,13 @@ import fr.acinq.eclair.channel.`WAIT_FOR_FUNDING_CONFIRMED$`
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.eclair.wire.SwapInResponse
-import fr.acinq.phoenix.BaseFragment
-import fr.acinq.phoenix.NavGraphMainDirections
-import fr.acinq.phoenix.R
+import fr.acinq.phoenix.*
 import fr.acinq.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
-import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.Constants
+import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -127,13 +127,12 @@ class ReceiveFragment : BaseFragment() {
       }
     })
 
-    appContext()?.payToOpenSettings?.value?.minFunding?.let { minFunding ->
-      context?.let { ctx ->
-        val min = Converter.printAmountPretty(minFunding, ctx, withUnit = true)
-        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, min))
-        mBinding.minFundingSwapIn.text = Converter.html(getString(R.string.receive_min_amount_swap_in, min))
+    context?.let { ctx ->
+      val payToOpenSettings = appContext(ctx).payToOpenSettings.value
+      val swapInSettings = appContext(ctx).swapInSettings.value
+      if (payToOpenSettings != null && swapInSettings != null) {
+        updateChannelServiceNotices(ctx, payToOpenSettings, swapInSettings)
       }
-      checkMinFunding(minFunding)
     }
 
     context?.let { mBinding.descValue.setText(Prefs.getDefaultPaymentDescription(it)) }
@@ -191,19 +190,7 @@ class ReceiveFragment : BaseFragment() {
     }
 
     mBinding.swapInButton.setOnClickListener {
-      context?.let { ctx ->
-        val percentFee = 100 * (appContext(ctx).payToOpenSettings.value?.feePercent ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.feePercent)
-        val minFee = appContext(ctx).payToOpenSettings.value?.minFee ?: Constants.DEFAULT_PAY_TO_OPEN_SETTINGS.minFee
-        AlertHelper.build(layoutInflater, getString(R.string.receive_swap_in_disclaimer_title),
-          Converter.html(getString(R.string.receive_swap_in_disclaimer_message,
-            String.format("%.2f", percentFee),
-            Converter.printAmountPretty(minFee, ctx, withUnit = true)
-          )))
-          .setPositiveButton(R.string.utils_proceed) { _, _ -> generateSwapIn() }
-          .setNegativeButton(R.string.btn_cancel, null)
-          .show()
-      }
-
+      context?.let { ctx -> generateSwapIn(ctx) }
     }
 
     mBinding.withdrawButton.setOnClickListener {
@@ -214,18 +201,6 @@ class ReceiveFragment : BaseFragment() {
 
     if (model.state.value == PaymentGenerationState.INIT) {
       generatePaymentRequest()
-    }
-
-    // listen to power saving mode
-    context?.let {
-      val powerManager = it.getSystemService(Context.POWER_SERVICE) as PowerManager
-      powerSavingReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-          log.info("power saving ? ${powerManager.isPowerSaveMode}")
-          model.isPowerSavingMode.value = powerManager.isPowerSaveMode
-        }
-      }
-      it.registerReceiver(powerSavingReceiver, IntentFilter("android.os.action.POWER_SAVE_MODE_CHANGED"))
     }
   }
 
@@ -256,13 +231,30 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-  private fun checkMinFunding(minFunding: Satoshi) {
+  private fun updateChannelServiceNotices(context: Context, payToOpenSettings: PayToOpenSettings, swapInSettings: SwapInSettings) {
     lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
-      log.error("could not list channels for min funding check: ", exception)
+      log.error("could not update pay-to-open and swap-in notices: ", exception)
     }) {
       val channels = app.requireService.getChannels().filter { it.state() is `NORMAL$` || it.state() is `WAIT_FOR_FUNDING_CONFIRMED$` || it.state() is `OFFLINE$` }
-      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && minFunding.`$greater`(Satoshi(0)))
-      model.showMinFundingSwapIn.postValue(minFunding.`$greater`(Satoshi(0)))
+      model.showMinFundingPayToOpen.postValue(channels.isEmpty() && swapInSettings.minFunding.`$greater`(Satoshi(0)))
+      model.payToOpenDisabled.postValue(payToOpenSettings.status is ServiceStatus.Disabled)
+
+      launch(Dispatchers.Main) {
+        val prettyPayToOpenMinFunding = Converter.printAmountPretty(payToOpenSettings.minFunding, context, withUnit = true)
+        val prettySwapInMinFunding = Converter.printAmountPretty(swapInSettings.minFunding, context, withUnit = true)
+        val prettySwapInPercentFee = String.format("%.2f", 100 * (swapInSettings.feePercent))
+        val prettySwapInMinFee = Converter.printAmountPretty(swapInSettings.minFee, context, withUnit = true)
+
+        mBinding.swapInInfo.text = Converter.html(getString(R.string.receive_swap_in_info, prettySwapInMinFunding, prettySwapInPercentFee, prettySwapInMinFee))
+        mBinding.minFundingPayToOpen.text = Converter.html(getString(R.string.receive_min_amount_pay_to_open, prettyPayToOpenMinFunding))
+        if (payToOpenSettings.status is ServiceStatus.Disabled) {
+          if (channels.isEmpty()) {
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled_nochannels)
+          } else {
+            mBinding.payToOpenDisabledMessage.text = getString(R.string.receive_paytoopen_disabled)
+          }
+        }
+      }
     }
   }
 
@@ -278,14 +270,31 @@ class ReceiveFragment : BaseFragment() {
     }
   }
 
-  private fun generateSwapIn() {
-    lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
-      log.error("error when generating swap in: ", exception)
-      model.state.value = SwapInState.ERROR
-    }) {
-      Wallet.hideKeyboard(context, mBinding.amountValue)
-      model.state.value = SwapInState.IN_PROGRESS
-      app.requireService.sendSwapIn()
+  private fun generateSwapIn(context: Context) {
+    Wallet.hideKeyboard(context, mBinding.amountValue)
+    when (appContext(context).swapInSettings.value?.status ?: ServiceStatus.Unknown) {
+      ServiceStatus.Unknown -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_unknown))
+        return
+      }
+      ServiceStatus.Disabled.Generic -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled))
+        return
+      }
+      ServiceStatus.Disabled.MempoolFull -> {
+        model.state.value = SwapInState.DISABLED
+        mBinding.swapInDisabledMessage.text = Converter.html(getString(R.string.receive_swap_in_disabled_mempool))
+        return
+      }
+      else -> lifecycleScope.launch(CoroutineExceptionHandler { _, exception ->
+        log.error("error when generating swap in: ", exception)
+        model.state.value = SwapInState.ERROR
+      }) {
+        model.state.value = SwapInState.IN_PROGRESS
+        app.requireService.sendSwapIn()
+      }
     }
   }
 

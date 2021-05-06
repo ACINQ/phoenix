@@ -257,10 +257,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connessione a electrum server in corso…</string>
-  <string name="main_alert_network_lost">Sei offline. Per favore controlla le tue impostazioni di rete…</string>
-  <string name="main_alert_lightning_connection_lost">Imposibile stabilire una connessione Lightning Network…</string>
-  <string name="main_alert_settings_button">Impostazioni</string>
   <string name="main_swapin_incoming">+%1$s in arrivo</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_stores_button">Negozi</string>

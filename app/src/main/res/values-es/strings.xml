@@ -277,10 +277,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Conectando al servidor Electrum…</string>
-  <string name="main_alert_network_lost">No hay conexión. Por favor verifica la configuración de tu red…</string>
-  <string name="main_alert_lightning_connection_lost">No se ha podido conectar a la red Lightning…</string>
-  <string name="main_alert_settings_button">Ajustes</string>
   <string name="main_swapin_incoming">+%1$s entrante</string>
   <string name="main_faq_button">Preguntas frecuentes</string>
   <string name="main_connectivity_button">Conectando…</string>

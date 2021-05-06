@@ -105,26 +105,48 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Solicitação de pagamento</string>
+  <string name="receive_edit_title">Invoice</string>
   <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
   <string name="receive_in_progress_message">Favor aguardar…</string>
-  <string name="receive_error_message">Ocorreu um erro ao gerar a solicitação de pagamento…\n\nTente novamente.</string>
+  <string name="receive_error_message">Ocorreu um erro ao gerar a invoice…\n\nTente novamente.</string>
   <string name="receive_amount_label">Quantidade (opcional)</string>
   <string name="receive_desc_label">Descrição do pagamento (opcional):</string>
   <string name="receive_default_desc">Pagamento Phoenix</string>
   <string name="receive_generate_button">Solicitar</string>
 
   <string name="receive_share_subject">Pagamento solicitado</string>
-  <string name="receive_share_title">Compartilhe esta solicitação de pagamento com…</string>
+  <string name="receive_share_title">Compartilhe esta invoice com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
   <string name="receive_min_amount_swap_in"><![CDATA[O depósito precisa ser de no mínimo <b>%1$s</b>.]]></string>
+  <string name="receive_paytoopen_disabled">A abertura de canais foi temporariamente desativada. Alguns pagamentos não poderão ser recebidos.</string>
+  <string name="receive_paytoopen_disabled_nochannels">A abertura de canais foi temporariamente desativada. Você não poderá receber pagamentos.</string>
+
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
-  <string name="receive_swap_in_error_message">Ocorreu um erro ao trocar para uma transação da rede Bitcoin…\n\nTente novamente.</string>
+  <string name="receive_swap_in_error_message">Não foi possível obter um endereço Bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
+  <string name="receive_swap_in_unknown"><![CDATA[
+    <b>Indisponível</b>
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
+  <string name="receive_swap_in_disabled"><![CDATA[
+    <b>Serviço desabilitado</b>
+    <br /><br />
+    O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
+  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+    <b>Serviço desabilitado</b>
+    <br /><br />
+    O mempool do Bitcoin está cheio e as taxas muito altas. O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    <br /><br />
+    Tente novamente mais tarde.
+  ]]></string>
   <string name="receive_swap_in_progress_message">Solicitando um endereço Bitcoin…</string>
   <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -132,7 +154,7 @@
   <br /><br />
   Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
-  Uma taxa de <b>%1$s%%</b> será cobrada (with a <b>%2$s</b> minimum).
+  Uma taxa de <b>%1$s%%</b> será cobrada (taxa mínima de <b>%2$s</b>).
   ]]></string>
 
   <!-- //////////////// send //////////////// -->
@@ -144,6 +166,8 @@
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
   <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
+  <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
@@ -172,7 +196,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
+  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma invoice, endereço bitcoin ou LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_expired">O pagamento expirou.</string>
@@ -260,7 +284,7 @@
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
 
   <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
-  <string name="notif__pay_to_open_missed_message">O valor não foi recebido por ser uma quantia insuficiente para criar um novo canal de pagamento.</string>
+  <string name="notif__pay_to_open_missed_message">Valor insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -318,8 +342,6 @@
 
   <string name="channel_loading">Recuperando dados do canal…</string>
   <string name="channel_error">Não foi possível recuperar os detalhes deste canal. Tente novamente mais tarde.</string>
-  <string name="channel_send">Enviar</string>
-  <string name="channel_receive">Receber</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -329,18 +351,12 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
-   <string name="initwallet_terms"><![CDATA[
-    Ao prosseguir, você concorda com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.
-  ]]></string>
+  <string name="initwallet_terms"><![CDATA[Eu li e concordo com os <a href="https://phoenix.acinq.co/terms">termos de uso</a>.]]></string>
   <string name="initwallet_create">Criar nova carteira</string>
   <string name="initwallet_restore">Restaurar minha carteira</string>
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Conectando ao servidor Electrum…</string>
-  <string name="main_alert_network_lost">Você está offline. Verifique suas configurações de rede…</string>
-  <string name="main_alert_lightning_connection_lost">Não foi possível acessar a rede Lightning…</string>
-  <string name="main_alert_settings_button">Configurações</string>
   <string name="main_swapin_incoming">recebendo +%1$s</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Conectando…</string>
@@ -444,7 +460,7 @@
   <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
   <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
-  <string name="paymentdetails_payment_request_label">Solicitação de pagamento</string>
+  <string name="paymentdetails_payment_request_label">Invoice</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
@@ -543,7 +559,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum aleatórios. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
   <string name="electrum_change_button">Definir servidor…</string>
 
   <string name="electrum_block_height_label">Altura do bloco</string>
@@ -599,7 +615,7 @@
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
-  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso as 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém e tome cuidado com ataques phishing.
+  Observe que esta carteira é do tipo não custodiante: <strong>significa que somente você tem acesso às 12 palavras da carteira, também conhecida como seed</strong>. Não forneça a seed para ninguém e tome cuidado com ataques phishing.
   <br/><br/>
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
@@ -610,6 +626,7 @@
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Fornecido por Coindesk</a>
   ]]></string>
   <string name="about_terms">Termos de uso</string>
+  <string name="about_privacy">Privacidade</string>
 
   <!-- //////////////// background node service //////////////// -->
 
@@ -645,7 +662,7 @@
   <string name="ftue__pay_to_open__body"><![CDATA[
   Se necessário, canais de pagamento serão abertos automaticamente para você.
   <br /><br />
-  A taxa é <b>%1$s%%</b><br/>com um mínimo de <b>%2$s</b>.
+  A taxa é <b>%1$s%%</b><br/>taxa mínima de <b>%2$s</b>.
   <br /><br />
   Por exemplo, para receber 250 000 sat, a taxa seria de %2$s.
   ]]></string>
@@ -668,6 +685,11 @@
     <h4>Aprimoramento da função de bloqueio</h4>
     <p>O bloqueio do aplicativo agora usa o bloqueio do sistema operacional. Não há necessidade de lembrar outro PIN!</p>
     <p>Ir para Configurações > Segurança para ativar o novo recurso de bloqueio de tela.</p>
+  ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Aumento de taxas para novos canais</h4>
+    <p>A % da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
+    <p>Se alguém te enviar 15 000 sat e você ainda não tiver canais abertos, um novo canal será criado e você receberá 14 000 sat.</p>
   ]]></string>
 
   <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>

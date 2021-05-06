@@ -40,7 +40,6 @@
     android:layout_marginStart="@dimen/space_sm"
     android:layout_marginEnd="@dimen/space_lg"
     android:ellipsize="end"
-    android:text="@string/lipsum_short"
     android:textSize="@dimen/text_md"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toStartOf="@id/channel_balance_layout"
@@ -62,20 +61,20 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:barrierDirection="start"
-      app:constraint_referenced_ids="channel_receivable_value,channel_sendable_value" />
+      app:constraint_referenced_ids="channel_balance_value,channel_capacity_value" />
 
     <TextView
-      android:id="@+id/channel_sendable_label"
+      android:id="@+id/channel_balance_label"
       style="@style/MutedLabelView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="@dimen/space_xs"
-      android:text="@string/channel_send"
-      app:layout_constraintBaseline_toBaselineOf="@id/channel_sendable_value"
+      android:text="@string/channel_balance"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 
     <fr.acinq.phoenix.utils.customviews.CoinView
-      android:id="@+id/channel_sendable_value"
+      android:id="@+id/channel_balance_value"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:amount_size="@dimen/text_md"
@@ -87,24 +86,24 @@
       app:unit_size="@dimen/text_sm" />
 
     <TextView
-      android:id="@+id/channel_receivable_label"
+      android:id="@+id/channel_capacity_label"
       style="@style/MutedLabelView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="@dimen/space_xs"
-      android:text="@string/channel_receive"
-      app:layout_constraintBaseline_toBaselineOf="@id/channel_receivable_value"
+      android:text="@string/channel_capacity"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_capacity_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 
     <fr.acinq.phoenix.utils.customviews.CoinView
-      android:id="@+id/channel_receivable_value"
+      android:id="@+id/channel_capacity_value"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:amount_size="@dimen/text_md"
       app:layout_constrainedWidth="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="1"
-      app:layout_constraintTop_toBottomOf="@id/channel_sendable_value"
+      app:layout_constraintTop_toBottomOf="@id/channel_balance_value"
       app:thin="false"
       app:unit_size="@dimen/text_sm" />
 
