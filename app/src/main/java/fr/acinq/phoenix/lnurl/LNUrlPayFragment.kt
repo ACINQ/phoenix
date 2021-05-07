@@ -135,7 +135,7 @@ class LNUrlPayFragment : BaseFragment() {
         is LNUrlPayState.RequestingInvoice -> mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_sending_payment))
         is LNUrlPayState.ValidInvoice -> {
           mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_checking_invoice))
-          sendPayment(state.paymentRequest)
+          sendPayment(state.paymentRequest, state.action)
         }
         is LNUrlPayState.SendingPayment -> mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_sending_payment))
         else -> Unit
@@ -267,8 +267,7 @@ class LNUrlPayFragment : BaseFragment() {
         } else if (!pr.description().right().get().equals(Crypto.sha256().apply(ByteVector.encodeUtf8(model.metadata.raw).right().get()))) {
           throw InvoiceDescriptionHashDoesNotMatch(pr, model.metadata.raw)
         } else {
-          action?.let { model.saveSuccessAction(pr.paymentHash(), it) }
-          model.state.postValue(LNUrlPayState.ValidInvoice(pr))
+          model.state.postValue(LNUrlPayState.ValidInvoice(pr, action))
         }
       }
     } else {
@@ -290,14 +289,17 @@ class LNUrlPayFragment : BaseFragment() {
     else -> throw UnhandledLNUrlPaySuccessAction(json.toString())
   }
 
-  private fun sendPayment(pr: PaymentRequest) {
+  private fun sendPayment(pr: PaymentRequest, action: LNUrlPayActionData?) {
     model.state.value = LNUrlPayState.SendingPayment(pr)
     lifecycleScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
       log.error("error when sending payment in state=${model.state}: ", e)
       model.state.value = LNUrlPayState.Error(e)
     }) {
       log.info("sending payment for invoice=$pr")
-      app.requireService.sendPaymentRequest(amount = pr.amount().get(), paymentRequest = pr, subtractFee = false)
+      val paymentId = app.requireService.sendPaymentRequest(amount = pr.amount().get(), paymentRequest = pr, subtractFee = false)
+      if (paymentId != null) {
+        model.saveLNUrlInfo(paymentId.toString(), action)
+      }
       findNavController().navigate(R.id.action_lnurl_pay_to_main)
     }
   }
@@ -326,7 +328,7 @@ sealed class LNUrlPayAmountState {
 sealed class LNUrlPayState {
   object Init : LNUrlPayState()
   object RequestingInvoice : LNUrlPayState()
-  data class ValidInvoice(val paymentRequest: PaymentRequest) : LNUrlPayState()
+  data class ValidInvoice(val paymentRequest: PaymentRequest, val action: LNUrlPayActionData?) : LNUrlPayState()
   data class SendingPayment(val paymentRequest: PaymentRequest) : LNUrlPayState()
   data class Error(val cause: Throwable) : LNUrlPayState()
 }
@@ -344,8 +346,8 @@ class LNUrlPayViewModel(
   val state = MutableLiveData<LNUrlPayState>(LNUrlPayState.Init)
   val amountState = MutableLiveData<LNUrlPayAmountState>(LNUrlPayAmountState.Pristine)
 
-  suspend fun saveSuccessAction(paymentHash: ByteVector32, action: LNUrlPayActionData) {
-    paymentMetaRepository.saveLNUrlPaySuccessAction(paymentHash.toString(), action)
+  suspend fun saveLNUrlInfo(paymentId: String, action: LNUrlPayActionData?) {
+    paymentMetaRepository.saveLNUrlPayInfo(paymentId, callbackUrl, action)
   }
 
   class Factory(

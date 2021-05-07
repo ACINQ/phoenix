@@ -445,6 +445,7 @@
     <br /><br />
     To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
   ]]></string>
+  <string name="paymentdetails_lnurlpay_service_label">Service</string>
 
   <string name="paymentdetails_technicals_button">Show details</string>
 

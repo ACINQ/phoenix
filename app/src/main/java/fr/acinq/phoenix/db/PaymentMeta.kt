@@ -22,6 +22,8 @@ import fr.acinq.eclair.`package$`
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
+import okhttp3.HttpUrl
 
 enum class LNUrlPayActionTypeVersion {
   URL_V0,
@@ -56,7 +58,13 @@ enum class ClosingType(val code: Long) {
 
 fun PaymentMeta.getSpendingTxs(): List<String>? = closing_spending_txs?.split(";")?.map { it.trim() }
 
-fun PaymentMeta.getSuccessAction(): LNUrlPayActionData? = null
+fun PaymentMeta.getSuccessAction(): LNUrlPayActionData? = if (lnurlpay_action_typeversion != null && lnurlpay_action_data != null) {
+  when (lnurlpay_action_typeversion) {
+    LNUrlPayActionTypeVersion.MESSAGE_V0 -> Json.decodeFromString<LNUrlPayActionData.Message.V0>(lnurlpay_action_data).let { LNUrlPayActionData.Message.V0(it.message) }
+    LNUrlPayActionTypeVersion.URL_V0 -> Json.decodeFromString<LNUrlPayActionData.Url.V0>(lnurlpay_action_data).let { LNUrlPayActionData.Url.V0(it.description, it.url) }
+    LNUrlPayActionTypeVersion.AES_V0 -> Json.decodeFromString<LNUrlPayActionData.Aes.V0>(lnurlpay_action_data).let { LNUrlPayActionData.Aes.V0(it.description, it.cipherText, it.iv) }
+  }
+} else null
 
 class PaymentMetaRepository private constructor(private val queries: PaymentMetaQueries) {
 
@@ -90,14 +98,18 @@ class PaymentMetaRepository private constructor(private val queries: PaymentMeta
     }
   }
 
-  fun saveLNUrlPaySuccessAction(paymentId: String, action: LNUrlPayActionData) {
-    get(paymentId) ?: insert(paymentId)
-    val (typeversion, data) = when (action) {
-      is LNUrlPayActionData.Message.V0 -> LNUrlPayActionTypeVersion.MESSAGE_V0 to Json.encodeToString(action)
-      is LNUrlPayActionData.Url.V0 -> LNUrlPayActionTypeVersion.URL_V0 to Json.encodeToString(action)
-      is LNUrlPayActionData.Aes.V0 -> LNUrlPayActionTypeVersion.AES_V0 to Json.encodeToString(action)
+  fun saveLNUrlPayInfo(paymentId: String, url: HttpUrl, action: LNUrlPayActionData?) {
+    queries.transaction {
+      get(paymentId) ?: insert(paymentId)
+      queries.setLNUrlPayUrl(url.toString(), paymentId)
+      val (typeversion, data) = when (action) {
+        is LNUrlPayActionData.Message.V0 -> LNUrlPayActionTypeVersion.MESSAGE_V0 to Json.encodeToString(action)
+        is LNUrlPayActionData.Url.V0 -> LNUrlPayActionTypeVersion.URL_V0 to Json.encodeToString(action)
+        is LNUrlPayActionData.Aes.V0 -> LNUrlPayActionTypeVersion.AES_V0 to Json.encodeToString(action)
+        else -> null to null
+      }
+      queries.setLNUrlPayAction(typeversion, data, paymentId)
     }
-    queries.setLNUrlPayAction(typeversion, data, paymentId)
   }
 
   companion object {

@@ -55,6 +55,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -103,43 +104,54 @@ class PaymentDetailsFragment : BaseFragment() {
     })
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
-        is PaymentDetailsState.Outgoing.Pending -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))
-          mBinding.amountValue.setAmount(state.amountToRecipient)
-          showStatusIconAndDetails(R.drawable.ic_send_lg, R.attr.mutedTextColor)
-        }
-        is PaymentDetailsState.Outgoing.Failed -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
-          // use error of the last subpayment as it's probably the most pertinent
-          when (state.failureType) {
-            is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
-            is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
-            is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
-            is OutgoingFailure.TrampolineFee -> {
-              mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
-              mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
-              mBinding.errorAction.setOnClickListener {
-                findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
-              }
+        is PaymentDetailsState.Outgoing -> {
+          val meta = model.paymentMeta.value
+          val successAction = meta?.getSuccessAction()
+          if (meta?.lnurlpay_url != null) {
+            mBinding.lnurlPayServiceValue.text = try {
+              HttpUrl.parse(meta.lnurlpay_url)?.topPrivateDomain()
+            } catch (e: Exception) {
+              getString(R.string.utils_unknown)
             }
           }
-
-          mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
-          showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
-        }
-        is PaymentDetailsState.Outgoing.Sent -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
-          mBinding.feesValue.setAmount(state.fees)
-          mBinding.amountValue.setAmount(state.amountToRecipient)
-          showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
-          if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
-            model.paymentMeta.value?.run {
-              if (closing_type != ClosingType.Mutual.code) {
-                mBinding.infoLayout.visibility = View.VISIBLE
-                val address = app.state.value?.getFinalAddress() ?: closing_main_output_script ?: ""
-                mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
+          when (state) {
+            is PaymentDetailsState.Outgoing.Pending -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))
+              mBinding.amountValue.setAmount(state.amountToRecipient)
+              showStatusIconAndDetails(R.drawable.ic_send_lg, R.attr.mutedTextColor)
+            }
+            is PaymentDetailsState.Outgoing.Failed -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
+              // use error of the last subpayment as it's probably the most pertinent
+              when (state.failureType) {
+                is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
+                is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
+                is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
+                is OutgoingFailure.TrampolineFee -> {
+                  mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
+                  mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
+                  mBinding.errorAction.setOnClickListener {
+                    findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
+                  }
+                }
+              }
+              mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
+              showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
+            }
+            is PaymentDetailsState.Outgoing.Sent -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
+              mBinding.feesValue.setAmount(state.fees)
+              mBinding.amountValue.setAmount(state.amountToRecipient)
+              showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
+              if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
+                if (meta?.closing_type != ClosingType.Mutual.code) {
+                  val address = app.state.value?.getFinalAddress() ?: meta?.closing_main_output_script ?: ""
+                  mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
+                  mBinding.infoLayout.visibility = View.VISIBLE
+                }
               }
             }
+            else -> Unit
           }
         }
         is PaymentDetailsState.Incoming.Pending -> {
@@ -298,6 +310,7 @@ sealed class PaymentDetailsState {
     object Generic : Error()
     object NotFound : Error()
   }
+
 }
 
 sealed class OutgoingFailure {

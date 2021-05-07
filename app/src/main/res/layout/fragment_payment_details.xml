@@ -246,6 +246,35 @@
             app:layout_constraintStart_toEndOf="@id/destination_label"
             app:layout_constraintTop_toBottomOf="@id/onchain_address_explorer_button" />
 
+          <!-- LNURL-pay fields -->
+
+          <TextView
+            android:id="@+id/lnurl_pay_service_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_lnurlpay_service_label"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBaseline_toBaselineOf="@id/lnurl_pay_service_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:visible="@{model.paymentMeta.lnurlpay_url != null}" />
+
+          <TextView
+            android:id="@+id/lnurl_pay_service_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:text="@string/utils_unknown"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/lnurl_pay_service_label"
+            app:layout_constraintTop_toBottomOf="@id/destination_pubkey"
+            app:visible="@{model.paymentMeta.lnurlpay_url != null}" />
+
+          <!-- end of LNURL-pay fields -->
+
           <TextView
             android:id="@+id/desc_label"
             style="@style/MutedLabelView"
@@ -265,7 +294,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/desc_label"
-            app:layout_constraintTop_toBottomOf="@id/destination_pubkey"
+            app:layout_constraintTop_toBottomOf="@id/lnurl_pay_service_value"
             app:layout_constraintWidth_default="spread">
 
             <TextView

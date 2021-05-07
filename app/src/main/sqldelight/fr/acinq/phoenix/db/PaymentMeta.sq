@@ -29,6 +29,7 @@ CREATE TABLE PaymentMeta (
 
   custom_desc TEXT DEFAULT NULL,
 
+  lnurlpay_url TEXT DEFAULT NULL,
   lnurlpay_action_typeversion TEXT AS LNUrlPayActionTypeVersion DEFAULT NULL,
   lnurlpay_action_data TEXT DEFAULT NULL
 );
@@ -56,6 +57,11 @@ VALUES (?, ?, ?, ?);
 insertClosing:
 INSERT INTO PaymentMeta(id, closing_type, closing_channel_id, closing_spending_txs, closing_main_output_script)
 VALUES (?, ?, ?, ?, ?);
+
+setLNUrlPayUrl:
+UPDATE PaymentMeta
+SET lnurlpay_url=?
+WHERE id=?;
 
 setLNUrlPayAction:
 UPDATE PaymentMeta
