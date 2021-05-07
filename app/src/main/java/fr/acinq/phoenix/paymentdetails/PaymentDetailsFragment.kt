@@ -80,8 +80,7 @@ class PaymentDetailsFragment : BaseFragment() {
       PaymentDetailsViewModel.Factory(appContext.applicationContext,
         paymentId = args.identifier,
         paymentMetaRepository = PaymentMetaRepository.getInstance(paymentMetaQueries),
-        payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(payToOpenMetaQueries),
-        nodeMetaRepository = NodeMetaRepository.getInstance(nodeMetaQueries))
+        payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(payToOpenMetaQueries))
     }
   }
 
@@ -312,13 +311,11 @@ class PaymentDetailsViewModel(
   private val appContext: Context,
   private val paymentId: String,
   private val paymentMetaRepository: PaymentMetaRepository,
-  private val payToOpenMetaRepository: PayToOpenMetaRepository,
-  private val nodeMetaRepository: NodeMetaRepository
+  private val payToOpenMetaRepository: PayToOpenMetaRepository
 ) : ViewModel() {
 
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<PaymentDetailsState>()
-  val recipientMeta = MutableLiveData<NodeMeta>()
   val paymentMeta = MutableLiveData<PaymentMeta>()
   val payToOpenMeta = MutableLiveData<PayToOpenMeta>()
 
@@ -427,7 +424,6 @@ class PaymentDetailsViewModel(
     }
     val paymentMeta = paymentMetaRepository.get(paymentId)
     val amountToRecipient = payments.first().recipientAmount()
-    updateRecipientMeta(payments.first().recipientNodeId().toString())
     val description = payments.first().paymentRequest()?.run {
       if (isDefined) {
         get().description()?.let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
@@ -509,14 +505,6 @@ class PaymentDetailsViewModel(
     }
   }
 
-  private fun updateRecipientMeta(nodeId: String) {
-    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.error("failed to retrieve recipient metadata: ", e)
-    }) {
-      nodeMetaRepository.get(nodeId)?.let { recipientMeta.postValue(it) }
-    }
-  }
-
   fun saveCustomDescription(desc: String) {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
       log.error("failed to save description=$desc for payment=$paymentId: ", e)
@@ -535,11 +523,10 @@ class PaymentDetailsViewModel(
     private val paymentId: String,
     private val paymentMetaRepository: PaymentMetaRepository,
     private val payToOpenMetaRepository: PayToOpenMetaRepository,
-    private val nodeMetaRepository: NodeMetaRepository,
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-      return PaymentDetailsViewModel(appContext, paymentId, paymentMetaRepository, payToOpenMetaRepository, nodeMetaRepository) as T
+      return PaymentDetailsViewModel(appContext, paymentId, paymentMetaRepository, payToOpenMetaRepository) as T
     }
   }
 }
