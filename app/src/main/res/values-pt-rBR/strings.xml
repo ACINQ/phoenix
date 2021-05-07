@@ -128,7 +128,7 @@
   
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
   <string name="receive_swap_in_info"><![CDATA[
-   Este endereço é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
+   Este endereço bitcoin é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
     <br /><br />
     O depósito precisa ser de no mínimo <b>%1$s</b>. Taxa <b>%2$s%%</b> (<b>%3$s</b> taxa mínima).
   ]]></string>
