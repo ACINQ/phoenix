@@ -146,7 +146,7 @@ dependencies {
   implementation "androidx.viewpager2:viewpager2:$view_pager_version"
 
   // SQLDelight
-  implementation "com.squareup.sqldelight:android-driver:1.4.4"
+  implementation "com.squareup.sqldelight:android-driver:1.5.0"
 
   // logging
   implementation 'org.slf4j:slf4j-api:1.7.30'
