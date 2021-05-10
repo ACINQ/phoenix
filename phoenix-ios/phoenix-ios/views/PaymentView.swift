@@ -56,7 +56,11 @@ fileprivate struct SummaryView: View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	init(payment: PhoenixShared.Lightning_kmpWalletPayment, closeSheet: @escaping () -> Void) {
-		self.payment = payment
+	//	self.payment = payment
+		// ^^^ This compiles on Xcode 12.5, but crashes on the device.
+		// To be more specific, it seems to crash on _some_ devices, and only when running in Release mode.
+		self._payment = State<PhoenixShared.Lightning_kmpWalletPayment>(initialValue: payment)
+		
 		self.closeSheet = closeSheet
 	}
 	

@@ -179,11 +179,10 @@ struct HomeView : MVIView, ViewName {
 					}
 				}
 				.sheet(isPresented: .constant(selectedPayment != nil)) {
-					selectedPayment = nil
-				} content: {
+					
 					PaymentView(
 						payment: selectedPayment!,
-						closeSheet: { selectedPayment = nil }
+						closeSheet: { self.selectedPayment = nil }
 					)
 					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 				}
