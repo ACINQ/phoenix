@@ -446,6 +446,18 @@
     To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
   ]]></string>
   <string name="paymentdetails_lnurlpay_service_label">Service</string>
+  <string name="paymentdetails_lnurlpay_success_action_label">Message</string>
+  <string name="paymentdetails_lnurlpay_success_action_url"><![CDATA[
+  %1$s
+  <br /><br />
+  <a href="%2$s">Open Link</a>
+  ]]></string>
+  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes"><![CDATA[
+  %1$s
+  <br />
+  <b>%2$s</b>
+  ]]></string>
+  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes_failure">Message from service could not be decrypted.</string>
 
   <string name="paymentdetails_technicals_button">Show details</string>
 

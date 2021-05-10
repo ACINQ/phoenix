@@ -51,10 +51,7 @@ import fr.acinq.phoenix.databinding.FragmentPaymentDetailsBinding
 import fr.acinq.phoenix.db.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.Wallet.simpleExecute
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.HttpUrl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -106,7 +103,6 @@ class PaymentDetailsFragment : BaseFragment() {
       when (state) {
         is PaymentDetailsState.Outgoing -> {
           val meta = model.paymentMeta.value
-          val successAction = meta?.getSuccessAction()
           if (meta?.lnurlpay_url != null) {
             mBinding.lnurlPayServiceValue.text = try {
               HttpUrl.parse(meta.lnurlpay_url)?.topPrivateDomain()
@@ -149,6 +145,11 @@ class PaymentDetailsFragment : BaseFragment() {
                   mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
                   mBinding.infoLayout.visibility = View.VISIBLE
                 }
+              }
+              when (val successAction = meta?.getSuccessAction()) {
+                is LNUrlPayActionData.Message.V0 -> mBinding.lnurlPaySuccessActionValue.text = successAction.message
+                is LNUrlPayActionData.Url.V0 -> mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
+                is LNUrlPayActionData.Aes.V0 -> decryptLNUrlPayAes(successAction)
               }
             }
             else -> Unit
@@ -240,6 +241,25 @@ class PaymentDetailsFragment : BaseFragment() {
     } else {
       mBinding.midSection.visibility = View.VISIBLE
       mBinding.bottomSection.visibility = View.VISIBLE
+    }
+  }
+
+  private fun decryptLNUrlPayAes(data: LNUrlPayActionData.Aes.V0) {
+    lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
+      log.error("failed to decrypt lnurl_pay aes action=$data: ", exception)
+      lifecycleScope.launch(Dispatchers.Main) {
+        mBinding.lnurlPaySuccessActionValue.text = getString(R.string.paymentdetails_lnurlpay_success_action_aes_failure)
+      }
+    }) {
+      val preimage = ByteVector32.fromValidHex(model.preimage.value)
+      if (preimage == null) {
+        throw RuntimeException("payment preimage is null")
+      } else {
+        val text = data.decrypt(preimage)
+        lifecycleScope.launch(Dispatchers.Main) {
+          mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_aes, data.description, text))
+        }
+      }
     }
   }
 

@@ -32,7 +32,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.eclair.*
 import fr.acinq.eclair.payment.PaymentRequest

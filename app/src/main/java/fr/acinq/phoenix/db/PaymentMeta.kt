@@ -16,14 +16,20 @@
 
 package fr.acinq.phoenix.db
 
+import android.util.Base64
+import androidx.annotation.WorkerThread
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.Transaction
 import fr.acinq.eclair.`package$`
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 import okhttp3.HttpUrl
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 enum class LNUrlPayActionTypeVersion {
   URL_V0,
@@ -48,7 +54,14 @@ sealed class LNUrlPayActionData {
   @Serializable
   sealed class Aes : LNUrlPayActionData() {
     @Serializable
-    data class V0(val description: String, val cipherText: String, val iv: String) : Aes()
+    data class V0(val description: String, val cipherText: String, val iv: String) : Aes() {
+      @WorkerThread
+      fun decrypt(preimage: ByteVector32): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(preimage.bytes().toArray(), "AES"), IvParameterSpec(Base64.decode(iv, Base64.DEFAULT)))
+        return String(cipher.doFinal(Base64.decode(cipherText, Base64.DEFAULT)), Charsets.UTF_8)
+      }
+    }
   }
 }
 
