@@ -148,7 +148,10 @@ class PaymentDetailsFragment : BaseFragment() {
               }
               when (val successAction = meta?.getSuccessAction()) {
                 is LNUrlPayActionData.Message.V0 -> mBinding.lnurlPaySuccessActionValue.text = successAction.message
-                is LNUrlPayActionData.Url.V0 -> mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
+                is LNUrlPayActionData.Url.V0 -> {
+                  mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
+                  mBinding.lnurlPaySuccessActionValue.movementMethod = LinkMovementMethod.getInstance()
+                }
                 is LNUrlPayActionData.Aes.V0 -> decryptLNUrlPayAes(successAction)
               }
             }
