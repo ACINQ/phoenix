@@ -70,10 +70,10 @@
         android:alpha=".15"
         android:contentDescription="@null"
         android:src="@drawable/ic_send_lg"
-        android:tint="?attr/mutedTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:tint="?attr/mutedTextColor"
         app:visible="@{model.isFormVisible()}" />
 
       <fr.acinq.phoenix.utils.customviews.ActionBarView
@@ -90,6 +90,7 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:padding="@dimen/space_md"
+        android:visibility="@{model.isFormVisible()}"
         app:layout_constraintBottom_toBottomOf="@id/action_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
@@ -132,16 +133,48 @@
         app:text_size="@dimen/text_lg" />
 
       <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
-        android:padding="@dimen/space_md"
+        android:padding="@dimen/space_lg"
         android:text="@string/send_invalid_pr_generic"
-        android:visibility="@{model.state instanceof SendState.InvalidInvoice}"
+        android:background="@drawable/rounded"
+        android:visibility="@{model.state instanceof SendState.InvalidInvoice.Generic}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/balance_section"
-        app:layout_constraintWidth_max="@dimen/max_width_md" />
+        app:layout_constraintWidth_max="@dimen/max_width_sm" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/already_paid_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded"
+        android:layout_margin="@dimen/space_lg"
+        android:padding="@dimen/space_lg"
+        android:visibility="@{model.state instanceof SendState.InvalidInvoice.AlreadyPaid}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:layout_constraintWidth_max="@dimen/max_width_sm">
+
+        <TextView
+          android:id="@+id/already_paid_layout_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/send_invalid_pr_already_paid"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/already_paid_layout_button"
+          android:layout_width="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          android:layout_height="wrap_content"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/already_paid_layout_message"
+          app:text="@string/send_invalid_pr_already_paid_button" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/payment_section"

@@ -102,19 +102,8 @@
   <br /><br />
   Geld dat naar dit adres wordt gestuurd zal na 1 bevestiging in je wallet zichtbaar zijn.
   <br /><br />
-  Een <b>%1$s%%</b> vergoeding zal worden toegepast.
+  Een <b>%1$s%%</b> vergoeding zal worden toegepast (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Inkomende betaling</string>
-  <string name="receive_with_open_help_desc">Wat is dit?</string>
-  <string name="receive_with_open_help">Om Lightning betalingen te ontvangen heb je een kanaal nodig met voldoende inkomende liquiditeit.\n\nAls je die niet hebt, zal Phoenix indien nodig automatisch een kanaal voor je openen. De setup vergoeding dekt de kosten voor het openen van een kanaal en het toewijzen van liquiditeit.</string>
-  <string name="receive_with_open_amount_label">Je hebt een hangende inkomende betaling van</string>
-  <string name="receive_with_open_cost"><![CDATA[Het accepteren van deze betaling vereist een setup vergoeding van <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accepteren (expires in %1$ss)</string>
-  <string name="receive_with_open_decline">Afwijzen</string>
-  <string name="receive_with_open_expired">Deze betaling is verlopen!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -271,10 +260,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Verbinden met Electrum server…</string>
-  <string name="main_alert_network_lost">Je bent offline. Controleer je netwerkinstellingen…</string>
-  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning netwerk…</string>
-  <string name="main_alert_settings_button">Instellingen</string>
   <string name="main_swapin_incoming">+%1$s inkomend</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Verbinden…</string>
@@ -376,8 +361,6 @@
   <string name="lnurl_withdraw_error_amount">Bedrag is ongeldig.</string>
   <string name="lnurl_withdraw_error_amount_min">Bedrag moet minimaal %1$s zijn.</string>
   <string name="lnurl_withdraw_error_amount_max">Bedrag kan %1$s niet overschrijden.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s reageerde met een foutmelding: %2$s.\n\nProbeer opnieuw, of neem contact op met hun support.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Ongeldige data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

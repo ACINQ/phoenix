@@ -17,10 +17,12 @@
 package fr.acinq.phoenix.send
 
 import androidx.annotation.UiThread
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import fr.acinq.eclair.payment.PaymentRequest
-import fr.acinq.phoenix.R
 import fr.acinq.phoenix.lnurl.LNUrl
+import fr.acinq.phoenix.lnurl.LNUrlError
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.Dispatchers
@@ -36,10 +38,12 @@ sealed class ReadInputState {
     data class Onchain(val bitcoinUri: BitcoinURI) : Done()
     data class Url(val url: LNUrl) : Done()
   }
+
   sealed class Error : ReadInputState() {
     object PayToSelf : Error()
     object PaymentExpired : Error()
     object InvalidChain : Error()
+    data class ErrorInLNURLResponse(val error: LNUrlError) : Error()
     object UnhandledLNURL : Error()
     object UnhandledInput : Error()
   }
@@ -73,7 +77,10 @@ class ReadInputViewModel : ViewModel() {
             })
           } catch (e: Exception) {
             log.info("invalid lightning object: ${e.localizedMessage}")
-            inputState.postValue(ReadInputState.Error.UnhandledInput)
+            inputState.postValue(when (e) {
+              is LNUrlError -> ReadInputState.Error.ErrorInLNURLResponse(e)
+              else -> ReadInputState.Error.UnhandledInput
+            })
           }
         }
       }

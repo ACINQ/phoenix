@@ -101,19 +101,8 @@
   <br /><br />
   Finance poslané na tuto adresu se zobrazí po jednom potvrzení.
   <br /><br />
-  Poplatek <b>%1$s%%</b> bude aplikován.
+  Poplatek <b>%1$s%%</b> bude aplikován (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Příchozí platba</string>
-  <string name="receive_with_open_help_desc">Co to je?</string>
-  <string name="receive_with_open_help">Pro přijetí Lightning platby musíte mít dostatečnou příchozí likviditu.\n\nPokud žádnou nemáte, Phoenix automaticky vytvoří kanál dle potřeby. Zřizovací poplatek pokryje cenu vytvoření kanálu a přidání likvidity do něj.</string>
-  <string name="receive_with_open_amount_label">Máte nevyřízenou příchozí platbu</string>
-  <string name="receive_with_open_cost"><![CDATA[Přijmutí této platby vyžaduje zřizovací poplatek <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Přijmout (vyprší za %1$ss)</string>
-  <string name="receive_with_open_decline">Odmítnout</string>
-  <string name="receive_with_open_expired">Tato platba vypršela!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -271,10 +260,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Připojování k electrum serveru…</string>
-  <string name="main_alert_network_lost">Jste offline. Prosím, zkontrolujte vaše připojení…</string>
-  <string name="main_alert_lightning_connection_lost">Nepodařilo se připojit k Lightning síti…</string>
-  <string name="main_alert_settings_button">Nastavení</string>
   <string name="main_swapin_incoming">Příchozí +%1$s</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_tor_connected_button">Tor aktivní</string>
@@ -376,8 +361,6 @@
   <string name="lnurl_withdraw_error_amount">Neplatné množství.</string>
   <string name="lnurl_withdraw_error_amount_min">Množství musí být alespoň %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Množství nesmí překročit %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s odpověděl s chybou: %2$s.\n\nZkuste to znovu, nebo kontaktujte podporu.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Neplatná data</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

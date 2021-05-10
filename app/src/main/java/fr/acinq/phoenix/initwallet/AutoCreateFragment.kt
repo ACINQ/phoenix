@@ -30,7 +30,6 @@ import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentInitWalletAutoCreateBinding
-import fr.acinq.phoenix.utils.crypto.KeystoreHelper
 import fr.acinq.phoenix.utils.Wallet
 import fr.acinq.phoenix.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.utils.crypto.SeedManager

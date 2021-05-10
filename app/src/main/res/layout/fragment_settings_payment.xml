@@ -55,15 +55,6 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_defaultdesc_title" />
 
-        <fr.acinq.phoenix.utils.customviews.SwitchView
-          android:id="@+id/pay_to_open_auto_switch"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          app:icon="@color/transparent"
-          app:layout_constraintTop_toBottomOf="@id/default_description_button"
-          app:subtitle="@string/paymentsettings_paytoopen_auto_desc"
-          app:text="@string/paymentsettings_paytoopen_auto_title" />
-
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/trampoline_fees_button"
           android:layout_width="match_parent"
@@ -72,9 +63,21 @@
           android:background="@drawable/button_bg_square"
           app:hz_bias="0"
           app:icon="@color/transparent"
-          app:layout_constraintTop_toBottomOf="@id/pay_to_open_auto_switch"
+          app:layout_constraintTop_toBottomOf="@id/default_description_button"
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_trampoline_fees_title" />
+
+        <fr.acinq.phoenix.utils.customviews.ButtonView
+          android:id="@+id/pay_to_open_fees_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:background="@drawable/button_bg_square"
+          app:hz_bias="0"
+          app:icon="@color/transparent"
+          app:layout_constraintTop_toBottomOf="@id/trampoline_fees_button"
+          app:spacer_size="@dimen/space_md"
+          app:text="@string/paymentsettings_paytoopen_fees_title" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

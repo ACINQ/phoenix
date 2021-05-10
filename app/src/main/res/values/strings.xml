@@ -118,11 +118,38 @@
   <string name="receive_share_title">Share this payment request with…</string>
   <string name="receive_share_button">Share…</string>
 
+  <string name="receive_min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
+  <string name="receive_paytoopen_disabled">Channel creation has been temporarily disabled. You may not be able to receive some payments.</string>
+  <string name="receive_paytoopen_disabled_nochannels">Channel creation has been temporarily disabled. You will not be able to receive any payments.</string>
   <string name="receive_address_label">Address</string>
   <string name="receive_withdraw_button">Use LNURL link</string>
 
   <string name="receive_swap_in_button">Show a Bitcoin address</string>
-  <string name="receive_swap_in_error_message">There was an error when swapping to Bitcoin address…\n\nPlease try again.</string>
+  <string name="receive_swap_in_info"><![CDATA[
+    This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels.
+    <br /><br />
+    Deposits must be at least <b>%1$s</b>. The fee is <b>%2$s%%</b> (<b>%3$s</b> minimum).
+  ]]></string>
+  <string name="receive_swap_in_error_message">Could not get a Bitcoin address from the swap service.\n\nPlease try again later.</string>
+  <string name="receive_swap_in_unknown"><![CDATA[
+    <b>Unavailable</b>
+    <br /><br />
+    Please try again later.
+  ]]></string>
+  <string name="receive_swap_in_disabled"><![CDATA[
+    <b>Service disabled</b>
+    <br /><br />
+    The on-chain deposit swap service has been temporarily disabled.
+    <br /><br />
+    Try again later.
+  ]]></string>
+  <string name="receive_swap_in_disabled_mempool"><![CDATA[
+    <b>Service disabled</b>
+    <br /><br />
+    The Bitcoin mempool is congested and fees are very high. The on-chain deposit swap service has been temporarily disabled.
+    <br /><br />
+    Try again later.
+  ]]></string>
   <string name="receive_swap_in_progress_message">Requesting a Bitcoin address…</string>
   <string name="receive_swap_in_disclaimer_title">Receive with a Bitcoin address</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
@@ -130,19 +157,8 @@
   <br /><br />
   Funds sent to this address will be shown on your wallet after one confirmation.
   <br /><br />
-  A <b>%1$s%%</b> fee will be applied.
+  A <b>%1$s%%</b> fee will be applied (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Incoming Payment</string>
-  <string name="receive_with_open_help_desc">What\'s this?</string>
-  <string name="receive_with_open_help">In order to receive payments on Lightning, you need to have a channel with enough inbound liquidity.\n\nIf you don\'t have one, Phoenix will automatically create a channel on-the-fly as needed. The setup fee covers the cost of creating the channel and allocating liquidity to it.</string>
-  <string name="receive_with_open_amount_label">You have a pending incoming payment of</string>
-  <string name="receive_with_open_cost"><![CDATA[Accepting this payment requires a setup fee of <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accept (expires in %1$ss)</string>
-  <string name="receive_with_open_decline">Decline</string>
-  <string name="receive_with_open_expired">This payment has expired!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -153,6 +169,8 @@
   <string name="send_use_all_balance">Send all</string>
   <string name="send_loading">Checking payment…</string>
   <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
+  <string name="send_invalid_pr_already_paid">This payment has already been paid.</string>
+  <string name="send_invalid_pr_already_paid_button">Open payment</string>
   <string name="send_amount_error">Please enter a valid amount.</string>
   <string name="send_amount_error_balance">Amount exceeds your balance.</string>
   <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
@@ -188,6 +206,14 @@
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
+  <string name="scan_error_lnurl_failure_generic"><![CDATA[The LNURL Service <b>%1$s</b> returned an error.]]></string>
+  <string name="scan_error_lnurl_failure_code"><![CDATA[The LNURL Service <b>%1$s</b> returned a %2$d HTTP error code.]]></string>
+  <string name="scan_error_lnurl_failure_detailed"><![CDATA[
+    The LNURL Service <b>%1$s</b> returned an error:
+    <br/><br/>
+    <em>%2$s</em>
+  ]]></string>
+  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[The LNURL Service <b>%1$s</b> returned an invalid message.]]></string>
   <string name="scan_error_invalid_scan">Invalid data.\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>
@@ -213,6 +239,7 @@
   <string name="utils_cancel">Cancel</string>
   <string name="utils_date_just_now">just now</string>
   <string name="utils_unknown">N/A</string>
+  <string name="utils_unavailable">Unavailable</string>
   <string name="utils_copied">Copied to clipboard!</string>
   <string name="btn_back">Go back</string>
   <string name="btn_ok">OK</string>
@@ -238,7 +265,7 @@
   <string name="settings_force_close">Danger zone</string>
   <string name="settings_tor">Tor</string>
   <string name="settings_about">About</string>
-  <string name="settings_payment_settings">Payment settings</string>
+  <string name="settings_payment_settings">Payment options and fees</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
@@ -259,6 +286,9 @@
 
   <string name="notif_pay_to_open_title">Accept incoming payment</string>
   <string name="notif_pay_to_open_message">Tap to open the app</string>
+
+  <string name="notif__pay_to_open_missed_title">Missed payment (%1$s)</string>
+  <string name="notif__pay_to_open_missed_message">The amount incoming was too small to create a new payment channel.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -316,8 +346,8 @@
 
   <string name="channel_loading">Retrieving channel data…</string>
   <string name="channel_error">Could not retrieve the details for this channel. Please try again later.</string>
-  <string name="channel_send">Send</string>
-  <string name="channel_receive">Receive</string>
+  <string name="channel_balance">Balance</string>
+  <string name="channel_capacity">Capacity</string>
 
   <!-- //////////////// menu //////////////// -->
 
@@ -327,15 +357,12 @@
 
   <!-- //////////////// init wallet //////////////// -->
 
+  <string name="initwallet_terms"><![CDATA[I have read and agree with<br/>the <a href="https://phoenix.acinq.co/terms">terms of usage</a>.]]></string>
   <string name="initwallet_create">Create new wallet</string>
   <string name="initwallet_restore">Restore my wallet</string>
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connecting to Electrum server…</string>
-  <string name="main_alert_network_lost">You are offline. Please check your network settings…</string>
-  <string name="main_alert_lightning_connection_lost">Could not reach the Lightning network…</string>
-  <string name="main_alert_settings_button">Settings</string>
   <string name="main_swapin_incoming">+%1$s incoming</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Connecting…</string>
@@ -503,14 +530,34 @@
   <string name="lnurl_withdraw_service_host_label"><![CDATA[You are redeeming funds from<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Redeem</string>
   <string name="lnurl_withdraw_wait">Redeeming funds…</string>
-  <string name="lnurl_withdraw_success">Please hold while %1$s is sending funds.\n\nKeep the app online.</string>
+  <string name="lnurl_withdraw_success">%1$s will send you the funds, it can take some time.\n\nKeep the app online.</string>
   <string name="lnurl_withdraw_error_internal">Could not redeem the payment. Please try again.</string>
   <string name="lnurl_withdraw_error_invalid">This request to redeem payment is invalid. Please try again.</string>
   <string name="lnurl_withdraw_error_amount">Amount is invalid.</string>
   <string name="lnurl_withdraw_error_amount_min">Amount must be at least %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Amount cannot exceed %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s responded with an error: %2$s.\n\nTry again later, or contact their support.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Invalid data</string>
+  <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
+    <b>%1$s</b> returned an error, or an invalid response.
+    <br/><br/>
+    Try again later, or contact their support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_unreadable"><![CDATA[
+    The withdrawal may have failed. <b>%1$s</b> returned an unreadable response.
+    <br/><br/>
+    Try again later, or contact their support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_code"><![CDATA[
+    The withdrawal failed. <b>%1$s</b> returned a %2$d HTTP error code.
+    <br/><br/>
+    Try again later, or contact their support.
+  ]]></string>
+  <string name="lnurl_withdraw_error_remote_detailed"><![CDATA[
+    The withdrawal failed. <b>%1$s</b> returned the following error:
+    <br/><br/>
+    <em>%2$s</em>
+    <br/><br/>—<br/>
+    Try again later, or contact their support.
+  ]]></string>
 
   <!-- //////////////// display preferences //////////////// -->
 
@@ -591,6 +638,8 @@
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
   ]]></string>
+  <string name="about_terms">Terms of usage</string>
+  <string name="about_privacy">Privacy</string>
 
   <!-- //////////////// background node service //////////////// -->
 
@@ -598,19 +647,14 @@
 
   <!-- //////////////// settings: options for payments //////////////// -->
 
-  <string name="paymentsettings_title">Payment settings</string>
-  <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
+  <string name="paymentsettings_title">Payment options and fees</string>
+  <string name="paymentsettings_subtitle">Set various options and fees for payments you send or receive.</string>
 
   <string name="paymentsettings_defaultdesc_title">Default payment description</string>
   <string name="paymentsettings_defaultdesc_none">No description set…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
   <string name="paymentsettings_defaultdesc_dialog_description">Payment requests that you create will use this description. You can override it on a case-by-case basis.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
-
-  <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
-  <string name="paymentsettings_paytoopen_auto_desc">It is sometimes necessary to create a new Lightning payment channel in order to receive an incoming payment.\n\nIn this case a fee of %1$s%% is deducted from the amount received, to cover the cost of creating the channel.</string>
-  <string name="paymentsettings_paytoopen_dialog_title">Are you sure?</string>
-  <string name="paymentsettings_paytoopen_dialog_description">The app will automatically create a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the amount received, to cover the cost of creating the channel.</string>
 
   <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
@@ -620,16 +664,31 @@
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
 
+  <string name="paymentsettings_paytoopen_fees_title">Fee for on the fly channel creation</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s minimum)</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">On the fly channels</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+    This fee applies when you receive a payment over Lightning and a new channel needs to be created.
+    <br /><br />
+    See <a href="https://phoenix.acinq.co/faq#what-are-the-fees">the FAQ</a> for more information.
+  ]]></string>
+
   <!-- ftue -->
 
   <string name="ftue__bullet_1" translatable="false">●○○</string>
   <string name="ftue__bullet_2" translatable="false">○●○</string>
   <string name="ftue__bullet_3" translatable="false">○○●</string>
-  <string name="ftue__skip_button">Skip</string>
   <string name="ftue__welcome__header">Welcome!</string>
   <string name="ftue__welcome__body">With Phoenix, receiving and sending bitcoins is safe, easy, and fast.</string>
   <string name="ftue__pay_to_open__header">Automatic channel creation</string>
-  <string name="ftue__pay_to_open__body">Payment channels will be automatically created for you if needed. There is a small cost: %1$s%%. For example, to receive $100, the fee would be 10 cents.\n\nYou can also control this manually.</string>
+  <string name="ftue__pay_to_open__body"><![CDATA[
+    Payment channels are automatically created when needed.
+    <br /><br />
+    The fee is <b>%1$s%%</b><br/>with a minimum: not less than <b>%2$s</b>.
+    <br /><br />
+    For example, to receive 250 000 sat, the channel creation fee would be %2$s.
+  ]]></string>
+  <string name="ftue__pay_to_open__button">I understand</string>
   <string name="ftue__backup_seed__header">Keep control</string>
   <string name="ftue__backup_seed__body">A backup phrase is generated, storing all the information needed to recover your Bitcoin funds.\n\nKeep it safe and secret!</string>
   <string name="ftue__backup_seed__button">Get started</string>
@@ -650,5 +709,15 @@
     <p>The app lock now uses the system\'s lock. No need to remember yet another PIN!</p>
     <p>Go to Settings > Security to enroll for the new screen lock feature.</p>
   ]]></string>
+  <string name="patchnotes_v23"><![CDATA[
+    <h4>Fee increase for new channels</h4>
+    <p>The fee rate for new channels stays the same (%1$s%%), but there is now a <b>%2$s</b> minimum fee.</p>
+    <p>If someone sends you 15 000 sat and you don\'t have any channels, a new channel will be created and you will receive 14 000 sat.</p>
+  ]]></string>
+
+  <string name="paymentmode_onchain">Pay on-chain</string>
+  <string name="paymentmode_onchain_desc">On-chain transactions are typically slower and more expensive</string>
+  <string name="paymentmode_lightning">Pay with Lightning</string>
+  <string name="paymentmode_lightning_desc">This is the recommended option</string>
 
 </resources>

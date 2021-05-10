@@ -68,7 +68,6 @@ object Prefs {
 
   // -- payment configuration
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
-  const val PREFS_AUTO_ACCEPT_PAY_TO_OPEN = "PREFS_AUTO_ACCEPT_PAY_TO_OPEN"
   const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
   const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
 
@@ -300,14 +299,6 @@ object Prefs {
 
   fun setDefaultPaymentDescription(context: Context, value: String) {
     return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, value).apply()
-  }
-
-  fun getAutoAcceptPayToOpen(context: Context): Boolean {
-    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, true)
-  }
-
-  fun setAutoAcceptPayToOpen(context: Context, value: Boolean) {
-    return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_ACCEPT_PAY_TO_OPEN, value).apply()
   }
 
   fun getMaxTrampolineCustomFee(context: Context): TrampolineFeeSetting? {

@@ -32,7 +32,9 @@ import fr.acinq.phoenix.BaseFragment
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentSettingsMutualCloseBinding
 import fr.acinq.phoenix.utils.AlertHelper
+import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Wallet
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
@@ -95,8 +97,9 @@ class MutualCloseFragment : BaseFragment() {
       model.state.value = MutualCloseState.ERROR
       Handler().postDelayed({ model.state.value = PreChannelsCloseState.READY }, 2000)
     }) {
+      val address = BitcoinURI(mBinding.mutualCloseAddressInput.text.toString())
       model.state.value = MutualCloseState.IN_PROGRESS
-      app.requireService.mutualCloseAllChannels(mBinding.mutualCloseAddressInput.text.toString())
+      app.requireService.mutualCloseAllChannels(address.address)
       model.state.value = MutualCloseState.DONE
     }
   }

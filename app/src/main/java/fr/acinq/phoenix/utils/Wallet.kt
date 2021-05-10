@@ -33,6 +33,7 @@ import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.BuildConfig
 import fr.acinq.phoenix.background.Xpub
 import fr.acinq.phoenix.lnurl.LNUrl
+import fr.acinq.phoenix.lnurl.LNUrlError
 import fr.acinq.phoenix.utils.crypto.SeedManager
 import fr.acinq.phoenix.utils.tor.TorHelper
 import okhttp3.OkHttpClient
@@ -87,7 +88,7 @@ object Wallet {
     } else {
       DeterministicWallet.`KeyPath$`.`MODULE$`.apply("m/84'/1'/0'/0/0")
     }
-    return SingleAddressEclairWallet(fr.acinq.bitcoin.`package$`.`MODULE$`.computeBIP84Address(DeterministicWallet.derivePrivateKey(master, path).publicKey(), getChainHash()))
+    return SingleAddressEclairWallet(getChainHash(), DeterministicWallet.derivePrivateKey(master, path).publicKey())
   }
 
   fun buildXpub(master: DeterministicWallet.ExtendedPrivateKey): Xpub {
@@ -147,11 +148,16 @@ object Wallet {
             }
           }.run { LNUrl.extractLNUrl(this) }
         } catch (e3: Exception) {
-          log.debug("unhandled input=$input")
-          log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
-          log.debug("invalid as BitcoinURI: ${e2.localizedMessage}")
-          log.debug("invalid as LNURL: ", e3)
-          throw UnreadableLightningObject("not a readable lightning object: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
+          when (e3) {
+            is LNUrlError -> throw e3 // the input is correct, but the LNURL service returns an error that must be visible to the user.
+            else -> {
+              log.debug("unhandled input=$input")
+              log.debug("invalid as PaymentRequest: ${e1.localizedMessage}")
+              log.debug("invalid as BitcoinURI: ${e2.localizedMessage}")
+              log.debug("invalid as LNURL: ", e3)
+              throw UnreadableLightningObject("not a readable lightning object: ${e1.localizedMessage} / ${e2.localizedMessage} / ${e3.localizedMessage}")
+            }
+          }
         }
       }
     }

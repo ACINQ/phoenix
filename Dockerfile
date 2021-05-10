@@ -30,7 +30,7 @@ RUN git clone https://github.com/ACINQ/eclair -b $(cat eclair-core-version.txt)
 RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
 
 # main build image
-FROM ubuntu:19.10
+FROM ubuntu:20.10
 
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8

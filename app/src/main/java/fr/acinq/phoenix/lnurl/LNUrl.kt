@@ -31,19 +31,20 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-class LNUrlUnhandledTag(tag: String) : RuntimeException("unhandled LNURL tag=$tag")
-
-sealed class LNUrlRemoteFailure : java.lang.RuntimeException() {
-  object Generic : LNUrlRemoteFailure()
-  object CouldNotConnect : LNUrlRemoteFailure()
-  object Unreadable : LNUrlRemoteFailure()
-  data class Detailed(val reason: String) : LNUrlRemoteFailure()
-  data class Code(val code: Int) : LNUrlRemoteFailure()
+sealed class LNUrlError(message: String = "") : RuntimeException(message) {
+  object AuthMissingK1 : LNUrlError("missing parameter k1 in LNURL-auth url")
+  data class WithdrawAtLeastMinSat(val min: MilliSatoshi) : LNUrlError()
+  data class WithdrawAtMostMaxSat(val max: MilliSatoshi) : LNUrlError()
+  data class UnhandledTag(val tag: String) : LNUrlError("unhandled LNURL tag=$tag")
+  sealed class RemoteFailure : LNUrlError("service returned an error") {
+    abstract val origin: String
+    data class Generic(override val origin: String) : RemoteFailure()
+    data class CouldNotConnect(override val origin: String) : RemoteFailure()
+    data class Unreadable(override val origin: String) : RemoteFailure()
+    data class Detailed(override val origin: String, val reason: String) : RemoteFailure()
+    data class Code(override val origin: String, val code: Int) : RemoteFailure()
+  }
 }
-
-class LNUrlAuthMissingK1 : RuntimeException("missing parameter k1 in LNURL-auth url")
-class LNUrlWithdrawAtLeastMinSat(val min: MilliSatoshi) : RuntimeException()
-class LNUrlWithdrawAtMostMaxSat(val max: MilliSatoshi) : RuntimeException()
 
 interface LNUrl {
 
@@ -74,7 +75,7 @@ interface LNUrl {
       return if (url.queryParameter("tag") == "login") {
         val k1 = url.queryParameter("k1")
         if (k1 == null) {
-          throw LNUrlAuthMissingK1()
+          throw LNUrlError.AuthMissingK1
         } else {
           LNUrlAuth(url.toString(), k1)
         }
@@ -92,7 +93,7 @@ interface LNUrl {
             val desc = json.getString("defaultDescription")
             LNUrlWithdraw(url.toString(), callback.toString(), walletIdentifier, desc, minWithdrawable, maxWithdrawable)
           }
-          else -> throw LNUrlUnhandledTag(tag)
+          else -> throw LNUrlError.UnhandledTag(tag)
         }
       }
     }
@@ -105,6 +106,7 @@ interface LNUrl {
 
     fun handleLNUrlRemoteResponse(response: Response): JSONObject {
       val body = response.body()
+      val origin = response.request().url().run { topPrivateDomain() ?: host()}
       try {
         if (response.isSuccessful && body != null) {
           val json = JSONObject(body.string())
@@ -112,18 +114,21 @@ interface LNUrl {
           if (json.has("status") && json.getString("status").trim().equals("error", true)) {
             log.error("lnurl service responded with error: $json")
             val message = if (json.has("reason")) json.getString("reason") else "N/A"
-            throw LNUrlRemoteFailure.Detailed(message)
+            throw LNUrlError.RemoteFailure.Detailed(origin, message.take(160).replace("<", ""))
           } else {
             return json
           }
         } else if (!response.isSuccessful) {
-          throw LNUrlRemoteFailure.Code(response.code())
+          throw LNUrlError.RemoteFailure.Code(origin, response.code())
         } else {
-          throw LNUrlRemoteFailure.Generic
+          throw LNUrlError.RemoteFailure.Generic(origin)
         }
-      } catch (e: JSONException) {
+      } catch (e: Exception) {
         log.error("failed to read LNUrl response: ", e)
-        throw LNUrlRemoteFailure.Unreadable
+        when (e) {
+          is LNUrlError.RemoteFailure -> throw e
+          else -> throw LNUrlError.RemoteFailure.Unreadable(origin)
+        }
       } finally {
         body?.close()
       }

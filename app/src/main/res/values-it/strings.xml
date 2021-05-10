@@ -98,19 +98,8 @@
   <br /><br />
   I fondi inviati a quest\'indirizzo saranno visibili sul tuo wallet dopo una conferma sulla chain.
   <br /><br />
-  Una commissione di <b>%1$s%%</b> verrà applicata.
+  Una commissione di <b>%1$s%%</b> verrà applicata (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pagamento in ingresso</string>
-  <string name="receive_with_open_help_desc">Che cos\'è?</string>
-  <string name="receive_with_open_help">Per ricevere pagamenti Lightning devi avere un canale con abbastanza liquidita in ingresso.\n\nSe non ne hai uno, Phoenix lo creerà qualóra fosse necessario. Le commissioni di apertura coprono i costi di creazione del canale e della liquidità allocata su di esso.</string>
-  <string name="receive_with_open_amount_label">Hai un pagamento in arrivo di</string>
-  <string name="receive_with_open_cost"><![CDATA[L\'accettazione di questo pagamento comporta un costo aggiuntivo di <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Accetta (scade in %1$ss)</string>
-  <string name="receive_with_open_decline">Declina</string>
-  <string name="receive_with_open_expired">Questo pagamento è scaduto!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -268,10 +257,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connessione a electrum server in corso…</string>
-  <string name="main_alert_network_lost">Sei offline. Per favore controlla le tue impostazioni di rete…</string>
-  <string name="main_alert_lightning_connection_lost">Imposibile stabilire una connessione Lightning Network…</string>
-  <string name="main_alert_settings_button">Impostazioni</string>
   <string name="main_swapin_incoming">+%1$s in arrivo</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_stores_button">Negozi</string>
@@ -379,8 +364,6 @@
   <string name="lnurl_withdraw_error_amount">Ammontare invalido.</string>
   <string name="lnurl_withdraw_error_amount_min">L\'importo deve essere almeno %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">L\'importo puo essere al massimo %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s ha risposto con un errore: %2$s.\n\nRiprova dopo o contatta il loro supporto.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Dati invalidi</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

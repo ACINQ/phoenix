@@ -37,11 +37,6 @@
     app:enterAnim="@anim/slide_up"
     app:exitAnim="@anim/fade_out"
     app:launchSingleTop="true" />
-  <!-- global to receive with payToOpen -->
-  <action
-    android:id="@+id/global_action_any_to_receive_with_open"
-    app:destination="@id/receive_with_open_dialog"
-    app:launchSingleTop="true" />
   <!-- global to send -->
   <action
     android:id="@+id/global_action_any_to_send"
@@ -186,30 +181,6 @@
       app:popUpTo="@id/main_fragment"
       app:popUpToInclusive="true" />
   </fragment>
-
-  <!-- dialog to confirm money reception over new channel -->
-  <dialog
-    android:id="@+id/receive_with_open_dialog"
-    android:name="fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragment">
-    <argument
-      android:name="fundingSat"
-      app:argType="long" />
-    <argument
-      android:name="amountMsat"
-      app:argType="long" />
-    <argument
-      android:name="feeSat"
-      app:argType="long" />
-    <argument
-      android:name="paymentHash"
-      app:argType="string" />
-    <action
-      android:id="@+id/action_receive_with_open_to_main"
-      app:destination="@id/main_fragment" />
-    <argument
-      android:name="expireAt"
-      app:argType="long" />
-  </dialog>
 
   <!-- send money -->
   <fragment

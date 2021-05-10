@@ -103,19 +103,8 @@
   <br /><br />
   Los fondos enviados a esta dirección se mostrarán en tu cartera después de una confirmación.
   <br /><br />
-  Se aplicará el <b>%1$s%%</b> de comisión.
+  Se aplicará el <b>%1$s%%</b> de comisión (with a <b>%2$s</b> minimum).
   ]]></string>
-
-  <!-- //////////////// receive with open channel //////////////// -->
-
-  <string name="receive_with_open_title">Pago entrante</string>
-  <string name="receive_with_open_help_desc">¿Qué es esto?</string>
-  <string name="receive_with_open_help">Para recibir pagos en Lightning, debes tener un canal con suficiente liquidez entrante.\n\nSi no tienes uno, Phoenix creará un canal automáticamente y al vuelo según sea necesario. La comisión cubre el coste de crear el canal y asignarle liquidez.</string>
-  <string name="receive_with_open_amount_label">Tienes pendiente un pago entrante de</string>
-  <string name="receive_with_open_cost"><![CDATA[Aceptar este pago requiere una comisión de apertura de <b>%1$s</b> (%2$s).]]></string>
-  <string name="receive_with_open_accept">Aceptar (expira en %1$ss)</string>
-  <string name="receive_with_open_decline">Rechazar</string>
-  <string name="receive_with_open_expired">¡Este pago ha expirado!</string>
 
   <!-- //////////////// send //////////////// -->
 
@@ -288,10 +277,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Conectando al servidor Electrum…</string>
-  <string name="main_alert_network_lost">No hay conexión. Por favor verifica la configuración de tu red…</string>
-  <string name="main_alert_lightning_connection_lost">No se ha podido conectar a la red Lightning…</string>
-  <string name="main_alert_settings_button">Ajustes</string>
   <string name="main_swapin_incoming">+%1$s entrante</string>
   <string name="main_faq_button">Preguntas frecuentes</string>
   <string name="main_connectivity_button">Conectando…</string>
@@ -412,8 +397,6 @@
   <string name="lnurl_withdraw_error_amount">El importe no es válido.</string>
   <string name="lnurl_withdraw_error_amount_min">El importe debe ser de al menos %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">El importe no puede exceder %1$s.</string>
-  <string name="lnurl_withdraw_error_remote">%1$s respondió con un error: %2$s.\n\nVuelve a intentarlo más tarde o contacta a su soporte.</string>
-  <string name="lnurl_withdraw_error_remote_invalid_response">Datos incorrectos</string>
 
   <!-- //////////////// display preferences //////////////// -->
 

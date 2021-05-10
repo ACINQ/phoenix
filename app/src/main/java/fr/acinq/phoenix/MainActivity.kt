@@ -36,10 +36,8 @@ import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.phoenix.background.EclairNodeService
 import fr.acinq.phoenix.background.KitState
-import fr.acinq.phoenix.background.PayToOpenNavigationEvent
 import fr.acinq.phoenix.databinding.ActivityMainBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
-import fr.acinq.phoenix.receive.ReceiveWithOpenDialogFragmentDirections
 import fr.acinq.phoenix.send.ReadInputFragmentDirections
 import fr.acinq.phoenix.utils.Prefs
 import org.slf4j.Logger
@@ -93,23 +91,6 @@ class MainActivity : AppCompatActivity() {
     app = ViewModelProvider(this).get(AppViewModel::class.java)
     app.navigationEvent.observe(this, {
       when (it) {
-        is PayToOpenNavigationEvent -> {
-          val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
-          if (autoAcceptPayToOpen) {
-            app.service?.let { service ->
-              log.info("automatically accepting pay-to-open=$it")
-              service.acceptPayToOpen(it.payToOpen.paymentHash())
-            }
-          } else {
-            val action = ReceiveWithOpenDialogFragmentDirections.globalActionAnyToReceiveWithOpen(
-              amountMsat = it.payToOpen.amountMsat().toLong(),
-              fundingSat = it.payToOpen.fundingSatoshis().toLong(),
-              feeSat = it.payToOpen.feeSatoshis().toLong(),
-              paymentHash = it.payToOpen.paymentHash().toString(),
-              expireAt = it.payToOpen.expireAt())
-            findNavController(R.id.nav_host_main).navigate(action)
-          }
-        }
         is PaymentSent -> {
           val action = NavGraphMainDirections.globalActionAnyToPaymentDetails(PaymentDetailsFragment.OUTGOING, it.id().toString(), fromEvent = true)
           findNavController(R.id.nav_host_main).navigate(action)

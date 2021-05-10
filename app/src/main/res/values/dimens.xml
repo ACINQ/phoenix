@@ -64,6 +64,7 @@
   <dimen name="details_label_width">76dp</dimen>
 
   <!-- max width -->
+  <dimen name="max_width_xxs">200dp</dimen>
   <dimen name="max_width_xs">280dp</dimen>
   <dimen name="max_width_sm">330dp</dimen>
   <dimen name="max_width_md">500dp</dimen>

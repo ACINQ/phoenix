@@ -86,10 +86,10 @@ class AppContext : Application(), DefaultLifecycleObserver {
         log.error("error when reading wallet context from preferences: ", e)
       }
     }
-    updateWalletContext(applicationContext)
 
-    // poll exchange rate api every 120 minutes
-    kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 120 * 60 * 1000) {
+    // poll context and exchange rate api every 60 minutes
+    kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 60 * 60 * 1000) {
+      updateWalletContext(applicationContext)
       Wallet.httpClient.newCall(Request.Builder().url(Constants.BLOCKCHAININFO_TICKER).build()).enqueue(handleBlockchainInfoTicker(applicationContext))
       Wallet.httpClient.newCall(Request.Builder().url(Constants.BITSO_MXN_TICKER).build()).enqueue(getMXNRateHandler(applicationContext))
       Wallet.httpClient.newCall(Request.Builder().url(Constants.COINDESK_CZK_TICKER).build()).enqueue(handleCoindeskCZKTicker(applicationContext))
@@ -117,17 +117,20 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
   }
 
+  /** Settings for pay-to-open. */
+  val payToOpenSettings = MutableLiveData<PayToOpenSettings?>()
+
   /** Settings for the fees allocated to a trampoline node. */
   val trampolineFeeSettings = MutableLiveData(Constants.DEFAULT_TRAMPOLINE_SETTINGS)
 
   /** List of in-app notifications. */
   val notifications = MutableLiveData(HashSet<InAppNotifications>())
 
-  /** Fee settings for swap-in (on-chain -> LN). */
-  val swapInSettings = MutableLiveData(Constants.DEFAULT_SWAP_IN_SETTINGS)
-
-  /** Fee settings for swap-out (LN -> on-chain). */
+  /** Settings for swap-out (LN -> on-chain). */
   val swapOutSettings = MutableLiveData(Constants.DEFAULT_SWAP_OUT_SETTINGS)
+
+  /** Settings for swap-in (on-chain -> LN). */
+  val swapInSettings = MutableLiveData<SwapInSettings?>()
 
   /** Context of the Bitcoin mempool, used to display notifications. */
   val mempoolContext = MutableLiveData(Constants.DEFAULT_MEMPOOL_CONTEXT)
@@ -211,17 +214,41 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
     trampolineSettingsList.sortedWith(compareBy({ it.feeProportionalMillionths }, { it.feeBase }))
     trampolineFeeSettings.postValue(trampolineSettingsList)
-    log.info("trampoline settings set to $trampolineSettingsList")
-
-    // -- swap-in settings
-    val remoteSwapInSettings = SwapInSettings(feePercent = json.getJSONObject("swap_in").getJSONObject("v1").getDouble("fee_percent"))
-    swapInSettings.postValue(remoteSwapInSettings)
-    log.info("swap-in settings set to $remoteSwapInSettings")
+    log.info("trampoline settings=$trampolineSettingsList")
 
     // -- swap-out settings
-    val remoteSwapOutSettings = SwapOutSettings(minFeerateSatByte = json.getJSONObject("swap_out").getJSONObject("v1").getLong("min_feerate_sat_byte").coerceAtLeast(1))
+    val remoteSwapOutSettings = json.getJSONObject("swap_out").getJSONObject("v1").run {
+      SwapOutSettings(
+        minFeerateSatByte = getLong("min_feerate_sat_byte").coerceAtLeast(0),
+        status = ServiceStatus.valueOf(optInt("status"))
+      )
+    }
     swapOutSettings.postValue(remoteSwapOutSettings)
-    log.info("swap-out settings set to $remoteSwapOutSettings")
+    log.info("swap-out settings=$remoteSwapOutSettings")
+
+    // -- swap-in settings
+    val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1").run {
+      SwapInSettings(
+        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+        feePercent = getDouble("fee_percent"),
+        status = ServiceStatus.valueOf(optInt("status"))
+      )
+    }
+    swapInSettings.postValue(remoteSwapInSettings)
+    log.info("swap-in settings=$remoteSwapInSettings")
+
+    // -- pay-to-open settings
+    val remotePayToOpenSettings = json.getJSONObject("pay_to_open").getJSONObject("v1").run {
+      PayToOpenSettings(
+        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+        feePercent = getDouble("fee_percent"),
+        status = ServiceStatus.valueOf(optInt("status"))
+      )
+    }
+    payToOpenSettings.postValue(remotePayToOpenSettings)
+    log.info("pay-to-open settings=$remotePayToOpenSettings")
   }
 
   private fun handleBlockchainInfoTicker(context: Context): Callback {
@@ -324,7 +351,25 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
   fun printFeeProportional(): String = Converter.perMillionthsToPercentageString(feeProportionalMillionths)
 }
 
-data class SwapInSettings(val feePercent: Double)
-data class SwapOutSettings(val minFeerateSatByte: Long)
+data class SwapInSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)
+data class SwapOutSettings(val minFeerateSatByte: Long, val status: ServiceStatus)
 data class MempoolContext(val highUsageWarning: Boolean)
+data class PayToOpenSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)
+sealed class ServiceStatus {
+  object Unknown : ServiceStatus()
+  object Active : ServiceStatus()
+  sealed class Disabled : ServiceStatus() {
+    object Generic : Disabled()
+    object MempoolFull : Disabled()
+  }
+
+  companion object {
+    fun valueOf(code: Int) = when (code) {
+      -1 -> Unknown
+      1 -> Disabled.Generic
+      2 -> Disabled.MempoolFull
+      else -> Active
+    }
+  }
+}

@@ -422,6 +422,7 @@ class EclairNodeService : Service() {
     system.eventStream().subscribe(nodeSupervisor, PayToOpenResponse::class.java)
     system.eventStream().subscribe(nodeSupervisor, ElectrumClient.ElectrumEvent::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelErrorOccurred::class.java)
+    system.eventStream().subscribe(nodeSupervisor, MissedPayToOpenPayment::class.java)
 
     val kit = Await.result(setup.bootstrap(), Duration.create(60, TimeUnit.SECONDS))
     // this is only needed to create the peer when we don't yet have any channel, connection will be handled by the reconnection task
@@ -532,18 +533,6 @@ class EclairNodeService : Service() {
       }
     }
     return successfullyClosed
-  }
-
-  /** Accept a pay-to-open request for a given payment hash. */
-  @UiThread
-  fun acceptPayToOpen(paymentHash: ByteVector32) {
-    kit?.system()?.eventStream()?.publish(AcceptPayToOpen(paymentHash))
-  }
-
-  /** Reject a pay-to-open request for a given payment hash. */
-  @UiThread
-  fun rejectPayToOpen(paymentHash: ByteVector32) {
-    kit?.system()?.eventStream()?.publish(RejectPayToOpen(paymentHash))
   }
 
   /** Extracts the worst case (fee, ctlv expiry delta) scenario from the routing hints in a payment request. If the payment request has no routing hints, return (0, 0). */
@@ -686,6 +675,12 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+  suspend fun getSentPaymentsFromPaymentHash(paymentHash: ByteVector32): List<OutgoingPayment> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+    kit?.run {
+      JavaConverters.seqAsJavaListConverter(nodeParams().db().payments().listOutgoingPayments(paymentHash)).asJava()
+    } ?: throw KitNotInitialized
+  }
+
   suspend fun getSentPaymentsFromParentId(parentId: UUID): List<OutgoingPayment> = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
       JavaConverters.seqAsJavaListConverter(nodeParams().db().payments().listOutgoingPayments(parentId)).asJava()
@@ -806,29 +801,34 @@ class EclairNodeService : Service() {
       serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
         log.error("failed to save closing event=$event: ", e)
       }) {
-        val id = UUID.randomUUID()
-        val preimage = `package$`.`MODULE$`.randomBytes32()
-        val paymentHash = Crypto.hash256(preimage.bytes())
-        val date = System.currentTimeMillis()
-        val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
-        val paymentCounterpart = OutgoingPayment(
-          /* id and parent id */ id, id,
-          /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
-          /* placeholder payment hash */ paymentHash,
-          /* type of payment */ "ClosingChannel",
-          /* balance */ event.balance,
-          /* recipient amount */ event.balance,
-          /* fake recipient id */ fakeRecipientId,
-          /* creation date */ date,
-          /* payment request */ Option.empty(),
-          /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
-        nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
-        paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
-        val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
-        val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
-          ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
-        nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
-        EventBus.getDefault().post(PaymentPending())
+        if (event.balance == MilliSatoshi(0)) {
+          log.info("ignore closing channel event=$event because our balance is empty")
+        } else {
+          log.info("save closing channel event=$event")
+          val id = UUID.randomUUID()
+          val preimage = `package$`.`MODULE$`.randomBytes32()
+          val paymentHash = Crypto.hash256(preimage.bytes())
+          val date = System.currentTimeMillis()
+          val fakeRecipientId = `package$`.`MODULE$`.randomKey().publicKey()
+          val paymentCounterpart = OutgoingPayment(
+            /* id and parent id */ id, id,
+            /* use arbitrary external id to designate payment as channel closing counterpart */ Option.apply("closing-${event.channelId}"),
+            /* placeholder payment hash */ paymentHash,
+            /* type of payment */ "ClosingChannel",
+            /* balance */ event.balance,
+            /* recipient amount */ event.balance,
+            /* fake recipient id */ fakeRecipientId,
+            /* creation date */ date,
+            /* payment request */ Option.empty(),
+            /* payment is always successful */ OutgoingPaymentStatus.`Pending$`.`MODULE$`)
+          nodeParams().db().payments().addOutgoingPayment(paymentCounterpart)
+          paymentMetaRepository.insertClosing(id.toString(), event.closingType, event.channelId.toString(), event.spendingTxs, event.scriptDestMainOutput)
+          val partialPayment = PaymentSent.PartialPayment(id, event.balance, MilliSatoshi(0), ByteVector32.Zeroes(), Option.empty(), date)
+          val paymentCounterpartSent = PaymentSent(id, paymentHash, preimage, event.balance, fakeRecipientId,
+            ScalaList.empty<PaymentSent.PartialPayment>().`$colon$colon`(partialPayment))
+          nodeParams().db().payments().updateOutgoingPayment(paymentCounterpartSent)
+          EventBus.getDefault().post(PaymentPending())
+        }
       }
     }
   }
@@ -865,30 +865,16 @@ class EclairNodeService : Service() {
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
-  fun handleEvent(event: PayToOpenRequestEvent) {
-    val autoAcceptPayToOpen = Prefs.getAutoAcceptPayToOpen(applicationContext)
-    if (autoAcceptPayToOpen) {
-      log.info("automatically accepting pay-to-open=$event")
-      acceptPayToOpen(event.payToOpenRequest().paymentHash())
-    } else {
-      if (isHeadless) {
-        log.info("automatically rejecting pay-to-open=$event")
-        updateNotification(getString(R.string.notif__headless_title__missed_incoming), getString(R.string.notif__headless_message__manual_pay_to_open))
-        rejectPayToOpen(event.payToOpenRequest().paymentHash())
-      } else {
-        EventBus.getDefault().post(PayToOpenNavigationEvent(event.payToOpenRequest()))
-        if (!appContext.isAppVisible) {
-          notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__CHANNELS_WATCHER)
-            .setSmallIcon(R.drawable.ic_phoenix_outline)
-            .setContentTitle(getString(R.string.notif_pay_to_open_title))
-            .setContentText(getString(R.string.notif_pay_to_open_message))
-            .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__CHANNELS_WATCHER,
-              Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
-            .setAutoCancel(true)
-            .build())
-        }
-      }
-    }
+  fun handleEvent(event: MissedPayToOpenPayment) {
+    notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN)
+      .setSmallIcon(R.drawable.ic_phoenix_outline)
+      .setContentTitle(getString(R.string.notif__pay_to_open_missed_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
+      .setContentText(getString(R.string.notif__pay_to_open_missed_message))
+      .setStyle(NotificationCompat.BigTextStyle().bigText(getString(R.string.notif__pay_to_open_missed_message)))
+      .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__PAY_TO_OPEN,
+        Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
+      .setAutoCancel(true)
+      .build())
   }
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)

@@ -26,16 +26,16 @@ import org.slf4j.LoggerFactory
 object Migration {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-  val VERSIONS_WITH_NOTABLE_CHANGES = listOf(15)
+  val VERSIONS_WITH_NOTABLE_CHANGES = listOf(15, 23)
 
   /** Apply migration scripts when needed. */
   fun doMigration(context: Context) {
     val version = Prefs.getLastVersionUsed(context)
     if (0 < version && version < BuildConfig.VERSION_CODE) {
       log.info("previously used version=$version, now using version=${BuildConfig.VERSION_CODE}, starting migration")
-      when {
-        version < 15 -> applyMigration_15(context)
-      }
+//      when {
+//        version < XX -> applyMigration_XX
+//      }
       log.info("end of migration from version=$version")
       Prefs.setMigratedFrom(context, version)
     } else {
@@ -44,7 +44,7 @@ object Migration {
     Prefs.setLastVersionUsed(context, BuildConfig.VERSION_CODE)
   }
 
-  /** A patch note must be shown if the given version is below at least one version with a notable change*/
+  /** A patch note must be shown if the given version is below at least one version with a notable change */
   fun listNotableChangesSince(version: Int): List<Int> {
     return if (version > 0) {
       VERSIONS_WITH_NOTABLE_CHANGES.filter { it > version }
@@ -58,7 +58,4 @@ object Migration {
   //   MigrationPrefs.saveMigrationDone(context, fromVersion, XX)
   // }
 
-  private fun applyMigration_15(context: Context) {
-    Prefs.setAutoAcceptPayToOpen(context, true)
-  }
 }
