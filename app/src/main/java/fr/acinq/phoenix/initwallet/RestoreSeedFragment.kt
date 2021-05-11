@@ -47,7 +47,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
+import org.bouncycastle.util.encoders.Hex
 import java.util.*
 
 class RestoreSeedFragment : Fragment() {
