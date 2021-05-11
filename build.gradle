@@ -30,7 +30,9 @@ buildscript {
     classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safeargs_version"
     // plugin for firebase cloud messaging
     classpath "com.google.gms:google-services:4.3.5"
-    classpath 'com.squareup.sqldelight:gradle-plugin:1.4.4'
+    classpath 'com.squareup.sqldelight:gradle-plugin:1.5.0'
+    // kotlinx serialization
+    classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
   }
 }
 

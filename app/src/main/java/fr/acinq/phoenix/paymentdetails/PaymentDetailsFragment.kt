@@ -51,10 +51,8 @@ import fr.acinq.phoenix.databinding.FragmentPaymentDetailsBinding
 import fr.acinq.phoenix.db.*
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.Wallet.simpleExecute
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import okhttp3.HttpUrl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.Option
@@ -77,8 +75,10 @@ class PaymentDetailsFragment : BaseFragment() {
   private val model: PaymentDetailsViewModel by navGraphViewModels(R.id.nav_graph_payment_details) {
     val appContext = appContext(requireContext())
     AppDb.getInstance(appContext.applicationContext).run {
-      PaymentDetailsViewModel.Factory(appContext.applicationContext, args.identifier, PaymentMetaRepository.getInstance(paymentMetaQueries),
-        PayToOpenMetaRepository.getInstance(payToOpenMetaQueries), NodeMetaRepository.getInstance(nodeMetaQueries))
+      PaymentDetailsViewModel.Factory(appContext.applicationContext,
+        paymentId = args.identifier,
+        paymentMetaRepository = PaymentMetaRepository.getInstance(paymentMetaQueries),
+        payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(payToOpenMetaQueries))
     }
   }
 
@@ -101,43 +101,61 @@ class PaymentDetailsFragment : BaseFragment() {
     })
     model.state.observe(viewLifecycleOwner, Observer { state ->
       when (state) {
-        is PaymentDetailsState.Outgoing.Pending -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))
-          mBinding.amountValue.setAmount(state.amountToRecipient)
-          showStatusIconAndDetails(R.drawable.ic_send_lg, R.attr.mutedTextColor)
-        }
-        is PaymentDetailsState.Outgoing.Failed -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
-          // use error of the last subpayment as it's probably the most pertinent
-          when (state.failureType) {
-            is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
-            is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
-            is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
-            is OutgoingFailure.TrampolineFee -> {
-              mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
-              mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
-              mBinding.errorAction.setOnClickListener {
-                findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
-              }
+        is PaymentDetailsState.Outgoing -> {
+          val meta = model.paymentMeta.value
+          if (meta?.lnurlpay_url != null) {
+            mBinding.lnurlPayServiceValue.text = try {
+              HttpUrl.parse(meta.lnurlpay_url)?.topPrivateDomain()
+            } catch (e: Exception) {
+              getString(R.string.utils_unknown)
             }
           }
-
-          mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
-          showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
-        }
-        is PaymentDetailsState.Outgoing.Sent -> {
-          mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
-          mBinding.feesValue.setAmount(state.fees)
-          mBinding.amountValue.setAmount(state.amountToRecipient)
-          showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
-          if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
-            model.paymentMeta.value?.run {
-              if (closing_type != ClosingType.Mutual.code) {
-                mBinding.infoLayout.visibility = View.VISIBLE
-                val address = app.state.value?.getFinalAddress() ?: closing_main_output_script ?: ""
-                mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
+          when (state) {
+            is PaymentDetailsState.Outgoing.Pending -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))
+              mBinding.amountValue.setAmount(state.amountToRecipient)
+              showStatusIconAndDetails(R.drawable.ic_send_lg, R.attr.mutedTextColor)
+            }
+            is PaymentDetailsState.Outgoing.Failed -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_failed))
+              // use error of the last subpayment as it's probably the most pertinent
+              when (state.failureType) {
+                is OutgoingFailure.Generic -> mBinding.errorValue.text = state.failureType.message
+                is OutgoingFailure.IncorrectPaymentDetails -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_invalid_details)
+                is OutgoingFailure.RecipientUnknownOrNeedsLiquidity -> mBinding.errorValue.text = getString(R.string.paymentdetails_failure_recipient_unknown_or_liquidity)
+                is OutgoingFailure.TrampolineFee -> {
+                  mBinding.errorValue.text = getString(R.string.paymentdetails_failure_trampoline_fees)
+                  mBinding.errorAction.setText(getString(R.string.paymentdetails_failure_trampoline_fees_action))
+                  mBinding.errorAction.setOnClickListener {
+                    findNavController().navigate(R.id.global_payment_details_to_payment_settings_fragment)
+                  }
+                }
+              }
+              mBinding.amountValue.setAmount(state.parts.last().recipientAmount())
+              showStatusIconAndDetails(R.drawable.ic_cross, R.attr.negativeColor)
+            }
+            is PaymentDetailsState.Outgoing.Sent -> {
+              mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_successful, Transcriber.relativeTime(requireContext(), state.completedAt)))
+              mBinding.feesValue.setAmount(state.fees)
+              mBinding.amountValue.setAmount(state.amountToRecipient)
+              showStatusIconAndDetails(if (args.fromEvent) R.drawable.ic_payment_success_animated else R.drawable.ic_payment_success_static, R.attr.positiveColor)
+              if (state is PaymentDetailsState.Outgoing.Sent.Closing) {
+                if (meta?.closing_type != ClosingType.Mutual.code) {
+                  val address = app.state.value?.getFinalAddress() ?: meta?.closing_main_output_script ?: ""
+                  mBinding.infoBody.text = Converter.html(getString(R.string.paymentdetails_info_uniclose, address))
+                  mBinding.infoLayout.visibility = View.VISIBLE
+                }
+              }
+              when (val successAction = meta?.getSuccessAction()) {
+                is LNUrlPayActionData.Message.V0 -> mBinding.lnurlPaySuccessActionValue.text = successAction.message
+                is LNUrlPayActionData.Url.V0 -> {
+                  mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_url, successAction.description, successAction.url))
+                  mBinding.lnurlPaySuccessActionValue.movementMethod = LinkMovementMethod.getInstance()
+                }
+                is LNUrlPayActionData.Aes.V0 -> decryptLNUrlPayAes(successAction)
               }
             }
+            else -> Unit
           }
         }
         is PaymentDetailsState.Incoming.Pending -> {
@@ -229,6 +247,25 @@ class PaymentDetailsFragment : BaseFragment() {
     }
   }
 
+  private fun decryptLNUrlPayAes(data: LNUrlPayActionData.Aes.V0) {
+    lifecycleScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, exception ->
+      log.error("failed to decrypt lnurl_pay aes action=$data: ", exception)
+      lifecycleScope.launch(Dispatchers.Main) {
+        mBinding.lnurlPaySuccessActionValue.text = getString(R.string.paymentdetails_lnurlpay_success_action_aes_failure)
+      }
+    }) {
+      val preimage = ByteVector32.fromValidHex(model.preimage.value)
+      if (preimage == null) {
+        throw RuntimeException("payment preimage is null")
+      } else {
+        val text = data.decrypt(preimage)
+        lifecycleScope.launch(Dispatchers.Main) {
+          mBinding.lnurlPaySuccessActionValue.text = Converter.html(getString(R.string.paymentdetails_lnurlpay_success_action_aes, data.description, text))
+        }
+      }
+    }
+  }
+
   private fun getPaymentDetails() {
     val identifier = args.identifier
     lifecycleScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, exception ->
@@ -296,26 +333,25 @@ sealed class PaymentDetailsState {
     object Generic : Error()
     object NotFound : Error()
   }
+
 }
 
 sealed class OutgoingFailure {
-  data class Generic(val message: String): OutgoingFailure()
-  object RecipientUnknownOrNeedsLiquidity: OutgoingFailure()
-  object TrampolineFee: OutgoingFailure()
-  object IncorrectPaymentDetails: OutgoingFailure()
+  data class Generic(val message: String) : OutgoingFailure()
+  object RecipientUnknownOrNeedsLiquidity : OutgoingFailure()
+  object TrampolineFee : OutgoingFailure()
+  object IncorrectPaymentDetails : OutgoingFailure()
 }
 
 class PaymentDetailsViewModel(
   private val appContext: Context,
   private val paymentId: String,
   private val paymentMetaRepository: PaymentMetaRepository,
-  private val payToOpenMetaRepository: PayToOpenMetaRepository,
-  private val nodeMetaRepository: NodeMetaRepository
+  private val payToOpenMetaRepository: PayToOpenMetaRepository
 ) : ViewModel() {
 
   private val log = LoggerFactory.getLogger(this::class.java)
   val state = MutableLiveData<PaymentDetailsState>()
-  val recipientMeta = MutableLiveData<NodeMeta>()
   val paymentMeta = MutableLiveData<PaymentMeta>()
   val payToOpenMeta = MutableLiveData<PayToOpenMeta>()
 
@@ -424,7 +460,6 @@ class PaymentDetailsViewModel(
     }
     val paymentMeta = paymentMetaRepository.get(paymentId)
     val amountToRecipient = payments.first().recipientAmount()
-    updateRecipientMeta(payments.first().recipientNodeId().toString())
     val description = payments.first().paymentRequest()?.run {
       if (isDefined) {
         get().description()?.let { d -> if (d.isLeft) d.left().get() else d.right().get().toString() }
@@ -506,14 +541,6 @@ class PaymentDetailsViewModel(
     }
   }
 
-  private fun updateRecipientMeta(nodeId: String) {
-    viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-      log.error("failed to retrieve recipient metadata: ", e)
-    }) {
-      nodeMetaRepository.get(nodeId)?.let { recipientMeta.postValue(it) }
-    }
-  }
-
   fun saveCustomDescription(desc: String) {
     viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
       log.error("failed to save description=$desc for payment=$paymentId: ", e)
@@ -524,16 +551,18 @@ class PaymentDetailsViewModel(
     }
   }
 
+  /**
+   * @param paymentId payment Hash if incoming, parentId if outgoing.
+   */
   class Factory(
     private val appContext: Context,
     private val paymentId: String,
     private val paymentMetaRepository: PaymentMetaRepository,
     private val payToOpenMetaRepository: PayToOpenMetaRepository,
-    private val nodeMetaRepository: NodeMetaRepository,
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-      return PaymentDetailsViewModel(appContext, paymentId, paymentMetaRepository, payToOpenMetaRepository, nodeMetaRepository) as T
+      return PaymentDetailsViewModel(appContext, paymentId, paymentMetaRepository, payToOpenMetaRepository) as T
     }
   }
 }

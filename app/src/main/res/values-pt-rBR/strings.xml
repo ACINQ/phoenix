@@ -510,13 +510,6 @@
   <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
   <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
 
-  <!-- //////////////// ln url pay //////////////// -->
-
-  <string name="lnurl_pay_wait" translatable="false">Retrieving payment details…</string>
-  <string name="lnurl_pay_error_remote" translatable="false">Could not get a valid invoice from %1$s.\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_remote_code" translatable="false">Could not get a valid invoice from %1$s (code %2$s).\n\nYou may want to try again later.</string>
-  <string name="lnurl_pay_error_missing_callback" translatable="false">There was an error when handling this invoice. Please try again later.</string>
-
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">Valor a receber</string>

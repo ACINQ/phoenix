@@ -42,6 +42,7 @@ import fr.acinq.phoenix.R
 import fr.acinq.phoenix.databinding.FragmentReadInvoiceBinding
 import fr.acinq.phoenix.lnurl.LNUrlAuth
 import fr.acinq.phoenix.lnurl.LNUrlError
+import fr.acinq.phoenix.lnurl.LNUrlPay
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.customviews.ButtonView
@@ -98,7 +99,7 @@ class ReadInputFragment : BaseFragment() {
             model.inputState.value = ReadInputState.Error.PayToSelf
           } else if (it.pr.isExpired) {
             model.inputState.value = ReadInputState.Error.PaymentExpired
-          } else if (acceptedPrefix.isEmpty || acceptedPrefix.get() != it.pr.prefix()) {
+          } else if (!Wallet.isSupportedPrefix(it.pr)) {
             model.inputState.value = ReadInputState.Error.InvalidChain
           } else if (it.pr.amount().isEmpty && !it.pr.features().allowTrampoline()) {
             // Payment request is pre-trampoline and SHOULD specify an amount. Show warning to user.
@@ -141,6 +142,7 @@ class ReadInputFragment : BaseFragment() {
           when (it.url) {
             is LNUrlWithdraw -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlWithdraw(it.url))
             is LNUrlAuth -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlAuth(it.url))
+            is LNUrlPay -> findNavController().navigate(ReadInputFragmentDirections.actionReadInputToLnurlPay(it.url))
             else -> model.inputState.value = ReadInputState.Error.UnhandledLNURL
           }
         }

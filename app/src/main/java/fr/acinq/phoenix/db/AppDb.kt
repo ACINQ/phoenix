@@ -17,8 +17,8 @@
 package fr.acinq.phoenix.db
 
 import android.content.Context
+import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
-import fr.acinq.phoenix.Database
 
 object AppDb {
   @Volatile
@@ -29,11 +29,14 @@ object AppDb {
 
   fun getInstance(context: Context): Database {
     return instance ?: synchronized(this) {
-      instance ?: Database(AndroidSqliteDriver(
-        schema = Database.Schema,
-        context = context,
-        name = "phoenix-meta.db"
-      )).also { instance = it }
+      instance ?: Database(
+        driver = AndroidSqliteDriver(
+          schema = Database.Schema,
+          context = context,
+          name = "phoenix-meta.db"
+        ),
+        PaymentMetaAdapter = PaymentMeta.Adapter(EnumColumnAdapter())
+      ).also { instance = it }
     }
   }
 }

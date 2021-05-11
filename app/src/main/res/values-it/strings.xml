@@ -344,13 +344,6 @@
   <string name="accessctrl_auth_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
   <string name="accessctrl_auth_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
 
-  <!-- //////////////// ln url pay //////////////// -->
-
-  <string name="lnurl_pay_wait">Recuperando i dettagli del pagamento…</string>
-  <string name="lnurl_pay_error_remote">Impossibile ottenere una richiesta di pagamento valida da %1$s.\n\nPotresti riprovare più tardi.</string>
-  <string name="lnurl_pay_error_remote_code">Impossibile ottenere una richiesta di pagamento valida da %1$s (code %2$s).\n\nPotresti riprovare più tardi.</string>
-  <string name="lnurl_pay_error_missing_callback">C\'è stato un errore con questa richiesta di pagamento. Per favore riprova più tardi.</string>
-
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">Importo da ricevere</string>

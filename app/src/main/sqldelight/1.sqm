@@ -1,0 +1,11 @@
+import fr.acinq.phoenix.db.LNUrlPayActionTypeVersion;
+
+-- Migration file from version 1 to version 2
+--
+-- Adds columns for lnurl-pay to the payment_meta database:
+--  - lnurlpay_action_typeversion
+--  - lnurlpay_action_data
+
+ALTER TABLE PaymentMeta ADD COLUMN lnurlpay_url TEXT DEFAULT NULL;
+ALTER TABLE PaymentMeta ADD COLUMN lnurlpay_action_typeversion TEXT AS LNUrlPayActionTypeVersion DEFAULT NULL;
+ALTER TABLE PaymentMeta ADD COLUMN lnurlpay_action_data TEXT DEFAULT NULL;
