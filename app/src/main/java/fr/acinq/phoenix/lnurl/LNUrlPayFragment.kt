@@ -18,6 +18,7 @@ package fr.acinq.phoenix.lnurl
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.Base64
 import android.view.LayoutInflater
@@ -158,7 +159,7 @@ class LNUrlPayFragment : BaseFragment() {
     } else {
       mBinding.metadataImage.visibility = View.GONE
     }
-
+    mBinding.appModel = app
     mBinding.model = model
   }
 
@@ -166,8 +167,14 @@ class LNUrlPayFragment : BaseFragment() {
     super.onStart()
     mBinding.actionBar.setOnBackAction { findNavController().navigate(R.id.action_lnurl_pay_to_main) }
     mBinding.startPaymentButton.setOnClickListener {
-      if (model.maxCommentLength ?: 0 > 0) {
-        AlertHelper.buildWithInput(layoutInflater, title = getString(R.string.lnurl_pay_comment_title), message = getString(R.string.lnurl_pay_comment_message),
+      val maxCommentLength = model.maxCommentLength ?: 0
+      if (maxCommentLength > 0) {
+        AlertHelper.buildWithInput(layoutInflater,
+          title = getString(R.string.lnurl_pay_comment_title),
+          message = getString(R.string.lnurl_pay_comment_message, maxCommentLength),
+          inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE,
+          maxLines = 3,
+          maxLength = maxCommentLength.toInt(),
           callback = { comment -> requestInvoice(comment) },
           defaultValue = "",
           hint = getString(R.string.lnurl_pay_comment_hint))

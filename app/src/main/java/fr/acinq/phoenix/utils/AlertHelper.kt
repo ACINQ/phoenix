@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import android.app.AlertDialog
+import android.text.InputFilter
 import android.text.InputType
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -45,17 +46,24 @@ object AlertHelper {
     callback: (String) -> Unit,
     defaultValue: String,
     inputType: Int = InputType.TYPE_CLASS_TEXT,
-    hint: String = ""): AlertDialog.Builder {
+    maxLines: Int = 1,
+    maxLength: Int? = null,
+    hint: String = ""
+  ): AlertDialog.Builder {
     val view = inflater.inflate(R.layout.dialog_alert_input, null)
     default(view, title, message)
     val input = view.findViewById<EditText>(R.id.alert_input).apply {
       this.inputType = inputType
       this.setText(defaultValue)
       this.hint = hint
+      this.maxLines = maxLines
+      if (maxLength != null) {
+        this.filters = arrayOf(InputFilter.LengthFilter(maxLength))
+      }
     }
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
-      .setPositiveButton(inflater.context.getString(R.string.btn_confirm)) { _, _ -> callback(input.text.toString()) }
+      .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(input.text.toString()) }
   }
 
   fun buildWithCheckBox(inflater: LayoutInflater, title: CharSequence?, message: CharSequence?, checkBoxLabel: CharSequence?, defaultValue: Boolean, callback: (Boolean) -> Unit): AlertDialog.Builder {

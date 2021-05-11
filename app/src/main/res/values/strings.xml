@@ -448,14 +448,14 @@
   <string name="paymentdetails_lnurlpay_service_label">Service</string>
   <string name="paymentdetails_lnurlpay_success_action_label">Message</string>
   <string name="paymentdetails_lnurlpay_success_action_url"><![CDATA[
-  %1$s
-  <br /><br />
-  <a href="%2$s">Open Link</a>
+    %1$s
+    <br /><br />
+    <a href="%2$s">Open Link</a>
   ]]></string>
   <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes"><![CDATA[
-  %1$s
-  <br />
-  <b>%2$s</b>
+    %1$s
+    <br />
+    <b>%2$s</b>
   ]]></string>
   <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes_failure">Message from service could not be decrypted.</string>
 
@@ -534,7 +534,7 @@
   <string name="lnurl_pay_domain"><![CDATA[Payment requested by<br/><b>%1$s</b>]]></string>
   <string name="lnurl_pay_meta_description">Description</string>
   <string name="lnurl_pay_comment_title">Add optional comment</string>
-  <string name="lnurl_pay_comment_message">You can attach a comment to the payment if you want</string>
+  <string name="lnurl_pay_comment_message">You can attach a comment to the payment (max %1$d characters). It will be sent to the recipient.</string>
   <string name="lnurl_pay_comment_hint">No comment</string>
   <string name="lnurl_pay_pay_button">Pay</string>
   <string name="lnurl_pay_requesting_invoice">Requesting invoice…</string>
@@ -548,9 +548,9 @@
   <string name="lnurl_pay_amount_invalid">Invalid amount</string>
 
   <string name="lnurl_pay_error_header">No payment sent.</string>
-  <string name="lnurl_pay_error_unreachable">The service %1$s is not reachable, please check your connection.</string>
-  <string name="lnurl_pay_error_invalid_invoice">The service %1$s provided an invalid invoice (%2$s).</string>
-  <string name="lnurl_pay_error_remote_error">The service %1$s returned an error (%2$s).</string>
+  <string name="lnurl_pay_error_unreachable">The service \'%1$s\' is not reachable, please check your connection.</string>
+  <string name="lnurl_pay_error_invalid_invoice">The service \'%1$s\' provided an invalid invoice (%2$s).</string>
+  <string name="lnurl_pay_error_remote_error">The service \'%1$s\' returned an error (%2$s).</string>
   <string name="lnurl_pay_error_try_again_button">Try again.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->

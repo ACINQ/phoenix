@@ -477,7 +477,7 @@
   <string name="lnurl_pay_domain"><![CDATA[Paiement demandé par<br/><b>%1$s</b>]]></string>
   <string name="lnurl_pay_meta_description">Description</string>
   <string name="lnurl_pay_comment_title">Commentaire (optionnel)</string>
-  <string name="lnurl_pay_comment_message">Vous pouvez ajouter un commentaire au paiement si vous le souhaitez</string>
+  <string name="lnurl_pay_comment_message">Vous pouvez attacher un commentaire au paiement (max %1$d caractères). Il sera envoyé au destinataire.</string>
   <string name="lnurl_pay_comment_hint">Aucun commentaire</string>
   <string name="lnurl_pay_pay_button">Payer</string>
   <string name="lnurl_pay_requesting_invoice">Récupèration du paiement…</string>
@@ -491,9 +491,9 @@
   <string name="lnurl_pay_amount_invalid">Montant invalide</string>
 
   <string name="lnurl_pay_error_header">Le paiement n\'a pas fonctionné</string>
-  <string name="lnurl_pay_error_unreachable">Le service %1$s n\'est pas joignable. Vérifiez votre connexion.</string>
-  <string name="lnurl_pay_error_invalid_invoice">Le service %1$s a fourni une requête de paiement invalide (%2$s).</string>
-  <string name="lnurl_pay_error_remote_error">Le service %1$s a retourné une erreur (%2$s).</string>
+  <string name="lnurl_pay_error_unreachable">Le service \'%1$s\' n\'est pas joignable. Vérifiez votre connexion.</string>
+  <string name="lnurl_pay_error_invalid_invoice">Le service \'%1$s\' a fourni une requête de paiement invalide (%2$s).</string>
+  <string name="lnurl_pay_error_remote_error">Le service \'%1$s\' a retourné une erreur (%2$s).</string>
   <string name="lnurl_pay_error_try_again_button">Réessayer.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->

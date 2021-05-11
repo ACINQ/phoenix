@@ -25,6 +25,10 @@
     <import type="fr.acinq.phoenix.lnurl.LNUrlPayAmountState" />
 
     <variable
+      name="appModel"
+      type="fr.acinq.phoenix.AppViewModel" />
+
+    <variable
       name="model"
       type="fr.acinq.phoenix.lnurl.LNUrlPayViewModel" />
   </data>
@@ -202,14 +206,16 @@
         android:layout_height="wrap_content"
         android:backgroundTint="?attr/colorPrimary"
         android:layout_marginTop="@dimen/space_lg"
-        app:layout_goneMarginTop="@dimen/space_lg"
         android:visibility="@{model.state instanceof LNUrlPayState.Init}"
         app:enableOrFade="@{!(model.amountState instanceof LNUrlPayAmountState.Error)}"
         app:icon="@drawable/ic_send"
         app:icon_tint="?attr/altTextColor"
+        app:is_paused="@{!appModel.networkInfo.lightningConnected}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/form_layout"
+        app:layout_goneMarginTop="@dimen/space_lg"
+        app:paused_text="@string/btn_pause_connecting"
         app:text="@string/lnurl_pay_pay_button"
         app:text_color="?attr/altTextColor" />
 
@@ -248,9 +254,9 @@
           android:src="@drawable/ic_alert_triangle"
           android:contentDescription="@null"
           app:layout_constraintBaseline_toBaselineOf="@id/error_message"
-          app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintEnd_toStartOf="@id/error_header"
           app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
           app:tint="?attr/negativeColor" />
 
         <TextView
@@ -270,10 +276,10 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginTop="@dimen/space_xs"
+          android:textAlignment="center"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
-          android:textAlignment="center"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/error_header" />
 
