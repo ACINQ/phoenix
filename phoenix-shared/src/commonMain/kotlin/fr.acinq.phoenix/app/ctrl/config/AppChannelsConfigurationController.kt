@@ -2,8 +2,8 @@ package fr.acinq.phoenix.app.ctrl.config
 
 import fr.acinq.lightning.channel.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.Normal
-import fr.acinq.lightning.serialization.ByteVector32KSerializer
-import fr.acinq.lightning.serialization.Serialization.lightningSerializersModule
+import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
+import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersModule
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
@@ -37,15 +37,19 @@ class AppChannelsConfigurationController(
         launch {
             val peer = peerManager.getPeer()
 
-            peer.channelsFlow.collect {
+            peer.channelsFlow.collect { channels ->
                 model(ChannelsConfiguration.Model(
-                    peer.nodeParams.keyManager.nodeId.toString(),
-                    json.encodeToString(MapSerializer(
-                        ByteVector32KSerializer,
-                        fr.acinq.lightning.serialization.v1.ChannelState.serializer()
+                    nodeId = peer.nodeParams.keyManager.nodeId.toString(),
+                    json = json.encodeToString(
+                        serializer = MapSerializer(
+                            ByteVector32KSerializer,
+                            fr.acinq.lightning.serialization.v1.ChannelState.serializer()
+                        ),
+                        value = channels.mapValues {
+                            fr.acinq.lightning.serialization.v1.ChannelState.import(it.value)
+                        }
                     ),
-                    it.mapValues { m ->  fr.acinq.lightning.serialization.v1.ChannelState.import(m.value) } ),
-                    it.map { (id, state) ->
+                    channels = channels.map { (id, state) ->
                         ChannelsConfiguration.Model.Channel(
                             id = id.toHex(),
                             isOk = state is Normal,
