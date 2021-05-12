@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.ctrl.config
 
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.ctrl.MVI
 import fr.acinq.phoenix.data.ElectrumConfig
 
@@ -10,6 +11,7 @@ object ElectrumConfiguration {
 
     data class Model(
         val configuration: ElectrumConfig? = null,
+        val currentServer: ServerAddress? = null,
         val connection: Connection = Connection.CLOSED,
         val feeRate: Long = 0,
         val blockHeight: Int = 0,

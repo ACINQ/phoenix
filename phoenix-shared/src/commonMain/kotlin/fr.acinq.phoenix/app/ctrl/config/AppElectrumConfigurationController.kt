@@ -3,6 +3,7 @@ package fr.acinq.phoenix.app.ctrl.config
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.phoenix.app.AppConfigurationManager
+import fr.acinq.phoenix.app.AppConnectionsDaemon
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumAddress
@@ -17,18 +18,21 @@ import org.kodein.log.LoggerFactory
 class AppElectrumConfigurationController(
     loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
-    private val electrumClient: ElectrumClient
+    private val electrumClient: ElectrumClient,
+    private val appConnectionsDaemon: AppConnectionsDaemon
 ) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(loggerFactory, ElectrumConfiguration.Model()) {
 
     init {
         launch {
             combine(
                 configurationManager.electrumConfig(),
+                appConnectionsDaemon.lastElectrumServerAddress,
                 electrumClient.connectionState,
                 configurationManager.electrumMessages(),
-                transform = { configState, connectionState, message ->
+                transform = { configState, currentServer, connectionState, message ->
                     ElectrumConfiguration.Model(
                         configuration = configState,
+                        currentServer = currentServer,
                         connection = connectionState,
                         blockHeight = message?.height ?: 0,
                         tipTimestamp = message?.header?.time ?: 0,
