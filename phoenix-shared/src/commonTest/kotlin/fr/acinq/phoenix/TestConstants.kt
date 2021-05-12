@@ -98,100 +98,162 @@ object TestConstants {
 }
 
 val rawWalletParams = """
-    {
-      "testnet": {
-        "version": 4,
-        "latest_critical_version": 0,
-        "trampoline": {
-          "v1": {
-            "fee_base_sat": 2,
-            "fee_percent": 0.001,
-            "hops_count": 5,
-            "cltv_expiry": 143
-          },
-          "v2": {
-            "attempts": [
-              {
-                "fee_base_sat": 0,
-                "fee_percent": 0,
-                "fee_per_millionths": 0,
-                "cltv_expiry": 576
-              },
-              {
-                "fee_base_sat": 1,
-                "fee_percent": 0.0001,
-                "fee_per_millionths": 100,
-                "cltv_expiry": 576
-              }
-            ],
-            "nodes": [
-              {
-                "name": "ACINQ",
-                "uri": "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@13.248.222.197:9735"
-              }
-            ]
-          }
-        },
-        "swap_in": {
-          "v1": {
-            "fee_percent": 0.001
-          }
-        },
-        "swap_out": {
-          "v1": {
-            "min_feerate_sat_byte": 0
-          }
-        },
-        "mempool": {
-          "v1": {
-            "high_usage": true
-          }
-        }
+{
+  "testnet": {
+    "version": 25,
+    "latest_critical_version": 0,
+    "trampoline": {
+      "v1": {
+        "fee_base_sat": 2,
+        "fee_percent": 0.001,
+        "hops_count": 5,
+        "cltv_expiry": 143
       },
-      "mainnet": {
-        "version": 4,
-        "latest_critical_version": 0,
-        "trampoline": {
-          "v1": {
-            "fee_base_sat": 2,
+      "v2": {
+        "attempts": [{
+            "fee_base_sat": 1,
+            "fee_percent": 0.0001,
+            "fee_per_millionths": 100,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 3,
+            "fee_percent": 0.0001,
+            "fee_per_millionths": 100,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 5,
+            "fee_percent": 0.0005,
+            "fee_per_millionths": 500,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 7,
             "fee_percent": 0.001,
-            "hops_count": 5,
-            "cltv_expiry": 143
-          },
-          "v2": {
-            "attempts": [
-              {
-                "fee_base_sat": 0,
-                "fee_percent": 0,
-                "fee_per_millionths": 0,
-                "cltv_expiry": 576
-              },
-              {
-                "fee_base_sat": 1,
-                "fee_percent": 0.0001,
-                "fee_per_millionths": 100,
-                "cltv_expiry": 576
-              }
-            ]
+            "fee_per_millionths": 1000,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 10,
+            "fee_percent": 0.0012,
+            "fee_per_millionths": 1200,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 12,
+            "fee_percent": 0.003,
+            "fee_per_millionths": 3000,
+            "cltv_expiry": 576
           }
-        },
-        "swap_in": {
-          "v1": {
-            "fee_percent": 0.001
-          }
-        },
-        "swap_out": {
-          "v1": {
-            "min_feerate_sat_byte": 40
-          }
-        },
-        "mempool": {
-          "v1": {
-            "high_usage": false
-          }
-        }
+        ],
+        "nodes": [{
+          "name": "endurance",
+          "uri": "03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134@13.248.222.197:9735"
+        }]
+      }
+    },
+     "pay_to_open": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_in": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_out": {
+      "v1": {
+        "min_feerate_sat_byte": 0,
+        "status": 0
+      }
+    },
+    "mempool": {
+      "v1": {
+        "high_usage": false
       }
     }
+  },
+  "mainnet": {
+    "version": 25,
+    "latest_critical_version": 0,
+    "trampoline": {
+      "v1": {
+        "fee_base_sat": 2,
+        "fee_percent": 0.001,
+        "hops_count": 5,
+        "cltv_expiry": 143
+      },
+      "v2": {
+        "attempts": [{
+            "fee_base_sat": 1,
+            "fee_percent": 0.0001,
+            "fee_per_millionths": 100,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 3,
+            "fee_percent": 0.0001,
+            "fee_per_millionths": 100,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 5,
+            "fee_percent": 0.0005,
+            "fee_per_millionths": 500,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 7,
+            "fee_percent": 0.001,
+            "fee_per_millionths": 1000,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 10,
+            "fee_percent": 0.0012,
+            "fee_per_millionths": 1200,
+            "cltv_expiry": 576
+          }, {
+            "fee_base_sat": 12,
+            "fee_percent": 0.003,
+            "fee_per_millionths": 3000,
+            "cltv_expiry": 576
+          }
+        ],
+        "nodes": [{
+          "name": "ACINQ",
+          "uri": "03864ef025fde8fb587d989186ce6a4a186895ee44a926bfc370e2c366597a3f8f@34.239.230.56:9735"
+        }]
+      }
+    },
+    "pay_to_open": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_in": {
+      "v1": {
+        "min_funding_sat": 10000,
+        "min_fee_sat": 3000,
+        "fee_percent": 0.01,
+        "status": 0
+      }
+    },
+    "swap_out": {
+      "v1": {
+        "min_feerate_sat_byte": 0,
+        "status": 0
+      }
+    },
+    "mempool": {
+      "v1": {
+        "high_usage": false
+      }
+    }
+  }
+}
 """
 
 @OptIn(ExperimentalTime::class)
