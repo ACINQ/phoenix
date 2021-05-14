@@ -94,9 +94,6 @@ struct PaymentOptionsView: View {
 			}
 		}
 		.navigationBarTitle("Payment Options")
-		.onAppear {
-			UITableView.appearance().contentInset.top = -35
-		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
