@@ -136,12 +136,15 @@ struct ReceiveLightningView: View, ViewName {
 	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
+	@State var isSwapInEnabled = true
+	@State var isPayToOpenEnabled = true
+	
 	@State var pushPermissionRequestedFromOS = true
 	@State var bgAppRefreshDisabled = false
 	@State var notificationsDisabled = false
 	@State var alertsDisabled = false
 	@State var badgesDisabled = false
-	@State var showRequestPushPermissionPopupTimer: Timer? = nil
+	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -151,7 +154,8 @@ struct ReceiveLightningView: View, ViewName {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	@StateObject var lastIncomingPayment = ObservableLastIncomingPayment()
+	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -175,15 +179,18 @@ struct ReceiveLightningView: View, ViewName {
 		.onDisappear {
 			onDisappear()
 		}
-		.onChange(of: mvi.model, perform: { newModel in
+		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
-		})
-		.onChange(of: lastIncomingPayment.value) { (payment: Lightning_kmpWalletPayment?) in
-			lastIncomingPaymentChanged(payment)
 		}
-		.onReceive(willEnterForegroundPublisher, perform: { _ in
+		.onReceive(lastIncomingPaymentPublisher) {
+			lastIncomingPaymentChanged($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
+		}
+		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
-		})
+		}
 		.sheet(isPresented: Binding( // SwiftUI only allows for 1 ".sheet"
 			get: { sheet != nil },
 			set: { if !$0 { sheet = nil }}
@@ -218,7 +225,7 @@ struct ReceiveLightningView: View, ViewName {
 	func mainPortrait() -> some View {
 		
 		VStack {
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding()
 				.background(Color.white)
@@ -230,7 +237,12 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
-				.padding([.top, .bottom])
+				.padding(.top)
+			
+			if !isPayToOpenEnabled {
+				payToOpenDisabledWarning()
+					.padding(.top, 8)
+			}
 			
 			VStack(alignment: .center) {
 			
@@ -246,8 +258,8 @@ struct ReceiveLightningView: View, ViewName {
 					.padding(.bottom, 2)
 			}
 			.padding([.leading, .trailing], 20)
-			.padding(.bottom)
-
+			.padding([.top, .bottom])
+			
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				copyButton()
 				shareButton()
@@ -278,7 +290,7 @@ struct ReceiveLightningView: View, ViewName {
 		
 		HStack {
 			
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -324,7 +336,7 @@ struct ReceiveLightningView: View, ViewName {
 	}
 	
 	@ViewBuilder
-	func qrCodeView() -> some View {
+	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
 		   qrCode.value == m.request,
@@ -337,7 +349,10 @@ struct ReceiveLightningView: View, ViewName {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						UIPasteboard.general.image = uiImg
-						toast.toast(text: "Copied QR code image to pasteboard!")
+						toast.pop(
+							Text("Copied QR code image to pasteboard!").anyView,
+							colorScheme: colorScheme.opposite
+						)
 					}) {
 						Text("Copy")
 					}
@@ -424,7 +439,7 @@ struct ReceiveLightningView: View, ViewName {
 			// Thus we have never tried to enable push notifications.
 			
 			Button {
-				showRequestPushPermissionPopup()
+				showRequestPushPermissionPopover()
 			} label: {
 				Image(systemName: "exclamationmark.bubble.fill")
 					.renderingMode(.template)
@@ -457,6 +472,27 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
+	@ViewBuilder
+	func payToOpenDisabledWarning() -> some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.padding(.trailing, 10)
+			Text(
+				"Channel creation has been temporarily disabled." +
+				" You may not be able to receive some payments."
+			)
+		}
+		.font(.caption)
+		.padding(12)
+		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.stroke(Color.appAccent, lineWidth: 1)
+		)
+		.padding([.leading, .trailing], 10)
+	}
+	
 	func invoiceAmount() -> String {
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
@@ -476,7 +512,7 @@ struct ReceiveLightningView: View, ViewName {
 				)
 			}
 		} else {
-			return ""
+			return "..."
 		}
 	}
 	
@@ -491,14 +527,15 @@ struct ReceiveLightningView: View, ViewName {
 				)
 			}
 		} else {
-			return ""
+			return "..."
 		}
 	}
 	
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
-		mvi.intent(Receive.IntentAsk(amount: nil, desc: nil))
+		let defaultDesc = Prefs.shared.defaultPaymentDescription
+		mvi.intent(Receive.IntentAsk(amount: nil, desc: defaultDesc))
 		
 		let query = Prefs.shared.pushPermissionQuery
 		if query == .neverAskedUser {
@@ -509,9 +546,9 @@ struct ReceiveLightningView: View, ViewName {
 			// But let's show the popup after a brief delay,
 			// to allow the user to see what this view is about.
 			
-			showRequestPushPermissionPopupTimer =
+			showRequestPushPermissionPopoverTimer =
 				Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-					showRequestPushPermissionPopup()
+					showRequestPushPermissionPopover()
 				}
 			
 		} else {
@@ -523,7 +560,7 @@ struct ReceiveLightningView: View, ViewName {
 	func onDisappear() -> Void {
 		log.trace("[\(viewName)] onDisappear()")
 		
-		showRequestPushPermissionPopupTimer?.invalidate()
+		showRequestPushPermissionPopoverTimer?.invalidate()
 	}
 	
 	func onModelChange(model: Receive.Model) -> Void {
@@ -630,10 +667,10 @@ struct ReceiveLightningView: View, ViewName {
 		))
 	}
 	
-	func showRequestPushPermissionPopup() -> Void {
-		log.trace("[\(viewName)] showRequestPushPermissionPopup()")
+	func showRequestPushPermissionPopover() -> Void {
+		log.trace("[\(viewName)] showRequestPushPermissionPopover()")
 		
-		let callback = {(response: PushPermissionPopupResponse) -> Void in
+		let callback = {(response: PushPermissionPopoverResponse) -> Void in
 			
 			log.debug("PushPermissionPopupResponse: \(response.rawValue)")
 			
@@ -654,7 +691,7 @@ struct ReceiveLightningView: View, ViewName {
 		
 		popoverState.display.send(PopoverItem(
 		
-			RequestPushPermissionPopup(callback: callback).anyView,
+			RequestPushPermissionPopover(callback: callback).anyView,
 			dismissable: true
 		))
 	}
@@ -664,7 +701,11 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			UIPasteboard.general.string = m.request
-			toast.toast(text: "Copied to pasteboard!")
+			toast.pop(
+				Text("Copied to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite,
+				style: .chrome
+			)
 		}
 	}
 	
@@ -689,38 +730,42 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func lastIncomingPaymentChanged(_ payment: Lightning_kmpWalletPayment?) {
+	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("[\(viewName)] lastIncomingPaymentChanged()")
 		
-		guard
-			let model = mvi.model as? Receive.ModelGenerated,
-			let lastIncomingPayment = payment as? Lightning_kmpIncomingPayment
-		else {
+		guard let model = mvi.model as? Receive.ModelGenerated else {
 			return
 		}
 		
-		if lastIncomingPayment.state() == WalletPaymentState.success {
-			
-			if lastIncomingPayment.paymentHash.toHex() == model.paymentHash {
-				presentationMode.wrappedValue.dismiss()
-			}
+		if lastIncomingPayment.state() == WalletPaymentState.success &&
+		   lastIncomingPayment.paymentHash.toHex() == model.paymentHash
+		{
+			presentationMode.wrappedValue.dismiss()
 		}
+	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		isSwapInEnabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
+		isPayToOpenEnabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
 	}
 	
 	func didTapSwapInButton() -> Void {
 		log.trace("[\(viewName)] didTapSwapInButton()")
 		
-		let didAcceptFeesCallback = {() -> Void in
+		if isSwapInEnabled {
 			
-			log.debug("SwapInFeePopup: didAcceptFeesCallback")
 			mvi.intent(Receive.IntentRequestSwapIn())
+			
+		} else {
+			
+			popoverState.display.send(PopoverItem(
+				
+				SwapInDisabledPopover().anyView,
+				dismissable: true
+			))
 		}
-		
-		popoverState.display.send(PopoverItem(
-		
-			SwapInFeePopup(didAcceptFeesCallback: didAcceptFeesCallback).anyView,
-			dismissable: false
-		))
 	}
 }
 
@@ -1075,15 +1120,15 @@ struct NotificationsDisabledWarning: View {
 	}
 }
 
-enum PushPermissionPopupResponse: String {
+enum PushPermissionPopoverResponse: String {
 	case ignored
 	case denied
 	case accepted
 }
 
-struct RequestPushPermissionPopup: View {
+struct RequestPushPermissionPopover: View, ViewName {
 	
-	let callback: (PushPermissionPopupResponse) -> Void
+	let callback: (PushPermissionPopoverResponse) -> Void
 	
 	@State private var userIsIgnoringPopover: Bool = true
 	@Environment(\.popoverState) private var popoverState: PopoverState
@@ -1119,7 +1164,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func didDeny() -> Void {
-		log.trace("[RequestPushPermissionPopup] didDeny()")
+		log.trace("[\(viewName)] didDeny()")
 		
 		callback(.denied)
 		userIsIgnoringPopover = false
@@ -1127,7 +1172,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func didAccept() -> Void {
-		log.trace("[RequestPushPermissionPopup] didAccept()")
+		log.trace("[\(viewName)] didAccept()")
 		
 		callback(.accepted)
 		userIsIgnoringPopover = false
@@ -1135,7 +1180,7 @@ struct RequestPushPermissionPopup: View {
 	}
 	
 	func willClose() -> Void {
-		log.trace("[RequestPushPermissionPopup] willClose()")
+		log.trace("[\(viewName)] willClose()")
 		
 		if userIsIgnoringPopover {
 			callback(.ignored)
@@ -1143,69 +1188,39 @@ struct RequestPushPermissionPopup: View {
 	}
 }
 
-struct SwapInFeePopup : View {
+fileprivate struct SwapInDisabledPopover: View, ViewName {
 	
-	let didAcceptFeesCallback: () -> Void
+	@Environment(\.popoverState) var popoverState: PopoverState
 	
-	@Environment(\.popoverState) private var popoverState: PopoverState
-	
+	@ViewBuilder
 	var body: some View {
-		VStack(alignment: .leading) {
+		
+		VStack(alignment: .trailing) {
 			
-			Text("Receive with a Bitcoin address")
-				.font(.headline)
+			VStack(alignment: .leading) {
+				Text("Some Services Disabled")
+					.font(.title3)
+					.padding(.bottom)
+				
+				Text(
+					"The bitcoin mempool is congested and fees are very high." +
+					" The on-chain swap service has been temporarily disabled."
+				)
 				.lineLimit(nil)
-				.padding(.bottom, 20)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
-			
-				Text("A standard Bitcoin address will be displayed next.") +
-				Text(" Funds sent to this address will arrive in your wallet after one confirmation.")
-				
-				let min = Utils.formatBitcoin(sat: 1_000, bitcoinUnit: .sat)
-				Group {
-					Text("There is a small fee of ") +
-					Text("0.10%").bold() +
-					Text(" with a minimum fee of ") +
-					Text(min.string).bold() + Text(".")
-				}
-				
-				Text("For example, if you send $750, the fee is $0.75.")
 			}
-			.font(.callout)
+			.padding(.bottom)
 			
 			HStack {
-				Spacer()
-				Button("Cancel") {
-					didCancel()
-				}
-				.padding(.trailing, 8)
-				
-				Button("Proceed") {
-					didAccept()
+				Button {
+					popoverState.close.send()
+				} label : {
+					Text("Try again later").font(.headline)
 				}
 			}
-			.font(.headline)
-			.padding(.top, 20)
-			
-		} // </VStack>
+		}
 		.padding()
 	}
-	
-	func didCancel() -> Void {
-		log.trace("[SwapInFeePopup] didCancel()")
-		
-		popoverState.close.send()
-	}
-	
-	func didAccept() -> Void {
-		log.trace("[SwapInFeePopup] didAccept()")
-		
-		didAcceptFeesCallback()
-		popoverState.close.send()
-	}
 }
-
 
 struct SwapInView: View, ViewName {
 	
@@ -1221,17 +1236,22 @@ struct SwapInView: View, ViewName {
 	
 	@State var sheet: ReceiveViewSheet? = nil
 	
+	@State var swapIn_feePercent: Double = 0.0
+	@State var swapIn_minFeeSat: Int64 = 0
+	@State var swapIn_minFundingSat: Int64 = 0
+	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	@ViewBuilder
 	var body: some View {
 		
 		VStack {
 			
-			qrCodeView()
+			qrCodeView
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -1256,7 +1276,10 @@ struct SwapInView: View, ViewName {
 						.contextMenu {
 							Button(action: {
 								UIPasteboard.general.string = btcAddr
-								toast.toast(text: "Copied to pasteboard!")
+								toast.pop(
+									Text("Copied to pasteboard!").anyView,
+									colorScheme: colorScheme.opposite
+								)
 							}) {
 								Text("Copy")
 							}
@@ -1267,14 +1290,6 @@ struct SwapInView: View, ViewName {
 			}
 			.padding([.leading, .trailing], 40)
 			.padding(.bottom)
-			
-			let min = Utils.formatBitcoin(sat: 10_000, bitcoinUnit: .sat)
-			Group {
-				Text("Deposit must be at least ") + Text(min.string).bold()
-			}
-			.font(.subheadline)
-			.padding(.bottom)
-			
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				
@@ -1289,6 +1304,9 @@ struct SwapInView: View, ViewName {
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
 				
 			} // </HStack>
+			
+			feesInfoView
+				.padding([.top, .leading, .trailing])
 			
 			Spacer()
 			
@@ -1311,16 +1329,19 @@ struct SwapInView: View, ViewName {
 			} // </switch>
 		}
 		.navigationBarTitle("Swap In", displayMode: .inline)
-		.onChange(of: mvi.model, perform: { newModel in
+		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
-		})
-		.onReceive(incomingSwapsPublisher) { incomingSwaps in
-			onIncomingSwapsChanged(incomingSwaps)
+		}
+		.onReceive(incomingSwapsPublisher) {
+			onIncomingSwapsChanged($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
 		}
 	}
 	
 	@ViewBuilder
-	func qrCodeView() -> some View {
+	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated,
 			qrCode.value == m.address,
@@ -1333,7 +1354,10 @@ struct SwapInView: View, ViewName {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						UIPasteboard.general.image = uiImg
-						toast.toast(text: "Copied QR code image to pasteboard!")
+						toast.pop(
+							Text("Copied QR code image to pasteboard!").anyView,
+							colorScheme: colorScheme.opposite
+						)
 					}) {
 						Text("Copy")
 					}
@@ -1363,6 +1387,50 @@ struct SwapInView: View, ViewName {
 				.font(.caption)
 			}
 		}
+	}
+	
+	@ViewBuilder
+	var feesInfoView: some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 8) {
+			
+			Image(systemName: "exclamationmark.circle")
+				.imageScale(.large)
+			
+			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
+			
+			let feePercent = String(format:"%.2f", swapIn_feePercent)
+			let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+				
+				Text(
+					"This is a swap address. It is not controlled by your wallet." +
+					" On-chain deposits sent to this address will be converted to Lightning channels."
+				)
+				.lineLimit(nil)
+				.multilineTextAlignment(.leading)
+				.padding(.bottom, 14)
+				
+				Group {
+					Text("Deposits must be at least ") +
+					Text(minFunding.string).bold() +
+					Text(". The fee is ") +
+					Text("\(feePercent)%").bold() +
+					Text(" (") +
+					Text("\(minFee.string)") +
+					Text(" minimum).")
+				}
+				.lineLimit(nil)
+				.multilineTextAlignment(.leading)
+			}
+		}
+		.font(.subheadline)
+		.padding()
+		.background(
+			RoundedRectangle(cornerRadius: 10)
+				.foregroundColor(Color.mutedBackground)
+		)
 	}
 	
 	func bitcoinAddress() -> String? {
@@ -1402,12 +1470,23 @@ struct SwapInView: View, ViewName {
 		}
 	}
 	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		swapIn_feePercent = context.swapIn.v1.feePercent
+		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
+		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
+	}
+	
 	func didTapCopyButton() -> Void {
 		log.trace("[\(viewName)] didTapCopyButton()")
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			UIPasteboard.general.string = m.address
-			toast.toast(text: "Copied to pasteboard!")
+			toast.pop(
+				Text("Copied to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
 		}
 	}
 	

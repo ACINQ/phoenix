@@ -10,6 +10,22 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+/// The `AnyHTML` class is an ObservableObject designed to asynchronously
+/// load & manipulate HTML files in the app bundle.
+///
+/// It supports loading both a `*.html` & `*.css"` file.
+///
+/// The general idea is:
+/// 1. Create an html file (e.g. "foo.html"), and add to your app bundle.
+/// 2. Optionally create a corresponding css file with the same name. E.g. "foo.css"
+/// 3. The html file can optionally be localized using standard Xcode localization.
+///    This class will automatically load the correct localization for the user.
+///    The css file can optionally be localized too (although this is less common).
+/// 4. Add an empty style placeholder to your html file: `<style></style>`.
+///    It will get replaced with the contents of your css file.
+/// 5. Add any placeholders you want into either file using `[[some_key_name_here]]`
+/// 6  Subclass this class, and override `cssReplacements` & `htmlReplacements` as needed
+///
 class AnyHTML: ObservableObject {
 	
 	let filename: String
@@ -82,6 +98,20 @@ class AnyHTML: ObservableObject {
 		return html
 	}
 	
+	/// Provides a replacement mapping of `[key: value]`,
+	/// where text in the css file matching `[[key]]` is replaced by `value`.
+	///
+	/// For example, if the css file contains:
+	/// `color: [[dynamic_color]];`
+	///
+	/// And you provide a mapping of:
+	/// `["my_color": "blue"]`
+	///
+	/// Then the css becomes:
+	/// `color: blue;`
+	///
+	/// This method is designed to be overriden by subclasses.
+	///
 	func cssReplacements(_ traits: UITraitCollection) -> [String: String] {
 		
 		var replacements = [String: String]()
@@ -92,6 +122,20 @@ class AnyHTML: ObservableObject {
 		return replacements
 	}
 	
+	/// Provides a replacement mapping of `[key: value]`,
+	/// where text in the css file matching `[[key]]` is replaced by `value`.
+	///
+	/// For example, if the html file contains:
+	/// `Hello [[customer_name]]`
+	///
+	/// And you provide a mapping of:
+	/// `["customer_name": "Satoshi Nakamoto"]`
+	///
+	/// Then the html becomes:
+	/// `Hello Satoshi Nakamoto`
+	///
+	/// This method is designed to be overriden by subclasses.
+	///
 	func htmlReplacements(_ traits: UITraitCollection) -> [String: String] {
 		
 		return [String: String]()

@@ -24,7 +24,8 @@ struct ConfigurationView: MVIView {
 		case AboutView
 		case DisplayConfigurationView
 		case ElectrumConfigurationView
-		case ComingSoonView
+		case TorView
+		case PaymentOptionsView
 		case AppAccessView
 		case RecoverySeedView
 		case LogsConfigurationView
@@ -70,11 +71,20 @@ struct ConfigurationView: MVIView {
 				}
 				NavigationLink(
 					destination: ComingSoonView(),
-					tag: Tag.ComingSoonView.rawValue,
+					tag: Tag.TorView.rawValue,
 					selection: $selectedTag
 				) {
 					Label { Text("Tor") } icon: {
 						Image(systemName: "shield.lefthalf.fill")
+					}
+				}
+				NavigationLink(
+					destination: PaymentOptionsView(),
+					tag: Tag.PaymentOptionsView.rawValue,
+					selection: $selectedTag
+				) {
+					Label { Text("Payment options & fees") } icon: {
+						Image(systemName: "wrench")
 					}
 				}
 			}

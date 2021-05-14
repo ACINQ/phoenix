@@ -25,6 +25,7 @@ struct SendView: MVIView {
 	
 	@StateObject var toast = Toast()
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	init(firstModel: Scan.Model? = nil) {
@@ -44,8 +45,8 @@ struct SendView: MVIView {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.onChange(of: mvi.model, perform: { newModel in
 
-			if newModel is Scan.ModelBadRequest {
-				toast.toast(text: "Unexpected request format!")
+			if let newModel = newModel as? Scan.ModelBadRequest {
+				showErrorToast(newModel)
 			}
 			else if let model = newModel as? Scan.ModelDangerousRequest {
 				paymentRequest = model.request
@@ -89,6 +90,57 @@ struct SendView: MVIView {
 		}
 	}
 	
+	func showErrorToast(_ model: Scan.ModelBadRequest) -> Void {
+		log.trace("showErrorToast()")
+		
+		let msg: String
+		if let reason = model.reason as? Scan.BadRequestReasonChainMismatch {
+			
+			let requestChain = reason.requestChain?.name ?? "unknown"
+			msg = NSLocalizedString(
+				"The invoice is for \(requestChain), but you're on \(reason.myChain.name)",
+				comment: "Error message - scanning lightning invoice"
+			)
+		
+		} else if model.reason is Scan.BadRequestReasonIsLnUrl {
+			
+			msg = NSLocalizedString(
+				"Phoenix does not support the LNURL protocol yet",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		} else if model.reason is Scan.BadRequestReasonIsBitcoinAddress {
+			
+			msg = NSLocalizedString(
+				"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments." +
+				" You can use a third-party service to make the offchain->onchain swap.",
+				comment: "Error message - scanning lightning invoice"
+			)
+			
+		} else if model.reason is Scan.BadRequestReasonAlreadyPaidInvoice {
+			
+			msg = NSLocalizedString(
+				"You've already paid this invoice. Paying it again could result in stolen funds.",
+				comment: "Error message - scanning lightning invoice"
+			)
+		
+		} else {
+		
+			msg = NSLocalizedString(
+				"This doesn't appear to be a Lightning invoice",
+				comment: "Error message - scanning lightning invoice"
+			)
+		}
+		toast.pop(
+			Text(msg).multilineTextAlignment(.center).anyView,
+			colorScheme: colorScheme.opposite,
+			style: .chrome,
+			duration: 30.0,
+			location: .middle,
+			showCloseButton: true
+		)
+	}
+	
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
@@ -96,7 +148,7 @@ struct SendView: MVIView {
 	}
 }
 
-struct ScanView: View {
+struct ScanView: View, ViewName {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
@@ -146,9 +198,7 @@ struct ScanView: View {
 				}
 				
 				Button {
-					if let request = UIPasteboard.general.string {
-						mvi.intent(Scan.IntentParse(request: request))
-					}
+					pasteFromClipboard()
 				} label: {
 					Image(systemName: "arrow.right.doc.on.clipboard")
 					Text("Paste from clipboard")
@@ -160,7 +210,7 @@ struct ScanView: View {
 		}
 		.frame(maxHeight: .infinity)
 		.navigationBarTitle("Scan a QR code", displayMode: .inline)
-		.zIndex(2) // [SendingView, ValidateView, ReadyView]
+		.zIndex(2) // [SendingView, ValidateView, ScanView]
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -181,14 +231,31 @@ struct ScanView: View {
 		}
 	}
 	
+	func pasteFromClipboard() -> Void {
+		log.trace("[\(viewName)] pasteFromClipboard()")
+		
+		if let request = UIPasteboard.general.string {
+			mvi.intent(Scan.IntentParse(request: request))
+		}
+	}
+	
 	func showWarning() -> Void {
+		log.trace("[\(viewName)] showWarning()")
+		
+		guard
+			let paymentRequest = paymentRequest,
+			let model = mvi.model as? Scan.ModelDangerousRequest
+		else {
+			return
+		}
 		
 		ignoreScanner = true
 		popoverState.display.send(PopoverItem(
 			
-			PopupAlert(
+			DangerousInvoiceAlert(
+				model: model,
 				postIntent: mvi.intent,
-				paymentRequest: paymentRequest!,
+				paymentRequest: paymentRequest,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
 			).anyView,
@@ -197,8 +264,9 @@ struct ScanView: View {
 	}
 }
 
-struct PopupAlert : View {
+struct DangerousInvoiceAlert : View, ViewName {
 
+	let model: Scan.ModelDangerousRequest
 	let postIntent: (Scan.Intent) -> Void
 	let paymentRequest: String
 
@@ -209,15 +277,50 @@ struct PopupAlert : View {
 
 	var body: some View {
 		
-		VStack(alignment: .leading) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 
 			Text("Warning")
 				.font(.title2)
 				.padding(.bottom)
+			
+			if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
+				content_amountlessInvoice
+			} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
+				content_ownInvoice
+			} else {
+				content_unknown
+			}
 
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				Spacer()
+				
+				Button("Cancel") {
+					didCancel()
+				}
+				.font(.title3)
+				.padding(.trailing)
+					
+				Button("Continue") {
+					didConfirm()
+				}
+				.font(.title3)
+				.disabled(isUnknownType())
+			}
+			.padding(.top, 30)
+			
+		} // </VStack>
+		.padding()
+	}
+	
+	@ViewBuilder
+	var content_amountlessInvoice: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
 			Group {
 				Text(
-					"This invoice doesn't include an amount. This may be dangerous:" +
+					"The invoice doesn't include an amount. This can be dangerous:" +
 					" malicious nodes may be able to steal your payment. To be safe, "
 				)
 				+ Text("ask the payee to specify an amount").fontWeight(.bold)
@@ -226,27 +329,52 @@ struct PopupAlert : View {
 			.padding(.bottom)
 
 			Text("Are you sure you want to pay this invoice?")
-				.padding(.bottom)
-
-			HStack {
-				Button("Cancel") {
-					isShowing = false
-					ignoreScanner = false
-					popoverState.close.send()
-				}
-				.font(.title3)
-					
-				Spacer()
-					
-				Button("Confirm") {
-					isShowing = false
-					postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
-					popoverState.close.send()
-				}
-				.font(.title3)
-			}
-		} // </VStack>
-		.padding()
+		}
+	}
+	
+	@ViewBuilder
+	var content_ownInvoice: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("The invoice is for you. You are about to pay yourself.")
+		}
+	}
+	
+	@ViewBuilder
+	var content_unknown: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Something is amiss with this invoice...")
+		}
+	}
+	
+	func isUnknownType() -> Bool {
+		
+		if model.reason is Scan.DangerousRequestReasonIsAmountlessInvoice {
+			return false
+		} else if model.reason is Scan.DangerousRequestReasonIsOwnInvoice {
+			return false
+		} else {
+			return true
+		}
+	}
+	
+	func didCancel() -> Void {
+		log.trace("[\(viewName)] didCancel()")
+		
+		isShowing = false
+		ignoreScanner = false
+		popoverState.close.send()
+	}
+	
+	func didConfirm() -> Void {
+		log.trace("[\(viewName)] didConfirm()")
+		
+		isShowing = false
+		postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
+		popoverState.close.send()
 	}
 }
 
@@ -400,7 +528,7 @@ struct ValidateView: View, ViewName {
 			
 		}// </ZStack>
 		.navigationBarTitle("Confirm Payment", displayMode: .inline)
-		.zIndex(1) // [SendingView, ValidateView, ReadyView]
+		.zIndex(1) // [SendingView, ValidateView, ScanView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
 			onAppear()
@@ -589,7 +717,7 @@ struct SendingView: View {
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle("Sending payment", displayMode: .inline)
-		.zIndex(0) // [SendingView, ValidateView, ReadyView]
+		.zIndex(0) // [SendingView, ValidateView, ScanView]
 	}
 }
 
@@ -623,13 +751,6 @@ class SendView_Previews: PreviewProvider {
 
 		NavigationView {
 			SendingView(model: Scan.ModelSending())
-		}
-		.modifier(GlobalEnvironment())
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
-		
-		NavigationView {
-			
 		}
 		.modifier(GlobalEnvironment())
 		.preferredColorScheme(.dark)

@@ -2,6 +2,7 @@ package fr.acinq.phoenix.app
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.NetworkState
@@ -72,6 +73,9 @@ class AppConnectionsDaemon(
     private val httpApiControlFlow = MutableStateFlow(TrafficControl())
     private val httpApiControlChanges = Channel<TrafficControl.() -> TrafficControl>()
 
+    private var _lastElectrumServerAddress = MutableStateFlow<ServerAddress?>(null)
+    val lastElectrumServerAddress: StateFlow<ServerAddress?> = _lastElectrumServerAddress
+
     init {
         fun enableControlFlow(
             label: String,
@@ -95,14 +99,18 @@ class AppConnectionsDaemon(
                 when {
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (electrumConnectionJob == null) {
-                            electrumConnectionJob = connectionLoop("Electrum", electrumClient.connectionState) {
-                                val electrumConfig = configurationManager.electrumConfig().value
-                                if (electrumConfig == null) {
+                            electrumConnectionJob = connectionLoop(
+                                name = "Electrum",
+                                statusStateFlow = electrumClient.connectionState
+                            ) {
+                                val electrumServerAddress = configurationManager.electrumServerAddress()
+                                if (electrumServerAddress == null) {
                                     logger.info { "ignored electrum connection opportunity because no server is configured yet" }
                                 } else {
-                                    logger.info { "connecting to electrum using config=$electrumConfig" }
-                                    electrumClient.connect(electrumConfig.server)
+                                    logger.info { "connecting to electrum server=$electrumServerAddress" }
+                                    electrumClient.connect(electrumServerAddress)
                                 }
+                                _lastElectrumServerAddress.value = electrumServerAddress
                             }
                         }
                     }
@@ -124,7 +132,10 @@ class AppConnectionsDaemon(
                 when {
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (peerConnectionJob == null) {
-                            peerConnectionJob = connectionLoop("Peer", peer.connectionState) {
+                            peerConnectionJob = connectionLoop(
+                                name = "Peer",
+                                statusStateFlow = peer.connectionState
+                            ) {
                                 peer.connect()
                             }
                         }
@@ -147,14 +158,14 @@ class AppConnectionsDaemon(
                     it.networkIsAvailable && it.disconnectCount <= 0 -> {
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
-                            configurationManager.startWalletParamsLoop()
+                            configurationManager.startWalletContextLoop()
                             currencyManager.start()
                         }
                     }
                     else -> {
                         if (httpControlFlowEnabled) {
                             httpControlFlowEnabled = false
-                            configurationManager.stopWalletParamsLoop()
+                            configurationManager.stopWalletContextLoop()
                             currencyManager.stop()
                         }
                     }
@@ -202,18 +213,46 @@ class AppConnectionsDaemon(
         // listen to electrum configuration changes and reconnect when needed.
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
-            configurationManager.electrumConfig().collect { config ->
-                if (config == null) {
+            configurationManager.electrumConfig().collect { newElectrumConfig ->
+                val changed = when (val oldElectrumConfig = previousElectrumConfig) {
+                    is ElectrumConfig.Custom -> {
+                        when (newElectrumConfig) {
+                            is ElectrumConfig.Custom -> { // custom -> custom
+                                newElectrumConfig.server.host != oldElectrumConfig.server.host ||
+                                newElectrumConfig.server.port != oldElectrumConfig.server.port
+                            }
+                            is ElectrumConfig.Random -> true // custom -> random
+                            else -> true // custom -> null
+                        }
+                    }
+                    is ElectrumConfig.Random -> {
+                        when (newElectrumConfig) {
+                            is ElectrumConfig.Custom -> true // random -> custom
+                            is ElectrumConfig.Random -> false // random -> random
+                            else -> true // random -> null
+                        }
+                    }
+                    else -> {
+                        when (newElectrumConfig) {
+                            null -> false // null -> null
+                            else -> true // null -> (custom || random)
+                        }
+                    }
+                }
+                if (changed) {
+                    logger.info { "electrum server config changed to=$newElectrumConfig, reconnecting..." }
                     electrumControlChanges.send { incrementDisconnectCount() }
-                } else if (config.server.host != previousElectrumConfig?.server?.host) {
-                    logger.info { "electrum server config updated to=$config, reconnecting..." }
-                    electrumControlChanges.send { incrementDisconnectCount() }
-                    delay(500)
+                    if (previousElectrumConfig != null) {
+                        // The electrumConfig is only null on app launch.
+                        // It gets set by the client app during launch,
+                        // and from that point forward it's either Custom or Random.
+                        delay(500)
+                    }
                     // We need to delay the next connection vote because the collector WILL skip fast updates (see documentation)
                     // and ignore the change since the TrafficControl object would not have changed.
                     electrumControlChanges.send { decrementDisconnectCount() }
                 }
-                previousElectrumConfig = config
+                previousElectrumConfig = newElectrumConfig
             }
         }
     }
@@ -234,12 +273,24 @@ class AppConnectionsDaemon(
         }
     }
 
-    private fun connectionLoop(name: String, statusStateFlow: StateFlow<Connection>, connect: () -> Unit) = launch {
+    private fun connectionLoop(
+        name: String,
+        statusStateFlow: StateFlow<Connection>,
+        connect: () -> Unit
+    ) = launch {
+
+        var disconnectCount = 0
         var retryDelay = RETRY_DELAY
         statusStateFlow.collect {
             if (it == Connection.CLOSED) {
-                logger.debug { "Wait for $retryDelay before retrying connection on $name" }
-                delay(retryDelay) ; retryDelay = increaseDelay(retryDelay)
+                if (disconnectCount > 0) {
+                    logger.debug { "Wait for $retryDelay before retrying connection on $name" }
+                    delay(retryDelay)
+                    retryDelay = increaseDelay(retryDelay)
+                } else {
+                    // First connection attempt in loop - no need for backoff
+                }
+                disconnectCount++
                 connect()
             } else if (it == Connection.ESTABLISHED) {
                 retryDelay = RETRY_DELAY

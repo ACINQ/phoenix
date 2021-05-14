@@ -12,7 +12,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct LockView : View {
 	
-	@Binding var isUnlocked: Bool
+	@ObservedObject var lockState: LockState
 	
 	@State var isTouchID = true
 	@State var isFaceID = false
@@ -25,6 +25,24 @@ struct LockView : View {
 	)
 	
 	var body: some View {
+		
+		ZStack {
+			
+			Color.clear   // an additional layer
+				.zIndex(0) // for animation purposes
+			
+			if !lockState.isUnlocked {
+				main
+					.zIndex(1)
+					.transition(.asymmetric(
+						insertion : .identity,
+						removal   : .move(edge: .bottom)
+					))
+			}
+		}
+	}
+	
+	var main: some View {
 		
 		VStack {
 			
@@ -100,7 +118,7 @@ struct LockView : View {
 		// - The application has just finished launching.
 		//   In this case: applicationState == .active
 		//
-		// - The user is backgrounding the app, so the ContentView is switching in the LockView for security.
+		// - The user is backgrounding the app, so we're switching in the LockView for security.
 		//   In this case: applicationState == .background
 		
 		log.debug("UIApplication.shared.applicationState = \(UIApplication.shared.applicationState)")
@@ -186,7 +204,7 @@ struct LockView : View {
 				case .success(let mnemonics):
 					AppDelegate.get().loadWallet(mnemonics: mnemonics)
 					withAnimation(.easeInOut) {
-						isUnlocked = true
+						lockState.isUnlocked = true
 					}
 				case .failure(let error):
 					log.debug("tryUnlockWithBiometrics: error: \(String(describing: error))")

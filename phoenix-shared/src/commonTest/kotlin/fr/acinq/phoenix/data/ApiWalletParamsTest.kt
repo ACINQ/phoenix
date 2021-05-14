@@ -31,16 +31,16 @@ class ApiWalletParamsTest {
     @Test
     fun wallet_params_deserialization() {
         val json = Json { ignoreUnknownKeys = true }
-        val decodedParams = json.decodeFromString(ApiWalletParams.V0.serializer(), rawWalletParams)
+        val decodedParams = json.decodeFromString(WalletContext.V0.serializer(), rawWalletParams)
 
         assertNotNull(decodedParams)
 
-        fun ApiWalletParams.V0.ChainParams.checkStructure() {
-            assertEquals(4, version)
+        fun WalletContext.V0.ChainContext.checkStructure() {
+            assertEquals(25, version)
             assertEquals(0, latestCriticalVersion)
-            assertEquals(2, trampoline.v2.attempts.size)
-            assertEquals(ApiWalletParams.V0.TrampolineParams.TrampolineFees(0, 0, 576), trampoline.v2.attempts.first())
-            assertEquals(ApiWalletParams.V0.TrampolineParams.TrampolineFees(1, 100, 576), trampoline.v2.attempts.last())
+            assertEquals(6, trampoline.v2.attempts.size)
+            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(1, 100, 576), trampoline.v2.attempts.first())
+            assertEquals(WalletContext.V0.TrampolineParams.TrampolineFees(12, 3000, 576), trampoline.v2.attempts.last())
         }
 
         decodedParams.testnet.checkStructure()
@@ -54,23 +54,16 @@ class ApiWalletParamsTest {
     @Test
     fun export_to_wallet_params() {
         val json = Json { ignoreUnknownKeys = true }
-        val apiWalletParams = json.decodeFromString(ApiWalletParams.V0.serializer(), rawWalletParams)
+        val apiWalletParams = json.decodeFromString(WalletContext.V0.serializer(), rawWalletParams)
         assertNotNull(apiWalletParams)
 
         assertEquals(
-            WalletParams(
-                NodeUri(
-                    PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"),
-                    "13.248.222.197",
-                    9735
-                ),
-                listOf(
-                    TrampolineFees(0.sat, 0, CltvExpiryDelta(576)),
-                    TrampolineFees(1.sat, 100, CltvExpiryDelta(576))
-                ),
-                InvoiceDefaultRoutingFees(1000.msat, 100, CltvExpiryDelta(144))
+            NodeUri(
+                PublicKey.fromHex("03933884aaf1d6b108397e5efe5c86bcf2d8ca8d2f700eda99db9214fc2712b134"),
+                "13.248.222.197",
+                9735
             ),
-            apiWalletParams.export(Chain.Testnet))
+            apiWalletParams.export(Chain.Testnet).walletParams().trampolineNode)
     }
 
 }

@@ -229,6 +229,7 @@ fileprivate struct ChannelInfoPopup: View {
 	@Binding var sharing: String?
 	@ObservedObject var toast: Toast
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	var body: some View {
@@ -245,7 +246,10 @@ fileprivate struct ChannelInfoPopup: View {
 			HStack {
 				Button {
 					UIPasteboard.general.string = channel.json
-					toast.toast(text: "Copied to pasteboard")
+					toast.pop(
+						Text("Copied to pasteboard").anyView,
+						colorScheme: colorScheme.opposite
+					)
 				} label: {
 					Image(systemName: "square.on.square")
 						.resizable()

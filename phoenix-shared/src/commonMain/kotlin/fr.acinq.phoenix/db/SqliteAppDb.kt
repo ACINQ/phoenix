@@ -3,10 +3,8 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import fr.acinq.lightning.WalletParams
-import fr.acinq.phoenix.data.ApiWalletParams
+import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.BitcoinPriceRate
-import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +41,7 @@ class SqliteAppDb(driver: SqlDriver) {
 
     }
 
-    suspend fun setWalletParams(version: ApiWalletParams.Version, rawData: String): WalletParams? {
+    suspend fun setWalletContext(version: WalletContext.Version, rawData: String): WalletContext.V0? {
         withContext(Dispatchers.Default) {
             paramsQueries.transaction {
                 paramsQueries.get(version.name).executeAsOneOrNull()?.run {
@@ -62,30 +60,30 @@ class SqliteAppDb(driver: SqlDriver) {
             }
         }
 
-        return getWalletParamsOrNull(version).second
+        return getWalletContextOrNull(version).second
     }
 
-    suspend fun getWalletParamsOrNull(version: ApiWalletParams.Version): Pair<Instant, WalletParams?> =
+    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Instant, WalletContext.V0?> =
         withContext(Dispatchers.Default) {
-            paramsQueries.get(version.name, ::mapWalletParams).executeAsOneOrNull()
+            paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
         } ?: Instant.DISTANT_PAST to null
 
-    private fun mapWalletParams(
+    private fun mapWalletContext(
         version: String,
         data: String,
         updated_at: Long
-    ): Pair<Instant, WalletParams?> {
-        val walletParams = when (ApiWalletParams.Version.valueOf(version)) {
-            ApiWalletParams.Version.V0 -> try {
+    ): Pair<Instant, WalletContext.V0?> {
+        val walletContext = when (WalletContext.Version.valueOf(version)) {
+            WalletContext.Version.V0 -> try {
                 json.decodeFromString(
-                    ApiWalletParams.V0.serializer(),
+                    WalletContext.V0.serializer(),
                     data
-                ).export(Chain.Mainnet)
+                )
             } catch (e: Exception) {
                 null
             }
         }
 
-        return Instant.fromEpochSeconds(updated_at) to walletParams
+        return Instant.fromEpochSeconds(updated_at) to walletContext
     }
 }

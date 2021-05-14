@@ -82,7 +82,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Connections observer
-		let connectionsMonitor = AppDelegate.get().business.connectionsMonitor
+		let connectionsMonitor = business.connectionsMonitor
 		connectionsMonitor.publisher.sink {(connections: Connections) in
 			self.connectionsChanged(connections)
 		}.store(in: &cancellables)
@@ -200,18 +200,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		var didReceivePayment = false
 		var totalTimer: Timer? = nil
 		var postPaymentTimer: Timer? = nil
-		var watcher: Ktor_ioCloseable? = nil
+		var publisher: AnyPublisher<Lightning_kmpIncomingPayment, Never>? = nil
+		var cancellable: AnyCancellable? = nil
+		
+		let pushReceivedAt = Date()
 		
 		var isFinished = false
 		let Finish = { (_: Timer) -> Void in
 			
 			if !isFinished {
 				isFinished = true
-				self.business.incrementDisconnectCount() // balance previous call
+				self.business.incrementDisconnectCount() // balance previous decrement call
 				
 				totalTimer?.invalidate()
 				postPaymentTimer?.invalidate()
-				watcher?.close()
+				publisher = nil
+				cancellable?.cancel()
 				
 				if didReceivePayment {
 					log.info("Background fetch: Cleaning up")
@@ -227,23 +231,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// So we set a timer to ensure we stop before the max allowed.
 		totalTimer = Timer.scheduledTimer(withTimeInterval: 29.0, repeats: false, block: Finish)
 		
-		var isCurrentValue = true
-		let flow = SwiftFlow<Lightning_kmpWalletPayment>(origin: business.paymentsManager.lastIncomingPayment)
-		watcher = flow.watch { (payment: Lightning_kmpWalletPayment?) in
-			assertMainThread()
-			if isCurrentValue {
-				isCurrentValue = false
-				return // from block
-			}
-			if let payment = payment {
-				log.info("Background fetch: Payment received !")
+		publisher = business.paymentsManager.lastIncomingPaymentPublisher()
+		cancellable = publisher!.sink(receiveValue: { (payment: Lightning_kmpIncomingPayment) in
 				
-				didReceivePayment = true
-				postPaymentTimer?.invalidate()
-				postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
-				self.displayLocalNotification(payment)
+			assertMainThread()
+			
+			guard
+				let paymentReceivedAt = payment.received?.receivedAtDate,
+				paymentReceivedAt > pushReceivedAt
+			else {
+				// Ignoring - this is the most recently received incomingPayment, but not a new one
+				return
 			}
-		}
+			
+			log.info("Background fetch: Payment received !")
+			
+			didReceivePayment = true
+			postPaymentTimer?.invalidate()
+			postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
+			self.displayLocalNotification(payment)
+		})
 	}
 	
 	func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {

@@ -120,3 +120,21 @@ extension View {
 		}
 	}
 }
+
+extension View {
+	
+	/// Helper to create `AnyView` from view
+	var anyView: AnyView {
+		AnyView(self)
+	}
+}
+
+extension ColorScheme {
+	
+	var opposite: ColorScheme {
+		switch self {
+			case .light : return .dark
+			default     : return .light
+		}
+	}
+}

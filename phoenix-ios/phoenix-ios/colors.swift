@@ -12,11 +12,7 @@ extension Color {
 
 	static var appAccent: Color {
 		get {
-			if AppDelegate.get().business.chain.isTestnet() {
-				return Color("appAccentBlue")
-			} else {
-				return Color("appAccentGreen")
-			}
+			return Color(UIColor.appAccent) // see below: extension UIColor
 		}
 	}
 	

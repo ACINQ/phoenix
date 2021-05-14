@@ -18,6 +18,7 @@ class Prefs {
 		case pushPermissionQuery
 		case electrumConfig
 		case isTorEnabled
+		case defaultPaymentDescription
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -148,6 +149,18 @@ class Prefs {
 		set {
 			let key = Keys.electrumConfig.rawValue
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
+		}
+	}
+	
+	var defaultPaymentDescription: String? {
+		get {
+			let key = Keys.defaultPaymentDescription.rawValue
+			let saved: String? = UserDefaults.standard.string(forKey: key)
+			return saved
+		}
+		set {
+			let key = Keys.defaultPaymentDescription.rawValue
+			UserDefaults.standard.setValue(newValue, forKey: key)
 		}
 	}
 }

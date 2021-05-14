@@ -19,18 +19,16 @@ struct HomeView : MVIView, ViewName {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@State var lastCompletedPayment: Lightning_kmpWalletPayment? = nil
-	@State var showConnections = false
-
 	@State var selectedPayment: Lightning_kmpWalletPayment? = nil
+	
+	@State var isMempoolFull = false
 	
 	@StateObject var toast = Toast()
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let lastCompletedPaymentPublisher = KotlinPassthroughSubject<Lightning_kmpWalletPayment>(
-		AppDelegate.get().business.paymentsManager.lastCompletedPayment
-	)
+	let lastCompletedPaymentPublisher = AppDelegate.get().business.paymentsManager.lastCompletedPaymentPublisher()
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
@@ -38,7 +36,10 @@ struct HomeView : MVIView, ViewName {
 	@State var incomingSwapAnimationsRemaining = 0
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
-
+	
+	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.openURL) var openURL
+	
 	@ViewBuilder
 	var view: some View {
 
@@ -61,8 +62,11 @@ struct HomeView : MVIView, ViewName {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
-		.onReceive(lastCompletedPaymentPublisher) { (payment: Lightning_kmpWalletPayment) in
-			lastCompletedPaymentChanged(payment)
+		.onReceive(lastCompletedPaymentPublisher) {
+			lastCompletedPaymentChanged($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
 		}
 		.onReceive(incomingSwapsPublisher) { incomingSwaps in
 			onIncomingSwapsChanged(incomingSwaps)
@@ -132,17 +136,37 @@ struct HomeView : MVIView, ViewName {
 			)
 			.padding(.bottom, 25)
 
-			// === Disclaimer ===
-			VStack {
-				Text("This app is experimental. Please back up your seed. \nYou can report issues to phoenix@acinq.co.")
+			// === Beta Version Disclaimer ===
+			DisclaimerBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "umbrella")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+					Text("This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co.")
+				}
+				.font(.caption)
+			}
+			
+			// === Mempool Full Warning ====
+			if isMempoolFull {
+				DisclaimerBox {
+					HStack(alignment: VerticalAlignment.top, spacing: 0) {
+						Image(systemName: "exclamationmark.triangle")
+							.imageScale(.large)
+							.padding(.trailing, 10)
+						VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
+							Text("Bitcoin mempool is full and fees are high.")
+							Button {
+								mempoolFullInfo()
+							} label: {
+								Text("See how Phoenix is affected".uppercased())
+							}
+						}
+					}
 					.font(.caption)
-					.padding(12)
-					.background(
-						RoundedRectangle(cornerRadius: 5)
-							.stroke(Color.appAccent, lineWidth: 1)
-					)
-			}.padding(12)
-
+				}
+			}
+			
 			// === Payments List ====
 			ScrollView {
 				LazyVStack {
@@ -155,11 +179,10 @@ struct HomeView : MVIView, ViewName {
 					}
 				}
 				.sheet(isPresented: .constant(selectedPayment != nil)) {
-					selectedPayment = nil
-				} content: {
+					
 					PaymentView(
 						payment: selectedPayment!,
-						close: { selectedPayment = nil }
+						closeSheet: { self.selectedPayment = nil }
 					)
 					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 				}
@@ -185,10 +208,15 @@ struct HomeView : MVIView, ViewName {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
 		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
 		
-		if lastCompletedPayment != payment {
-			lastCompletedPayment = payment
-			selectedPayment = payment
+		if selectedPayment == nil {
+			selectedPayment = payment // selection triggers display of PaymentView sheet
 		}
+	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("[\(viewName)] chainContextChanged()")
+		
+		isMempoolFull = context.mempool.v1.highUsage
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
@@ -285,9 +313,17 @@ struct HomeView : MVIView, ViewName {
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
 	}
+	
+	func mempoolFullInfo() -> Void {
+		log.trace("[\(viewName)] mempoolFullInfo()")
+		
+		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
+			openURL(url)
+		}
+	}
 }
 
-struct PaymentCell : View {
+fileprivate struct PaymentCell : View {
 
 	let payment: PhoenixShared.Lightning_kmpWalletPayment
 	
@@ -357,7 +393,7 @@ struct PaymentCell : View {
 	}
 }
 
-struct ConnectionStatusButton : View {
+fileprivate struct ConnectionStatusButton : View {
 	
 	@State var dimStatus = false
 	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
@@ -411,14 +447,14 @@ struct ConnectionStatusButton : View {
 	}
 }
 
-struct FaqButton: View {
+fileprivate struct FaqButton: View, ViewName {
 	
 	@Environment(\.openURL) var openURL
 	
 	var body: some View {
 		
 		Button {
-			openURL(URL(string: "https://phoenix.acinq.co/faq")!)
+			didTapButton()
 		} label: {
 			HStack {
 				Image(systemName: "questionmark.circle")
@@ -440,9 +476,41 @@ struct FaqButton: View {
 				.stroke(Color.borderColor, lineWidth: 1)
 		)
 	}
+	
+	func didTapButton() -> Void {
+		log.trace("[\(viewName)] didTapButton()")
+		
+		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+			openURL(url)
+		}
+	}
 }
 
-struct BottomBar: View, ViewName {
+fileprivate struct DisclaimerBox<Content: View>: View {
+	
+	let content: Content
+	
+	init(@ViewBuilder builder: () -> Content) {
+		content = builder()
+	}
+	
+	@ViewBuilder
+	var body: some View {
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			content
+			Spacer() // ensure content takes up full width of screen
+		}
+		.padding(12)
+		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.stroke(Color.appAccent, lineWidth: 1)
+		)
+		.padding([.leading, .trailing, .bottom], 10)
+	}
+}
+
+fileprivate struct BottomBar: View, ViewName {
 
 	@ObservedObject var toast: Toast
 	
@@ -577,7 +645,12 @@ struct BottomBar: View, ViewName {
 				
 			} else if let _ = model as? Scan.ModelBadRequest {
 				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
-				toast.toast(text: msg, duration: 4.0, location: .middle)
+				toast.pop(
+					Text(msg).anyView,
+					colorScheme: colorScheme.opposite,
+					duration: 4.0,
+					location: .middle
+				)
 			}
 			
 			// Cleanup

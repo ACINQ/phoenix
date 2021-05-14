@@ -65,7 +65,6 @@ enum class FiatCurrency : CurrencyUnit {
 }
 
 sealed class ElectrumConfig {
-    abstract val server: ServerAddress
-    data class Random(override val server: ServerAddress) : ElectrumConfig()
-    data class Custom(override val server: ServerAddress) : ElectrumConfig()
+    data class Custom(val server: ServerAddress) : ElectrumConfig()
+    object Random : ElectrumConfig()
 }

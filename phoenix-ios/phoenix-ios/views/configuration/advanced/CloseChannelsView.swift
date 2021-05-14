@@ -95,15 +95,18 @@ fileprivate struct StandardWalletView : View {
 	let model: CloseChannelsConfiguration.ModelReady
 	let postIntent: (CloseChannelsConfiguration.Intent) -> Void
 
-	@State var bitcoinAddress: String = ""
-	@State var isValidAddress: Bool = false
+	@State var textFieldValue: String = ""
+	@State var scannedValue: String? = nil
+	@State var parsedBitcoinAddress: String? = nil
 	@State var detailedErrorMsg: String? = nil
+	
+	@State var isScanningQrCode = false
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	var body: some View {
 
-		VStack(alignment: .leading) {
+		VStack(alignment: HorizontalAlignment.leading) {
 			let totalSats = model.channels.map { $0.balance }.reduce(0, +)
 			let formattedSats = Utils.formatBitcoin(sat: totalSats, bitcoinUnit: .sat)
 			
@@ -128,23 +131,37 @@ fileprivate struct StandardWalletView : View {
 			.padding(.top, 20)
 			.padding(.bottom, 10)
 			
-			HStack {
-				TextField("Bitcoin address", text: $bitcoinAddress)
-					.onChange(of: bitcoinAddress) { _ in
-						checkBitcoinAddress()
+			HStack(alignment: VerticalAlignment.center, spacing: 10) {
+			
+				// [Bitcoin Address TextField (X)]
+				HStack {
+					TextField("Bitcoin address", text: $textFieldValue)
+						.onChange(of: textFieldValue) { _ in
+							checkBitcoinAddress()
+						}
+					
+					// Clear text field button
+					Button {
+						textFieldValue = ""
+					} label: {
+						Image(systemName: "multiply.circle.fill")
+							.foregroundColor(.secondary)
 					}
-				
-				Button {
-					bitcoinAddress = ""
-				} label: {
-					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(.secondary)
+					.isHidden(textFieldValue == "")
 				}
-				.isHidden(bitcoinAddress == "")
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.background(Capsule().stroke(Color(UIColor.separator)))
+				
+				// [Scan QRCode Button]
+				Button {
+					didTapScanQrCodeButton()
+				} label: {
+					Image(systemName: "qrcode.viewfinder")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
 			}
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-			.background(Capsule().stroke(Color(UIColor.separator)))
 			.padding(.bottom, 10)
 			
 			if let detailedErrorMsg = detailedErrorMsg {
@@ -169,22 +186,46 @@ fileprivate struct StandardWalletView : View {
 						disabledBorderStroke: Color(UIColor.separator)
 					)
 				)
-				.disabled(!isValidAddress)
+				.disabled(parsedBitcoinAddress == nil)
 			}
 			
 			Spacer()
 			
 			FooterView()
+		
+		}// </VStack>
+		.sheet(isPresented: $isScanningQrCode) {
+			
+			ScanBitcoinAddressSheet(didScanQrCode: self.didScanQrCode)
 		}
+	}
+	
+	func didTapScanQrCodeButton() -> Void {
+		log.trace("didTapScanQrCodeButton()")
+		
+		scannedValue = nil
+		isScanningQrCode = true
+	}
+	
+	func didScanQrCode(result: String) -> Void {
+		log.trace("didScanQrCode()")
+		
+		isScanningQrCode = false
+		scannedValue = result
+		textFieldValue = result
 	}
 	
 	func checkBitcoinAddress() -> Void {
 		log.trace("checkBitcoinAddress()")
 		
+		let isScannedValue = textFieldValue == scannedValue
+		
 		let business = AppDelegate.get().business
-		let result = business.util.parseBitcoinAddress(addr: bitcoinAddress)
+		let result = business.util.parseBitcoinAddress(input: textFieldValue)
 		
 		if let error = result.left {
+			
+			log.debug("result.error = \(error)")
 			
 			if let error = error as? Utilities.BitcoinAddressErrorChainMismatch {
 				detailedErrorMsg = NSLocalizedString(
@@ -199,15 +240,31 @@ fileprivate struct StandardWalletView : View {
 					comment: "Error message - parsing bitcoin address"
 				)
 			}
+			else if isScannedValue {
+				// If the user scanned a non-bitcoin QRcode, we should notify them of the error
+				detailedErrorMsg = NSLocalizedString(
+					"The scanned QR code is not a bitcoin address",
+					comment: "Error message - parsing bitcoin address"
+				)
+			}
 			else {
 				detailedErrorMsg = nil
 			}
 			
-			isValidAddress = false
+			parsedBitcoinAddress = nil
 			
 		} else {
-			isValidAddress = true
+			
+			log.debug("result.info = \(result.right!)")
+			
+			parsedBitcoinAddress = result.right!.address
 			detailedErrorMsg = nil
+		}
+		
+		if !isScannedValue && scannedValue != nil {
+			// The user has changed the textFieldValue,
+			// so we're no longer dealing with the scanned value
+			scannedValue = nil
 		}
 	}
 	
@@ -223,6 +280,10 @@ fileprivate struct StandardWalletView : View {
 	
 	func confirmDrainWallet() -> Void {
 		log.trace("confirmDrainWallet()")
+		
+		guard let bitcoinAddress = parsedBitcoinAddress else {
+			return
+		}
 		
 		postIntent(
 			CloseChannelsConfiguration.IntentMutualCloseAllChannels(
@@ -269,11 +330,14 @@ fileprivate struct FundsSentView : View {
 						comment: "label text"
 					)
 
-				Text(intro) +
-				Text("main").italic() +
-				Text(" screen. And you can view the status of your channels in the ") +
-				Text("channels list").italic() +
-				Text(" screen.")
+				Group {
+					Text(intro) +
+					Text("main").italic() +
+					Text(" screen. And you can view the status of your channels in the ") +
+					Text("channels list").italic() +
+					Text(" screen.")
+				}
+				.lineLimit(nil) // text is getting truncated for some reason
 
 			} // </VStack>
 		}
@@ -345,6 +409,52 @@ fileprivate struct ConfirmationPopover : View {
 		log.trace("confirm()")
 		popoverState.close.send()
 		confirmAction()
+	}
+}
+
+fileprivate struct ScanBitcoinAddressSheet: View, ViewName {
+	
+	let didScanQrCode: (String) -> Void
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				Spacer()
+					.frame(width: 30)
+				
+				Spacer() // Text should be centered
+				Text("Scan Bitcoin Address")
+					.font(.headline)
+				Spacer() // Text should be centered
+				
+				Button {
+					didTapClose()
+				} label: {
+					Image("ic_cross")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
+			
+			} // </HStack>
+			.padding([.leading, .trailing], 20)
+			.padding([.top, .bottom], 8)
+			
+			QrCodeScannerView {(request: String) in
+				didScanQrCode(request)
+			}
+		
+		} // </VStack>
+	}
+	
+	func didTapClose() -> Void {
+		log.trace("[\(viewName)] didTapClose()")
+		
+		presentationMode.wrappedValue.dismiss()
 	}
 }
 
