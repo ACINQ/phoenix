@@ -64,7 +64,7 @@ kotlin {
 
     sourceSets {
 
-        val lightningkmpVersion = "snapshot"
+        val lightningkmpVersion = "1.0-beta12"
         val coroutinesVersion = "1.4.2-native-mt"
         val serializationVersion = "1.1.0"
         val secp256k1Version = "0.4.1"
