@@ -178,19 +178,22 @@ struct HomeView : MVIView, ViewName {
 						}
 					}
 				}
-				.sheet(isPresented: .constant(selectedPayment != nil)) {
-					
-					PaymentView(
-						payment: selectedPayment!,
-						closeSheet: { self.selectedPayment = nil }
-					)
-					.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-				}
 			}
 
 			BottomBar(toast: toast)
 		
 		} // </VStack>
+		.sheet(isPresented: Binding(
+			get: { selectedPayment != nil },
+			set: { if !$0 { selectedPayment = nil }} // needed if user slides the sheet to dismiss
+		)) {
+
+			PaymentView(
+				payment: selectedPayment!,
+				closeSheet: { self.selectedPayment = nil }
+			)
+			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
+		}
 	}
 	
 	func incomingAmount() -> FormattedAmount? {
