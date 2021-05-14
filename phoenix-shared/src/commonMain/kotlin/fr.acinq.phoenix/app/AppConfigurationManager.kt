@@ -132,7 +132,9 @@ class AppConfigurationManager(
         Chain.Mainnet -> electrumMainnetConfigurations.random()
         Chain.Testnet -> electrumTestnetConfigurations.random()
         Chain.Regtest -> platformElectrumRegtestConf()
-    }.asServerAddress(tls = TcpSocket.TLS.SAFE)
+    }.let {
+        ServerAddress(it.host, it.sslPort, TcpSocket.TLS.UNSAFE_CERTIFICATES)
+    }
 
     /** The flow containing the electrum header responses messages. */
     private val _electrumMessages by lazy { MutableStateFlow<HeaderSubscriptionResponse?>(null) }
