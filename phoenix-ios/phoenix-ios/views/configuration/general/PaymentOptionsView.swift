@@ -60,7 +60,7 @@ struct PaymentOptionsView: View {
 					Text("Fee for on-the-fly channel creation:")
 						.padding(.bottom, 8)
 					
-					let feePercent = String(format:"%.2f", payToOpen_feePercent)
+					let feePercent = formatFeePercent()
 					let minFee = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
 					
 					Text("\(feePercent)% (\(minFee.string) minimum)")
@@ -99,6 +99,15 @@ struct PaymentOptionsView: View {
 		}
 	}
 	
+	func formatFeePercent() -> String {
+		
+		let formatter = NumberFormatter()
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 3
+		
+		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
+	}
+	
 	func defaultPaymentDescriptionChanged() -> Void {
 		log.trace("defaultPaymentDescriptionChanged(): \(defaultPaymentDescription)")
 		
@@ -116,7 +125,7 @@ struct PaymentOptionsView: View {
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
 		log.trace("chainContextChanged()")
 		
-		payToOpen_feePercent = context.payToOpen.v1.feePercent
+		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
 		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
 	}
 }
