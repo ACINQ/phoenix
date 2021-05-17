@@ -1399,7 +1399,7 @@ struct SwapInView: View, ViewName {
 			
 			let minFunding = Utils.formatBitcoin(sat: swapIn_minFundingSat, bitcoinUnit: .sat)
 			
-			let feePercent = String(format:"%.2f", swapIn_feePercent)
+			let feePercent = formatFeePercent()
 			let minFee = Utils.formatBitcoin(sat: swapIn_minFeeSat, bitcoinUnit: .sat)
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -1442,6 +1442,15 @@ struct SwapInView: View, ViewName {
 		}
 	}
 	
+	func formatFeePercent() -> String {
+		
+		let formatter = NumberFormatter()
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 3
+		
+		return formatter.string(from: NSNumber(value: swapIn_feePercent))!
+	}
+	
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("[\(viewName)] onModelChange()")
 		
@@ -1473,7 +1482,7 @@ struct SwapInView: View, ViewName {
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
 		log.trace("[\(viewName)] chainContextChanged()")
 		
-		swapIn_feePercent = context.swapIn.v1.feePercent
+		swapIn_feePercent = context.swapIn.v1.feePercent * 100    // 0.01 => 1%
 		swapIn_minFeeSat = context.payToOpen.v1.minFeeSat         // not yet segregated for swapIn - future work
 		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import PhoenixShared
 import os.log
 
 #if DEBUG && true
@@ -109,6 +110,11 @@ struct IntroView2: View {
 	
 	let advance: () -> Void
 	
+	@State var payToOpen_feePercent: Double = 0.0
+	@State var payToOpen_minFeeSat: Int64 = 0
+	
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -121,15 +127,22 @@ struct IntroView2: View {
 				
 				Text("Payment channels are automatically created when needed.")
 				
-				let min = Utils.formatBitcoin(sat: 1_000, bitcoinUnit: .sat)
+				let percent = formatFeePercent()
+				let min = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
+				
 				Group {
 					Text("The fee is ") +
-					Text("0.10%").bold() +
+					Text("\(percent)%").bold() +
 					Text(" with a minimum fee of ") +
 					Text(min.string).bold() + Text(".")
 				}
 				
-				Text("For example, to receive $750, the channel creation fee is $0.75.")
+				Text(
+					"This fee only applies when a new channel needs to be created." +
+					" Payments that use existing channels don't pay this fee." +
+					" The fee is dynamic and may change depending on bitcoin network conditions."
+				)
+				.font(.footnote)
 			}
 			.multilineTextAlignment(.center)
 			.padding(.top, 30)
@@ -157,6 +170,25 @@ struct IntroView2: View {
 		}
 		.padding(.horizontal)
 		.offset(x: 0, y: -40) // move center upwards
+		.onReceive(chainContextPublisher) {
+			chainContextChanged($0)
+		}
+	}
+	
+	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("chainContextChanged()")
+		
+		payToOpen_feePercent = context.payToOpen.v1.feePercent * 100 // 0.01 => 1%
+		payToOpen_minFeeSat = context.payToOpen.v1.minFeeSat
+	}
+	
+	func formatFeePercent() -> String {
+		
+		let formatter = NumberFormatter()
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 3
+		
+		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
 	}
 }
 
