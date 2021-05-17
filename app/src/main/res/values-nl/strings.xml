@@ -260,10 +260,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Verbinden met Electrum server…</string>
-  <string name="main_alert_network_lost">Je bent offline. Controleer je netwerkinstellingen…</string>
-  <string name="main_alert_lightning_connection_lost">Kan niet verbinden met het Lightning netwerk…</string>
-  <string name="main_alert_settings_button">Instellingen</string>
   <string name="main_swapin_incoming">+%1$s inkomend</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_connectivity_button">Verbinden…</string>

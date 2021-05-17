@@ -223,28 +223,57 @@
             app:text_color="?attr/mutedTextColor"
             app:text_size="@dimen/text_md" />
 
-          <TextView
-            android:id="@+id/destination_label"
-            style="@style/MutedLabelView"
-            android:layout_width="@dimen/details_label_width"
-            android:text="@{model.state instanceof PaymentDetailsState.Outgoing.Sent.SwapOut ? @string/paymentdetails_relayer_label : @string/paymentdetails_destination_label}"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
-            android:textAlignment="viewEnd"
-            app:layout_constraintBaseline_toBaselineOf="@id/destination_pubkey"
-            app:layout_constraintStart_toStartOf="parent" />
+          <!-- LNURL-pay fields -->
 
           <TextView
-            android:id="@+id/destination_pubkey"
-            android:layout_width="0dp"
+            android:id="@+id/lnurl_pay_service_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_lnurlpay_service_label"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBaseline_toBaselineOf="@id/lnurl_pay_service_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:visible="@{model.paymentMeta.lnurlpay_url != null}" />
+
+          <TextView
+            android:id="@+id/lnurl_pay_service_value"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space_xs"
             android:layout_marginTop="@dimen/space_xs"
-            android:singleLine="true"
-            android:text="@{model.pubkey}"
-            android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing &amp;&amp; !(model.state instanceof PaymentDetailsState.Outgoing.Sent.Closing)}"
+            android:text="@string/utils_unknown"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/destination_label"
-            app:layout_constraintTop_toBottomOf="@id/onchain_address_explorer_button" />
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/lnurl_pay_service_label"
+            app:layout_constraintTop_toBottomOf="@id/onchain_address_explorer_button"
+            app:visible="@{model.paymentMeta.lnurlpay_url != null}" />
+
+          <TextView
+            android:id="@+id/lnurl_pay_success_action_label"
+            style="@style/MutedLabelView"
+            android:layout_width="@dimen/details_label_width"
+            android:text="@string/paymentdetails_lnurlpay_success_action_label"
+            android:textAlignment="viewEnd"
+            app:layout_constraintBaseline_toBaselineOf="@id/lnurl_pay_success_action_value"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/lnurl_pay_success_action_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_xs"
+            android:text="@string/utils_unknown"
+            app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/lnurl_pay_success_action_label"
+            app:layout_constraintTop_toBottomOf="@id/lnurl_pay_service_value" />
+
+          <!-- end of LNURL-pay fields -->
 
           <TextView
             android:id="@+id/desc_label"
@@ -265,7 +294,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/desc_label"
-            app:layout_constraintTop_toBottomOf="@id/destination_pubkey"
+            app:layout_constraintTop_toBottomOf="@id/lnurl_pay_success_action_value"
             app:layout_constraintWidth_default="spread">
 
             <TextView
@@ -280,7 +309,7 @@
             <View
               android:id="@+id/desc_separator"
               style="@style/HSeparator"
-              android:layout_marginTop="@dimen/space_xs"
+              android:layout_marginTop="@dimen/space_sm"
               android:visibility="@{model.paymentMeta.custom_desc != null &amp;&amp; model.description != null}"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintTop_toBottomOf="@id/desc_value" />

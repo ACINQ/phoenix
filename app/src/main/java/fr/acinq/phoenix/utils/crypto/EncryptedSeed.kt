@@ -27,7 +27,7 @@ import fr.acinq.phoenix.utils.Wallet
 import fr.acinq.phoenix.utils.tryWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
+import org.bouncycastle.util.encoders.Hex
 import scodec.bits.ByteVector
 import scodec.bits.`ByteVector$`
 import java.io.ByteArrayInputStream

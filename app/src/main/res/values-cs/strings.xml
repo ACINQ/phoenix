@@ -260,10 +260,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Připojování k electrum serveru…</string>
-  <string name="main_alert_network_lost">Jste offline. Prosím, zkontrolujte vaše připojení…</string>
-  <string name="main_alert_lightning_connection_lost">Nepodařilo se připojit k Lightning síti…</string>
-  <string name="main_alert_settings_button">Nastavení</string>
   <string name="main_swapin_incoming">Příchozí +%1$s</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_tor_connected_button">Tor aktivní</string>

@@ -257,10 +257,6 @@
 
   <!-- //////////////// main //////////////////// -->
 
-  <string name="main_alert_electrum_connecting">Connessione a electrum server in corso…</string>
-  <string name="main_alert_network_lost">Sei offline. Per favore controlla le tue impostazioni di rete…</string>
-  <string name="main_alert_lightning_connection_lost">Imposibile stabilire una connessione Lightning Network…</string>
-  <string name="main_alert_settings_button">Impostazioni</string>
   <string name="main_swapin_incoming">+%1$s in arrivo</string>
   <string name="main_faq_button">FAQ</string>
   <string name="main_stores_button">Negozi</string>
@@ -347,13 +343,6 @@
   <string name="accessctrl_auth_no_hw">Il tuo dispositivo non supporta l\'autenticazione biometrica.</string>
   <string name="accessctrl_auth_hw_unavailable">Il dispositivo per il rilevamento biometrico non è disponibile. Riprova prova più tardi.</string>
   <string name="accessctrl_auth_none_enrolled">Per favore prima attiva l\'autenticazione biometrica.</string>
-
-  <!-- //////////////// ln url pay //////////////// -->
-
-  <string name="lnurl_pay_wait">Recuperando i dettagli del pagamento…</string>
-  <string name="lnurl_pay_error_remote">Impossibile ottenere una richiesta di pagamento valida da %1$s.\n\nPotresti riprovare più tardi.</string>
-  <string name="lnurl_pay_error_remote_code">Impossibile ottenere una richiesta di pagamento valida da %1$s (code %2$s).\n\nPotresti riprovare più tardi.</string>
-  <string name="lnurl_pay_error_missing_callback">C\'è stato un errore con questa richiesta di pagamento. Per favore riprova più tardi.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 

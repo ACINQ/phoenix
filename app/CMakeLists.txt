@@ -11,17 +11,6 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             secp256k1
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             src/main/cpp/secp256k1/secp256k1.c
-             src/main/cpp/secp256k1/org_bitcoin_NativeSecp256k1.c
-             src/main/cpp/secp256k1/org_bitcoin_Secp256k1Context.c)
-
-add_library( # Sets the name of the library.
              sqlitejdbc
 
              # Sets the library as a shared library.
@@ -35,13 +24,6 @@ add_library( # Sets the name of the library.
 # default, you only need to specify the name of the public NDK library
 # you want to add. CMake verifies that the library exists before
 # completing its build.
-
-target_compile_options(secp256k1 PUBLIC -DHAVE_CONFIG_H)
-
-target_include_directories(secp256k1 PUBLIC
-  src/main/cpp/secp256k1/
-)
-
 
 target_compile_options(sqlitejdbc PUBLIC
 -DSQLITE_HAVE_ISNAN
@@ -74,13 +56,6 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
-                       secp256k1
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
 
 target_link_libraries( # Specifies the target library.
                        sqlitejdbc

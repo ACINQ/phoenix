@@ -39,7 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.spongycastle.util.encoders.Hex
+import org.bouncycastle.util.encoders.Hex
 import scala.collection.JavaConverters
 
 class AutoCreateFragment : Fragment() {
