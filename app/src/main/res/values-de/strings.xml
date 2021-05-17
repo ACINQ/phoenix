@@ -111,9 +111,6 @@
   <string name="receive_min_amount_pay_to_open">
     <![CDATA[Ihre Wallet ist leer. Die erste Zahlung, die Sie erhalten, muss mindestens <b>%1$s</b> betragen.]]>
   </string>
-  <string name="receive_min_amount_swap_in">
-    <![CDATA[Einzahlung muss mindestens <b>%1$s</b> betragen.]]>
-  </string>
   <string name="receive_paytoopen_disabled">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Möglicherweise können Sie einige Zahlungen nicht erhalten.</string>
   <string name="receive_paytoopen_disabled_nochannels">Die Erstellung von Kanälen wurde vorübergehend deaktiviert. Sie werden keine Zahlungen erhalten können.</string>
   <string name="receive_address_label">Adresse</string>
@@ -360,8 +357,6 @@
 
   <string name="channel_loading">Kanaldaten werden abgerufen…</string>
   <string name="channel_error">Die Details für diesen Kanal konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.</string>
-  <string name="channel_send">Senden</string>
-  <string name="channel_receive">Empfangen</string>
 
   <!-- //////////////// menu //////////////// -->
 
