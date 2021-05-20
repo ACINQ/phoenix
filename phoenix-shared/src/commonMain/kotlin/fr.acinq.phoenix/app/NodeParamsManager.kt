@@ -93,7 +93,7 @@ class NodeParamsManager(
                         updateFeeMinDiffRatio = 0.1,
                         feerateTolerance = FeerateTolerance(ratioLow = 0.01, ratioHigh = 100.0)
                     ),
-                    maxHtlcValueInFlightMsat = 150000000L,
+                    maxHtlcValueInFlightMsat = 20000000000L,
                     maxAcceptedHtlcs = 30,
                     expiryDeltaBlocks = CltvExpiryDelta(144),
                     fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
@@ -103,7 +103,7 @@ class NodeParamsManager(
                     toRemoteDelayBlocks = CltvExpiryDelta(144),
                     maxToLocalDelayBlocks = CltvExpiryDelta(1000),
                     feeBase = 1000.msat,
-                    feeProportionalMillionth = 10,
+                    feeProportionalMillionth = 100,
                     reserveToFundingRatio = 0.01, // note: not used (overridden below)
                     maxReserveToFundingRatio = 0.05,
                     revocationTimeoutSeconds = 20,
@@ -119,8 +119,8 @@ class NodeParamsManager(
                     channelFlags = 1,
                     paymentRequestExpirySeconds = 3600,
                     multiPartPaymentExpirySeconds = 60,
-                    minFundingSatoshis = 1000.sat,
-                    maxFundingSatoshis = 16777215.sat,
+                    minFundingSatoshis = 20_000.sat,
+                    maxFundingSatoshis = 21_000_000_000_00000.sat,
                     maxPaymentAttempts = 5,
                     enableTrampolinePayment = true,
                 )
