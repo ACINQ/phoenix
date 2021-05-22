@@ -564,7 +564,7 @@
   <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
   <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
-  <string name="lnurl_withdraw_error_amount_min">A quantidade não pode ser menor que %1$s.</string>
+  <string name="lnurl_withdraw_error_amount_min">Quantidade não pode ser menor que %1$s.</string>
   <string name="lnurl_withdraw_error_amount_max">Quantidade não pode ser maior que %1$s.</string>
   <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
     <b>%1$s</b> retornou um erro, ou uma mensagem inválida.
