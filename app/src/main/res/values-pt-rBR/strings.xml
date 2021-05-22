@@ -221,7 +221,7 @@
   <string name="scan_amountless_legacy_message"><![CDATA[
     Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na invoice.
     <br /><br />
-    Tem certeza de que deseja pagar esta cobrança?
+    Tem certeza de que deseja pagar esta invoice?
   ]]></string>
   <string name="scan_amountless_legacy_confirm_button">Confirmar</string>
   <string name="scan_amountless_legacy_cancel_button">Cancelar</string>
