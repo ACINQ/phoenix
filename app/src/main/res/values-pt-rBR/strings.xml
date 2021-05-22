@@ -173,7 +173,7 @@
   <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
-  <string name="send_amount_error_balance">A quantidade excede o seu saldo.</string>
+  <string name="send_amount_error_balance">Quantidade excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
