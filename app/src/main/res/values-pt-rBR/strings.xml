@@ -169,7 +169,7 @@
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma cobrança de bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma invoice de bitcoins.\n\nTente novamente.</string>
   <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
@@ -219,7 +219,7 @@
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na invoice.
+    Esta invoice não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na invoice.
     <br /><br />
     Tem certeza de que deseja pagar esta invoice?
   ]]></string>
@@ -462,7 +462,7 @@
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
 
   <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
-  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a cobrança já foi paga ou quando a cobrança contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
+  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a invoice já foi paga ou quando a invoice contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
   <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
   <string name="paymentdetails_failure_trampoline_fees_action">Mudar taxa</string>
 
@@ -683,7 +683,7 @@
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">As cobranças que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As invoices que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
   <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
