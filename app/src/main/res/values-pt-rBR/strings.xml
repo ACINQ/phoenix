@@ -544,7 +544,7 @@
   <string name="lnurl_pay_amount_empty">Insira uma quantidade</string>
   <string name="lnurl_pay_amount_below_min">Quantidade mínima de %1$s</string>
   <string name="lnurl_pay_amount_above_max">Quantidade máxima de %1$s</string>
-  <string name="lnurl_pay_amount_above_balance">Quantidade excede seu saldo</string>
+  <string name="lnurl_pay_amount_above_balance">A quantidade excede seu saldo</string>
   <string name="lnurl_pay_amount_invalid">Quantidade inválida</string>
 
   <string name="lnurl_pay_error_header">Pagamento não enviado.</string>
