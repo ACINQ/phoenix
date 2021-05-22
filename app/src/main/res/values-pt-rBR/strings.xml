@@ -173,7 +173,7 @@
   <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
-  <string name="send_amount_error_balance">O valor excede o seu saldo.</string>
+  <string name="send_amount_error_balance">A quantidade excede o seu saldo.</string>
   <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
@@ -192,7 +192,7 @@
   <string name="send_swap_in_progress">Preparando transação…</string>
   <string name="send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
   <string name="send_swap_required_button">Preparar transação</string>
-  <string name="send_swap_complete_recap_amount">Valor</string>
+  <string name="send_swap_complete_recap_amount">Quantidade</string>
   <string name="send_swap_complete_recap_fee">Taxa de mineração</string>
   <string name="send_swap_complete_recap_total">Total</string>
   <string name="send_swap_complete_cannot_afford">O total após taxas excede seu saldo.</string>
@@ -219,7 +219,7 @@
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na cobrança.
+    Esta cobrança não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na invoice.
     <br /><br />
     Tem certeza de que deseja pagar esta cobrança?
   ]]></string>
@@ -288,7 +288,7 @@
   <string name="notif_pay_to_open_message">Toque para abrir o aplicativo</string>
 
   <string name="notif__pay_to_open_missed_title">Pagamento não recebido (%1$s)</string>
-  <string name="notif__pay_to_open_missed_message">Valor insuficiente para criar um novo canal de pagamento.</string>
+  <string name="notif__pay_to_open_missed_message">Quantidade insuficiente para criar um novo canal de pagamento.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -445,6 +445,19 @@
     <br /><br />
     Para recuperar seus fundos, siga <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">as instruções contidas no FAQ</a>.
   ]]></string>
+  <string name="paymentdetails_lnurlpay_service_label">Serviço</string>
+  <string name="paymentdetails_lnurlpay_success_action_label">Mensagem</string>
+  <string name="paymentdetails_lnurlpay_success_action_url"><![CDATA[
+    %1$s
+    <br /><br />
+    <a href="%2$s">Open Link</a>
+  ]]></string>
+  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes"><![CDATA[
+    %1$s
+    <br />
+    <b>%2$s</b>
+  ]]></string>
+  <string translatable="false" name="paymentdetails_lnurlpay_success_action_aes_failure">Não foi possível descriptografar a mensagem do serviço.</string>
 
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
 
@@ -514,11 +527,35 @@
   <string name="lnurl_auth_success">Autenticação realizada com sucesso.</string>
   <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
-  <string name="lnurl_auth_failure_remote_details">Servidor respondeu com %1$s</string>
+  <string name="lnurl_auth_failure_remote_details">Serviço respondeu com %1$s</string>
+  
+   <!-- //////////////// ln url pay //////////////// -->
+
+  <string name="lnurl_pay_domain"><![CDATA[Payment requested by<br/><b>%1$s</b>]]></string>
+  <string name="lnurl_pay_meta_description">Descrição</string>
+  <string name="lnurl_pay_comment_title">Insira uma nota (opcional)</string>
+  <string name="lnurl_pay_comment_message">Você pode inserir uma descrição ao pagamento (max %1$d caracteres). Será enviado ao destinatário.</string>
+  <string name="lnurl_pay_comment_hint">Sem descrição</string>
+  <string name="lnurl_pay_pay_button">Pagar</string>
+  <string name="lnurl_pay_requesting_invoice">Solicitando invoice…</string>
+  <string name="lnurl_pay_checking_invoice">Verificando invoice…</string>
+  <string name="lnurl_pay_sending_payment">Enviando pagamento…</string>
+
+  <string name="lnurl_pay_amount_empty">Insira uma quantidade</string>
+  <string name="lnurl_pay_amount_below_min">Quantidade mínima de %1$s</string>
+  <string name="lnurl_pay_amount_above_max">Quantidade máxima de %1$s</string>
+  <string name="lnurl_pay_amount_above_balance">Quantidade excede seu saldo</string>
+  <string name="lnurl_pay_amount_invalid">Quantidade inválida</string>
+
+  <string name="lnurl_pay_error_header">Pagamento não enviado.</string>
+  <string name="lnurl_pay_error_unreachable">O serviço \'%1$s\' não está acessível, por favor, verifique sua conexão.</string>
+  <string name="lnurl_pay_error_invalid_invoice">O serviço \'%1$s\' forneceu uma invoice inválida (%2$s).</string>
+  <string name="lnurl_pay_error_remote_error">O serviço \'%1$s\' retornou um erro (%2$s).</string>
+  <string name="lnurl_pay_error_try_again_button">Tente novamente.</string>
 
   <!-- //////////////// ln url withdraw //////////////// -->
 
-  <string name="lnurl_withdraw_amount_label">Valor a receber</string>
+  <string name="lnurl_withdraw_amount_label">Quantidade a receber</string>
   <string name="lnurl_withdraw_description_label">Detalhes</string>
   <string name="lnurl_withdraw_service_host_label"><![CDATA[Você está resgatando fundos de<br/><b>%1$s</b>.]]></string>
   <string name="lnurl_withdraw_confirm_button">Resgatar</string>
@@ -527,8 +564,8 @@
   <string name="lnurl_withdraw_error_internal">Não foi possível resgatar este pagamento. Tente novamente.</string>
   <string name="lnurl_withdraw_error_invalid">Esta solicitação para resgate de pagamento é inválida. Tente novamente.</string>
   <string name="lnurl_withdraw_error_amount">A quantia é inválida.</string>
-  <string name="lnurl_withdraw_error_amount_min">O valor não pode ser menor que %1$s.</string>
-  <string name="lnurl_withdraw_error_amount_max">O valor não pode ser maior que %1$s.</string>
+  <string name="lnurl_withdraw_error_amount_min">A quantidade não pode ser menor que %1$s.</string>
+  <string name="lnurl_withdraw_error_amount_max">A quantidade não pode ser maior que %1$s.</string>
   <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
     <b>%1$s</b> retornou um erro, ou uma mensagem inválida.
     <br/><br/>
