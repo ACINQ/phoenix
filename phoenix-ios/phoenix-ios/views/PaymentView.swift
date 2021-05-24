@@ -333,7 +333,6 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentFeesRow
 			timeElapsedRow
 			paymentErrorRow
-		//	paymentHashRow
 		}
 		.padding([.leading, .trailing])
 	}
@@ -389,7 +388,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
 					Text(pType.0)
-					+ Text(" (\(pType.1))")
+					+ Text(verbatim: " (\(pType.1))")
 						.font(.footnote)
 						.foregroundColor(.secondary)
 					
@@ -512,27 +511,6 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		}
 	}
 	
-//	@ViewBuilder
-//	var paymentHashRow: some View {
-//
-//		InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
-//
-//			keyColumn(NSLocalizedString("Payment Hash", comment: "Label in SummaryInfoGrid"))
-//
-//		} valueColumn: {
-//
-//			let paymentHash = payment.paymentHashString()
-//			Text(paymentHash)
-//				.contextMenu {
-//					Button(action: {
-//						UIPasteboard.general.string = paymentHash
-//					}) {
-//						Text("Copy")
-//					}
-//				}
-//		}
-//	}
-	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
 	}
@@ -596,32 +574,29 @@ fileprivate struct DetailsView: View {
 	
 	var body: some View {
 		
-		Group {
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					Button {
-						presentationMode.wrappedValue.dismiss()
-					} label: {
-						Image(systemName: "chevron.left")
-							.imageScale(.medium)
-					}
-					Spacer()
-					Button {
-						closeSheet()
-					} label: {
-						Image(systemName: "xmark") // must match size of chevron.left above
-							.imageScale(.medium)
-					}
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Button {
+					presentationMode.wrappedValue.dismiss()
+				} label: {
+					Image(systemName: "chevron.left")
+						.imageScale(.medium)
 				}
-				.font(.title2)
-				.padding()
-				
-				ScrollView {
-					DetailsInfoGrid(payment: $payment)
-						.padding([.leading, .trailing])
+				Spacer()
+				Button {
+					closeSheet()
+				} label: {
+					Image(systemName: "xmark") // must match size of chevron.left above
+						.imageScale(.medium)
 				}
+			}
+			.font(.title2)
+			.padding()
+				
+			ScrollView {
+				DetailsInfoGrid(payment: $payment)
+					.padding([.leading, .trailing])
 			}
 		}
 		.navigationBarTitle("Details", displayMode: .inline)
@@ -1017,12 +992,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			switch onChain.closingType {
-				case Lightning_kmpChannelClosingType.local   : Text("Local")
-				case Lightning_kmpChannelClosingType.mutual  : Text("Mutual")
-				case Lightning_kmpChannelClosingType.remote  : Text("Remote")
-				case Lightning_kmpChannelClosingType.revoked : Text("Revoked")
-				case Lightning_kmpChannelClosingType.other   : Text("Other")
-				default                                      : Text("?")
+				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
+				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
+				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
+				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
+				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
+				default                                      : Text(verbatim: "?")
 			}
 		}
 	}
@@ -1411,8 +1386,10 @@ extension Lightning_kmpWalletPayment {
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
 					
 					let exp = NSLocalizedString(
-						"In order to receive this payment, a new payment channel was opened." +
-						" This is not always required.",
+						"""
+						In order to receive this payment, a new payment channel was opened. \
+						This is not always required.
+						""",
 						comment: "Fees explanation"
 					)
 					
@@ -1448,12 +1425,12 @@ extension Lightning_kmpWalletPayment {
 				let exp: String
 				if txCount == 1 {
 					exp = NSLocalizedString(
-						"Bitcoin networks fees paid for on-chain transaction. Payment required 1 transaction.",
+						"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction.",
 						comment: "Fees explanation"
 					)
 				} else {
 					exp = NSLocalizedString(
-						"Bitcoin networks fees paid for on-chain transactions. Payment required \(txCount) transactions.",
+						"Bitcoin network fees paid for on-chain transactions. Payment required \(txCount) transactions.",
 						comment: "Fees explanation"
 					)
 				}

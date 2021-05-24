@@ -158,7 +158,7 @@ fileprivate struct ChannelRowView: View {
 					Spacer()
 					
 					if let c = channel.commitments {
-						Text("\(c.first!) / \(c.second!) sat")
+						Text(verbatim: "\(c.first!) / \(c.second!) sat")
 							.foregroundColor(Color.primary)
 					}
 				}

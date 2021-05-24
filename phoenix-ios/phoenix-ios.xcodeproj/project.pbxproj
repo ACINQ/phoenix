@@ -46,6 +46,9 @@
 		DC18C41D256FF91100A2D083 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18C41C256FF91100A2D083 /* Utils.swift */; };
 		DC1D2B4B2593EB860036AD38 /* CurrencyUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */; };
 		DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */; };
+		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
+		DC384D81265C12B700131772 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D80265C12B700131772 /* Cache.swift */; };
+		DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D82265C32F100131772 /* TextField+Verbatim.swift */; };
 		DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */ = {isa = PBXBuildFile; productRef = DC4195D725FA6EBA008F0888 /* DYPopoverView */; };
 		DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */; };
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
@@ -175,6 +178,11 @@
 		DC18C41C256FF91100A2D083 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyUnit.swift; sourceTree = "<group>"; };
 		DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattedAmount.swift; sourceTree = "<group>"; };
+		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
+		DC384D7D265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/advancedSecurity.html; sourceTree = "<group>"; };
+		DC384D7E265BF36600131772 /* StyledString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledString.swift; sourceTree = "<group>"; };
+		DC384D80265C12B700131772 /* Cache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
 		DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCurrencyStyler.swift; sourceTree = "<group>"; };
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
 		DC649FDB2577002300853C46 /* KotlinExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinExtensions.swift; sourceTree = "<group>"; };
@@ -280,6 +288,7 @@
 		53BEF1337AFCFF0AE82A46BD /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				DC384D80265C12B700131772 /* Cache.swift */,
 				53BEFFB3CB63090BBCFF6A36 /* ui.swift */,
 				53BEF6CBB2587136D25A625A /* lang.swift */,
 				53BEF60DF224046E5DE0FDCC /* publishers.swift */,
@@ -415,6 +424,7 @@
 			children = (
 				DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */,
 				DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */,
+				DC384D7E265BF36600131772 /* StyledString.swift */,
 			);
 			path = style;
 			sourceTree = "<group>";
@@ -478,6 +488,7 @@
 				DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */,
 				DC72C32E25A51797008A927A /* UserDefaults+Codable.swift */,
 				DC09085725B5E43900A46136 /* String+VersionComparison.swift */,
+				DC384D82265C32F100131772 /* TextField+Verbatim.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -641,6 +652,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -766,6 +778,7 @@
 				DCACF6FD2566D0BA0009B01E /* SecurityFile.swift in Sources */,
 				DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */,
 				DC142140261E72E40075857A /* AnyHTML.swift in Sources */,
+				DC384D7F265BF36600131772 /* StyledString.swift in Sources */,
 				53BEF981E71E3087871890F9 /* SendView.swift in Sources */,
 				DC1D2B502594CE900036AD38 /* FormattedAmount.swift in Sources */,
 				DCE1E5FC26432B4C005465B8 /* KotlinPublishers.swift in Sources */,
@@ -777,6 +790,7 @@
 				DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */,
 				C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */,
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
+				DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */,
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
 				C8D7A84CCF914B08BDB03BE6 /* RestoreWalletView.swift in Sources */,
 				DC72C32F25A51797008A927A /* UserDefaults+Codable.swift in Sources */,
@@ -786,6 +800,7 @@
 				DC0994B0263A074C003031CA /* InfoGrid.swift in Sources */,
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
+				DC384D81265C12B700131772 /* Cache.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,
@@ -871,6 +886,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DC99E94925BA258C00FB20F7 /* Base */,
+				DC384D7C265BE41900131772 /* fr */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -879,6 +895,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DC99E94B25BA258C00FB20F7 /* Base */,
+				DC384D7D265BE41900131772 /* fr */,
 			);
 			name = advancedSecurity.html;
 			sourceTree = "<group>";
@@ -890,6 +907,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -952,6 +970,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

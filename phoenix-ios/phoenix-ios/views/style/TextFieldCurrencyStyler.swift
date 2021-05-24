@@ -34,7 +34,7 @@ enum TextFieldCurrencyStylerError: Error {
 ///
 /// var body: some View {
 ///   let styler = TextFieldCurrencyStyler(unit: $unit, amount: $amount, parsedAmount: $parsedAmount)
-///   TextField("123", text: styler.amountProxy)
+///   TextField(verbatim: "123", text: styler.amountProxy)
 ///       .onChange(of: amount) { _ in
 ///           // new values for amount & parsedAmount available now
 ///       }

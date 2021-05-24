@@ -152,8 +152,10 @@ struct AppAccessView : View {
 					.imageScale(.medium)
 					.foregroundColor(Color.appWarn)
 				Text(
-					"Phoenix can be accessed without credentials." +
-					" Make sure that you have enabled adequate protections for iOS."
+					"""
+					Phoenix can be accessed without credentials. \
+					Make sure that you have enabled adequate protections for iOS.
+					"""
 				)
 				
 			} else {
@@ -178,8 +180,10 @@ struct AppAccessView : View {
 			VStack(alignment: HorizontalAlignment.leading) {
 				if advancedSecurityEnabled {
 					Text(
-						"To receive incoming payments, Phoenix must be running, " +
-						"and you must have unlocked the app once."
+						"""
+						To receive incoming payments, Phoenix must be running, \
+						and you must have unlocked the app once.
+						"""
 					)
 					
 				} else {

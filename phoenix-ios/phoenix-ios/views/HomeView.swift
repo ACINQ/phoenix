@@ -570,8 +570,8 @@ fileprivate struct PaymentCell : View, ViewName {
 
 				Text(amount.digits)
 					.foregroundColor(color)
-
-				Text(" " + amount.type)
+					
+				Text(verbatim: " \(amount.type)")
 					.font(.caption)
 					.foregroundColor(.gray)
 			}

@@ -130,17 +130,17 @@ struct IntroView2: View {
 				let percent = formatFeePercent()
 				let min = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
 				
-				Group {
-					Text("The fee is ") +
-					Text("\(percent)%").bold() +
-					Text(" with a minimum fee of ") +
-					Text(min.string).bold() + Text(".")
-				}
+				Text(styled: NSLocalizedString(
+					"The fee is **\(percent)%** with a minimum fee of **\(min.string)**.",
+					comment: "IntroView"
+				))
 				
 				Text(
-					"This fee only applies when a new channel needs to be created." +
-					" Payments that use existing channels don't pay this fee." +
-					" The fee is dynamic and may change depending on bitcoin network conditions."
+					"""
+					This fee only applies when a new channel needs to be created. \
+					Payments that use existing channels don't pay this fee. \
+					The fee is dynamic and may change depending on bitcoin network conditions.
+					"""
 				)
 				.font(.footnote)
 			}

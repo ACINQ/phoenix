@@ -480,8 +480,10 @@ struct ReceiveLightningView: View, ViewName {
 				.imageScale(.large)
 				.padding(.trailing, 10)
 			Text(
-				"Channel creation has been temporarily disabled." +
-				" You may not be able to receive some payments."
+				"""
+				Channel creation has been temporarily disabled. \
+				You may not be able to receive some payments.
+				"""
 			)
 		}
 		.font(.caption)
@@ -1033,14 +1035,20 @@ struct BgAppRefreshDisabledWarning: View {
 					.padding(.bottom, 4)
 				
 				Text(
-					"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground."
+					"""
+					This means you will not be able to receive payments when Phoenix \
+					is in the background. To receive payments, Phoenix must be open and in the foreground.
+					"""
 				)
 				.lineLimit(nil)
 				.minimumScaleFactor(0.5) // problems with "foreground" being truncated
 				.padding(.bottom, 4)
 				
 				Text(
-					"To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh"
+					"""
+					To fix this re-enable Background App Refresh via: \
+					Settings -> General -> Background App Refresh
+					"""
 				)
 				
 			}
@@ -1079,8 +1087,10 @@ struct NotificationsDisabledWarning: View {
 					.padding(.bottom, 4)
 				
 				Text(
-					"This means you will not be notified if you receive a payment while" +
-					" Phoenix is in the background."
+					"""
+					This means you will not be notified if you receive a payment while \
+					Phoenix is in the background.
+					"""
 				)
 			}
 			.padding(.bottom)
@@ -1203,8 +1213,10 @@ fileprivate struct SwapInDisabledPopover: View, ViewName {
 					.padding(.bottom)
 				
 				Text(
-					"The bitcoin mempool is congested and fees are very high." +
-					" The on-chain swap service has been temporarily disabled."
+					"""
+					The bitcoin mempool is congested and fees are very high. \
+					The on-chain swap service has been temporarily disabled.
+					"""
 				)
 				.lineLimit(nil)
 			}
@@ -1405,22 +1417,22 @@ struct SwapInView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
 				Text(
-					"This is a swap address. It is not controlled by your wallet." +
-					" On-chain deposits sent to this address will be converted to Lightning channels."
+					"""
+					This is a swap address. It is not controlled by your wallet. \
+					On-chain deposits sent to this address will be converted to Lightning channels.
+					"""
 				)
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)
 				.padding(.bottom, 14)
 				
-				Group {
-					Text("Deposits must be at least ") +
-					Text(minFunding.string).bold() +
-					Text(". The fee is ") +
-					Text("\(feePercent)%").bold() +
-					Text(" (") +
-					Text("\(minFee.string)") +
-					Text(" minimum).")
-				}
+				Text(styled: NSLocalizedString(
+					"""
+					Deposits must be at least **\(minFunding.string)**. \
+					The fee is **\(feePercent)%** (\(minFee.string) minimum).
+					""",
+					comment: "Minimum amount description."
+				))
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)
 			}

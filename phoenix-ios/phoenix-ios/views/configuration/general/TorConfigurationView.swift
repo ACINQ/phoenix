@@ -24,21 +24,24 @@ struct TorConfigurationView: View {
                 .navigationBarTitle("Tor Settings", displayMode: .inline)
     }
 
-    struct TorFormHeader: View {
-        var body: some View {
-            Text(
-                    "You can improve your privacy by only using Tor when connecting to an Electrum server or" +
-                            " to your Lightning peer. This will slightly slow down your transactions."
-            )
-                    .font(.body)
-                    .foregroundColor(Color.primary)
-                    .padding(.top, 10)
-        }
-    }
+	struct TorFormHeader: View {
+		
+		var body: some View {
+			Text(
+				"""
+				You can improve your privacy by only using Tor when connecting to an Electrum server or \
+				to your Lightning peer. This will slightly slow down your transactions.
+				"""
+			)
+			.font(.body)
+			.foregroundColor(Color.primary)
+			.padding(.top, 10)
+		}
+	}
 
-    func toggleTor(_ isEnabled: Bool) {
-        Prefs.shared.isTorEnabled = isEnabled
-    }
+	func toggleTor(_ isEnabled: Bool) {
+		Prefs.shared.isTorEnabled = isEnabled
+	}
 }
 
 class TorConfigurationView_Previews: PreviewProvider {

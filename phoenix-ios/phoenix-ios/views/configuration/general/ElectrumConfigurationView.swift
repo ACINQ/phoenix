@@ -121,7 +121,7 @@ struct ElectrumConfigurationView: MVIView {
 					if mvi.model.feeRate > 0 {
 						Text("\(mvi.model.feeRate.formatInDecimalStyle()) sat/byte")
 					} else {
-						Text("-")
+						Text(verbatim: "-")
 					}
 				}
 
@@ -182,8 +182,10 @@ struct ElectrumConfigurationView: MVIView {
 		var body: some View {
 			
 			Text(
-				"By default Phoenix connects to random Electrum servers in order to access the" +
-				" Bitcoin blockchain. You can also choose to connect to your own Electrum server."
+				"""
+				By default Phoenix connects to random Electrum servers in order to access the \
+				Bitcoin blockchain. You can also choose to connect to your own Electrum server.
+				"""
 			)
 			.font(.body)
 			.foregroundColor(Color.primary)
@@ -330,7 +332,7 @@ struct ElectrumAddressPopup: View {
 						
 						HStack {
 							HStack {
-								TextField("50002", text: $port,
+								TextField(verbatim: "50002", text: $port,
 									onCommit: {
 										onPortDidCommit()
 									}

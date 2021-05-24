@@ -112,8 +112,10 @@ struct SendView: MVIView {
 		} else if model.reason is Scan.BadRequestReasonIsBitcoinAddress {
 			
 			msg = NSLocalizedString(
-				"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments." +
-				" You can use a third-party service to make the offchain->onchain swap.",
+				"""
+				You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. \
+				You can use a third-party service to make the offchain->onchain swap.
+				""",
 				comment: "Error message - scanning lightning invoice"
 			)
 			
@@ -318,14 +320,14 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			Group {
-				Text(
-					"The invoice doesn't include an amount. This can be dangerous:" +
-					" malicious nodes may be able to steal your payment. To be safe, "
-				)
-				+ Text("ask the payee to specify an amount").fontWeight(.bold)
-				+ Text(" in the payment request.")
-			}
+			Text(styled: NSLocalizedString(
+				"""
+				The invoice doesn't include an amount. This can be dangerous: \
+				malicious nodes may be able to steal your payment. To be safe, \
+				**ask the payee to specify an amount**  in the payment request.
+				""",
+				comment: "SendView"
+			))
 			.padding(.bottom)
 
 			Text("Are you sure you want to pay this invoice?")
@@ -449,7 +451,7 @@ struct ValidateView: View, ViewName {
 			VStack {
 		
 				HStack(alignment: .firstTextBaseline) {
-					TextField("123", text: currencyStyler().amountProxy)
+					TextField(verbatim: "123", text: currencyStyler().amountProxy)
 						.keyboardType(.decimalPad)
 						.disableAutocorrection(true)
 						.fixedSize()
