@@ -659,7 +659,6 @@
   <string name="patchnotes_v23"><![CDATA[
     <h4>Augmentation des frais pour les nouveaux canaux de paiement</h4>
     <p>Les frais de création de nouveaux channels restent les mêmes (%1$s%%), mais ils ont désormais un plancher minimal de <b>%2$s</b>.</p>
-    <p>Si quelqu\'un vous envoie 15 000 sat et que vous n\'avez pas de canal de paiement, un nouveau canal sera créé et vous recevrez 14 000 sat.</p>
   ]]></string>
 
 </resources>

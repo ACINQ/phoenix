@@ -124,7 +124,7 @@
 
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
-  
+
   <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
   <string name="receive_swap_in_info"><![CDATA[
    Este endereço bitcoin é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
@@ -693,7 +693,7 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
-  
+
   <string name="paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
@@ -740,8 +740,7 @@
   ]]></string>
   <string name="patchnotes_v23"><![CDATA[
     <h4>Aumento de taxas para novos canais</h4>
-    <p>A % da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
-    <p>Se alguém te enviar 15 000 sat e você ainda não tiver canais abertos, um novo canal será criado e você receberá 14 000 sat.</p>
+    <p>A %% da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
   ]]></string>
 
   <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>

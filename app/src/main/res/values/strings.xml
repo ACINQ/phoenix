@@ -742,7 +742,6 @@
   <string name="patchnotes_v23"><![CDATA[
     <h4>Fee increase for new channels</h4>
     <p>The fee rate for new channels stays the same (%1$s%%), but there is now a <b>%2$s</b> minimum fee.</p>
-    <p>If someone sends you 15 000 sat and you don\'t have any channels, a new channel will be created and you will receive 14 000 sat.</p>
   ]]></string>
 
   <string name="paymentmode_onchain">Pay on-chain</string>
