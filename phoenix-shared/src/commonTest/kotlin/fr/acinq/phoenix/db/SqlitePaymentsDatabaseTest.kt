@@ -186,6 +186,9 @@ class SqlitePaymentsDatabaseTest {
             OutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 120),
         )
         // Parts need a valid parent.
+        // NB: This test fails on iOS !
+        // The problem is that foreign key constraints are disabled.
+        // See iosDbFactory.kt for discussion.
         assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
         // New parts must have a unique id.
         assertFails { db.addOutgoingParts(onePartFailed.id, newParts.map { it.copy(id = p.parts[0].id) }) }

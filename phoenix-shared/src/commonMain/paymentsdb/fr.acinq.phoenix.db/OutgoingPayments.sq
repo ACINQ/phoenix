@@ -54,10 +54,20 @@ updateOutgoingPayment:
 UPDATE outgoing_payments SET completed_at=?, status_type=?, status_blob=? WHERE id=?;
 
 addOutgoingPart:
-INSERT INTO outgoing_payment_parts (part_id, part_parent_id, part_amount_msat, part_route, part_created_at) VALUES (?, ?, ?, ?, ?);
+INSERT INTO outgoing_payment_parts (
+            part_id,
+            part_parent_id,
+            part_amount_msat,
+            part_route,
+            part_created_at)
+VALUES (?, ?, ?, ?, ?);
 
 updateOutgoingPart:
-UPDATE outgoing_payment_parts SET part_status_type=?, part_status_blob=?, part_completed_at=? WHERE part_id=?;
+UPDATE outgoing_payment_parts
+SET    part_status_type=?,
+       part_status_blob=?,
+       part_completed_at=?
+WHERE  part_id=?;
 
 getOutgoingPart:
 SELECT * FROM outgoing_payment_parts WHERE part_id=?;

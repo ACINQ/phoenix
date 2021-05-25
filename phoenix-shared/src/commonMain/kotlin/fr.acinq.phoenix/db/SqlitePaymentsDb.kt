@@ -20,6 +20,7 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
@@ -140,18 +141,86 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
 
     // ---- list ALL payments
 
+    suspend fun listPaymentsCount(): Long {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).executeAsList().first()
+        }
+    }
+
+    suspend fun listPaymentsCountFlow(): Flow<Long> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
+        }
+    }
+
+    suspend fun listPaymentsOrder(count: Int, skip: Int): List<WalletPaymentOrderRow> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsOrder(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).executeAsList()
+        }
+    }
+
+    suspend fun listPaymentsOrderFlow(count: Int, skip: Int): Flow<List<WalletPaymentOrderRow>> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsOrder(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).asFlow().mapToList()
+        }
+    }
+
     override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> {
         return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).executeAsList()
+            aggrQueries.listAllPayments(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsMapper
+            ).executeAsList()
         }
     }
 
     suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
         return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).asFlow().mapToList()
+            aggrQueries.listAllPayments(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsMapper
+            ).asFlow().mapToList()
         }
     }
 
+    private fun allPaymentsCountMapper(
+        result: Long?
+    ): Long {
+        return result ?: 0
+    }
+
+    private fun allPaymentsOrderMapper(
+        direction: String,
+        outgoing_payment_id: String?,
+        incoming_payment_id: ByteArray?,
+        @Suppress("UNUSED_PARAMETER") created_at: Long,
+        @Suppress("UNUSED_PARAMETER") completed_at: Long?
+    ): WalletPaymentOrderRow {
+        val paymentId = when(direction.toLowerCase()) {
+            "outgoing" -> WalletPaymentId.OutgoingPaymentId(
+                id = UUID.fromString(outgoing_payment_id!!)
+            )
+            "incoming" -> WalletPaymentId.IncomingPaymentId(
+                paymentHash = ByteVector32(incoming_payment_id!!)
+            )
+            else -> throw UnhandledDirection(direction)
+        }
+        return WalletPaymentOrderRow(
+            id = paymentId,
+            createdAt = created_at,
+            completedAt = completed_at
+        )
+    }
 
     private fun allPaymentsMapper(
         direction: String,
@@ -238,3 +307,37 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
 class OutgoingPaymentPartNotFound(partId: UUID) : RuntimeException("could not find outgoing payment part with part_id=$partId")
 class IncomingPaymentNotFound(paymentHash: ByteVector32) : RuntimeException("missing payment for payment_hash=$paymentHash")
 class UnhandledDirection(direction: String) : RuntimeException("unhandled direction=$direction")
+
+sealed class WalletPaymentId {
+    data class OutgoingPaymentId(val id: UUID): WalletPaymentId()
+    data class IncomingPaymentId(val paymentHash: ByteVector32): WalletPaymentId()
+
+    val identifier: String get() = when(this) {
+        is OutgoingPaymentId -> "outgoing|${this.id.toString()}"
+        is IncomingPaymentId -> "incoming|${this.paymentHash.toHex()}"
+    }
+}
+
+data class WalletPaymentOrderRow(
+    val id: WalletPaymentId,
+    val createdAt: Long,
+    val completedAt: Long?
+) {
+    /// Returns a unique identifier, suitable for use in a HashMap.
+    /// Form is:
+    /// - "outgoing|id|createdAt|completedAt"
+    /// - "incoming|paymentHash|createdAt|completedAt"
+    ///
+    val identifier: String get() {
+        return "${this.staleIdentifierPrefix}${completedAt?.toString() ?: "null"}"
+    }
+
+    /// Returns a prefix that can be used to detect older (stale) versions of the row.
+    /// Form is:
+    /// - "outgoing|id|createdAt|"
+    /// - "incoming|paymentHash|createdAt|"
+    ///
+    val staleIdentifierPrefix: String get() {
+        return "${id.identifier}|${createdAt}|"
+    }
+}

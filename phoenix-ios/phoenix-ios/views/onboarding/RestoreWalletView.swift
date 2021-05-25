@@ -137,8 +137,8 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
-	let topID = "top"
-	let inputID = "input"
+	let topID = "top"     // Todo: replace with: @Namespace var topID
+	let inputID = "input" // Todo: replace with: @Namespace var inputID
 	let keyboardWillShow = NotificationCenter.default.publisher(for:
 		UIApplication.keyboardWillShowNotification
 	)

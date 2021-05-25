@@ -30,10 +30,19 @@ extension PaymentsManager {
 	///
 	/// There are 2 solutions to this problem that I can think of:
 	/// - Remember this edge case everytime you use the on-the-fly-created publisher,
-	///   and store it in a `@State var`
+	///   and store the publisher in a `@State var`
 	/// - Fix the problem once by storing the publisher in a (lazy) `static var`
 	/// 
 	fileprivate struct _Lazy {
+		
+		/// Transforming from Kotlin:
+		/// ```
+		/// paymentsPage: MutableStateFlow<PaymentsPage>
+		/// ```
+		static var paymentsPagePublisher: AnyPublisher<PaymentsPage, Never> =
+			KotlinCurrentValueSubject<PaymentsPage, PaymentsPage>(
+				AppDelegate.get().business.paymentsManager.paymentsPage
+			).eraseToAnyPublisher()
 		
 		/// Transforming from Kotlin:
 		/// ```
@@ -70,18 +79,19 @@ extension PaymentsManager {
 			.eraseToAnyPublisher()
 	}
 	
+	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
+		return _Lazy.paymentsPagePublisher
+	}
+	
 	func incomingSwapsPublisher() -> AnyPublisher<[String: Lightning_kmpMilliSatoshi], Never> {
-		
 		return _Lazy.incomingSwapsPublisher
 	}
 	
 	func lastCompletedPaymentPublisher() -> AnyPublisher<Lightning_kmpWalletPayment, Never> {
-		
 		return _Lazy.lastCompletedPaymentPublisher
 	}
 	
 	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
-		
 		return _Lazy.lastIncomingPaymentPublisher
 	}
 }

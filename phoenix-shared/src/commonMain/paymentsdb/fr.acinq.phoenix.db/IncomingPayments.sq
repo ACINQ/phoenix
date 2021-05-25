@@ -17,10 +17,19 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     received_with_blob BLOB DEFAULT NULL
 );
 
+-- The received_amount_msat column is used regularly as a filter within AggragateQueries.
+CREATE INDEX IF NOT EXISTS received_amount_msat_idx ON incoming_payments(received_amount_msat);
+
 -- queries
 
 insert:
-INSERT INTO incoming_payments (payment_hash, preimage, created_at, origin_type, origin_blob) VALUES (?, ?, ?, ?, ?);
+INSERT INTO incoming_payments (
+            payment_hash,
+            preimage,
+            created_at,
+            origin_type,
+            origin_blob)
+VALUES (?, ?, ?, ?, ?);
 
 -- The receive query sums the already received amount to the newly received amounts.
 receive:
@@ -41,7 +50,7 @@ INSERT INTO incoming_payments (
             received_at,
             received_with_type,
             received_with_blob)
-VALUES      (?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 get:
 SELECT *

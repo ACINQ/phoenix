@@ -18,11 +18,21 @@ package fr.acinq.phoenix.db
 
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
+import fr.acinq.lightning.Lightning
 
 actual fun testDriver(): SqlDriver {
     return NativeSqliteDriver(ChannelsDatabase.Schema, ":memory:")
 }
 
 actual fun testPaymentsDriver(): SqlDriver {
-    return NativeSqliteDriver(PaymentsDatabase.Schema, ":memory:")
+    // In-memory databases don't seem to work on native/iOS.
+    // This creates a persistent database, which breaks our unit test logic.
+//  return NativeSqliteDriver(PaymentsDatabase.Schema, ":memory:")
+    // The docs reference other ways of making in-memory databases:
+    // https://sqlite.org/inmemorydb.html
+    // But none of them seem to work (at the time of writing).
+    //
+    // Current workaround is to create a fresh database for each test.
+    val randomName = Lightning.randomBytes32().toHex()
+    return NativeSqliteDriver(PaymentsDatabase.Schema, randomName)
 }

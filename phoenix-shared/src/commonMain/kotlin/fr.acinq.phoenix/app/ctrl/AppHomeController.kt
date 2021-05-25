@@ -49,14 +49,18 @@ class AppHomeController(
 
         launch {
             paymentsManager.incomingSwaps.collect {
-                model { copy(incomingBalance = it.values.sum().takeIf { it.msat > 0 }) }
+                model {
+                    copy(incomingBalance = it.values.sum().takeIf { it.msat > 0 })
+                }
             }
         }
 
         launch {
-            paymentsManager.payments.collect {
+            paymentsManager.paymentsCount.collect {
                 model {
-                    copy(payments = it)
+                    copy(
+                        paymentsCount = it
+                    )
                 }
             }
         }

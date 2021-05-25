@@ -4,6 +4,44 @@ import Combine
 import CryptoKit
 
 
+extension WalletPaymentId: Identifiable {
+	
+	var identifiable: String {
+		return self.identifier
+	}
+}
+
+extension WalletPaymentOrderRow: Identifiable {
+	
+	var identifiable: String {
+		return self.identifier
+	}
+}
+
+extension PaymentsManager {
+	
+	func getCachedPayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+		
+		return fetcher.getCachedPayment(row: row)
+	}
+	
+	func getCachedStalePayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+		
+		return fetcher.getCachedStalePayment(row: row)
+	}
+	
+	func getPayment(
+		row: WalletPaymentOrderRow,
+		completion: @escaping (PaymentsFetcher.Result) -> Void
+	) -> Void {
+		
+		fetcher.getPayment(row: row) { (result: PaymentsFetcher.Result?, _: Error?) in
+			
+			completion(result ?? PaymentsFetcher.Result(payment: nil))
+		}
+	}
+}
+
 extension Lightning_kmpIncomingPayment {
 	
 	var createdAtDate: Date {
