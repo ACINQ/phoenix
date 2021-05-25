@@ -27,6 +27,7 @@ import fr.acinq.eclair.channel.HasCommitments
 import fr.acinq.eclair.channel.RES_GETINFO
 import fr.acinq.phoenix.R
 import fr.acinq.phoenix.settings.ListChannelsFragmentDirections
+import fr.acinq.phoenix.utils.LangExtensions.findNavControllerSafe
 import fr.acinq.phoenix.utils.Transcriber
 import fr.acinq.phoenix.utils.customviews.CoinView
 import org.slf4j.Logger
@@ -67,7 +68,7 @@ class ChannelHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     itemView.setOnClickListener {
       val action = ListChannelsFragmentDirections.actionListChannelsToChannelDetails(channel.channelId().toString())
-      itemView.findNavController().navigate(action)
+      itemView.findNavControllerSafe()?.navigate(action)
     }
   }
 }

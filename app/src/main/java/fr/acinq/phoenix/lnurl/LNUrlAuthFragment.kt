@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +39,7 @@ import fr.acinq.phoenix.background.KitState
 import fr.acinq.phoenix.databinding.FragmentLnurlAuthBinding
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.KitNotInitialized
+import fr.acinq.phoenix.utils.LangExtensions.findNavControllerSafe
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -73,7 +73,7 @@ class LNUrlAuthFragment : BaseFragment() {
       HttpUrl.parse(args.url.url)!!
     } catch (e: Exception) {
       log.error("could not parse url=${args.url.url}: ", e)
-      findNavController().popBackStack()
+      findNavControllerSafe()?.popBackStack()
       return
     }
     model = ViewModelProvider(this, LNUrlAuthViewModel.Factory(url)).get(LNUrlAuthViewModel::class.java)
@@ -90,7 +90,7 @@ class LNUrlAuthFragment : BaseFragment() {
         }
         is LNUrlAuthState.Done -> Handler().postDelayed({
           if (model.state.value is LNUrlAuthState.Done) {
-            findNavController().popBackStack()
+            findNavControllerSafe()?.popBackStack()
           }
         }, 3000)
         else -> Unit

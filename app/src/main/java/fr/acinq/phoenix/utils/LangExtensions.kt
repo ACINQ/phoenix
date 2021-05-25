@@ -16,9 +16,13 @@
 
 package fr.acinq.phoenix.utils
 
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
+import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Utility method rebinding any exceptions thrown by a method into another exception, using the origin exception as the root cause.
@@ -29,4 +33,21 @@ inline fun <T> tryWith(exception: Exception, action: () -> T): T = try {
 } catch (t: Exception) {
   exception.initCause(t)
   throw exception
+}
+object LangExtensions {
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
+
+  fun Fragment.findNavControllerSafe(): NavController? = try {
+    NavHostFragment.findNavController(this)
+  } catch (e: Exception) {
+    log.warn("failed to find navigation controller in fragment=${this::class.qualifiedName.toString()}")
+    null
+  }
+
+  fun View.findNavControllerSafe(): NavController? = try {
+    Navigation.findNavController(this)
+  } catch (e: Exception) {
+    log.warn("failed to find navigation controller in view=${this::class.qualifiedName.toString()}")
+    null
+  }
 }
