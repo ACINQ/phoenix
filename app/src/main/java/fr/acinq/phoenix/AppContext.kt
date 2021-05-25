@@ -203,49 +203,72 @@ class AppContext : Application(), DefaultLifecycleObserver {
     notifications.postValue(inAppNotifs)
 
     // -- trampoline settings
-    val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
-    val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
-    for (i in 0 until trampolineArray.length()) {
-      val setting: JSONObject = trampolineArray.get(i) as JSONObject
-      trampolineSettingsList += TrampolineFeeSetting(
-        feeBase = Satoshi(setting.getLong("fee_base_sat")),
-        feeProportionalMillionths = setting.getLong("fee_per_millionths"),
-        cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
+    val remoteTrampolineSettings = try {
+      val trampolineArray = json.getJSONObject("trampoline").getJSONObject("v2").getJSONArray("attempts")
+      val trampolineSettingsList = ArrayList<TrampolineFeeSetting>()
+      for (i in 0 until trampolineArray.length()) {
+        val setting: JSONObject = trampolineArray.get(i) as JSONObject
+        trampolineSettingsList += TrampolineFeeSetting(
+          feeBase = Satoshi(setting.getLong("fee_base_sat")),
+          feeProportionalMillionths = setting.getLong("fee_per_millionths"),
+          cltvExpiry = CltvExpiryDelta(setting.getInt("cltv_expiry")))
+      }
+      trampolineSettingsList.sortedWith(compareBy({ it.feeProportionalMillionths }, { it.feeBase }))
+      trampolineSettingsList
+    } catch (e: Exception) {
+      log.warn("failed to read trampoline settings: ", e)
+      Constants.DEFAULT_TRAMPOLINE_SETTINGS
     }
-    trampolineSettingsList.sortedWith(compareBy({ it.feeProportionalMillionths }, { it.feeBase }))
-    trampolineFeeSettings.postValue(trampolineSettingsList)
-    log.info("trampoline settings=$trampolineSettingsList")
+    trampolineFeeSettings.postValue(remoteTrampolineSettings)
+    log.info("trampoline settings=$remoteTrampolineSettings")
 
     // -- swap-out settings
-    val remoteSwapOutSettings = json.getJSONObject("swap_out").getJSONObject("v1").run {
-      SwapOutSettings(
-        minFeerateSatByte = getLong("min_feerate_sat_byte").coerceAtLeast(0),
-        status = ServiceStatus.valueOf(optInt("status"))
-      )
+    val remoteSwapOutSettings = try {
+      json.getJSONObject("swap_out").getJSONObject("v1").run {
+        SwapOutSettings(
+          minFeerateSatByte = getLong("min_feerate_sat_byte").coerceAtLeast(0),
+          minAmount = Satoshi(getLong("min_amount_sat")),
+          maxAmount = Satoshi(getLong("max_amount_sat")),
+          status = ServiceStatus.valueOf(optInt("status"))
+        )
+      }
+    } catch (e: Exception) {
+      log.warn("failed to read swap-out settings: ", e)
+      Constants.DEFAULT_SWAP_OUT_SETTINGS
     }
     swapOutSettings.postValue(remoteSwapOutSettings)
     log.info("swap-out settings=$remoteSwapOutSettings")
 
     // -- swap-in settings
-    val remoteSwapInSettings = json.getJSONObject("swap_in").getJSONObject("v1").run {
-      SwapInSettings(
-        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
-        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
-        feePercent = getDouble("fee_percent"),
-        status = ServiceStatus.valueOf(optInt("status"))
-      )
+    val remoteSwapInSettings = try {
+      json.getJSONObject("swap_in").getJSONObject("v1").run {
+        SwapInSettings(
+          minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+          minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+          feePercent = getDouble("fee_percent"),
+          status = ServiceStatus.valueOf(optInt("status"))
+        )
+      }
+    } catch (e: Exception) {
+      log.warn("failed to read swap-in settings: ", e)
+      null
     }
     swapInSettings.postValue(remoteSwapInSettings)
     log.info("swap-in settings=$remoteSwapInSettings")
 
     // -- pay-to-open settings
-    val remotePayToOpenSettings = json.getJSONObject("pay_to_open").getJSONObject("v1").run {
-      PayToOpenSettings(
-        minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
-        minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
-        feePercent = getDouble("fee_percent"),
-        status = ServiceStatus.valueOf(optInt("status"))
-      )
+    val remotePayToOpenSettings = try {
+      json.getJSONObject("pay_to_open").getJSONObject("v1").run {
+        PayToOpenSettings(
+          minFunding = Satoshi(getLong("min_funding_sat").coerceAtLeast(0)),
+          minFee = Satoshi(getLong("min_fee_sat").coerceAtLeast(0)),
+          feePercent = getDouble("fee_percent"),
+          status = ServiceStatus.valueOf(optInt("status"))
+        )
+      }
+    } catch (e: Exception) {
+      log.warn("failed to read pay-to-open settings: ", e)
+      null
     }
     payToOpenSettings.postValue(remotePayToOpenSettings)
     log.info("pay-to-open settings=$remotePayToOpenSettings")
@@ -352,7 +375,7 @@ data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillion
 }
 
 data class SwapInSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)
-data class SwapOutSettings(val minFeerateSatByte: Long, val status: ServiceStatus)
+data class SwapOutSettings(val minFeerateSatByte: Long, val minAmount: Satoshi, val maxAmount: Satoshi, val status: ServiceStatus)
 data class MempoolContext(val highUsageWarning: Boolean)
 data class PayToOpenSettings(val minFunding: Satoshi, val minFee: Satoshi, val feePercent: Double, val status: ServiceStatus)
 data class Balance(val channelsCount: Int, val sendable: MilliSatoshi, val receivable: MilliSatoshi)

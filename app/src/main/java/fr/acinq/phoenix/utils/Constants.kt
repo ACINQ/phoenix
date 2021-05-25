@@ -58,6 +58,7 @@ object Constants {
   // -- default wallet values
   val DEFAULT_FEERATE = FeerateEstimationPerKb(rate20min = 12, rate60min = 6, rate12hours = 3)
   val DEFAULT_NETWORK_INFO = NetworkInfo(electrumServer = null, lightningConnected = false, torConnections = HashMap())
+
   // these default values will be overridden by fee settings from remote, with up-to-date values
   val DEFAULT_TRAMPOLINE_SETTINGS = listOf(
     TrampolineFeeSetting(Satoshi(0), 0, CltvExpiryDelta(576)), // 0 sat + 0.0 %
@@ -67,7 +68,11 @@ object Constants {
     TrampolineFeeSetting(Satoshi(7), 1000, CltvExpiryDelta(576)), // 7 sat + 0.1 %
     TrampolineFeeSetting(Satoshi(10), 1200, CltvExpiryDelta(576)), // 10 sat + 0.12 %
     TrampolineFeeSetting(Satoshi(12), 3000, CltvExpiryDelta(576))) // 12 sat + 0.3 %
-  val DEFAULT_SWAP_OUT_SETTINGS = SwapOutSettings(10, ServiceStatus.Active)
+  val DEFAULT_SWAP_OUT_SETTINGS = SwapOutSettings(
+    minFeerateSatByte = 5,
+    minAmount = Satoshi(10_000),
+    maxAmount = Satoshi(2_000_000), // 0.02 BTC
+    status = ServiceStatus.Active)
   val DEFAULT_MEMPOOL_CONTEXT = MempoolContext(false)
   val DEFAULT_BALANCE = Balance(0, MilliSatoshi(0), MilliSatoshi(0))
 }

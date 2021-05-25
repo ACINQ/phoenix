@@ -174,7 +174,7 @@
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">A quantidade excede o seu saldo.</string>
-  <string name="send_amount_error_swap_out_too_small">Mín. 10000 sat para pagamentos pela rede Bitcoin.</string>
+  <string name="send_amount_error_swap_out_too_small">Mín. %1$s para pagamentos pela rede Bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Ajustar taxa</string>
@@ -528,7 +528,7 @@
   <string name="lnurl_auth_failure">Autenticação falhou.\n\nDetalhes: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">Não foi possível conectar a %1$s</string>
   <string name="lnurl_auth_failure_remote_details">O serviço respondeu com %1$s</string>
-  
+
    <!-- //////////////// ln url pay //////////////// -->
 
   <string name="lnurl_pay_domain"><![CDATA[Payment requested by<br/><b>%1$s</b>]]></string>

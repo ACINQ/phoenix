@@ -141,7 +141,8 @@
   <string name="send_invalid_pr_already_paid_button">Ouvrir le paiement</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
-  <string name="send_amount_error_swap_out_too_small">10 000 sat minimum pour un paiement on-chain.</string>
+  <string name="send_amount_error_swap_out_too_small">%1$s minimum pour un paiement on-chain.</string>
+  <string name="send_amount_error_swap_out_above_max">%1$s maximum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Ajuster fees</string>

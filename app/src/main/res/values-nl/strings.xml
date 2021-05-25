@@ -115,7 +115,7 @@
   <string name="send_invalid_pr_generic">Deze betaling is niet geldig. Je hebt mogelijk een onjuist betalingsverzoek gescand.\n\nProbeer opnieuw.</string>
   <string name="send_amount_error">Voer een geldig bedrag in.</string>
   <string name="send_amount_error_balance">Bedrag overschrijdt je balans.</string>
-  <string name="send_amount_error_swap_out_too_small">Min. 10000 sat voor on-chain betaling.</string>
+  <string name="send_amount_error_swap_out_too_small">Min. %1$s voor on-chain betaling.</string>
   <string name="send_destination_label">Verzend naar</string>
   <string name="send_description_label">Omschr.</string>
   <string name="send_error_sending">Er is een interne fout opgetreden tijdens het versturen van deze betaling. Er is geen geld verzonden.</string>

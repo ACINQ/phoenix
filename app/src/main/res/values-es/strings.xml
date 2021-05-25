@@ -117,7 +117,7 @@
   <string name="send_invalid_pr_generic">Este pago no es válido. Es posible que hayas escaneado una solicitud incorrecta.\n\nPor favor inténtalo de nuevo.</string>
   <string name="send_amount_error">Por favor introduce una cantidad válida.</string>
   <string name="send_amount_error_balance">La cantidad excede tu saldo.</string>
-  <string name="send_amount_error_swap_out_too_small">Min. 10000 sat para pago en la cadena de bloques.</string>
+  <string name="send_amount_error_swap_out_too_small">Min. %1$s para pago en la cadena de bloques.</string>
   <string name="send_destination_label">Enviar a</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Editar comisión</string>

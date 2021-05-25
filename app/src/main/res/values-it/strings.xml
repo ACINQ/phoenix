@@ -112,7 +112,7 @@
   <string name="send_invalid_pr_generic">Questa richiesta di pagamento è invalida. Potresti aver letto una richiesta di pagamento malformata.\n\nPer favore riprova più tardi.</string>
   <string name="send_amount_error">Per favore inserisci un ammontare corretto.</string>
   <string name="send_amount_error_balance">L\'ammontare è superiore al tuo bilancio.</string>
-  <string name="send_amount_error_swap_out_too_small">Min. 10000 sat per pagamenti on-chain.</string>
+  <string name="send_amount_error_swap_out_too_small">Min. %1$s per pagamenti on-chain.</string>
   <string name="send_destination_label">Invia a</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">C\'è stato un errore interno provando ad inviare questo pagamento, il tuo bilancio è rimasto invariato.</string>
