@@ -141,7 +141,8 @@
   <string name="send_invalid_pr_already_paid_button">Ouvrir le paiement</string>
   <string name="send_amount_error">Veuillez saisir un montant valide.</string>
   <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
-  <string name="send_amount_error_swap_out_too_small">10 000 sat minimum pour un paiement on-chain.</string>
+  <string name="send_amount_error_swap_out_too_small">%1$s minimum pour un paiement on-chain.</string>
+  <string name="send_amount_error_swap_out_above_max">%1$s maximum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Ajuster fees</string>
@@ -659,7 +660,6 @@
   <string name="patchnotes_v23"><![CDATA[
     <h4>Augmentation des frais pour les nouveaux canaux de paiement</h4>
     <p>Les frais de création de nouveaux channels restent les mêmes (%1$s%%), mais ils ont désormais un plancher minimal de <b>%2$s</b>.</p>
-    <p>Si quelqu\'un vous envoie 15 000 sat et que vous n\'avez pas de canal de paiement, un nouveau canal sera créé et vous recevrez 14 000 sat.</p>
   ]]></string>
 
 </resources>

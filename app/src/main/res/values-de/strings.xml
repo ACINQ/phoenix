@@ -168,7 +168,7 @@
   <string name="send_invalid_pr_already_paid_button">Offene Zahlung</string>
   <string name="send_amount_error">Bitte geben Sie einen gültigen Betrag ein.</string>
   <string name="send_amount_error_balance">Der Betrag übersteigt Ihr Kontostand.</string>
-  <string name="send_amount_error_swap_out_too_small">Mind. 10000 Sat für on-Chain Zahlungen.</string>
+  <string name="send_amount_error_swap_out_too_small">Mind. %1$s für on-Chain Zahlungen.</string>
   <string name="send_destination_label">Senden an</string>
   <string name="send_description_label">Beschr.</string>
   <string name="send_chain_fees_edit">Gebühren bearbeiten</string>
@@ -749,7 +749,6 @@
     <![CDATA[
     <h4>Gebührenerhöhung für neue Kanäle</h4>
     <p>Der Gebührensatz für neue Kanäle bleibt gleich (%1$s%%), aber es gibt jetzt eine Mindestgebühr von <b>%2$s</b>.</p>
-    <p>Wenn Ihnen jemand 15 000 Sat sendet und Sie keine Kanäle haben, wird ein neuer Kanal erstellt und Sie erhalten 14 000 Sat.</p>
   ]]>
   </string>
 

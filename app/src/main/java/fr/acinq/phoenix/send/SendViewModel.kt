@@ -22,10 +22,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.background.EclairNodeService
-import fr.acinq.phoenix.utils.BitcoinURI
-import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.SingleLiveEvent
-import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -72,7 +69,7 @@ class SendViewModel : ViewModel() {
   val isAmountFieldPristine = MutableLiveData<Boolean>()
   val useMaxBalance = MutableLiveData<Boolean>()
   /** Contains strings resource id for amount error message. Not contained in the fragment Error state because an incorrect amount is not a fatal error. */
-  val amountErrorMessage = SingleLiveEvent<Int>()
+  val amountError = MutableLiveData<Exception?>()
   val showFeeratesForm = MutableLiveData<Boolean>()
   val chainFeesSatBytes = MutableLiveData<Long>()
 
@@ -82,7 +79,7 @@ class SendViewModel : ViewModel() {
     state.value = SendState.CheckingInvoice
     useMaxBalance.value = false
     isAmountFieldPristine.value = true
-    amountErrorMessage.value = null
+    amountError.value = null
     showFeeratesForm.value = false // by default, show a lean view without advanced stuff
     chainFeesSatBytes.value = 3 // base fee in sat/bytes
   }

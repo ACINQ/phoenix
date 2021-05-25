@@ -61,6 +61,7 @@ class SendFragment : BaseFragment() {
   private lateinit var model: SendViewModel
 
   private lateinit var unitList: List<String>
+  private val swapOutSettings by lazy { appContext()?.swapOutSettings?.value ?: Constants.DEFAULT_SWAP_OUT_SETTINGS }
   private val minFeerateSwapout by lazy { getMinSwapoutFeerate() }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -136,11 +137,16 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.amountErrorMessage.observe(viewLifecycleOwner, { msgId ->
+    model.amountError.observe(viewLifecycleOwner, { error ->
       if (model.isAmountFieldPristine.value != true) {
-        if (msgId != null) {
+        if (error != null) {
           mBinding.amountConverted.text = ""
-          mBinding.amountError.text = getString(msgId)
+          mBinding.amountError.text = when (error) {
+            AmountError.NotEnoughBalance -> getString(R.string.send_amount_error_balance)
+            AmountError.SwapOutBelowMin -> getString(R.string.send_amount_error_swap_out_too_small, Converter.printAmountPretty(swapOutSettings.minAmount, requireContext(), withUnit = true))
+            AmountError.SwapOutAboveMax -> getString(R.string.send_amount_error_swap_out_above_max, Converter.printAmountPretty(swapOutSettings.maxAmount, requireContext(), withUnit = true))
+            else -> getString(R.string.send_amount_error)
+          }
           mBinding.amountError.visibility = View.VISIBLE
         } else {
           mBinding.amountError.visibility = View.GONE
@@ -281,11 +287,10 @@ class SendFragment : BaseFragment() {
   }
 
   private fun getMinSwapoutFeerate(): Long {
-    val minSetting = appContext()?.swapOutSettings?.value?.minFeerateSatByte ?: 1
-    return if (minSetting == 0L) {
+    return if (swapOutSettings.minFeerateSatByte == 0L) {
       (app.state.value?.kit()?.nodeParams()?.onChainFeeConf()?.feeEstimator()?.getFeeratePerKb(36) ?: 1000) / 1000
     } else {
-      minSetting
+      swapOutSettings.minFeerateSatByte
     }
   }
 
@@ -355,7 +360,7 @@ class SendFragment : BaseFragment() {
       val unit = mBinding.unit.selectedItem.toString()
       val amountInput = mBinding.amount.text.toString()
       val balance = appContext(requireContext()).balance.value
-      model.amountErrorMessage.value = null
+      model.amountError.value = null
       val fiat = Prefs.getFiatCurrency(ctx)
       val amount = if (unit == fiat) {
         Option.apply(Converter.convertFiatToMsat(ctx, amountInput))
@@ -369,23 +374,21 @@ class SendFragment : BaseFragment() {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
         }
         if (balance != null && amount.get().`$greater`(balance.sendable)) {
-          throw InsufficientBalance()
+          throw AmountError.NotEnoughBalance
         }
-        if (model.state.value is SendState.Onchain && amount.get().`$less`(Satoshi(10000))) {
-          throw SwapOutInsufficientAmount()
+        if (model.state.value is SendState.Onchain && amount.get().`$less`(swapOutSettings.minAmount)) {
+          throw AmountError.SwapOutBelowMin
+        } else if (model.state.value is SendState.Onchain && amount.get().`$greater`(swapOutSettings.maxAmount)) {
+          throw AmountError.SwapOutAboveMax
         }
       } else {
         throw RuntimeException("amount is undefined")
       }
       amount
     } catch (e: Exception) {
-      log.debug("could not check amount: ${e.message}")
+      log.debug("user entered an invalid amount: ${e.message ?: e::class.java.simpleName}")
       mBinding.amountConverted.text = ""
-      model.amountErrorMessage.value = when (e) {
-        is SwapOutInsufficientAmount -> R.string.send_amount_error_swap_out_too_small
-        is InsufficientBalance -> R.string.send_amount_error_balance
-        else -> R.string.send_amount_error
-      }
+      model.amountError.value = e
       Option.empty()
     }
   }

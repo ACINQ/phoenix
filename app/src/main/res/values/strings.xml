@@ -173,7 +173,8 @@
   <string name="send_invalid_pr_already_paid_button">Open payment</string>
   <string name="send_amount_error">Please enter a valid amount.</string>
   <string name="send_amount_error_balance">Amount exceeds your balance.</string>
-  <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
+  <string name="send_amount_error_swap_out_too_small">Min. %1$s for on-chain payment.</string>
+  <string name="send_amount_error_swap_out_above_max">Max. %1$s for on-chain payment.</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_chain_fees_edit">Edit fees</string>
@@ -742,7 +743,6 @@
   <string name="patchnotes_v23"><![CDATA[
     <h4>Fee increase for new channels</h4>
     <p>The fee rate for new channels stays the same (%1$s%%), but there is now a <b>%2$s</b> minimum fee.</p>
-    <p>If someone sends you 15 000 sat and you don\'t have any channels, a new channel will be created and you will receive 14 000 sat.</p>
   ]]></string>
 
   <string name="paymentmode_onchain">Pay on-chain</string>

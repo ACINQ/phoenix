@@ -30,8 +30,12 @@ object ServiceDisconnected : RuntimeException("node service is disconnected")
 class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
 
 // -- payment exceptions
-class InsufficientBalance : RuntimeException()
-class SwapOutInsufficientAmount : RuntimeException()
+sealed class AmountError: RuntimeException() {
+  object Default : AmountError()
+  object NotEnoughBalance : AmountError()
+  object SwapOutBelowMin : AmountError()
+  object SwapOutAboveMax : AmountError()
+}
 object CannotSendHeadless : RuntimeException("the service cannot send a payment while being headless")
 
 // -- parsing exceptions

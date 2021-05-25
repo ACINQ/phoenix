@@ -115,7 +115,7 @@
   <string name="send_invalid_pr_generic">Tato platba není platná. Musel jste naskenovat neplatný požadavek.\n\nProsím, zkuste to znovu.</string>
   <string name="send_amount_error">Prosím, zadejte platné množství.</string>
   <string name="send_amount_error_balance">Množství je vyšší než váš zůstatek.</string>
-  <string name="send_amount_error_swap_out_too_small">Minimálně 10000 satoshi za on-chain platbu.</string>
+  <string name="send_amount_error_swap_out_too_small">Minimálně %1$s za on-chain platbu.</string>
   <string name="send_destination_label">Odeslat na</string>
   <string name="send_description_label">Popis</string>
   <string name="send_error_sending">Nastala chyba při odesílání platby. Žádné peníze nebyly odeslány.</string>
