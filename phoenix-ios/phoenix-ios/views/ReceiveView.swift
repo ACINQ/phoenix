@@ -128,11 +128,19 @@ struct ReceiveLightningView: View, ViewName {
 		case editing(model: Receive.ModelGenerated)
 	}
 	
+	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
+	// In particular, animating the border around the qrcode doesn't work well.
+	@Namespace private var qrCodeAnimation_inner
+	@Namespace private var qrCodeAnimation_outer
+	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast
 	
 	@StateObject var qrCode = QRCode()
 
+	@State var didAppear = false
+	@State var isFullScreenQrcode = false
+	
 	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
@@ -164,15 +172,19 @@ struct ReceiveLightningView: View, ViewName {
 	@ViewBuilder
 	var body: some View {
 		
-		Group {
-			
-			if verticalSizeClass == UserInterfaceSizeClass.compact {
+		// We're using a ZStack here instead of a Group,
+		// because with Group, we get a onAppear/onDisappear whenever the content changes.
+		// E.g. when toggling isFullScreenQrcode
+		//
+		ZStack {
+			if isFullScreenQrcode {
+				fullScreenQrcode()
+			} else if verticalSizeClass == UserInterfaceSizeClass.compact {
 				mainLandscape()
 			} else {
 				mainPortrait()
 			}
-			
-		} // </Group>
+		}
 		.onAppear {
 			onAppear()
 		}
@@ -237,6 +249,7 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding(.top)
 			
 			if !isPayToOpenEnabled {
@@ -302,6 +315,7 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding([.top, .bottom])
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 20) {
@@ -336,6 +350,43 @@ struct ReceiveLightningView: View, ViewName {
 	}
 	
 	@ViewBuilder
+	func fullScreenQrcode() -> some View {
+		
+		ZStack {
+			
+			qrCodeView
+				.padding()
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.strokeBorder(
+							ReceiveView.qrCodeBorderColor(colorScheme),
+							lineWidth: 1
+						)
+				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
+			
+			VStack {
+				HStack {
+					Spacer()
+					Button {
+						withAnimation {
+							isFullScreenQrcode = false
+						}
+					} label: {
+						Image("ic_cross")
+							.resizable()
+							.frame(width: 30, height: 30)
+					}
+					.padding()
+				}
+				Spacer()
+			}
+		}
+	}
+	
+	@ViewBuilder
 	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
@@ -345,6 +396,7 @@ struct ReceiveLightningView: View, ViewName {
 		{
 			qrCodeImage
 				.resizable()
+				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
@@ -357,12 +409,24 @@ struct ReceiveLightningView: View, ViewName {
 						Text("Copy")
 					}
 					Button(action: {
+						// We add a delay here to give the contextMenu time to finish it's own animation.
+						// Otherwise the effect of the double-animations looks funky.
+						DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+							withAnimation {
+								isFullScreenQrcode = true
+							}
+						}
+					}) {
+						Text("Full Screen")
+					}
+					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
 					}) {
 						Text("Share")
 					}
-				}
+				} // </contextMenu>
+				.matchedGeometryEffect(id: "qrCodeView_inner", in: qrCodeAnimation_inner)
 			
 		} else {
 			VStack {
@@ -536,6 +600,12 @@ struct ReceiveLightningView: View, ViewName {
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
+		// Careful: this function may be called multiple times
+		if didAppear {
+			return
+		}
+		didAppear = true
+			
 		let defaultDesc = Prefs.shared.defaultPaymentDescription
 		mvi.intent(Receive.IntentAsk(amount: nil, desc: defaultDesc))
 		
