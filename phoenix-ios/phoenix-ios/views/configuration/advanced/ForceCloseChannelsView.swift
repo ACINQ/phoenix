@@ -288,7 +288,8 @@ fileprivate struct FundsSentView : View {
 						comment: "label text"
 					)
 				
-				Text(msg)
+				Text(styled: msg)
+					.lineLimit(nil) // text is getting truncated for some reason
 				
 			} // </VStack>
 

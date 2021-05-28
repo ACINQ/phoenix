@@ -317,9 +317,12 @@ struct HomeView : MVIView, ViewName {
 	func maybePreFetchPaymentsFromDatabase() -> Void {
 		
 		if !didPreFetch && paymentsPage.rows.count > 0 {
-	
 			didPreFetch = true
-			prefetchPaymentsFromDatabase(idx: 0)
+			
+			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+				prefetchPaymentsFromDatabase(idx: 0)
+			}
 		}
 	}
 	
