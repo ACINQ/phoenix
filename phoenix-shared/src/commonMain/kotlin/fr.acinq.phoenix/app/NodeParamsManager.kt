@@ -78,8 +78,8 @@ class NodeParamsManager(
                     alias = "phoenix",
                     features = Features(
                         Feature.OptionDataLossProtect to FeatureSupport.Mandatory,
-                        Feature.VariableLengthOnion to FeatureSupport.Optional,
-                        Feature.PaymentSecret to FeatureSupport.Optional,
+                        Feature.VariableLengthOnion to FeatureSupport.Mandatory,
+                        Feature.PaymentSecret to FeatureSupport.Mandatory,
                         Feature.BasicMultiPartPayment to FeatureSupport.Optional,
                         Feature.Wumbo to FeatureSupport.Optional,
                         Feature.StaticRemoteKey to FeatureSupport.Optional,
