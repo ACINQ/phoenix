@@ -54,7 +54,7 @@ object TestConstants {
             feerateTolerance = FeerateTolerance(ratioLow = 0.01, ratioHigh = 100.0)
         ),
         maxHtlcValueInFlightMsat = 150000000L,
-        maxAcceptedHtlcs = 30,
+        maxAcceptedHtlcs = 6,
         expiryDeltaBlocks = CltvExpiryDelta(144),
         fulfillSafetyBeforeTimeoutBlocks = CltvExpiryDelta(6),
         checkHtlcTimeoutAfterStartupDelaySeconds = 15,
