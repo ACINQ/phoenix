@@ -37,9 +37,9 @@ internal class SqliteChannelsDb(private val driver: SqlDriver, private val nodeP
         withContext(Dispatchers.Default) {
             queries.transaction {
                 queries.getChannel(channelId).executeAsOneOrNull()?.run {
-                    queries.updateChannel(channel_id = this.channel_id, data = data)
+                    queries.updateChannel(channel_id = this.channel_id, data_ = data)
                 } ?: run {
-                    queries.insertChannel(channel_id = channelId, data = data)
+                    queries.insertChannel(channel_id = channelId, data_ = data)
                 }
             }
         }

@@ -174,24 +174,25 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     }
 
     override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> {
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsMapper
-            ).executeAsList()
-        }
+        return listOf()
+//        return withContext(Dispatchers.Default) {
+//            aggrQueries.listAllPayments(
+//                limit = count.toLong(),
+//                offset = skip.toLong(),
+//                mapper = ::allPaymentsMapper
+//            ).executeAsList()
+//        }
     }
 
-    suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
-        return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(
-                limit = count.toLong(),
-                offset = skip.toLong(),
-                mapper = ::allPaymentsMapper
-            ).asFlow().mapToList()
-        }
-    }
+//    suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
+//        return withContext(Dispatchers.Default) {
+//            aggrQueries.listAllPayments(
+//                limit = count.toLong(),
+//                offset = skip.toLong(),
+//                mapper = ::allPaymentsMapper
+//            ).asFlow().mapToList()
+//        }
+//    }
 
     private fun allPaymentsCountMapper(
         result: Long?

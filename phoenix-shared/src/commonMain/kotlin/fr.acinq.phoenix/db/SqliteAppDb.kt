@@ -47,13 +47,13 @@ class SqliteAppDb(driver: SqlDriver) {
                 paramsQueries.get(version.name).executeAsOneOrNull()?.run {
                     paramsQueries.update(
                         version = this.version,
-                        data = rawData,
+                        data_ = rawData,
                         updated_at = Clock.System.now().epochSeconds
                     )
                 } ?: run {
                     paramsQueries.insert(
                         version = version.name,
-                        data = rawData,
+                        data_ = rawData,
                         updated_at = Clock.System.now().epochSeconds
                     )
                 }
