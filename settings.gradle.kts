@@ -8,8 +8,6 @@ pluginManagement {
 
 rootProject.name = "phoenix-kmm"
 
-enableFeaturePreview("GRADLE_METADATA")
-
 // We use a property defined in `local.properties` to know whether we should build the android application or not.
 // For example, iOS developers may want to skip that most of the time.
 val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
