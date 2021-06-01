@@ -69,7 +69,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:${Versions.serialization}")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
                 api("org.kodein.memory:kodein-memory-files:${Versions.kodeinMemory}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+                    version { strictly(Versions.coroutines) }
+                }
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.datetime}")
                 implementation("io.ktor:ktor-client-core:${Versions.ktor}")
                 implementation("io.ktor:ktor-client-json:${Versions.ktor}")

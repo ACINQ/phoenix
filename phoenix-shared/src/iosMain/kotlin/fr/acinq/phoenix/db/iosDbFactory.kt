@@ -45,7 +45,9 @@ actual fun createPaymentsDbDriver(
     val configuration = DatabaseConfiguration(
         name = name,
         version = schema.version,
-        foreignKeyConstraints = true,
+        extendedConfig = DatabaseConfiguration.Extended(
+            foreignKeyConstraints = true
+        ),
         create = { connection ->
             wrapConnection(connection) { schema.create(it) }
         },
