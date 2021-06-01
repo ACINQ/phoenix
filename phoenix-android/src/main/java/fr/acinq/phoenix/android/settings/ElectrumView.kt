@@ -69,7 +69,8 @@ fun ElectrumView() {
                 connection == Connection.CLOSED && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
                 connection == Connection.ESTABLISHING && config is ElectrumConfig.Random -> stringResource(id = R.string.electrum_connecting)
                 connection == Connection.ESTABLISHING && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_connecting_to_custom, config.server.host)
-                connection == Connection.ESTABLISHED && config != null -> stringResource(id = R.string.electrum_connected, config.server.host)
+                connection == Connection.ESTABLISHED && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_connected, config.server.host)
+                connection == Connection.ESTABLISHED -> stringResource(id = R.string.electrum_connected, "TODO") // FIXME get server's address
                 else -> stringResource(id = R.string.electrum_not_connected)
             }
             val description = when (config) {
