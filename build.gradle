@@ -24,7 +24,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.3'
+    classpath 'com.android.tools.build:gradle:4.2.1'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     // plugin to generate args classes for the androidx navigation component
     classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$safeargs_version"

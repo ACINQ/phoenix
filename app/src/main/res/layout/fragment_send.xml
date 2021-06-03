@@ -311,7 +311,7 @@
           android:layout_marginStart="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_md"
-          android:drawableTint="?attr/colorPrimary"
+          app:drawableTint="?attr/colorPrimary"
           android:ellipsize="none"
           android:singleLine="@{model.state instanceof SendState.Lightning}"
           android:text="@{model.destination}"
@@ -329,7 +329,7 @@
           android:layout_marginStart="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_xxs"
           android:layout_marginEnd="@dimen/space_md"
-          android:text="@string/send_chain_fees_description"
+          android:text="@string/send_chain_description"
           android:textSize="@dimen/text_md"
           android:visibility="@{model.state instanceof SendState.Onchain}"
           app:layout_constrainedWidth="true"
@@ -365,101 +365,6 @@
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
           app:layout_constraintTop_toBottomOf="@id/destination_chain_description" />
-
-        <TextView
-          android:id="@+id/chain_fees_label"
-          style="@style/MutedLabelView"
-          android:layout_width="wrap_content"
-          android:layout_marginStart="@dimen/space_md"
-          android:text="@string/send_chain_fees_label"
-          android:textAlignment="viewEnd"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
-          app:layout_constraintBaseline_toBaselineOf="@id/chain_fees_value"
-          app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
-          app:layout_constraintHorizontal_bias="1"
-          app:layout_constraintStart_toStartOf="parent" />
-
-        <fr.acinq.phoenix.utils.customviews.ButtonView
-          android:id="@+id/show_chain_fees_button"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_xs"
-          android:background="@drawable/button_bg_no_border"
-          android:padding="6dp"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm == false}"
-          app:icon="@drawable/ic_edit"
-          app:icon_size="14dp"
-          app:icon_tint="?attr/colorPrimary"
-          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/description_value"
-          app:spacer_size="@dimen/space_xxs"
-          app:text="@string/send_chain_fees_edit"
-          app:text_size="@dimen/text_sm" />
-
-        <EditText
-          android:id="@+id/chain_fees_value"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_xs"
-          android:layout_marginTop="@dimen/space_sm"
-          android:layout_marginEnd="@dimen/space_lg_p"
-          android:background="@null"
-          android:contentDescription="@string/send_chain_fees_label"
-          android:importantForAutofill="no"
-          android:inputType="numberSigned"
-          android:labelFor="@id/chain_fees_label"
-          android:minWidth="24dp"
-          android:singleLine="true"
-          android:text="@={model.chainFeesSatBytes}"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_bias="0"
-          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/description_value" />
-
-        <TextView
-          android:id="@+id/chain_fees_unit"
-          style="@style/MutedLabelView"
-          android:layout_width="wrap_content"
-          android:layout_marginStart="@dimen/space_xxs"
-          android:text="@string/send_chain_fees_unit"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
-          app:layout_constraintBaseline_toBaselineOf="@id/chain_fees_value"
-          app:layout_constraintStart_toEndOf="@id/chain_fees_value" />
-
-        <View
-          android:id="@+id/chain_fees_value_underline"
-          android:layout_width="0dp"
-          android:layout_height="2dp"
-          android:layout_marginTop="@dimen/space_xxxs"
-          android:background="@drawable/line_dots"
-          android:backgroundTint="?attr/colorPrimary"
-          android:layerType="software"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="@id/chain_fees_value"
-          app:layout_constraintStart_toStartOf="@id/chain_fees_value"
-          app:layout_constraintTop_toBottomOf="@id/chain_fees_value" />
-
-        <TextView
-          android:id="@+id/chain_fees_feedback"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_xs"
-          android:layout_marginTop="@dimen/space_xxs"
-          android:layout_marginEnd="@dimen/space_md"
-          android:text="@string/send_chain_fees_feedback_invalid"
-          android:textSize="@dimen/text_md"
-          android:translationX="-26dp"
-          android:drawablePadding="@dimen/space_xs"
-          android:visibility="@{model.state instanceof SendState.Onchain &amp;&amp; model.showFeeratesForm}"
-          app:drawableLeftCompat="@drawable/ic_blank"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_bias="0"
-          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/chain_fees_value_underline" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -506,7 +411,8 @@
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_md"
           android:background="@drawable/rounded_border"
-          android:padding="@dimen/space_md"
+          android:paddingVertical="@dimen/space_md_p"
+          android:paddingHorizontal="@dimen/space_lg"
           android:visibility="@{model.state instanceof SendState.Onchain.Ready || model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -593,7 +499,7 @@
             android:id="@+id/swap_recap_total_separator"
             android:layout_width="50dp"
             android:layout_height="1dp"
-            android:layout_marginTop="@dimen/space_xs"
+            android:layout_marginTop="@dimen/space_sm"
             android:background="?attr/mutedTextColor"
             app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
             app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value_fiat" />
@@ -613,7 +519,7 @@
             android:id="@+id/swap_recap_total_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_xxs"
+            android:layout_marginTop="@dimen/space_xs"
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
