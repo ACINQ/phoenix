@@ -142,7 +142,7 @@
   <!-- //////////////// scan //////////////// -->
 
   <string name="scan_request_camera_access">Permitir acceso a la cámara</string>
-  <string name="scan_instructions">Escanea un código QR que contenga una solicitud de pago, una dirección de Bitcoino una LNURL</string>
+  <string name="scan_instructions">Escanea un código QR que contenga una solicitud de pago, una dirección de Bitcoin o LNURL</string>
   <string name="scan_state_reading">Leyendo datos</string>
 
   <string name="scan_error_expired">El pago ha expirado.</string>
