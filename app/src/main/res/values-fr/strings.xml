@@ -145,15 +145,12 @@
   <string name="send_amount_error_swap_out_above_max">%1$s maximum pour un paiement on-chain.</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
-  <string name="send_chain_fees_edit">Ajuster fees</string>
-  <string name="send_chain_fees_label">Fee rate</string>
-  <string name="send_chain_fees_unit">sat/byte</string>
-  <string name="send_chain_fees_description">Ce paiement est une transaction on-chain, plus lente et généralement plus chère. Des frais de minage vont être appliqués.</string>
-  <string name="send_chain_fees_feedback_invalid">Veuillez utiliser un fee-rate valide.</string>
-  <string name="send_chain_fees_feedback_20min">Avec ce fee rate, le paiement devrait être reçu d\'ici 30 minutes.</string>
-  <string name="send_chain_fees_feedback_1h">Avec ce fee rate, le paiement devrait être reçu d\'ici une heure.</string>
-  <string name="send_chain_fees_feedback_12h">Avec ce fee rate, le paiement devrait être reçu d\'ici douze heures.</string>
-  <string name="send_chain_fees_feedback_inf">Avec ce fee rate, le paiement ne devrait être reçu que dans au moins 12 heures.</string>
+  <string name="send_mining_fee_info_title">À quoi correspondent ces frais ?</string>
+  <string name="send_mining_fee_info_message"><![CDATA[
+  Ce paiement est à destination de la chaîne Bitcoin et des frais de minage s\'appliquent. Le feerate de la transaction est fixé par le service de swap.
+  <br /><br />
+  <a href="https://phoenix.acinq.co/faq#why-dont-you-let-me-set-the-feerate-myself-when-sending-on-chain">Plus d\'informations ici.</a>
+  ]]></string>
   <string name="send_error_sending">Il y a eu une erreur lors de l\'envoi du paiement. Aucun argent n\'a été envoyé.</string>
   <string name="send_pay_button">Payer</string>
   <string name="send_swap_in_progress">Création de la transaction…</string>

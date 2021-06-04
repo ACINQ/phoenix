@@ -196,11 +196,6 @@ class SendFragment : BaseFragment() {
         checkAmount()
       }
     }
-
-    mBinding.destinationChainDescription.apply {
-      text = Converter.html(getString(R.string.send_chain_description))
-      movementMethod = LinkMovementMethod.getInstance()
-    }
   }
 
   override fun onStart() {
@@ -233,6 +228,10 @@ class SendFragment : BaseFragment() {
           requestSwapOut(it.uri)
         }
       }
+    }
+
+    mBinding.swapRecapFeeLabel.setOnClickListener {
+      AlertHelper.build(layoutInflater, getString(R.string.send_mining_fee_info_title), Converter.html(getString(R.string.send_mining_fee_info_message))).show()
     }
 
     mBinding.alreadyPaidLayoutButton.setOnClickListener {

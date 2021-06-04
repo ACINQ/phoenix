@@ -136,9 +136,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_md"
+        android:background="@drawable/rounded"
         android:padding="@dimen/space_lg"
         android:text="@string/send_invalid_pr_generic"
-        android:background="@drawable/rounded"
         android:visibility="@{model.state instanceof SendState.InvalidInvoice.Generic}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,8 +149,8 @@
         android:id="@+id/already_paid_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded"
         android:layout_margin="@dimen/space_lg"
+        android:background="@drawable/rounded"
         android:padding="@dimen/space_lg"
         android:visibility="@{model.state instanceof SendState.InvalidInvoice.AlreadyPaid}"
         app:layout_constrainedWidth="true"
@@ -169,8 +169,8 @@
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/already_paid_layout_button"
           android:layout_width="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
           android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/already_paid_layout_message"
           app:text="@string/send_invalid_pr_already_paid_button" />
@@ -311,32 +311,16 @@
           android:layout_marginStart="@dimen/space_xs"
           android:layout_marginTop="@dimen/space_lg"
           android:layout_marginEnd="@dimen/space_md"
-          app:drawableTint="?attr/colorPrimary"
           android:ellipsize="none"
           android:singleLine="@{model.state instanceof SendState.Lightning}"
           android:text="@{model.destination}"
           android:textIsSelectable="true"
+          app:drawableTint="?attr/colorPrimary"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
           app:layout_constraintTop_toBottomOf="@id/max_checkbox" />
-
-        <TextView
-          android:id="@+id/destination_chain_description"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/space_xs"
-          android:layout_marginTop="@dimen/space_xxs"
-          android:layout_marginEnd="@dimen/space_md"
-          android:text="@string/send_chain_description"
-          android:textSize="@dimen/text_md"
-          android:visibility="@{model.state instanceof SendState.Onchain}"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_bias="0"
-          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/destination_value" />
 
         <TextView
           android:id="@+id/description_label"
@@ -364,7 +348,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/destination_chain_description" />
+          app:layout_constraintTop_toBottomOf="@id/destination_value" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -411,8 +395,8 @@
           android:layout_marginStart="@dimen/space_md"
           android:layout_marginEnd="@dimen/space_md"
           android:background="@drawable/rounded_border"
-          android:paddingVertical="@dimen/space_md_p"
           android:paddingHorizontal="@dimen/space_lg"
+          android:paddingVertical="@dimen/space_md_p"
           android:visibility="@{model.state instanceof SendState.Onchain.Ready || model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="parent"
@@ -465,7 +449,12 @@
             style="@style/MutedLabelView"
             android:layout_width="wrap_content"
             android:layout_marginEnd="@dimen/space_xs"
+            android:clickable="true"
+            android:drawablePadding="@dimen/space_xs"
+            android:focusable="true"
             android:text="@string/send_swap_complete_recap_fee"
+            app:drawableStartCompat="@drawable/ic_info"
+            app:drawableTint="?attr/colorPrimary"
             app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
             app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
             app:layout_constraintHorizontal_bias="1"
@@ -534,8 +523,8 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_marginStart="@dimen/space_lg"
-          android:layout_marginEnd="@dimen/space_lg"
           android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_lg"
           android:drawableStart="@drawable/ic_alert_triangle"
           android:drawableTint="?attr/negativeColor"
           android:maxWidth="260dp"
