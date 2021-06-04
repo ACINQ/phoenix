@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.receive
 
+import android.app.AlertDialog
 import android.content.*
 import android.os.Bundle
 import android.text.Editable
@@ -25,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
@@ -41,10 +43,7 @@ import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.phoenix.*
 import fr.acinq.phoenix.databinding.FragmentReceiveBinding
 import fr.acinq.phoenix.paymentdetails.PaymentDetailsFragment
-import fr.acinq.phoenix.utils.Constants
-import fr.acinq.phoenix.utils.Converter
-import fr.acinq.phoenix.utils.Prefs
-import fr.acinq.phoenix.utils.Wallet
+import fr.acinq.phoenix.utils.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -168,6 +167,13 @@ class ReceiveFragment : BaseFragment() {
 
     mBinding.copyButton.setOnClickListener {
       copyInvoice()
+    }
+
+    mBinding.enlargeButton.setOnClickListener {
+      val qrImage = model.bitmap.value
+      if (context != null && qrImage != null) {
+        AlertHelper.buildFullScreenImage(layoutInflater, qrImage).show()
+      }
     }
 
     mBinding.qrImage.setOnClickListener {

@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.utils
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.text.InputFilter
 import android.text.InputType
 import android.text.method.LinkMovementMethod
@@ -24,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import fr.acinq.phoenix.R
 
@@ -76,6 +78,14 @@ object AlertHelper {
     return AlertDialog.Builder(inflater.context, R.style.default_dialogTheme)
       .setView(view)
       .setPositiveButton(inflater.context.getString(R.string.btn_ok)) { _, _ -> callback(checkbox.isChecked) }
+  }
+
+  fun buildFullScreenImage(inflater: LayoutInflater, bitmap: Bitmap): AlertDialog.Builder {
+    val view = inflater.inflate(R.layout.dialog_alert_image, null)
+    view.findViewById<ImageView>(R.id.dialog_alert_imageview).apply {
+      setImageBitmap(bitmap)
+    }
+    return AlertDialog.Builder(inflater.context, R.style.dialog_fullScreen).setView(view)
   }
 
   private fun default(view: View, title: CharSequence?, message: CharSequence?) = view.apply {
