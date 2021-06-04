@@ -21,8 +21,8 @@
 
   <string name="notification_channels_watcher_title">Background watcher</string>
   <string name="notification_channels_watcher_desc">Alerts you if you need to start the app. Should be high priority.</string>
-  <string name="notification_pay_to_open_title">Accept incoming payment</string>
-  <string name="notification_pay_to_open_desc">Pops up when someone sends you a payment and you need to accept it manually.</string>
+  <string name="notification_pay_to_open_missed_title">Missed payment notifications</string>
+  <string name="notification_pay_to_open_missed_desc">Notifies you when an incoming payment has failed because automatic on-the-fly channel creation has been disabled.</string>
   <string name="notification_headless_title">Phoenix running in background</string>
   <string name="notification_headless_desc">Notifies you that Phoenix is running in background. This happens when someone is sending you money and the app is not already started.</string>
 
@@ -280,11 +280,11 @@
   <string name="notif__headless_message__manual_pay_to_open">Channel creation requires manual approval</string>
   <string name="notif__headless_message__received_payment">Received %1$s (%2$s)</string>
 
-  <string name="notif_pay_to_open_title">Accept incoming payment</string>
-  <string name="notif_pay_to_open_message">Tap to open the app</string>
+  <string name="notif_pay_to_open_missed_title">Payment missed</string>
+  <string name="notif_pay_to_open_missed_message">A new channel was needed to receive this payment. Tap here to enable automatic channel creation.</string>
 
-  <string name="notif__pay_to_open_missed_title">Missed payment (%1$s)</string>
-  <string name="notif__pay_to_open_missed_message">The amount incoming was too small to create a new payment channel.</string>
+  <string name="notif__pay_to_open_missed_too_small_title">Missed payment (%1$s)</string>
+  <string name="notif__pay_to_open_missed_too_small_message">The amount incoming was too small to create a new payment channel.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -690,9 +690,13 @@
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
 
-  <string name="paymentsettings_paytoopen_fees_title">Fee for on the fly channel creation</string>
+  <string name="paymentsettings_paytoopen_auto_switch_title">Automatic on-the-fly channel creation</string>
+  <string name="paymentsettings_paytoopen_auto_switch_enabled">New channel will be opened when needed, a fee will apply (see below)</string>
+  <string name="paymentsettings_paytoopen_auto_switch_disabled">Incoming payments that require a new channel will be rejected and will fail</string>
+
+  <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s minimum)</string>
-  <string name="paymentsettings_paytoopen_fees_dialog_title">On the fly channels</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
   <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
     This fee applies when you receive a payment over Lightning and a new channel needs to be created.
     <br /><br />

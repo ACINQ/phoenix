@@ -231,15 +231,15 @@
   <string name="settings_force_close">Zone à risque</string>
   <string name="settings_tor">Tor</string>
   <string name="settings_about">À propos</string>
-  <string name="settings_payment_settings">Options des paiements</string>
+  <string name="settings_payment_settings">Options et frais de paiements</string>
 
   <!-- //////////////// notification - watcher //////////////// -->
 
   <string name="notif_watcher_cheating_title">Veuillez démarrer Phoenix</string>
   <string name="notif_watcher_cheating_message">Une tentative de triche a été détectée.</string>
 
-  <string name="notif_watcher_connection_title">Phoenix a besoin d\'internet</string>
-  <string name="notif_watcher_connection_message">La tâche de fond surveillant les canaux de paiement a besoin d\'une connexion internet pour pouvoir fonctionner.</string>
+  <string name="notif_watcher_connection_title">Connexion internet requise</string>
+  <string name="notif_watcher_connection_message">La tâche de fond surveillant vos canaux de paiement a besoin d\'une connexion internet pour pouvoir fonctionner.</string>
 
   <string name="notif__headless_title__default">Phoenix tourne en tâche de fond</string>
   <string name="notif__headless_title__missed_incoming">Paiement entrant manqué</string>
@@ -250,8 +250,11 @@
   <string name="notif__headless_message__manual_pay_to_open">La création de canal de paiement requiert une action manuelle</string>
   <string name="notif__headless_message__received_payment">Vous avez reçu %1$s (%2$s)</string>
 
-  <string name="notif_pay_to_open_title">Accepter un paiement entrant</string>
-  <string name="notif_pay_to_open_message">Cliquez pour ouvrir l\'application</string>
+  <string name="notif_pay_to_open_missed_title">Payment entrant manqué</string>
+  <string name="notif_pay_to_open_missed_message">Un nouveau canal de paiement était nécessaire pour recevoir ce paiement. Appuyez ici pour activer la création automatique de canaux.</string>
+
+  <string name="notif__pay_to_open_missed_too_small_title">Paiement entrant manqué (%1$s)</string>
+  <string name="notif__pay_to_open_missed_too_small_message">Le montant était trop petit pour qu\'un nouveau canal de paiement soit créé.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
@@ -609,12 +612,12 @@
 
   <!-- //////////////// settings: options for payments //////////////// -->
 
-  <string name="paymentsettings_title">Options des paiements</string>
-  <string name="paymentsettings_subtitle">Définissez ici des options pour les paiements que vous envoyez ou recevez.</string>
+  <string name="paymentsettings_title">Options et frais de paiements</string>
+  <string name="paymentsettings_subtitle">Définissez ici vos préférences pour les paiements que vous envoyez ou recevez.</string>
 
   <string name="paymentsettings_defaultdesc_title">Description des paiements reçus</string>
-  <string name="paymentsettings_defaultdesc_dialog_title">Description par défaut</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Elle peut être changée au cas par cas.</string>
+  <string name="paymentsettings_defaultdesc_dialog_title">Description de vos requêtes de paiement</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Celle-ci peut toujours être changée au cas par cas.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
 
   <string name="paymentsettings_trampoline_fees_title">Frais max pour les paiements Lightning sortants</string>
@@ -624,6 +627,19 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Saisissez une valeur en satoshis</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Frais proportionnels (%)</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Saisissez une valeur en %</string>
+
+  <string name="paymentsettings_paytoopen_auto_switch_title">Création de canaux automatique</string>
+  <string name="paymentsettings_paytoopen_auto_switch_enabled">De nouveaux canaux de paiement seront créés au besoin. Des frais seront appliqués automatiquement (voir ci-dessous).</string>
+  <string name="paymentsettings_paytoopen_auto_switch_disabled">Les paiements entrants nécessitant un nouveau canal de paiement seront refusés.</string>
+
+  <string name="paymentsettings_paytoopen_fees_title">Frais de création de canaux</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (au minimum %2$s)</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">Création automatique de canaux</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+    Ces frais s\'appliquent lorsque l\'on vous envoie un paiement via Lightning et qu\'un nouveau canal de paiement doit être créé pour le recevoir.
+    <br /><br />
+    Consultez <a href="https://phoenix.acinq.co/faq#what-are-the-fees">notre FAQ</a> pour plus de détails.
+  ]]></string>
 
   <!-- ftue -->
 

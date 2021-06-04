@@ -149,6 +149,7 @@ class ChannelsWatcher(context: Context, workerParams: WorkerParameters) : Worker
       .setStyle(NotificationCompat.BigTextStyle().bigText(message))
       .setContentIntent(PendingIntent.getActivity(context, Constants.NOTIF_ID__CHANNELS_WATCHER, startIntent, PendingIntent.FLAG_UPDATE_CURRENT))
       .setOngoing(isAlert)
+      .setPriority(if (isAlert) NotificationCompat.PRIORITY_MAX else NotificationCompat.PRIORITY_DEFAULT)
       .setAutoCancel(true)
     NotificationManagerCompat.from(context).notify(Constants.NOTIF_ID__CHANNELS_WATCHER, builder.build())
   }

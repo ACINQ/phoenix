@@ -38,17 +38,20 @@ import fr.acinq.phoenix.utils.AlertHelper
 import fr.acinq.phoenix.utils.BindingHelpers
 import fr.acinq.phoenix.utils.Converter
 import fr.acinq.phoenix.utils.Prefs
+import fr.acinq.phoenix.utils.customviews.SwitchView
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
+class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
   private lateinit var mBinding: FragmentSettingsPaymentBinding
 
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_PAYMENT_DEFAULT_DESCRIPTION
-      || key == Prefs.PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE || key == Prefs.PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE) {
+      || key == Prefs.PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE || key == Prefs.PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE
+      || key == Prefs.PREFS_AUTO_PAY_TO_OPEN
+    ) {
       refreshUI()
     }
   }
@@ -65,12 +68,14 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
     refreshUI()
     mBinding.defaultDescriptionButton.setOnClickListener {
       context?.let { ctx ->
-        AlertHelper.buildWithInput(layoutInflater,
+        AlertHelper.buildWithInput(
+          layoutInflater,
           title = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_title),
           message = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_description),
           callback = { value -> context?.let { Prefs.setDefaultPaymentDescription(it, value) } },
           defaultValue = Prefs.getDefaultPaymentDescription(ctx),
-          hint = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_hint))
+          hint = ctx.getString(R.string.paymentsettings_defaultdesc_dialog_hint)
+        )
           .setNegativeButton(getString(R.string.utils_cancel), null)
           .show()
       }
@@ -80,6 +85,10 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
       AlertHelper.build(layoutInflater, title = getString(R.string.paymentsettings_paytoopen_fees_dialog_title),
         message = Converter.html(getString(R.string.paymentsettings_paytoopen_fees_dialog_message)))
         .show()
+    }
+    mBinding.payToOpenEnableSwitch.setOnClickListener {
+      val isChecked = mBinding.payToOpenEnableSwitch.isChecked()
+      context?.let { Prefs.setAutoPayToOpen(it, !isChecked) }
     }
     mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
   }
@@ -93,6 +102,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
     context?.let { ctx ->
       mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
 
+      val isAutoPayToOpenEnabled = Prefs.isAutoPayToOpenEnabled(ctx)
       val trampolineFeeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()
       val payToOpenSettings = appContext(ctx).payToOpenSettings.value
 
@@ -109,6 +119,13 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = false) {
           Converter.printAmountPretty(payToOpenSettings.minFee, ctx, withUnit = true)))
       } else {
         mBinding.payToOpenFeesButton.setSubtitle(getString(R.string.utils_unavailable))
+      }
+
+      mBinding.payToOpenEnableSwitch.setChecked(isAutoPayToOpenEnabled)
+      if (isAutoPayToOpenEnabled) {
+        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.paymentsettings_paytoopen_auto_switch_enabled))
+      } else {
+        mBinding.payToOpenEnableSwitch.setSubtitle(getString(R.string.paymentsettings_paytoopen_auto_switch_disabled))
       }
     }
   }

@@ -67,6 +67,14 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_trampoline_fees_title" />
 
+        <fr.acinq.phoenix.utils.customviews.SwitchView
+          android:id="@+id/pay_to_open_enable_switch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:icon="@drawable/ic_blank"
+          app:text="@string/paymentsettings_paytoopen_auto_switch_title"
+          app:layout_constraintTop_toBottomOf="@id/trampoline_fees_button" />
+
         <fr.acinq.phoenix.utils.customviews.ButtonView
           android:id="@+id/pay_to_open_fees_button"
           android:layout_width="match_parent"
@@ -75,7 +83,7 @@
           android:background="@drawable/button_bg_square"
           app:hz_bias="0"
           app:icon="@color/transparent"
-          app:layout_constraintTop_toBottomOf="@id/trampoline_fees_button"
+          app:layout_constraintTop_toBottomOf="@id/pay_to_open_enable_switch"
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_paytoopen_fees_title" />
 

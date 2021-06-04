@@ -21,8 +21,6 @@
 
   <string name="notification_channels_watcher_title">Hintergrundbeobachter</string>
   <string name="notification_channels_watcher_desc">Benachrichtigt Sie, wenn Sie die Anwendung starten müssen. Sollte hohe Priorität haben.</string>
-  <string name="notification_pay_to_open_title">Eingehende Zahlung akzeptieren</string>
-  <string name="notification_pay_to_open_desc">Erscheint, wenn Ihnen jemand eine Zahlung sendet und Sie diese manuell akzeptieren müssen.</string>
   <string name="notification_headless_title">Phoenix läuft im Hintergrund</string>
   <string name="notification_headless_desc">Benachrichtigt Sie, dass Phoenix im Hintergrund läuft. Dies passiert, wenn Ihnen jemand Geld sendet und die App noch nicht gestartet ist.</string>
 
@@ -291,11 +289,8 @@
   <string name="notif__headless_message__manual_pay_to_open">Die Erstellung von Kanälen erfordert eine manuelle Zustimmung</string>
   <string name="notif__headless_message__received_payment">%1$s (%2$s) erhalten</string>
 
-  <string name="notif_pay_to_open_title">Akzeptiere eingehende Zahlung</string>
-  <string name="notif_pay_to_open_message">Tippen Sie hier, um die Anwendung zu starten</string>
-
-  <string name="notif__pay_to_open_missed_title">Zahlung verpasst (%1$s)</string>
-  <string name="notif__pay_to_open_missed_message">Der eingehende Betrag war zu gering, um einen neuen Zahlungskanal zu erstellen.</string>
+  <string name="notif__pay_to_open_missed_too_small_title">Zahlung verpasst (%1$s)</string>
+  <string name="notif__pay_to_open_missed_too_small_message">Der eingehende Betrag war zu gering, um einen neuen Zahlungskanal zu erstellen.</string>
 
   <!-- //////////////// close all channels //////////////// -->
 
