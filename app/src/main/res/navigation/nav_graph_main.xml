@@ -78,6 +78,12 @@
     app:destination="@id/tor_fragment"
     app:launchSingleTop="true"
     app:popUpTo="@id/main_fragment" />
+  <!-- global to payments settings -->
+  <action
+    android:id="@+id/global_action_any_to_payments_setting"
+    app:destination="@id/payment_settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
   <!-- global to global settings -->
   <action
     android:id="@+id/global_action_any_to_settings"

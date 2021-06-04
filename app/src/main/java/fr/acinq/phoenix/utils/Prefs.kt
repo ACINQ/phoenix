@@ -70,6 +70,8 @@ object Prefs {
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
   const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
   const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
+  const val PREFS_AUTO_PAY_TO_OPEN = "PREFS_AUTO_PAY_TO_OPEN"
+  const val PREFS_MISSED_PAY_TO_OPEN_NOTIF_TIMESTAMP = "PREFS_MISSED_PAY_TO_OPEN_NOTIF_TIMESTAMP"
 
   // -- migration
   const val PREFS_MIGRATED_FROM = "PREFS_MIGRATED_FROM"
@@ -325,5 +327,21 @@ object Prefs {
       .remove(PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE)
       .remove(PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE)
       .commit()
+  }
+
+  fun isAutoPayToOpenEnabled(context: Context): Boolean {
+    return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREFS_AUTO_PAY_TO_OPEN, true)
+  }
+
+  fun setAutoPayToOpen(context: Context, enabled: Boolean) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREFS_AUTO_PAY_TO_OPEN, enabled).apply()
+  }
+
+  fun getMissedPayToOpenNotifTimestamp(context: Context): Long {
+    return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_MISSED_PAY_TO_OPEN_NOTIF_TIMESTAMP, 0)
+  }
+
+  fun setMissedPayToOpenNotifTimestamp(context: Context, timestamp: Long) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_MISSED_PAY_TO_OPEN_NOTIF_TIMESTAMP, timestamp).apply()
   }
 }

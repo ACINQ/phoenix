@@ -19,6 +19,7 @@ package fr.acinq.phoenix.send
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,7 +63,6 @@ class SendFragment : BaseFragment() {
 
   private lateinit var unitList: List<String>
   private val swapOutSettings by lazy { appContext()?.swapOutSettings?.value ?: Constants.DEFAULT_SWAP_OUT_SETTINGS }
-  private val minFeerateSwapout by lazy { getMinSwapoutFeerate() }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
     mBinding = FragmentSendBinding.inflate(inflater, container, false)
@@ -75,18 +75,6 @@ class SendFragment : BaseFragment() {
     model = ViewModelProvider(this).get(SendViewModel::class.java)
     mBinding.model = model
     mBinding.appModel = app
-
-    app.state.value?.kit()?.run {
-      val feerate = nodeParams().onChainFeeConf().feeEstimator().run {
-        FeerateEstimationPerKb(
-          rate20min = (getFeeratePerKb(2) / 1000).coerceAtLeast(minFeerateSwapout),
-          rate60min = (getFeeratePerKb(6) / 1000).coerceAtLeast(minFeerateSwapout),
-          rate12hours = (getFeeratePerKb(72) / 1000).coerceAtLeast(minFeerateSwapout))
-      }
-      log.info("feerates base estimation=$feerate")
-      model.feerateEstimation.value = feerate
-      model.chainFeesSatBytes.value = feerate.rate60min
-    }
 
     context?.let {
       unitList = listOf(SatUnit.code(), BitUnit.code(), MBtcUnit.code(), BtcUnit.code(), Prefs.getFiatCurrency(it))
@@ -161,35 +149,6 @@ class SendFragment : BaseFragment() {
             val unit = Prefs.getCoinUnit(ctx)
             mBinding.unit.setSelection(unitList.indexOf(unit.code()))
             mBinding.amount.setText(Converter.printAmountRaw(it.sendable, ctx))
-          }
-        }
-      }
-    })
-
-    model.chainFeesSatBytes.observe(viewLifecycleOwner, { feerate ->
-      val state = model.state.value
-      if (state is SendState.Onchain && state !is SendState.Onchain.SwapRequired) {
-        model.state.value = SendState.Onchain.SwapRequired(state.uri)
-      }
-
-      model.feerateEstimation.value?.let { feerateEstimation ->
-        when {
-          feerate <= 0 -> mBinding.chainFeesFeedback.apply {
-            text = getString(R.string.send_chain_fees_feedback_invalid)
-            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_alert_triangle), null, null, null)
-          }
-          feerate < minFeerateSwapout -> mBinding.chainFeesFeedback.apply {
-            text = getString(R.string.send_chain_fees_feedback_too_low, minFeerateSwapout.toString())
-            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_alert_triangle), null, null, null)
-          }
-          else -> mBinding.chainFeesFeedback.apply {
-            text = getString(when {
-              feerate < feerateEstimation.rate12hours -> R.string.send_chain_fees_feedback_inf
-              feerate < feerateEstimation.rate60min -> R.string.send_chain_fees_feedback_12h
-              feerate < feerateEstimation.rate20min -> R.string.send_chain_fees_feedback_1h
-              else -> R.string.send_chain_fees_feedback_20min
-            })
-            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context, R.drawable.ic_blank), null, null, null)
           }
         }
       }
@@ -271,7 +230,9 @@ class SendFragment : BaseFragment() {
       }
     }
 
-    mBinding.showChainFeesButton.setOnClickListener { model.showFeeratesForm.value = true }
+    mBinding.swapRecapFeeLabel.setOnClickListener {
+      AlertHelper.build(layoutInflater, getString(R.string.send_mining_fee_info_title), Converter.html(getString(R.string.send_mining_fee_info_message))).show()
+    }
 
     mBinding.alreadyPaidLayoutButton.setOnClickListener {
       val state = model.state.value
@@ -286,9 +247,9 @@ class SendFragment : BaseFragment() {
     EventBus.getDefault().unregister(this)
   }
 
-  private fun getMinSwapoutFeerate(): Long {
+  private fun getSwapoutFeerate(): Long {
     return if (swapOutSettings.minFeerateSatByte == 0L) {
-      (app.state.value?.kit()?.nodeParams()?.onChainFeeConf()?.feeEstimator()?.getFeeratePerKb(36) ?: 1000) / 1000
+      (app.state.value?.kit()?.nodeParams()?.onChainFeeConf()?.feeEstimator()?.getFeeratePerKb(6) ?: 3000) / 1000 // target 1 hour
     } else {
       swapOutSettings.minFeerateSatByte
     }
@@ -302,10 +263,9 @@ class SendFragment : BaseFragment() {
     }) {
       model.isAmountFieldPristine.value = false
       val amount = checkAmount()
-      val feerateSatPerByte = model.chainFeesSatBytes.value!!
-      if (feerateSatPerByte <= 0 || feerateSatPerByte < minFeerateSwapout) {
-        model.showFeeratesForm.value = true
-      } else if (amount.isDefined) {
+      val feerateSatPerByte = getSwapoutFeerate()
+      log.debug("requesting swap-out with feerate=$feerateSatPerByte sat/b")
+      if (amount.isDefined) {
         Wallet.hideKeyboard(context, mBinding.amount)
         model.state.value = SendState.Onchain.Swapping(uri, feerateSatPerByte)
         app.requireService.requestSwapOut(amount = Converter.msat2sat(amount.get()), address = uri.address, feeratePerKw = `package$`.`MODULE$`.feerateByte2Kw(feerateSatPerByte))

@@ -70,18 +70,12 @@ class SendViewModel : ViewModel() {
   val useMaxBalance = MutableLiveData<Boolean>()
   /** Contains strings resource id for amount error message. Not contained in the fragment Error state because an incorrect amount is not a fatal error. */
   val amountError = MutableLiveData<Exception?>()
-  val showFeeratesForm = MutableLiveData<Boolean>()
-  val chainFeesSatBytes = MutableLiveData<Long>()
-
-  val feerateEstimation = MutableLiveData(Constants.DEFAULT_FEERATE)
 
   init {
     state.value = SendState.CheckingInvoice
     useMaxBalance.value = false
     isAmountFieldPristine.value = true
     amountError.value = null
-    showFeeratesForm.value = false // by default, show a lean view without advanced stuff
-    chainFeesSatBytes.value = 3 // base fee in sat/bytes
   }
 
   // ---- computed values from payment request
@@ -131,5 +125,4 @@ class SendViewModel : ViewModel() {
       }
     }
   }
-
 }

@@ -867,12 +867,13 @@ class EclairNodeService : Service() {
 
   @Subscribe(threadMode = ThreadMode.BACKGROUND)
   fun handleEvent(event: MissedPayToOpenPayment) {
-    notificationManager.notify(Constants.NOTIF_ID__PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__PAY_TO_OPEN)
+    val message = getString(R.string.notif__pay_to_open_missed_too_small_message)
+    notificationManager.notify(Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
       .setSmallIcon(R.drawable.ic_phoenix_outline)
-      .setContentTitle(getString(R.string.notif__pay_to_open_missed_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
-      .setContentText(getString(R.string.notif__pay_to_open_missed_message))
-      .setStyle(NotificationCompat.BigTextStyle().bigText(getString(R.string.notif__pay_to_open_missed_message)))
-      .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__PAY_TO_OPEN,
+      .setContentTitle(getString(R.string.notif__pay_to_open_missed_too_small_title, Converter.printAmountPretty(event.amount(), applicationContext, withUnit = true)))
+      .setContentText(message)
+      .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+      .setContentIntent(PendingIntent.getActivity(applicationContext, Constants.NOTIF_ID__MISSED_PAY_TO_OPEN,
         Intent(applicationContext, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP }, PendingIntent.FLAG_UPDATE_CURRENT))
       .setAutoCancel(true)
       .build())

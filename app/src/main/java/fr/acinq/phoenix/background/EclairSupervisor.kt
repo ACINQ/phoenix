@@ -17,7 +17,13 @@
 package fr.acinq.phoenix.background
 
 import akka.actor.UntypedActor
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.text.format.DateUtils
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
 import fr.acinq.bitcoin.Base58Check
 import fr.acinq.bitcoin.Script
 import fr.acinq.eclair.MilliSatoshi
@@ -37,11 +43,15 @@ import fr.acinq.eclair.wire.SwapInPending
 import fr.acinq.eclair.wire.SwapInResponse
 import fr.acinq.eclair.wire.SwapOutResponse
 import fr.acinq.phoenix.Balance
+import fr.acinq.phoenix.MainActivity
+import fr.acinq.phoenix.R
 import fr.acinq.phoenix.db.AppDb
 import fr.acinq.phoenix.db.ClosingType
 import fr.acinq.phoenix.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.db.PaymentMetaRepository
+import fr.acinq.phoenix.utils.Constants
 import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.utils.Prefs
 import fr.acinq.phoenix.utils.Wallet
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
@@ -51,15 +61,17 @@ import scala.collection.JavaConverters
 /**
  * This actor listens to events dispatched by eclair core.
  */
-class EclairSupervisor(applicationContext: Context) : UntypedActor() {
+class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
 
   private val paymentMetaRepository: PaymentMetaRepository
   private val payToOpenMetaRepository: PayToOpenMetaRepository
+  private val notificationManager: NotificationManagerCompat
 
   init {
     val appDb = AppDb.getInstance(applicationContext)
     paymentMetaRepository = PaymentMetaRepository.getInstance(appDb.paymentMetaQueries)
     payToOpenMetaRepository = PayToOpenMetaRepository.getInstance(appDb.payToOpenMetaQueries)
+    notificationManager = NotificationManagerCompat.from(applicationContext)
   }
 
   private val log = LoggerFactory.getLogger(EclairSupervisor::class.java)
@@ -144,14 +156,41 @@ class EclairSupervisor(applicationContext: Context) : UntypedActor() {
       // -------------- PAY TO OPEN -------------
       is PayToOpenRequestEvent -> {
         log.info("adding pay-to-open request=$event")
-        if (event.decision().trySuccess(true)) {
+        val isAutoChannelEnabled = Prefs.isAutoPayToOpenEnabled(applicationContext)
+        val result = event.decision().trySuccess(isAutoChannelEnabled)
+        if (result && isAutoChannelEnabled) {
+          log.info("accepted pay-to-open channel opening, saving event to meta db")
           payToOpenMetaRepository.insert(
             paymentHash = event.payToOpenRequest().paymentHash(),
             fee = event.payToOpenRequest().payToOpenFee(),
             amount = event.payToOpenRequest().amountMsat().truncateToSatoshi(),
-            capacity = event.payToOpenRequest().fundingSatoshis())
+            capacity = event.payToOpenRequest().fundingSatoshis()
+          )
+        } else if (result && !isAutoChannelEnabled) {
+          log.info("rejected pay-to-open channel opening")
+          val message = applicationContext.getString(R.string.notif_pay_to_open_missed_message)
+          if (System.currentTimeMillis() - Prefs.getMissedPayToOpenNotifTimestamp(applicationContext) > 20 * DateUtils.MINUTE_IN_MILLIS) {
+            notificationManager.notify(
+              Constants.NOTIF_ID__MISSED_PAY_TO_OPEN, NotificationCompat.Builder(applicationContext, Constants.NOTIF_CHANNEL_ID__MISSED_PAY_TO_OPEN)
+                .setSmallIcon(R.drawable.ic_phoenix_outline)
+                .setContentTitle(applicationContext.getString(R.string.notif_pay_to_open_missed_title))
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+                .setContentIntent(
+                  NavDeepLinkBuilder(applicationContext)
+                    .setGraph(R.navigation.nav_graph_main)
+                    .setDestination(R.id.payment_settings_fragment)
+                    .createPendingIntent()
+                ).setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
+                .build())
+            Prefs.setMissedPayToOpenNotifTimestamp(applicationContext, System.currentTimeMillis())
+          } else {
+            log.debug("ignored missed payment notification, do not spam")
+          }
         } else {
-          log.warn("failed to accept pay-to-open request, promise has failed for event=$event")
+          log.warn("failed to complete pay-to-open request promise for event=$event")
         }
         EventBus.getDefault().post(event)
       }
