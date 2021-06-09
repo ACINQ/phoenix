@@ -172,19 +172,7 @@ struct ReceiveLightningView: View, ViewName {
 	@ViewBuilder
 	var body: some View {
 		
-		// We're using a ZStack here instead of a Group,
-		// because with Group, we get a onAppear/onDisappear whenever the content changes.
-		// E.g. when toggling isFullScreenQrcode
-		//
-		ZStack {
-			if isFullScreenQrcode {
-				fullScreenQrcode()
-			} else if verticalSizeClass == UserInterfaceSizeClass.compact {
-				mainLandscape()
-			} else {
-				mainPortrait()
-			}
-		}
+		content()
 		.onAppear {
 			onAppear()
 		}
@@ -222,7 +210,7 @@ struct ReceiveLightningView: View, ViewName {
 				
 				ModifyInvoiceSheet(
 					mvi: mvi,
-					dismissSheet: { sheet = nil },
+					dismissSheet: { self.sheet = nil },
 					initialAmount: model.amount,
 					desc: model.desc ?? ""
 				)
@@ -231,6 +219,18 @@ struct ReceiveLightningView: View, ViewName {
 			} // </switch>
 		}
 		.navigationBarTitle("Receive", displayMode: .inline)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		if isFullScreenQrcode {
+			fullScreenQrcode()
+		} else if verticalSizeClass == UserInterfaceSizeClass.compact {
+			mainLandscape()
+		} else {
+			mainPortrait()
+		}
 	}
 	
 	@ViewBuilder
