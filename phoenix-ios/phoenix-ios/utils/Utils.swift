@@ -134,7 +134,33 @@ class Utils {
 			formatter.maximumFractionDigits += 3
 		}
 		
-		formatter.roundingMode = .floor
+		// Rounding will respect our configured maximumFractionDigits.
+		//
+		// Rounding options:
+		// - ceiling  : Round towards positive infinity
+		// - floor    : Round towards negative infinity
+		// - down     : Round towards zero
+		// - up       : Round away from zero
+		// - halfEven : Round towards the nearest integer, or towards an even number if equidistant.
+		// - halfDown : Round towards the nearest integer, or towards zero if equidistant.
+		// - halfUp   : Round towards the nearest integer, or away from zero if equidistant.
+		//
+		// Keep in mind:
+		// * incoming payments are positive (i.e. +14.054)
+		// * outgoing payments are negative (i.e. -14.054)
+		//
+		// In most situations, what we really want is halfUp.
+		// For example, if we're formatting satoshis (w/ maximumFractionDigits == 0), then with halfUp:
+		// * +16.001 sats => received 16 sats
+		// * -16.001 sats => sent 16 sats
+		//
+		// The exception to this rule is when we round to zero:
+		// * +0.100 sats => received 0 sats
+		// * -0.100 sats => sent 0 sats
+		//
+		// So we handle the zero edge case below.
+		//
+		formatter.roundingMode = .halfUp
 		
 		return formatter
 	}
@@ -186,7 +212,18 @@ class Utils {
 		let targetAmount: Double = convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 		let formatter = bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
 		
-		let digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+		var digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+		
+		// Zero edge-case check
+		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0"
+		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0"
+		
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && targetAmount != 0.0 {
+			
+			formatter.roundingMode = .up // Round away from zero
+			digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+		}
+		
 		let formattedAmount = FormattedAmount(
 			digits: digits,
 			type: bitcoinUnit.shortName,
@@ -220,10 +257,31 @@ class Utils {
 		formatter.currencySymbol = ""
 		formatter.paddingCharacter = ""
 		
-		// Fiat amount should be rounded up.
-		// Otherwise 1 sat (or 1msat...) = $0.00 which is not really correct.
-		// It's better to display $0.01 instead.
-		formatter.roundingMode = .ceiling
+		// Rounding options:
+		// - ceiling  : Round towards positive infinity
+		// - floor    : Round towards negative infinity
+		// - down     : Round towards zero
+		// - up       : Round away from zero
+		// - halfEven : Round towards the nearest integer, or towards an even number if equidistant.
+		// - halfDown : Round towards the nearest integer, or towards zero if equidistant.
+		// - halfUp   : Round towards the nearest integer, or away from zero if equidistant.
+		//
+		// Keep in mind:
+		// * incoming payments are positive (i.e. +14.054)
+		// * outgoing payments are negative (i.e. -14.054)
+		//
+		// In most situations, what we really want is halfUp.
+		// For example, with halfUp:
+		// * +2.05123 usd => received 2.05 usd
+		// * -2.05123 usd => sent 2.05 usd
+		//
+		// The exception to this rule is when we round to zero:
+		// * +0.00123 usd => received 0.00 usd
+		// * -0.00123 usd => sent 0.00 usd
+		//
+		// So we handle the zero edge case below.
+		//
+		formatter.roundingMode = .halfUp
 		
 		return formatter
 	}
@@ -265,7 +323,18 @@ class Utils {
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
 		let formatter = fiatFormatter()
 		
-		let digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+		var digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+		
+		// Zero edge-case check
+		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0.00"
+		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0.00"
+		
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && fiatAmount != 0.0 {
+			
+			formatter.roundingMode = .up // Round away from zero
+			digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+		}
+		
 		return FormattedAmount(
 			digits: digits,
 			type: exchangeRate.fiatCurrency.shortName,

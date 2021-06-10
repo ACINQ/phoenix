@@ -175,17 +175,46 @@ fileprivate struct SummaryView: View {
 				EmptyView()
 			}
 
-			HStack(alignment: .bottom) {
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat(), hideMsats: false)
 
-				Text(amount.digits)
-					.font(.largeTitle)
-					.onTapGesture { toggleCurrencyType() }
-				Text(amount.type)
-					.font(.title3)
-					.foregroundColor(Color.appAccent)
-					.padding(.bottom, 4)
-					.onTapGesture { toggleCurrencyType() }
+				if currencyPrefs.currencyType == .bitcoin &&
+				   currencyPrefs.bitcoinUnit == .sat &&
+				   amount.hasFractionDigits
+				{
+					// We're showing the value in satoshis, but the value contains a fractional
+					// component representing the millisatoshis.
+					// This can be a little confusing for those new to Lightning.
+					// So we're going to downplay the millisatoshis visually.
+					
+					Text("\(amount.integerDigits).")
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+					Text(amount.fractionDigits)
+						.lineLimit(1)            // SwiftUI bugs
+						.minimumScaleFactor(0.5) // Truncating text
+						.font(.title)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
+						.padding(.trailing, 6)
+					Text(amount.type)
+						.font(.title3)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+					
+				} else {
+					
+					Text(amount.digits)
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+						.padding(.trailing, 6)
+					Text(amount.type)
+						.font(.title3)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+				}
 			}
 			.padding([.top, .leading, .trailing], 8)
 			.padding(.bottom, 33)
