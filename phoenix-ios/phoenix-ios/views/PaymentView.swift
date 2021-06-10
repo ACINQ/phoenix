@@ -669,6 +669,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				rows_outgoingPayment(outgoingPayment)
 			}
 		}
+		.padding(.bottom)
 	}
 	
 	@ViewBuilder
@@ -757,18 +758,21 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		HStack {
 			Spacer()
 			Text(title)
+				.lineLimit(1)
+				.minimumScaleFactor(0.5)
 				.font(.title3)
-				.padding(.bottom, 12)
-				.background(
-					VStack {
-						Spacer()
-						RoundedRectangle(cornerRadius: 10)
-							.frame(height: 4, alignment: .center)
-							.foregroundColor(Color.appAccent)
-					}
-				)
 			Spacer()
 		}
+		.padding(.horizontal)
+		.padding(.bottom, 12)
+		.background(
+			VStack {
+				Spacer()
+				RoundedRectangle(cornerRadius: 10)
+					.frame(height: 1, alignment: .center)
+					.foregroundColor(Color.appAccent)
+			}
+		)
 		.padding(.top, 24)
 		.padding(.bottom, 4)
 	}
@@ -1209,7 +1213,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			Text(display_msat.string)
 			if let display_fiat = display_fiat {
-				Text(display_fiat.string)
+				Text("≈ \(display_fiat.string)")
 			}
 		}
 	}
