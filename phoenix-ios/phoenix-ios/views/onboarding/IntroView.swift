@@ -73,6 +73,7 @@ struct IntroView1: View {
 			
 			Text("Welcome!")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				Text("With Phoenix, receiving and sending bitcoin is safe, easy, and fast.")
@@ -122,6 +123,7 @@ struct IntroView2: View {
 			
 			Text("Automatic Channel Creation")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				
@@ -130,9 +132,10 @@ struct IntroView2: View {
 				let percent = formatFeePercent()
 				let min = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
 				
-				Text(styled: NSLocalizedString(
-					"The fee is **\(percent)%** with a minimum fee of **\(min.string)**.",
-					comment: "IntroView"
+				Text(styled: String(format: NSLocalizedString(
+					"The fee is **%@%%** with a minimum fee of **%@**.",
+					comment: "IntroView"),
+					percent, min.string
 				))
 				
 				Text(
@@ -203,6 +206,7 @@ struct IntroView3: View {
 			
 			Text("Keep Control")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				

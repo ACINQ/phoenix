@@ -2,27 +2,30 @@ import SwiftUI
 
 struct TorConfigurationView: View {
 
-    @State var isTorEnabled = Prefs.shared.isTorEnabled
-    @State var theme = Prefs.shared.theme
+	@State var isTorEnabled = Prefs.shared.isTorEnabled
+	@State var theme = Prefs.shared.theme
 
-    var body: some View {
-        Form {
-            Section(header: TorFormHeader(), content: {}).textCase(nil)
+	var body: some View {
+		Form {
+			Section(header: TorFormHeader(), content: {}).textCase(nil)
 
-            Toggle(isOn: $isTorEnabled.animation()) {
-                if isTorEnabled {
-                    Text("Tor is enabled")
-                } else {
-                    Text("Tor is disabled")
-                }
-            }.onChange(of: isTorEnabled) { newValue in
-                self.toggleTor(newValue)
-            }
-        }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.bottom)
-                .navigationBarTitle("Tor Settings", displayMode: .inline)
-    }
+			Toggle(isOn: $isTorEnabled.animation()) {
+				if isTorEnabled {
+					Text("Tor is enabled")
+				} else {
+					Text("Tor is disabled")
+				}
+			}.onChange(of: isTorEnabled) { newValue in
+				self.toggleTor(newValue)
+			}
+		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.edgesIgnoringSafeArea(.bottom)
+		.navigationBarTitle(
+			NSLocalizedString("Tor Settings", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+	}
 
 	struct TorFormHeader: View {
 		

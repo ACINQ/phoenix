@@ -187,7 +187,7 @@ fileprivate struct SummaryView: View {
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
 					
-					Text("\(amount.integerDigits).")
+					Text(verbatim: "\(amount.integerDigits).")
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
 					Text(amount.fractionDigits)
@@ -582,7 +582,10 @@ fileprivate struct DetailsView: View {
 					.padding([.leading, .trailing])
 			}
 		}
-		.navigationBarTitle("Details", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Details", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.navigationBarHidden(true)
 	}
 }
@@ -734,7 +737,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@ViewBuilder
 	func keyColumn(_ str: String) -> some View {
 		
-		Text(str)
+		Text(str.lowercased())
 			.font(.subheadline)
 			.fontWeight(.thin)
 			.multilineTextAlignment(.trailing)
@@ -1126,7 +1129,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						Text(formatted.string)
 					}
 					
-					Text("\(part_failed.remoteFailureCode?.description ?? "local"): \(part_failed.details)")
+					let code = part_failed.remoteFailureCode?.description ?? "local"
+					Text(verbatim: "\(code): \(part_failed.details)")
 				}
 				
 			} else {
@@ -1167,7 +1171,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			Text(display_msat.string)
 			if let display_fiat = display_fiat {
-				Text("≈ \(display_fiat.string)")
+				Text(verbatim: "≈ \(display_fiat.string)")
 			}
 		}
 	}
@@ -1445,16 +1449,18 @@ extension Lightning_kmpWalletPayment {
 							comment: "Fees explanation"
 						)
 					} else {
-						exp = NSLocalizedString(
-							"Lightning fees for routing the payment. Payment required \(hops) hops.",
-							comment: "Fees explanation"
+						exp = String(format: NSLocalizedString(
+							"Lightning fees for routing the payment. Payment required %d hops.",
+							comment: "Fees explanation"),
+							hops
 						)
 					}
 					
 				} else {
-					exp = NSLocalizedString(
-						"Lightning fees for routing the payment. Payment was divided into \(parts) parts, using \(hops) hops.",
-						comment: "Fees explanation"
+					exp = String(format: NSLocalizedString(
+						"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops.",
+						comment: "Fees explanation"),
+						parts, hops
 					)
 				}
 				

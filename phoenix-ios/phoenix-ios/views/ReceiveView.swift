@@ -218,7 +218,10 @@ struct ReceiveLightningView: View, ViewName {
 			
 			} // </switch>
 		}
-		.navigationBarTitle("Receive", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Receive", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 	
 	@ViewBuilder
@@ -1410,7 +1413,10 @@ struct SwapInView: View, ViewName {
 				
 			} // </switch>
 		}
-		.navigationBarTitle("Swap In", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Swap In", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -1496,12 +1502,12 @@ struct SwapInView: View, ViewName {
 				.multilineTextAlignment(.leading)
 				.padding(.bottom, 14)
 				
-				Text(styled: NSLocalizedString(
+				Text(styled: String(format: NSLocalizedString(
 					"""
-					Deposits must be at least **\(minFunding.string)**. \
-					The fee is **\(feePercent)%** (\(minFee.string) minimum).
+					Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
 					""",
-					comment: "Minimum amount description."
+					comment:	"Minimum amount description."),
+					minFunding.string, feePercent, minFee.string
 				))
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)

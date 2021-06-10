@@ -52,6 +52,8 @@
 		DC4195D825FA6EBA008F0888 /* DYPopoverView in Frameworks */ = {isa = PBXBuildFile; productRef = DC4195D725FA6EBA008F0888 /* DYPopoverView */; };
 		DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */; };
 		DC49DA8E258BB882005BC4BC /* ScaledButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */; };
+		DC5AF4542677BBF7003C911B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4522677BBF7003C911B /* InfoPlist.strings */; };
+		DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC5AF4552677BBF7003C911B /* Localizable.strings */; };
 		DC649FDC2577002300853C46 /* KotlinExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC649FDB2577002300853C46 /* KotlinExtensions.swift */; };
 		DC67654E25655D93004D4263 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC67654D25655D93004D4263 /* Colors.xcassets */; };
 		DC682FE8258175CE00CA1114 /* Popover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC682FE7258175CE00CA1114 /* Popover.swift */; };
@@ -185,6 +187,8 @@
 		DC384D82265C32F100131772 /* TextField+Verbatim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextField+Verbatim.swift"; sourceTree = "<group>"; };
 		DC48D2C32593DE30008D138C /* TextFieldCurrencyStyler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCurrencyStyler.swift; sourceTree = "<group>"; };
 		DC49DA8D258BB882005BC4BC /* ScaledButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledButtonStyle.swift; sourceTree = "<group>"; };
+		DC5AF4532677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		DC5AF4562677BBF7003C911B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DC649FDB2577002300853C46 /* KotlinExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinExtensions.swift; sourceTree = "<group>"; };
 		DC67654D25655D93004D4263 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		DC682FE7258175CE00CA1114 /* Popover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popover.swift; sourceTree = "<group>"; };
@@ -212,6 +216,8 @@
 		DCACF6F92566D0BA0009B01E /* GenericPasswordConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordConvertible.swift; sourceTree = "<group>"; };
 		DCACF7082566D0F00009B01E /* AppAccessView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppAccessView.swift; sourceTree = "<group>"; };
 		DCACF70D256701870009B01E /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
+		DCAE99C12671928500D76E64 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = es; path = es.lproj/about.html; sourceTree = "<group>"; };
+		DCAE99C22671928500D76E64 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = es; path = es.lproj/advancedSecurity.html; sourceTree = "<group>"; };
 		DCB04684260D162C007FDA37 /* ViewName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewName.swift; sourceTree = "<group>"; };
 		DCB0DB83255AE42F005B29C8 /* PhoenixShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhoenixShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
@@ -366,6 +372,8 @@
 				DC67654D25655D93004D4263 /* Colors.xcassets */,
 				7555FF89242A565B00829871 /* LaunchScreen.storyboard */,
 				7555FF8C242A565B00829871 /* Info.plist */,
+				DC5AF4552677BBF7003C911B /* Localizable.strings */,
+				DC5AF4522677BBF7003C911B /* InfoPlist.strings */,
 				DC72C2F025A3CBD6008A927A /* GoogleService-Info.plist */,
 				DC72C2B925A3A450008A927A /* Phoenix.entitlements */,
 				7555FF86242A565B00829871 /* Preview Content */,
@@ -653,6 +661,7 @@
 				en,
 				Base,
 				fr,
+				es,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -678,6 +687,7 @@
 			files = (
 				DC99E94D25BA258C00FB20F7 /* about.html in Resources */,
 				DC99E94E25BA258C00FB20F7 /* advancedSecurity.html in Resources */,
+				DC5AF4572677BBF7003C911B /* Localizable.strings in Resources */,
 				7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */,
 				DC99E95825BA2BA800FB20F7 /* about.css in Resources */,
 				7555FF88242A565B00829871 /* Preview Assets.xcassets in Resources */,
@@ -685,6 +695,7 @@
 				DC67654E25655D93004D4263 /* Colors.xcassets in Resources */,
 				DC72C2F125A3CBD6008A927A /* GoogleService-Info.plist in Resources */,
 				DC99E95925BA2BA800FB20F7 /* advancedSecurity.css in Resources */,
+				DC5AF4542677BBF7003C911B /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -882,11 +893,28 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		DC5AF4522677BBF7003C911B /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC5AF4532677BBF7003C911B /* es */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		DC5AF4552677BBF7003C911B /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DC5AF4562677BBF7003C911B /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		DC99E94825BA258C00FB20F7 /* about.html */ = {
 			isa = PBXVariantGroup;
 			children = (
 				DC99E94925BA258C00FB20F7 /* Base */,
 				DC384D7C265BE41900131772 /* fr */,
+				DCAE99C12671928500D76E64 /* es */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -896,6 +924,7 @@
 			children = (
 				DC99E94B25BA258C00FB20F7 /* Base */,
 				DC384D7D265BE41900131772 /* fr */,
+				DCAE99C22671928500D76E64 /* es */,
 			);
 			name = advancedSecurity.html;
 			sourceTree = "<group>";

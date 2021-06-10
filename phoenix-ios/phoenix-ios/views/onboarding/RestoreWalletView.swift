@@ -27,7 +27,10 @@ struct RestoreWalletView: MVIView {
 	var view: some View {
 		
 		main()
-			.navigationBarTitle("Restore my wallet", displayMode: .inline)
+			.navigationBarTitle(
+				NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
+				displayMode: .inline
+			)
 			.onChange(of: mvi.model, perform: { model in
 				onModelChange(model: model)
 			})
@@ -372,7 +375,7 @@ struct RestoreView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				ForEach(0..<6, id: \.self) { idx in
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(Font.headline.weight(.regular))
 							.foregroundColor(Color(UIColor.tertiaryLabel))
 					}
@@ -407,7 +410,7 @@ struct RestoreView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				ForEach(6..<12, id: \.self) { idx in
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(Font.headline.weight(.regular))
 							.foregroundColor(Color(UIColor.tertiaryLabel))
 					}

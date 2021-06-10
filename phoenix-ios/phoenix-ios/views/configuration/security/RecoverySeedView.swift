@@ -74,7 +74,10 @@ struct RecoverySeedView : View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationBarTitle("Recovery Seed", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Recovery Seed", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 	
 	func decrypt() -> Void {
@@ -155,8 +158,13 @@ struct RecoverySeedReveal: View {
 			
 			Spacer()
 			
-			Text("KEEP THIS SEED SAFE.").font(.title2).padding(.bottom, 2)
-			Text("DO NOT SHARE.").font(.title2)
+			Text("KEEP THIS SEED SAFE.")
+				.font(.title2)
+				.multilineTextAlignment(.center)
+				.padding(.bottom, 2)
+			Text("DO NOT SHARE.")
+				.multilineTextAlignment(.center)
+				.font(.title2)
 			
 			Spacer()
 			

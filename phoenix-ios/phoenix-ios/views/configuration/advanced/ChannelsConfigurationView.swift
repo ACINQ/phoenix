@@ -29,7 +29,10 @@ struct ChannelsConfigurationView: MVIView {
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("My payment channels", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Payment channels", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 }
 
@@ -199,7 +202,7 @@ fileprivate struct FooterView: View {
 				.font(.footnote)
 				.padding(.bottom, 1)
 			
-			Text("\(model.nodeId)")
+			Text(model.nodeId)
 				.font(.footnote)
 				.contextMenu {
 					Button(action: {
@@ -247,7 +250,7 @@ fileprivate struct ChannelInfoPopup: View {
 				Button {
 					UIPasteboard.general.string = channel.json
 					toast.pop(
-						Text("Copied to pasteboard").anyView,
+						Text("Copied to pasteboard!").anyView,
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

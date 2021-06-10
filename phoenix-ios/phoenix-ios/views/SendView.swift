@@ -211,7 +211,10 @@ struct ScanView: View, ViewName {
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.navigationBarTitle("Scan a QR code", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Scan a QR code", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(2) // [SendingView, ValidateView, ScanView]
 		.transition(
 			.asymmetric(
@@ -529,7 +532,10 @@ struct ValidateView: View, ViewName {
 			} // </VStack>
 			
 		}// </ZStack>
-		.navigationBarTitle("Confirm Payment", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Confirm Payment", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(1) // [SendingView, ValidateView, ScanView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
@@ -718,7 +724,10 @@ struct SendingView: View {
 		.frame(maxHeight: .infinity)
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle("Sending payment", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(0) // [SendingView, ValidateView, ScanView]
 	}
 }

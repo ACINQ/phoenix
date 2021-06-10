@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ComingSoonView: View {
 	
+	let title: String
+	
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.center) {
@@ -11,5 +13,6 @@ struct ComingSoonView: View {
 			
 			Spacer()
 		}
+		.navigationBarTitle(title)
 	}
 }

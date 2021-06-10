@@ -63,10 +63,14 @@ struct PaymentOptionsView: View {
 					let feePercent = formatFeePercent()
 					let minFee = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
 					
-					Text("\(feePercent)% (\(minFee.string) minimum)")
-					//	.font(.system(.callout, design: .monospaced))
-					//	.fontWeight(.medium)
-					//	.foregroundColor(.appAccent)
+					// This doesn't get translated properly. SwiftUI localization bug ?
+				//	Text("\(feePercent)% (\(minFee.string) minimum)")
+					
+					Text(String(format: NSLocalizedString(
+						"%@%% (%@ minimum)",
+						comment: "Minimum fee information"),
+						feePercent, minFee.string
+					))
 				}
 				.padding([.top, .bottom], 8)
 				
@@ -93,7 +97,7 @@ struct PaymentOptionsView: View {
 				.padding([.top, .bottom], 8)
 			}
 		}
-		.navigationBarTitle("Payment Options")
+		.navigationBarTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}

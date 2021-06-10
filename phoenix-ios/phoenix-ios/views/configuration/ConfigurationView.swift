@@ -75,7 +75,7 @@ struct ConfigurationView: MVIView {
 				}
 				
 				NavigationLink(
-					destination: ComingSoonView(),
+					destination: ComingSoonView(title: "Tor"),
 					tag: Tag.TorView,
 					selection: $selectedTag
 				) {
@@ -169,7 +169,10 @@ struct ConfigurationView: MVIView {
 		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
 			onExternalLightningUrl(url)
 		}
-		.navigationBarTitle("Settings", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Settings", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 			
 	} // end: view
 	

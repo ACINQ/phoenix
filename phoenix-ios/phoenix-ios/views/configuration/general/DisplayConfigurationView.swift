@@ -71,7 +71,10 @@ struct DisplayConfigurationView: View {
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("Display options", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Display options", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.onAppear {
 			onAppear()
 		}
