@@ -19,7 +19,6 @@ struct ConfigurationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
-	@State private var selectedTag: String? = nil
 	enum Tag: String {
 		case AboutView
 		case DisplayConfigurationView
@@ -33,6 +32,9 @@ struct ConfigurationView: MVIView {
 		case CloseChannelsView
 		case ForceCloseChannelsView
 	}
+	@State private var selectedTag: Tag? = nil
+	
+	@State private var listViewId = UUID()
 	
 	@ViewBuilder
 	var view: some View {
@@ -44,43 +46,47 @@ struct ConfigurationView: MVIView {
 				
 				NavigationLink(
 					destination: AboutView(),
-					tag: Tag.AboutView.rawValue,
+					tag: Tag.AboutView,
 					selection: $selectedTag
 				) {
 					Label { Text("About") } icon: {
 						Image(systemName: "info.circle")
 					}
 				}
+				
 				NavigationLink(
 					destination: DisplayConfigurationView(),
-					tag: Tag.DisplayConfigurationView.rawValue,
+					tag: Tag.DisplayConfigurationView,
 					selection: $selectedTag
 				) {
 					Label { Text("Display") } icon: {
 						Image(systemName: "paintbrush.pointed")
 					}
 				}
+				
 				NavigationLink(
 					destination: ElectrumConfigurationView(),
-					tag: Tag.ElectrumConfigurationView.rawValue,
+					tag: Tag.ElectrumConfigurationView,
 					selection: $selectedTag
 				) {
 					Label { Text("Electrum server") } icon: {
 						Image(systemName: "link")
 					}
 				}
+				
 				NavigationLink(
 					destination: ComingSoonView(),
-					tag: Tag.TorView.rawValue,
+					tag: Tag.TorView,
 					selection: $selectedTag
 				) {
 					Label { Text("Tor") } icon: {
 						Image(systemName: "shield.lefthalf.fill")
 					}
 				}
+				
 				NavigationLink(
 					destination: PaymentOptionsView(),
-					tag: Tag.PaymentOptionsView.rawValue,
+					tag: Tag.PaymentOptionsView,
 					selection: $selectedTag
 				) {
 					Label { Text("Payment options & fees") } icon: {
@@ -94,7 +100,7 @@ struct ConfigurationView: MVIView {
 					
 					NavigationLink(
 						destination: AppAccessView(),
-						tag: Tag.AppAccessView.rawValue,
+						tag: Tag.AppAccessView,
 						selection: $selectedTag
 					) {
 						Label { Text("App access") } icon: {
@@ -103,7 +109,7 @@ struct ConfigurationView: MVIView {
 					}
 					NavigationLink(
 						destination: RecoverySeedView(),
-						tag: Tag.RecoverySeedView.rawValue,
+						tag: Tag.RecoverySeedView,
 						selection: $selectedTag
 					) {
 						Label { Text("Recovery phrase") } icon: {
@@ -117,7 +123,7 @@ struct ConfigurationView: MVIView {
 				
 				NavigationLink(
 					destination: LogsConfigurationView(),
-					tag: Tag.LogsConfigurationView.rawValue,
+					tag: Tag.LogsConfigurationView,
 					selection: $selectedTag
 				) {
 					Label { Text("Logs") } icon: {
@@ -127,7 +133,7 @@ struct ConfigurationView: MVIView {
 				if fullMode {
 					NavigationLink(
 						destination: ChannelsConfigurationView(),
-						tag: Tag.ChannelsConfigurationView.rawValue,
+						tag: Tag.ChannelsConfigurationView,
 						selection: $selectedTag
 					) {
 						Label { Text("Payment channels") } icon: {
@@ -136,7 +142,7 @@ struct ConfigurationView: MVIView {
 					}
 					NavigationLink(
 						destination: CloseChannelsView(),
-						tag: Tag.CloseChannelsView.rawValue,
+						tag: Tag.CloseChannelsView,
 						selection: $selectedTag
 					) {
 						Label { Text("Close all channels") } icon: {
@@ -145,7 +151,7 @@ struct ConfigurationView: MVIView {
 					}
 					NavigationLink(
 						destination: ForceCloseChannelsView(),
-						tag: Tag.ForceCloseChannelsView.rawValue,
+						tag: Tag.ForceCloseChannelsView,
 						selection: $selectedTag
 					) {
 						Label { Text("Danger zone") } icon: {
@@ -156,28 +162,57 @@ struct ConfigurationView: MVIView {
 			}
 		}
 		.listStyle(GroupedListStyle())
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
-			
-			// We previoulsy had a crash under the following conditions:
-			// - navigate to ConfigurationView
-			// - navigate to a subview (such as AboutView)
-			// - switch to another app, and open a lightning URL with Phoenix
-			// - crash !
-			//
-			// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
-			//
-			log.debug("externalLightningUrlPublisher fired")
-			selectedTag = nil
-		})
+		.id(listViewId)
 		.onAppear() {
-			
-			// This doesn't work anymore on iOS 14 :(
-		//	UITableView.appearance().separatorInset =
-		//		UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 50)
+			onAppear()
+		}
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
+			onExternalLightningUrl(url)
 		}
 		.navigationBarTitle("Settings", displayMode: .inline)
 			
 	} // end: view
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// This doesn't work anymore on iOS 14 :(
+	//	UITableView.appearance().separatorInset =
+	//		UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 50)
+		
+		// SwiftUI BUG, and workaround.
+		//
+		// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
+		// For example:
+		// - Tap on "About", to push the AboutView onto the NavigationView
+		// - Tap "<" to pop the AboutView
+		// - Notice that the "About" row is still selected (e.g. has gray background)
+		//
+		// There are several workaround for this issue:
+		// https://developer.apple.com/forums/thread/660468
+		//
+		// We are implementing the least risky solution.
+		// Which requires us to change the `List.id` property.
+		
+		if selectedTag != nil {
+			selectedTag = nil
+			listViewId = UUID()
+		}
+	}
+	
+	func onExternalLightningUrl(_ url: URL) {
+		log.debug("onExternalLightningUrl()")
+		
+		// We previoulsy had a crash under the following conditions:
+		// - navigate to ConfigurationView
+		// - navigate to a subview (such as AboutView)
+		// - switch to another app, and open a lightning URL with Phoenix
+		// - crash !
+		//
+		// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
+		//
+		selectedTag = nil
+	}
 }
 
 class ConfigurationView_Previews: PreviewProvider {

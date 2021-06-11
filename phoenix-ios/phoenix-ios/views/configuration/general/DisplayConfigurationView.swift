@@ -1,13 +1,24 @@
 import SwiftUI
 import PhoenixShared
+import os.log
 
-
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "DisplayConfigurationView"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 struct DisplayConfigurationView: View {
 	
 	@State var fiatCurrency = Prefs.shared.fiatCurrency
 	@State var bitcoinUnit = Prefs.shared.bitcoinUnit
 	@State var theme = Prefs.shared.theme
+	
+	@State var sectionId = UUID()
+	@State var firstAppearance = true
 	
 	var body: some View {
 		Form {
@@ -42,6 +53,7 @@ struct DisplayConfigurationView: View {
 					.padding(.top, 8)
 					.padding(.bottom, 4) // visible in dark mode
 			}
+			.id(sectionId)
 			
 			Section {
 				Picker(
@@ -54,11 +66,15 @@ struct DisplayConfigurationView: View {
 						let theme = Theme.allCases[$0]
 						Text(theme.localized()).tag(theme)
 					}
-				}.pickerStyle(SegmentedPickerStyle())
+				}
+				.pickerStyle(SegmentedPickerStyle())
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("Display options", displayMode: .inline)
+		.onAppear {
+			onAppear()
+		}
 		.onReceive(Prefs.shared.fiatCurrencyPublisher) { newValue in
 			fiatCurrency = newValue
 		}
@@ -87,6 +103,30 @@ struct DisplayConfigurationView: View {
 		Text(verbatim: "  \(bitcoinUnit.explanation)")
 			.font(.footnote)
 			.foregroundColor(Color.secondary)
+	}
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		// SwiftUI BUG, and workaround.
+		//
+		// In iOS 14, the Picker remains selected after we return from the subview.
+		// For example:
+		// - Tap on "Fiat Currency"
+		// - Make a selection or tap "<" to pop back
+		// - Notice that the "Fiat Currency" row is still selected (e.g. has gray background)
+		//
+		// There are several workaround for this issue:
+		// https://developer.apple.com/forums/thread/660468
+		//
+		// We are implementing the least risky solution.
+		// Which requires us to change the `Section.id` property.
+		
+		if firstAppearance {
+			firstAppearance = false
+		} else {
+			sectionId = UUID()
+		}
 	}
 }
 

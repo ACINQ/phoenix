@@ -280,53 +280,7 @@ fileprivate struct SummaryView: View {
 	}
 }
 
-// Architecture Design:
-//
-// We want to display a list of key/value pairs:
-//
-//     Desc: Pizza reimbursement
-//     Fees: 2 sat
-//  Elapsed: 2.4 seconds
-//
-// Requirements:
-// 1. the elements must be vertically aligned
-//   - all keys have same trailing edge
-//   - all values have same leading edge
-// 2. the list (as a whole) must be horizontally centered
-//
-//       1,042 sat
-//       ---------
-// Desc: Party
-//
-//      ^ Wrong! List not horizontally centered!
-//
-//       1,042 sat
-//       ---------
-//      Desc: Party
-//
-//      ^ Correct!
-//
-// Ultimately, we need to:
-// - assign all keys the same width
-// - ensure the assigned width is the minimum possible width
-//
-// This was super easy with UIKit.
-// We could simply add constraints such that all keys are equal width.
-//
-// In SwiftUI, it's not that simple. But it's not that bad either.
-//
-// - we use InfoGrid_Column0 to measure the width of each key
-// - we use InfoGrid_Column0_MeasuredWidth to communicate the width
-//   up the hierarchy to the InfoGrid.
-// - InfoGrid_Column0_MeasuredWidth.reduce is used to find the max width
-// - InfoGrid assigns the maxWidth to each key frame
-//
-// Note that this occurs in 2 passes.
-// - In the first pass, InfoGrid.widthColumn0 is nil
-// - It then lays out all the elements, and they get measured
-// - The width is passed up the hierarchy via InfoGrid_Column0_MeasuredWidth preference
-// - This triggers InfoGrid.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self)
-// - Which triggers a second layout pass
+// See InfoGridView for architecture discussion.
 //
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
