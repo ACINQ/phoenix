@@ -910,12 +910,25 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding(.leading, 16)
 				.padding(.bottom, 4)
 
-			HStack {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField("Description (optional)", text: $desc)
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					desc = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
+				}
+				.isHidden(desc == "")
 			}
-			.background(Capsule().stroke(Color(UIColor.separator)))
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(
+				Capsule()
+					.strokeBorder(Color(UIColor.separator))
+			)
 
 			Spacer()
 			HStack {
