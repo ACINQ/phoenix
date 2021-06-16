@@ -461,70 +461,67 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		var upToDateListener: AnyCancellable? = nil
 		
 		var peer: Lightning_kmpPeer? = nil
-		var oldChannels: [Bitcoin_kmpByteVector32 : Lightning_kmpChannelState] = [:]
+		var oldChannels = [Bitcoin_kmpByteVector32 : Lightning_kmpChannelState]()
+		
+		let cleanup = {(success: Bool) in
+			
+			if didDecrement { // need to balance decrement call
+				appConnectionsDaemon?.incrementDisconnectCount(target: electrumTarget)
+			}
+			upToDateListener?.cancel()
+
+			var notifyRevokedCommit = false
+			let newChannels = peer?.channels ?? [:]
+
+			for (channelId, oldChannel) in oldChannels {
+				if let newChannel = newChannels[channelId] {
+
+					var oldHasRevokedCommit = false
+					do {
+						var oldClosing: Lightning_kmpClosing? = oldChannel.asClosing()
+						if oldClosing == nil {
+							oldClosing = oldChannel.asOffline()?.state.asClosing()
+						}
+
+						if let oldClosing = oldClosing {
+							oldHasRevokedCommit = !oldClosing.revokedCommitPublished.isEmpty
+						}
+					}
+
+					var newHasRevokedCommit = false
+					do {
+						var newClosing: Lightning_kmpClosing? = newChannel.asClosing()
+						if newClosing == nil {
+							newClosing = newChannel.asOffline()?.state.asClosing()
+						}
+
+						if let newClosing = newChannel.asClosing() {
+							newHasRevokedCommit = !newClosing.revokedCommitPublished.isEmpty
+						}
+					}
+
+					if !oldHasRevokedCommit && newHasRevokedCommit {
+						notifyRevokedCommit = true
+					}
+				}
+			}
+
+			if notifyRevokedCommit {
+				self.displayLocalNotification_revokedCommit()
+			}
+
+			self.scheduleBackgroundTasks(soon: success ? false : true)
+			task.setTaskCompleted(success: false)
+		}
 		
 		var isFinished = false
 		let finishTask = {(success: Bool) in
 			
-			let cleanup = {
-				if isFinished {
-					return
+			DispatchQueue.main.async {
+				if !isFinished {
+					isFinished = true
+					cleanup(success)
 				}
-				isFinished = true
-				
-				if didDecrement { // need to balance decrement call
-					appConnectionsDaemon?.incrementDisconnectCount(target: electrumTarget)
-				}
-				upToDateListener?.cancel()
-				
-				var notifyRevokedCommit = false
-				let newChannels = peer?.channels ?? [:]
-				
-				for (channelId, oldChannel) in oldChannels {
-					if let newChannel = newChannels[channelId] {
-						
-						var oldHasRevokedCommit = false
-						do {
-							var oldClosing: Lightning_kmpClosing? = oldChannel.asClosing()
-							if oldClosing == nil {
-								oldClosing = oldChannel.asOffline()?.state.asClosing()
-							}
-							
-							if let oldClosing = oldClosing {
-								oldHasRevokedCommit = !oldClosing.revokedCommitPublished.isEmpty
-							}
-						}
-						
-						var newHasRevokedCommit = false
-						do {
-							var newClosing: Lightning_kmpClosing? = newChannel.asClosing()
-							if newClosing == nil {
-								newClosing = newChannel.asOffline()?.state.asClosing()
-							}
-							
-							if let newClosing = newChannel.asClosing() {
-								newHasRevokedCommit = !newClosing.revokedCommitPublished.isEmpty
-							}
-						}
-						
-						if !oldHasRevokedCommit && newHasRevokedCommit {
-							notifyRevokedCommit = true
-						}
-					}
-				}
-				
-				if notifyRevokedCommit {
-					self.displayLocalNotification_revokedCommit()
-				}
-				
-				self.scheduleBackgroundTasks(soon: success ? false : true)
-				task.setTaskCompleted(success: false)
-			}
-			
-			if Thread.isMainThread {
-				cleanup()
-			} else {
-				DispatchQueue.main.async { cleanup() }
 			}
 		}
 		
@@ -533,13 +530,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 		
 		peer = business.getPeer()
-		guard let peer = peer else {
+		guard let _peer = peer else {
 			// If there's not a peer, then the wallet is locked.
 			return finishTask(true)
 		}
 		
-		oldChannels = peer.channels
-		
+		oldChannels = _peer.channels
 		guard oldChannels.count > 0 else {
 			// We don't have any channels, so there's nothing to watch.
 			return finishTask(true)
@@ -551,8 +547,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// We setup a handler so we know when the WatchTower task has completed.
 		// I.e. when the channel subscriptions are considered up-to-date.
 		
-		upToDateListener = peer.watcher.upToDatePublisher().sink { (millis: Int64) in
-			
+		upToDateListener = _peer.watcher.upToDatePublisher().sink { (millis: Int64) in
 			finishTask(true)
 		}
 	}
