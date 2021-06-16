@@ -30,7 +30,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	private var badgeCount = 0
 	private var cancellables = Set<AnyCancellable>()
 	
-	private var didIncrementDisconnectCount = false
+	private var isInBackground = false
+	
+	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<URL, Never>()
 	
@@ -127,11 +129,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationDidEnterBackground(_ application: UIApplication) {
 		log.trace("### applicationDidEnterBackground(_:)")
 		
-		if !didIncrementDisconnectCount {
+		if !isInBackground {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.all
 			)
-			didIncrementDisconnectCount = true
+			isInBackground = true
 		}
 		
 		scheduleBackgroundTasks()
@@ -140,11 +142,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	func _applicationWillEnterForeground(_ application: UIApplication) {
 		log.trace("### applicationWillEnterForeground(_:)")
 		
-		if didIncrementDisconnectCount {
+		if isInBackground {
 			business.appConnectionsDaemon?.decrementDisconnectCount(
 				target: AppConnectionsDaemon.ControlTarget.all
 			)
-			didIncrementDisconnectCount = false
+			isInBackground = false
 		}
 	}
 	
@@ -398,6 +400,65 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	}
 
 	// --------------------------------------------------
+	// MARK: Long-Lived Tasks
+	// --------------------------------------------------
+	
+	// A long-lived task is for:
+	//
+	// > when leaving a task unfinished may cause a bad user experience in your app.
+	// > For example: to complete disk writes, finish user-initiated requests, network calls, ...
+	//
+	// For historical reasons, this is also called a "background task".
+	// However, in order to differentiate from the new BGTask's introduced in iOS 13,
+	// we're now calling these "long-lived tasks".
+	
+	func setupActivePaymentsListener() -> Void {
+		
+		business.paymentsManager.inFlightOutgoingPaymentsPublisher().sink { [weak self](count: Int) in
+			
+			log.debug("inFlightOutgoingPaymentsPublisher: count = \(count)")
+			if count > 0 {
+				self?.beginLongLivedTask()
+			} else {
+				self?.endLongLivedTask()
+			}
+			
+		}.store(in: &cancellables)
+	}
+	
+	func beginLongLivedTask() {
+		log.trace("beginLongLivedTask()")
+		assertMainThread()
+		
+		if longLivedTask == .invalid {
+			longLivedTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+				self?.endLongLivedTask()
+			}
+			log.debug("Invoking: business.decrementDisconnectCount()")
+			business.appConnectionsDaemon?.decrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.all
+			)
+		}
+	}
+	
+	func endLongLivedTask() {
+		log.trace("endLongLivedTask()")
+		assertMainThread()
+		
+		if longLivedTask != .invalid {
+			
+			let task = longLivedTask
+			longLivedTask = .invalid
+			
+			UIApplication.shared.endBackgroundTask(task)
+			log.debug("Invoking: business.incrementDisconnectCount()")
+			business.appConnectionsDaemon?.incrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.all
+			)
+		}
+	}
+	
+	// --------------------------------------------------
 	// MARK: Background Execution
 	// --------------------------------------------------
 	
@@ -571,6 +632,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			business.loadWallet(seed: seed)
 			walletLoaded = true
 			maybeRegisterFcmToken()
+			setupActivePaymentsListener()
 		}
 	}
 	

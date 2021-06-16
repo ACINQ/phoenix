@@ -76,6 +76,9 @@ class PaymentsManager(
     val fetcher: PaymentsFetcher by lazy {
         PaymentsFetcher(paymentsManager = this, cacheSizeLimit = 250)
     }
+    
+    private val _inFlightOutgoingPayments = MutableStateFlow<Set<UUID>>(setOf())
+    val inFlightOutgoingPayments: StateFlow<Set<UUID>> = _inFlightOutgoingPayments
 
     init {
         launch {
@@ -87,13 +90,18 @@ class PaymentsManager(
         launch {
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
                 when (event) {
+                    is PaymentProgress -> {
+                        addToInFlightOutgoingPayments(event.request.paymentId)
+                    }
                     is PaymentSent -> {
                         _lastCompletedPayment.value = event.payment
+                        removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentNotSent -> {
                         getOutgoingPayment(event.request.paymentId)?.let {
                             _lastCompletedPayment.value = it
                         }
+                        removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentReceived -> {
                         _lastCompletedPayment.value = event.incomingPayment
@@ -108,6 +116,18 @@ class PaymentsManager(
                 }
             }
         }
+    }
+
+    private fun addToInFlightOutgoingPayments(id: UUID): Unit {
+        val oldSet = _inFlightOutgoingPayments.value
+        val newSet = oldSet.plus(id)
+        _inFlightOutgoingPayments.value = newSet
+    }
+
+    private fun removeFromInFlightOutgoingPayments(id: UUID): Unit {
+        val oldSet = _inFlightOutgoingPayments.value
+        val newSet = oldSet.minus(id)
+        _inFlightOutgoingPayments.value = newSet
     }
 
     fun db() = nodeParamsManager.databases.value?.payments

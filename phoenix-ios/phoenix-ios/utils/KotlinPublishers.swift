@@ -112,6 +112,19 @@ extension PaymentsManager {
 				return $0 as? Lightning_kmpIncomingPayment
 			}
 			.eraseToAnyPublisher()
+		
+		/// Transforming from Kotlin:
+		/// ```
+		/// inFlightOutgoingPayments: StateFlow<Set<UUID>>
+		/// ```
+		static var inFlightOutgoingPaymentsPublisher: AnyPublisher<Int, Never> =
+			KotlinCurrentValueSubject<NSSet, Set<Lightning_kmpUUID>>(
+				AppDelegate.get().business.paymentsManager.inFlightOutgoingPayments
+			)
+			.map {
+				return $0.count
+			}
+			.eraseToAnyPublisher()
 	}
 	
 	func paymentsPagePublisher() -> AnyPublisher<PaymentsPage, Never> {
@@ -128,6 +141,11 @@ extension PaymentsManager {
 	
 	func lastIncomingPaymentPublisher() -> AnyPublisher<Lightning_kmpIncomingPayment, Never> {
 		return _Lazy.lastIncomingPaymentPublisher
+	}
+	
+	func inFlightOutgoingPaymentsPublisher() -> AnyPublisher<Int, Never> {
+		
+		return _Lazy.inFlightOutgoingPaymentsPublisher
 	}
 }
 
