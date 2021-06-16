@@ -3,6 +3,7 @@ import PhoenixShared
 import os.log
 import Firebase
 import Combine
+import BackgroundTasks
 
 #if DEBUG && false
 fileprivate var log = Logger(
@@ -32,6 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	private var didIncrementDisconnectCount = false
 	
 	public var externalLightningUrlPublisher = PassthroughSubject<URL, Never>()
+	
+	// The taskID must match the value in Info.plist
+	private let taskId_watchTower = "co.acinq.phoenix.WatchTower"
 
 	override init() {
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
@@ -61,6 +65,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		FirebaseApp.configure()
 		Messaging.messaging().delegate = self
+	
+		registerBackgroundTasks()
 
 		let nc = NotificationCenter.default
 		
@@ -122,16 +128,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		log.trace("### applicationDidEnterBackground(_:)")
 		
 		if !didIncrementDisconnectCount {
-			business.incrementDisconnectCount()
+			business.appConnectionsDaemon?.incrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.all
+			)
 			didIncrementDisconnectCount = true
 		}
+		
+		scheduleBackgroundTasks()
 	}
 	
 	func _applicationWillEnterForeground(_ application: UIApplication) {
 		log.trace("### applicationWillEnterForeground(_:)")
 		
 		if didIncrementDisconnectCount {
-			business.decrementDisconnectCount()
+			business.appConnectionsDaemon?.decrementDisconnectCount(
+				target: AppConnectionsDaemon.ControlTarget.all
+			)
 			didIncrementDisconnectCount = false
 		}
 	}
@@ -195,7 +207,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		log.debug("Received remote notification: \(userInfo)")
 		
-		business.decrementDisconnectCount() // allow network connection, even if app in background
+		// allow network connection, even if app in background
+		let appConnectionsDaemon = business.appConnectionsDaemon
+		let all = AppConnectionsDaemon.ControlTarget.all
+		appConnectionsDaemon?.decrementDisconnectCount(target: all)
 		
 		var didReceivePayment = false
 		var totalTimer: Timer? = nil
@@ -210,7 +225,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			
 			if !isFinished {
 				isFinished = true
-				self.business.incrementDisconnectCount() // balance previous decrement call
+				
+				// balance previous decrement call
+				appConnectionsDaemon?.incrementDisconnectCount(target: all)
 				
 				totalTimer?.invalidate()
 				postPaymentTimer?.invalidate()
@@ -249,7 +266,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			didReceivePayment = true
 			postPaymentTimer?.invalidate()
 			postPaymentTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: Finish)
-			self.displayLocalNotification(payment)
+			self.displayLocalNotification_receivedPayment(payment)
 		})
 	}
 	
@@ -268,6 +285,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	// --------------------------------------------------
 	
 	func requestPermissionForLocalNotifications(_ callback: @escaping (Bool) -> Void) {
+		log.trace("requestPermissionForLocalNotifications()")
 		
 		let center = UNUserNotificationCenter.current()
 		center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
@@ -283,7 +301,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}
 	}
 	
-	func displayLocalNotification(_ payment: Lightning_kmpWalletPayment) {
+	func displayLocalNotification_receivedPayment(_ payment: Lightning_kmpIncomingPayment) {
+		log.trace("displayLocalNotification_receivedPayment()")
 		
 		// We are having problems interacting with the `payment` parameter outside the main thread.
 		// This might have to do with the goofy Kotlin freezing stuff.
@@ -338,7 +357,206 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			}
 		}
 	}
+	
+	func displayLocalNotification_revokedCommit() {
+		log.trace("displayLocalNotification_revokedCommit()")
+		
+		let handler = {(settings: UNNotificationSettings) -> Void in
+			
+			guard settings.authorizationStatus == .authorized else {
+				return
+			}
+			
+			self.badgeCount += 1
+			
+			let content = UNMutableNotificationContent()
+			content.title = "Some of your channels have closed"
+			content.body = "Please start Phoenix to review your channels."
+			content.badge = NSNumber(value: self.badgeCount)
+			
+			let request = UNNotificationRequest(
+				identifier: "revokedCommit",
+				content: content,
+				trigger: nil
+			)
+			
+			UNUserNotificationCenter.current().add(request) { error in
+				if let error = error {
+					log.error("NotificationCenter.add(request): error: \(String(describing: error))")
+				}
+			}
+		}
+		
+		UNUserNotificationCenter.current().getNotificationSettings { settings in
+			
+			if Thread.isMainThread {
+				handler(settings)
+			} else {
+				DispatchQueue.main.async { handler(settings) }
+			}
+		}
+	}
 
+	// --------------------------------------------------
+	// MARK: Background Execution
+	// --------------------------------------------------
+	
+	func registerBackgroundTasks() -> Void {
+		log.trace("registerWatchTowerTask()")
+		
+		BGTaskScheduler.shared.register(
+			forTaskWithIdentifier: taskId_watchTower,
+			using: DispatchQueue.main
+		) { (task) in
+			
+			if let task = task as? BGAppRefreshTask {
+				log.debug("BGTaskScheduler.executeTask: WatchTower")
+				
+				self.performWatchTowerTask(task)
+			}
+		}
+	}
+	
+	func scheduleBackgroundTasks(soon: Bool = false) {
+		
+		// As per the docs:
+		// > There can be a total of 1 refresh task and 10 processing tasks scheduled at any time.
+		// > Trying to schedule more tasks returns BGTaskScheduler.Error.Code.tooManyPendingTaskRequests.
+		
+		let task = BGAppRefreshTaskRequest(identifier: taskId_watchTower)
+		
+		// As per WWDC talk (https://developer.apple.com/videos/play/wwdc2019/707):
+		// It's recommended this value be a week or less.
+		//
+		if soon { // last attempt failed
+			task.earliestBeginDate = Date(timeIntervalSinceNow: (60 * 60 * 4)) // 4 hours
+			
+		} else { // last attempt succeeded
+			task.earliestBeginDate = Date(timeIntervalSinceNow: (60 * 60 * 24 * 2)) // 2 days
+		}
+		
+	#if !targetEnvironment(simulator) // background tasks not available in simulator
+		do {
+			try BGTaskScheduler.shared.submit(task)
+			log.debug("BGTaskScheduler.submit: success")
+		} catch {
+			log.error("BGTaskScheduler.submit: \(error.localizedDescription)")
+		}
+	#endif
+	}
+	
+	/// How to debug this:
+	/// https://www.andyibanez.com/posts/modern-background-tasks-ios13/
+	///
+	func performWatchTowerTask(_ task: BGAppRefreshTask) -> Void {
+		log.trace("performWatchTowerTask()")
+		
+		// kotlin will crash below if we attempt to run this code on non-main thread
+		assertMainThread()
+		
+		let appConnectionsDaemon = business.appConnectionsDaemon
+		let electrumTarget = AppConnectionsDaemon.ControlTarget.electrum
+		
+		var didDecrement = false
+		var upToDateListener: AnyCancellable? = nil
+		
+		var peer: Lightning_kmpPeer? = nil
+		var oldChannels: [Bitcoin_kmpByteVector32 : Lightning_kmpChannelState] = [:]
+		
+		var isFinished = false
+		let finishTask = {(success: Bool) in
+			
+			let cleanup = {
+				if isFinished {
+					return
+				}
+				isFinished = true
+				
+				if didDecrement { // need to balance decrement call
+					appConnectionsDaemon?.incrementDisconnectCount(target: electrumTarget)
+				}
+				upToDateListener?.cancel()
+				
+				var notifyRevokedCommit = false
+				let newChannels = peer?.channels ?? [:]
+				
+				for (channelId, oldChannel) in oldChannels {
+					if let newChannel = newChannels[channelId] {
+						
+						var oldHasRevokedCommit = false
+						do {
+							var oldClosing: Lightning_kmpClosing? = oldChannel.asClosing()
+							if oldClosing == nil {
+								oldClosing = oldChannel.asOffline()?.state.asClosing()
+							}
+							
+							if let oldClosing = oldClosing {
+								oldHasRevokedCommit = !oldClosing.revokedCommitPublished.isEmpty
+							}
+						}
+						
+						var newHasRevokedCommit = false
+						do {
+							var newClosing: Lightning_kmpClosing? = newChannel.asClosing()
+							if newClosing == nil {
+								newClosing = newChannel.asOffline()?.state.asClosing()
+							}
+							
+							if let newClosing = newChannel.asClosing() {
+								newHasRevokedCommit = !newClosing.revokedCommitPublished.isEmpty
+							}
+						}
+						
+						if !oldHasRevokedCommit && newHasRevokedCommit {
+							notifyRevokedCommit = true
+						}
+					}
+				}
+				
+				if notifyRevokedCommit {
+					self.displayLocalNotification_revokedCommit()
+				}
+				
+				self.scheduleBackgroundTasks(soon: success ? false : true)
+				task.setTaskCompleted(success: false)
+			}
+			
+			if Thread.isMainThread {
+				cleanup()
+			} else {
+				DispatchQueue.main.async { cleanup() }
+			}
+		}
+		
+		task.expirationHandler = {
+			finishTask(false)
+		}
+		
+		peer = business.getPeer()
+		guard let peer = peer else {
+			// If there's not a peer, then the wallet is locked.
+			return finishTask(true)
+		}
+		
+		oldChannels = peer.channels
+		
+		guard oldChannels.count > 0 else {
+			// We don't have any channels, so there's nothing to watch.
+			return finishTask(true)
+		}
+		
+		appConnectionsDaemon?.decrementDisconnectCount(target: electrumTarget)
+		didDecrement = true
+		
+		// We setup a handler so we know when the WatchTower task has completed.
+		// I.e. when the channel subscriptions are considered up-to-date.
+		
+		upToDateListener = peer.watcher.upToDatePublisher().sink { (millis: Int64) in
+			
+			finishTask(true)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: PhoenixBusiness
 	// --------------------------------------------------

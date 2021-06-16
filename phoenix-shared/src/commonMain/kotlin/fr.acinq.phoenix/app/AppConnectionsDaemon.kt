@@ -257,19 +257,30 @@ class AppConnectionsDaemon(
         }
     }
 
-    fun incrementDisconnectCount(): Unit {
+    enum class ControlTarget(val flags: Int) {
+        Peer(0b001),
+        Electrum(0b010),
+        Http(0b100),
+        All(0b111);
+
+        val peer get() = (flags and Peer.flags) != 0
+        val electrum get() = (flags and Electrum.flags) != 0
+        val http get() = (flags and Http.flags) != 0
+    }
+
+    fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All): Unit {
         launch {
-            peerControlChanges.send { incrementDisconnectCount() }
-            electrumControlChanges.send { incrementDisconnectCount() }
-            httpApiControlChanges.send { incrementDisconnectCount() }
+            if (target.peer) { peerControlChanges.send { incrementDisconnectCount() } }
+            if (target.electrum) { electrumControlChanges.send { incrementDisconnectCount() } }
+            if (target.http) { httpApiControlChanges.send { incrementDisconnectCount() } }
         }
     }
 
-    fun decrementDisconnectCount(): Unit {
+    fun decrementDisconnectCount(target: ControlTarget = ControlTarget.All): Unit {
         launch {
-            peerControlChanges.send { decrementDisconnectCount() }
-            electrumControlChanges.send { decrementDisconnectCount() }
-            httpApiControlChanges.send { decrementDisconnectCount() }
+            if (target.peer) { peerControlChanges.send { decrementDisconnectCount() } }
+            if (target.electrum) { electrumControlChanges.send { decrementDisconnectCount() } }
+            if (target.http) { httpApiControlChanges.send { decrementDisconnectCount() } }
         }
     }
 
