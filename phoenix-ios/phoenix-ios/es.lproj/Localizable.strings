@@ -23,9 +23,6 @@
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**No compartas esta semilla con nadie.** Cuidado con el fraude. Los desarrolladores de Phoenix nunca pedirán tu semilla.";
 
 /* No comment provided by engineer. */
-"%@ channels" = "%@ canales";
-
-/* No comment provided by engineer. */
 "%@ milliseconds" = "%@ milisegundos";
 
 /* No comment provided by engineer. */
@@ -36,6 +33,9 @@
 
 /* Minimum fee information */
 "%@%% (%@ minimum)" = "%1$@%% (%2$@ minimo)";
+
+/* Count != 1 */
+"%d channels" = "%d canales";
 
 /* No comment provided by engineer. */
 "+%@ incoming" = "+%@ entradas";
@@ -279,7 +279,7 @@
 "Do not use this feature if you don't fully understand what it does." = "No use esta función si no comprende completamente lo que hace.";
 
 /* No comment provided by engineer. */
-"Drain my wallet" = "Drenar mi billetera";
+"Drain my wallet" = "Vaciar mi billetera";
 
 /* No comment provided by engineer. */
 "Edit payment request" = "Editar solicitud de pago";
@@ -399,7 +399,7 @@
 "Invalid server. Use format: domain.tld" = "Servidor inválido. Utilice el formato: domain.tld";
 
 /* Label in DetailsView_IncomingPayment */
-"invoice created" = "Factura creada";
+"invoice created" = "creado el";
 
 /* error message */
 "Invoice is expired" = "La factura a expirado";
@@ -444,7 +444,7 @@
 "Logs" = "Registros";
 
 /* No comment provided by engineer. */
-"Look at the logs" = "Mira los registros";
+"Look at the logs" = "Ver registros";
 
 /* No comment provided by engineer. */
 "Master public key" = "Clave pública maestra";
@@ -517,7 +517,7 @@
 "Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Los canales de pago se crean automáticamente cuando se reciben pagos. Utilice la opción **Recibir** para recibir a través de la red Lightning.";
 
 /* Label in DetailsView_IncomingPayment */
-"payment hash" = "Pago Hash";
+"payment hash" = "hash de pago";
 
 /* Navigation Bar Title */
 "Payment Options" = "Opciones de pago";
@@ -576,8 +576,11 @@
 /* Navigation bar title */
 "Receive" = "Recibir";
 
+/* No comment provided by engineer. */
+"RECEIVED" = "RECIBIDO";
+
 /* Label in DetailsView_IncomingPayment */
-"received at" = "Recibido en";
+"received at" = "recibido el";
 
 /* Label in DetailsView_IncomingPayment */
 "recipient pubkey" = "Receptor de clave publica";
@@ -627,8 +630,11 @@
 /* No comment provided by engineer. */
 "Sending Payment..." = "Enviando pago...";
 
+/* No comment provided by engineer. */
+"SENT" = "ENVIADO";
+
 /* Label in DetailsView_IncomingPayment */
-"sent at" = "Enviado a";
+"sent at" = "enviado el";
 
 /* No comment provided by engineer. */
 "Server" = "Servidor";
@@ -643,7 +649,7 @@
 "Share channel list" = "Compartir lista de canales";
 
 /* No comment provided by engineer. */
-"Share the logs" = "Compartir los registros";
+"Share the logs" = "Compartir registros";
 
 /* No comment provided by engineer. */
 "Show a Bitcoin address" = "Mostrar una dirección de Bitcoin";
@@ -685,7 +691,7 @@
 "Thai Baht" = "Baht tailandés";
 
 /* Error message - parsing bitcoin address */
-"The address is for (error.addrChain.name), but you're on (error.myChain.name)" = "La dirección es para (error.addrChain.name), pero estas en (error.myChain.name)";
+"The address is for %@, but you're on %@" = "La dirección es para %@, pero estas en %@";
 
 /* No comment provided by engineer. */
 "The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "La frase de respaldo, conocida como semilla, es una lista de 12 palabras en inglés. Esto le permitirá recuperar el acceso completo a sus fondos si es necesario.";

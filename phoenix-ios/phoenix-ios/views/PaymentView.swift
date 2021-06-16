@@ -128,9 +128,15 @@ fileprivate struct SummaryView: View {
 					.foregroundColor(Color.appPositive)
 					.padding(.bottom, 16)
 				VStack {
-					Text(payment is Lightning_kmpOutgoingPayment ? "SENT" : "RECEIVED")
-						.font(Font.title2.bold())
-						.padding(.bottom, 2)
+					Group {
+						if payment is Lightning_kmpOutgoingPayment {
+							Text("SENT")
+						} else {
+							Text("RECEIVED")
+						}
+					}
+					.font(Font.title2.bold())
+					.padding(.bottom, 2)
 					Text(payment.timestamp().formatDateMS())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -1294,12 +1300,12 @@ extension Lightning_kmpWalletPayment {
 			if let _ = incomingPayment.origin.asSwapIn() {
 				let val = NSLocalizedString("Swap-In", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = incomingPayment.origin.asKeySend() {
 				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
@@ -1307,17 +1313,17 @@ extension Lightning_kmpWalletPayment {
 			if let _ = outgoingPayment.details.asSwapOut() {
 				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = outgoingPayment.details.asKeySend() {
 				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = outgoingPayment.details.asChannelClosing() {
 				let val = NSLocalizedString("Channel Closing", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 		}
 		

@@ -107,7 +107,11 @@ struct ChannelHeaderView: View {
 			if model.channels.count == 1 {
 				Text("1 channel")
 			} else {
-				Text("\(model.channels.count) channels")
+				Text(String(format: NSLocalizedString(
+					"%d channels",
+					comment: "Count != 1"),
+					model.channels.count
+				))
 			}
 			
 			Spacer()
