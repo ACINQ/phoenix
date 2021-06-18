@@ -31,11 +31,9 @@ INSERT INTO incoming_payments (
             origin_blob)
 VALUES (?, ?, ?, ?, ?);
 
--- The receive query sums the already received amount to the newly received amounts.
-receive:
+updateReceived:
 UPDATE incoming_payments
-SET    received_amount_msat=? + COALESCE(received_amount_msat, 0),
-       received_at=?,
+SET    received_at=?,
        received_with_type=?,
        received_with_blob=?
 WHERE  payment_hash = ?;
@@ -46,19 +44,18 @@ INSERT INTO incoming_payments (
             preimage,
             created_at,
             origin_type, origin_blob,
-            received_amount_msat,
             received_at,
             received_with_type,
             received_with_blob)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 get:
-SELECT *
+SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
 FROM   incoming_payments
 WHERE  payment_hash=?;
 
 list:
-SELECT *
+SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
 FROM   incoming_payments
 ORDER BY
        coalesce(received_at, created_at) DESC,

@@ -115,15 +115,21 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         }
     }
 
-    override suspend fun receivePayment(paymentHash: ByteVector32, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, receivedAt: Long) {
+    override suspend fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {
         withContext(Dispatchers.Default) {
-            inQueries.receivePayment(paymentHash, amount, receivedWith, receivedAt)
+            inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
         }
     }
 
-    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, createdAt: Long, receivedAt: Long) {
+    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, receivedWith: Set<IncomingPayment.ReceivedWith>, createdAt: Long, receivedAt: Long) {
         withContext(Dispatchers.Default) {
-            inQueries.addAndReceivePayment(preimage, origin, amount, receivedWith, createdAt, receivedAt)
+            inQueries.addAndReceivePayment(preimage, origin, receivedWith, createdAt, receivedAt)
+        }
+    }
+
+    override suspend fun updateNewChannelReceivedWithChannelId(paymentHash: ByteVector32, channelId: ByteVector32) {
+        withContext(Dispatchers.Default) {
+            inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
         }
     }
 
@@ -173,26 +179,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         }
     }
 
-    override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> {
-        return listOf()
-//        return withContext(Dispatchers.Default) {
-//            aggrQueries.listAllPayments(
-//                limit = count.toLong(),
-//                offset = skip.toLong(),
-//                mapper = ::allPaymentsMapper
-//            ).executeAsList()
-//        }
-    }
-
-//    suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
-//        return withContext(Dispatchers.Default) {
-//            aggrQueries.listAllPayments(
-//                limit = count.toLong(),
-//                offset = skip.toLong(),
-//                mapper = ::allPaymentsMapper
-//            ).asFlow().mapToList()
-//        }
-//    }
+    override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
 
     private fun allPaymentsCountMapper(
         result: Long?
@@ -221,87 +208,6 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
             createdAt = created_at,
             completedAt = completed_at
         )
-    }
-
-    private fun allPaymentsMapper(
-        direction: String,
-        outgoing_payment_id: String?,
-        payment_hash: ByteArray,
-        parts_total_succeeded: Long?,
-        amount: Long,
-        outgoing_recipient: String?,
-        outgoing_details_type: OutgoingDetailsTypeVersion?,
-        outgoing_details_blob: ByteArray?,
-        outgoing_status_type: OutgoingStatusTypeVersion?,
-        outgoing_status_blob: ByteArray?,
-        incoming_preimage: ByteArray?,
-        incoming_origin_type: IncomingOriginTypeVersion?,
-        incoming_origin_blob: ByteArray?,
-        incoming_received_with_type: IncomingReceivedWithTypeVersion?,
-        incoming_received_with_blob: ByteArray?,
-        created_at: Long,
-        completed_at: Long?
-    ): WalletPayment = when (direction.toLowerCase()) {
-        "outgoing" -> {
-            val details = OutgoingDetailsData.deserialize(outgoing_details_type!!, outgoing_details_blob!!)
-
-            // An OutgoingPayment is split between 2 tables:
-            // - outgoing_payments
-            // - outgoing_payment_parts
-            //
-            // But for this query, we're only fetching the SUM from outgoing_payment_parts.
-            // This means we will not have a proper OutgoingPayment.parts list.
-            // But we do have the SUM, which we can use to relay information about the fees.
-            //
-            val parts: List<OutgoingPayment.Part> =
-                if (parts_total_succeeded != null) {
-                    // For normal payments, we create a FAKE parts list.
-                    // This allows us to properly calculate the fees associated with the payment.
-                    // Note that we need to know ALL of the following:
-                    // - totalAmount
-                    // - feesAmount
-                    //
-                    listOf(
-                        OutgoingPayment.Part(
-                            id = UUID.fromString("00000000-0000-0000-0000-000000000000"),
-                            amount = MilliSatoshi(parts_total_succeeded),
-                            route = listOf(),
-                            status = OutgoingPayment.Part.Status.Succeeded(
-                                preimage = ByteVector32.Zeroes,
-                                completedAt = 0
-                            ),
-                            createdAt = 0 // <= always zero for fake parts
-                        )
-                    )
-                } else {
-                    listOf()
-                }
-            OutgoingPayment(
-                id = UUID.fromString(outgoing_payment_id!!),
-                recipientAmount = MilliSatoshi(amount),
-                recipient = PublicKey(ByteVector(outgoing_recipient!!)),
-                details = details,
-                parts = parts,
-                status = OutgoingQueries.mapOutgoingPaymentStatus(
-                    completed_at = completed_at,
-                    status_type = outgoing_status_type,
-                    status = outgoing_status_blob,
-                ),
-                createdAt = created_at
-            )
-        }
-        "incoming" -> IncomingQueries.mapIncomingPayment(
-            payment_hash = payment_hash,
-            preimage = incoming_preimage!!,
-            created_at = created_at,
-            origin_type = incoming_origin_type!!,
-            origin_blob = incoming_origin_blob!!,
-            received_amount_msat = amount,
-            received_at = completed_at,
-            received_with_type = incoming_received_with_type,
-            received_with_blob = incoming_received_with_blob,
-        )
-        else -> throw UnhandledDirection(direction)
     }
 }
 

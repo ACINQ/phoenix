@@ -649,12 +649,19 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let received = incomingPayment.received {
 
-			header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+			// There's usually just one receivedWith instance.
+			// But there could technically be multiple, so we'll show a section for each if that's the case.
 			
-			paymentReceived_receivedAt(received)
-			paymentReceived_amountReceived(received)
-			paymentReceived_via(received)
-			paymentReceived_channelId(received)
+			let receivedWithArray = received.receivedWith.sorted { $0.identifiable < $1.identifiable }
+			ForEach(receivedWithArray, id: \.identifiable) { receivedWith in
+				
+				header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+				
+				paymentReceived_receivedAt(received)
+				paymentReceived_amountReceived(receivedWith)
+				paymentReceived_via(receivedWith)
+				paymentReceived_channelId(receivedWith)
+			}
 		}
 	}
 	
@@ -815,7 +822,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_amountReceived(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_amountReceived(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
 		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
 			
@@ -823,29 +830,25 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			if let msat = received.amount {
-				commonValue_amount(msat: msat)
-			} else {
-				Text("Any amount")
-			}
+			commonValue_amount(msat: receivedWith.amount)
 		}
 	}
 	
 	@ViewBuilder
-	func paymentReceived_via(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_via(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
 		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
-			
+		
 			keyColumn(NSLocalizedString("via", comment: "Label in DetailsView_IncomingPayment"))
-			
+		
 		} valueColumn: {
-			
-			if let _ = received.receivedWith.asLightningPayment() {
+		
+			if let _ = receivedWith.asLightningPayment() {
 				Text("Lightning network")
-				
-			} else if let _ = received.receivedWith.asNewChannel() {
+		
+			} else if let _ = receivedWith.asNewChannel() {
 				Text("New Channel (auto-created)")
-				
+		
 			} else {
 				Text("")
 			}
@@ -853,9 +856,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_channelId(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
-		if let newChannel = received.receivedWith.asNewChannel() {
+		if let newChannel = receivedWith.asNewChannel() {
 			
 			InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
 				
@@ -1377,7 +1380,7 @@ extension Lightning_kmpWalletPayment {
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
 				
-				let msat = received.receivedWith.fees.msat
+				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)

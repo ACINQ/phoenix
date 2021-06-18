@@ -21,6 +21,8 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.payments.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -61,22 +63,43 @@ class IncomingPaymentDbTypeVersionTest {
 
     @Test
     fun incoming_receivedwith_lightning() {
-        val receivedWith = IncomingPayment.ReceivedWith.LightningPayment
-        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0, receivedWith.mapToDb().second)
-        assertEquals(receivedWith, deserialized)
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, ByteVector32.One, 2L))
+        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.MULTIPARTS_V0, receivedWith.mapToDb()!!.second, null)
+        assertEquals(receivedWith.first(), deserialized.first())
     }
 
     @Test
     fun incoming_receivedwith_newchannel() {
-        val receivedWith = IncomingPayment.ReceivedWith.NewChannel(123456789.msat, channelId1)
-        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0, receivedWith.mapToDb().second)
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(123456789.msat, 1000.msat, channelId1))
+        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.MULTIPARTS_V0, receivedWith.mapToDb()!!.second, null)
         assertEquals(receivedWith, deserialized)
     }
 
     @Test
     fun incoming_receivedwith_newchannel_null() {
-        val receivedWith = IncomingPayment.ReceivedWith.NewChannel(111111111.msat, null)
-        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0, receivedWith.mapToDb().second)
+        val receivedWith = setOf(IncomingPayment.ReceivedWith.NewChannel(111111111.msat, 1000.msat, null))
+        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.MULTIPARTS_V0, receivedWith.mapToDb()!!.second, null)
         assertEquals(receivedWith, deserialized)
+    }
+
+    @Test
+    fun incoming_receivedwith_lightning_legacy() {
+        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0,
+            Json.encodeToString(IncomingReceivedWithData.LightningPayment.V0).toByteArray(Charsets.UTF_8), 999_999.msat)
+            .first() as IncomingPayment.ReceivedWith.LightningPayment
+        assertEquals(999_999.msat, deserialized.amount)
+        assertEquals(0.msat, deserialized.fees)
+        assertEquals(ByteVector32.Zeroes, deserialized.channelId)
+        assertEquals(0L, deserialized.htlcId)
+    }
+
+    @Test
+    fun incoming_receivedwith_newchannel_legacy() {
+        val deserialized = IncomingReceivedWithData.deserialize(IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0,
+            Json.encodeToString(IncomingReceivedWithData.NewChannel.V0(15_000.msat, channelId1)).toByteArray(Charsets.UTF_8), 123_456.msat)
+            .first() as IncomingPayment.ReceivedWith.NewChannel
+        assertEquals(123_456.msat, deserialized.amount)
+        assertEquals(15_000.msat, deserialized.fees)
+        assertEquals(channelId1, deserialized.channelId)
     }
 }

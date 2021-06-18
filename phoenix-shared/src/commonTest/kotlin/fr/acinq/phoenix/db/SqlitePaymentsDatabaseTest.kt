@@ -27,6 +27,7 @@ import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
 import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.payment.PaymentRequest
@@ -42,12 +43,14 @@ class SqlitePaymentsDatabaseTest {
     private val preimage1 = randomBytes32()
     private val paymentHash1 = Crypto.sha256(preimage1).toByteVector32()
     private val origin1 = IncomingPayment.Origin.Invoice(createInvoice(preimage1))
-    private val receivedWith1 = IncomingPayment.ReceivedWith.LightningPayment
+    private val channelId1 = randomBytes32()
+    private val receivedWith1 = setOf(IncomingPayment.ReceivedWith.LightningPayment(100_000.msat, channelId1, 1L))
+    private val receivedWith3 = setOf(IncomingPayment.ReceivedWith.LightningPayment(150_000.msat, channelId1, 1L))
 
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = IncomingPayment.ReceivedWith.NewChannel(fees = MilliSatoshi(5000), channelId = randomBytes32())
+    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(amount = 2_000_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
@@ -55,7 +58,7 @@ class SqlitePaymentsDatabaseTest {
     fun incoming__empty() = runTest {
         assertNull(db.getIncomingPayment(paymentHash1))
         assertEquals(listOf(), db.listReceivedPayments(10, 0))
-        assertFailsWith(IncomingPaymentNotFound::class) { db.receivePayment(paymentHash1, MilliSatoshi(123), receivedWith1, 5) }
+        assertFailsWith(IncomingPaymentNotFound::class) { db.receivePayment(paymentHash1, receivedWith1, 5) }
     }
 
     @Test
@@ -67,12 +70,12 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(origin1, it.origin)
             assertNull(it.received)
         }
-        db.receivePayment(paymentHash1, MilliSatoshi(123), receivedWith1, 10)
+        db.receivePayment(paymentHash1, receivedWith1, 10)
         db.getIncomingPayment(paymentHash1)!!.let {
             assertEquals(paymentHash1, it.paymentHash)
             assertEquals(preimage1, it.preimage)
             assertEquals(origin1, it.origin)
-            assertEquals(MilliSatoshi(123), it.received?.amount)
+            assertEquals(100_000.msat, it.received?.amount)
             assertEquals(10, it.received?.receivedAt)
             assertEquals(receivedWith1, it.received?.receivedWith)
         }
@@ -89,7 +92,7 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(db.getIncomingPayment(paymentHash2), it[0])
             assertEquals(db.getIncomingPayment(paymentHash1), it[1])
         }
-        db.receivePayment(paymentHash1, MilliSatoshi(123), receivedWith1, 20)
+        db.receivePayment(paymentHash1, receivedWith1, 20)
         db.listReceivedPayments(10, 0).let {
             // reception date takes precedence over creation date
             assertEquals(db.getIncomingPayment(paymentHash1), it[0])
@@ -111,17 +114,18 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__receive_should_sum() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
-        db.receivePayment(paymentHash1, MilliSatoshi(100), receivedWith1, 10)
-        assertEquals(MilliSatoshi(100), db.getIncomingPayment(paymentHash1)?.received?.amount)
-        db.receivePayment(paymentHash1, MilliSatoshi(50), receivedWith1, 20)
-        assertEquals(MilliSatoshi(150), db.getIncomingPayment(paymentHash1)?.received?.amount)
+        db.receivePayment(paymentHash1, receivedWith1, 10)
+        assertEquals(100_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
+        db.receivePayment(paymentHash1, receivedWith3, 20)
+        assertEquals(250_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
     }
 
     @Test
     fun incoming__add_and_receive() = runTest {
-        db.addAndReceivePayment(preimage1, origin3, MilliSatoshi(1234567), receivedWith2)
+        db.addAndReceivePayment(preimage1, origin3, receivedWith2)
         assertNotNull(db.getIncomingPayment(paymentHash1))
-        assertEquals(MilliSatoshi(1234567), db.getIncomingPayment(paymentHash1)?.received?.amount)
+        assertEquals(1_995_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
+        assertEquals(5_000.msat, WalletPayment.fees(db.getIncomingPayment(paymentHash1)!!))
         assertEquals(origin3, db.getIncomingPayment(paymentHash1)!!.origin)
         assertEquals(receivedWith2, db.getIncomingPayment(paymentHash1)!!.received!!.receivedWith)
     }
@@ -131,7 +135,7 @@ class SqlitePaymentsDatabaseTest {
         val expiredInvoice =
             PaymentRequest.read("lntb1p0ufamxpp5l23zy5f8h2dcr8hxynptkcyuzdygy36pz76hgayp7n9q45a3cwuqdqqxqyjw5q9qtzqqqqqq9qsqsp5vusneyeywvawt4d7sslx3kx0eh7kk68l7j26qr0ge7z04lxhe5ssrzjqwfn3p9278ttzzpe0e00uhyxhned3j5d9acqak5emwfpflp8z2cnfluw6cwxn8wdcyqqqqlgqqqqqeqqjqmjvx0y3cfw54syp4jqw6jlj73qt97vxftjd3w3ywx6v2jqkdx9uxw3hk9qq6st9qyfpu3nzrpefwye63vmnyyzn6z8n7nkqsjj6lsaspu2p3mm")
         db.addIncomingPayment(preimage1, IncomingPayment.Origin.Invoice(expiredInvoice), 0)
-        db.receivePayment(paymentHash1, MilliSatoshi(123), receivedWith1, 10)
+        db.receivePayment(paymentHash1, receivedWith1, 10)
         assertTrue(db.getIncomingPayment(paymentHash1)!!.isExpired())
     }
 
@@ -271,124 +275,6 @@ class SqlitePaymentsDatabaseTest {
         assertFails { db.completeOutgoingPayment(UUID.randomUUID(), FinalFailure.NoRouteToRecipient, 120) }
         assertEquals(paymentFailed, db.getOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
-    }
-
-    @Test
-    fun outgoing__list_by_payment_hash() = runTest {
-
-    }
-
-    @Test
-    fun outgoing__list_with_paging() = runTest {
-
-    }
-
-    @Test
-    fun outgoing__list_all_payments() = runTest {
-        val (preimage1, preimage2, preimage3, preimage4) = listOf(randomBytes32(), randomBytes32(), randomBytes32(), randomBytes32())
-
-        val incoming1 = IncomingPayment(preimage1, IncomingPayment.Origin.Invoice(createInvoice(preimage1)), null, createdAt = 20)
-        val incoming2 = IncomingPayment(preimage2, IncomingPayment.Origin.SwapIn("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb"), null, createdAt = 21)
-        val incoming3 = IncomingPayment(preimage3, IncomingPayment.Origin.Invoice(createInvoice(preimage3)), null, createdAt = 22)
-        val incoming4 = IncomingPayment(preimage4, IncomingPayment.Origin.Invoice(createInvoice(preimage4)), null, createdAt = 23)
-        listOf(incoming1, incoming2, incoming3, incoming4).forEach { db.addIncomingPayment(it.preimage, it.origin, it.createdAt) }
-
-        // Pending incoming payments should not be listed.
-        assertTrue(db.listPayments(count = 10, skip = 0).isEmpty())
-
-        // Will succeed
-        val outgoing1Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 50_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing1 = OutgoingPayment(UUID.randomUUID(), 50_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing1Parts, OutgoingPayment.Status.Pending)
-        // Will fail
-        val outgoing2Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing2 = OutgoingPayment(UUID.randomUUID(), 55_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.KeySend(randomBytes32()), outgoing2Parts, OutgoingPayment.Status.Pending)
-        // Will succeed but first part will be a failure
-        val outgoing3Parts = listOf(
-            OutgoingPayment.Part(UUID.randomUUID(), 60_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-            OutgoingPayment.Part(UUID.randomUUID(), 45_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-            OutgoingPayment.Part(UUID.randomUUID(), 17_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(43))), OutgoingPayment.Part.Status.Pending, 100)
-        )
-        val outgoing3 =
-            OutgoingPayment(UUID.randomUUID(), 60_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.SwapOut("1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", randomBytes32()), outgoing3Parts, OutgoingPayment.Status.Pending)
-        // Will stay pending
-        val outgoing4 = OutgoingPayment(UUID.randomUUID(), 45_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())))
-        // Will succeed but is overpaid...
-        val outgoing5Parts = listOf(OutgoingPayment.Part(UUID.randomUUID(), 55_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100))
-        val outgoing5 = OutgoingPayment(UUID.randomUUID(), 35_000.msat, Lightning.randomKey().publicKey(), OutgoingPayment.Details.Normal(createInvoice(randomBytes32())), outgoing5Parts, OutgoingPayment.Status.Pending)
-        val closing6 = OutgoingPayment.Details.ChannelClosing(randomBytes32(), "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb", true)
-        val outgoing6 = OutgoingPayment(UUID.randomUUID(), 100_000_000.msat, Lightning.randomKey().publicKey(), closing6, listOf(), OutgoingPayment.Status.Pending)
-
-        // Add outgoing to database
-        listOf(
-            outgoing1, outgoing2, outgoing3, outgoing4, outgoing5, outgoing6
-        ).forEach { db.addOutgoingPayment(it) }
-        // Pending outgoing payments should be listed.
-        assertEquals(6, db.listPayments(count = 10, skip = 0).size)
-
-        // receive incoming1, should be last in resulting list, with a +20_000 msat amount
-        db.receivePayment(incoming1.paymentHash, 20_000.msat, IncomingPayment.ReceivedWith.LightningPayment, receivedAt = 100)
-        val expectedIncoming1 = incoming1.copy(received = IncomingPayment.Received(20_000.msat, IncomingPayment.ReceivedWith.LightningPayment, 100))
-
-        // send outgoing 1 with 1 successful part
-        db.updateOutgoingPart(outgoing1Parts[0].id, randomBytes32(), completedAt = 102)
-        db.completeOutgoingPayment(outgoing1.id, randomBytes32(), completedAt = 103)
-        val expectedOutgoing1 = db.getOutgoingPayment(outgoing1.id)
-        assertNotNull(expectedOutgoing1)
-
-        // receive incoming 2 with a bit more than expected
-        db.receivePayment(incoming2.paymentHash, 25_000.msat, IncomingPayment.ReceivedWith.NewChannel(250.msat, channelId = null), receivedAt = 105)
-        val expectedIncoming2 = incoming2.copy(received = IncomingPayment.Received(25_000.msat, IncomingPayment.ReceivedWith.NewChannel(250.msat, channelId = null), 105))
-
-        // fail outgoing2
-        db.updateOutgoingPart(outgoing2Parts[0].id, Either.Left(ChannelUnavailable(randomBytes32())), completedAt = 106)
-        db.completeOutgoingPayment(outgoing2.id, FinalFailure.UnknownError, completedAt = 106)
-        val expectedOutgoing2 = db.getOutgoingPayment(outgoing2.id)
-        assertNotNull(expectedOutgoing2)
-
-        // fail 1st part of outgoing3, succeed remaining parts
-        db.updateOutgoingPart(outgoing3Parts[0].id, Either.Left(ChannelUnavailable(randomBytes32())), completedAt = 107)
-        db.updateOutgoingPart(outgoing3Parts[1].id, randomBytes32(), completedAt = 107)
-        db.updateOutgoingPart(outgoing3Parts[2].id, randomBytes32(), completedAt = 107)
-        db.completeOutgoingPayment(outgoing3.id, randomBytes32(), completedAt = 107)
-        val expectedOutgoing3 = db.getOutgoingPayment(outgoing3.id)
-        assertNotNull(expectedOutgoing3)
-
-        // receive incoming4
-        db.receivePayment(incoming4.paymentHash, 10_000.msat, IncomingPayment.ReceivedWith.LightningPayment, receivedAt = 110)
-        val expectedIncoming4 = incoming4.copy(received = IncomingPayment.Received(10_000.msat, IncomingPayment.ReceivedWith.LightningPayment, 110))
-
-        // receive outgoing5, overpaying
-        db.updateOutgoingPart(outgoing5Parts[0].id, randomBytes32(), completedAt = 111)
-        db.completeOutgoingPayment(outgoing5.id, randomBytes32(), completedAt = 112)
-        val expectedOutgoing5 = db.getOutgoingPayment(outgoing5.id)
-
-        db.completeOutgoingPayment(outgoing6.id, randomBytes32(), completedAt = 114)
-        val expectedOutgoing6 = db.getOutgoingPayment(outgoing6.id)
-
-        // outgoing4 and incoming3 are still pending.
-        val last10 = db.listPayments(count = 10, skip = 0)
-        assertEquals(9, last10.size)
-        assertEquals(outgoing4.id, (last10[0] as OutgoingPayment).id)
-        assertEquals(OutgoingPayment.Status.Pending, (last10[0] as OutgoingPayment).status) // this payment is still pending!
-        assertEquals(0.msat, (last10[0] as OutgoingPayment).parts.map { it.amount }.sum())
-        assertEquals(expectedOutgoing6!!.id, (last10[1] as OutgoingPayment).id)
-        assertTrue((last10[1] as OutgoingPayment).details is OutgoingPayment.Details.ChannelClosing)
-        assertEquals(expectedOutgoing5!!.id, (last10[2] as OutgoingPayment).id)
-        assertEquals(55_000.msat, (last10[2] as OutgoingPayment).parts.map { it.amount }.sum())
-        assertEquals(expectedIncoming4.paymentHash, (last10[3] as IncomingPayment).paymentHash)
-        assertEquals(expectedOutgoing3.id, (last10[4] as OutgoingPayment).id)
-        assertEquals(62_000.msat, (last10[4] as OutgoingPayment).parts.map { it.amount }.sum())
-        assertEquals(expectedOutgoing2.id, (last10[5] as OutgoingPayment).id)
-        assertEquals(expectedIncoming2.paymentHash, (last10[6] as IncomingPayment).paymentHash)
-        assertEquals(expectedOutgoing1.id, (last10[7] as OutgoingPayment).id)
-        assertEquals(expectedIncoming1.paymentHash, (last10[8] as IncomingPayment).paymentHash)
-
-        // test paging
-        val last5after5 = db.listPayments(count = 5, skip = 5)
-        assertEquals(expectedOutgoing2.id, (last5after5[0] as OutgoingPayment).id)
-        assertEquals(expectedIncoming2.paymentHash, (last5after5[1] as IncomingPayment).paymentHash)
-        assertEquals(expectedOutgoing1.id, (last5after5[2] as OutgoingPayment).id)
-        assertEquals(expectedIncoming1.paymentHash, (last5after5[3] as IncomingPayment).paymentHash)
     }
 
     companion object {

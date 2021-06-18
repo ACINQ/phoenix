@@ -71,6 +71,10 @@ dependencies {
     implementation(project(":phoenix-shared"))
     implementation("com.google.android.material:material:1.3.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+        version { strictly(Versions.coroutines) }
+    }
+
     // -- AndroidX
     implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
     // -- AndroidX: preferences

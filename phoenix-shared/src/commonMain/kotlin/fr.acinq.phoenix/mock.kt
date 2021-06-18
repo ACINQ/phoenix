@@ -22,8 +22,7 @@ object Mock {
             origin = IncomingPayment.Origin.Invoice(PaymentRequest.read("lntb15u1psqtnwzpp57u4wnvjx6z94j39gvpkgc9x6trmwz7sq90pu28f9fq8svcr4tpjqdq4xysyymr0vd4kzcmrd9hx7cqp7xqrrss9qy9qsqsp5s8ky7hr7rzl3gk2vvpgcv6y9mdyqt69gmuu6fgqnjtj3ygjkc6gsqxnvjtrjg9g22kxrfje4cu2xkk2vvyzmj476ke6767z4z8aymunna369angdf2mfrukn6m697nr2mga2ytlewmws3mstez7865k2w2qqullvf2")),
             createdAt = now - 1000 * 60,
             received = IncomingPayment.Received(
-                amount = 678_000.msat,
-                receivedWith = IncomingPayment.ReceivedWith.LightningPayment,
+                receivedWith = setOf(IncomingPayment.ReceivedWith.LightningPayment(678_000.msat, ByteVector32.Zeroes, 1L)),
                 receivedAt = now
             )
         )

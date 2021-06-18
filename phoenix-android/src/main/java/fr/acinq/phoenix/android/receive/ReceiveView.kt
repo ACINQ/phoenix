@@ -154,7 +154,9 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generated -> {
-                    vm.generateQrCodeBitmap(invoice = model.request)
+                    SideEffect {
+                        vm.generateQrCodeBitmap(invoice = model.request)
+                    }
                     Spacer(modifier = Modifier.height(24.dp))
                     vm.qrBitmap?.let { QRCode(it) }
                     Spacer(modifier = Modifier.height(24.dp))

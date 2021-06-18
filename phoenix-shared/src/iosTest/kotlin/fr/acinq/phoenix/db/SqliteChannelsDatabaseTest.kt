@@ -20,7 +20,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 import fr.acinq.lightning.Lightning
 
-actual fun testDriver(): SqlDriver {
+actual fun testChannelsDriver(): SqlDriver {
     return NativeSqliteDriver(ChannelsDatabase.Schema, ":memory:")
 }
 

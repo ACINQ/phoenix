@@ -91,12 +91,12 @@ kotlin {
         if (includeAndroid) {
             val androidMain by getting {
                 dependencies {
-                    api("androidx.core:core-ktx:${Versions.Android.ktx}")
-                    api("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
+                    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+                    implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
                     implementation("io.ktor:ktor-network:${Versions.ktor}")
                     implementation("io.ktor:ktor-network-tls:${Versions.ktor}")
                     implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
                     implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
                 }
             }

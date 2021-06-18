@@ -3,6 +3,13 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
+extension Lightning_kmpWalletPayment: Identifiable {
+	
+	var identifiable: String {
+		// @see LightningExtensions.kt: `fun WalletPayment.id()`
+		return self.id()
+	}
+}
 
 extension WalletPaymentId: Identifiable {
 	
@@ -53,6 +60,13 @@ extension Lightning_kmpIncomingPayment.Received {
 	
 	var receivedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(receivedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpIncomingPayment.ReceivedWith: Identifiable {
+	
+	var identifiable: Int {
+		return self.hash
 	}
 }
 
