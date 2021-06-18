@@ -7,32 +7,32 @@
 </head>
 <body>
 
-<p>Standard security:</p>
+<p>Sécurité standard :</p>
 <ul>
-	<li>Access to the user interface is protected by biometrics.</li>
-	<li>Phoenix can receive incoming payments as long as the app is running.</li>
+	<li>L'accès à l'interface de l'application requiert une authentification biométrique.</li>
+	<li>Phoenix peut recevoir des paiements tant que l'application est démarrée.</li>
 </ul>
 
-<p>Advanced security:</p>
+<p>Sécurité avancée :</p>
 <ul>
-	<li>Access to your seed is protected by biometrics.</li>
-	<li>Phoenix can receive incoming payments as long as the app is running <strong>AND</strong> you&#39;ve unlocked the app at least once.</li>
+	<li>L'accès même à la clé requiert une authentification biométrique.</li>
+	<li>Phoenix peut recevoir des paiements tant que l'application est démarrée <strong>ET</strong> que vous avez déverrouillé l'application préalablement.</li>
 </ul>
 
-<h4>Reduced app functionality:</h4>
+<h4>Fonctionnalités dégradées :</h4>
 <p>
-	With advanced security enabled: If the device is restarted, and Phoenix is re-launched automatically (e.g. operating system upgrade), then incoming payments will fail until you unlock Phoenix.
+	Avec l'option de sécurité avancée activée : si le téléphone est redémarré et que Phoenix est relancé automatiquement (par exemple après mise à jour du système), alors les paiements entrants échoueront tant que vous n'avez pas déverrouillé Phoenix.
 </p>
 
-<h4>Technical details:</h4>
+<h4>Détails techniques :</h4>
 <p>
-	Your seed is wrapped using ChaCha20-Poly1305 with a 256-bit lockingKey, and the resulting {ciphertext, nonce, tag} is stored in a JSON file on disk. The lockingKey is stored in the iOS keychain.
+	Votre clé est chiffrée en utilisant ChaCha20-Poly1305 avec une clé de 256 bits, et le triplet résultant {ciphertext, nonce, tag} est stocké sous forme de JSON sur le disque. La clé de chiffrement est stockée dans la keychain iOS.
 </p>
 <p>
-	With normal security, the app can access the lockingKey on app launch, and immediately unlock the bitcoin wallet. Enabled security options restrict access to the user interface.
+	Avec l'option standard, l'application peut accéder à la clé de chiffrement lors du lancement de l'application, et déverrouille immédiatement votre portefeuille. Cette option permet de limiter l'accès à l'interface de l'application.
 </p>
 <p>
-	With advanced security, the lockingKey is encumbered such that it cannot be accessed unless you authenticate with biometrics. Thus the app is incapable of unlocking the bitcoin wallet without your assistance.
+	Avec l'option avancée, la clé de chiffrement est grevée de telle sorte qu'elle ne peut être utilisée à moins que vous vous soyez authentifiée avec le système biométrique. De cette façon, l'application ne peut déverrouiller la clé du portefeuille sans votre recours.
 </p>
 </body>
 </html>

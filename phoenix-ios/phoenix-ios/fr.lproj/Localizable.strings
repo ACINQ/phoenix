@@ -1,0 +1,909 @@
+/* No comment provided by engineer. */
+" (not available)" = "(non disponible)";
+
+/* No comment provided by engineer. */
+" (not enrolled)" = "(non activé)";
+
+/* No comment provided by engineer. */
+"-" = "-";
+
+/* No comment provided by engineer. */
+"…" = "…";
+
+/* No comment provided by engineer. */
+"(derived from your seed)" = "(dérivée de votre clé)";
+
+/* No comment provided by engineer. */
+"(Phoenix can be running in the background.)" = "(Phoenix peut tourner en tâche de fond)";
+
+/* No comment provided by engineer. */
+"(This is your address - derived from your seed. You alone possess your seed.)" = "(Cette adresse vous appartient et est dérivée de votre clé. Vous seul en avez possession)";
+
+/* No comment provided by engineer. */
+"(you provided this address)" = "(vous avez fourni cette adresse)";
+
+/* RecoverySeedView */
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds.\"" = "**Ne perdez pas cette clé.** Sauvegardez là dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous ne pourrez plus accéder à vos fonds.";
+
+/* RecoverySeedView */
+"**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**Ne la donnez à personne.** Prenez garde au hameçonnage. Les développeurs de Phoenix ne vous demanderont jamais votre clé.";
+
+/* No comment provided by engineer. */
+"%@ milliseconds" = "%@ millisecondes";
+
+/* No comment provided by engineer. */
+"%@ sat/byte" = "%@ sat/byte";
+
+/* No comment provided by engineer. */
+"%@.%@ seconds" = "%1$@.%2$@ secondes";
+
+/* No comment provided by engineer. */
+"%@% (%@ minimum)" = "%1$@%2$ (minimum %3$@)";
+
+/* Minimum fee information */
+"%@%% (%@ minimum)" = "%1$@%% (minimum %2$@)";
+
+/* Count != 1 */
+"%d channels" = "%d canaux";
+
+/* No comment provided by engineer. */
+"+%@ incoming" = "+%@ entrant";
+
+/* No comment provided by engineer. */
+"1 channel" = "1 canal";
+
+/* No comment provided by engineer. */
+"A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos fonds Bitcoin au besoin.";
+
+/* No comment provided by engineer. */
+"A random electrum server will be selected on each connection attempt." = "Un serveur Electrum aléatoire sera sélectionné à chaque tentative de connexion.";
+
+/* Navigation bar title */
+"About" = "À propos";
+
+/* No comment provided by engineer. */
+"Access to Phoenix is protected by biometrics." = "L’accès à Phoenix est protégé par un contrôle biométrique.";
+
+/* No comment provided by engineer. */
+"Address" = "Adresse";
+
+/* Label in DetailsView_IncomingPayment */
+"address type" = "Type d’adresse";
+
+/* No comment provided by engineer. */
+"Advanced" = "Avancé";
+
+/* No comment provided by engineer. */
+"Advanced security" = "Sécurité avancée";
+
+/* No comment provided by engineer. */
+"Amount (optional)" = "Montant (optionnel)";
+
+/* error message */
+"Amount exceeds your balance" = "Le montant dépasse votre solde";
+
+/* Label in DetailsView_IncomingPayment */
+"amount received" = "Montant reçu";
+
+/* Label in DetailsView_IncomingPayment */
+"amount requested" = "Montant demandé";
+
+/* placeholder: invoice is amount-less */
+"any amount" = "montant indéfini";
+
+/* error message */
+"Any amount" = "Montant indéfini";
+
+/* No comment provided by engineer. */
+"App access" = "Accès à l’application";
+
+/* Navigation bar title */
+"App Access" = "Accès à l’application";
+
+/* Biometrics prompt to unlock the Phoenix app */
+"App is locked" = "L’application est verrouillée";
+
+/* No comment provided by engineer. */
+"App theme" = "Thème de l’application";
+
+/* No comment provided by engineer. */
+"Are you sure you want to pay this invoice?" = "Êtes-vous sûr de vouloir payer cette requête ?";
+
+/* No comment provided by engineer. */
+"Are you sure you want to proceed?" = "Êtes-vous sûr de vouloir poursuivre ?";
+
+/* Currency name: AUD */
+"Australian Dollar" = "Dollar australien";
+
+/* User prompt */
+"Authenticate to disable biometrics." = "Authentifiez-vous pour désactiver le contrôle biométrique.";
+
+/* No comment provided by engineer. */
+"Automatic Channel Creation" = "Création automatique de canaux";
+
+/* No comment provided by engineer. */
+"Biometrics" = "Contrôle biométrique";
+
+/* No comment provided by engineer. */
+"BIP39 seed with standard BIP84 derivation path" = "Clé BIP39 avec chemin de dérivation standard BIP84";
+
+/* Label in DetailsView_IncomingPayment */
+"bitcoin address" = "adresse Bitcoin";
+
+/* No comment provided by engineer. */
+"Bitcoin address" = "Adresse Bitcoin";
+
+/* No comment provided by engineer. */
+"Bitcoin mempool is full and fees are high." = "Le réseau Bitcoin est saturé et les frais élevés.";
+
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction." = "Frais de réseau Bitcoin payés pour des transactions on-chain. Ce paiement a nécessité 1 transaction.";
+
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transactions. Payment required (txCount) transactions." = "Frais de réseau Bitcoin payés pour des transactions on-chain. Ce paiement a nécessité (txCount) transactions.";
+
+/* Label in DetailsView_IncomingPayment */
+"bitcoin txids" = "Identificant de transaction";
+
+/* No comment provided by engineer. */
+"Bitcoin unit" = "Unité Bitcoin";
+
+/* No comment provided by engineer. */
+"Block height" = "Hauteur de blocs";
+
+/* No comment provided by engineer. */
+"blockchain tx" = "Transaction blockchain";
+
+/* Currency name: BRL */
+"Brazilian Real" = "Real brésilien";
+
+/* No comment provided by engineer. */
+"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Par défaut Phoenix se connecte à des serveurs Electrum aléatoire pour accéder à la blockchain Bitcoin. Vous pouvez également choisir de ne vous connecter qu’à un serveur en particulier.";
+
+/* Currency name: CAD */
+"Canadian Dollar" = "Dollar canadien";
+
+/* No comment provided by engineer. */
+"Cancel" = "Annuler";
+
+/* Title in DetailsView_IncomingPayment
+   Transaction Info: Value */
+"Channel Closing" = "Clôture de canal";
+
+/* No comment provided by engineer. */
+"Channel creation has been temporarily disabled. You may not be able to receive some payments." = "La création de canal de paiement a été temporairement désactivée. Certains paiements ne pourront pas être reçus.";
+
+/* Label in DetailsView_IncomingPayment */
+"channel id" = "Identifiant du canal";
+
+/* No comment provided by engineer. */
+"Checking channel state..." = "Vérification de l’état du canal";
+
+/* Currency name: CLP */
+"Chilean Peso" = "Peso chiléen";
+
+/* Currency name: CNY */
+"Chinese Yuan" = "Yuan chinois";
+
+/* Label in DetailsView_IncomingPayment */
+"claimed amount" = "montant récupéré";
+
+/* No comment provided by engineer. */
+"Close all channels" = "Fermer tous les canaux de paiement";
+
+/* Navigation bar title */
+"Close channels" = "Fermer les canaux";
+
+/* Title in DetailsView_IncomingPayment */
+"Closing Status" = "Statut de la fermeture";
+
+/* No comment provided by engineer. */
+"Coming Soon" = "Disponible prochainement";
+
+/* Label in DetailsView_IncomingPayment */
+"completed at" = "terminé à";
+
+/* No comment provided by engineer. */
+"Configuration" = "Configuration";
+
+/* No comment provided by engineer. */
+"Confirm" = "Confirmer";
+
+/* Navigation bar title */
+"Confirm Payment" = "Confirmer le paiement";
+
+/* Connection state */
+"Connected" = "Connecté";
+
+/* Connection status */
+"Connected to:" = "Connecté à :";
+
+/* button text */
+"connecting to electrum" = "connexion à Electrum";
+
+/* button text */
+"connecting to peer" = "connexion au pair";
+
+/* Connection status */
+"Connecting to:" = "Connexion à :";
+
+/* Connection state */
+"Connecting..." = "En connexion…";
+
+/* No comment provided by engineer. */
+"Connection status" = "Statut de la connexion";
+
+/* No comment provided by engineer. */
+"Copied QR code image to pasteboard!" = "QR code copié dans le presse-papiers !";
+
+/* No comment provided by engineer. */
+"Copied to pasteboard!" = "Copié dans le presse-papiers !";
+
+/* No comment provided by engineer. */
+"Copy" = "Copier";
+
+/* No comment provided by engineer. */
+"Create new wallet" = "Créer un nouveau portefeuille";
+
+/* No comment provided by engineer. */
+"Danger zone" = "Zone à risques";
+
+/* Currency name: DKK */
+"Danish Krone" = "Couronne danoise";
+
+/* App theme option */
+"Dark" = "Sombre";
+
+/* No comment provided by engineer. */
+"Default payment description" = "Description des paiements par défaut";
+
+/* Minimum amount description. */
+"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "Le dépôt doit être d’au moins **%1$@**. Les frais sont de **%2$@%%** (minimum %3$@).";
+
+/* Label in SummaryInfoGrid */
+"Desc" = "Desc";
+
+/* No comment provided by engineer. */
+"Description (optional)" = "Description (optionnel)";
+
+/* Navigation bar title */
+"Details" = "Détails";
+
+/* No comment provided by engineer. */
+"Display" = "Affichage";
+
+/* Navigation bar title */
+"Display options" = "Options d’affichage";
+
+/* No comment provided by engineer. */
+"Display seed" = "Afficher la clé";
+
+/* No comment provided by engineer. */
+"Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don't have another Phoenix wallet running with the same seed." = "N’importez pas une clé qui n’a pas été créée par cette application.\n\nÉgalement, assurez-vous de ne pas faire tourner en parallèle un autre portefeuille Phoenix avec la même clé.";
+
+/* No comment provided by engineer. */
+"DO NOT SHARE." = "NE PAS PARTAGER";
+
+/* No comment provided by engineer. */
+"Do not use this feature if you don't fully understand what it does." = "N’utilisez pas cette fonctionnalité si vous ne comprenez pas bien ce qu’elle fait.";
+
+/* No comment provided by engineer. */
+"Drain my wallet" = "Vider mon portefeuille";
+
+/* No comment provided by engineer. */
+"Edit payment request" = "Modifier la requête de paiement";
+
+/* Label in SummaryInfoGrid */
+"Elapsed" = "Temps écoulé";
+
+/* Navigation bar title */
+"Electrum server" = "Serveur Electrum";
+
+/* error message */
+"Enter a valid amount" = "Saisissez un montant valide";
+
+/* error message */
+"Enter an amount" = "Saisissez un montant";
+
+/* No comment provided by engineer. */
+"Enter keywords from your seed" = "Saisissez les mots de votre clé";
+
+/* Label in SummaryInfoGrid */
+"Error" = "Erreur";
+
+/* Currency name: EUR */
+"Euro" = "Euro";
+
+/* No comment provided by engineer. */
+"example.com" = "example.com";
+
+/* No comment provided by engineer. */
+"Expect to receive %@ separate payments." = "Attendez-vous à recevoir %@ separate payments.";
+
+/* No comment provided by engineer. */
+"External" = "Externe";
+
+/* No comment provided by engineer. */
+"FAILED" = "ÉCHOUÉ";
+
+/* No comment provided by engineer. */
+"FAQ" = "FAQ";
+
+/* No comment provided by engineer. */
+"Fee for on-the-fly channel creation:" = "Frais pour la création de canal :";
+
+/* No comment provided by engineer. */
+"Fee rate" = "Taux des frais";
+
+/* Label in SummaryInfoGrid */
+"Fees" = "Frais";
+
+/* No comment provided by engineer. */
+"Fiat currency" = "Devise fiduciaire";
+
+/* No comment provided by engineer. */
+"For more information, see the FAQ" = "Pour plus de détails, consultez la FAQ";
+
+/* No comment provided by engineer. */
+"Force close allows you to unilaterally close your channels." = "La clôture forcée vous permet de fermer vos canaux de paiement de façon unilatérale.";
+
+/* Navigation bar title */
+"Force close channels" = "Forcer la clôture";
+
+/* ForceCloseChannelsView */
+"Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "Forcer la clôture des canaux de paiement vous coûtera cher (afin de couvrir les frais on-chain), et vos fonds seront verrouillés sur la chaine pendant plusieurs jours. **Ne désinstaller pas l’application tant que vos canaux ne sont pas complètement fermés ou bien vous perdrez de l’argent.**";
+
+/* No comment provided by engineer. */
+"Full Screen" = "Plein écran";
+
+/* No comment provided by engineer. */
+"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "Les fonds peuvent être envoyés vers une adresse Bitcoin de votre choix. Assurez-vous que l’adresse soit correcte avant d’envoyer.";
+
+/* No comment provided by engineer. */
+"Funds sent" = "Fonds envoyés";
+
+/* No comment provided by engineer. */
+"Funds will eventually be sent to:" = "Les fonds seront in fine envoyés à :";
+
+/* No comment provided by engineer. */
+"General" = "Général";
+
+/* No comment provided by engineer. */
+"Generating QRCode..." = "Génération du QR code";
+
+/* No comment provided by engineer. */
+"Get started" = "Commencer";
+
+/* Currency name: GBP */
+"Great British Pound" = "Livre britannique";
+
+/* No comment provided by engineer. */
+"Here you can extract and visualize application logs, as well as share them." = "Dans cet écran vous pouvez extraire et visualiser les logs de l’application, ainsi que les partager avec un tiers.";
+
+/* Currency name: HKD */
+"Hong Kong Dollar" = "Dollar de Hong-Kong";
+
+/* No comment provided by engineer. */
+"I understand" = "Je comprends";
+
+/* No comment provided by engineer. */
+"I understand." = "Je comprends.";
+
+/* Currency name: ISK */
+"Icelandic Kròna" = "Couronne islandaise";
+
+/* No comment provided by engineer. */
+"Import" = "Importer";
+
+/* Fees explanation */
+"In order to receive this payment, a new payment channel was opened. This is not always required." = "Afin de recevoir ce paiement, un nouveau canal de paiement a été ouvert. Cela n’est pas toujours indispensable.";
+
+/* Currency name: INR */
+"Indian Rupee" = "Roupie indienne";
+
+/* toast warning */
+"Invalid Lightning Request" = "Requête de paiement Lightning invalide";
+
+/* No comment provided by engineer. */
+"Invalid port. Valid range: [1 - 65535]" = "Port invalide. Plage acceptée : 1-65535";
+
+/* No comment provided by engineer. */
+"Invalid server. Use format: domain.tld" = "Serveur invalide. Utiliser le format : domaine.tld";
+
+/* Label in DetailsView_IncomingPayment */
+"invoice created" = "requête créée";
+
+/* error message */
+"Invoice is expired" = "La requête a expirée";
+
+/* Currency name: JPY */
+"Japanese Yen" = "Yen japonais";
+
+/* No comment provided by engineer. */
+"Keep Control" = "Gardez le contrôle";
+
+/* No comment provided by engineer. */
+"Keep it safe and secret!" = "Gardez la secrète et en sureté !";
+
+/* No comment provided by engineer. */
+"KEEP THIS SEED SAFE." = "GARDEZ LA EN SÉCURITÉ.";
+
+/* Transaction Info: Value */
+"KeySend" = "KeySend";
+
+/* Currency name: KRW */
+"Korean Won" = "Won coréen";
+
+/* Transaction Info: Explanation */
+"layer 1 -> 2" = "couche 1 -> 2";
+
+/* Transaction Info: Explanation */
+"layer 2 -> 1" = "couche 2 -> 1";
+
+/* App theme option */
+"Light" = "Clair";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required %d hops." = "Frais de routage Lightning. Le paiement a nécessité %d sauts.";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required 1 hop." = "Frais de routage Lightning. Le paiement a nécessité 1 saut.";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops." = "Frais de routage Lightning. Le paiement a été divisé en %1$d parties, en faisant %2$d sauts.";
+
+/* No comment provided by engineer. */
+"Lightning network" = "Réseau Lightning";
+
+/* Navigation bar title */
+"Logs" = "Logs";
+
+/* No comment provided by engineer. */
+"Look at the logs" = "Consulter les logs";
+
+/* No comment provided by engineer. */
+"Master public key" = "Clé publique maître";
+
+/* Currency name: MXN */
+"Mexican Peso" = "Peso mexicain";
+
+/* No comment provided by engineer. */
+"Modify" = "Modifier";
+
+/* No comment provided by engineer. */
+"New Channel (auto-created)" = "Nouveau canal (créé automatiquement)";
+
+/* Currency name: NZD */
+"New Zealand Dollar" = "Dollar néo-zélandais";
+
+/* No comment provided by engineer. */
+"Next" = "Suivant";
+
+/* No comment provided by engineer. */
+"No" = "Non";
+
+/* placeholder: invoice is description-less */
+"no description" = "Sans description";
+
+/* placeholder text */
+"No description" = "Sans description";
+
+/* No comment provided by engineer. */
+"NO FUNDS HAVE BEEN SENT" = "AUCUN FONDS ENVOYÉS";
+
+/* Transaction Info: Explanation */
+"non-invoice payment" = "paiement spontané";
+
+/* No comment provided by engineer. */
+"None" = "Néant";
+
+/* No comment provided by engineer. */
+"Note: Server must have a valid certificate" = "Note : le serveur doit avoir un certificat valide";
+
+/* Connection state */
+"Offline" = "Hors ligne";
+
+/* No comment provided by engineer. */
+"OK" = "Ok";
+
+/* No comment provided by engineer. */
+"Only you alone possess this seed. Keep it private." = "Vous seul avez possession de cette clé. Gardez la secrète.";
+
+/* Label in SummaryInfoGrid */
+"Output" = "Sortie";
+
+/* No comment provided by engineer. */
+"Paste from clipboard" = "Coller depuis le presse-papiers.";
+
+/* No comment provided by engineer. */
+"Path" = "Chemin";
+
+/* No comment provided by engineer. */
+"Pay" = "Payer";
+
+/* Navigation bar title */
+"Payment channels" = "Canaux de paiement";
+
+/* No comment provided by engineer. */
+"Payment channels are automatically created when needed." = "Les canaux de paiement sont créés automatiquement au besoin.";
+
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Des canaux de paiements sont automatiquement créés quand vous recevez des paiements. Utilisez l’écran **Recevoir** pour créér des requêtes de paiement Lightning.";
+
+/* Label in DetailsView_IncomingPayment */
+"payment hash" = "payment hash";
+
+/* Navigation Bar Title */
+"Payment Options" = "Options des paiements";
+
+/* No comment provided by engineer. */
+"Payment options & fees" = "Options et frais des paiements";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Parts" = "Parties de paiement";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Received" = "Paiement reçu";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Request" = "Requête de paiement";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Sent" = "Paiement envoyé";
+
+/* timestamp string for pending transaction */
+"pending" = "en cours";
+
+/* No comment provided by engineer. */
+"PENDING" = "EN COURS";
+
+/* No comment provided by engineer. */
+"Phoenix" = "Phoenix";
+
+/* No comment provided by engineer. */
+"Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "Phoenix peut être ouvert sans authentification. Assurez-vous d’avoir mis en place des mesure de sécurité adéquate dans iOS.";
+
+/* Error message - scanning lightning invoice */
+"Phoenix does not support the LNURL protocol yet" = "Phoenix n’est pas encore compatible LNULRL";
+
+/* No comment provided by engineer. */
+"Phoenix generated" = "Généré par Phoenix";
+
+/* Error message in LockView */
+"Please enable Touch ID" = "Veuillez activer Touch ID";
+
+/* Error message in LockView */
+"Please enabled Face ID" = "Veuillez activer Face ID";
+
+/* Currency name: PLN */
+"Polish Zloty" = "Zloty polonais";
+
+/* No comment provided by engineer. */
+"Port" = "Port";
+
+/* Connection info */
+"Random server" = "Serveur aléatoire";
+
+/* Label in DetailsView_IncomingPayment */
+"reason" = "cause";
+
+/* Navigation bar title */
+"Receive" = "Recevoir";
+
+/* No comment provided by engineer. */
+"RECEIVED" = "Reçu";
+
+/* Label in DetailsView_IncomingPayment */
+"received at" = "reçu à";
+
+/* Label in DetailsView_IncomingPayment */
+"recipient pubkey" = "clé publique du destinataire";
+
+/* No comment provided by engineer. */
+"Recovery phrase" = "Clé de sauvegarde";
+
+/* Navigation bar title */
+"Recovery Seed" = "Clé de sauvegarde";
+
+/* No comment provided by engineer. */
+"Requesting Swap-In Address..." = "Demande d’adresse de swap-in";
+
+/* No comment provided by engineer. */
+"Require Face ID" = "Nécessite Face ID";
+
+/* No comment provided by engineer. */
+"Require Touch ID" = "Nécessite Touch ID";
+
+/* Navigation bar title */
+"Restore my wallet" = "Restaurer mon portefeuille";
+
+/* Currency name: RUB */
+"Russian Ruble" = "Rouble russe";
+
+/* Navigation bar title */
+"Scan a QR code" = "Scanner un QR code";
+
+/* No comment provided by engineer. */
+"Scan Bitcoin Address" = "Scanner une adresse Bitcoin";
+
+/* No comment provided by engineer. */
+"Security" = "Sécurité";
+
+/* No comment provided by engineer. */
+"See how Phoenix is affected" = "Voir comment cela affecte Phoenix";
+
+/* No comment provided by engineer. */
+"Send" = "Envoyer";
+
+/* Title in DetailsView_IncomingPayment */
+"Send Failed" = "Envoi échoué";
+
+/* No comment provided by engineer. */
+"Send Funds" = "Envoyer des fonds";
+
+/* Navigation bar title */
+"Sending payment" = "Envoi du paiement";
+
+/* No comment provided by engineer. */
+"Sending Payment..." = "Envoi du paiement…";
+
+/* No comment provided by engineer. */
+"SENT" = "ENVOYÉ";
+
+/* Label in DetailsView_IncomingPayment */
+"sent at" = "envoyé vers";
+
+/* No comment provided by engineer. */
+"Server" = "Serveur";
+
+/* Navigation bar title */
+"Settings" = "Préférences";
+
+/* No comment provided by engineer. */
+"Share" = "Partager";
+
+/* No comment provided by engineer. */
+"Share channel list" = "Partager la liste des canaux";
+
+/* No comment provided by engineer. */
+"Share the logs" = "Partager les logs";
+
+/* No comment provided by engineer. */
+"Show a Bitcoin address" = "Montrer une adresse Bitcoin";
+
+/* Currency name: SGD */
+"Singapore Dollar" = "Dollar singapourien";
+
+/* No comment provided by engineer. */
+"Some Services Disabled" = "Certains services sont désactivés";
+
+/* No comment provided by engineer. */
+"Something is amiss with this invoice..." = "Quelque chose ne va pas dans cette requête…";
+
+/* No comment provided by engineer. */
+"Status" = "Statut";
+
+/* Navigation bar title */
+"Swap In" = "Swap-in";
+
+/* Transaction Info: Value */
+"Swap-In" = "Swap-in";
+
+/* Transaction Info: Value */
+"Swap-Out" = "Swap-out";
+
+/* Currency name: SEK */
+"Swedish Krona" = "Couronne suédoise";
+
+/* Currency name: CHF */
+"Swiss Franc" = "Franc suisse";
+
+/* App theme option */
+"System" = "Système";
+
+/* Currency name: TWD */
+"Taiwan New Dollar" = "Nouveau Dollar taiwanais";
+
+/* Currency name: THB */
+"Thai Baht" = "Baht thaïlandais";
+
+/* Error message - parsing bitcoin address */
+"The address is for %@, but you're on %@" = "L’adresse est pour %1$@, mais vous êtes sur %2$@";
+
+/* No comment provided by engineer. */
+"The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "La clé de sauvegarde, aussi appelée “seed”, est une liste de 12 mots anglais. Elle vous permet de récupérer l’accès à vos fonds si nécessaire.";
+
+/* No comment provided by engineer. */
+"The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Le réseau Bitcoin est saturé et les frais sont très élevés. Le service de swap on-chain a été désactivé temporairement.";
+
+/* label text */
+"The closing transaction is in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "La transaction de fermeture est visible dans la liste des transaction, dans l’écran __principal__. Vous pouvez voir le statut de vos canaux de paiement dans l’écran __list des canaux__.";
+
+/* label text */
+"The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "Les transactions de fermeture sont visibles dans la liste des transaction, dans l’écran __principal__. Vous pouvez voir le statut de vos canaux de paiement dans l’écran __liste des canaux__.";
+
+/* IntroView */
+"The fee is **%@%%** with a minimum fee of **%@**." = "Les frais sont de **%1$@%%** avec un minimum de **%2$@**.";
+
+/* SendView */
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait vous voler le paiement. Pour être sûr, **demandez au destinataire du paiement de spécifier un montant** dans sa requête.";
+
+/* Error message - scanning lightning invoice */
+"The invoice is for (requestChain), but you're on (reason.myChain.name)" = "Cette requête est valable pour la chaîne (requestChain), mais vous êtes sur la chaîne (reason.myChain.name).";
+
+/* No comment provided by engineer. */
+"The invoice is for you. You are about to pay yourself." = "Cette requête de paiement vous est destinée. Vous vous apprêtez à vous payer vous-même.";
+
+/* Error message - parsing bitcoin address */
+"The scanned QR code is not a bitcoin address" = "Le QR code scanné n’est pas une adresse Bitcoin.";
+
+/* Warning for iOS Simulator (only for devs) */
+"The simulator cannot access the camera. Please use the clipboard." = "Le simulateur ne peut pas accéder à la caméra. Veuillez utiliser le presse-papiers.";
+
+/* No comment provided by engineer. */
+"This address is derived from your seed and belongs to you." = "Cette adresse est dérivée de votre clé et vous appartient.";
+
+/* No comment provided by engineer. */
+"This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co." = "Cette application est expérimentale. Veuillez sauvegarder votre clé. Contactez phoenix@acinq.co si vous rencontrez des problèmes.";
+
+/* Error message - scanning lightning invoice */
+"This doesn't appear to be a Lightning invoice" = "Cela ne semble pas être une requête Lightning";
+
+/* ForceCloseChannelsView */
+"This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sûreté, **à n’utiliser qu’en dernier recours.** Par exemple, si votre pair (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**";
+
+/* No comment provided by engineer. */
+"This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "Ces frais s’appliquent quand vous recevez un paiement Lightning et qu’un nouveau canal doit être créé.";
+
+/* No comment provided by engineer. */
+"This fee is dynamic, and may change depending on the conditions of the bitcoin network." = "Ces frais sont dynamiques, et peuvent changer selon les conditions du réseau Bitcoin.";
+
+/* No comment provided by engineer. */
+"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Ces frais s’appliquent quand un nouveau canal doit être créé. Les paiement qui passent par des canaux existants ne paient pas ces frais. Ces frais sont dynamiques et peuvent changer selon les conditions du réseau Bitcoin.";
+
+/* No comment provided by engineer. */
+"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Ceci est une adresse de swap. Elle n’est pas contrôllée par votre portefeuille. Les dépôts on-chain seront convertis en des canaux de paiement Lightning.";
+
+/* No comment provided by engineer. */
+"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en tâche de fond. Pour recevoir des paiements, Phoenix devra être ouvert et au premier plan.";
+
+/* No comment provided by engineer. */
+"This means you will not be notified if you receive a payment while Phoenix is in the background." = "Cela signifie que vous ne serez pas notifié si vous recevez un paiement alors que Phoenix est en tâche de fond.";
+
+/* No comment provided by engineer. */
+"This seed is invalid and cannot be imported.\n\nPlease try again" = "Cette clé n’est pas valide et ne peut être importée.\n\nVeuillez réessayer.";
+
+/* No comment provided by engineer. */
+"Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." = "Au fil de l’application, vous pourrez taper sur la plupart des montants pour basculer l’affichage entre Bitcoin et votre devise fiduciaire.";
+
+/* Label in DetailsView_IncomingPayment */
+"timestamp" = "horodatage";
+
+/* No comment provided by engineer. */
+"Tip timestamp" = "Horodatage du dernier bloc";
+
+/* No comment provided by engineer. */
+"To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" = "Pour corriger cela, veuillez réactiver l’actualisation en tâche de fond dans Réglages > Phoenix > Actualiser (arrière-plan)";
+
+/* No comment provided by engineer. */
+"To receive incoming payments, Phoenix must be running, and you must have unlocked the app once." = "Pour recevoir des paiements, Phoenix doit être démarré et vous devez avoir déjà déverrouillé l’application.";
+
+/* No comment provided by engineer. */
+"To receive incoming payments, Phoenix must be running." = "Pour recevoir des paiements, Phoenix doit être démarré.";
+
+/* Informational warning in SendView */
+"To scan a QR code you must give Phoenix permission to access the camera." = "Pour scanner un QR code, vous devez d’abord donner à Phoenix accès à la caméra.";
+
+/* No comment provided by engineer. */
+"Tor" = "Tor";
+
+/* No comment provided by engineer. */
+"Tor is disabled" = "Tor est désactivé";
+
+/* No comment provided by engineer. */
+"Tor is enabled" = "Tor est activé";
+
+/* Navigation bar title */
+"Tor Settings" = "Réglages Tor";
+
+/* Label in DetailsView_IncomingPayment */
+"total amount" = "Montant total";
+
+/* No comment provided by engineer. */
+"Try again later" = "Veuillez réessayer plus tard";
+
+/* No comment provided by engineer. */
+"Tx" = "Tx";
+
+/* Label in DetailsView_IncomingPayment */
+"type" = "type";
+
+/* Label in SummaryInfoGrid */
+"Type" = "Type";
+
+/* Currency name: USD */
+"United States Dollar" = "Dollar américain";
+
+/* Connection state */
+"Unknown" = "Inconnu";
+
+/* Error message - parsing bitcoin address */
+"Unknown Bech32 version" = "Version Bech32 inconnue";
+
+/* Error message in LockView */
+"Unknown biometrics" = "Biométrie inconnue";
+
+/* Biometrics prompt */
+"Unlock your seed." = "Déverrouiller ma clé";
+
+/* No comment provided by engineer. */
+"Use a custom server" = "Utiliser un serveur personnalisé";
+
+/* CloseChannelsView */
+"Use this feature to transfer __all__ your funds to a Bitcoin address." = "Utilisez cette fonctionnalité pour transférer __tous__ vos fonds vers une adresse Bitcoin";
+
+/* No comment provided by engineer. */
+"Version %@" = "Version %@";
+
+/* Label in DetailsView_IncomingPayment */
+"via" = "via";
+
+/* button text */
+"waiting for internet" = "en attente d’internet";
+
+/* No comment provided by engineer. */
+"Warning" = "Avertissement";
+
+/* No comment provided by engineer. */
+"Welcome!" = "Bienvenue !";
+
+/* Connection status */
+"Will connect to:" = "Se connectera à :";
+
+/* No comment provided by engineer. */
+"With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "Avec Phoenix, recevoir et envoyer des bitcoins est sûr, facile, et rapide.";
+
+/* No comment provided by engineer. */
+"Would you like to be notified when somebody sends you a payment?" = "Souhaitez-vous être notifié quand quelqu’un vous enverra un paiement ?";
+
+/* No comment provided by engineer. */
+"Yes" = "Oui";
+
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"You can also use the **Payment Channels** screen to inspect the state of your channels." = "Vous pouvez également utiliser l’écran **Mes canaux de paiement** pour consulter l’état de vos canaux.";
+
+/* No comment provided by engineer. */
+"You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "Tor vous permet de protéger votre vie privée quand vous vous connectez à Electrum et à votre pair Lightning. Cette fonctionnalité va légèrement ralentir l’application.";
+
+/* No comment provided by engineer. */
+"You currenly have 1 Lightning channel with a balance of %@." = "Vous avez en ce moment 1 canal Lightning avec une balance de %@.";
+
+/* No comment provided by engineer. */
+"You currently don't have any channels that can be closed." = "Vous n’avez en ce moment aucun canal de paiement qui puisse être fermé.";
+
+/* No comment provided by engineer. */
+"You currently have %@ Lightning channels with an aggragate balance of %@." = "Vous avez en ce moment %1$@ canaux Lightning d’une balance aggrégée de %2$@.";
+
+/* No comment provided by engineer. */
+"You don't have any payment channels." = "Vous n’avez aucun canal de paiement.";
+
+/* No comment provided by engineer. */
+"You have disabled Background App Refresh for this app." = "Vous avez désactivé l’actualisation en arrière-plan pour cette application.";
+
+/* No comment provided by engineer. */
+"You have disabled notifications for this app." = "Vous avez désactivé les notifications pour cette application.";
+
+/* Error message - scanning lightning invoice */
+"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." = "Vous avez scanné une adresse Bitcoin. Phoenix ne supporte que l’envoi de paiements Lightning pour l’instant. Vous pouvez utiliser un service tiers de swap offchain-onchain.";
+
+/* Error message - scanning lightning invoice */
+"You've already paid this invoice. Paying it again could result in stolen funds." = "Vous avez déjà payé cette requête. La payer de nouveau peut résulter dans une perte des fonds.";
+
+/* No comment provided by engineer. */
+"Your Node ID:" = "Votre identifiant de noeud :";
+
+/* No comment provided by engineer. */
+"Your wallet's seed is a list of 12 english words." = "La clé de votre portefeuille est une liste de 12 mots anglais.";
+
