@@ -40,9 +40,9 @@ class AppConfigurationManager(
     val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
 
     private fun initWalletContext() = launch {
-        val (instant, fallbackWalletContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
+        val (timestamp, fallbackWalletContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
-        val freshness = Clock.System.now() - instant
+        val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
         logger.info { "local WalletContext loaded, not updated since=$freshness" }
 
         val timeout =

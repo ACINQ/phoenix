@@ -48,13 +48,13 @@ class SqliteAppDb(driver: SqlDriver) {
                     paramsQueries.update(
                         version = this.version,
                         data_ = rawData,
-                        updated_at = Clock.System.now().epochSeconds
+                        updated_at = Clock.System.now().toEpochMilliseconds()
                     )
                 } ?: run {
                     paramsQueries.insert(
                         version = version.name,
                         data_ = rawData,
-                        updated_at = Clock.System.now().epochSeconds
+                        updated_at = Clock.System.now().toEpochMilliseconds()
                     )
                 }
             }
@@ -63,16 +63,16 @@ class SqliteAppDb(driver: SqlDriver) {
         return getWalletContextOrNull(version).second
     }
 
-    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Instant, WalletContext.V0?> =
+    suspend fun getWalletContextOrNull(version: WalletContext.Version): Pair<Long, WalletContext.V0?> =
         withContext(Dispatchers.Default) {
             paramsQueries.get(version.name, ::mapWalletContext).executeAsOneOrNull()
-        } ?: Instant.DISTANT_PAST to null
+        } ?: Instant.DISTANT_PAST.toEpochMilliseconds() to null
 
     private fun mapWalletContext(
         version: String,
         data: String,
         updated_at: Long
-    ): Pair<Instant, WalletContext.V0?> {
+    ): Pair<Long, WalletContext.V0?> {
         val walletContext = when (WalletContext.Version.valueOf(version)) {
             WalletContext.Version.V0 -> try {
                 json.decodeFromString(
@@ -84,6 +84,6 @@ class SqliteAppDb(driver: SqlDriver) {
             }
         }
 
-        return Instant.fromEpochSeconds(updated_at) to walletContext
+        return updated_at to walletContext
     }
 }
