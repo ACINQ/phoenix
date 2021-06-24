@@ -3,6 +3,51 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
+extension Lightning_kmpWalletPayment: Identifiable {
+	
+	var identifiable: String {
+		// @see LightningExtensions.kt: `fun WalletPayment.id()`
+		return self.id()
+	}
+}
+
+extension WalletPaymentId: Identifiable {
+	
+	var identifiable: String {
+		return self.identifier
+	}
+}
+
+extension WalletPaymentOrderRow: Identifiable {
+	
+	var identifiable: String {
+		return self.identifier
+	}
+}
+
+extension PaymentsManager {
+	
+	func getCachedPayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+		
+		return fetcher.getCachedPayment(row: row)
+	}
+	
+	func getCachedStalePayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+		
+		return fetcher.getCachedStalePayment(row: row)
+	}
+	
+	func getPayment(
+		row: WalletPaymentOrderRow,
+		completion: @escaping (PaymentsFetcher.Result) -> Void
+	) -> Void {
+		
+		fetcher.getPayment(row: row) { (result: PaymentsFetcher.Result?, _: Error?) in
+			
+			completion(result ?? PaymentsFetcher.Result(payment: nil))
+		}
+	}
+}
 
 extension Lightning_kmpIncomingPayment {
 	
@@ -15,6 +60,13 @@ extension Lightning_kmpIncomingPayment.Received {
 	
 	var receivedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(receivedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpIncomingPayment.ReceivedWith: Identifiable {
+	
+	var identifiable: Int {
+		return self.hash
 	}
 }
 

@@ -73,6 +73,7 @@ struct IntroView1: View {
 			
 			Text("Welcome!")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				Text("With Phoenix, receiving and sending bitcoin is safe, easy, and fast.")
@@ -122,6 +123,7 @@ struct IntroView2: View {
 			
 			Text("Automatic Channel Creation")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				
@@ -130,17 +132,18 @@ struct IntroView2: View {
 				let percent = formatFeePercent()
 				let min = Utils.formatBitcoin(sat: payToOpen_minFeeSat, bitcoinUnit: .sat)
 				
-				Group {
-					Text("The fee is ") +
-					Text("\(percent)%").bold() +
-					Text(" with a minimum fee of ") +
-					Text(min.string).bold() + Text(".")
-				}
+				Text(styled: String(format: NSLocalizedString(
+					"The fee is **%@%%** with a minimum fee of **%@**.",
+					comment: "IntroView"),
+					percent, min.string
+				))
 				
 				Text(
-					"This fee only applies when a new channel needs to be created." +
-					" Payments that use existing channels don't pay this fee." +
-					" The fee is dynamic and may change depending on bitcoin network conditions."
+					"""
+					This fee only applies when a new channel needs to be created. \
+					Payments that use existing channels don't pay this fee. \
+					The fee is dynamic and may change depending on bitcoin network conditions.
+					"""
 				)
 				.font(.footnote)
 			}
@@ -203,6 +206,7 @@ struct IntroView3: View {
 			
 			Text("Keep Control")
 				.font(.title)
+				.multilineTextAlignment(.center)
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 25) {
 				

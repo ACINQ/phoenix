@@ -5,9 +5,10 @@ It can run on many different platforms, including mobile devices (iOS and Androi
 
 ## Requirements
 
-You will need to install the Large File Storage Git extension: https://git-lfs.github.com/.
-
-For iOS, you need [Intellij IDEA Community edition](https://www.jetbrains.com/idea/download/) and [Xcode](https://developer.apple.com/xcode/). For Android, you only need [Android Studio Preview](https://developer.android.com/studio/preview) Canary Build.
+You'll need to install the following:
+- [Git LFS](https://git-lfs.github.com/): large files like png are stored using the Large File Storage Git extension.
+- [Xcode](https://developer.apple.com/xcode/): if you build the iOS app.
+- [Android Studio](https://developer.android.com/studio): if you want to build the Android app. It is also recommended if you want to contribute to the `phoenix-shared` module which contains shared code used by both iOS and Android apps.
 
 ## Build lightning-kmp
 
@@ -54,7 +55,7 @@ If the project builds successfully, you can then run it on a device or an emulat
 
 ### Build the Android app
 
-Open the entire phoenix-kmm project in Android Studio, then build the application. Note that the Android app uses Jetpack compose, which currently requires Android Studio Canary. Using a regular Android Studio release will not work.
+Open the entire phoenix-kmm project in Android Studio, then build the application. Note that the Android app uses Jetpack compose, which currently requires Android Studio Canary. Using a regular Android Studio release may cause issues.
 
 ## Troubleshooting
 

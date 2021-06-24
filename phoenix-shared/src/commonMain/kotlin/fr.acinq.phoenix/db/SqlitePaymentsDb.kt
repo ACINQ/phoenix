@@ -20,6 +20,7 @@ import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.PublicKey
@@ -114,15 +115,21 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         }
     }
 
-    override suspend fun receivePayment(paymentHash: ByteVector32, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, receivedAt: Long) {
+    override suspend fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {
         withContext(Dispatchers.Default) {
-            inQueries.receivePayment(paymentHash, amount, receivedWith, receivedAt)
+            inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
         }
     }
 
-    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, amount: MilliSatoshi, receivedWith: IncomingPayment.ReceivedWith, createdAt: Long, receivedAt: Long) {
+    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, receivedWith: Set<IncomingPayment.ReceivedWith>, createdAt: Long, receivedAt: Long) {
         withContext(Dispatchers.Default) {
-            inQueries.addAndReceivePayment(preimage, origin, amount, receivedWith, createdAt, receivedAt)
+            inQueries.addAndReceivePayment(preimage, origin, receivedWith, createdAt, receivedAt)
+        }
+    }
+
+    override suspend fun updateNewChannelReceivedWithChannelId(paymentHash: ByteVector32, channelId: ByteVector32) {
+        withContext(Dispatchers.Default) {
+            inQueries.updateNewChannelReceivedWithChannelId(paymentHash, channelId)
         }
     }
 
@@ -140,101 +147,104 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
 
     // ---- list ALL payments
 
-    override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> {
+    suspend fun listPaymentsCount(): Long {
         return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).executeAsList()
+            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).executeAsList().first()
         }
     }
 
-    suspend fun listPaymentsFlow(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): Flow<List<WalletPayment>> {
+    suspend fun listPaymentsCountFlow(): Flow<Long> {
         return withContext(Dispatchers.Default) {
-            aggrQueries.listAllPayments(skip.toLong(), count.toLong(), ::allPaymentsMapper).asFlow().mapToList()
+            aggrQueries.listAllPaymentsCount(::allPaymentsCountMapper).asFlow().mapToOne()
         }
     }
 
+    suspend fun listPaymentsOrder(count: Int, skip: Int): List<WalletPaymentOrderRow> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsOrder(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).executeAsList()
+        }
+    }
 
-    private fun allPaymentsMapper(
+    suspend fun listPaymentsOrderFlow(count: Int, skip: Int): Flow<List<WalletPaymentOrderRow>> {
+        return withContext(Dispatchers.Default) {
+            aggrQueries.listAllPaymentsOrder(
+                limit = count.toLong(),
+                offset = skip.toLong(),
+                mapper = ::allPaymentsOrderMapper
+            ).asFlow().mapToList()
+        }
+    }
+
+    override suspend fun listPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
+
+    private fun allPaymentsCountMapper(
+        result: Long?
+    ): Long {
+        return result ?: 0
+    }
+
+    private fun allPaymentsOrderMapper(
         direction: String,
         outgoing_payment_id: String?,
-        payment_hash: ByteArray,
-        parts_total_succeeded: Long?,
-        amount: Long,
-        outgoing_recipient: String?,
-        outgoing_details_type: OutgoingDetailsTypeVersion?,
-        outgoing_details_blob: ByteArray?,
-        outgoing_status_type: OutgoingStatusTypeVersion?,
-        outgoing_status_blob: ByteArray?,
-        incoming_preimage: ByteArray?,
-        incoming_origin_type: IncomingOriginTypeVersion?,
-        incoming_origin_blob: ByteArray?,
-        incoming_received_with_type: IncomingReceivedWithTypeVersion?,
-        incoming_received_with_blob: ByteArray?,
-        created_at: Long,
-        completed_at: Long?
-    ): WalletPayment = when (direction.toLowerCase()) {
-        "outgoing" -> {
-            val details = OutgoingDetailsData.deserialize(outgoing_details_type!!, outgoing_details_blob!!)
-
-            // An OutgoingPayment is split between 2 tables:
-            // - outgoing_payments
-            // - outgoing_payment_parts
-            //
-            // But for this query, we're only fetching the SUM from outgoing_payment_parts.
-            // This means we will not have a proper OutgoingPayment.parts list.
-            // But we do have the SUM, which we can use to relay information about the fees.
-            //
-            val parts: List<OutgoingPayment.Part> =
-                if (parts_total_succeeded != null) {
-                    // For normal payments, we create a FAKE parts list.
-                    // This allows us to properly calculate the fees associated with the payment.
-                    // Note that we need to know ALL of the following:
-                    // - totalAmount
-                    // - feesAmount
-                    //
-                    listOf(
-                        OutgoingPayment.Part(
-                            id = UUID.fromString("00000000-0000-0000-0000-000000000000"),
-                            amount = MilliSatoshi(parts_total_succeeded),
-                            route = listOf(),
-                            status = OutgoingPayment.Part.Status.Succeeded(
-                                preimage = ByteVector32.Zeroes,
-                                completedAt = 0
-                            ),
-                            createdAt = 0 // <= always zero for fake parts
-                        )
-                    )
-                } else {
-                    listOf()
-                }
-            OutgoingPayment(
-                id = UUID.fromString(outgoing_payment_id!!),
-                recipientAmount = MilliSatoshi(amount),
-                recipient = PublicKey(ByteVector(outgoing_recipient!!)),
-                details = details,
-                parts = parts,
-                status = OutgoingQueries.mapOutgoingPaymentStatus(
-                    completed_at = completed_at,
-                    status_type = outgoing_status_type,
-                    status = outgoing_status_blob,
-                ),
-                createdAt = created_at
+        incoming_payment_id: ByteArray?,
+        @Suppress("UNUSED_PARAMETER") created_at: Long,
+        @Suppress("UNUSED_PARAMETER") completed_at: Long?
+    ): WalletPaymentOrderRow {
+        val paymentId = when(direction.toLowerCase()) {
+            "outgoing" -> WalletPaymentId.OutgoingPaymentId(
+                id = UUID.fromString(outgoing_payment_id!!)
             )
+            "incoming" -> WalletPaymentId.IncomingPaymentId(
+                paymentHash = ByteVector32(incoming_payment_id!!)
+            )
+            else -> throw UnhandledDirection(direction)
         }
-        "incoming" -> IncomingQueries.mapIncomingPayment(
-            payment_hash = payment_hash,
-            preimage = incoming_preimage!!,
-            created_at = created_at,
-            origin_type = incoming_origin_type!!,
-            origin_blob = incoming_origin_blob!!,
-            received_amount_msat = amount,
-            received_at = completed_at,
-            received_with_type = incoming_received_with_type,
-            received_with_blob = incoming_received_with_blob,
+        return WalletPaymentOrderRow(
+            id = paymentId,
+            createdAt = created_at,
+            completedAt = completed_at
         )
-        else -> throw UnhandledDirection(direction)
     }
 }
 
 class OutgoingPaymentPartNotFound(partId: UUID) : RuntimeException("could not find outgoing payment part with part_id=$partId")
 class IncomingPaymentNotFound(paymentHash: ByteVector32) : RuntimeException("missing payment for payment_hash=$paymentHash")
 class UnhandledDirection(direction: String) : RuntimeException("unhandled direction=$direction")
+
+sealed class WalletPaymentId {
+    data class OutgoingPaymentId(val id: UUID): WalletPaymentId()
+    data class IncomingPaymentId(val paymentHash: ByteVector32): WalletPaymentId()
+
+    val identifier: String get() = when(this) {
+        is OutgoingPaymentId -> "outgoing|${this.id.toString()}"
+        is IncomingPaymentId -> "incoming|${this.paymentHash.toHex()}"
+    }
+}
+
+data class WalletPaymentOrderRow(
+    val id: WalletPaymentId,
+    val createdAt: Long,
+    val completedAt: Long?
+) {
+    /// Returns a unique identifier, suitable for use in a HashMap.
+    /// Form is:
+    /// - "outgoing|id|createdAt|completedAt"
+    /// - "incoming|paymentHash|createdAt|completedAt"
+    ///
+    val identifier: String get() {
+        return "${this.staleIdentifierPrefix}${completedAt?.toString() ?: "null"}"
+    }
+
+    /// Returns a prefix that can be used to detect older (stale) versions of the row.
+    /// Form is:
+    /// - "outgoing|id|createdAt|"
+    /// - "incoming|paymentHash|createdAt|"
+    ///
+    val staleIdentifierPrefix: String get() {
+        return "${id.identifier}|${createdAt}|"
+    }
+}

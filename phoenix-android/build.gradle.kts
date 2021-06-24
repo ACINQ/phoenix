@@ -1,19 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("kotlin-android")
 }
 
 val chain: String by project
-
-val xCoreKtxVersion = "1.3.2"
-val xLifecycleVersion = "2.3.0"
-val xPrefsVersion = "1.1.1"
-val composeVersion = "1.0.0-beta02"
-val navComposeVersion = "1.0.0-alpha09"
-val zxingVersion = "4.1.0"
 
 android {
     compileSdkVersion(30)
@@ -27,12 +17,12 @@ android {
     }
 
     buildTypes {
-        debug {
+        getByName("debug") {
             resValue("string", "CHAIN", chain)
             buildConfigField("String", "CHAIN", chain)
             isDebuggable = true
         }
-        release {
+        getByName("release") {
             resValue("string", "CHAIN", chain)
             buildConfigField("String", "CHAIN", chain)
             isMinifyEnabled = false
@@ -63,8 +53,8 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.31"
-        kotlinCompilerExtensionVersion = composeVersion
+        kotlinCompilerVersion = Versions.kotlin
+        kotlinCompilerExtensionVersion = Versions.Android.compose
     }
 
 }
@@ -81,38 +71,40 @@ dependencies {
     implementation(project(":phoenix-shared"))
     implementation("com.google.android.material:material:1.3.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
+        version { strictly(Versions.coroutines) }
+    }
+
     // -- AndroidX
-    implementation("androidx.core:core-ktx:$xCoreKtxVersion")
-//    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
     // -- AndroidX: preferences
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$xLifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$xLifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")
     // -- AndroidX: preferences
-    implementation("androidx.preference:preference-ktx:$xPrefsVersion")
+    implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
 
     // -- jetpack compose
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.foundation:foundation-layout:$composeVersion")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha03")
-    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    implementation("androidx.compose.ui:ui-viewbinding:$composeVersion")
-    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
+    implementation("androidx.compose.ui:ui:${Versions.Android.compose}")
+    implementation("androidx.compose.foundation:foundation:${Versions.Android.compose}")
+    implementation("androidx.compose.foundation:foundation-layout:${Versions.Android.compose}")
+    implementation("androidx.compose.ui:ui-tooling:${Versions.Android.compose}")
+    implementation("androidx.compose.ui:ui-viewbinding:${Versions.Android.compose}")
+    implementation("androidx.compose.runtime:runtime-livedata:${Versions.Android.compose}")
+    implementation("androidx.compose.material:material:${Versions.Android.compose}")
+    implementation("androidx.constraintlayout:constraintlayout-compose:${Versions.Android.constraintLayout}")
     // -- jetpack compose: navigation
-    implementation("androidx.navigation:navigation-compose:$navComposeVersion")
+    implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
 
     // -- scanner zxing
-    implementation("com.journeyapps:zxing-android-embedded:$zxingVersion")
+    implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")
 
     // logging
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("com.github.tony19:logback-android:2.0.0")
+    implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
+    implementation("com.github.tony19:logback-android:${Versions.Android.logback}")
 
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:${Versions.junit}")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 }

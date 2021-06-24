@@ -62,6 +62,14 @@ struct FormattedAmount {
 		let range = sRange.upperBound ..< digits.endIndex
 		return String(digits[range])
 	}
+	
+	/// Returns whether or not the amount contains any fractional digits. E.g.:
+	/// - digits="12,845"   => false
+	/// - digits="12 845.1" => true
+	///
+	var hasFractionDigits: Bool {
+		return !fractionDigits.isEmpty
+	}
 }
 
 extension FormattedAmount {

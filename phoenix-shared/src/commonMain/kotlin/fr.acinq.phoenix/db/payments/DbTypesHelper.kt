@@ -18,11 +18,21 @@ package fr.acinq.phoenix.db.payments
 
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 object DbTypesHelper {
     /** Decode a byte array and apply a deserialization handler. */
     fun <T> decodeBlob(blob: ByteArray, handler: (String, Json) -> T) = handler(String(bytes = blob, charset = Charsets.UTF_8), Json)
+
+    val module = SerializersModule {
+        polymorphic(IncomingReceivedWithData.Part::class) {
+            subclass(IncomingReceivedWithData.Part.Htlc.V0::class)
+            subclass(IncomingReceivedWithData.Part.NewChannel.V0::class)
+        }
+    }
+
+    val polymorphicFormat = Json { serializersModule = module }
 }

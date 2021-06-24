@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
@@ -52,22 +51,20 @@ import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.Converter
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.app.amountMsat
-import fr.acinq.phoenix.app.desc
+import fr.acinq.phoenix.app.PaymentsManager
 import fr.acinq.phoenix.ctrl.ControllerFactory
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.ctrl.HomeController
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.Connections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -93,12 +90,23 @@ private class HomeViewModel(val connectionsFlow: StateFlow<Connections>, control
 fun HomeView(appVM: AppViewModel) {
     requireWalletPresent(inScreen = Screen.Home) {
         val log = logger()
+
         val connectionsFlow = business.connectionsMonitor.connections
         val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(connectionsFlow, controllerFactory, CF::home))
         val connectionsState = vm.connectionsFlow.collectAsState()
         val showConnectionsDialog = remember { mutableStateOf(false) }
         if (showConnectionsDialog.value) {
             ConnectionDialog(connections = connectionsState.value, onClose = { showConnectionsDialog.value = false })
+        }
+
+        val paymentsManager = business.paymentsManager
+        val paymentsPage by remember { mutableStateOf(paymentsManager.paymentsPage) }
+        DisposableEffect(key1 = "homeview") {
+            log.debug { "subscribing to changes in payments page" }
+            paymentsManager.subscribeToPaymentsPage(0, 50)
+            onDispose {
+                log.debug { "disposing of homeview" }
+            }
         }
 
         val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -109,7 +117,7 @@ fun HomeView(appVM: AppViewModel) {
             drawerShape = RectangleShape,
             drawerContent = { SideMenu() },
             content = {
-                MVIView(CF::home) { model, _ ->
+                MVIView(vm) { model, _ ->
                     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                         TopBar(showConnectionsDialog, connectionsState)
                         Spacer(modifier = Modifier.height(16.dp))
@@ -134,8 +142,8 @@ fun HomeView(appVM: AppViewModel) {
                         ) { }
                         Spacer(modifier = Modifier.height(24.dp))
                         LazyColumn(modifier = Modifier.weight(1f)) {
-                            items(model.payments) {
-                                PaymentLine(payment = it)
+                            items(paymentsPage.value.rows) {
+                                PreparePaymentLine(it)
                             }
                         }
                         BottomBar(scope, drawerState)
@@ -289,6 +297,17 @@ private fun IncomingAmountNotif(amount: MilliSatoshi) {
 }
 
 @Composable
+private fun PreparePaymentLine(row: WalletPaymentOrderRow) {
+    val log = logger()
+    val paymentsManager = business.paymentsManager
+    var payment by remember { mutableStateOf<WalletPayment?>(null) }
+    LaunchedEffect(key1 = row.id) {
+        payment = paymentsManager.fetcher.getPayment(row).payment
+    }
+    payment?.let { PaymentLine(it) } ?: Text("Loading...")
+}
+
+@Composable
 private fun PaymentLine(payment: WalletPayment) {
     val log = logger()
     Row(
@@ -350,7 +369,6 @@ private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modi
 }
 
 private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Completed.Failed)
-        || (payment is IncomingPayment && payment.isExpired())
 
 @Composable
 private fun PaymentIcon(payment: WalletPayment) {

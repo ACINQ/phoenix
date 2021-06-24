@@ -35,6 +35,7 @@ import fracinqphoenixdb.OutgoingPaymentsQueries
 class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
 
     fun addOutgoingParts(parentId: UUID, parts: List<OutgoingPayment.Part>) {
+        if (parts.size == 0) return
         queries.transaction {
             parts.map {
                 queries.addOutgoingPart(
@@ -44,6 +45,9 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
                     part_route = it.route,
                     part_created_at = it.createdAt
                 )
+            }
+            if (queries.changes().executeAsOne() != 1L) {
+                throw OutgoingPaymentPartNotFound(parts.first().id)
             }
         }
     }

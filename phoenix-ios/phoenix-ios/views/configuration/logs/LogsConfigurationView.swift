@@ -45,7 +45,10 @@ struct LogsConfigurationView: MVIView {
 			} // </List>
 			
 		} // </VStack>
-		.navigationBarTitle("Logs")
+		.navigationBarTitle(
+			NSLocalizedString("Logs", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 }
 

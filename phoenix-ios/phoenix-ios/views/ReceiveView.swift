@@ -128,11 +128,19 @@ struct ReceiveLightningView: View, ViewName {
 		case editing(model: Receive.ModelGenerated)
 	}
 	
+	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
+	// In particular, animating the border around the qrcode doesn't work well.
+	@Namespace private var qrCodeAnimation_inner
+	@Namespace private var qrCodeAnimation_outer
+	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast
 	
 	@StateObject var qrCode = QRCode()
 
+	@State var didAppear = false
+	@State var isFullScreenQrcode = false
+	
 	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
@@ -164,15 +172,7 @@ struct ReceiveLightningView: View, ViewName {
 	@ViewBuilder
 	var body: some View {
 		
-		Group {
-			
-			if verticalSizeClass == UserInterfaceSizeClass.compact {
-				mainLandscape()
-			} else {
-				mainPortrait()
-			}
-			
-		} // </Group>
+		content()
 		.onAppear {
 			onAppear()
 		}
@@ -210,7 +210,7 @@ struct ReceiveLightningView: View, ViewName {
 				
 				ModifyInvoiceSheet(
 					mvi: mvi,
-					dismissSheet: { sheet = nil },
+					dismissSheet: { self.sheet = nil },
 					initialAmount: model.amount,
 					desc: model.desc ?? ""
 				)
@@ -218,7 +218,22 @@ struct ReceiveLightningView: View, ViewName {
 			
 			} // </switch>
 		}
-		.navigationBarTitle("Receive", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Receive", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
+		if isFullScreenQrcode {
+			fullScreenQrcode()
+		} else if verticalSizeClass == UserInterfaceSizeClass.compact {
+			mainLandscape()
+		} else {
+			mainPortrait()
+		}
 	}
 	
 	@ViewBuilder
@@ -237,6 +252,7 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding(.top)
 			
 			if !isPayToOpenEnabled {
@@ -302,6 +318,7 @@ struct ReceiveLightningView: View, ViewName {
 							lineWidth: 1
 						)
 				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding([.top, .bottom])
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 20) {
@@ -336,6 +353,43 @@ struct ReceiveLightningView: View, ViewName {
 	}
 	
 	@ViewBuilder
+	func fullScreenQrcode() -> some View {
+		
+		ZStack {
+			
+			qrCodeView
+				.padding()
+				.background(Color.white)
+				.cornerRadius(20)
+				.overlay(
+					RoundedRectangle(cornerRadius: 20)
+						.strokeBorder(
+							ReceiveView.qrCodeBorderColor(colorScheme),
+							lineWidth: 1
+						)
+				)
+				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
+			
+			VStack {
+				HStack {
+					Spacer()
+					Button {
+						withAnimation {
+							isFullScreenQrcode = false
+						}
+					} label: {
+						Image("ic_cross")
+							.resizable()
+							.frame(width: 30, height: 30)
+					}
+					.padding()
+				}
+				Spacer()
+			}
+		}
+	}
+	
+	@ViewBuilder
 	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
@@ -345,6 +399,7 @@ struct ReceiveLightningView: View, ViewName {
 		{
 			qrCodeImage
 				.resizable()
+				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
@@ -357,12 +412,24 @@ struct ReceiveLightningView: View, ViewName {
 						Text("Copy")
 					}
 					Button(action: {
+						// We add a delay here to give the contextMenu time to finish it's own animation.
+						// Otherwise the effect of the double-animations looks funky.
+						DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+							withAnimation {
+								isFullScreenQrcode = true
+							}
+						}
+					}) {
+						Text("Full Screen")
+					}
+					Button(action: {
 						let uiImg = UIImage(cgImage: qrCodeCgImage)
 						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
 					}) {
 						Text("Share")
 					}
-				}
+				} // </contextMenu>
+				.matchedGeometryEffect(id: "qrCodeView_inner", in: qrCodeAnimation_inner)
 			
 		} else {
 			VStack {
@@ -480,8 +547,10 @@ struct ReceiveLightningView: View, ViewName {
 				.imageScale(.large)
 				.padding(.trailing, 10)
 			Text(
-				"Channel creation has been temporarily disabled." +
-				" You may not be able to receive some payments."
+				"""
+				Channel creation has been temporarily disabled. \
+				You may not be able to receive some payments.
+				"""
 			)
 		}
 		.font(.caption)
@@ -534,6 +603,12 @@ struct ReceiveLightningView: View, ViewName {
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
+		// Careful: this function may be called multiple times
+		if didAppear {
+			return
+		}
+		didAppear = true
+			
 		let defaultDesc = Prefs.shared.defaultPaymentDescription
 		mvi.intent(Receive.IntentAsk(amount: nil, desc: defaultDesc))
 		
@@ -835,12 +910,25 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding(.leading, 16)
 				.padding(.bottom, 4)
 
-			HStack {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				TextField("Description (optional)", text: $desc)
-					.padding([.top, .bottom], 8)
-					.padding([.leading, .trailing], 16)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					desc = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
+				}
+				.isHidden(desc == "")
 			}
-			.background(Capsule().stroke(Color(UIColor.separator)))
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(
+				Capsule()
+					.strokeBorder(Color(UIColor.separator))
+			)
 
 			Spacer()
 			HStack {
@@ -1033,14 +1121,20 @@ struct BgAppRefreshDisabledWarning: View {
 					.padding(.bottom, 4)
 				
 				Text(
-					"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground."
+					"""
+					This means you will not be able to receive payments when Phoenix \
+					is in the background. To receive payments, Phoenix must be open and in the foreground.
+					"""
 				)
 				.lineLimit(nil)
 				.minimumScaleFactor(0.5) // problems with "foreground" being truncated
 				.padding(.bottom, 4)
 				
 				Text(
-					"To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh"
+					"""
+					To fix this re-enable Background App Refresh via: \
+					Settings -> General -> Background App Refresh
+					"""
 				)
 				
 			}
@@ -1079,8 +1173,10 @@ struct NotificationsDisabledWarning: View {
 					.padding(.bottom, 4)
 				
 				Text(
-					"This means you will not be notified if you receive a payment while" +
-					" Phoenix is in the background."
+					"""
+					This means you will not be notified if you receive a payment while \
+					Phoenix is in the background.
+					"""
 				)
 			}
 			.padding(.bottom)
@@ -1203,8 +1299,10 @@ fileprivate struct SwapInDisabledPopover: View, ViewName {
 					.padding(.bottom)
 				
 				Text(
-					"The bitcoin mempool is congested and fees are very high." +
-					" The on-chain swap service has been temporarily disabled."
+					"""
+					The bitcoin mempool is congested and fees are very high. \
+					The on-chain swap service has been temporarily disabled.
+					"""
 				)
 				.lineLimit(nil)
 			}
@@ -1328,7 +1426,10 @@ struct SwapInView: View, ViewName {
 				
 			} // </switch>
 		}
-		.navigationBarTitle("Swap In", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Swap In", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
@@ -1405,22 +1506,22 @@ struct SwapInView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
 				Text(
-					"This is a swap address. It is not controlled by your wallet." +
-					" On-chain deposits sent to this address will be converted to Lightning channels."
+					"""
+					This is a swap address. It is not controlled by your wallet. \
+					On-chain deposits sent to this address will be converted to Lightning channels.
+					"""
 				)
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)
 				.padding(.bottom, 14)
 				
-				Group {
-					Text("Deposits must be at least ") +
-					Text(minFunding.string).bold() +
-					Text(". The fee is ") +
-					Text("\(feePercent)%").bold() +
-					Text(" (") +
-					Text("\(minFee.string)") +
-					Text(" minimum).")
-				}
+				Text(styled: String(format: NSLocalizedString(
+					"""
+					Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum).
+					""",
+					comment:	"Minimum amount description."),
+					minFunding.string, feePercent, minFee.string
+				))
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)
 			}

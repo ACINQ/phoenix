@@ -29,7 +29,10 @@ struct ChannelsConfigurationView: MVIView {
 			}
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.navigationBarTitle("My payment channels", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Payment channels", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 }
 
@@ -104,7 +107,11 @@ struct ChannelHeaderView: View {
 			if model.channels.count == 1 {
 				Text("1 channel")
 			} else {
-				Text("\(model.channels.count) channels")
+				Text(String(format: NSLocalizedString(
+					"%d channels",
+					comment: "Count != 1"),
+					model.channels.count
+				))
 			}
 			
 			Spacer()
@@ -158,7 +165,7 @@ fileprivate struct ChannelRowView: View {
 					Spacer()
 					
 					if let c = channel.commitments {
-						Text("\(c.first!) / \(c.second!) sat")
+						Text(verbatim: "\(c.first!) / \(c.second!) sat")
 							.foregroundColor(Color.primary)
 					}
 				}
@@ -199,7 +206,7 @@ fileprivate struct FooterView: View {
 				.font(.footnote)
 				.padding(.bottom, 1)
 			
-			Text("\(model.nodeId)")
+			Text(model.nodeId)
 				.font(.footnote)
 				.contextMenu {
 					Button(action: {
@@ -247,7 +254,7 @@ fileprivate struct ChannelInfoPopup: View {
 				Button {
 					UIPasteboard.general.string = channel.json
 					toast.pop(
-						Text("Copied to pasteboard").anyView,
+						Text("Copied to pasteboard!").anyView,
 						colorScheme: colorScheme.opposite
 					)
 				} label: {

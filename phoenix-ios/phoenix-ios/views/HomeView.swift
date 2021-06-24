@@ -3,7 +3,7 @@ import PhoenixShared
 import Network
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "HomeView"
@@ -12,25 +12,33 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate let PAGE_COUNT_START = 25
+fileprivate let PAGE_COUNT_INCREMENT = 25
+
 struct HomeView : MVIView, ViewName {
 
+	static let phoenixBusiness = AppDelegate.get().business
+	let phoenixBusiness: PhoenixBusiness = HomeView.phoenixBusiness
+	
 	@StateObject var mvi = MVIState({ $0.home() })
 
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
 	@State var selectedPayment: Lightning_kmpWalletPayment? = nil
-	
 	@State var isMempoolFull = false
 	
 	@StateObject var toast = Toast()
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let lastCompletedPaymentPublisher = AppDelegate.get().business.paymentsManager.lastCompletedPaymentPublisher()
-	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let paymentsPagerPublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
+	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
 	
-	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
+	let lastCompletedPaymentPublisher = phoenixBusiness.paymentsManager.lastCompletedPaymentPublisher()
+	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
+	
+	let incomingSwapsPublisher = phoenixBusiness.paymentsManager.incomingSwapsPublisher()
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
@@ -40,28 +48,37 @@ struct HomeView : MVIView, ViewName {
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	
+	@State var didAppear = false
+	@State var didPreFetch = false
+	
 	@ViewBuilder
 	var view: some View {
-
+		
 		ZStack {
-			
+
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
-			
-			if AppDelegate.get().business.chain.isTestnet() {
+
+			if phoenixBusiness.chain.isTestnet() {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
-			
+
 			main
-			
+
 			toast.view()
-			
+
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
+		.onChange(of: mvi.model) { newModel in
+			onModelChange(model: newModel)
+		}
+		.onReceive(paymentsPagerPublisher) {
+			paymentsPageChanged($0)
+		}
 		.onReceive(lastCompletedPaymentPublisher) {
 			lastCompletedPaymentChanged($0)
 		}
@@ -72,7 +89,7 @@ struct HomeView : MVIView, ViewName {
 			onIncomingSwapsChanged(incomingSwaps)
 		}
 	}
-	
+
 	@ViewBuilder
 	var main: some View {
 		
@@ -170,11 +187,26 @@ struct HomeView : MVIView, ViewName {
 			// === Payments List ====
 			ScrollView {
 				LazyVStack {
-					ForEach(mvi.model.payments.indices, id: \.self) { index in
+					// paymentsPage.rows: [WalletPaymentOrderRow]
+					// WalletPaymentOrderRow.identifiable: String (defined in KotlinExtensions)
+					//
+					// Here's how this works:
+					// - ForEach uses the given `id` (which conforms to Swift's Identifiable protocol)
+					//   to determine whether or not the row is new/modified or the same as before.
+					// - If the row is new/modified, then it it initialized with fresh state,
+					//   and the row's `onAppear` will fire.
+					// - If the row is unmodified, then it is initialized with existing state,
+					//   and the row's `onAppear` with NOT fire.
+					//
+					// Since we use WalletPaymentOrderRow.identifiable, our unique identifier
+					// contains the row's completedAt date, which is modified when the row changes.
+					// Thus our row is automatically refreshed after it fails/succeeds.
+					//
+					ForEach(paymentsPage.rows, id: \.identifiable) { row in
 						Button {
-							selectedPayment = mvi.model.payments[index]
+							didSelectPayment(row: row)
 						} label: {
-							PaymentCell(payment: mvi.model.payments[index])
+							PaymentCell(row: row, didAppearCallback: paymentCellDidAppear)
 						}
 					}
 				}
@@ -183,6 +215,9 @@ struct HomeView : MVIView, ViewName {
 			BottomBar(toast: toast)
 		
 		} // </VStack>
+		.onAppear {
+			onAppear()
+		}
 		.sheet(isPresented: Binding(
 			get: { selectedPayment != nil },
 			set: { if !$0 { selectedPayment = nil }} // needed if user slides the sheet to dismiss
@@ -195,7 +230,7 @@ struct HomeView : MVIView, ViewName {
 			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 		}
 	}
-	
+
 	func incomingAmount() -> FormattedAmount? {
 		
 		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
@@ -206,6 +241,44 @@ struct HomeView : MVIView, ViewName {
 		} else {
 			return nil
 		}
+	}
+	
+	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
+		log.trace("[\(viewName)] didSelectPayment()")
+		
+		// pretty much guaranteed to be in the cache
+		phoenixBusiness.paymentsManager.getPayment(row: row) { (result: PaymentsFetcher.Result) in
+			
+			if let payment = result.payment {
+				selectedPayment = payment
+			}
+		}
+	}
+	
+	func onAppear() {
+		log.trace("[\(viewName)] onAppear()")
+		
+		// Careful: this function may be called when returning from the Receive/Send view
+		if !didAppear {
+			didAppear = true
+			AppDelegate.get().business.paymentsManager.subscribeToPaymentsPage(
+				offset: 0,
+				count: Int32(PAGE_COUNT_START)
+			)
+		}
+	}
+	
+	func onModelChange(model: Home.Model) -> Void {
+		log.trace("[\(viewName)] onModelChange()")
+		
+		// Todo: maybe update paymentsPage subscription ?
+	}
+	
+	func paymentsPageChanged(_ page: PaymentsManager.PaymentsPage) -> Void {
+		log.trace("[\(viewName)] paymentsPageChanged()")
+		
+		paymentsPage = page
+		maybePreFetchPaymentsFromDatabase()
 	}
 	
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
@@ -238,6 +311,33 @@ struct HomeView : MVIView, ViewName {
 			// This isn't added to the transaction list, but is instead displayed under the balance.
 			// So let's add a little animation to draw the user's attention to it.
 			startAnimatingIncomingSwapText()
+		}
+	}
+	
+	func maybePreFetchPaymentsFromDatabase() -> Void {
+		
+		if !didPreFetch && paymentsPage.rows.count > 0 {
+			didPreFetch = true
+			
+			// Delay the pre-fetch process a little bit, to give priority to other app-startup tasks.
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+				prefetchPaymentsFromDatabase(idx: 0)
+			}
+		}
+	}
+	
+	func prefetchPaymentsFromDatabase(idx: Int) {
+
+		guard idx < paymentsPage.rows.count else {
+			// recursion complete
+			return
+		}
+
+		let row = paymentsPage.rows[idx]
+		log.debug("[\(viewName)] Pre-fetching: \(row.identifiable)")
+
+		phoenixBusiness.paymentsManager.getPayment(row: row) { _ in
+			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
 	
@@ -324,75 +424,227 @@ struct HomeView : MVIView, ViewName {
 			openURL(url)
 		}
 	}
+	
+	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
+		log.trace("[\(viewName)] paymentCellDidAppear(): \(visibleRow.id)")
+		
+		// Infinity Scrolling
+		//
+		// Here's the general idea:
+		//
+		// - We start by fetching a small "page" from the database.
+		//   For example: Page(offset=0, count=50)
+		// - When the user scrolls to the bottom, we can increase the count.
+		//   For example: Page(offset=0, count=100)
+		//
+		// Note:
+		// In the original design, we didn't increase the count forever.
+		// At some poing we incremented the offset instead.
+		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
+		// So the end result is that the user's position within the scrollView jumps,
+		// and results in a very confusing user experience.
+		// I cannot find a clean way of accomplishing a solution with pure SwiftUI.
+		// So this remains a todo item for future improvement.
+		
+		var rowIdxWithinPage: Int? = nil
+		for (idx, r) in paymentsPage.rows.enumerated() {
+			
+			if r == visibleRow {
+				rowIdxWithinPage = idx
+				break
+			}
+		}
+		
+		guard let rowIdxWithinPage = rowIdxWithinPage else {
+			// Row not found within current page.
+			// Perhaps the page just changed, and it no longer includes this row.
+			return
+		}
+		
+		let isLastRowWithinPage = rowIdxWithinPage + 1 == paymentsPage.rows.count
+		if isLastRowWithinPage {
+		
+			let rowIdxWithinDatabase = Int(paymentsPage.offset) + rowIdxWithinPage
+			let hasMoreRowsInDatabase = rowIdxWithinDatabase + 1 < mvi.model.paymentsCount
+			
+			if hasMoreRowsInDatabase {
+				
+				// increase paymentsPage.count
+				
+				let prvOffset = paymentsPage.offset
+				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
+				
+				log.debug("[\(viewName)] increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				
+				AppDelegate.get().business.paymentsManager.subscribeToPaymentsPage(
+					offset: prvOffset,
+					count: newCount
+				)
+			}
+		}
+	}
 }
 
-fileprivate struct PaymentCell : View {
+fileprivate struct PaymentCell : View, ViewName {
 
-	let payment: PhoenixShared.Lightning_kmpWalletPayment
+	let row: WalletPaymentOrderRow
+	let didAppearCallback: (WalletPaymentOrderRow) -> Void
+	
+	let phoenixBusiness: PhoenixBusiness = AppDelegate.get().business
+	
+	@State var fetched: PaymentsFetcher.Result
+	@State var fetchedIsStale: Bool
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
-	var body: some View {
-		HStack {
-			switch payment.state() {
-			case .success:
-				Image("payment_holder_def_success")
-					.foregroundColor(Color.accentColor)
-					.padding(4)
-					.background(
-						RoundedRectangle(cornerRadius: .infinity)
-							.fill(Color.appAccent)
-					)
-			case .pending:
-				Image("payment_holder_def_pending")
-					.padding(4)
-			case .failure:
-				Image("payment_holder_def_failed")
-					.padding(4)
-			default: EmptyView()
-			}
+	init(
+		row: WalletPaymentOrderRow,
+		didAppearCallback: @escaping (WalletPaymentOrderRow)->Void
+	) {
+		self.row = row
+		self.didAppearCallback = didAppearCallback
+		
+		var result = phoenixBusiness.paymentsManager.getCachedPayment(row: row)
+		if let _ = result.payment {
 			
+			self._fetched = State(initialValue: result)
+			self._fetchedIsStale = State(initialValue: false)
+		} else {
+			
+			result = phoenixBusiness.paymentsManager.getCachedStalePayment(row: row)
+			
+			self._fetched = State(initialValue: result)
+			self._fetchedIsStale = State(initialValue: true)
+		}
+	}
+	
+	var body: some View {
+		
+		HStack {
+			if let payment = fetched.payment {
+				
+				switch payment.state() {
+					case .success:
+						Image("payment_holder_def_success")
+							.foregroundColor(Color.accentColor)
+							.padding(4)
+							.background(
+								RoundedRectangle(cornerRadius: .infinity)
+									.fill(Color.appAccent)
+							)
+					case .pending:
+						Image("payment_holder_def_pending")
+							.padding(4)
+					case .failure:
+						Image("payment_holder_def_failed")
+							.padding(4)
+					default:
+						Image(systemName: "doc.text.magnifyingglass")
+							.padding(4)
+				}
+			} else {
+				
+				Image(systemName: "doc.text.magnifyingglass")
+					.padding(4)
+			}
+
 			VStack(alignment: .leading) {
-				Text(payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text"))
+				Text(paymentDescription())
 					.lineLimit(1)
 					.truncationMode(.tail)
 					.foregroundColor(.primaryForeground)
-				
-				let timestamp = payment.timestamp()
-				let timestampStr = timestamp > 0
-					? timestamp.formatDateMS()
-					: NSLocalizedString("pending", comment: "timestamp string for pending transaction")
-				
-				Text(timestampStr)
+
+				Text(paymentTimestamp())
 					.font(.caption)
 					.foregroundColor(.secondary)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding([.leading, .trailing], 6)
-			
+
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
-				
-				let isFailure = payment.state() == WalletPaymentState.failure
-				let isNegative = payment.amountMsat() < 0
-				
+
+				let (amount, isFailure, isNegative) = paymentAmountInfo()
+
 				let color: Color = isFailure ? .secondary : (isNegative ? .appNegative : .appPositive)
-				
+
 				Text(isNegative ? "" : "+")
 					.foregroundColor(color)
 					.padding(.trailing, 1)
-				
+
 				Text(amount.digits)
 					.foregroundColor(color)
 					
-				Text(" " + amount.type)
+				Text(verbatim: " \(amount.type)")
 					.font(.caption)
 					.foregroundColor(.gray)
 			}
 		}
 		.padding([.top, .bottom], 14)
 		.padding([.leading, .trailing], 12)
+		.onAppear {
+			onAppear()
+		}
+	}
+
+	func paymentDescription() -> String {
+
+		if let payment = fetched.payment {
+			return payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text")
+		} else {
+			return ""
+		}
+	}
+	
+	func paymentTimestamp() -> String {
+
+		if let payment = fetched.payment {
+			let timestamp = payment.timestamp()
+			return timestamp > 0
+				? timestamp.formatDateMS()
+				: NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+		} else {
+			return ""
+		}
+	}
+	
+	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
+
+		if let payment = fetched.payment {
+
+			let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
+
+			let isFailure = payment.state() == WalletPaymentState.failure
+			let isNegative = payment.amountMsat() < 0
+
+			return (amount, isFailure, isNegative)
+
+		} else {
+
+			let type: String
+			switch currencyPrefs.currencyType {
+				case .fiat    : type = currencyPrefs.fiatCurrency.shortName
+				case .bitcoin : type = currencyPrefs.bitcoinUnit.shortName
+			}
+
+			let amount = FormattedAmount(digits: "", type: type, decimalSeparator: " ")
+
+			let isFailure = false
+			let isNegative = true
+
+			return (amount, isFailure, isNegative)
+		}
+	}
+	
+	func onAppear() -> Void {
+		
+		if fetched.payment == nil || fetchedIsStale {
+			
+			phoenixBusiness.paymentsManager.getPayment(row: row) { (result: PaymentsFetcher.Result) in
+				self.fetched = result
+			}
+		}
+		
+		didAppearCallback(row)
 	}
 }
 
@@ -678,20 +930,20 @@ class HomeView_Previews: PreviewProvider {
 	)
 
 	static var previews: some View {
-
+		
 		HomeView().mock(Home.Model(
 			balance: Lightning_kmpMilliSatoshi(msat: 123500),
 			incomingBalance: Lightning_kmpMilliSatoshi(msat: 0),
-			payments: []
+			paymentsCount: 0
 		))
 		.preferredColorScheme(.dark)
 		.previewDevice("iPhone 8")
 		.environmentObject(CurrencyPrefs.mockEUR())
-		
+
 		HomeView().mock(Home.Model(
 			balance: Lightning_kmpMilliSatoshi(msat: 1000000),
 			incomingBalance: Lightning_kmpMilliSatoshi(msat: 12000000),
-			payments: []
+			paymentsCount: 0
 		))
 		.preferredColorScheme(.light)
 		.previewDevice("iPhone 8")

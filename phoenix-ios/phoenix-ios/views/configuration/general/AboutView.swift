@@ -31,7 +31,10 @@ struct AboutView: View {
 					.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
 				)
 		}
-		.navigationBarTitle("About", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("About", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 	
 	func versionString() -> String {

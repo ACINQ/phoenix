@@ -7,8 +7,8 @@ import SwiftUI
 ///   // button action...
 /// } label: {
 ///   HStack {
-///     Image("...")
-///     Text("...")
+///     Image()
+///     Text()
 ///   }
 ///   .padding(...)
 /// }

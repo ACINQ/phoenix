@@ -1,8 +1,7 @@
 package fr.acinq.phoenix.ctrl
 
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 
 
 typealias HomeController = MVI.Controller<Home.Model, Home.Intent>
@@ -12,11 +11,14 @@ object Home {
     data class Model(
         val balance: MilliSatoshi,
         val incomingBalance: MilliSatoshi?,
-        val payments: List<WalletPayment>
+        val paymentsCount: Long
     ) : MVI.Model()
 
-    val emptyModel = Model(MilliSatoshi(0), null, emptyList())
+    val emptyModel = Model(
+        balance = MilliSatoshi(0),
+        incomingBalance = null,
+        paymentsCount = 0
+    )
 
     sealed class Intent : MVI.Intent()
-
 }

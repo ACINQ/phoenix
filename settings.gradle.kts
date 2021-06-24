@@ -1,37 +1,24 @@
-enableFeaturePreview("GRADLE_METADATA")
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+}
+
 rootProject.name = "phoenix-kmm"
 
+// We use a property defined in `local.properties` to know whether we should build the android application or not.
+// For example, iOS developers may want to skip that most of the time.
+val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
+    ?.inputStream()?.use { java.util.Properties().apply { load(it) } }
+    ?.run { getProperty("skip.android", "true")?.toBoolean() }
+    ?: true
+
+// Use system properties to inject the property in other gradle build files.
+System.setProperty("includeAndroid", (!skipAndroid).toString())
+
 include(":phoenix-shared")
-
-
-val isIntelliJ = System.getProperty("idea.paths.selector").orEmpty().startsWith("IntelliJIdea")
-
-// We cannot use buildSrc here for now.
-// https://github.com/gradle/gradle/issues/11090#issuecomment-734795353
-
-val skipAndroid: String? by settings
-
-val withAndroid = if (skipAndroid == "true") {
-    false
-} else {
-    val localFile = File("$rootDir/local.properties").takeIf { it.exists() }
-        ?: error("Please create a $rootDir/local.properties file with either 'sdk.dir' or 'skip.android' properties")
-
-    val localProperties = java.util.Properties()
-    localFile.inputStream().use { localProperties.load(it) }
-
-    if (localProperties["sdk.dir"] == null && localProperties["skip.android"] != "true") {
-        error("local.properties: sdk.dir == null && skip.android != true : $localProperties")
-    }
-
-    localProperties["skip.android"] != "true"
-}
-
-System.setProperty("fr.acinq.phoenix.with-android", if (withAndroid) "true" else "false")
-
-if (withAndroid && !isIntelliJ) {
+if (!skipAndroid) {
     include(":phoenix-android")
 }
-
-System.setProperty("withAndroid", withAndroid.toString())
-System.setProperty("isIntelliJ", isIntelliJ.toString())

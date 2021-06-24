@@ -23,8 +23,10 @@ struct RecoverySeedView : View {
 				
 			VStack(alignment: .leading, spacing: 40) {
 				Text(
-					"The backup phrase, known as a seed, is a list of 12 english words. " +
-					"It allows you to recover full access to your funds if needed."
+					"""
+					The backup phrase, known as a seed, is a list of 12 english words. \
+					It allows you to recover full access to your funds if needed.
+					"""
 				)
 				
 				Text(
@@ -32,28 +34,22 @@ struct RecoverySeedView : View {
 				)
 				.fontWeight(.bold)
 				
-				Group {
-					Text(
-						"Do not share this seed with anyone. "
-					)
-					.fontWeight(.bold)
-					+
-					Text(
-						"Beware of phishing. The developers of Phoenix will never ask for your seed."
-					)
-				}
+				Text(styled: NSLocalizedString(
+					"""
+					**Do not share this seed with anyone.** \
+					Beware of phishing. The developers of Phoenix will never ask for your seed.
+					""",
+					comment: "RecoverySeedView"
+				))
 				
-				Group {
-					Text(
-						"Do not lose this seed. "
-					)
-					.fontWeight(.bold)
-					+
-					Text(
-						"Save it somewhere safe (not on this phone). " +
-						"If you lose your seed and your phone, you've lost your funds."
-					)
-				}
+				Text(styled: NSLocalizedString(
+					"""
+					**Do not lose this seed.** \
+					Save it somewhere safe (not on this phone). \
+					If you lose your seed and your phone, you've lost your funds."
+					""",
+					comment: "RecoverySeedView"
+				))
 				
 				Button {
 					decrypt()
@@ -78,7 +74,10 @@ struct RecoverySeedView : View {
 				mnemonics: $mnemonics
 			)
 		}
-		.navigationBarTitle("Recovery Seed", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Recovery Seed", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 	}
 	
 	func decrypt() -> Void {
@@ -159,8 +158,13 @@ struct RecoverySeedReveal: View {
 			
 			Spacer()
 			
-			Text("KEEP THIS SEED SAFE.").font(.title2).padding(.bottom, 2)
-			Text("DO NOT SHARE.").font(.title2)
+			Text("KEEP THIS SEED SAFE.")
+				.font(.title2)
+				.multilineTextAlignment(.center)
+				.padding(.bottom, 2)
+			Text("DO NOT SHARE.")
+				.multilineTextAlignment(.center)
+				.font(.title2)
 			
 			Spacer()
 			
@@ -169,7 +173,7 @@ struct RecoverySeedReveal: View {
 				
 				VStack {
 					ForEach(0..<6, id: \.self) { idx in
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(.headline)
 							.foregroundColor(.secondary)
 							.padding(.bottom, 2)
@@ -190,7 +194,7 @@ struct RecoverySeedReveal: View {
 				
 				VStack {
 					ForEach(6..<12, id: \.self) { idx in
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(.headline)
 							.foregroundColor(.secondary)
 							.padding(.bottom, 2)

@@ -27,7 +27,10 @@ struct RestoreWalletView: MVIView {
 	var view: some View {
 		
 		main()
-			.navigationBarTitle("Restore my wallet", displayMode: .inline)
+			.navigationBarTitle(
+				NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
+				displayMode: .inline
+			)
 			.onChange(of: mvi.model, perform: { model in
 				onModelChange(model: model)
 			})
@@ -78,8 +81,11 @@ struct WarningView: View {
 		VStack {
 			
 			Text(
-				"Do not import a seed that was NOT created by this application.\n\n" +
-				"Also, make sure that you don't have another Phoenix wallet running with the same seed."
+				"""
+				Do not import a seed that was NOT created by this application.
+				
+				Also, make sure that you don't have another Phoenix wallet running with the same seed.
+				"""
 			)
 			.font(.title3)
 			.padding(.top, 20)
@@ -137,8 +143,8 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
-	let topID = "top"
-	let inputID = "input"
+	let topID = "top"     // Todo: replace with: @Namespace var topID
+	let inputID = "input" // Todo: replace with: @Namespace var inputID
 	let keyboardWillShow = NotificationCenter.default.publisher(for:
 		UIApplication.keyboardWillShowNotification
 	)
@@ -226,8 +232,11 @@ struct RestoreView: View {
 
 			if mvi.model is RestoreWallet.ModelInvalidMnemonics {
 				Text(
-					"This seed is invalid and cannot be imported.\n\n" +
-					"Please try again"
+					"""
+					This seed is invalid and cannot be imported.
+					
+					Please try again
+					"""
 				)
 				.padding([.top, .bottom])
 				.foregroundColor(Color.red)
@@ -366,7 +375,7 @@ struct RestoreView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				ForEach(0..<6, id: \.self) { idx in
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(Font.headline.weight(.regular))
 							.foregroundColor(Color(UIColor.tertiaryLabel))
 					}
@@ -401,7 +410,7 @@ struct RestoreView: View {
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				ForEach(6..<12, id: \.self) { idx in
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
-						Text("#\(idx + 1) ")
+						Text(verbatim: "#\(idx + 1) ")
 							.font(Font.headline.weight(.regular))
 							.foregroundColor(Color(UIColor.tertiaryLabel))
 					}

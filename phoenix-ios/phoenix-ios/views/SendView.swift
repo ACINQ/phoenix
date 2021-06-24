@@ -112,8 +112,10 @@ struct SendView: MVIView {
 		} else if model.reason is Scan.BadRequestReasonIsBitcoinAddress {
 			
 			msg = NSLocalizedString(
-				"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments." +
-				" You can use a third-party service to make the offchain->onchain swap.",
+				"""
+				You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. \
+				You can use a third-party service to make the offchain->onchain swap.
+				""",
 				comment: "Error message - scanning lightning invoice"
 			)
 			
@@ -209,7 +211,10 @@ struct ScanView: View, ViewName {
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.navigationBarTitle("Scan a QR code", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Scan a QR code", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(2) // [SendingView, ValidateView, ScanView]
 		.transition(
 			.asymmetric(
@@ -318,14 +323,14 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			Group {
-				Text(
-					"The invoice doesn't include an amount. This can be dangerous:" +
-					" malicious nodes may be able to steal your payment. To be safe, "
-				)
-				+ Text("ask the payee to specify an amount").fontWeight(.bold)
-				+ Text(" in the payment request.")
-			}
+			Text(styled: NSLocalizedString(
+				"""
+				The invoice doesn't include an amount. This can be dangerous: \
+				malicious nodes may be able to steal your payment. To be safe, \
+				**ask the payee to specify an amount**  in the payment request.
+				""",
+				comment: "SendView"
+			))
 			.padding(.bottom)
 
 			Text("Are you sure you want to pay this invoice?")
@@ -449,7 +454,7 @@ struct ValidateView: View, ViewName {
 			VStack {
 		
 				HStack(alignment: .firstTextBaseline) {
-					TextField("123", text: currencyStyler().amountProxy)
+					TextField(verbatim: "123", text: currencyStyler().amountProxy)
 						.keyboardType(.decimalPad)
 						.disableAutocorrection(true)
 						.fixedSize()
@@ -527,7 +532,10 @@ struct ValidateView: View, ViewName {
 			} // </VStack>
 			
 		}// </ZStack>
-		.navigationBarTitle("Confirm Payment", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Confirm Payment", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(1) // [SendingView, ValidateView, ScanView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
@@ -716,7 +724,10 @@ struct SendingView: View {
 		.frame(maxHeight: .infinity)
 		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle("Sending payment", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.zIndex(0) // [SendingView, ValidateView, ScanView]
 	}
 }

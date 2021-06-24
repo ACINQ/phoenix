@@ -53,7 +53,7 @@ fileprivate struct ConnectionCell : View {
 				bullet.foregroundColor(.appNegative)
 			}
 
-			Text("\(label):")
+			Text(verbatim: "\(label):")
 			Spacer()
 			Text(connection.localizedText())
 		}

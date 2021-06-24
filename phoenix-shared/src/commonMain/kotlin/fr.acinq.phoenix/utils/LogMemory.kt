@@ -25,7 +25,7 @@ class LogMemory(val directory: Path) : LogFrontend {
 
     private var lines = ArrayList<Line>().also { it.preventFreeze() }
 
-    private fun currentDate() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    private fun currentDate() = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 
     val file get() = directory.resolve(toFileName(currentDate()) + ".txt")
 

@@ -58,7 +58,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
     private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
 
-    private var appConnectionsDaemon: AppConnectionsDaemon? = null
+    var appConnectionsDaemon: AppConnectionsDaemon? = null
 
     private val walletManager by lazy { WalletManager() }
     private val nodeParamsManager by lazy { NodeParamsManager(loggerFactory, ctx, chain, walletManager) }
@@ -102,14 +102,6 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
         if (walletManager.wallet.value == null) {
             walletManager.loadWallet(seed)
         }
-    }
-
-    fun incrementDisconnectCount(): Unit {
-        appConnectionsDaemon?.incrementDisconnectCount()
-    }
-
-    fun decrementDisconnectCount(): Unit {
-        appConnectionsDaemon?.decrementDisconnectCount()
     }
 
     fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain.isMainnet())

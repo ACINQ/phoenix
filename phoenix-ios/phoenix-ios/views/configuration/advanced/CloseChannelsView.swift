@@ -25,7 +25,10 @@ struct CloseChannelsView : MVIView {
 			.padding(.top, 30)
 			.padding([.leading, .trailing], 30)
 			.padding(.bottom, 10)
-			.navigationBarTitle("Close channels", displayMode: .inline)
+			.navigationBarTitle(
+				NSLocalizedString("Close channels", comment: "Navigation bar title"),
+				displayMode: .inline
+			)
 	}
 	
 	@ViewBuilder
@@ -71,17 +74,21 @@ fileprivate struct EmptyWalletView : View {
 			Text("You currently don't have any channels that can be closed.")
 				.padding(.bottom, 20)
 			
-			Group {
-				Text("Payment channels are automatically created when you receive payments. ") +
-				Text("Use the ") +
-				Text("Receive").bold() +
-				Text(" screen to receive via the Lightning network.")
-			}
+			Text(styled: NSLocalizedString(
+				"""
+				Payment channels are automatically created when you receive payments. \
+				Use the **Receive** screen to receive via the Lightning network.
+				""",
+				comment: "CloseChannelsView"
+			))
 			.padding(.bottom, 20)
-
-			Text("You can also use the ") +
-			Text("Payment Channels").bold() +
-			Text(" screen to inspect the state of your channels.")
+			
+			Text(styled: NSLocalizedString(
+				"""
+				You can also use the **Payment Channels** screen to inspect the state of your channels.
+				""",
+				comment: "CloseChannelsView"
+			))
 
 			Spacer()
 
@@ -112,22 +119,26 @@ fileprivate struct StandardWalletView : View {
 			
 			if model.channels.count == 1 {
 				Text(
-					"You currenly have 1 Lightning channel" +
-					" with a balance of \(formattedSats.string)."
+					"""
+					You currenly have 1 Lightning channel \
+					with a balance of \(formattedSats.string).
+					"""
 				)
 			} else {
 				Text(
-					"You currently have \(String(model.channels.count)) Lightning channels" +
-					" with an aggragate balance of \(formattedSats.string)."
+					"""
+					You currently have \(String(model.channels.count)) Lightning channels \
+					with an aggragate balance of \(formattedSats.string).
+					"""
 				)
 			}
 			
-			Group {
-				Text(
-					"Funds can be sent to a Bitcoin wallet." +
-					" Make sure the address is correct before sending."
-				)
-			}
+			Text(
+				"""
+				Funds can be sent to a Bitcoin wallet. \
+				Make sure the address is correct before sending.
+				"""
+			)
 			.padding(.top, 20)
 			.padding(.bottom, 10)
 			
@@ -228,10 +239,13 @@ fileprivate struct StandardWalletView : View {
 			log.debug("result.error = \(error)")
 			
 			if let error = error as? Utilities.BitcoinAddressErrorChainMismatch {
-				detailedErrorMsg = NSLocalizedString(
-					"The address is for \(error.addrChain.name)," +
-					" but you're on \(error.myChain.name)",
-					comment: "Error message - parsing bitcoin address"
+				detailedErrorMsg = String(format: NSLocalizedString(
+					"""
+					The address is for %@, \
+					but you're on %@
+					""",
+					comment: "Error message - parsing bitcoin address"),
+					error.addrChain.name, error.myChain.name
 				)
 			}
 			else if error is Utilities.BitcoinAddressErrorUnknownBech32Version {
@@ -320,24 +334,24 @@ fileprivate struct FundsSentView : View {
 						.padding(.bottom, 10)
 				}
 
-				let intro = (model.channels.count == 1)
+				let msg = (model.channels.count <= 1)
 					? NSLocalizedString(
-						"The closing transaction is in your transactions list on the ",
+						"""
+						The closing transaction is in your transactions list on the __main__ screen. \
+						And you can view the status of your channels in the __channels list__ screen.
+						""",
 						comment: "label text"
 					)
 					: NSLocalizedString(
-						"The closing transactions are in your transactions list on the ",
+						"""
+						The closing transactions are in your transactions list on the __main__ screen. \
+						And you can view the status of your channels in the __channels list__ screen.
+						""",
 						comment: "label text"
 					)
 
-				Group {
-					Text(intro) +
-					Text("main").italic() +
-					Text(" screen. And you can view the status of your channels in the ") +
-					Text("channels list").italic() +
-					Text(" screen.")
-				}
-				.lineLimit(nil) // text is getting truncated for some reason
+				Text(styled: msg)
+					.lineLimit(nil) // text is getting truncated for some reason
 
 			} // </VStack>
 		}
@@ -350,17 +364,22 @@ fileprivate struct FooterView : View {
 		
 		// The "send to bitcoin address" functionality isn't available in lightning-kmp yet.
 		// When added, and integrated into Send screen, the code below should be uncommented.
-		// 
-		Group {
-			Text("Use this feature to transfer ") +
-			Text("all").italic() +
-			Text(" your funds to a Bitcoin address. ") // +
-		//	Text("If you only want to send ") +
-		//	Text("some").italic() +
-		//	Text(" of your funds, then you can use the ") +
-		//	Text("Send").bold().italic() +
-		//	Text(" screen. Just scan/enter a Bitcoin address and Phoenix does the rest.")
-		}
+		
+	//	Text(styled: _NS_LocalizedString(
+	//		"""
+	//		Use this feature to transfer __all__ your funds to a Bitcoin address. \
+	//		If you only want to send __some__ of your funds, then you can use the **Send** screen. \
+	//		Just scan/enter a Bitcoin address and Phoenix does the rest.
+	//		""",
+	//		comment: "CloseChannelsView"
+	//	))
+	//	.font(.footnote)
+	//	.foregroundColor(.secondary)
+		
+		Text(styled: NSLocalizedString(
+			"Use this feature to transfer __all__ your funds to a Bitcoin address.",
+			comment: "CloseChannelsView"
+		))
 		.font(.footnote)
 		.foregroundColor(.secondary)
 	}

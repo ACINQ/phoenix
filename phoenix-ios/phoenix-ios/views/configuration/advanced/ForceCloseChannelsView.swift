@@ -25,7 +25,10 @@ struct ForceCloseChannelsView : MVIView {
 	@ViewBuilder
 	var view: some View {
 		
-		main.navigationBarTitle("Force close channels", displayMode: .inline)
+		main.navigationBarTitle(
+			NSLocalizedString("Force close channels", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		
 		// Note:
 		//   Some views use a ScrollView,
@@ -79,19 +82,21 @@ fileprivate struct EmptyWalletView : View {
 			Text("You currently don't have any channels that can be closed.")
 				.padding(.bottom)
 			
-			Group {
-				Text("Payment channels are automatically created when you receive payments. ") +
-				Text("Use the ") +
-				Text("Receive").bold() +
-				Text(" screen to receive via the Lightning network.")
-			}
+			Text(styled: NSLocalizedString(
+				"""
+				Payment channels are automatically created when you receive payments. \
+				Use the **Receive** screen to receive via the Lightning network.
+				""",
+				comment: "ForceCloseChannelsView"
+			))
 			.padding(.bottom)
-
-			Group {
-				Text("You can also use the ") +
-				Text("Payment Channels").bold() +
-				Text(" screen to inspect the state of your channels.")
-			}
+			
+			Text(styled: NSLocalizedString(
+				"""
+				You can also use the **Payment Channels** screen to inspect the state of your channels.
+				""",
+				comment: "ForceCloseChannelsView"
+			))
 
 			Spacer()
 		}
@@ -124,23 +129,27 @@ fileprivate struct StandardWalletView : View {
 				Text("Force close allows you to unilaterally close your channels.")
 					.padding(.bottom)
 				
-				Group {
-					Text("This feature is not a \"fix everything magic button\".") +
-					Text(" It is here as a safety measure and ") +
-					Text("should only be used in extreme scenarios").bold() +
-					Text(". For example, if your peer (ACINQ) disappears permanently,") +
-					Text(" preventing you from spending your money. In all other cases, ") +
-					Text("if you experience issues with Phoenix you should contact support").bold() +
-					Text(".")
-				}
+				Text(styled: NSLocalizedString(
+					"""
+					This feature is not a "fix everything magic button". \
+					It is here as a safety measure and \
+					**should only be used in extreme scenarios**. \
+					For example, if your peer (ACINQ) disappears permanently, \
+					preventing you from spending your money. In all other cases, \
+					**if you experience issues with Phoenix you should contact support**.
+					""",
+					comment: "ForceCloseChannelsView"
+				))
 				.padding(.bottom)
 				
-				Group {
-					Text("Force closing channels will cost you money (to cover the on-chain fees)") +
-					Text(" and will cause your funds to be locked for days. ") +
-					Text("Do not uninstall the app until your channels are fully closed or you will lose money.")
-						.bold()
-				}
+				Text(styled: NSLocalizedString(
+					"""
+					Force closing channels will cost you money (to cover the on-chain fees) \
+					and will cause your funds to be locked for days. \
+					**Do not uninstall the app until your channels are fully closed or you will lose money.**
+					""",
+					comment: "ForceCloseChannelsView"
+				))
 				.padding(.bottom)
 				
 				Text("Do not use this feature if you don't fully understand what it does.")
@@ -266,23 +275,25 @@ fileprivate struct FundsSentView : View {
 						.padding(.bottom, 10)
 				}
 
-				let intro = (model.channels.count == 1)
+				let msg = (model.channels.count <= 1)
 					? NSLocalizedString(
-						"The closing transaction is in your transactions list on the ",
+						"""
+						The closing transaction is in your transactions list on the __main__ screen. \
+						And you can view the status of your channels in the __channels list__ screen.
+						""",
 						comment: "label text"
 					)
 					: NSLocalizedString(
-						"The closing transactions are in your transactions list on the ",
+						"""
+						The closing transactions are in your transactions list on the __main__ screen. \
+						And you can view the status of your channels in the __channels list__ screen.
+						""",
 						comment: "label text"
 					)
-	
-				Group {
-					Text(intro) +
-					Text("main").italic() +
-					Text(" screen. And you can view the status of your channels in the ") +
-					Text("channels list").italic() +
-					Text(" screen.")
-				}
+				
+				Text(styled: msg)
+					.lineLimit(nil) // text is getting truncated for some reason
+				
 			} // </VStack>
 
 		} // </VStack>

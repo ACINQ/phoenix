@@ -16,8 +16,10 @@
 
 package fr.acinq.phoenix.db
 
+import co.touchlab.sqliter.DatabaseConfiguration
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
+import com.squareup.sqldelight.drivers.native.wrapConnection
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 
@@ -25,8 +27,35 @@ actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash
     return NativeSqliteDriver(ChannelsDatabase.Schema, "channels-${chain.name.toLowerCase()}-$nodeIdHash.sqlite")
 }
 
-actual fun createPaymentsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return NativeSqliteDriver(PaymentsDatabase.Schema, "payments-${chain.name.toLowerCase()}-$nodeIdHash.sqlite")
+actual fun createPaymentsDbDriver(
+    ctx: PlatformContext,
+    chain: Chain,
+    nodeIdHash: String
+): SqlDriver {
+    val schema = PaymentsDatabase.Schema
+    val name = "payments-${chain.name.toLowerCase()}-$nodeIdHash.sqlite"
+
+    // The foreign_keys constraint isn't properly enabled for native/iOS.
+    // More information can be found here:
+    // https://github.com/cashapp/sqldelight/issues/1356
+    //
+    // The official solution is implemented below, however it doesn't work.
+
+//  return NativeSqliteDriver(schema, name)
+    val configuration = DatabaseConfiguration(
+        name = name,
+        version = schema.version,
+        extendedConfig = DatabaseConfiguration.Extended(
+            foreignKeyConstraints = true
+        ),
+        create = { connection ->
+            wrapConnection(connection) { schema.create(it) }
+        },
+        upgrade = { connection, oldVersion, newVersion ->
+            wrapConnection(connection) { schema.migrate(it, oldVersion, newVersion) }
+        }
+    )
+    return NativeSqliteDriver(configuration)
 }
 
 actual fun createAppDbDriver(ctx: PlatformContext): SqlDriver {

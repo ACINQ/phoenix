@@ -128,9 +128,15 @@ fileprivate struct SummaryView: View {
 					.foregroundColor(Color.appPositive)
 					.padding(.bottom, 16)
 				VStack {
-					Text(payment is Lightning_kmpOutgoingPayment ? "SENT" : "RECEIVED")
-						.font(Font.title2.bold())
-						.padding(.bottom, 2)
+					Group {
+						if payment is Lightning_kmpOutgoingPayment {
+							Text("SENT")
+						} else {
+							Text("RECEIVED")
+						}
+					}
+					.font(Font.title2.bold())
+					.padding(.bottom, 2)
 					Text(payment.timestamp().formatDateMS())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
@@ -175,17 +181,46 @@ fileprivate struct SummaryView: View {
 				EmptyView()
 			}
 
-			HStack(alignment: .bottom) {
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat(), hideMsats: false)
 
-				Text(amount.digits)
-					.font(.largeTitle)
-					.onTapGesture { toggleCurrencyType() }
-				Text(amount.type)
-					.font(.title3)
-					.foregroundColor(Color.appAccent)
-					.padding(.bottom, 4)
-					.onTapGesture { toggleCurrencyType() }
+				if currencyPrefs.currencyType == .bitcoin &&
+				   currencyPrefs.bitcoinUnit == .sat &&
+				   amount.hasFractionDigits
+				{
+					// We're showing the value in satoshis, but the value contains a fractional
+					// component representing the millisatoshis.
+					// This can be a little confusing for those new to Lightning.
+					// So we're going to downplay the millisatoshis visually.
+					
+					Text(verbatim: "\(amount.integerDigits).")
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+					Text(amount.fractionDigits)
+						.lineLimit(1)            // SwiftUI bugs
+						.minimumScaleFactor(0.5) // Truncating text
+						.font(.title)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
+						.padding(.trailing, 6)
+					Text(amount.type)
+						.font(.title3)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+					
+				} else {
+					
+					Text(amount.digits)
+						.font(.largeTitle)
+						.onTapGesture { toggleCurrencyType() }
+						.padding(.trailing, 6)
+					Text(amount.type)
+						.font(.title3)
+						.foregroundColor(Color.appAccent)
+						.padding(.bottom, 4)
+						.onTapGesture { toggleCurrencyType() }
+				}
 			}
 			.padding([.top, .leading, .trailing], 8)
 			.padding(.bottom, 33)
@@ -251,53 +286,7 @@ fileprivate struct SummaryView: View {
 	}
 }
 
-// Architecture Design:
-//
-// We want to display a list of key/value pairs:
-//
-//     Desc: Pizza reimbursement
-//     Fees: 2 sat
-//  Elapsed: 2.4 seconds
-//
-// Requirements:
-// 1. the elements must be vertically aligned
-//   - all keys have same trailing edge
-//   - all values have same leading edge
-// 2. the list (as a whole) must be horizontally centered
-//
-//       1,042 sat
-//       ---------
-// Desc: Party
-//
-//      ^ Wrong! List not horizontally centered!
-//
-//       1,042 sat
-//       ---------
-//      Desc: Party
-//
-//      ^ Correct!
-//
-// Ultimately, we need to:
-// - assign all keys the same width
-// - ensure the assigned width is the minimum possible width
-//
-// This was super easy with UIKit.
-// We could simply add constraints such that all keys are equal width.
-//
-// In SwiftUI, it's not that simple. But it's not that bad either.
-//
-// - we use InfoGrid_Column0 to measure the width of each key
-// - we use InfoGrid_Column0_MeasuredWidth to communicate the width
-//   up the hierarchy to the InfoGrid.
-// - InfoGrid_Column0_MeasuredWidth.reduce is used to find the max width
-// - InfoGrid assigns the maxWidth to each key frame
-//
-// Note that this occurs in 2 passes.
-// - In the first pass, InfoGrid.widthColumn0 is nil
-// - It then lays out all the elements, and they get measured
-// - The width is passed up the hierarchy via InfoGrid_Column0_MeasuredWidth preference
-// - This triggers InfoGrid.onPreferenceChange(InfoGrid_Column0_MeasuredWidth.self)
-// - Which triggers a second layout pass
+// See InfoGridView for architecture discussion.
 //
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
@@ -333,7 +322,6 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentFeesRow
 			timeElapsedRow
 			paymentErrorRow
-		//	paymentHashRow
 		}
 		.padding([.leading, .trailing])
 	}
@@ -389,7 +377,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					
 					Text(pType.0)
-					+ Text(" (\(pType.1))")
+					+ Text(verbatim: " (\(pType.1))")
 						.font(.footnote)
 						.foregroundColor(.secondary)
 					
@@ -512,27 +500,6 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		}
 	}
 	
-//	@ViewBuilder
-//	var paymentHashRow: some View {
-//
-//		InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
-//
-//			keyColumn(NSLocalizedString("Payment Hash", comment: "Label in SummaryInfoGrid"))
-//
-//		} valueColumn: {
-//
-//			let paymentHash = payment.paymentHashString()
-//			Text(paymentHash)
-//				.contextMenu {
-//					Button(action: {
-//						UIPasteboard.general.string = paymentHash
-//					}) {
-//						Text("Copy")
-//					}
-//				}
-//		}
-//	}
-	
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
 	}
@@ -596,35 +563,35 @@ fileprivate struct DetailsView: View {
 	
 	var body: some View {
 		
-		Group {
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
-			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
-				
-				HStack(alignment: VerticalAlignment.center, spacing: 0) {
-					Button {
-						presentationMode.wrappedValue.dismiss()
-					} label: {
-						Image(systemName: "chevron.left")
-							.imageScale(.medium)
-					}
-					Spacer()
-					Button {
-						closeSheet()
-					} label: {
-						Image(systemName: "xmark") // must match size of chevron.left above
-							.imageScale(.medium)
-					}
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Button {
+					presentationMode.wrappedValue.dismiss()
+				} label: {
+					Image(systemName: "chevron.left")
+						.imageScale(.medium)
 				}
-				.font(.title2)
-				.padding()
-				
-				ScrollView {
-					DetailsInfoGrid(payment: $payment)
-						.padding([.leading, .trailing])
+				Spacer()
+				Button {
+					closeSheet()
+				} label: {
+					Image(systemName: "xmark") // must match size of chevron.left above
+						.imageScale(.medium)
 				}
 			}
+			.font(.title2)
+			.padding()
+				
+			ScrollView {
+				DetailsInfoGrid(payment: $payment)
+					.padding([.leading, .trailing])
+			}
 		}
-		.navigationBarTitle("Details", displayMode: .inline)
+		.navigationBarTitle(
+			NSLocalizedString("Details", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
 		.navigationBarHidden(true)
 	}
 }
@@ -665,6 +632,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				rows_outgoingPayment(outgoingPayment)
 			}
 		}
+		.padding(.bottom)
 	}
 	
 	@ViewBuilder
@@ -681,12 +649,19 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let received = incomingPayment.received {
 
-			header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+			// There's usually just one receivedWith instance.
+			// But there could technically be multiple, so we'll show a section for each if that's the case.
 			
-			paymentReceived_receivedAt(received)
-			paymentReceived_amountReceived(received)
-			paymentReceived_via(received)
-			paymentReceived_channelId(received)
+			let receivedWithArray = received.receivedWith.sorted { $0.identifiable < $1.identifiable }
+			ForEach(receivedWithArray, id: \.identifiable) { receivedWith in
+				
+				header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
+				
+				paymentReceived_receivedAt(received)
+				paymentReceived_amountReceived(receivedWith)
+				paymentReceived_via(receivedWith)
+				paymentReceived_channelId(receivedWith)
+			}
 		}
 	}
 	
@@ -753,18 +728,21 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		HStack {
 			Spacer()
 			Text(title)
+				.lineLimit(1)
+				.minimumScaleFactor(0.5)
 				.font(.title3)
-				.padding(.bottom, 12)
-				.background(
-					VStack {
-						Spacer()
-						RoundedRectangle(cornerRadius: 10)
-							.frame(height: 4, alignment: .center)
-							.foregroundColor(Color.appAccent)
-					}
-				)
 			Spacer()
 		}
+		.padding(.horizontal)
+		.padding(.bottom, 12)
+		.background(
+			VStack {
+				Spacer()
+				RoundedRectangle(cornerRadius: 10)
+					.frame(height: 1, alignment: .center)
+					.foregroundColor(Color.appAccent)
+			}
+		)
 		.padding(.top, 24)
 		.padding(.bottom, 4)
 	}
@@ -772,7 +750,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@ViewBuilder
 	func keyColumn(_ str: String) -> some View {
 		
-		Text(str)
+		Text(str.lowercased())
 			.font(.subheadline)
 			.fontWeight(.thin)
 			.multilineTextAlignment(.trailing)
@@ -844,7 +822,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_amountReceived(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_amountReceived(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
 		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
 			
@@ -852,29 +830,25 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			if let msat = received.amount {
-				commonValue_amount(msat: msat)
-			} else {
-				Text("Any amount")
-			}
+			commonValue_amount(msat: receivedWith.amount)
 		}
 	}
 	
 	@ViewBuilder
-	func paymentReceived_via(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_via(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
 		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
-			
+		
 			keyColumn(NSLocalizedString("via", comment: "Label in DetailsView_IncomingPayment"))
-			
+		
 		} valueColumn: {
-			
-			if let _ = received.receivedWith.asLightningPayment() {
+		
+			if let _ = receivedWith.asLightningPayment() {
 				Text("Lightning network")
-				
-			} else if let _ = received.receivedWith.asNewChannel() {
+		
+			} else if let _ = receivedWith.asNewChannel() {
 				Text("New Channel (auto-created)")
-				
+		
 			} else {
 				Text("")
 			}
@@ -882,9 +856,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentReceived_channelId(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
 		
-		if let newChannel = received.receivedWith.asNewChannel() {
+		if let newChannel = receivedWith.asNewChannel() {
 			
 			InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
 				
@@ -1017,12 +991,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			switch onChain.closingType {
-				case Lightning_kmpChannelClosingType.local   : Text("Local")
-				case Lightning_kmpChannelClosingType.mutual  : Text("Mutual")
-				case Lightning_kmpChannelClosingType.remote  : Text("Remote")
-				case Lightning_kmpChannelClosingType.revoked : Text("Revoked")
-				case Lightning_kmpChannelClosingType.other   : Text("Other")
-				default                                      : Text("?")
+				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
+				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
+				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
+				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
+				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
+				default                                      : Text(verbatim: "?")
 			}
 		}
 	}
@@ -1164,7 +1138,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						Text(formatted.string)
 					}
 					
-					Text("\(part_failed.remoteFailureCode?.description ?? "local"): \(part_failed.details)")
+					let code = part_failed.remoteFailureCode?.description ?? "local"
+					Text(verbatim: "\(code): \(part_failed.details)")
 				}
 				
 			} else {
@@ -1205,7 +1180,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			Text(display_msat.string)
 			if let display_fiat = display_fiat {
-				Text(display_fiat.string)
+				Text(verbatim: "≈ \(display_fiat.string)")
 			}
 		}
 	}
@@ -1328,12 +1303,12 @@ extension Lightning_kmpWalletPayment {
 			if let _ = incomingPayment.origin.asSwapIn() {
 				let val = NSLocalizedString("Swap-In", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 1 -> 2", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = incomingPayment.origin.asKeySend() {
 				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			
 		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
@@ -1341,17 +1316,17 @@ extension Lightning_kmpWalletPayment {
 			if let _ = outgoingPayment.details.asSwapOut() {
 				let val = NSLocalizedString("Swap-Out", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = outgoingPayment.details.asKeySend() {
 				let val = NSLocalizedString("KeySend", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("non-invoice payment", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 			if let _ = outgoingPayment.details.asChannelClosing() {
 				let val = NSLocalizedString("Channel Closing", comment: "Transaction Info: Value")
 				let exp = NSLocalizedString("layer 2 -> 1", comment: "Transaction Info: Explanation")
-				return (val, exp)
+				return (val, exp.lowercased())
 			}
 		}
 		
@@ -1405,14 +1380,16 @@ extension Lightning_kmpWalletPayment {
 			// An incomingPayment may have fees if a new channel was automatically opened
 			if let received = incomingPayment.received {
 				
-				let msat = received.receivedWith.fees.msat
+				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
 					let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
 					
 					let exp = NSLocalizedString(
-						"In order to receive this payment, a new payment channel was opened." +
-						" This is not always required.",
+						"""
+						In order to receive this payment, a new payment channel was opened. \
+						This is not always required.
+						""",
 						comment: "Fees explanation"
 					)
 					
@@ -1448,12 +1425,12 @@ extension Lightning_kmpWalletPayment {
 				let exp: String
 				if txCount == 1 {
 					exp = NSLocalizedString(
-						"Bitcoin networks fees paid for on-chain transaction. Payment required 1 transaction.",
+						"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction.",
 						comment: "Fees explanation"
 					)
 				} else {
 					exp = NSLocalizedString(
-						"Bitcoin networks fees paid for on-chain transactions. Payment required \(txCount) transactions.",
+						"Bitcoin network fees paid for on-chain transactions. Payment required \(txCount) transactions.",
 						comment: "Fees explanation"
 					)
 				}
@@ -1481,16 +1458,18 @@ extension Lightning_kmpWalletPayment {
 							comment: "Fees explanation"
 						)
 					} else {
-						exp = NSLocalizedString(
-							"Lightning fees for routing the payment. Payment required \(hops) hops.",
-							comment: "Fees explanation"
+						exp = String(format: NSLocalizedString(
+							"Lightning fees for routing the payment. Payment required %d hops.",
+							comment: "Fees explanation"),
+							hops
 						)
 					}
 					
 				} else {
-					exp = NSLocalizedString(
-						"Lightning fees for routing the payment. Payment was divided into \(parts) parts, using \(hops) hops.",
-						comment: "Fees explanation"
+					exp = String(format: NSLocalizedString(
+						"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops.",
+						comment: "Fees explanation"),
+						parts, hops
 					)
 				}
 				
