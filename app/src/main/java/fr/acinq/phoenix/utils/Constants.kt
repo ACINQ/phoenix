@@ -45,6 +45,7 @@ object Constants {
 
   // -- intents
   const val INTENT_CAMERA_PERMISSION_REQUEST = 1
+  const val INTENT_PICK_IMAGE_FILE = 2
 
   // -- android notifications
   const val DELAY_BEFORE_BACKGROUND_WARNING = DateUtils.DAY_IN_MILLIS * 5

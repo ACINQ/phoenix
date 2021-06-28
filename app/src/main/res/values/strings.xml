@@ -163,6 +163,7 @@
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Paste data from clipboard</string>
+  <string name="send_init_browse">Load image from disk</string>
   <string name="send_init_reading">Reading scan…</string>
 
   <string name="send_balance_prefix">Balance:</string>
