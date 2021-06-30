@@ -23,7 +23,7 @@
 "(you provided this address)" = "(vous avez fourni cette adresse)";
 
 /* RecoverySeedView */
-"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds.\"" = "**Ne perdez pas cette clé.** Sauvegardez là dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous ne pourrez plus accéder à vos fonds.";
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds.\"" = "**Ne perdez pas cette clé.** Sauvegardez la dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous ne pourrez plus accéder à vos fonds.";
 
 /* RecoverySeedView */
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**Ne la donnez à personne.** Prenez garde au hameçonnage. Les développeurs de Phoenix ne vous demanderont jamais votre clé.";
@@ -53,7 +53,7 @@
 "1 channel" = "1 canal";
 
 /* No comment provided by engineer. */
-"A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos fonds Bitcoin au besoin.";
+"A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos fonds Bitcoin si nécessaire.";
 
 /* No comment provided by engineer. */
 "A random electrum server will be selected on each connection attempt." = "Un serveur Electrum aléatoire sera sélectionné à chaque tentative de connexion.";
@@ -158,7 +158,7 @@
 "Brazilian Real" = "Real brésilien";
 
 /* No comment provided by engineer. */
-"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Par défaut Phoenix se connecte à des serveurs Electrum aléatoire pour accéder à la blockchain Bitcoin. Vous pouvez également choisir de ne vous connecter qu’à un serveur en particulier.";
+"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Par défaut Phoenix se connecte à des serveurs Electrum aléatoires pour accéder à la blockchain Bitcoin. Vous pouvez également choisir de ne vous connecter qu’à un serveur en particulier.";
 
 /* Currency name: CAD */
 "Canadian Dollar" = "Dollar canadien";
@@ -258,7 +258,7 @@
 "Default payment description" = "Description des paiements par défaut";
 
 /* Minimum amount description. */
-"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "Le dépôt doit être d’au moins **%1$@**. Les frais sont de **%2$@%%** (minimum %3$@).";
+"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "Le montant déposé doit être d’au moins **%1$@**. Les frais sont de **%2$@%%** (minimum %3$@).";
 
 /* Label in SummaryInfoGrid */
 "Desc" = "Desc";
@@ -396,7 +396,7 @@
 "Import" = "Importer";
 
 /* Fees explanation */
-"In order to receive this payment, a new payment channel was opened. This is not always required." = "Afin de recevoir ce paiement, un nouveau canal de paiement a été ouvert. Cela n’est pas toujours indispensable.";
+"In order to receive this payment, a new payment channel was opened. This is not always required." = "Afin de recevoir ce paiement, un nouveau canal de paiement a été ouvert. Cela n’est pas toujours nécessaire.";
 
 /* Currency name: INR */
 "Indian Rupee" = "Roupie indienne";
@@ -562,7 +562,7 @@
 "Phoenix" = "Phoenix";
 
 /* No comment provided by engineer. */
-"Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "Phoenix peut être ouvert sans authentification. Assurez-vous d’avoir mis en place des mesure de sécurité adéquate dans iOS.";
+"Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "Phoenix peut être ouvert sans contrôle d'accès. Assurez-vous d’avoir mis en place des mesure de sécurité adéquate dans iOS.";
 
 /* Error message - scanning lightning invoice */
 "Phoenix does not support the LNURL protocol yet" = "Phoenix n’est pas encore compatible LNULRL";
@@ -610,10 +610,10 @@
 "Requesting Swap-In Address..." = "Demande d’adresse de swap-in";
 
 /* No comment provided by engineer. */
-"Require Face ID" = "Nécessite Face ID";
+"Require Face ID" = "Authentification par Face ID";
 
 /* No comment provided by engineer. */
-"Require Touch ID" = "Nécessite Touch ID";
+"Require Touch ID" = "Authentification par Touch ID";
 
 /* Navigation bar title */
 "Restore my wallet" = "Restaurer mon portefeuille";
@@ -727,7 +727,7 @@
 "The fee is **%@%%** with a minimum fee of **%@**." = "Les frais sont de **%1$@%%** avec un minimum de **%2$@**.";
 
 /* SendView */
-"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait vous voler le paiement. Pour être sûr, **demandez au destinataire du paiement de spécifier un montant** dans sa requête.";
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Cette requête de paiement ne définit pas de montant. Cela peut être dangereux : un noeud malicieux pourrait intercepter le paiement. Pour assurer la sécurité du paiement, **demandez au destinataire du paiement de spécifier un montant** dans sa requête.";
 
 /* Error message - scanning lightning invoice */
 "The invoice is for (requestChain), but you're on (reason.myChain.name)" = "Cette requête est valable pour la chaîne (requestChain), mais vous êtes sur la chaîne (reason.myChain.name).";
@@ -760,16 +760,16 @@
 "This fee is dynamic, and may change depending on the conditions of the bitcoin network." = "Ces frais sont dynamiques, et peuvent changer selon les conditions du réseau Bitcoin.";
 
 /* No comment provided by engineer. */
-"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Ces frais s’appliquent quand un nouveau canal doit être créé. Les paiement qui passent par des canaux existants ne paient pas ces frais. Ces frais sont dynamiques et peuvent changer selon les conditions du réseau Bitcoin.";
+"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Ces frais s’appliquent quand un nouveau canal doit être créé. Les paiements qui passent par des canaux existants ne paient pas ces frais. Ces frais sont dynamiques et peuvent changer selon les conditions du réseau Bitcoin.";
 
 /* No comment provided by engineer. */
-"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Ceci est une adresse de swap. Elle n’est pas contrôllée par votre portefeuille. Les dépôts on-chain seront convertis en des canaux de paiement Lightning.";
+"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en des canaux de paiement Lightning.";
 
 /* No comment provided by engineer. */
-"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en tâche de fond. Pour recevoir des paiements, Phoenix devra être ouvert et au premier plan.";
+"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en arrière-plan. Pour recevoir des paiements, Phoenix devra être allumé et au premier plan.";
 
 /* No comment provided by engineer. */
-"This means you will not be notified if you receive a payment while Phoenix is in the background." = "Cela signifie que vous ne serez pas notifié si vous recevez un paiement alors que Phoenix est en tâche de fond.";
+"This means you will not be notified if you receive a payment while Phoenix is in the background." = "Cela signifie que vous ne serez pas notifié si vous recevez un paiement alors que Phoenix est en arrière-plan.";
 
 /* No comment provided by engineer. */
 "This seed is invalid and cannot be imported.\n\nPlease try again" = "Cette clé n’est pas valide et ne peut être importée.\n\nVeuillez réessayer.";
