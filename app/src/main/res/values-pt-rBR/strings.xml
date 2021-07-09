@@ -21,6 +21,8 @@
 
   <string name="notification_channels_watcher_title">Observador de segundo plano</string>
   <string name="notification_channels_watcher_desc">Alerta você em caso de necessidade de iniciar o aplicativo. Deve ser prioridade.</string>
+  <string name="notification_pay_to_open_missed_title">Notificações de pagamentos não recebidos</string>
+  <string name="notification_pay_to_open_missed_desc">Notifica você quando há falha ao receber um pagamento porque a opção de abertura automática de canais foi desabilitada.</string>
   <string name="notification_headless_title">A Phoenix está rodando em segundo plano</string>
   <string name="notification_headless_desc">Notifica você que a Phoenix está sendo executada em segundo plano. Isso acontece quando alguém está enviando dinheiro para você e o aplicativo ainda não foi iniciado.</string>
 
@@ -678,7 +680,10 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
-
+  
+  <string name="paymentsettings_paytoopen_auto_switch_title">Abertura automática de canais</string>
+  <string name="paymentsettings_paytoopen_auto_switch_enabled">Se for necessário, novos canais serão abertos, uma taxa será cobrada (ver abaixo)</string>
+  <string name="paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de novos canais, a transação será rejeitada e irá falhar</string>
   <string name="paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
