@@ -683,7 +683,7 @@
   
   <string name="paymentsettings_paytoopen_auto_switch_title">Abertura automática de canais</string>
   <string name="paymentsettings_paytoopen_auto_switch_enabled">Se for necessário, novos canais serão abertos, uma taxa será cobrada (ver abaixo)</string>
-  <string name="paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de novos canais, a transação será rejeitada e irá falhar</string>
+  <string name="paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de um novo canal, a transação será rejeitada e irá falhar</string>
   <string name="paymentsettings_paytoopen_fees_title">Taxa de abertura de canal</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
