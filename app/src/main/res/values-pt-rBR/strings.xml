@@ -518,7 +518,7 @@
 
    <!-- //////////////// ln url pay //////////////// -->
 
-  <string name="lnurl_pay_domain"><![CDATA[Payment requested by<br/><b>%1$s</b>]]></string>
+  <string name="lnurl_pay_domain"><![CDATA[Cobrança solicitada por<br/><b>%1$s</b>]]></string>
   <string name="lnurl_pay_meta_description">Descrição</string>
   <string name="lnurl_pay_comment_title">Insira uma nota (opcional)</string>
   <string name="lnurl_pay_comment_message">Você pode inserir uma descrição ao pagamento (max %1$d caracteres). Será enviado ao destinatário.</string>
