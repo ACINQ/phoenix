@@ -580,7 +580,7 @@
 
   <string name="prefs_display_title">Opções de exibição</string>
   <string name="prefs_display_coin_label">Unidade de Bitcoin</string>
-  <string name="prefs_display_fiat_label">Moeda fiduciária</string>
+  <string name="prefs_display_fiat_label">Moeda estatal</string>
   <string name="prefs_display_theme_label">Tema</string>
   <string name="prefs_display_explorer_label">Blockchain</string>
   <string name="prefs_display_balance_display">Mostrar saldo na tela inicial</string>
