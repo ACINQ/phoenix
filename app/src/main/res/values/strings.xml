@@ -305,7 +305,7 @@
   <string name="closechannels_force_instructions"><![CDATA[
     Force close allows you to unilaterally close your channels.
     <br/><br/>
-    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarii</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
+    This feature is not a &quot;fix everything magic button&quot;; it is here as a safety measure and <b>should only be used in extreme scenarios</b>. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, <b>if you experience issues with Phoenix you should contact support</b>.
     <br/><br/>
     Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. <b>Do not uninstall the app until your channels are fully closed or you will lose money.</b>
     <br/><br/>
