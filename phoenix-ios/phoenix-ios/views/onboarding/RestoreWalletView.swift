@@ -143,8 +143,8 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
-	let topID = "top"     // Todo: replace with: @Namespace var topID
-	let inputID = "input" // Todo: replace with: @Namespace var inputID
+	@Namespace var topID
+	@Namespace var inputID
 	let keyboardWillShow = NotificationCenter.default.publisher(for:
 		UIApplication.keyboardWillShowNotification
 	)
@@ -193,19 +193,43 @@ struct RestoreView: View {
 	
 		VStack(alignment: HorizontalAlignment.leading) {
 
-			Text("Your wallet's seed is a list of 12 english words.")
-				.font(.title3)
-				.padding(.top)
-				.id(topID)
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Text("Your wallet's seed is a list of 12 english words.")
+					.font(.title3)
+					.id(topID)
+				Spacer()
+			}
+			.padding(.top)
+			.padding([.leading, .trailing], 16)
 			
-			TextField("Enter keywords from your seed", text: $wordInput)
-				.onChange(of: wordInput) { _ in
-					onInput()
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				TextField("Enter keywords from your seed", text: $wordInput)
+					.onChange(of: wordInput) { _ in
+						onInput()
+					}
+					.disableAutocorrection(true)
+					.disabled(mnemonics.count == 12)
+					.padding(.trailing, 4)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					wordInput = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
 				}
-				.id(inputID)
-				.padding([.top, .bottom])
-				.disableAutocorrection(true)
-				.disabled(mnemonics.count == 12)
+				.isHidden(wordInput == "")
+			}
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(
+				Capsule()
+					.strokeBorder(Color(UIColor.separator))
+			)
+			.padding(.top)
+			.id(inputID)
 
 			// Autocomplete suggestions for mnemonics
 			ScrollView(.horizontal) {
