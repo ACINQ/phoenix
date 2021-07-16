@@ -471,7 +471,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 								.font(.body)
 						}
 						.anchorView(viewId: explainFeesButtonViewId)
-						.padding(.leading, 4)
+						.padding(.leading, 6)
 					}
 				}
 			}
