@@ -59,7 +59,7 @@ struct HomeView : MVIView, ViewName {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if phoenixBusiness.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar

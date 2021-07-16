@@ -187,7 +187,7 @@ struct ScanView: View, ViewName {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.get().business.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -435,7 +435,7 @@ struct ValidateView: View, ViewName {
 			Color.primaryBackground
 				.ignoresSafeArea(.all, edges: .all)
 			
-			if AppDelegate.get().business.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.ignoresSafeArea(.all, edges: .all)
@@ -710,7 +710,7 @@ struct SendingView: View {
 		
 		ZStack {
 		
-			if AppDelegate.get().business.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 			}

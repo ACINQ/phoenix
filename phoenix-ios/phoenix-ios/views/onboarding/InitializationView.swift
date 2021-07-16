@@ -34,7 +34,7 @@ struct InitializationView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.get().business.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -129,7 +129,7 @@ struct InitializationView: MVIView {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.get().business.chain.isTestnet() {
+		if AppDelegate.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

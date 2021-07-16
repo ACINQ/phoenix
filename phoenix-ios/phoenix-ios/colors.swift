@@ -30,7 +30,7 @@ extension Color {
 extension UIColor {
 	
 	static var appAccent: UIColor {
-		if AppDelegate.get().business.chain.isTestnet() {
+		if AppDelegate.isTestnet {
 			return UIColor(named: "appAccentBlue")!
 		} else {
 			return UIColor(named: "appAccentGreen")!

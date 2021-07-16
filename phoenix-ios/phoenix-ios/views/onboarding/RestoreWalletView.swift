@@ -46,7 +46,7 @@ struct RestoreWalletView: MVIView {
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
-			if AppDelegate.get().business.chain.isTestnet() {
+			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
@@ -134,7 +134,7 @@ struct WarningView: View {
 			} label: {
 				HStack {
 					Text("Next")
-					Image(systemName: "checkmark.circle")
+					Image(systemName: "checkmark")
 						.imageScale(.medium)
 				}
 				.padding([.top, .bottom], 8)
