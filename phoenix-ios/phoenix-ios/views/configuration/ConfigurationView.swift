@@ -19,6 +19,9 @@ struct ConfigurationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
+	@State var isFaceID = true
+	@State var isTouchID = false
+	
 	enum Tag: String {
 		case AboutView
 		case DisplayConfigurationView
@@ -104,7 +107,7 @@ struct ConfigurationView: MVIView {
 						selection: $selectedTag
 					) {
 						Label { Text("App access") } icon: {
-							Image(systemName: "touchid")
+							Image(systemName: isTouchID ? "touchid" : "faceid")
 						}
 					}
 					NavigationLink(
@@ -179,9 +182,19 @@ struct ConfigurationView: MVIView {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		// This doesn't work anymore on iOS 14 :(
-	//	UITableView.appearance().separatorInset =
-	//		UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 50)
+		let support = AppSecurity.shared.deviceBiometricSupport()
+		switch support {
+			case .touchID_available    : fallthrough
+			case .touchID_notEnrolled  : fallthrough
+			case .touchID_notAvailable : isTouchID = true
+			default                    : isTouchID = false
+		}
+		switch support {
+			case .faceID_available    : fallthrough
+			case .faceID_notEnrolled  : fallthrough
+			case .faceID_notAvailable : isFaceID = true
+			default                   : isFaceID = false
+		}
 		
 		// SwiftUI BUG, and workaround.
 		//
