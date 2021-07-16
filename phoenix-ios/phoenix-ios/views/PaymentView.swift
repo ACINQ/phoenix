@@ -193,10 +193,10 @@ fileprivate struct SummaryView: View {
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
 					
-					Text(verbatim: "\(amount.integerDigits).")
+					Text(verbatim: "\(amount.integerDigits)")
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
-					Text(amount.fractionDigits)
+					Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
 						.lineLimit(1)            // SwiftUI bugs
 						.minimumScaleFactor(0.5) // Truncating text
 						.font(.title)
@@ -260,7 +260,7 @@ fileprivate struct SummaryView: View {
 		log.trace("onAppear()")
 		
 		// Update text in explainFeesPopover
-		explainFeesText = payment.paymentFees(currencyPrefs: currencyPrefs)?.1 ?? ""
+		explainFeesText = explainFeesPopoverText()
 		
 		if let outgoingPayment = payment as? PhoenixShared.Lightning_kmpOutgoingPayment {
 			
@@ -277,9 +277,7 @@ fileprivate struct SummaryView: View {
 				
 				if let fullOutgoingPayment = fullOutgoingPayment {
 					payment = fullOutgoingPayment
-					
-					let feesInfo = fullOutgoingPayment.paymentFees(currencyPrefs: currencyPrefs)
-					explainFeesText = feesInfo?.1 ?? ""
+					explainFeesText = explainFeesPopoverText()
 				}
 			}
 		}
@@ -440,8 +438,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
-					Text(pFees.0.string) // pFees.0 => FormattedAmount
-						.onTapGesture { toggleCurrencyType() }
+					let amount: FormattedAmount = pFees.0
+					
+					if currencyPrefs.currencyType == .bitcoin &&
+						currencyPrefs.bitcoinUnit == .sat &&
+						amount.hasFractionDigits
+					{
+						let styledText: Text =
+							Text("\(amount.integerDigits)")
+						+	Text("\(amount.decimalSeparator)\(amount.fractionDigits)")
+								.foregroundColor(.secondary)
+								.font(.callout)
+								.fontWeight(.light)
+						+	Text(" \(amount.type)")
+						
+						styledText
+							.onTapGesture { toggleCurrencyType() }
+						
+					} else {
+						Text(amount.string)
+							.onTapGesture { toggleCurrencyType() }
+					}
 					
 					if pFees.1.count > 0 {
 						
@@ -1119,7 +1136,14 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							.foregroundColor(Color.appPositive)
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
-						Text(formatted.string)
+						if formatted.hasFractionDigits { // has visible millisatoshi's
+							Text("\(formatted.integerDigits)") +
+							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)")
+								.foregroundColor(.secondary) +
+							Text(" \(formatted.type)")
+						} else {
+							Text(formatted.string)
+						}
 					}
 				}
 				
@@ -1135,7 +1159,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							.foregroundColor(.appNegative)
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
-						Text(formatted.string)
+						if formatted.hasFractionDigits { // has visible millisatoshi's
+							Text("\(formatted.integerDigits)") +
+							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)").foregroundColor(.secondary) +
+							Text(" \(formatted.type)")
+						} else {
+							Text(formatted.string)
+						}
 					}
 					
 					let code = part_failed.remoteFailureCode?.description ?? "local"
@@ -1178,7 +1208,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 			
-			Text(display_msat.string)
+			if display_msat.hasFractionDigits { // has visible millisatoshi's
+				Text("\(display_msat.integerDigits)") +
+				Text("\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
+					.foregroundColor(.secondary) +
+				Text(" \(display_msat.type)")
+			} else {
+				Text(display_msat.string)
+			}
+			
 			if let display_fiat = display_fiat {
 				Text(verbatim: "≈ \(display_fiat.string)")
 			}
