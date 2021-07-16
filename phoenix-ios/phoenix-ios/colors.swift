@@ -37,6 +37,10 @@ extension UIColor {
 		}
 	}
 	
+	static var primaryBackground: UIColor {
+		return UIColor(named: "primaryBackground")!
+	}
+	
 	/// Note that UITraitCollection.current may be incorrect if accessed from a background thread.
 	///
 	func htmlString(_ traitCollection: UITraitCollection) -> String {
