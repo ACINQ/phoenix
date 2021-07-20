@@ -26,6 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	var cancellables = Set<AnyCancellable>()
 	
 	var lockWindow: UIWindow?
+	var errorWindow: UIWindow?
 	
 	let lockState = LockState(isUnlocked: false)
 	
@@ -193,7 +194,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			}
 		}.store(in: &cancellables)
 		
-		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, enabledSecurity: EnabledSecurity) in
+		AppSecurity.shared.tryUnlockWithKeychain {
+			(mnemonics: [String]?, enabledSecurity: EnabledSecurity, danger: LossOfSeedDanger?) in
 
 			// There are multiple potential configurations:
 			//
@@ -202,15 +204,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// - advanced security => mnemonics are not available, enabledSecurity is non-empty
 			//
 			// Another way to think about it:
-			// - standard security => touchID only protects the UI, wallet can immediately be loaded
-			// - advanced security => touchID required to unlock both the UI and the seed
+			// - standard security => biometrics only protect the UI, wallet can immediately be loaded
+			// - advanced security => biometrics required to unlock both the UI and the seed
 
 			if let mnemonics = mnemonics {
 				// unlock & load wallet
 				AppDelegate.get().loadWallet(mnemonics: mnemonics)
 			}
 			
-			if enabledSecurity.isEmpty {
+			if let danger = danger {
+				self.showErrorWindow(danger)
+			} else if enabledSecurity.isEmpty {
 				self.lockState.isUnlocked = true
 			} else {
 				self.showLockWindow()
@@ -225,6 +229,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	private func showLockWindow() {
 		log.trace("showLockWindow()")
 		
+		guard errorWindow == nil else {
+			return
+		}
 		guard let windowScene = self.window?.windowScene else {
 			return
 		}
@@ -249,6 +256,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	private func hideLockWindow() {
 		log.trace("hideLockWindow()")
 		
+		guard errorWindow == nil else {
+			return
+		}
+		
 		// Make window the responder for touch events & other input.
 		window?.makeKey()
 		
@@ -269,6 +280,30 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 				self.lockWindow = nil
 			}
 		}
+	}
+	
+	private func showErrorWindow(_ danger: LossOfSeedDanger) {
+		log.trace("showErrorWindow()")
+		
+		guard let windowScene = self.window?.windowScene else {
+			return
+		}
+		
+		if errorWindow == nil {
+			
+			let errorView = ErrorView(danger: danger)
+			
+			let controller = UIHostingController(rootView: errorView)
+			controller.view.backgroundColor = .clear
+			
+			errorWindow = UIWindow(windowScene: windowScene)
+			errorWindow?.rootViewController = controller
+			errorWindow?.tintColor = UIColor.appAccent
+			errorWindow?.overrideUserInterfaceStyle = Prefs.shared.theme.toInterfaceStyle()
+			errorWindow?.windowLevel = .alert + 1
+		}
+		
+		errorWindow?.makeKeyAndVisible()
 	}
 }
 

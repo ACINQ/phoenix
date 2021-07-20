@@ -35,6 +35,31 @@ enum BiometricSupport {
 	}
 }
 
+enum ReadSecurityFileError: Error {
+	case fileNotFound
+	case errorReadingFile(underlying: Error)
+	case errorDecodingFile(underlying: Error)
+}
+
+enum ReadKeychainError: Error {
+	case keychainOptionNotEnabled
+	case keychainBoxCorrupted(underlying: Error)
+	case errorReadingKey(underlying: Error)
+	case keyNotFound
+	case errorOpeningBox(underlying: Error)
+	case invalidMnemonics
+}
+
+struct LossOfSeedDanger {
+	let readSecurityFileError: ReadSecurityFileError?
+	let readKeychainError: ReadKeychainError?
+	
+	init(_ readSecurityFileError: ReadSecurityFileError?, _ readKeychainError: ReadKeychainError?) {
+		self.readSecurityFileError = readSecurityFileError
+		self.readKeychainError = readKeychainError
+	}
+}
+
 // Names of entries stored within the OS keychain:
 private let keychain_accountName_keychain = "securityFile_keychain"
 private let keychain_accountName_biometrics = "securityFile_biometrics"
@@ -79,17 +104,41 @@ class AppSecurity {
 	
 	/// Performs disk IO - prefer use in background thread.
 	///
-	private func readFromDisk() -> SecurityFile {
+	private func safeReadFromDisk() -> Result<SecurityFile, ReadSecurityFileError> {
 		
-		var result: SecurityFile? = nil
-		do {
-			let data = try Data(contentsOf: self.securityJsonUrl)
-			result = try JSONDecoder().decode(SecurityFile.self, from: data)
-		} catch {
-			// NB: in the event of various failures, we rely on the `createBackup` system.
+		let fileUrl = self.securityJsonUrl
+		
+		if !FileManager.default.fileExists(atPath: fileUrl.path) {
+			return .failure(.fileNotFound)
 		}
 		
-		return result ?? SecurityFile()
+		let data: Data
+		do {
+			data = try Data(contentsOf: fileUrl)
+		} catch {
+			log.error("safeReadFromDisk(): error reading file: \(String(describing: error))")
+			return .failure(.errorReadingFile(underlying: error))
+		}
+		
+		let result: SecurityFile
+		do {
+			result = try JSONDecoder().decode(SecurityFile.self, from: data)
+		} catch {
+			log.error("safeReadFromDisk(): error decoding file: \(String(describing: error))")
+			return .failure(.errorDecodingFile(underlying: error))
+		}
+		
+		return .success(result)
+	}
+	
+	/// Performs disk IO - prefer use in background thread.
+	///
+	private func readFromDisk() -> SecurityFile {
+		
+		let result = safeReadFromDisk()
+		let securityFile = try? result.get()
+		
+		return securityFile ?? SecurityFile()
 	}
 	
 	/// Performs disk IO - prefer use in background thread.
@@ -241,13 +290,38 @@ class AppSecurity {
 	/// Otherwise it will fail, and the completion closure will specify the additional security in place.
 	///
 	public func tryUnlockWithKeychain(
-		completion: @escaping (_ mnemonics: [String]?, _ configuration: EnabledSecurity) -> Void
+		completion: @escaping (
+			_ mnemonics: [String]?,
+			_ configuration: EnabledSecurity,
+			_ danger: LossOfSeedDanger?
+		) -> Void
 	) {
 		
-		let finish = {(_ mnemonics: [String]?, _ configuration: EnabledSecurity) -> Void in
+		let finish = {(mnemonics: [String]?, configuration: EnabledSecurity) -> Void in
+			
 			DispatchQueue.main.async {
 				self.enabledSecurity.send(configuration)
-				completion(mnemonics, configuration)
+				completion(mnemonics, configuration, nil)
+			}
+		}
+		
+		let dangerZone1 = {(error: ReadSecurityFileError, configuration: EnabledSecurity) -> Void in
+			
+			let danger = LossOfSeedDanger(error, nil)
+			
+			DispatchQueue.main.async {
+				self.enabledSecurity.send(configuration)
+				completion(nil, configuration, danger)
+			}
+		}
+		
+		let dangerZone2 = {(error: ReadKeychainError, configuration: EnabledSecurity) -> Void in
+			
+			let danger = LossOfSeedDanger(nil, error)
+			
+			DispatchQueue.main.async {
+				self.enabledSecurity.send(configuration)
+				completion(nil, configuration, danger)
 			}
 		}
 		
@@ -257,25 +331,64 @@ class AppSecurity {
 			
 			// Fetch the "security.json" file.
 			// If the file doesn't exist, an empty SecurityFile is returned.
-			let securityFile = self.readFromDisk()
+			let diskResult = self.safeReadFromDisk()
 			
-			let result = self.readKeychainEntry(securityFile)
-			let enabledSecurity = self.calculateEnabledSecurity(securityFile)
-			
-			let mnemonics = try? result.get()
-			finish(mnemonics, enabledSecurity)
+			switch diskResult {
+				case .failure(let reason):
+					
+					let securityFile = SecurityFile()
+					let configuration = self.calculateEnabledSecurity(securityFile)
+					
+					switch reason {
+						case .fileNotFound:
+							return finish(nil, configuration)
+							
+						case .errorReadingFile: fallthrough
+						case .errorDecodingFile:
+							return dangerZone1(reason, configuration)
+					}
+					
+				case .success(let securityFile):
+					
+					let configuration = self.calculateEnabledSecurity(securityFile)
+					
+					let keychainResult = self.readKeychainEntry(securityFile)
+					switch keychainResult {
+						case .failure(let reason):
+							
+							switch reason {
+								case .keychainOptionNotEnabled:
+									return finish(nil, configuration)
+									
+								case .keychainBoxCorrupted: fallthrough
+								case .errorReadingKey: fallthrough
+								case .keyNotFound: fallthrough
+								case .errorOpeningBox: fallthrough
+								case .invalidMnemonics:
+									return dangerZone2(reason, configuration)
+							}
+							
+						case .success(let mnemonics):
+							return finish(mnemonics, configuration)
+					}
+			}
 		}
 	}
 	
-	private func readKeychainEntry(_ securityFile: SecurityFile) -> Result<[String], Error> {
+	private func readKeychainEntry(_ securityFile: SecurityFile) -> Result<[String], ReadKeychainError> {
 		
 		// The securityFile tells us which security options have been enabled.
 		// If there isn't a keychain entry, then we cannot unlock the seed.
-		guard
-			let keyInfo = securityFile.keychain as? KeyInfo_ChaChaPoly,
-			let sealedBox = try? keyInfo.toSealedBox()
-		else {
-			return .failure(genericError(401, "SecurityFile doesn't have keychain entry"))
+		guard let keyInfo = securityFile.keychain as? KeyInfo_ChaChaPoly else {
+			return .failure(.keychainOptionNotEnabled)
+		}
+		
+		let sealedBox: ChaChaPoly.SealedBox
+		do {
+			sealedBox = try keyInfo.toSealedBox()
+		} catch {
+			log.error("readKeychainEntry(): error: keychainBoxCorrupted: \(String(describing: error))")
+			return .failure(.keychainBoxCorrupted(underlying: error))
 		}
 		
 		let keychain = GenericPasswordStore()
@@ -285,12 +398,13 @@ class AppSecurity {
 		do {
 			fetchedKey = try keychain.readKey(account: keychain_accountName_keychain)
 		} catch {
-			log.error("keychain.readKey(account: keychain): error: \(String(describing: error))")
-			return .failure(error)
+			log.error("readKeychainEntry(): error: readingKey: \(String(describing: error))")
+			return .failure(.errorReadingKey(underlying: error))
 		}
 		
 		guard let lockingKey = fetchedKey else {
-			return .failure(genericError(401, "Keychain entry missing"))
+			log.error("readKeychainEntry(): error: keyNotFound")
+			return .failure(.keyNotFound)
 		}
 		
 		// Decrypt the databaseKey using the lockingKey
@@ -298,11 +412,13 @@ class AppSecurity {
 		do {
 			mnemonicsData = try ChaChaPoly.open(sealedBox, using: lockingKey)
 		} catch {
-			return .failure(error)
+			log.error("readKeychainEntry(): error: openingBox: \(String(describing: error))")
+			return .failure(.errorOpeningBox(underlying: error))
 		}
 		
 		guard let mnemonicsString = String(data: mnemonicsData, encoding: .utf8) else {
-			return .failure(genericError(500, "Keychain data is invalid"))
+			log.error("readKeychainEntry(): error: invalidMnemonics")
+			return .failure(.invalidMnemonics)
 		}
 		
 		let mnemonics = mnemonicsString.split(separator: " ").map { String($0) }
@@ -318,8 +434,8 @@ class AppSecurity {
 	/// - the user is explicitly disabling existing security options
 	///
 	public func addKeychainEntry(
-		mnemonics : [String],
-		completion  : @escaping (_ error: Error?) -> Void
+		mnemonics  : [String],
+		completion : @escaping (_ error: Error?) -> Void
 	) {
 		let mnemonicsData = validateParameter(mnemonics: mnemonics)
 		
@@ -385,9 +501,9 @@ class AppSecurity {
 			//
 			// So we're careful to to perform operations in a particular order here:
 			//
-			// - add new entry to OS keychain
+			// - add new entry to OS keychain (account=keychain)
 			// - write security.json file to disk
-			// - then we can safely remove the old entries from the OS keychain
+			// - then we can safely remove the old entries from the OS keychain (account=biometrics)
 			
 			let keychain = GenericPasswordStore()
 			
@@ -686,11 +802,11 @@ class AppSecurity {
 				return fail(error)
 			}
 			
-			let keyInfo_touchID = KeyInfo_ChaChaPoly(sealedBox: sealedBox)
+			let keyInfo_biometrics = KeyInfo_ChaChaPoly(sealedBox: sealedBox)
 			
 			let oldSecurityFile = self.readFromDisk()
 			let securityFile = SecurityFile(
-				touchID    : keyInfo_touchID,
+				biometrics : keyInfo_biometrics,
 				passphrase : oldSecurityFile.passphrase // maintain existing option
 			)
 			

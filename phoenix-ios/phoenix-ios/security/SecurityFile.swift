@@ -52,9 +52,9 @@ struct SecurityFile: Codable {
 		self.passphrase = nil
 	}
 	
-	init(touchID: KeyInfo?, passphrase: KeyInfo?) {
+	init(biometrics: KeyInfo?, passphrase: KeyInfo?) {
 		self.keychain = nil
-		self.biometrics = touchID
+		self.biometrics = biometrics
 		self.passphrase = passphrase
 	}
 

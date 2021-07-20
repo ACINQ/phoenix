@@ -96,7 +96,7 @@ struct RecoverySeedView : View {
 		
 		let enabledSecurity = AppSecurity.shared.enabledSecurity.value
 		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { mnemonics, _ in
+			AppSecurity.shared.tryUnlockWithKeychain { (mnemonics, _, _) in
 				
 				if let mnemonics = mnemonics {
 					Succeed(mnemonics)
