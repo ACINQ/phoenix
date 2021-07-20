@@ -74,7 +74,7 @@ struct ErrorView: View {
 			
 			Spacer()
 			
-			Text("A temporary error occurred, and Phoenix is unabled to continue loading.")
+			Text("A temporary error occurred, and Phoenix is unable to continue loading.")
 				.font(.title2)
 				.multilineTextAlignment(.center)
 				.padding(.bottom, 60)
