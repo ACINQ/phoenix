@@ -103,7 +103,7 @@ struct LockView : View {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.get().business.chain.isTestnet() {
+		if AppDelegate.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

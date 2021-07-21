@@ -26,18 +26,45 @@ struct RestoreWalletView: MVIView {
 	@ViewBuilder
 	var view: some View {
 		
-		main()
-			.navigationBarTitle(
-				NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
-				displayMode: .inline
-			)
-			.onChange(of: mvi.model, perform: { model in
-				onModelChange(model: model)
-			})
+		ZStack {
+			
+			// Animation Note:
+			// We have 2 options:
+			//
+			// 1. Put the background here, in this layer.
+			//    Which means when the WarningView dimisses (slides down vertically),
+			//    then only the content (text & buttons) are moving.
+			//    And the background stays in place.
+			//
+			// 2. Put the background in each layer below (WarningView & RestoreView).
+			//    Which would mean when the WarningView dismisses (slides down vertically),
+			//    then you see the background dismiss with it.
+			//    Only to be replaced with the exact same background.
+			//
+			// In testing, I think #1 looks cleaner.
+			//
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+
+			if AppDelegate.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+			}
+			
+			main
+		}
+		.navigationBarTitle(
+			NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+		.onChange(of: mvi.model, perform: { model in
+			onModelChange(model: model)
+		})
 	}
 
 	@ViewBuilder
-	func main() -> some View {
+	var main: some View {
 		
 		if !acceptedWarning {
 			WarningView(acceptedWarning: $acceptedWarning)
@@ -78,6 +105,7 @@ struct WarningView: View {
 	@State var iUnderstand: Bool = false
 	
 	var body: some View {
+		
 		VStack {
 			
 			Text(
@@ -87,13 +115,12 @@ struct WarningView: View {
 				Also, make sure that you don't have another Phoenix wallet running with the same seed.
 				"""
 			)
-			.font(.title3)
-			.padding(.top, 20)
+			.padding(.top, 30)
 			
 			HStack {
 				Spacer()
 				Text("I understand.")
-					.font(.title3)
+					.font(.headline)
 					.padding(.trailing, 10)
 				Toggle("", isOn: $iUnderstand).labelsHidden()
 				Spacer()
@@ -104,32 +131,28 @@ struct WarningView: View {
 				withAnimation {
 					acceptedWarning = true
 				}
-				
 			} label: {
 				HStack {
-					Image("ic_arrow_next")
-						.resizable()
-						.frame(width: 16, height: 16)
 					Text("Next")
-						.font(.title2)
+					Image(systemName: "checkmark")
+						.imageScale(.medium)
 				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
 			}
 			.disabled(!iUnderstand)
-			.buttonStyle(PlainButtonStyle())
-			.padding([.top, .bottom], 8)
-			.padding([.leading, .trailing], 16)
-			.background(Color(UIColor.systemFill))
-			.cornerRadius(16)
-			.overlay(
-				RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.appAccent, lineWidth: 2)
+			.buttonStyle(
+				ScaleButtonStyle(
+					backgroundFill: Color.primaryBackground,
+					borderStroke: Color.appAccent,
+					disabledBorderStroke: Color(UIColor.separator)
+				)
 			)
 			
 			Spacer()
 			
 		} // </VStack>
 		.padding([.leading, .trailing])
-		.background(Color(UIColor.systemBackground)) // needed for animation (on dismissal)
 	}
 }
 
@@ -143,8 +166,8 @@ struct RestoreView: View {
 	@State var wordInput: String = ""
 	@State var isProcessingPaste = false
 	
-	let topID = "top"     // Todo: replace with: @Namespace var topID
-	let inputID = "input" // Todo: replace with: @Namespace var inputID
+	@Namespace var topID
+	@Namespace var inputID
 	let keyboardWillShow = NotificationCenter.default.publisher(for:
 		UIApplication.keyboardWillShowNotification
 	)
@@ -191,21 +214,45 @@ struct RestoreView: View {
 	@ViewBuilder
 	func main(_ scrollViewProxy: ScrollViewProxy) -> some View {
 	
-		VStack(alignment: HorizontalAlignment.leading) {
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 
-			Text("Your wallet's seed is a list of 12 english words.")
-				.font(.title3)
-				.padding(.top)
-				.id(topID)
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				Text("Your wallet's seed is a list of 12 english words.")
+					.id(topID)
+				Spacer()
+			}
+			.padding([.leading, .trailing], 16)
 			
-			TextField("Enter keywords from your seed", text: $wordInput)
-				.onChange(of: wordInput) { _ in
-					onInput()
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				TextField("Enter keywords from your seed", text: $wordInput)
+					.onChange(of: wordInput) { _ in
+						onInput()
+					}
+					.disableAutocorrection(true)
+					.disabled(mnemonics.count == 12)
+					.padding(.trailing, 4)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					wordInput = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
 				}
-				.id(inputID)
-				.padding([.top, .bottom])
-				.disableAutocorrection(true)
-				.disabled(mnemonics.count == 12)
+				.isHidden(wordInput == "")
+			}
+			.padding([.top, .bottom], 8)
+			.padding(.leading, 16)
+			.padding(.trailing, 8)
+			.background(Color.primaryBackground)
+			.cornerRadius(100)
+			.overlay(
+				RoundedRectangle(cornerRadius: 16)
+					.stroke(Color(UIColor.separator), lineWidth: 1.5)
+			)
+			.padding(.top)
+			.id(inputID)
 
 			// Autocomplete suggestions for mnemonics
 			ScrollView(.horizontal) {
@@ -249,29 +296,30 @@ struct RestoreView: View {
 					onImportButtonTapped()
 				} label: {
 					HStack {
-						Image(systemName: "checkmark.circle")
-							.imageScale(.small)
-
 						Text("Import")
+						Image(systemName: "checkmark.circle")
+							.imageScale(.medium)
 					}
-					.font(.title2)
+					.padding([.top, .bottom], 8)
+					.padding([.leading, .trailing], 16)
 				}
 				.disabled(mnemonics.count != 12)
-				.buttonStyle(PlainButtonStyle())
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-				.background(Color(UIColor.systemFill))
-				.cornerRadius(16)
-				.overlay(
-					RoundedRectangle(cornerRadius: 16)
-						.stroke(Color.appAccent, lineWidth: 2)
+				.buttonStyle(
+					ScaleButtonStyle(
+						backgroundFill: Color.primaryBackground,
+						borderStroke: Color.appAccent,
+						disabledBorderStroke: Color(UIColor.separator)
+					)
 				)
-				.padding([.top, .bottom]) // buffer space at bottom of scrollView
 				
 				Spacer()
 			}
-		}
+			.padding(.top)
+			
+		} // </VStack>
+		.padding(.top, 30)
 		.padding([.leading, .trailing], 20)
+		.padding(.bottom) // buffer space at bottom of scrollView
 		.onChange(of: mvi.model, perform: { model in
 			onModelChange(model: model)
 		})
@@ -328,7 +376,7 @@ struct RestoreView: View {
 		// What we want is for "bacon" & "animal" to be aligned vertically.
 		// But we can't get that with this design unless we:
 		// - hardcode the width of the number-row (difficult to do with adaptive text sizes)
-		// - use some hack to calculate the proper width based on current font size (possible option)
+		// - use tricks to calculate the proper width based on current font size (possible option)
 		//
 		// 2) HStack of VStack's
 		//

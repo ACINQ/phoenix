@@ -19,12 +19,27 @@ struct InitializationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
+	enum ButtonWidth: Preference {}
+	let buttonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<ButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var buttonWidth: CGFloat? = nil
+	
 	@ViewBuilder
 	var view: some View {
 		
 		ZStack {
 			
-			// ZStack: layer 0 (background)
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
+			if AppDelegate.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+			}
+			
 			// Position the settings icon in top-right corner.
 			HStack{
 				Spacer()
@@ -34,72 +49,66 @@ struct InitializationView: MVIView {
 							.renderingMode(.template)
 							.imageScale(.large)
 					}
-					.buttonStyle(PlainButtonStyle())
-					.padding(.all, 8)
-					.background(Color.buttonFill)
-					.cornerRadius(16)
-					.overlay(
-						RoundedRectangle(cornerRadius: 16)
-						.stroke(Color.appAccent, lineWidth: 2)
-					)
 					Spacer()
 				}
-				.padding(.all, 16)
+				.padding(.all, 20)
 			}
 			
-			// ZStack: layer 1 (foreground)
-			VStack {
+			// Primary content
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 				Spacer()
 				
 				Image(logoImageName)
 					.resizable()
 					.frame(width: 96, height: 96)
-				//	.overlay(Circle().stroke(Color.secondary, lineWidth: 1.5))
-				//	.clipShape(Circle())
-					.padding([.top, .bottom], 0)
 
 				Text("Phoenix")
 					.font(Font.title2)
 					.padding(.top, -10)
 					.padding(.bottom, 80)
-
+				
 				Button {
 					createMnemonics()
 				} label: {
-					HStack {
+					HStack(alignment: VerticalAlignment.firstTextBaseline) {
 						Image(systemName: "flame")
 							.imageScale(.small)
-
 						Text("Create new wallet")
 					}
-					.font(.title2)
-					.foregroundColor(Color(red: 0.99, green: 0.99, blue: 1.0))
+					.read(buttonWidthReader)
+					.frame(width: buttonWidth)
+					.font(.title3)
+					.padding([.top, .bottom], 8)
+					.padding([.leading, .trailing], 16)
 				}
-				.buttonStyle(PlainButtonStyle())
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-				.background(Color.appAccent)
-				.cornerRadius(16)
+				.buttonStyle(
+					ScaleButtonStyle(
+						backgroundFill: Color.primaryBackground,
+						borderStroke: Color.appAccent,
+						disabledBorderStroke: Color(UIColor.separator)
+					)
+				)
 				.padding(.bottom, 40)
 
 				NavigationLink(destination: RestoreWalletView()) {
-					HStack {
+					HStack(alignment: VerticalAlignment.firstTextBaseline) {
 						Image(systemName: "arrow.down.circle")
 							.imageScale(.small)
-
 						Text("Restore my wallet")
 					}
-					.font(.title2)
+					.read(buttonWidthReader)
+					.frame(width: buttonWidth)
+					.font(.title3)
+					.padding([.top, .bottom], 8)
+					.padding([.leading, .trailing], 16)
 				}
-				.buttonStyle(PlainButtonStyle())
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-				.background(Color(UIColor.systemFill))
-				.cornerRadius(16)
-				.overlay(
-					RoundedRectangle(cornerRadius: 16)
-					.stroke(Color.appAccent, lineWidth: 2)
+				.buttonStyle(
+					ScaleButtonStyle(
+						backgroundFill: Color.primaryBackground,
+						borderStroke: Color.appAccent,
+						disabledBorderStroke: Color(UIColor.separator)
+					)
 				)
 				.padding([.top, .bottom], 0)
 				
@@ -110,6 +119,8 @@ struct InitializationView: MVIView {
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			
 		} // </ZStack>
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
 		.navigationBarTitle("", displayMode: .inline)
 		.navigationBarHidden(true)
 		.onChange(of: mvi.model, perform: { model in
@@ -118,7 +129,7 @@ struct InitializationView: MVIView {
 	}
 	
 	var logoImageName: String {
-		if AppDelegate.get().business.chain.isTestnet() {
+		if AppDelegate.isTestnet {
 			return "logo_blue"
 		} else {
 			return "logo_green"

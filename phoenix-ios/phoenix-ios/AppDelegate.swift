@@ -16,10 +16,24 @@ fileprivate var log = Logger(OSLog.disabled)
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
-
+	
 	static func get() -> AppDelegate {
 		UIApplication.shared.delegate as! AppDelegate
 	}
+	
+	// There are some places in the code where we need to access the testnet state from a background thread.
+	// This is problematic because:
+	// - Calling `UIApplication.shared.delegate` from a background thread
+	//   produces an annoying runtime warning.
+	// - Calling into Kotlin via `business.chain.isTestnet()` from a background thread
+	//   will throw an exception.
+	//
+	// So we're caching this value here for background access.
+	// Also, this makes it easier to test mainnet UI & colors.
+	//
+	private static var _isTestnet: Bool? = nil
+	static let isTestnet = _isTestnet!
+	static let showTestnetBackground = _isTestnet!
 	
 	let business: PhoenixBusiness
 	
@@ -42,6 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	override init() {
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
 		business = PhoenixBusiness(ctx: PlatformContext())
+		AppDelegate._isTestnet = business.chain.isTestnet()
 		super.init()
 		performVersionUpgradeChecks()
 		business.start()

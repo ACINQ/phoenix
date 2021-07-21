@@ -66,6 +66,10 @@ protocol InfoGridView: View {
 	
 	var minKeyColumnWidth: CGFloat { get }
 	var maxKeyColumnWidth: CGFloat { get }
+	//  ^^^^^^^^^^^^^^^^^
+	// Possible solution if we don't know the max value, or don't want to hardcode it:
+	// https://finestructure.co/blog/2020/1/20/swiftui-equal-widths-view-constraints
+	// https://betterprogramming.pub/using-the-preferencekey-protocol-to-align-views-7f3ae32f60fc
 	
 	associatedtype Rows: View
 	@ViewBuilder var infoGridRows: Self.Rows { get }

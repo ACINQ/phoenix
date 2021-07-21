@@ -6,13 +6,14 @@
 import SwiftUI
 
 func UIKitAppearance() {
-    let navigationBar = UINavigationBarAppearance()
-    navigationBar.configureWithOpaqueBackground()
-    UINavigationBar.appearance().scrollEdgeAppearance = navigationBar
-    UINavigationBar.appearance().compactAppearance = navigationBar
-    UINavigationBar.appearance().standardAppearance = navigationBar
+	let navBarAppearance = UINavigationBarAppearance()
+	navBarAppearance.configureWithOpaqueBackground()
+	navBarAppearance.backgroundColor = .primaryBackground
+	UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+	UINavigationBar.appearance().compactAppearance = navBarAppearance
+	UINavigationBar.appearance().standardAppearance = navBarAppearance
 
-    UITableView.appearance().backgroundColor = .clear
-    UITableView.appearance().separatorStyle = .none
-    UITableViewCell.appearance().backgroundColor = .clear
+	UITableView.appearance().backgroundColor = .clear
+	UITableView.appearance().separatorStyle = .none
+	UITableViewCell.appearance().backgroundColor = .clear
 }

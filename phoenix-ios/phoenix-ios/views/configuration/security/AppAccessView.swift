@@ -374,7 +374,7 @@ struct AppAccessView : View {
 		// - SecurityFile.keychain == nil
 		// - SecurityFile.biometrics != nil
 		
-		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, _) in
+		AppSecurity.shared.tryUnlockWithKeychain {(mnemonics: [String]?, _, _) in
 			
 			guard let mnemnoics = mnemonics else {
 				return completion(false)

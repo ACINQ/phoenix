@@ -117,7 +117,7 @@ class AnyHTML: ObservableObject {
 		var replacements = [String: String]()
 		replacements["background_color"] = UIColor.systemBackground.htmlString(traits)
 		replacements["foreground_color"] = UIColor.label.htmlString(traits)
-		replacements["link_color"]       = UIColor.link.htmlString(traits)
+		replacements["link_color"]       = UIColor.appAccent.htmlString(traits)
 		
 		return replacements
 	}

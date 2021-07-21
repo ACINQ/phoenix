@@ -46,7 +46,7 @@ struct RecoverySeedView : View {
 					"""
 					**Do not lose this seed.** \
 					Save it somewhere safe (not on this phone). \
-					If you lose your seed and your phone, you've lost your funds."
+					If you lose your seed and your phone, you've lost your funds.
 					""",
 					comment: "RecoverySeedView"
 				))
@@ -96,7 +96,7 @@ struct RecoverySeedView : View {
 		
 		let enabledSecurity = AppSecurity.shared.enabledSecurity.value
 		if enabledSecurity == .none {
-			AppSecurity.shared.tryUnlockWithKeychain { mnemonics, _ in
+			AppSecurity.shared.tryUnlockWithKeychain { (mnemonics, _, _) in
 				
 				if let mnemonics = mnemonics {
 					Succeed(mnemonics)

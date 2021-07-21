@@ -30,11 +30,15 @@ extension Color {
 extension UIColor {
 	
 	static var appAccent: UIColor {
-		if AppDelegate.get().business.chain.isTestnet() {
+		if AppDelegate.isTestnet {
 			return UIColor(named: "appAccentBlue")!
 		} else {
 			return UIColor(named: "appAccentGreen")!
 		}
+	}
+	
+	static var primaryBackground: UIColor {
+		return UIColor(named: "primaryBackground")!
 	}
 	
 	/// Note that UITraitCollection.current may be incorrect if accessed from a background thread.
