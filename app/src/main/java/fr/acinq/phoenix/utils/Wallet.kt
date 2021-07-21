@@ -110,6 +110,8 @@ object Wallet {
     return when {
       trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
       trimmed.startsWith("lightning:", true) -> trimmed.drop(10)
+      trimmed.startsWith("lnurl://", true) -> trimmed.drop(8)
+      trimmed.startsWith("lnurl:", true) -> trimmed.drop(6)
       else -> trimmed
     }
   }
@@ -135,7 +137,7 @@ object Wallet {
         try {
           val uri = URI(input)
           if (uri.scheme != null) {
-            uri.getParams()["lightning"] ?: throw RuntimeException("not a valid LNURL fallback scheme")
+            uri.getParams()["lightning"] ?: throw RuntimeException("uri does not contain a valid LNURL fallback")
           } else {
             input
           }.let { LNUrl.extractLNUrl(it) }

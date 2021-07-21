@@ -17,23 +17,27 @@
 package fr.acinq.phoenix.send
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.common.base.Strings
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.ResultPoint
+import com.google.zxing.*
 import com.google.zxing.client.android.Intents
+import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.multi.qrcode.QRCodeMultiReader
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import fr.acinq.eclair.payment.PaymentRequest
@@ -46,8 +50,13 @@ import fr.acinq.phoenix.lnurl.LNUrlPay
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.*
 import fr.acinq.phoenix.utils.customviews.ButtonView
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 
 class ReadInputFragment : BaseFragment() {
 
@@ -91,8 +100,6 @@ class ReadInputFragment : BaseFragment() {
           mBinding.scanView.pause()
         }
         is ReadInputState.Done.Lightning -> {
-          // check payment request chain
-          val acceptedPrefix = PaymentRequest.prefixes().get(Wallet.getChainHash())
           // additional controls
           if (app.state.value?.getNodeId() == it.pr.nodeId()) {
             log.debug("abort payment to self")
@@ -170,6 +177,13 @@ class ReadInputFragment : BaseFragment() {
       context?.let { model.readInput(ClipboardHelper.read(it)) }
     }
 
+    mBinding.browseButton.setOnClickListener {
+      startActivityForResult(Intent(Intent.ACTION_GET_CONTENT).apply {
+        addCategory(Intent.CATEGORY_OPENABLE)
+        type = "image/*"
+      }, Constants.INTENT_PICK_IMAGE_FILE)
+    }
+
     mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
 
     mBinding.errorButton.setOnClickListener {
@@ -202,6 +216,13 @@ class ReadInputFragment : BaseFragment() {
     mBinding.scanView.pause()
   }
 
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == Constants.INTENT_PICK_IMAGE_FILE && resultCode == Activity.RESULT_OK) {
+      readBitmap(data?.data)
+    }
+  }
+
   private fun startScanning() {
     if (model.inputState.value is ReadInputState.Error || model.inputState.value is ReadInputState.Done) {
       model.inputState.postValue(ReadInputState.Scanning)
@@ -220,6 +241,27 @@ class ReadInputFragment : BaseFragment() {
       if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         model.hasCameraAccess.value = true
         startScanning()
+      }
+    }
+  }
+
+  private fun readBitmap(uri: Uri?) {
+    lifecycleScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+      log.error("failed to load or read QR code image from uri=$uri: ", e)
+      model.inputState.postValue(ReadInputState.Error.UnhandledInput)
+    }) {
+      val bitmap = requireContext().contentResolver.openFileDescriptor(uri!!, "r")?.use {
+        BitmapFactory.decodeFileDescriptor(it.fileDescriptor)
+      }!!
+      val pixels = IntArray(bitmap.width * bitmap.height)
+      bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+      val binaryBitmap = BinaryBitmap(HybridBinarizer(RGBLuminanceSource(bitmap.width, bitmap.height, pixels)))
+      val result = QRCodeMultiReader().decodeMultiple(
+        binaryBitmap
+      )
+      log.info("successfully read QR code with result=$result")
+      withContext(Dispatchers.Main) {
+        model.readInput(result.first().text)
       }
     }
   }

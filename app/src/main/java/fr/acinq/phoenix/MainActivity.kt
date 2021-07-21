@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
     log.debug("reading URI intent=$intent with data=$data")
     if (data != null && data.scheme != null) {
       when (data.scheme) {
-        "bitcoin", "lightning" -> {
+        "bitcoin", "lightning", "lnurl" -> {
           app.currentURIIntent.value = data.toString()
         }
         else -> log.info("unhandled payment scheme $data")
