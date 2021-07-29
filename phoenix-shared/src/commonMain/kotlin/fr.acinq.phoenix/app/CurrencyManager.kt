@@ -61,6 +61,7 @@ class CurrencyManager(
                 }
             }
             .forEach { appDb.saveBitcoinRate(it) }
+        log.info { "successfully refreshed bitcoin prices from blockchain.info" }
     } catch (e: Exception) {
         log.error(e) { "failed to refresh bitcoin price rates from blockchain.info ticker: $e" }
     }

@@ -52,7 +52,7 @@ fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
 
 @Serializable
 enum class FiatCurrency : CurrencyUnit {
-    AUD, BRL, CAD, CHF, CLP, CNY, DKK, EUR, GBP, HKD, INR, ISK, JPY, KRW, MXN, NZD, PLN, RUB, SEK, SGD, THB, TWD, USD;
+    AUD, BRL, CAD, CHF, CLP, CNY, CZK, DKK, EUR, GBP, HKD, HRK, HUF, INR, ISK, JPY, KRW, MXN, NZD, PLN, RON, RUB, SEK, SGD, THB, TWD, USD;
 
     companion object default {
         val values = FiatCurrency.values().toList()
