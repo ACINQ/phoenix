@@ -242,6 +242,9 @@
 /* No comment provided by engineer. */
 "Copy" = "Copier";
 
+/* Currency name: CZK */
+"Czech Koruna" = "Couronne tchèque";
+
 /* No comment provided by engineer. */
 "Create new wallet" = "Créer un nouveau portefeuille";
 
@@ -382,6 +385,12 @@
 
 /* Currency name: HKD */
 "Hong Kong Dollar" = "Dollar de Hong-Kong";
+
+/* Currency name: HRK */
+"Croation Kuna" = "Kuna croate";
+
+/* Currency name: HUD */
+"Hungarian Forint" = "Florin hongrois";
 
 /* No comment provided by engineer. */
 "I understand" = "Je comprends";
@@ -617,6 +626,9 @@
 
 /* Navigation bar title */
 "Restore my wallet" = "Restaurer mon portefeuille";
+
+/* Currency name: RON */
+"Romanian Leu" = "Leu roumain";
 
 /* Currency name: RUB */
 "Russian Ruble" = "Rouble russe";
