@@ -122,18 +122,18 @@
  الرجاء معاودة المحاولة في وقت لاحق.
 ]]></string>
   <string name="receive_swap_in_disabled"><![CDATA[
-<b>تعطيل الخدمة</b>
+<b>تم تعطيل الخدمة</b>
  <br /> <br />
 تم تعطيل خدمة مبادلة الايداعات على السلسلة الرئيسية مؤقتًا.
  <br /> <br />
- حاول مرة أخرى في وقت لاحق.
+ كرر المحاولة لاحقاّ.
 ]]></string>
   <string name="receive_swap_in_disabled_mempool"><![CDATA[
 <b> الخدمة معطلة </b>
  <br /> <br />
  الـ mempool (العمليات المعلقة) الخاصة بالبيتكوين مزدحمة حالياً والرسوم مرتفعة للغاية. تم تعطيل خدمة مبادلة الايداعات على السلسلة الرئيسية مؤقتًا.
  <br /> <br />
- حاول مرة أخرى في وقت لاحق.
+ كرر المحاولة لاحقاّ.
 ]]></string>
   <string name="receive_swap_in_progress_message">طلب عنوان بيتكوين...</string>
   <string name="receive_swap_in_disclaimer_title">الاستقبال بعنوان بيتكوين</string>
@@ -198,8 +198,8 @@
   <string name="scan_error_invalid_scan">بيانات غير صالحة. \n الرجاء المحاولة مرة أخرى.</string>
   <string name="scan_amountless_legacy_title">تحذير</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الضارة من سرقة مبلغك. لكي تبقى آمنًا، يجب أن <b>تطلب من المدفوع له تحديد مبلغ</b> في طلب الدفع.
- <br /> <br />
+لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الخبيثة من سرقة مبلغك. لكي تبقى آمنًا، يجب أن <b>تطلب من المدفوع له تحديد مبلغ</b> في طلب الدفع.
+<br /> <br />
  هل أنت متأكد أنك تريد دفع هذه الفاتورة؟
 ]]></string>
   <string name="scan_amountless_legacy_confirm_button">تأكيد</string>
@@ -277,21 +277,21 @@
   <string name="closechannels_mutual_input_instructions">يمكن إرسال الأموال إلى محفظة بيتكوين. تأكد من صحة العنوان قبل الإرسال.</string>
   <string name="closechannels_mutual_input_hint">أدخل عنوان بيتكوين</string>
   <string name="closechannels_mutual_button">أفرغ محفظتي</string>
-  <string name="closechannels_force_title">الاغلاق بالقوة</string>
+  <string name="closechannels_force_title">فرض الإغلاق</string>
   <string name="closechannels_force_instructions"><![CDATA[
 يسمح لك الإغلاق بالقوة إغلاق قنواتك من جانب واحد.
  <br/> <br/>
  هذه الميزة ليست \"الزر السحري لإصلاح كل شيء\"؛ يعتبر وجودها إجراء أمان و <b>يجب استخدامه فقط في الحالات الصعبة</b>. على سبيل المثال، إذا اختفى نظيرك (ACINQ) بشكل دائم، مما يمنعك من إنفاق أموالك. اما في جميع الحالات الأخرى، <b>إذا كنت تواجه مشكلات مع Phoenix ، فعليك الاتصال بالدعم</b> .
  <br/> <br/>
- سيكلفك الإغلاق بالقوة أموالًا (لتغطية رسوم الارسال عبر السلسلة الرئيسية) وسيؤدي إلى قفل أموالك لعدة أيام. <b> لا تقم بإلغاء تثبيت التطبيق حتى يتم إغلاق قنواتك بالكامل وإلا ستخسر المال.</b>
+ سيكلفك الإغلاق بالقوة أموالًا (لتغطية رسوم الارسال عبر السلسلة الرئيسية) وسيؤدي إلى حجز أموالك لعدة أيام. <b> لا تقم بإلغاء تثبيت التطبيق حتى يتم إغلاق قنواتك بالكامل وإلا ستخسر المال.</b>
  <br/> <br/>
- <b> لا تستخدم هذه الميزة إذا كنت لا تفهم تمامًا ما تفعله. </b>
+ <b>لا تستخدم هذه الميزة إذا كنت لا تفهم تمامًا ماذا تفعل.</b>
 ]]></string>
-  <string name="closechannels_force_destination">سيتم إرسال الأموال في نهاية المطاف إلى:</string>
+  <string name="closechannels_force_destination">سيتم إرسال الأموال في النهاية إلى:</string>
   <string name="closechannels_force_destination_desc">هذا العنوان مشتق من عبارة الاسترداد الخاصة بك وهو ملك لك.</string>
-  <string name="closechannels_force_button">فرض إغلاق القنوات بالقوة</string>
-  <string name="closechannels_confirm_dialog_message">هل انت متأكد انك تريد المتابعة؟</string>
-  <string name="closechannels_message_error">حصلت مشكلة. الرجاء اعادة المحاولة مرة اخرى لاحقًا.</string>
+  <string name="closechannels_force_button">فرض إغلاق القنوات</string>
+  <string name="closechannels_confirm_dialog_message">هل ترغب في المتابعة؟</string>
+  <string name="closechannels_message_error">حدثت مشكلة، يرجى تكرار المحاولة لاحقًا</string>
   <string name="closechannels_message_done">تم إرسال الأموال.</string>
   <string name="closechannels_message_in_progress">يرجى الانتظار…</string>
   
@@ -450,7 +450,7 @@
   <!-- //////////////// channel state state //////////////// -->
 
   <string name="state_wait_confirmed">يتم تأكيد تمويل الـ tx</string>
-  <string name="state_closing">القناة تُغلق</string>
+  <string name="state_closing">يتم إغلاق القناة</string>
   <string name="state_closed">تم إغلاق القناة</string>
   <string name="state_normal">يعمل</string>
   <string name="state_sync">المزامنة مع النظير</string>
@@ -525,26 +525,26 @@
   <string name="lnurl_withdraw_error_amount_min">يجب ألا يقل المبلغ عن %1$s .</string>
   <string name="lnurl_withdraw_error_amount_max">لا يمكن أن يتجاوز المبلغ %1$s .</string>
   <string name="lnurl_withdraw_error_remote_generic"><![CDATA[
-اظهر <b> %1$s </b> خطًأ أو استجابة غير صالحة.
+اظهر <b>%1$s</b> خطًأ أو استجابة غير صالحة.
  <br/> <br/>
- حاول مرة أخرى لاحقًا، أو اتصل بدعمهم.
+ كرر المحاوله لاحقًا، أو اتصل بالدعم الخاص بهم.
 ]]></string>
   <string name="lnurl_withdraw_error_remote_unreadable"><![CDATA[
-قد يكون السحب قد فشل. قام <b> %1$s </b> بارسال ردًا غير قابل للقراءة.
+ربما يكون قد فشل السحب. قام <b>%1$s</b> بارسال ردًا غير قابل للقراءة.
  <br/> <br/>
- حاول مرة أخرى لاحقًا، أو اتصل بدعمهم.
+ كرر المحاوله لاحقًا، أو اتصل بالدعم الخاص بهم.
 ]]></string>
   <string name="lnurl_withdraw_error_remote_code"><![CDATA[
-فشل السحب. قام <b> %1$s </b> بإظهر خطأ HTTP برقم  %2$d
+فشل السحب. قام <b>%1$s</b> بإظهر خطأ HTTP برقم  %2$d
  <br/> <br/>
- حاول مرة أخرى لاحقًا، أو اتصل بدعمهم.
+ كرر المحاوله لاحقًا، أو اتصل بالدعم الخاص بهم.
 ]]></string>
   <string name="lnurl_withdraw_error_remote_detailed"><![CDATA[
-لقد فشل السحب. قام <b> %1$s </b> بإظهار الخطأ التالي:
+لقد فشل السحب. قام <b>%1$s</b> بإظهار الخطأ التالي:
  <br/> <br/>
  <em> %2$s </em>
  <br/> <br/> - <br/>
- حاول مرة أخرى لاحقًا، أو اتصل بدعمهم.
+ كرر المحاوله لاحقًا، أو اتصل بالدعم الخاص بهم.
 ]]></string>
   
   <!-- //////////////// display preferences //////////////// -->
@@ -554,7 +554,7 @@
   <string name="prefs_display_fiat_label">العملة الورقية</string>
   <string name="prefs_display_theme_label">سمة التطبيق</string>
   <string name="prefs_display_explorer_label">مستكشف الشبكة الرئيسية</string>
-  <string name="prefs_display_balance_display">إظهار الرصيد في الرئيسية</string>
+  <string name="prefs_display_balance_display">إظهار الرصيد في الصفحة الرئيسية</string>
   <string name="prefs_display_balance_display_desc">يساعد إخفاء الرصيد التخفي من أعين المتطفلين</string>
   
   <!-- //////////////// electrum server //////////////// -->
@@ -563,14 +563,14 @@
   <string name="electrum_subtitle">بشكل افتراضي، يتصل Phoenix بخوادم Electrum عشوائية لأجل الوصول إلى سلسلة كتل البيتكوين. يمكنك أيضًا اختيار الاتصال بخادم Electrum الخاص بك.</string>
   <string name="electrum_change_button">تعيين الخادم ...</string>
   <string name="electrum_block_height_label">ارتفاع الكتلة</string>
-  <string name="electrum_tip_label">Tip timestamp</string>
+  <string name="electrum_tip_label">تلميح الطابع الزمني</string>
   <string name="electrum_fee_rate_label">معدل الرسوم</string>
-  <string name="electrum_xpub_label">المفتاح العمومي الرئيسي</string>
+  <string name="electrum_xpub_label">المفتاح العام الرئيسي</string>
   <string name="electrum_xpub_value">%1$s \n \n المسار: %2$s</string>
   <string name="electrum_fee_rate">%1$s ساتوشي/بايت</string>
   <string name="electrum_connection_label">الخادم</string>
   <string name="electrum_not_connected">غير متصل</string>
-  <string name="electrum_not_connected_to_custom"><![CDATA[ستتصل بـ<b> %1$s </b>]]></string>
+  <string name="electrum_not_connected_to_custom"><![CDATA[سوف تتصل بـ<b> %1$s </b>]]></string>
   <string name="electrum_connecting">اجراء اتصال…</string>
   <string name="electrum_connecting_to_custom"><![CDATA[يتم الآن الإتصال بـ<b> %1$s … </b>]]></string>
   <string name="electrum_connected"><![CDATA[متصل بـ: <b> %1$s </b>]]></string>
@@ -578,7 +578,7 @@
   <string name="electrum_dialog_ssl">يجب أن يمتلك الخادم شهادة صالحة</string>
   <string name="electrum_dialog_ssl_tor">تحقق أيضًا من شهادة عنوان Onion هذا</string>
   <string name="electrum_dialog_input">عنوان الخادم (host:port).</string>
-  <string name="electrum_empty_custom_address">الرجاء إدخال عنوان خادم Eelctrum</string>
+  <string name="electrum_empty_custom_address">الرجاء إدخال عنوان خادم Electrum</string>
   
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
@@ -588,7 +588,7 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">إعدادات Tor</string>
-  <string name="tor_settings_subtitle">يمكنك تحسين خصوصيتك باستخدام Tor عند الاتصال بخادم Electrum أو بنظير شبكة البرق الخاص بك. سيؤدي هذا إلى إبطاء بدء تشغيل التطبيق بشكل قليلًا.</string>
+  <string name="tor_settings_subtitle">يمكنك تحسين خصوصيتك فقط باستخدام Tor عند الاتصال بخادم Electrum أو بنظير شبكة البرق الخاص بك. سيؤدي هذا إلى إبطاء بدء تشغيل التطبيق قليلًا</string>
   <string name="tor_settings_enabled">تم تمكين Tor</string>
   <string name="tor_settings_disabled">تم تعطيل Tor</string>
   <string name="tor_settings_confirm_disable_title">هل أنت متأكد أنك تريد تعطيل Tor؟</string>
@@ -614,14 +614,14 @@ Phoenix هي محفظة بيتكوين تستخدم شبكة البرق لإرس
  <br/> <br/>
  البرنامج مجاني مفتوح المصدر، تم تطويره بواسطة <a href=\"https://phoenix.acinq.co\"> ACINQ </a> ضمن <a href=\"https://www.apache.org/licenses/LICENSE-2.0.txt\"> ترخيص Apache 2.0 </a> .
  <br/> <br/>
- لاحظ أن هذه المحفظة ليست محفظة مركزية: <strong>لديك تحكم كامل على على المحفظة وعبارة الاسترداد المكونة من 12 كلمة للمحفظة </strong>. لا تعطي هذه الكلمات لأي شخص، واحذر من التصيد الاحتيالي والصفحات المزورة.
+ لاحظ أن هذه المحفظة ليست محفظة مركزية: <strong>لديك الوصاية الوحيدة على أصل المحفظة المكون من 12 كلمة</strong>. لا تعطي هذه الكلمات لأي شخص، واحذر من التصيد الاحتيالي والصفحات المزورة.
  <br/> <br/>
  إذا كانت لديك أسئلة، فراجع <a href=\"https://phoenix.acinq.co/faq\">الأسئلة الشائعة</a>. يمكنك أيضًا الاتصال <a href=\"https://phoenix.acinq.co/support\">بالدعم</a> للحصول على المساعدة.
 ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-يتم معرفة سعر صرف البيتكوين والعملات الورقية باستخدام الواجهة البرمجية للعديد من الخدمات التابعة لأطراف ثالثة:
+يتم تحديد سعر صرف البيتكوين والعملات الورقية باستخدام الواجهة البرمجية للتطبيقات المتنوعة التابعة لأطراف خارجية:
  <br /> - Blockchain.info
- <br /> - بيتسو
+ <br /> - Bitso (a cryptocurrency exchange based in Mexico).
  <br /> - <a href=\"https://www.coindesk.com/price/bitcoin\"> مدعوم من Coindesk </a>
 ]]></string>
   <string name="about_terms">شروط الاستخدام</string>
@@ -647,7 +647,7 @@ Phoenix هي محفظة بيتكوين تستخدم شبكة البرق لإرس
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">أدخل الرسوم الأساسية بالساتوشي</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">الرسوم المناسبة (%)</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">أدخل رسومًا مناسبة بـ %</string>
-  <string name="paymentsettings_paytoopen_auto_switch_title">إنشاء قناة سريعة تلقائية على الفور</string>
+  <string name="paymentsettings_paytoopen_auto_switch_title">إنشاء قناة سريعة بشكل تلقائي/تلقائياّ</string>
   <string name="paymentsettings_paytoopen_auto_switch_enabled">سيتم فتح قناة جديدة عند الحاجة، سيتم تطبيق رسوم (انظر أدناه)</string>
   <string name="paymentsettings_paytoopen_auto_switch_disabled">سيتم رفض المدفوعات الواردة التي تتطلب قناة جديدة وستفشل</string>
   <string name="paymentsettings_paytoopen_fees_title">رسوم إنشاء قناة سريعة</string>
@@ -663,7 +663,7 @@ Phoenix هي محفظة بيتكوين تستخدم شبكة البرق لإرس
 
   <string name="ftue__welcome__header">أهلا بك!</string>
   <string name="ftue__welcome__body">مع Phoenix، يكون استلام عملات البيتكوين وإرسالها آمنًا وسهلاً وسريعًا.</string>
-  <string name="ftue__pay_to_open__header">إنشاء قناة تلقائية</string>
+  <string name="ftue__pay_to_open__header">إنشاء قناة بشكل تلقائي/تلقائياّ</string>
   <string name="ftue__pay_to_open__body"><![CDATA[
 يتم إنشاء قنوات الدفع تلقائيًا عند الحاجة.
  <br /> <br />
