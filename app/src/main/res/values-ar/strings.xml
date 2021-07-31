@@ -331,7 +331,7 @@
   
   <!-- //////////////// init wallet //////////////// -->
 
-  <string name="initwallet_terms"><![CDATA[لقد قرأت وأوافق على <br/> <a href=\"https://phoenix.acinq.co/terms\"> شروط الاستخدام </a> .]]></string>
+  <string name="initwallet_terms"><![CDATA[لقد قرأت وأوافق على <br/> <a href=\"https://phoenix.acinq.co/terms\"> شروط الاستخدام </a>.]]></string>
   <string name="initwallet_create">إنشاء محفظة جديدة</string>
   <string name="initwallet_restore">استعادة محفظتي</string>
   
@@ -638,7 +638,7 @@
   <string name="paymentsettings_defaultdesc_title">وصف الدفع الافتراضي</string>
   <string name="paymentsettings_defaultdesc_none">لم يتم تعيين وصف...</string>
   <string name="paymentsettings_defaultdesc_dialog_title">الوصف الافتراضي</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">ستستخدم طلبات الدفع التي تقوم بإنشائها هذا الوصف. يمكنك تغييره لكل معاملة على حدة.</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">ستستخدم طلبات الدفع التي تقوم بإنشائها هذا الوصف. ويمكنك تغييره لكل معاملة على حدة.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">أدخل وصفًا</string>
   <string name="paymentsettings_trampoline_fees_title">الحد الأقصى لرسوم مدفوعات شبكة البرق الصادرة</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s %%</string>
@@ -667,7 +667,7 @@
   <string name="ftue__pay_to_open__body"><![CDATA[
 يتم إنشاء قنوات الدفع تلقائيًا عند الحاجة.
  <br /> <br />
- الرسوم <b>%1$s%%</b><br/> بحد أدنى: لا تقل عن<b>%2$s</b>.
+ الرسوم <b>%1$s%%</b><br/> بحد أدنى: لا تقل عن <b>%2$s</b>.
  <br /> <br />
  على سبيل المثال، لاستقبال 250000 ساتوشي، ستكون رسوم إنشاء القناة %2$s.
 ]]></string>
