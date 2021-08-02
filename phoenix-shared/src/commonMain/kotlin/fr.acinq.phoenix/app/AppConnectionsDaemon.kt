@@ -3,6 +3,7 @@ package fr.acinq.phoenix.app
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.NetworkState
@@ -28,6 +29,16 @@ class AppConnectionsDaemon(
     private val electrumClient: ElectrumClient,
     loggerFactory: LoggerFactory,
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        configurationManager = business.appConfigurationManager,
+        walletManager = business.walletManager,
+        peerManager = business.peerManager,
+        currencyManager = business.currencyManager,
+        monitor = business.networkMonitor,
+        electrumClient = business.electrumClient
+    )
 
     private val logger = newLogger(loggerFactory)
 

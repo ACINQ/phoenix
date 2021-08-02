@@ -29,9 +29,10 @@ import org.kodein.memory.file.resolve
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUnsignedTypes::class)
-class PhoenixBusiness(private val ctx: PlatformContext) {
-
-    private val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
+class PhoenixBusiness(
+    internal val ctx: PlatformContext
+) {
+    internal val logMemory = LogMemory(Path(getApplicationFilesDirectoryPath(ctx)).resolve("logs"))
 
     val loggerFactory = LoggerFactory(
         defaultLogFrontend.withShortPackageKeepLast(1),
@@ -40,10 +41,10 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     private val logger = loggerFactory.newLogger(this::class)
 
-    private val tcpSocketBuilder = TcpSocket.Builder()
+    internal val tcpSocketBuilder = TcpSocket.Builder()
 
-    private val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
-    private val httpClient by lazy {
+    internal val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
+    internal val httpClient by lazy {
         HttpClient {
             install(JsonFeature) {
                 serializer = KotlinxSerializer(Json {
@@ -55,22 +56,22 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     val chain = Chain.Testnet
 
-    private val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
-    private val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
+    internal val electrumClient by lazy { ElectrumClient(tcpSocketBuilder, MainScope()) }
+    internal val electrumWatcher by lazy { ElectrumWatcher(electrumClient, MainScope()) }
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    private val walletManager by lazy { WalletManager() }
-    private val nodeParamsManager by lazy { NodeParamsManager(loggerFactory, ctx, chain, walletManager) }
-    private val peerManager by lazy { PeerManager(loggerFactory, nodeParamsManager, appConfigurationManager, tcpSocketBuilder, electrumWatcher) }
-    val paymentsManager by lazy { PaymentsManager(loggerFactory, peerManager, nodeParamsManager) }
+    internal val walletManager by lazy { WalletManager() }
+    internal val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
 
-    private val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
-    val appConfigurationManager by lazy { AppConfigurationManager(appDb, httpClient, electrumClient, chain, loggerFactory) }
-    val currencyManager by lazy { CurrencyManager(loggerFactory, appDb, httpClient) }
-
-    val connectionsMonitor by lazy { ConnectionsMonitor(peerManager, electrumClient, networkMonitor) }
-    val util by lazy { Utilities(loggerFactory, chain) }
+    val nodeParamsManager by lazy { NodeParamsManager(this) }
+    val databaseManager by lazy { DatabaseManager(this) }
+    val peerManager by lazy { PeerManager(this) }
+    val paymentsManager by lazy { PaymentsManager(this) }
+    val appConfigurationManager by lazy { AppConfigurationManager(this) }
+    val currencyManager by lazy { CurrencyManager(this) }
+    val connectionsMonitor by lazy { ConnectionsMonitor(this) }
+    val util by lazy { Utilities(this) }
 
     init {
         setLightningLoggerFactory(loggerFactory)
@@ -79,15 +80,7 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
     fun start() {
         if (appConnectionsDaemon == null) {
             logger.debug { "start business" }
-            appConnectionsDaemon = AppConnectionsDaemon(
-                appConfigurationManager,
-                walletManager,
-                peerManager,
-                currencyManager,
-                networkMonitor,
-                electrumClient,
-                loggerFactory,
-            )
+            appConnectionsDaemon = AppConnectionsDaemon(this)
         }
     }
 
@@ -117,41 +110,42 @@ class PhoenixBusiness(private val ctx: PlatformContext) {
 
     fun updateTorUsage(isEnabled: Boolean) = appConfigurationManager.updateTorUsage(isEnabled)
 
+    private val _this = this
     val controllers: ControllerFactory = object : ControllerFactory {
         override fun content(): ContentController =
-            AppContentController(loggerFactory, walletManager)
+            AppContentController(_this)
 
         override fun initialization(): InitializationController =
-            AppInitController(loggerFactory, walletManager)
+            AppInitController(_this)
 
         override fun home(): HomeController =
-            AppHomeController(loggerFactory, peerManager, paymentsManager)
+            AppHomeController(_this)
 
         override fun receive(): ReceiveController =
-            AppReceiveController(loggerFactory, chain, peerManager)
+            AppReceiveController(_this)
 
         override fun scan(firstModel: Scan.Model): ScanController =
-            AppScanController(loggerFactory, firstModel, peerManager, nodeParamsManager, util, chain)
+            AppScanController(_this, firstModel)
 
         override fun restoreWallet(): RestoreWalletController =
-            AppRestoreWalletController(loggerFactory)
+            AppRestoreWalletController(_this)
 
         override fun configuration(): ConfigurationController =
-            AppConfigurationController(loggerFactory, walletManager)
+            AppConfigurationController(_this)
 
         override fun electrumConfiguration(): ElectrumConfigurationController =
-            AppElectrumConfigurationController(loggerFactory, appConfigurationManager, electrumClient, appConnectionsDaemon!!)
+            AppElectrumConfigurationController(_this)
 
         override fun channelsConfiguration(): ChannelsConfigurationController =
-            AppChannelsConfigurationController(loggerFactory, peerManager, chain)
+            AppChannelsConfigurationController(_this)
 
         override fun logsConfiguration(): LogsConfigurationController =
-            AppLogsConfigurationController(ctx, loggerFactory, logMemory)
+            AppLogsConfigurationController(_this)
 
         override fun closeChannelsConfiguration(): CloseChannelsConfigurationController =
-            AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, false)
+            AppCloseChannelsConfigurationController(_this, isForceClose = false)
 
         override fun forceCloseChannelsConfiguration(): CloseChannelsConfigurationController =
-            AppCloseChannelsConfigurationController(loggerFactory, peerManager, walletManager, chain, util, true)
+            AppCloseChannelsConfigurationController(_this, isForceClose = true)
     }
 }

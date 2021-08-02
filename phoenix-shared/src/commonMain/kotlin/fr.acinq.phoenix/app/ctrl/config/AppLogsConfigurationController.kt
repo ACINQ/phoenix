@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.app.ctrl.config
 
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.LogsConfiguration
 import fr.acinq.phoenix.utils.LogMemory
@@ -15,11 +16,19 @@ import org.kodein.memory.io.*
 import org.kodein.memory.use
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppLogsConfigurationController(ctx: PlatformContext, loggerFactory: LoggerFactory, logMemory: LogMemory)
-    : AppController<LogsConfiguration.Model, LogsConfiguration.Intent>(
-    loggerFactory,
-    LogsConfiguration.Model.Loading
+class AppLogsConfigurationController(
+    ctx: PlatformContext,
+    loggerFactory: LoggerFactory,
+    logMemory: LogMemory
+) : AppController<LogsConfiguration.Model, LogsConfiguration.Intent>(
+    loggerFactory = loggerFactory,
+    firstModel = LogsConfiguration.Model.Loading
 ) {
+    constructor(business: PhoenixBusiness): this(
+        ctx = business.ctx,
+        loggerFactory = business.loggerFactory,
+        logMemory = business.logMemory
+    )
 
     private val numberOfFiles = 3 // Edit for longer files
 

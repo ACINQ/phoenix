@@ -1,9 +1,7 @@
 package fr.acinq.phoenix.app
 
-import fr.acinq.phoenix.data.BitcoinPriceRate
-import fr.acinq.phoenix.data.BlockchainInfoPriceObject
-import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.MxnApiResponse
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -21,6 +19,12 @@ class CurrencyManager(
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        appDb = business.appDb,
+        httpClient = business.httpClient
+    )
 
     private val log = newLogger(loggerFactory)
 

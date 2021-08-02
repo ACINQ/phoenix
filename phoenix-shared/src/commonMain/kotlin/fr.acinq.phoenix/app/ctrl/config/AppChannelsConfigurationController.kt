@@ -4,6 +4,7 @@ import fr.acinq.lightning.channel.ChannelStateWithCommitments
 import fr.acinq.lightning.channel.Normal
 import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
 import fr.acinq.lightning.serialization.v1.Serialization.lightningSerializersModule
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
@@ -19,13 +20,18 @@ import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppChannelsConfigurationController(
-    loggerFactory: LoggerFactory, 
+    loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
     private val chain: Chain
 ) : AppController<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>(
-    loggerFactory,
+    loggerFactory = loggerFactory,
     firstModel = ChannelsConfiguration.emptyModel
 ) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        peerManager = business.peerManager,
+        chain = business.chain
+    )
 
     private val json = Json {
         prettyPrint = true

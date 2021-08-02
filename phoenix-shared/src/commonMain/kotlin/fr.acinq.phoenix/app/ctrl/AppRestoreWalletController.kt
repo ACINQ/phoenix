@@ -1,7 +1,7 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.phoenix.app.WalletManager
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.ctrl.RestoreWallet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -11,9 +11,12 @@ import org.kodein.log.LoggerFactory
 class AppRestoreWalletController(
     loggerFactory: LoggerFactory
 ) : AppController<RestoreWallet.Model, RestoreWallet.Intent>(
-    loggerFactory,
-    RestoreWallet.Model.Ready
+    loggerFactory = loggerFactory,
+    firstModel = RestoreWallet.Model.Ready
 ) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory
+    )
 
     override fun process(intent: RestoreWallet.Intent) {
         when (intent) {

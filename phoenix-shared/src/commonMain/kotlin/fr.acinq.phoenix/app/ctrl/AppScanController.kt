@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.app.ctrl
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
@@ -12,12 +11,12 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.sum
-import fr.acinq.phoenix.app.NodeParamsManager
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.app.DatabaseManager
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.Utilities
 import fr.acinq.phoenix.ctrl.Scan
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.data.toMilliSatoshi
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
@@ -29,13 +28,21 @@ class AppScanController(
     loggerFactory: LoggerFactory,
     firstModel: Scan.Model?,
     private val peerManager: PeerManager,
-    private val nodeParamsManager: NodeParamsManager,
+    private val databaseManager: DatabaseManager,
     private val utilities: Utilities,
     private val chain: Chain
 ) : AppController<Scan.Model, Scan.Intent>(
-    loggerFactory,
+    loggerFactory = loggerFactory,
     firstModel = firstModel ?: Scan.Model.Ready
 ) {
+    constructor(business: PhoenixBusiness, firstModel: Scan.Model?): this(
+        loggerFactory = business.loggerFactory,
+        firstModel = firstModel,
+        databaseManager = business.databaseManager,
+        peerManager = business.peerManager,
+        utilities = business.util,
+        chain = business.chain,
+    )
 
     init {
         launch {
@@ -77,7 +84,7 @@ class AppScanController(
                             false
                         } else {
                             // amountless invoice -> dangerous unless full trampoline is in effect
-                            val features = Features(paymentRequest.features ?: ByteVector.empty)
+                            val features = Features(paymentRequest.features)
                             !features.hasFeature(Feature.TrampolinePayment)
                         }
                         if (isDangerousAmountless) {
@@ -201,7 +208,7 @@ class AppScanController(
             return Either.Left(Scan.BadRequestReason.ChainMismatch(chain, requestChain))
         }
 
-        val db = nodeParamsManager.databases.filterNotNull().first()
+        val db = databaseManager.databases.filterNotNull().first()
         val previousInvoicePayment = db.payments.listOutgoingPayments(paymentRequest.paymentHash).find {
             it.status is OutgoingPayment.Status.Completed.Succeeded
         }

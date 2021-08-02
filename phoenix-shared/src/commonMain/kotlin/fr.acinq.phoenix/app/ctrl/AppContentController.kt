@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.app.ctrl
 
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.WalletManager
 import fr.acinq.phoenix.ctrl.Content
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -8,7 +9,18 @@ import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppContentController(loggerFactory: LoggerFactory, private val walletManager: WalletManager) : AppController<Content.Model, Content.Intent>(loggerFactory, Content.Model.Waiting) {
+class AppContentController(
+    loggerFactory: LoggerFactory,
+    private val walletManager: WalletManager
+) : AppController<Content.Model, Content.Intent>(
+    loggerFactory = loggerFactory,
+    firstModel = Content.Model.Waiting
+) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        walletManager = business.walletManager
+    )
+
     init {
         launch {
             if (walletManager.wallet.value != null) {

@@ -6,6 +6,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.db.Databases
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.phoenix.PhoenixBusiness
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -21,12 +22,23 @@ import org.kodein.log.newLogger
 class PeerManager(
     loggerFactory: LoggerFactory,
     private val nodeParamsManager: NodeParamsManager,
+    private val databaseManager: DatabaseManager,
     private val configurationManager: AppConfigurationManager,
     private val tcpSocketBuilder: TcpSocket.Builder,
     private val electrumWatcher: ElectrumWatcher,
 ) : CoroutineScope by MainScope() {
 
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        nodeParamsManager = business.nodeParamsManager,
+        databaseManager = business.databaseManager,
+        configurationManager = business.appConfigurationManager,
+        tcpSocketBuilder = business.tcpSocketBuilder,
+        electrumWatcher = business.electrumWatcher
+    )
+
     private val logger = newLogger(loggerFactory)
+
     private val _peer = MutableStateFlow<Peer?>(null)
     public val peerState: StateFlow<Peer?> = _peer
 
@@ -36,7 +48,7 @@ class PeerManager(
                 nodeParams = nodeParamsManager.nodeParams.filterNotNull().first(),
                 walletParams = configurationManager.chainContext.filterNotNull().first().walletParams(),
                 watcher = electrumWatcher,
-                db = nodeParamsManager.databases.filterNotNull().first(),
+                db = databaseManager.databases.filterNotNull().first(),
                 socketBuilder = tcpSocketBuilder,
                 scope = MainScope()
             )

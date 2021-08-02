@@ -4,6 +4,7 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import fr.acinq.phoenix.utils.RETRY_DELAY
@@ -26,6 +27,14 @@ class AppConfigurationManager(
     private val chain: Chain,
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        chain = business.chain,
+        appDb = business.appDb,
+        httpClient = business.httpClient,
+        electrumClient = business.electrumClient
+    )
 
     private val logger = newLogger(loggerFactory)
 
