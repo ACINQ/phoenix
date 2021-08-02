@@ -144,8 +144,11 @@ struct ReceiveLightningView: View, ViewName {
 	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
-	@State var isSwapInEnabled = true
-	@State var isPayToOpenEnabled = true
+	@State var swapIn_enabled = true
+	@State var payToOpen_enabled = true
+	@State var payToOpen_minFundingSat: Int64 = 0
+	
+	@State var channelsCount = 0
 	
 	@State var pushPermissionRequestedFromOS = true
 	@State var bgAppRefreshDisabled = false
@@ -164,6 +167,7 @@ struct ReceiveLightningView: View, ViewName {
 	
 	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	let channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -187,6 +191,9 @@ struct ReceiveLightningView: View, ViewName {
 		}
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
+		}
+		.onReceive(channelsPublisher) {
+			channelsChanged($0)
 		}
 		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
@@ -255,8 +262,11 @@ struct ReceiveLightningView: View, ViewName {
 				.matchedGeometryEffect(id: "qrCodeView_outer", in: qrCodeAnimation_outer)
 				.padding(.top)
 			
-			if !isPayToOpenEnabled {
+			if !payToOpen_enabled {
 				payToOpenDisabledWarning()
+					.padding(.top, 8)
+			} else if channelsCount == 0 {
+				payToOpenMinimumWarning()
 					.padding(.top, 8)
 			}
 			
@@ -546,12 +556,43 @@ struct ReceiveLightningView: View, ViewName {
 			Image(systemName: "exclamationmark.triangle")
 				.imageScale(.large)
 				.padding(.trailing, 10)
+				.foregroundColor(Color(UIColor.tertiaryLabel))
 			Text(
 				"""
 				Channel creation has been temporarily disabled. \
 				You may not be able to receive some payments.
 				"""
 			)
+			.multilineTextAlignment(.center)
+			Image(systemName: "exclamationmark.triangle")
+				.imageScale(.large)
+				.padding(.leading, 10)
+				.foregroundColor(Color(UIColor.tertiaryLabel))
+		}
+		.font(.caption)
+		.padding(12)
+		.background(
+			RoundedRectangle(cornerRadius: 8)
+				.stroke(Color.appAccent, lineWidth: 1)
+		)
+		.padding([.leading, .trailing], 10)
+	}
+	
+	@ViewBuilder
+	func payToOpenMinimumWarning() -> some View {
+		
+		let minFunding = Utils.formatBitcoin(sat: payToOpen_minFundingSat, bitcoinUnit: .sat)
+		
+		HStack(alignment: VerticalAlignment.top, spacing: 0) {
+			Text(styled: String(format: NSLocalizedString(
+				"""
+				Your wallet is empty. The first payment you \
+				receive must be at least **%@**.
+				""",
+				comment:	"Minimum amount description."),
+				minFunding.string
+			))
+			.multilineTextAlignment(.center)
 		}
 		.font(.caption)
 		.padding(12)
@@ -822,14 +863,35 @@ struct ReceiveLightningView: View, ViewName {
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
 		log.trace("[\(viewName)] chainContextChanged()")
 		
-		isSwapInEnabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
-		isPayToOpenEnabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
+		swapIn_enabled = context.swapIn.v1.status is WalletContext.V0ServiceStatusActive
+		payToOpen_enabled = context.payToOpen.v1.status is WalletContext.V0ServiceStatusActive
+		payToOpen_minFundingSat = context.payToOpen.v1.minFundingSat
+	}
+	
+	func channelsChanged(_ channels: Lightning_kmpPeer.ChannelsMap) -> Void {
+		log.trace("[\(viewName)] channelsChanged()")
+		
+		var availableCount = 0
+		for (_, channel) in channels {
+			
+			if channel.asClosing() != nil ||
+			   channel.asClosed() != nil ||
+			   channel.asAborted() != nil
+			{
+				// ignore - channel isn't usable for incoming payments
+			} else {
+				availableCount += 1
+			}
+			
+		}
+		
+		channelsCount = availableCount
 	}
 	
 	func didTapSwapInButton() -> Void {
 		log.trace("[\(viewName)] didTapSwapInButton()")
 		
-		if isSwapInEnabled {
+		if swapIn_enabled {
 			
 			mvi.intent(Receive.IntentRequestSwapIn())
 			

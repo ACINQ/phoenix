@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.lightning.channel.ChannelState
-import fr.acinq.lightning.channel.Closing
-import fr.acinq.lightning.channel.Offline
+import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -166,5 +164,13 @@ fun ChannelState.asOffline(): Offline? = when (this) {
 }
 fun ChannelState.asClosing(): Closing? = when (this) {
     is Closing -> this
+    else -> null
+}
+fun ChannelState.asClosed(): Closed? = when (this) {
+    is Closed -> this
+    else -> null
+}
+fun ChannelState.asAborted(): Aborted? = when (this) {
+    is Aborted -> this
     else -> null
 }

@@ -172,25 +172,44 @@ extension AppConfigurationManager {
 
 extension Lightning_kmpElectrumWatcher {
 	
-	fileprivate struct _Lazy {
-		
-		static var upToDatePublisher: AnyPublisher<Int64, Never>? = nil
+	fileprivate struct _Key {
+		static var upToDatePublisher = 0
 	}
 	
 	func upToDatePublisher() -> AnyPublisher<Int64, Never> {
 		
-		// `self` is a singleton instance
-		
-		if let publisher = _Lazy.upToDatePublisher {
-			return publisher
-		} else {
-			let publisher = KotlinPassthroughSubject<KotlinLong, Int64>(
+		executeOnce(storageKey: &_Key.upToDatePublisher) {
+					
+			/// Transforming from Kotlin:
+			/// `openUpToDateFlow(): Flow<Long>`
+			///
+			KotlinPassthroughSubject<KotlinLong, Int64>(
 				self.openUpToDateFlow()
 			)
 			.eraseToAnyPublisher()
+		}
+	}
+}
+
+extension Lightning_kmpPeer {
+	
+	fileprivate struct _Key {
+		static var channelsPublisher = 0
+	}
+	
+	typealias ChannelsMap = [Bitcoin_kmpByteVector32: Lightning_kmpChannelState]
+	
+	func channelsPublisher() -> AnyPublisher<ChannelsMap, Never> {
+		
+		executeOnce(storageKey: &_Key.channelsPublisher) {
 			
-			_Lazy.upToDatePublisher = publisher
-			return publisher
+			/// Transforming from Kotlin:
+			/// `channelsFlow: StateFlow<Map<ByteVector32, ChannelState>>`
+			///
+			KotlinCurrentValueSubject<NSDictionary, ChannelsMap>(
+				self.channelsFlow
+			)
+			.eraseToAnyPublisher()
 		}
 	}
 }
