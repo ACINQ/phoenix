@@ -54,8 +54,6 @@ fun WalletPayment.paymentHashString(): String = when (this) {
     is IncomingPayment -> paymentHash.toString()
 }
 
-fun WalletPayment.timestamp(): Long = WalletPayment.completedAt(this)
-
 fun WalletPayment.errorMessage(): String? = when (this) {
     is OutgoingPayment -> when (val s = status) {
         is OutgoingPayment.Status.Completed.Failed -> s.reason.toString()

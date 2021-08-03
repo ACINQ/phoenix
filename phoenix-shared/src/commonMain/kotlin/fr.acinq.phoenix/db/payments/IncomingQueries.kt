@@ -109,16 +109,22 @@ class IncomingQueries(private val queries: IncomingPaymentsQueries) {
             return IncomingPayment(
                 preimage = ByteVector32(preimage),
                 origin = IncomingOriginData.deserialize(origin_type, origin_blob),
-                received = mapIncomingReceived(received_amount_msat?.msat, received_at, received_with_type, received_with_blob),
+                received = mapIncomingReceived(received_amount_msat?.msat, received_at, origin_type, received_with_type, received_with_blob),
                 createdAt = created_at
             )
         }
 
-        private fun mapIncomingReceived(amount: MilliSatoshi?, receivedAt: Long?, receivedWithTypeVersion: IncomingReceivedWithTypeVersion?, receivedWithBlob: ByteArray?): IncomingPayment.Received? {
+        private fun mapIncomingReceived(
+            amount: MilliSatoshi?,
+            receivedAt: Long?,
+            originTypeVersion: IncomingOriginTypeVersion,
+            receivedWithTypeVersion: IncomingReceivedWithTypeVersion?,
+            receivedWithBlob: ByteArray?
+        ): IncomingPayment.Received? {
             return when {
                 receivedAt == null && receivedWithTypeVersion == null && receivedWithBlob == null -> null
                 receivedAt != null && receivedWithTypeVersion != null && receivedWithBlob != null -> {
-                    IncomingPayment.Received(IncomingReceivedWithData.deserialize(receivedWithTypeVersion, receivedWithBlob, amount), receivedAt)
+                    IncomingPayment.Received(IncomingReceivedWithData.deserialize(receivedWithTypeVersion, receivedWithBlob, amount, originTypeVersion), receivedAt)
                 }
                 else -> throw UnreadableIncomingReceivedWith(receivedAt, receivedWithTypeVersion, receivedWithBlob)
             }

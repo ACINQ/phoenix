@@ -137,7 +137,7 @@ fileprivate struct SummaryView: View {
 					}
 					.font(Font.title2.bold())
 					.padding(.bottom, 2)
-					Text(payment.timestamp().formatDateMS())
+					Text(payment.completedAt().formatDateMS())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 				}
@@ -170,7 +170,7 @@ fileprivate struct SummaryView: View {
 						.font(Font.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
-					Text(payment.timestamp().formatDateMS())
+					Text(payment.completedAt().formatDateMS())
 						.font(Font.subheadline)
 						.foregroundColor(.secondary)
 					
@@ -1525,7 +1525,7 @@ extension Lightning_kmpWalletPayment {
 
 		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
-			let started = self.timestamp()
+			let started = self.completedAt()
 			var finished: Int64? = nil
 			
 			if let failed = outgoingPayment.status.asFailed() {

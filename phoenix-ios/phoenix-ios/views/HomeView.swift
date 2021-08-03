@@ -598,7 +598,7 @@ fileprivate struct PaymentCell : View, ViewName {
 	func paymentTimestamp() -> String {
 
 		if let payment = fetched.payment {
-			let timestamp = payment.timestamp()
+			let timestamp = payment.completedAt()
 			return timestamp > 0
 				? timestamp.formatDateMS()
 				: NSLocalizedString("pending", comment: "timestamp string for pending transaction")

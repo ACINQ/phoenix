@@ -339,7 +339,7 @@ private fun PaymentLine(payment: WalletPayment) {
                 }
             }
             Spacer(modifier = Modifier.width(2.dp))
-            Text(text = WalletPayment.completedAt(payment).toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            Text(text = payment.completedAt().toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
 }

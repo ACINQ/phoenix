@@ -50,7 +50,7 @@ class SqlitePaymentsDatabaseTest {
     private val preimage2 = randomBytes32()
     private val paymentHash2 = Crypto.sha256(preimage2).toByteVector32()
     private val origin2 = IncomingPayment.Origin.KeySend
-    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(amount = 2_000_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
+    private val receivedWith2 = setOf(IncomingPayment.ReceivedWith.NewChannel(amount = 1_995_000.msat, fees = 5_000.msat, channelId = randomBytes32()))
 
     val origin3 = IncomingPayment.Origin.SwapIn(address = "1PwLgmRdDjy5GAKWyp8eyAC4SFzWuboLLb")
 
@@ -62,7 +62,7 @@ class SqlitePaymentsDatabaseTest {
     }
 
     @Test
-    fun incoming__receive() = runTest {
+    fun incoming__receive_lightning() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
         db.listReceivedPayments(10, 0)[0].let {
             assertEquals(paymentHash1, it.paymentHash)
@@ -75,9 +75,31 @@ class SqlitePaymentsDatabaseTest {
             assertEquals(paymentHash1, it.paymentHash)
             assertEquals(preimage1, it.preimage)
             assertEquals(origin1, it.origin)
-            assertEquals(100_000.msat, it.received?.amount)
+            assertEquals(100_000.msat, it.amount)
+            assertEquals(0.msat, it.fees)
             assertEquals(10, it.received?.receivedAt)
             assertEquals(receivedWith1, it.received?.receivedWith)
+        }
+    }
+
+    @Test
+    fun incoming__receive_new_channel() = runTest {
+        db.addIncomingPayment(preimage1, origin3, 0)
+        db.listReceivedPayments(10, 0)[0].let {
+            assertEquals(paymentHash1, it.paymentHash)
+            assertEquals(preimage1, it.preimage)
+            assertEquals(origin3, it.origin)
+            assertNull(it.received)
+        }
+        db.receivePayment(paymentHash1, receivedWith2, 15)
+        db.getIncomingPayment(paymentHash1)!!.let {
+            assertEquals(paymentHash1, it.paymentHash)
+            assertEquals(preimage1, it.preimage)
+            assertEquals(origin3, it.origin)
+            assertEquals(1_995_000.msat, it.amount)
+            assertEquals(5_000.msat, it.fees)
+            assertEquals(15, it.received?.receivedAt)
+            assertEquals(receivedWith2, it.received?.receivedWith)
         }
     }
 
@@ -125,7 +147,7 @@ class SqlitePaymentsDatabaseTest {
         db.addAndReceivePayment(preimage1, origin3, receivedWith2)
         assertNotNull(db.getIncomingPayment(paymentHash1))
         assertEquals(1_995_000.msat, db.getIncomingPayment(paymentHash1)?.received?.amount)
-        assertEquals(5_000.msat, WalletPayment.fees(db.getIncomingPayment(paymentHash1)!!))
+        assertEquals(5_000.msat, db.getIncomingPayment(paymentHash1)!!.fees)
         assertEquals(origin3, db.getIncomingPayment(paymentHash1)!!.origin)
         assertEquals(receivedWith2, db.getIncomingPayment(paymentHash1)!!.received!!.receivedWith)
     }
