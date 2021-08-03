@@ -563,11 +563,11 @@ fileprivate struct PaymentCell : View, ViewName {
 
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 
-				let (amount, isFailure, isNegative) = paymentAmountInfo()
+				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 
-				let color: Color = isFailure ? .secondary : (isNegative ? .appNegative : .appPositive)
+				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
 
-				Text(isNegative ? "" : "+")
+				Text(isOutgoing ? "-" : "+")
 					.foregroundColor(color)
 					.padding(.trailing, 1)
 
@@ -611,12 +611,12 @@ fileprivate struct PaymentCell : View, ViewName {
 
 		if let payment = fetched.payment {
 
-			let amount = Utils.format(currencyPrefs, msat: payment.amountMsat())
+			let amount = Utils.format(currencyPrefs, msat: payment.amount)
 
 			let isFailure = payment.state() == WalletPaymentState.failure
-			let isNegative = payment.amountMsat() < 0
+			let isOutgoing = payment is Lightning_kmpOutgoingPayment
 
-			return (amount, isFailure, isNegative)
+			return (amount, isFailure, isOutgoing)
 
 		} else {
 
@@ -629,9 +629,9 @@ fileprivate struct PaymentCell : View, ViewName {
 			let amount = FormattedAmount(digits: "", type: type, decimalSeparator: " ")
 
 			let isFailure = false
-			let isNegative = true
+			let isOutgoing = true
 
-			return (amount, isFailure, isNegative)
+			return (amount, isFailure, isOutgoing)
 		}
 	}
 	

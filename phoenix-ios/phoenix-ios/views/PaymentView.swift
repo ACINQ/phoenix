@@ -182,7 +182,8 @@ fileprivate struct SummaryView: View {
 			}
 
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat(), hideMsats: false)
+				let isOutgoing = payment is Lightning_kmpOutgoingPayment
+				let amount = Utils.format(currencyPrefs, msat: payment.amount, hideMsats: false)
 
 				if currencyPrefs.currencyType == .bitcoin &&
 				   currencyPrefs.bitcoinUnit == .sat &&
@@ -193,6 +194,10 @@ fileprivate struct SummaryView: View {
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
 					
+					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+						.font(.largeTitle)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
 					Text(verbatim: "\(amount.integerDigits)")
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
@@ -211,6 +216,10 @@ fileprivate struct SummaryView: View {
 					
 				} else {
 					
+					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+						.font(.largeTitle)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
 					Text(amount.digits)
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }

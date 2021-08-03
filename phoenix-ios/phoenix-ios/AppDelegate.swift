@@ -332,7 +332,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			}
 			
 			let currencyPrefs = CurrencyPrefs()
-			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amountMsat())
+			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amount)
 
 			var body: String
 			if let desc = payment.desc(), desc.count > 0 {
