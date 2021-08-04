@@ -2,9 +2,11 @@ package fr.acinq.phoenix.app
 
 import fr.acinq.bitcoin.*
 import fr.acinq.lightning.utils.Either
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import org.kodein.log.Logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -12,6 +14,11 @@ class Utilities(
     loggerFactory: LoggerFactory,
     private val chain: Chain
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        chain = business.chain
+    )
 
     private val logger = newLogger(loggerFactory)
 

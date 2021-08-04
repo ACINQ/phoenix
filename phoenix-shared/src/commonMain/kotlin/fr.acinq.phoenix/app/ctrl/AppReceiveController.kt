@@ -1,17 +1,14 @@
 package fr.acinq.phoenix.app.ctrl
 
 import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.secure
 import fr.acinq.lightning.wire.SwapInRequest
-import fr.acinq.lightning.wire.SwapInResponse
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Receive
 import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.data.toMilliSatoshi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
 import org.kodein.log.LoggerFactory
@@ -19,7 +16,19 @@ import kotlin.random.Random
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppReceiveController(loggerFactory: LoggerFactory, private val chain: Chain, private val peerManager: PeerManager) : AppController<Receive.Model, Receive.Intent>(loggerFactory, Receive.Model.Awaiting) {
+class AppReceiveController(
+    loggerFactory: LoggerFactory,
+    private val chain: Chain,
+    private val peerManager: PeerManager
+) : AppController<Receive.Model, Receive.Intent>(
+    loggerFactory = loggerFactory,
+    firstModel = Receive.Model.Awaiting
+) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        chain = business.chain,
+        peerManager = business.peerManager
+    )
 
     private val Receive.Intent.Ask.description: String get() = desc?.takeIf { it.isNotBlank() } ?: ""
 

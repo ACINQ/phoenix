@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.utils.sum
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.PaymentsManager
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.ctrl.Home
@@ -23,9 +24,15 @@ class AppHomeController(
     private val peerManager: PeerManager,
     private val paymentsManager: PaymentsManager
 ) : AppController<Home.Model, Home.Intent>(
-    loggerFactory,
+    loggerFactory = loggerFactory,
     firstModel = Home.emptyModel
 ) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        peerManager = business.peerManager,
+        paymentsManager = business.paymentsManager
+    )
+
     private var isBoot = true
 
     init {

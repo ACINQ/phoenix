@@ -137,7 +137,7 @@ fileprivate struct SummaryView: View {
 					}
 					.font(Font.title2.bold())
 					.padding(.bottom, 2)
-					Text(payment.timestamp().formatDateMS())
+					Text(payment.completedAt().formatDateMS())
 						.font(.subheadline)
 						.foregroundColor(.secondary)
 				}
@@ -170,7 +170,7 @@ fileprivate struct SummaryView: View {
 						.font(Font.title2.uppercaseSmallCaps())
 						.padding(.bottom, 6)
 					
-					Text(payment.timestamp().formatDateMS())
+					Text(payment.completedAt().formatDateMS())
 						.font(Font.subheadline)
 						.foregroundColor(.secondary)
 					
@@ -182,7 +182,8 @@ fileprivate struct SummaryView: View {
 			}
 
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				let amount = Utils.format(currencyPrefs, msat: payment.amountMsat(), hideMsats: false)
+				let isOutgoing = payment is Lightning_kmpOutgoingPayment
+				let amount = Utils.format(currencyPrefs, msat: payment.amount, hideMsats: false)
 
 				if currencyPrefs.currencyType == .bitcoin &&
 				   currencyPrefs.bitcoinUnit == .sat &&
@@ -193,6 +194,10 @@ fileprivate struct SummaryView: View {
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
 					
+					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+						.font(.largeTitle)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
 					Text(verbatim: "\(amount.integerDigits)")
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
@@ -211,6 +216,10 @@ fileprivate struct SummaryView: View {
 					
 				} else {
 					
+					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+						.font(.largeTitle)
+						.foregroundColor(Color.secondary)
+						.onTapGesture { toggleCurrencyType() }
 					Text(amount.digits)
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
@@ -1525,7 +1534,7 @@ extension Lightning_kmpWalletPayment {
 
 		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
-			let started = self.timestamp()
+			let started = self.completedAt()
 			var finished: Int64? = nil
 			
 			if let failed = outgoingPayment.status.asFailed() {

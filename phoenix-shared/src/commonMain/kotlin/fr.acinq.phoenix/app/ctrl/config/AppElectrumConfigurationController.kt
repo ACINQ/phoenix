@@ -3,11 +3,11 @@ package fr.acinq.phoenix.app.ctrl.config
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.AppConfigurationManager
 import fr.acinq.phoenix.app.AppConnectionsDaemon
 import fr.acinq.phoenix.app.ctrl.AppController
 import fr.acinq.phoenix.ctrl.config.ElectrumConfiguration
-import fr.acinq.phoenix.data.ElectrumAddress
 import fr.acinq.phoenix.data.InvalidElectrumAddress
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -21,7 +21,16 @@ class AppElectrumConfigurationController(
     private val configurationManager: AppConfigurationManager,
     private val electrumClient: ElectrumClient,
     private val appConnectionsDaemon: AppConnectionsDaemon
-) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(loggerFactory, ElectrumConfiguration.Model()) {
+) : AppController<ElectrumConfiguration.Model, ElectrumConfiguration.Intent>(
+    loggerFactory = loggerFactory,
+    firstModel = ElectrumConfiguration.Model()
+) {
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        configurationManager = business.appConfigurationManager,
+        electrumClient = business.electrumClient,
+        appConnectionsDaemon = business.appConnectionsDaemon!!
+    )
 
     init {
         launch {

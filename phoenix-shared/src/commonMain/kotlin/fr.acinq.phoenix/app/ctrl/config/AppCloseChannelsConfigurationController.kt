@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.WrappedChannelEvent
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.app.PeerManager
 import fr.acinq.phoenix.app.Utilities
 import fr.acinq.phoenix.app.WalletManager
@@ -24,9 +25,18 @@ class AppCloseChannelsConfigurationController(
     private val util: Utilities,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
-    loggerFactory,
-    CloseChannelsConfiguration.Model.Loading
+    loggerFactory = loggerFactory,
+    firstModel = CloseChannelsConfiguration.Model.Loading
 ) {
+    constructor(business: PhoenixBusiness, isForceClose: Boolean): this(
+        loggerFactory = business.loggerFactory,
+        peerManager = business.peerManager,
+        walletManager = business.walletManager,
+        chain = business.chain,
+        util = business.util,
+        isForceClose = isForceClose
+    )
+
     var closingChannelIds: Set<ByteVector32>? = null
 
     fun channelInfoStatus(channel: ChannelState): ChannelInfoStatus? = when (channel) {

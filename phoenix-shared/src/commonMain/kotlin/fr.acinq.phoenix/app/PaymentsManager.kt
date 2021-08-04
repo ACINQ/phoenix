@@ -10,6 +10,7 @@ import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.getValue
 import fr.acinq.lightning.utils.setValue
 import fr.acinq.lightning.utils.toMilliSatoshi
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
@@ -23,8 +24,15 @@ import org.kodein.log.newLogger
 class PaymentsManager(
     loggerFactory: LoggerFactory,
     private val peerManager: PeerManager,
-    private val nodeParamsManager: NodeParamsManager,
+    private val databaseManager: DatabaseManager
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        peerManager = business.peerManager,
+        databaseManager = business.databaseManager
+    )
+
     private val log = newLogger(loggerFactory)
 
     data class PaymentsPage(
@@ -118,22 +126,24 @@ class PaymentsManager(
         }
     }
 
-    private fun addToInFlightOutgoingPayments(id: UUID): Unit {
+    /// Adds to StateFlow<Set<UUID>>
+    private fun addToInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.plus(id)
         _inFlightOutgoingPayments.value = newSet
     }
 
-    private fun removeFromInFlightOutgoingPayments(id: UUID): Unit {
+    /// Removes from StateFlow<Set<UUID>>
+    private fun removeFromInFlightOutgoingPayments(id: UUID) {
         val oldSet = _inFlightOutgoingPayments.value
         val newSet = oldSet.minus(id)
         _inFlightOutgoingPayments.value = newSet
     }
 
-    fun db() = nodeParamsManager.databases.value?.payments
+    fun db() = databaseManager.databases.value?.payments
 
     private suspend fun paymentsDb(): SqlitePaymentsDb {
-        val db = nodeParamsManager.databases.filterNotNull().first()
+        val db = databaseManager.databases.filterNotNull().first()
         return db.payments as SqlitePaymentsDb
     }
 
@@ -145,7 +155,7 @@ class PaymentsManager(
         return paymentsDb().getIncomingPayment(paymentHash)
     }
 
-    fun subscribeToPaymentsPage(offset: Int, count: Int): Unit {
+    fun subscribeToPaymentsPage(offset: Int, count: Int) {
         if (paymentsPage_offset == offset && paymentsPage_count == count) {
             // No changes
             return

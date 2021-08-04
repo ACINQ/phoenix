@@ -27,6 +27,7 @@ import fr.acinq.lightning.db.PaymentsDb
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toByteVector
+import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.db.SqliteChannelsDb
 import fr.acinq.phoenix.db.SqlitePaymentsDb
@@ -45,25 +46,27 @@ import org.kodein.memory.text.toHexString
 
 class NodeParamsManager(
     loggerFactory: LoggerFactory,
-    private val ctx: PlatformContext,
     chain: Chain,
     walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
+
+    constructor(business: PhoenixBusiness): this(
+        loggerFactory = business.loggerFactory,
+        chain = business.chain,
+        walletManager = business.walletManager
+    )
 
     private val log = newLogger(loggerFactory)
 
     private val _nodeParams = MutableStateFlow<NodeParams?>(null)
     val nodeParams: StateFlow<NodeParams?> = _nodeParams
 
-    private val _databases = MutableStateFlow<Databases?>(null)
-    val databases: StateFlow<Databases?> = _databases
-
     init {
         // we listen to the wallet manager and update node params and databases when the wallet changes
         launch {
             walletManager.wallet.collect {
                 if (it == null) return@collect
-                log.info { "wallet update in wallet manager, building node params and databases..." }
+                log.info { "wallet available: building nodeParams..." }
                 val genesisBlock = when (chain) {
                     Chain.Mainnet -> Block.LivenetGenesisBlock
                     Chain.Testnet -> Block.TestnetGenesisBlock
@@ -126,15 +129,6 @@ class NodeParamsManager(
                 )
 
                 _nodeParams.value = nodeParams
-
-                val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
-                val channelsDb = SqliteChannelsDb(createChannelsDbDriver(ctx, chain, nodeIdHash), nodeParams.copy())
-                val paymentsDb = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash))
-                log.debug { "databases object created" }
-                _databases.value = object : Databases {
-                    override val channels: ChannelsDb get() = channelsDb
-                    override val payments: PaymentsDb get() = paymentsDb
-                }
             }
         }
     }

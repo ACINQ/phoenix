@@ -1,8 +1,6 @@
 package fr.acinq.phoenix.utils
 
-import fr.acinq.lightning.channel.ChannelState
-import fr.acinq.lightning.channel.Closing
-import fr.acinq.lightning.channel.Offline
+import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
@@ -28,11 +26,6 @@ fun WalletPayment.desc(): String? = when (this) {
 
 enum class WalletPaymentState { Success, Pending, Failure }
 
-fun WalletPayment.amountMsat(): Long = when (this) {
-    is OutgoingPayment -> -recipientAmount.msat - fees.msat
-    is IncomingPayment -> received?.amount?.msat ?: 0
-}
-
 fun WalletPayment.id(): String = when (this) {
     is OutgoingPayment -> this.id.toString()
     is IncomingPayment -> this.paymentHash.toHex()
@@ -55,8 +48,6 @@ fun WalletPayment.paymentHashString(): String = when (this) {
     is OutgoingPayment -> paymentHash.toString()
     is IncomingPayment -> paymentHash.toString()
 }
-
-fun WalletPayment.timestamp(): Long = WalletPayment.completedAt(this)
 
 fun WalletPayment.errorMessage(): String? = when (this) {
     is OutgoingPayment -> when (val s = status) {
@@ -166,5 +157,13 @@ fun ChannelState.asOffline(): Offline? = when (this) {
 }
 fun ChannelState.asClosing(): Closing? = when (this) {
     is Closing -> this
+    else -> null
+}
+fun ChannelState.asClosed(): Closed? = when (this) {
+    is Closed -> this
+    else -> null
+}
+fun ChannelState.asAborted(): Aborted? = when (this) {
+    is Aborted -> this
     else -> null
 }
