@@ -38,6 +38,7 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
         if (parts.size == 0) return
         queries.transaction {
             parts.map {
+                // This will throw an exception if the sqlite foreign-key-constraint is violated.
                 queries.addOutgoingPart(
                     part_id = it.id.toString(),
                     part_parent_id = parentId.toString(),
@@ -45,9 +46,6 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
                     part_route = it.route,
                     part_created_at = it.createdAt
                 )
-            }
-            if (queries.changes().executeAsOne() != 1L) {
-                throw OutgoingPaymentPartNotFound(parts.first().id)
             }
         }
     }
@@ -76,7 +74,8 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
         }
     }
 
-    fun completeOutgoingPayment(id: UUID, completed: OutgoingPayment.Status.Completed) {
+    fun completeOutgoingPayment(id: UUID, completed: OutgoingPayment.Status.Completed): Boolean {
+        var result = true
         queries.transaction {
             val (statusType, statusBlob) = completed.mapToDb()
             queries.updateOutgoingPayment(
@@ -85,11 +84,19 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
                 status_type = statusType,
                 status_blob = statusBlob
             )
-            if (queries.changes().executeAsOne() != 1L) throw OutgoingPaymentPartNotFound(id)
+            if (queries.changes().executeAsOne() != 1L) {
+                result = false
+            }
         }
+        return result
     }
 
-    fun updateOutgoingPart(partId: UUID, preimage: ByteVector32, completedAt: Long) {
+    fun updateOutgoingPart(
+        partId: UUID,
+        preimage: ByteVector32,
+        completedAt: Long
+    ): Boolean {
+        var result = true
         val (statusTypeVersion, statusData) = OutgoingPayment.Part.Status.Succeeded(preimage).mapToDb()
         queries.transaction {
             queries.updateOutgoingPart(
@@ -97,11 +104,19 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
                 part_status_type = statusTypeVersion,
                 part_status_blob = statusData,
                 part_completed_at = completedAt)
-            if (queries.changes().executeAsOne() != 1L) throw OutgoingPaymentPartNotFound(partId)
+            if (queries.changes().executeAsOne() != 1L) {
+                result = false
+            }
         }
+        return result
     }
 
-    fun updateOutgoingPart(partId: UUID, failure: Either<ChannelException, FailureMessage>, completedAt: Long) {
+    fun updateOutgoingPart(
+        partId: UUID,
+        failure: Either<ChannelException, FailureMessage>,
+        completedAt: Long
+    ): Boolean {
+        var result = true
         val (statusTypeVersion, statusData) = OutgoingPaymentFailure.convertFailure(failure).mapToDb()
         queries.transaction {
             queries.updateOutgoingPart(
@@ -110,8 +125,11 @@ class OutgoingQueries(private val queries: OutgoingPaymentsQueries) {
                 part_status_blob = statusData,
                 part_completed_at = completedAt
             )
-            if (queries.changes().executeAsOne() != 1L) throw OutgoingPaymentPartNotFound(partId)
+            if (queries.changes().executeAsOne() != 1L) {
+                result = false
+            }
         }
+        return result
     }
 
     fun getOutgoingPart(partId: UUID): OutgoingPayment? {

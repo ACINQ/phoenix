@@ -26,7 +26,8 @@ actual fun testChannelsDriver(): SqlDriver {
 
 actual fun testPaymentsDriver(): SqlDriver {
     // In-memory databases don't seem to work on native/iOS.
-    // This creates a persistent database, which breaks our unit test logic.
+    // The call succeeds, but in reality it creates a persistent database,
+    // which then breaks our unit test logic.
 //  return NativeSqliteDriver(PaymentsDatabase.Schema, ":memory:")
     // The docs reference other ways of making in-memory databases:
     // https://sqlite.org/inmemorydb.html
@@ -35,4 +36,9 @@ actual fun testPaymentsDriver(): SqlDriver {
     // Current workaround is to create a fresh database for each test.
     val randomName = Lightning.randomBytes32().toHex()
     return NativeSqliteDriver(PaymentsDatabase.Schema, randomName)
+}
+
+// Workaround for known bugs in SQLDelight on native/iOS.
+actual fun isIOS(): Boolean {
+    return true
 }

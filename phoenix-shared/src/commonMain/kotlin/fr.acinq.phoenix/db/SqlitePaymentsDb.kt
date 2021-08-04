@@ -47,7 +47,7 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         incoming_paymentsAdapter = Incoming_payments.Adapter(origin_typeAdapter = EnumColumnAdapter(), received_with_typeAdapter = EnumColumnAdapter())
     )
     internal val inQueries = IncomingQueries(database.incomingPaymentsQueries)
-    private val outQueries = OutgoingQueries(database.outgoingPaymentsQueries)
+    internal val outQueries = OutgoingQueries(database.outgoingPaymentsQueries)
     private val aggrQueries = database.aggregatedQueriesQueries
 
     override suspend fun addOutgoingParts(parentId: UUID, parts: List<OutgoingPayment.Part>) {

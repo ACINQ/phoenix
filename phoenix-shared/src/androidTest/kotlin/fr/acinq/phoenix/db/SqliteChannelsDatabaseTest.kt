@@ -30,3 +30,7 @@ actual fun testPaymentsDriver(): SqlDriver {
     PaymentsDatabase.Schema.create(driver)
     return driver
 }
+
+actual fun isIOS(): Boolean {
+    return false
+}
