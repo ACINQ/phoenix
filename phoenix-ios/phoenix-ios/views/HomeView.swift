@@ -619,14 +619,9 @@ fileprivate struct PaymentCell : View, ViewName {
 			return (amount, isFailure, isOutgoing)
 
 		} else {
-
-			let type: String
-			switch currencyPrefs.currencyType {
-				case .fiat    : type = currencyPrefs.fiatCurrency.shortName
-				case .bitcoin : type = currencyPrefs.bitcoinUnit.shortName
-			}
-
-			let amount = FormattedAmount(digits: "", type: type, decimalSeparator: " ")
+			
+			let currency = currencyPrefs.currency
+			let amount = FormattedAmount(currency: currency, digits: "", decimalSeparator: " ")
 
 			let isFailure = false
 			let isOutgoing = true

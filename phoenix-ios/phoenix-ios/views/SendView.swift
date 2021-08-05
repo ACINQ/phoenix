@@ -389,7 +389,7 @@ struct ValidateView: View, ViewName {
 
 	@State var number: Double = 0.0
 	
-	@State var unit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var unit = Currency.bitcoin(.sat)
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -462,7 +462,7 @@ struct ValidateView: View, ViewName {
 						.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
 				
 					Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
-						let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+						let options = Currency.displayable(currencyPrefs: currencyPrefs)
 						ForEach(0 ..< options.count) {
 							let option = options[$0]
 							Text(option.abbrev).tag(option)
@@ -552,7 +552,7 @@ struct ValidateView: View, ViewName {
 		log.trace("[\(viewName)] onAppear()")
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
-		unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+		unit = Currency.bitcoin(bitcoinUnit)
 		
 		if let msat_kotlin = model.amountMsat {
 			let msat = Int64(truncating: msat_kotlin)
@@ -614,7 +614,8 @@ struct ValidateView: View, ViewName {
 			var msat: Int64? = nil
 			var alt: FormattedAmount? = nil
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
 				// amt    => bitcoinUnit
 				// altAmt => fiatCurrency
 				
@@ -627,8 +628,7 @@ struct ValidateView: View, ViewName {
 					// We don't know the exchange rate, so we can't display fiat value.
 					altAmount = ""
 				}
-				
-			} else if let fiatCurrency = unit.fiatCurrency {
+			case .fiat(let fiatCurrency):
 				// amt    => fiatCurrency
 				// altAmt => bitcoinUnit
 				
@@ -639,7 +639,7 @@ struct ValidateView: View, ViewName {
 					
 				} else {
 					// We don't know the exchange rate !
-					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
+					// We shouldn't get into this state since Currency.displayable() already filters for this.
 					altAmount = ""
 				}
 			}
@@ -678,16 +678,24 @@ struct ValidateView: View, ViewName {
 			return
 		}
 		
-		if let bitcoinUnit = unit.bitcoinUnit {
-
-            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
-			postIntent(Scan.IntentSend(request: model.request, amount: msat))
+		switch unit {
+		case .bitcoin(let bitcoinUnit):
+			let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+			postIntent(Scan.IntentSend(
+				request: model.request,
+				amount: Lightning_kmpMilliSatoshi(msat: msat)
+			))
 			
-		} else if let fiatCurrency = unit.fiatCurrency,
-		          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-		{
-            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
-			postIntent(Scan.IntentSend(request: model.request, amount: msat))
+		case .fiat(let fiatCurrency):
+			
+			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				
+				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+				postIntent(Scan.IntentSend(
+					request: model.request,
+					amount: Lightning_kmpMilliSatoshi(msat: msat)
+				))
+			}
 		}
 	}
 	

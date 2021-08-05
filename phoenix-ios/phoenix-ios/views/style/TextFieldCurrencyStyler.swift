@@ -28,7 +28,7 @@ enum TextFieldCurrencyStylerError: Error {
 /// - create TextField using the styler's `amountProxy`
 ///
 /// ```
-/// @State var unit: CurrencyUnit
+/// @State var unit: Currency
 /// @State var amount: String
 /// @State var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 ///
@@ -45,14 +45,14 @@ enum TextFieldCurrencyStylerError: Error {
 ///
 struct TextFieldCurrencyStyler {
 	
-	@Binding private var unit: CurrencyUnit
+	@Binding private var unit: Currency
 	@Binding private var amount: String
 	@Binding private var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 	
 	let hideMsats: Bool
 	
 	init(
-		unit: Binding<CurrencyUnit>,
+		unit: Binding<Currency>,
 		amount: Binding<String>,
 		parsedAmount: Binding<Result<Double, TextFieldCurrencyStylerError>>,
 		hideMsats: Bool = true
@@ -86,7 +86,7 @@ struct TextFieldCurrencyStyler {
 	
 	static func format(
 		input: String,
-		unit: CurrencyUnit,
+		unit: Currency,
 		hideMsats: Bool = true
 	) -> (String, Result<Double, TextFieldCurrencyStylerError>)
 	{
@@ -106,10 +106,17 @@ struct TextFieldCurrencyStyler {
 		
 		// Get appropriate formatter for the current state
 		
-		let isFiatCurrency = unit.fiatCurrency != nil
-		let formatter: NumberFormatter = isFiatCurrency
-			? Utils.fiatFormatter()
-			: Utils.bitcoinFormatter(bitcoinUnit: unit.bitcoinUnit!, hideMsats: hideMsats)
+		let isFiatCurrency: Bool
+		let formatter: NumberFormatter
+		switch unit {
+		case .bitcoin(let bitcoinUnit):
+			isFiatCurrency = false
+			formatter = Utils.bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
+			
+		case .fiat(_):
+			isFiatCurrency = true
+			formatter = Utils.fiatFormatter()
+		}
 		
 		if isFiatCurrency {
 			// The fiatFormatter is configured with minimumFractionDigits set to 2.
@@ -227,8 +234,8 @@ struct TextFieldCurrencyStyler {
 			// See discussion in: FormattedAmount.withFormattedFractionDigits()
 			//
 			let formattedAmount = FormattedAmount(
+				currency: unit,
 				digits: formattedInput,
-				type: unit.abbrev,
 				decimalSeparator: formatter.decimalSeparator
 			)
 			let betterFormattedInput = formattedAmount.withFormattedFractionDigits().digits

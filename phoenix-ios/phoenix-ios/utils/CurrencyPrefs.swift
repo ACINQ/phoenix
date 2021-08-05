@@ -15,7 +15,16 @@ class CurrencyPrefs: ObservableObject {
 	@Published var bitcoinUnit: BitcoinUnit
 	
 	@Published var fiatExchangeRates: [BitcoinPriceRate] = []
-    private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
+	private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
+	
+	var currency: Currency {
+		switch currencyType {
+		case .bitcoin:
+			return Currency.bitcoin(bitcoinUnit)
+		case .fiat:
+			return Currency.fiat(fiatCurrency)
+		}
+	}
 	
 	private var cancellables = Set<AnyCancellable>()
 	private var unsubscribe: (() -> Void)? = nil
@@ -64,7 +73,12 @@ class CurrencyPrefs: ObservableObject {
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
 		
-		let exchangeRate = BitcoinPriceRate(fiatCurrency: fiatCurrency, price: exchangeRate, source: "", timestampMillis: 0)
+		let exchangeRate = BitcoinPriceRate(
+			fiatCurrency: fiatCurrency,
+			price: exchangeRate,
+			source: "",
+			timestampMillis: 0
+		)
 		fiatExchangeRates.append(exchangeRate)
 	}
 	

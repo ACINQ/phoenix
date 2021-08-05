@@ -155,7 +155,7 @@ struct ReceiveLightningView: View, ViewName {
 	@State var badgesDisabled = false
 	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
-	@State var modificationUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var modificationUnit = Currency.bitcoin(.sat)
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -690,12 +690,12 @@ struct ReceiveLightningView: View, ViewName {
 		if currencyPrefs.currencyType == .fiat, currencyPrefs.fiatExchangeRate() != nil {
 			
 			let fiatCurrency = currencyPrefs.fiatCurrency
-			modificationUnit = CurrencyUnit(fiatCurrency: fiatCurrency)
+			modificationUnit = Currency.fiat(fiatCurrency)
 			
 		} else {
 			
 			let bitcoinUnit = currencyPrefs.bitcoinUnit
-			modificationUnit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+			modificationUnit = Currency.bitcoin(bitcoinUnit)
 		}
 	}
 	
@@ -939,7 +939,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 	
 	@State var desc: String
 	
-	@Binding var unit: CurrencyUnit
+	@Binding var unit: Currency
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -990,7 +990,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					selection: $unit,
 					label: Text(unit.abbrev).frame(minWidth: 40, alignment: Alignment.trailing)
 				) {
-					let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+					let options = Currency.displayable(currencyPrefs: currencyPrefs)
 					ForEach(0 ..< options.count) {
 						let option = options[$0]
 						Text(option.abbrev).tag(option)
@@ -1060,15 +1060,11 @@ struct ModifyInvoiceSheet: View, ViewName {
 		
 		let msat: Int64? = initialAmount?.msat
 		
-		// Regardless of whether or not the invoice currently has an amount,
-		// we should default to the user's preferred currency.
-		// In other words, we should default to fiat, if that's what the user prefers.
-		//
-		
-		if let fiatCurrency = unit.fiatCurrency,
-		   let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-		{
-			if let msat = msat {
+		switch unit {
+		case .fiat(let fiatCurrency):
+			
+			if let msat = msat, let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				
 				let targetAmt = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
 				parsedAmount = Result.success(targetAmt)
 				
@@ -1078,9 +1074,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 				refreshAltAmount()
 			}
 			
-		} else if let bitcoinUnit = unit.bitcoinUnit {
+		case .bitcoin(let bitcoinUnit):
 			
 			if let msat = msat {
+				
 				let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 				parsedAmount = Result.success(targetAmt)
 				
@@ -1128,7 +1125,8 @@ struct ModifyInvoiceSheet: View, ViewName {
 			isInvalidAmount = false
 			isEmptyAmount = false
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
 				// amt    => bitcoinUnit
 				// altAmt => fiatCurrency
 				
@@ -1142,7 +1140,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 				
-			} else if let fiatCurrency = unit.fiatCurrency {
+			case .fiat(let fiatCurrency):
 				// amt    => fiatCurrency
 				// altAmt => bitcoinUnit
 				
@@ -1153,7 +1151,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					
 				} else {
 					// We don't know the exchange rate !
-					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
+					// We shouldn't get into this state since Currency.displayable() already filters for this.
 					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 			}
@@ -1168,14 +1166,20 @@ struct ModifyInvoiceSheet: View, ViewName {
 		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
+							
+				msat = Lightning_kmpMilliSatoshi(msat:
+					Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+				)
 				
-				msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
+			case .fiat(let fiatCurrency):
 				
-			} else if let fiatCurrency = unit.fiatCurrency,
-			          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-			{
-				msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
+				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+					msat = Lightning_kmpMilliSatoshi(msat:
+						Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+					)
+				}
 			}
 		}
 		
