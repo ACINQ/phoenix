@@ -125,7 +125,6 @@ struct ReceiveLightningView: View, ViewName {
 	enum ReceiveViewSheet {
 		case sharingUrl(url: String)
 		case sharingImg(img: UIImage)
-		case editing(model: Receive.ModelGenerated)
 	}
 	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
@@ -141,7 +140,6 @@ struct ReceiveLightningView: View, ViewName {
 	@State var didAppear = false
 	@State var isFullScreenQrcode = false
 	
-	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
 	@State var swapIn_enabled = true
@@ -157,11 +155,14 @@ struct ReceiveLightningView: View, ViewName {
 	@State var badgesDisabled = false
 	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
+	@State var modificationUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -213,16 +214,6 @@ struct ReceiveLightningView: View, ViewName {
 				let items: [Any] = [sharingImg]
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
-			case .editing(let model):
-				
-				ModifyInvoiceSheet(
-					mvi: mvi,
-					dismissSheet: { self.sheet = nil },
-					initialAmount: model.amount,
-					desc: model.desc ?? ""
-				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-			
 			} // </switch>
 		}
 		.navigationBarTitle(
@@ -236,11 +227,35 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if isFullScreenQrcode {
 			fullScreenQrcode()
-		} else if verticalSizeClass == UserInterfaceSizeClass.compact {
-			mainLandscape()
 		} else {
-			mainPortrait()
+			mainWrapper()
 		}
+	}
+	
+	@ViewBuilder
+	func mainWrapper() -> some View {
+		
+		// SwiftUI BUG workaround:
+		//
+		// When the keyboard appears, the main view shouldn't move. At all.
+		// It should perform ZERO keyboard avoidance.
+		// Which means we need to use: `.ignoresSafeArea(.keyboard)`
+		//
+		// But, of course, this doesn't work properly because of a SwiftUI bug.
+		// So the current recommended workaround is to wrap everything in a GeometryReader.
+		//
+		GeometryReader { _ in
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer(minLength: 0)
+				if verticalSizeClass == UserInterfaceSizeClass.compact {
+					mainLandscape()
+				} else {
+					mainPortrait()
+				}
+				Spacer(minLength: 0)
+			} // </HStack>
+		} // </GeometryReader>
+		.ignoresSafeArea(.keyboard)
 	}
 	
 	@ViewBuilder
@@ -671,6 +686,17 @@ struct ReceiveLightningView: View, ViewName {
 			
 			checkPushPermissions()
 		}
+		
+		if currencyPrefs.currencyType == .fiat, currencyPrefs.fiatExchangeRate() != nil {
+			
+			let fiatCurrency = currencyPrefs.fiatCurrency
+			modificationUnit = CurrencyUnit(fiatCurrency: fiatCurrency)
+			
+		} else {
+			
+			let bitcoinUnit = currencyPrefs.bitcoinUnit
+			modificationUnit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+		}
 	}
 	
 	func onDisappear() -> Void {
@@ -834,8 +860,15 @@ struct ReceiveLightningView: View, ViewName {
 		log.trace("[\(viewName)] didTapEditButton()")
 		
 		if let model = mvi.model as? Receive.ModelGenerated {
-			withAnimation {
-				sheet = ReceiveViewSheet.editing(model: model)
+			
+			shortSheetState.display(dismissable: true) {
+				
+				ModifyInvoiceSheet(
+					mvi: mvi,
+					initialAmount: model.amount,
+					desc: model.desc ?? "",
+					unit: $modificationUnit
+				)
 			}
 		}
 	}
@@ -901,11 +934,12 @@ struct ReceiveLightningView: View, ViewName {
 struct ModifyInvoiceSheet: View, ViewName {
 
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
-	let dismissSheet: () -> Void
 
 	let initialAmount: Lightning_kmpMilliSatoshi?
 	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var desc: String
+	
+	@Binding var unit: CurrencyUnit
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -913,9 +947,17 @@ struct ModifyInvoiceSheet: View, ViewName {
 	@State var isInvalidAmount: Bool = false
 	@State var isEmptyAmount: Bool = false
 	
-	@State var desc: String
-	
 	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	// Workaround for SwiftUI bug
+	enum TextHeight: Preference {}
+	let textHeightReader = GeometryPreferenceReader(
+		key: AppendValue<TextHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var textHeight: CGFloat? = nil
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
@@ -926,6 +968,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 		)
 	}
 
+	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: .leading) {
@@ -938,10 +981,11 @@ struct ModifyInvoiceSheet: View, ViewName {
 					.keyboardType(.decimalPad)
 					.disableAutocorrection(true)
 					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+					.read(textHeightReader)
 					.padding([.top, .bottom], 8)
 					.padding(.leading, 16)
 					.padding(.trailing, 0)
-
+				
 				Picker(
 					selection: $unit,
 					label: Text(unit.abbrev).frame(minWidth: 40, alignment: Alignment.trailing)
@@ -953,6 +997,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
+				.frame(height: textHeight) // workaround for SwiftUI bug
 				.padding(.trailing, 16)
 			}
 			.background(Capsule().stroke(Color(UIColor.separator)))
@@ -983,8 +1028,8 @@ struct ModifyInvoiceSheet: View, ViewName {
 				Capsule()
 					.strokeBorder(Color(UIColor.separator))
 			)
-
-			Spacer()
+			.padding(.bottom)
+			
 			HStack {
 				Spacer()
 				Button("Save") {
@@ -997,6 +1042,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 
 		} // </VStack>
 		.padding([.leading, .trailing])
+		.assignMaxPreference(for: textHeightReader.key, to: $textHeight)
 		.onAppear() {
 			onAppear()
 		}
@@ -1012,17 +1058,16 @@ struct ModifyInvoiceSheet: View, ViewName {
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
-        let msat: Int64? = initialAmount?.msat
+		let msat: Int64? = initialAmount?.msat
 		
 		// Regardless of whether or not the invoice currently has an amount,
 		// we should default to the user's preferred currency.
 		// In other words, we should default to fiat, if that's what the user prefers.
 		//
-		if currencyPrefs.currencyType == .fiat, let exchangeRate = currencyPrefs.fiatExchangeRate() {
-			
-			let fiatCurrency = currencyPrefs.fiatCurrency
-			unit = CurrencyUnit(fiatCurrency: fiatCurrency)
-			
+		
+		if let fiatCurrency = unit.fiatCurrency,
+		   let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+		{
 			if let msat = msat {
 				let targetAmt = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
 				parsedAmount = Result.success(targetAmt)
@@ -1033,10 +1078,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 				refreshAltAmount()
 			}
 			
-		} else {
-			
-			let bitcoinUnit = currencyPrefs.bitcoinUnit
-			unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+		} else if let bitcoinUnit = unit.bitcoinUnit {
 			
 			if let msat = msat {
 				let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
@@ -1121,37 +1163,29 @@ struct ModifyInvoiceSheet: View, ViewName {
 	func didTapSaveButton() -> Void {
 		log.trace("[\(viewName)] didTapSaveButton()")
 		
+		var msat: Lightning_kmpMilliSatoshi? = nil
 		let trimmedDesc = desc.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
 		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
 			if let bitcoinUnit = unit.bitcoinUnit {
 				
-				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
-				mvi.intent(Receive.IntentAsk(
-					amount: msat,
-					desc: trimmedDesc
-				))
+				msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
 				
 			} else if let fiatCurrency = unit.fiatCurrency,
 			          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
 			{
-				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
-				mvi.intent(Receive.IntentAsk(
-					amount: msat,
-					desc: trimmedDesc
-				))
+				msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
 			}
-			
-		} else {
+		}
+		
+		shortSheetState.close {
 			
 			mvi.intent(Receive.IntentAsk(
-				amount: nil,
+				amount: msat,
 				desc: trimmedDesc
 			))
 		}
-		
-		dismissSheet()
 	}
 	
 } // </ModifyInvoiceSheet>

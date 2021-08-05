@@ -389,7 +389,7 @@ struct ValidateView: View, ViewName {
 
 	@State var number: Double = 0.0
 	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var unit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
