@@ -47,9 +47,11 @@ extension PhoenixBusiness {
 		/// peerState: StateFlow<Peer?>
 		/// ```
 		static var peerPublisher: AnyPublisher<Lightning_kmpPeer, Never> =
-			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer>(
+			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
 				AppDelegate.get().business.peerState()
-			).eraseToAnyPublisher()
+			)
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
 	}
 	
 	func peerPublisher() -> AnyPublisher<Lightning_kmpPeer, Never> {
