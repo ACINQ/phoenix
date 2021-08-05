@@ -36,14 +36,9 @@ struct ErrorView: View {
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.onReceive(popoverState.display) { (newPopoverItem: PopoverItem) in
+		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
 			withAnimation {
-				popoverItem = newPopoverItem
-			}
-		}
-		.onReceive(popoverState.close) { _ in
-			withAnimation {
-				popoverItem = nil
+				popoverItem = item
 			}
 		}
 	}
@@ -145,11 +140,9 @@ struct ErrorView: View {
 	func showDetails() {
 		log.trace("showDetails()")
 		
-		popoverState.display.send(PopoverItem(
-		
-			ErrorDetailsView(danger: danger, toast: toast).anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			ErrorDetailsView(danger: danger, toast: toast)
+		}
 	}
 }
 
@@ -278,7 +271,7 @@ struct ErrorDetailsView: View, ViewName {
 	func closePopover() {
 		log.trace("[\(viewName)] closePopover()")
 		
-		popoverState.close.send()
+		popoverState.close()
 	}
 }
 

@@ -694,11 +694,9 @@ fileprivate struct ConnectionStatusButton : View {
 	func showConnectionsPopover() -> Void {
 		log.trace("(ConnectionStatusButton) showConnectionsPopover()")
 		
-		popoverState.display.send(PopoverItem(
-		
-			ConnectionsPopover().anyView,
-			dismissable: true
-		))
+		popoverState.display(dismissable: true) {
+			ConnectionsPopover()
+		}
 	}
 }
 

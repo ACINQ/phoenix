@@ -24,7 +24,7 @@ struct ConnectionsPopover: View {
 				Spacer()
 				Button("OK") {
 					withAnimation {
-						popoverState.close.send()
+						popoverState.close()
 					}
 				}
 				.font(.title2)

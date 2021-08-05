@@ -766,21 +766,17 @@ struct ReceiveLightningView: View, ViewName {
 	func showBgAppRefreshDisabledWarning() -> Void {
 		log.trace("[\(viewName)] showBgAppRefreshDisabledWarning()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			BgAppRefreshDisabledWarning().anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			BgAppRefreshDisabledWarning()
+		}
 	}
 	
 	func showNotificationsDisabledWarning() -> Void {
 		log.trace("[\(viewName)] showNotificationsDisabledWarning()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			NotificationsDisabledWarning().anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			NotificationsDisabledWarning()
+		}
 	}
 	
 	func showRequestPushPermissionPopover() -> Void {
@@ -805,11 +801,9 @@ struct ReceiveLightningView: View, ViewName {
 			}
 		}
 		
-		popoverState.display.send(PopoverItem(
-		
-			RequestPushPermissionPopover(callback: callback).anyView,
-			dismissable: true
-		))
+		popoverState.display(dismissable: true) {
+			RequestPushPermissionPopover(callback: callback)
+		}
 	}
 	
 	func didTapCopyButton() -> Void {
@@ -897,11 +891,9 @@ struct ReceiveLightningView: View, ViewName {
 			
 		} else {
 			
-			popoverState.display.send(PopoverItem(
-				
-				SwapInDisabledPopover().anyView,
-				dismissable: true
-			))
+			popoverState.display(dismissable: true) {
+				SwapInDisabledPopover()
+			}
 		}
 	}
 }
@@ -1204,7 +1196,7 @@ struct BgAppRefreshDisabledWarning: View {
 			
 			HStack {
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("OK").font(.title3)
 				}
@@ -1212,7 +1204,7 @@ struct BgAppRefreshDisabledWarning: View {
 		}
 		.padding()
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
-			popoverState.close.send()
+			popoverState.close()
 		})
 	}
 }
@@ -1246,14 +1238,14 @@ struct NotificationsDisabledWarning: View {
 			HStack {
 				Button {
 					fixIt()
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("Settings").font(.title3)
 				}
 				.padding(.trailing, 20)
 				
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("OK").font(.title3)
 				}
@@ -1261,7 +1253,7 @@ struct NotificationsDisabledWarning: View {
 		}
 		.padding()
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
-			popoverState.close.send()
+			popoverState.close()
 		})
 	}
 	
@@ -1316,8 +1308,10 @@ struct RequestPushPermissionPopover: View, ViewName {
 			}
 		}
 		.padding()
-		.onReceive(popoverState.close) {
-			willClose()
+		.onReceive(popoverState.publisher) { item in
+			if item  == nil {
+				willClose()
+			}
 		}
 	}
 	
@@ -1326,7 +1320,7 @@ struct RequestPushPermissionPopover: View, ViewName {
 		
 		callback(.denied)
 		userIsIgnoringPopover = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didAccept() -> Void {
@@ -1334,7 +1328,7 @@ struct RequestPushPermissionPopover: View, ViewName {
 		
 		callback(.accepted)
 		userIsIgnoringPopover = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func willClose() -> Void {
@@ -1372,7 +1366,7 @@ fileprivate struct SwapInDisabledPopover: View, ViewName {
 			
 			HStack {
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("Try again later").font(.headline)
 				}

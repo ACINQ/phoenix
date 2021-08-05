@@ -285,11 +285,9 @@ fileprivate struct StandardWalletView : View {
 	func drainWallet() -> Void {
 		log.trace("drainWallet()")
 		
-		popoverState.display.send(PopoverItem(
-		
-			ConfirmationPopover(confirmAction: confirmDrainWallet).anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			ConfirmationPopover(confirmAction: confirmDrainWallet)
+		}
 	}
 	
 	func confirmDrainWallet() -> Void {
@@ -421,12 +419,12 @@ fileprivate struct ConfirmationPopover : View {
 	
 	func didTapCancel() -> Void {
 		log.trace("cancel()")
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didTapConfirm() -> Void {
 		log.trace("confirm()")
-		popoverState.close.send()
+		popoverState.close()
 		confirmAction()
 	}
 }

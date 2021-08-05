@@ -838,11 +838,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// Which means their existing channels are going to get force closed by the server.
 		// So we need to inform the user about what just happened.
 		
-//		popoverState.display.send(PopoverItem(
-//			
-//			PardonOurMess().anyView,
-//			dismissable: false
-//		))
+//		popoverState.display(dismissable: false) {
+//			PardonOurMess()
+//		}
 	}
 	
 	private func removeAppDbFile() {

@@ -222,13 +222,11 @@ fileprivate struct StandardWalletView : View {
 	func forceCloseChannels() -> Void {
 		log.debug("forceCloseChannels()")
 		
-		popoverState.display.send(PopoverItem(
-		
+		popoverState.display(dismissable: false) {
 			ConfirmationPopover(
 				confirmAction: confirmForceCloseChannels
-			).anyView,
-			dismissable: false
-		))
+			)
+		}
 	}
 	
 	func confirmForceCloseChannels() -> Void {
@@ -339,12 +337,12 @@ fileprivate struct ConfirmationPopover : View {
 	
 	func didTapCancel() -> Void {
 		log.trace("cancel()")
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didTapConfirm() -> Void {
 		log.trace("confirm()")
-		popoverState.close.send()
+		popoverState.close()
 		confirmAction()
 	}
 }

@@ -67,14 +67,9 @@ struct ContentView: MVIView {
 			
 		} // </ZStack>
 		.modifier(GlobalEnvironment())
-		.onReceive(popoverState.display) { (newPopoverItem: PopoverItem) in
+		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
 			withAnimation {
-				popoverItem = newPopoverItem
-			}
-		}
-		.onReceive(popoverState.close) { _ in
-			withAnimation {
-				popoverItem = nil
+				popoverItem = item
 			}
 		}
 	}

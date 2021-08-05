@@ -255,7 +255,7 @@ struct ScanView: View, ViewName {
 		}
 		
 		ignoreScanner = true
-		popoverState.display.send(PopoverItem(
+		popoverState.display(dismissable: false) {
 			
 			DangerousInvoiceAlert(
 				model: model,
@@ -263,9 +263,8 @@ struct ScanView: View, ViewName {
 				paymentRequest: paymentRequest,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
-			).anyView,
-			dismissable: false
-		))
+			)
+		}
 	}
 }
 
@@ -371,7 +370,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		isShowing = false
 		ignoreScanner = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didConfirm() -> Void {
@@ -379,7 +378,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		isShowing = false
 		postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
-		popoverState.close.send()
+		popoverState.close()
 	}
 }
 
@@ -695,11 +694,9 @@ struct ValidateView: View, ViewName {
 	func showConnectionsPopover() -> Void {
 		log.trace("[\(viewName)] showConnectionsPopover()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			ConnectionsPopover().anyView,
-			dismissable: true
-		))
+		popoverState.display(dismissable: true) {
+			ConnectionsPopover()
+		}
 	}
 }
 
