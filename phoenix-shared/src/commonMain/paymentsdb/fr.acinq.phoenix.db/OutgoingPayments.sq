@@ -75,6 +75,20 @@ SELECT * FROM outgoing_payment_parts WHERE part_id=?;
 deleteOutgoingPart:
 DELETE FROM outgoing_payment_parts WHERE part_id=?;
 
+getOutgoingPaymentWithoutParts:
+SELECT id,
+       recipient_amount_msat,
+       recipient_node_id,
+       payment_hash,
+       details_type,
+       details_blob,
+       created_at,
+       completed_at,
+       status_type,
+       status_blob
+FROM outgoing_payments
+WHERE id=?;
+
 getOutgoingPayment:
 SELECT parent.id,
        parent.recipient_amount_msat,
