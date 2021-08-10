@@ -164,6 +164,7 @@
   <!-- //////////////// send //////////////// -->
 
   <string name="send_init_paste">Colar dados da área de transferência</string>
+  <string name="send_init_browse">Usar imagem salva de código QR</string>
   <string name="send_init_reading">Lendo…</string>
 
   <string name="send_balance_prefix">Saldo:</string>
