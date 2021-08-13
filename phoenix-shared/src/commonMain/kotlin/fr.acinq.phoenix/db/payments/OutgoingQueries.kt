@@ -329,12 +329,15 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
 
         val hopDescAdapter: ColumnAdapter<List<HopDesc>, String> = object : ColumnAdapter<List<HopDesc>, String> {
-            override fun decode(databaseValue: String): List<HopDesc> = databaseValue.split(";").map { hop ->
-                val els = hop.split(":")
-                val n1 = PublicKey(ByteVector(els[0]))
-                val n2 = PublicKey(ByteVector(els[1]))
-                val cid = els[2].takeIf { it.isNotBlank() }?.run { ShortChannelId(this) }
-                HopDesc(n1, n2, cid)
+            override fun decode(databaseValue: String): List<HopDesc> = when {
+                databaseValue.isEmpty() -> listOf()
+                else -> databaseValue.split(";").map { hop ->
+                    val els = hop.split(":")
+                    val n1 = PublicKey(ByteVector(els[0]))
+                    val n2 = PublicKey(ByteVector(els[1]))
+                    val cid = els[2].takeIf { it.isNotBlank() }?.run { ShortChannelId(this) }
+                    HopDesc(n1, n2, cid)
+                }
             }
 
             override fun encode(value: List<HopDesc>): String = value.joinToString(";") {
