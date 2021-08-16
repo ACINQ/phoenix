@@ -3,6 +3,13 @@ import PhoenixShared
 import Combine
 import CryptoKit
 
+extension PhoenixBusiness {
+	
+	func getPeer() -> Lightning_kmpPeer? {
+		self.peerManager.peerState.value as? Lightning_kmpPeer
+	}
+}
+
 extension Lightning_kmpWalletPayment: Identifiable {
 	
 	var identifiable: String {
@@ -117,29 +124,6 @@ extension Lightning_kmpConnection {
 	}
 }
 
-extension KotlinByteArray {
-	
-	static func fromSwiftData(_ data: Data) -> KotlinByteArray {
-		
-		let kba = KotlinByteArray(size: Int32(data.count))
-		for (idx, byte) in data.enumerated() {
-			kba.set(index: Int32(idx), value: Int8(bitPattern: byte))
-		}
-		return kba
-	}
-	
-	func toSwiftData() -> Data {
-
-		let size = self.size
-		var data = Data(count: Int(size))
-		for idx in 0 ..< size {
-			let byte: Int8 = self.get(index: idx)
-			data[Int(idx)] = UInt8(bitPattern: byte)
-		}
-		return data
-	}
-}
-
 extension Bitcoin_kmpByteVector32 {
 	
 	static func random() -> Bitcoin_kmpByteVector32 {
@@ -150,7 +134,7 @@ extension Bitcoin_kmpByteVector32 {
 			return Data(bytes: bytes.baseAddress!, count: bytes.count)
 		}
 		
-		return Bitcoin_kmpByteVector32(bytes: KotlinByteArray.fromSwiftData(data))
+		return Bitcoin_kmpByteVector32(bytes: data.toKotlinByteArray())
 	}
 }
 
