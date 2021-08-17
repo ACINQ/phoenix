@@ -20,7 +20,7 @@ object Versions {
         const val prefs = "1.1.1"
         const val compose = "1.0.0-beta07"
         const val navCompose = "2.4.0-alpha01"
-        const val constraintLayout = "1.0.0-alpha07"
+        const val constraintLayoutCompose = "1.0.0-alpha07"
         const val zxing = "4.1.0"
         const val logback = "2.0.0"
         const val testRunner = "1.3.0"
