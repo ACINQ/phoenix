@@ -306,7 +306,7 @@
 "example.com" = "example.com";
 
 /* No comment provided by engineer. */
-"Expect to receive %@ separate payments." = "Espere recibir %@ pagos separados.";
+"Expect to receive %d separate payments." = "Espere recibir %d pagos separados.";
 
 /* No comment provided by engineer. */
 "External" = "Externo";
