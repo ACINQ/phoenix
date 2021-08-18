@@ -7,8 +7,6 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
-import fr.acinq.phoenix.utils.RETRY_DELAY
-import fr.acinq.phoenix.utils.increaseDelay
 import io.ktor.client.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
@@ -49,33 +47,28 @@ class AppConfigurationManager(
     val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
 
     private fun initWalletContext() = launch {
-        val (timestamp, fallbackWalletContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
+        val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
         val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
-        logger.info { "local WalletContext loaded, not updated since=$freshness" }
+        logger.info { "local context was updated $freshness ago" }
 
-        val timeout =
-            if (freshness < 48.hours) 2.seconds
-            else max(freshness.inDays.toInt(), 5) * 2.seconds // max=10s
+        val timeout = if (freshness < 48.hours) 2.seconds else max(freshness.inDays.toInt(), 5) * 2.seconds // max=10s
 
         // TODO are we using TOR? -> increase timeout
 
         val walletContext = try {
             withTimeout(timeout) {
-                fetchAndStoreWalletContext() ?: fallbackWalletContext
+                fetchAndStoreWalletContext() ?: localContext
             }
         } catch (t: TimeoutCancellationException) {
-            logger.warning { "Unable to fetch WalletContext, using fallback values=$fallbackWalletContext" }
-            fallbackWalletContext
+            logger.warning { "unable to refresh context from remote, using local fallback" }
+            localContext
         }
 
         // _chainContext can be updated by [updateWalletContextLoop] before we reach this block.
         // In that case, we don't update from here
         if (_chainContext.value == null) {
-            val chainContext = walletContext?.export(chain)
-            logger.debug { "init ChainContext=$chainContext" }
-            _chainContext.value = chainContext
-
+            _chainContext.value = walletContext?.export(chain)
         }
 
         logger.info { "chainContext=$chainContext" }
@@ -92,20 +85,15 @@ class AppConfigurationManager(
 
     @OptIn(ExperimentalTime::class)
     private fun updateWalletContextLoop() = launch {
-        var retryDelay = RETRY_DELAY
-
+        var pause = 0.5.seconds
         while (isActive) {
-            val walletContext = fetchAndStoreWalletContext()
-            if (walletContext != null) {
-                val chainContext = walletContext.export(chain)
-                logger.debug { "update ChainContext=$chainContext" }
+            pause = (pause * 2).coerceAtMost(5.minutes)
+            fetchAndStoreWalletContext()?.let {
+                val chainContext = it.export(chain)
                 _chainContext.value = chainContext
-                retryDelay = 60.minutes
-            } else {
-                retryDelay = increaseDelay(retryDelay)
+                pause = 60.minutes
             }
-
-            delay(retryDelay)
+            delay(pause)
         }
     }
 

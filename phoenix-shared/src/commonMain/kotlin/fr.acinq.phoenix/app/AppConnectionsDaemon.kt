@@ -7,8 +7,6 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
 import fr.acinq.phoenix.utils.NetworkMonitor
 import fr.acinq.phoenix.utils.NetworkState
-import fr.acinq.phoenix.utils.RETRY_DELAY
-import fr.acinq.phoenix.utils.increaseDelay
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -17,6 +15,7 @@ import kotlinx.coroutines.flow.*
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
@@ -300,22 +299,15 @@ class AppConnectionsDaemon(
         statusStateFlow: StateFlow<Connection>,
         connect: () -> Unit
     ) = launch {
-
-        var disconnectCount = 0
-        var retryDelay = RETRY_DELAY
+        var pause = 0.seconds
         statusStateFlow.collect {
             if (it == Connection.CLOSED) {
-                if (disconnectCount > 0) {
-                    logger.debug { "Wait for $retryDelay before retrying connection on $name" }
-                    delay(retryDelay)
-                    retryDelay = increaseDelay(retryDelay)
-                } else {
-                    // First connection attempt in loop - no need for backoff
-                }
-                disconnectCount++
+                logger.debug { "next $name connection attempt in $pause" }
+                delay(pause)
+                pause = (pause.coerceAtLeast(0.25.seconds) * 2).coerceAtMost(8.seconds)
                 connect()
             } else if (it == Connection.ESTABLISHED) {
-                retryDelay = RETRY_DELAY
+                pause = 0.5.seconds
             }
         }
     }
