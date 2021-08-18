@@ -168,7 +168,9 @@ struct ReceiveLightningView: View, ViewName {
 	
 	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
-	let channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
+	
+	// Saving custom publisher in @State since otherwise it fires on every render
+	@State var channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -427,14 +429,14 @@ struct ReceiveLightningView: View, ViewName {
 				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						UIPasteboard.general.image = uiImg
-						toast.pop(
-							Text("Copied QR code image to pasteboard!").anyView,
-							colorScheme: colorScheme.opposite
-						)
+						copyImageToPasteboard()
 					}) {
 						Text("Copy")
+					}
+					Button(action: {
+						shareImageToSystem()
+					}) {
+						Text("Share")
 					}
 					Button(action: {
 						// We add a delay here to give the contextMenu time to finish it's own animation.
@@ -446,12 +448,6 @@ struct ReceiveLightningView: View, ViewName {
 						}
 					}) {
 						Text("Full Screen")
-					}
-					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
-					}) {
-						Text("Share")
 					}
 				} // </contextMenu>
 				.matchedGeometryEffect(id: "qrCodeView_inner", in: qrCodeAnimation_inner)
@@ -474,18 +470,30 @@ struct ReceiveLightningView: View, ViewName {
 	func copyButton() -> some View {
 		
 		ReceiveView.copyButton {
-			didTapCopyButton()
+			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressCopyButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapCopyButton()
+		})
 	}
 	
 	@ViewBuilder
 	func shareButton() -> some View {
 		
 		ReceiveView.shareButton {
-			didTapShareButton()
+			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressShareButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapShareButton()
+		})
 	}
 	
 	@ViewBuilder
@@ -832,8 +840,8 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func didTapCopyButton() -> Void {
-		log.trace("[\(viewName)] didTapCopyButton()")
+	func copyTextToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			UIPasteboard.general.string = m.request
@@ -845,14 +853,80 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func didTapShareButton() -> Void {
-		log.trace("[\(viewName)] didTapShareButton()")
+	func copyImageToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyImageToPasteboard()")
+		
+		if let m = mvi.model as? Receive.ModelGenerated,
+			qrCode.value == m.request,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			UIPasteboard.general.image = uiImg
+			toast.pop(
+				Text("Copied QR code image to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
+		}
+	}
+	
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
+		
+		copyTextToPasteboard()
+	}
+	
+	func didLongPressCopyButton() -> Void {
+		log.trace("[\(viewName)] didLongPressCopyButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			CopyOptionsSheet(copyText: {
+				copyTextToPasteboard()
+			}, copyImage: {
+				copyImageToPasteboard()
+			})
+		}
+	}
+	
+	func shareTextToSystem() -> Void {
+		log.trace("[\(viewName)] shareTextToSystem()")
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			withAnimation {
 				let url = "lightning:\(m.request)"
 				sheet = ReceiveViewSheet.sharingUrl(url: url)
 			}
+		}
+	}
+	
+	func shareImageToSystem() -> Void {
+		log.trace("[\(viewName)] shareImageToSystem()")
+		
+		if let m = mvi.model as? Receive.ModelGenerated,
+			qrCode.value == m.request,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+		}
+	}
+	
+	func didTapShareButton() -> Void {
+		log.trace("[\(viewName)] didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() -> Void {
+		log.trace("[\(viewName)] didLongPressShareButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			ShareOptionsSheet(shareText: {
+				shareTextToSystem()
+			}, shareImage: {
+				shareImageToSystem()
+			})
 		}
 	}
 	
@@ -928,6 +1002,136 @@ struct ReceiveLightningView: View, ViewName {
 				SwapInDisabledPopover()
 			}
 		}
+	}
+}
+
+struct CopyOptionsSheet: View, ViewName {
+	
+	let copyText: () -> Void
+	let copyImage: () -> Void
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack {
+			
+			Button {
+				shortSheetState.close {
+					copyText()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.on.square")
+						.imageScale(.medium)
+					Text("Copy Text")
+					Spacer()
+					Text("(Lightning invoice)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+			.padding(.bottom, 8)
+			
+			Button {
+				shortSheetState.close {
+					copyImage()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.on.square")
+						.imageScale(.medium)
+					Text("Copy Image")
+					Spacer()
+					Text("(QR code)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+		}
+		.padding(.all)
+	}
+}
+
+struct ShareOptionsSheet: View, ViewName {
+	
+	let shareText: () -> Void
+	let shareImage: () -> Void
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack {
+			
+			Button {
+				shortSheetState.close {
+					shareText()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.and.arrow.up")
+						.imageScale(.medium)
+					Text("Share Text")
+					Spacer()
+					Text("(Lightning invoice)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+			.padding(.bottom, 8)
+			
+			Button {
+				shortSheetState.close {
+					shareImage()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.and.arrow.up")
+						.imageScale(.medium)
+					Text("Share Image")
+					Spacer()
+					Text("(QR code)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+		}
+		.padding(.all)
 	}
 }
 
@@ -1434,6 +1638,7 @@ struct SwapInView: View, ViewName {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
@@ -1486,14 +1691,26 @@ struct SwapInView: View, ViewName {
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				
 				ReceiveView.copyButton {
-					didTapCopyButton()
+					// using simultaneousGesture's below
 				}
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.simultaneousGesture(LongPressGesture().onEnded { _ in
+					didLongPressCopyButton()
+				})
+				.simultaneousGesture(TapGesture().onEnded {
+					didTapCopyButton()
+				})
 				
 				ReceiveView.shareButton {
-					didTapShareButton()
+					// using simultaneousGesture's below
 				}
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.simultaneousGesture(LongPressGesture().onEnded { _ in
+					didLongPressShareButton()
+				})
+				.simultaneousGesture(TapGesture().onEnded {
+					didTapShareButton()
+				})
 				
 			} // </HStack>
 			
@@ -1540,25 +1757,18 @@ struct SwapInView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated,
 			qrCode.value == m.address,
-			let qrCodeCgImage = qrCode.cgImage,
 			let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
 				.resizable()
 				.contextMenu {
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						UIPasteboard.general.image = uiImg
-						toast.pop(
-							Text("Copied QR code image to pasteboard!").anyView,
-							colorScheme: colorScheme.opposite
-						)
+						copyImageToPasteboard()
 					}) {
 						Text("Copy")
 					}
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+						shareImageToSystem()
 					}) {
 						Text("Share")
 					}
@@ -1682,8 +1892,8 @@ struct SwapInView: View, ViewName {
 		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
-	func didTapCopyButton() -> Void {
-		log.trace("[\(viewName)] didTapCopyButton()")
+	func copyTextToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			UIPasteboard.general.string = m.address
@@ -1694,12 +1904,78 @@ struct SwapInView: View, ViewName {
 		}
 	}
 	
-	func didTapShareButton() -> Void {
-		log.trace("[\(viewName)] didTapShareButton()")
+	func copyImageToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyImageToPasteboard()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+			qrCode.value == m.address,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			UIPasteboard.general.image = uiImg
+			toast.pop(
+				Text("Copied QR code image to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
+		}
+	}
+	
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
+		
+		copyTextToPasteboard()
+	}
+	
+	func didLongPressCopyButton() -> Void {
+		log.trace("[\(viewName)] didLongPressCopyButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			CopyOptionsSheet(copyText: {
+				copyTextToPasteboard()
+			}, copyImage: {
+				copyImageToPasteboard()
+			})
+		}
+	}
+	
+	func shareTextToSystem() {
+		log.trace("[\(viewName)] shareTextToSystem()")
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			let url = "bitcoin:\(m.address)"
 			sheet = ReceiveViewSheet.sharingUrl(url: url)
+		}
+	}
+	
+	func shareImageToSystem() {
+		log.trace("[\(viewName)] shareImageToSystem()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+			qrCode.value == m.address,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+		}
+	}
+	
+	func didTapShareButton() {
+		log.trace("[\(viewName)] didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() {
+		log.trace("[\(viewName)] didLongPressShareButton()")
+		
+		shortSheetState.display(dismissable: true) {
+					
+			ShareOptionsSheet(shareText: {
+				shareTextToSystem()
+			}, shareImage: {
+				shareImageToSystem()
+			})
 		}
 	}
 }
