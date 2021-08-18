@@ -65,7 +65,7 @@ import fr.acinq.phoenix.ctrl.ControllerFactory
 import fr.acinq.phoenix.ctrl.Home
 import fr.acinq.phoenix.ctrl.HomeController
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
-import fr.acinq.phoenix.utils.Connections
+import fr.acinq.phoenix.app.Connections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
@@ -91,7 +91,7 @@ fun HomeView(appVM: AppViewModel) {
     requireWalletPresent(inScreen = Screen.Home) {
         val log = logger()
 
-        val connectionsFlow = business.connectionsMonitor.connections
+        val connectionsFlow = business.connectionsManager.connections
         val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(connectionsFlow, controllerFactory, CF::home))
         val connectionsState = vm.connectionsFlow.collectAsState()
         val showConnectionsDialog = remember { mutableStateOf(false) }

@@ -1,8 +1,7 @@
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.app
 
-import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.StateFlow
 import org.kodein.log.LoggerFactory
 
@@ -12,7 +11,7 @@ enum class NetworkState {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-expect class NetworkMonitor(loggerFactory: LoggerFactory, ctx: PlatformContext) {
+expect class NetworkManager(loggerFactory: LoggerFactory, ctx: PlatformContext) {
     val networkState: StateFlow<NetworkState>
     fun start()
     fun stop()

@@ -43,7 +43,7 @@ class PhoenixBusiness(
 
     internal val tcpSocketBuilder = TcpSocket.Builder()
 
-    internal val networkMonitor by lazy { NetworkMonitor(loggerFactory, ctx) }
+    internal val networkMonitor by lazy { NetworkManager(loggerFactory, ctx) }
     internal val httpClient by lazy {
         HttpClient {
             install(JsonFeature) {
@@ -70,7 +70,7 @@ class PhoenixBusiness(
     val paymentsManager by lazy { PaymentsManager(this) }
     val appConfigurationManager by lazy { AppConfigurationManager(this) }
     val currencyManager by lazy { CurrencyManager(this) }
-    val connectionsMonitor by lazy { ConnectionsMonitor(this) }
+    val connectionsManager by lazy { ConnectionsManager(this) }
     val util by lazy { Utilities(this) }
 
     init {

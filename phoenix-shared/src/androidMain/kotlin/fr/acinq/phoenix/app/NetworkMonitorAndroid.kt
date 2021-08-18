@@ -1,9 +1,10 @@
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.app
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkRequest
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -15,7 +16,7 @@ import org.kodein.log.newLogger
 
 
 @ExperimentalCoroutinesApi
-actual class NetworkMonitor actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by MainScope() {
+actual class NetworkManager actual constructor(loggerFactory: LoggerFactory, val ctx: PlatformContext) : CoroutineScope by MainScope() {
 
     val logger = newLogger(loggerFactory)
 

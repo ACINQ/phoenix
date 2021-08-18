@@ -397,7 +397,7 @@ struct ValidateView: View, ViewName {
 	@State var isInvalidAmount: Bool = false
 	@State var isExpiredInvoice: Bool = false
 	
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -414,13 +414,13 @@ struct ValidateView: View, ViewName {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsMonitor.connections.internet != Lightning_kmpConnection.established {
+		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsMonitor.connections.peer != Lightning_kmpConnection.established {
+		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsMonitor.connections.electrum != Lightning_kmpConnection.established {
+		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
@@ -428,7 +428,7 @@ struct ValidateView: View, ViewName {
 	
 	var body: some View {
 		
-		let isDisconnected = connectionsMonitor.connections.global != .established
+		let isDisconnected = connectionsManager.connections.global != .established
 		ZStack {
 		
 			Color.primaryBackground

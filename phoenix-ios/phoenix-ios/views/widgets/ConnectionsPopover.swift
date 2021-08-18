@@ -3,7 +3,7 @@ import PhoenixShared
 
 struct ConnectionsPopover: View {
 
-	@StateObject var monitor = ObservableConnectionsMonitor()
+	@StateObject var monitor = ObservableConnectionsManager()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 

@@ -138,7 +138,7 @@ extension Bitcoin_kmpByteVector32 {
 	}
 }
 
-extension ConnectionsMonitor {
+extension ConnectionsManager {
 	
 	var currentValue: Connections {
 		return connections.value as! Connections
@@ -157,17 +157,17 @@ extension ConnectionsMonitor {
 	}
 }
 
-class ObservableConnectionsMonitor: ObservableObject {
+class ObservableConnectionsManager: ObservableObject {
 	
 	@Published var connections: Connections
 	
 	private var watcher: Ktor_ioCloseable? = nil
 	
 	init() {
-		let monitor = AppDelegate.get().business.connectionsMonitor
-		connections = monitor.currentValue
+		let manager = AppDelegate.get().business.connectionsManager
+		connections = manager.currentValue
 		
-		let swiftFlow = SwiftFlow<Connections>(origin: monitor.connections)
+		let swiftFlow = SwiftFlow<Connections>(origin: manager.connections)
 		
 		watcher = swiftFlow.watch {[weak self](newConnections: Connections?) in
 			self?.connections = newConnections!

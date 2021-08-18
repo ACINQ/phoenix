@@ -5,8 +5,6 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.ElectrumConfig
-import fr.acinq.phoenix.utils.NetworkMonitor
-import fr.acinq.phoenix.utils.NetworkState
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -24,7 +22,7 @@ class AppConnectionsDaemon(
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
-    private val monitor: NetworkMonitor,
+    private val networkManager: NetworkManager,
     private val electrumClient: ElectrumClient,
     loggerFactory: LoggerFactory,
 ) : CoroutineScope by MainScope() {
@@ -35,7 +33,7 @@ class AppConnectionsDaemon(
         walletManager = business.walletManager,
         peerManager = business.peerManager,
         currencyManager = business.currencyManager,
-        monitor = business.networkMonitor,
+        networkManager = business.networkMonitor,
         electrumClient = business.electrumClient
     )
 
@@ -184,8 +182,8 @@ class AppConnectionsDaemon(
         }
         // Internet connection monitor
         launch {
-            monitor.start()
-            monitor.networkState.filter { it != networkStatus.value }.collect {
+            networkManager.start()
+            networkManager.networkState.filter { it != networkStatus.value }.collect {
                 logger.info { "network state=$it" }
                 networkStatus.value = it
             }

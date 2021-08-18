@@ -1,5 +1,6 @@
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.app
 
+import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -13,7 +14,7 @@ import platform.darwin.dispatch_get_main_queue
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-actual class NetworkMonitor actual constructor(
+actual class NetworkManager actual constructor(
     loggerFactory: LoggerFactory,
     ctx: PlatformContext
 ) : CoroutineScope by MainScope() {

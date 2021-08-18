@@ -646,12 +646,12 @@ fileprivate struct PaymentCell : View, ViewName {
 fileprivate struct ConnectionStatusButton : View {
 	
 	@State var dimStatus = false
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
 	var body: some View {
-		let status = connectionsMonitor.connections.global
+		let status = connectionsManager.connections.global
 		
 		Group {
 			Button {

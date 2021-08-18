@@ -1,9 +1,8 @@
-package fr.acinq.phoenix.utils
+package fr.acinq.phoenix.app
 
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.app.PeerManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,16 +20,16 @@ data class Connections(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ConnectionsMonitor(
+class ConnectionsManager(
     peerManager: PeerManager,
     electrumClient: ElectrumClient,
-    networkMonitor: NetworkMonitor
+    networkManager: NetworkManager
 ): CoroutineScope {
 
     constructor(business: PhoenixBusiness): this(
         peerManager = business.peerManager,
         electrumClient = business.electrumClient,
-        networkMonitor = business.networkMonitor
+        networkManager = business.networkMonitor
     )
 
     private val job = Job()
@@ -44,7 +43,7 @@ class ConnectionsMonitor(
             combine(
                 peerManager.getPeer().connectionState,
                 electrumClient.connectionState,
-                networkMonitor.networkState
+                networkManager.networkState
             ) { peerState, electrumState, internetState ->
                 Connections(
                     peer = peerState,

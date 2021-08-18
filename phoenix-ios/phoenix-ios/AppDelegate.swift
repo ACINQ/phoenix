@@ -105,8 +105,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Connections observer
-		let connectionsMonitor = business.connectionsMonitor
-		connectionsMonitor.publisher.sink {(connections: Connections) in
+		let connectionsManager = business.connectionsManager
+		connectionsManager.publisher.sink {(connections: Connections) in
 			self.connectionsChanged(connections)
 		}.store(in: &cancellables)
 		
