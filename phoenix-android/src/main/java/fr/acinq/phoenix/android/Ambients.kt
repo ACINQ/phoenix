@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.security.KeyState
-import fr.acinq.phoenix.ctrl.ControllerFactory
+import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit

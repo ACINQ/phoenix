@@ -45,7 +45,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.share
-import fr.acinq.phoenix.ctrl.config.ChannelsConfiguration
+import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
 
 @Composable
 fun ChannelsView() {

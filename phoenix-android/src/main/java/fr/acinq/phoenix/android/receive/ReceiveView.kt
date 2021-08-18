@@ -49,9 +49,9 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.ctrl.ControllerFactory
-import fr.acinq.phoenix.ctrl.Receive
-import fr.acinq.phoenix.ctrl.ReceiveController
+import fr.acinq.phoenix.controllers.ControllerFactory
+import fr.acinq.phoenix.controllers.payments.Receive
+import fr.acinq.phoenix.controllers.ReceiveController
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

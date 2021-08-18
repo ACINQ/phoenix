@@ -39,7 +39,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.ctrl.config.CloseChannelsConfiguration
+import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 
 @Composable
 fun MutualCloseView() {
