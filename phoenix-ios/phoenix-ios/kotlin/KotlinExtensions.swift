@@ -200,7 +200,7 @@ extension FiatCurrency {
 			case FiatCurrency.chf : return NSLocalizedString("Swiss Franc",          comment: "Currency name: CHF")
 			case FiatCurrency.clp : return NSLocalizedString("Chilean Peso",         comment: "Currency name: CLP")
 			case FiatCurrency.cny : return NSLocalizedString("Chinese Yuan",         comment: "Currency name: CNY")
-			case FiatCurrency.czk : return NSLocalizedString("Czech Koruna", 		 comment: "Currency name: CZK")
+			case FiatCurrency.czk : return NSLocalizedString("Czech Koruna",         comment: "Currency name: CZK")
 			case FiatCurrency.dkk : return NSLocalizedString("Danish Krone",         comment: "Currency name: DKK")
 			case FiatCurrency.eur : return NSLocalizedString("Euro",                 comment: "Currency name: EUR")
 			case FiatCurrency.gbp : return NSLocalizedString("Great British Pound",  comment: "Currency name: GBP")
@@ -225,6 +225,39 @@ extension FiatCurrency {
 		}
 		
 		return self.name
+	}
+	
+	var flag: String {
+		switch self {
+		case FiatCurrency.aud : return "🇦🇺" // Australian Dollar
+		case FiatCurrency.brl : return "🇧🇷" // Brazilian Real
+		case FiatCurrency.cad : return "🇨🇦" // Canadian Dollar
+		case FiatCurrency.chf : return "🇨🇭" // Swiss Franc
+		case FiatCurrency.clp : return "🇨🇱" // Chilean Peso
+		case FiatCurrency.cny : return "🇨🇳" // Chinese Yuan
+		case FiatCurrency.czk : return "🇨🇿" // Czech Koruna
+		case FiatCurrency.dkk : return "🇩🇰" // Danish Krone
+		case FiatCurrency.eur : return "🇪🇺" // Euro
+		case FiatCurrency.gbp : return "🇬🇧" // Great British Pound
+		case FiatCurrency.hkd : return "🇭🇰" // Hong Kong Dollar
+		case FiatCurrency.hrk : return "🇭🇷" // Croation Kuna
+		case FiatCurrency.huf : return "🇭🇺" // Hungarian Forint
+		case FiatCurrency.inr : return "🇮🇳" // Indian Rupee
+		case FiatCurrency.isk : return "🇮🇸" // Icelandic Kròna
+		case FiatCurrency.jpy : return "🇯🇵" // Japanese Yen
+		case FiatCurrency.krw : return "🇰🇷" // Korean Won
+		case FiatCurrency.mxn : return "🇲🇽" // Mexican Peso
+		case FiatCurrency.nzd : return "🇳🇿" // New Zealand Dollar
+		case FiatCurrency.pln : return "🇵🇱" // Polish Zloty
+		case FiatCurrency.ron : return "🇷🇴" // Romanian Leu
+		case FiatCurrency.rub : return "🇷🇺" // Russian Ruble
+		case FiatCurrency.sek : return "🇸🇪" // Swedish Krona
+		case FiatCurrency.sgd : return "🇸🇬" // Singapore Dollar
+		case FiatCurrency.thb : return "🇹🇭" // Thai Baht
+		case FiatCurrency.twd : return "🇹🇼" // Taiwan New Dollar
+		case FiatCurrency.usd : return "🇺🇸" // United States Dollar
+		default               : return "🏳️"
+		}
 	}
 }
 
