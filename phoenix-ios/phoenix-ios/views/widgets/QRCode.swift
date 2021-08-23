@@ -9,6 +9,7 @@ class QRCode : ObservableObject {
 	func generate(value: String) {
 		if value == self.value { return }
 		self.value = value
+		self.cgImage = nil
 		self.image = nil
 
 		DispatchQueue.global(qos: .userInitiated).async {

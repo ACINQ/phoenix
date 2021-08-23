@@ -19,6 +19,11 @@ class Prefs {
 		case electrumConfig
 		case isTorEnabled
 		case defaultPaymentDescription
+		case hasCKRecordZone
+		case hasDownloadedCKRecords
+		case backupTransactions_enabled
+		case backupTransactions_useCellularData
+		case backupTransactions_useUploadDelay
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -106,7 +111,7 @@ class Prefs {
 		return CurrentValueSubject<Bool, Never>(value)
 	}()
 
-	var isTorEnabled : Bool {
+	var isTorEnabled: Bool {
 		get {
 			 UserDefaults.standard.bool(forKey: Keys.isTorEnabled.rawValue)
 		}
@@ -161,6 +166,101 @@ class Prefs {
 		set {
 			let key = Keys.defaultPaymentDescription.rawValue
 			UserDefaults.standard.setValue(newValue, forKey: key)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Cloud Backup
+	// --------------------------------------------------
+	
+	private func recordZoneCreatedKey(_ encryptedNodeId: String) -> String {
+		return "\(Keys.hasCKRecordZone.rawValue)-\(encryptedNodeId)"
+	}
+	
+	func recordZoneCreated(encryptedNodeId: String) -> Bool {
+		
+		return UserDefaults.standard.bool(forKey: recordZoneCreatedKey(encryptedNodeId))
+	}
+	
+	func setRecordZoneCreated(_ value: Bool, encryptedNodeId: String) {
+		
+		let key = recordZoneCreatedKey(encryptedNodeId)
+		if value == true {
+			UserDefaults.standard.setValue(value, forKey: key)
+		} else {
+			// Remove trace of account on disk
+			UserDefaults.standard.removeObject(forKey: key)
+		}
+	}
+	
+	private func hasDownloadedRecordsKey(_ encryptedNodeId: String) -> String {
+		return "\(Keys.hasDownloadedCKRecords.rawValue)-\(encryptedNodeId)"
+	}
+	
+	func hasDownloadedRecords(encryptedNodeId: String) -> Bool {
+		
+		return UserDefaults.standard.bool(forKey: hasDownloadedRecordsKey(encryptedNodeId))
+	}
+	
+	func setHasDownloadedRecords(_ value: Bool, encryptedNodeId: String) {
+		
+		let key = hasDownloadedRecordsKey(encryptedNodeId)
+		if value == true {
+			UserDefaults.standard.setValue(value, forKey: key)
+		} else {
+			// Remove trace of account on disk
+			UserDefaults.standard.removeObject(forKey: key)
+		}
+	}
+	
+	lazy private(set) var backupTransactions_isEnabledPublisher: CurrentValueSubject<Bool, Never> = {
+		var value = self.backupTransactions_isEnabled
+		return CurrentValueSubject<Bool, Never>(value)
+	}()
+	
+	var backupTransactions_isEnabled: Bool {
+		get {
+			let key = Keys.backupTransactions_enabled.rawValue
+			if UserDefaults.standard.object(forKey: key) != nil {
+				return UserDefaults.standard.bool(forKey: key)
+			} else {
+				return true // default value
+			}
+		}
+		set {
+			let key = Keys.backupTransactions_enabled.rawValue
+			UserDefaults.standard.set(newValue, forKey: key)
+			backupTransactions_isEnabledPublisher.send(newValue)
+		}
+	}
+	
+	var backupTransactions_useCellular: Bool {
+		get {
+			let key = Keys.backupTransactions_useCellularData.rawValue
+			if UserDefaults.standard.object(forKey: key) != nil {
+				return UserDefaults.standard.bool(forKey: key)
+			} else {
+				return true // default value
+			}
+		}
+		set {
+			let key = Keys.backupTransactions_useCellularData.rawValue
+			UserDefaults.standard.set(newValue, forKey: key)
+		}
+	}
+	
+	var backupTransactions_useUploadDelay: Bool {
+		get {
+			let key = Keys.backupTransactions_useUploadDelay.rawValue
+			if UserDefaults.standard.object(forKey: key) != nil {
+				return UserDefaults.standard.bool(forKey: key)
+			} else {
+				return false // default value
+			}
+		}
+		set {
+			let key = Keys.backupTransactions_useUploadDelay.rawValue
+			UserDefaults.standard.set(newValue, forKey: key)
 		}
 	}
 }

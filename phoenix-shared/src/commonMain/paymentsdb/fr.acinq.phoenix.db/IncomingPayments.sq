@@ -22,6 +22,10 @@ CREATE INDEX IF NOT EXISTS received_amount_msat_idx ON incoming_payments(receive
 
 -- queries
 
+hasIncomingPayment:
+SELECT COUNT(*) FROM incoming_payments
+WHERE payment_hash = ?;
+
 insert:
 INSERT INTO incoming_payments (
             payment_hash,
@@ -61,6 +65,12 @@ ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC
 LIMIT  ?, ?;
+
+scanCompleted:
+SELECT payment_hash,
+       received_at
+FROM   incoming_payments
+WHERE  received_at IS NOT NULL;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:

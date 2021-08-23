@@ -178,3 +178,23 @@ extension Lightning_kmpPeer {
 		}
 	}
 }
+
+extension CloudKitDb {
+	
+	fileprivate struct _Key {
+		static var fetchQueueCountPublisher = 0
+	}
+	
+	func fetchQueueCountPublisher() -> AnyPublisher<Int64, Never> {
+		
+		executeOnce(storageKey: &_Key.fetchQueueCountPublisher) {
+			
+			/// Transforming from Kotlin:
+			/// `queueCount: StateFlow<Long>`
+			///
+			KotlinCurrentValueSubject<KotlinLong, Int64>(
+				self.queueCount
+			).eraseToAnyPublisher()
+		}
+	}
+}

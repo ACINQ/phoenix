@@ -17,7 +17,7 @@
 "(you provided this address)" = "(proporcionaste esta dirección)";
 
 /* RecoverySeedView */
-"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds.\"" = "**No pierdas esta semilla.** Guárdala en un algún lugar seguro (no en este celular). Si pierdas tu semilla y tu celular, perderás tus fondos.";
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**No pierdas esta semilla.** Guárdala en un algún lugar seguro (no en este celular). Si pierdas tu semilla y tu celular, perderás tus fondos.";
 
 /* RecoverySeedView */
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**No compartas esta semilla con nadie.** Cuidado con el fraude. Los desarrolladores de Phoenix nunca pedirán tu semilla.";

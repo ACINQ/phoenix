@@ -56,6 +56,80 @@ extension PaymentsManager {
 	}
 }
 
+struct FetchQueueBatchResult {
+	let rowids: [Int64]
+	let rowidMap: [Int64: PaymentRowId]
+	let rowMap: [PaymentRowId : PaymentRow]
+	let metadataMap: [PaymentRowId : KotlinByteArray]
+	let incomingStats: CloudKitDb.MetadataStats
+	let outgoingStats: CloudKitDb.MetadataStats
+	
+	func uniquePaymentRowIds() -> Set<PaymentRowId> {
+		return Set<PaymentRowId>(rowidMap.values)
+	}
+	
+	func rowidsMatching(_ query: PaymentRowId) -> [Int64] {
+		var results = [Int64]()
+		for (rowid, paymentRowId) in rowidMap {
+			if paymentRowId == query {
+				results.append(rowid)
+			}
+		}
+		return results
+	}
+	
+	static func empty() -> FetchQueueBatchResult {
+		
+		return FetchQueueBatchResult(
+			rowids: [],
+			rowidMap: [:],
+			rowMap: [:],
+			metadataMap: [:],
+			incomingStats: CloudKitDb.MetadataStats(),
+			outgoingStats: CloudKitDb.MetadataStats()
+		)
+	}
+}
+
+extension CloudKitDb.FetchQueueBatchResult {
+	
+	func convertToSwift() -> FetchQueueBatchResult {
+		
+		// We are experiencing crashes like this:
+		//
+		// for (rowid, paymentRowId) in batch.rowidMap {
+		//      ^^^^^
+		// Crash: Could not cast value of type '__NSCFNumber' to 'PhoenixSharedLong'.
+		//
+		// This appears to be some kind of bug in Kotlin.
+		// So we're going to make a clean migration.
+		// And we need to do so without swift-style enumeration in order to avoid crashing.
+		
+		var _rowids = [Int64]()
+		var _rowidMap = [Int64: PaymentRowId]()
+		
+		for i in 0 ..< self.rowids.count { // cannot enumerate self.rowidMap
+			
+			let value_kotlin = rowids[i]
+			let value_swift = value_kotlin.int64Value
+			
+			_rowids.append(value_swift)
+			if let paymentRowId = self.rowidMap[value_kotlin] {
+				_rowidMap[value_swift] = paymentRowId
+			}
+		}
+		
+		return FetchQueueBatchResult(
+			rowids: _rowids,
+			rowidMap: _rowidMap,
+			rowMap: self.rowMap,
+			metadataMap: self.metadataMap,
+			incomingStats: self.incomingStats,
+			outgoingStats: self.outgoingStats
+		)
+	}
+}
+
 extension Lightning_kmpIncomingPayment {
 	
 	var createdAtDate: Date {
@@ -77,10 +151,10 @@ extension Lightning_kmpIncomingPayment.ReceivedWith: Identifiable {
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.StatusCompleted {
+extension Lightning_kmpOutgoingPayment {
 	
-	var completedAtDate: Date {
-		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+	var createdAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(createdAt) / Double(1_000)))
 	}
 }
 
@@ -99,6 +173,13 @@ extension Lightning_kmpOutgoingPayment.PartStatusSucceeded {
 }
 
 extension Lightning_kmpOutgoingPayment.PartStatusFailed {
+	
+	var completedAtDate: Date {
+		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
+	}
+}
+
+extension Lightning_kmpOutgoingPayment.StatusCompleted {
 	
 	var completedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))

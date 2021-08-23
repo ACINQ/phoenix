@@ -28,6 +28,7 @@ struct ConfigurationView: MVIView {
 		case ElectrumConfigurationView
 		case TorView
 		case PaymentOptionsView
+		case CloudOptionsView
 		case AppAccessView
 		case RecoverySeedView
 		case LogsConfigurationView
@@ -94,6 +95,16 @@ struct ConfigurationView: MVIView {
 				) {
 					Label { Text("Payment options & fees") } icon: {
 						Image(systemName: "wrench")
+					}
+				}
+				
+				NavigationLink(
+					destination: CloudOptionsView(),
+					tag: Tag.CloudOptionsView,
+					selection: $selectedTag
+				) {
+					Label { Text("Cloud backup") } icon: {
+						Image(systemName: "icloud")
 					}
 				}
 			}

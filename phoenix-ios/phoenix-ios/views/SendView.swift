@@ -516,7 +516,7 @@ struct ValidateView: View, ViewName {
 				if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
 					
 					Button {
-						showConnectionsPopover()
+						showAppStatusPopover()
 					} label: {
 						HStack {
 							ProgressView()
@@ -699,11 +699,11 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
-	func showConnectionsPopover() -> Void {
-		log.trace("[\(viewName)] showConnectionsPopover()")
+	func showAppStatusPopover() -> Void {
+		log.trace("[\(viewName)] showAppStatusPopover()")
 		
 		popoverState.display(dismissable: true) {
-			ConnectionsPopover()
+			AppStatusPopover()
 		}
 	}
 }

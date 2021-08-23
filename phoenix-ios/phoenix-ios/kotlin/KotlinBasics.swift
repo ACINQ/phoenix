@@ -27,3 +27,15 @@ extension Data {
 		return result
 	}
 }
+
+extension Array {
+	
+	func toKotlinArray<Element: AnyObject>() -> KotlinArray<Element> {
+		
+		return KotlinArray(size: Int32(self.count)) { (i: KotlinInt) in
+			var shutUpCompiler: Element? = nil
+			shutUpCompiler = (self[i.intValue] as! Element)
+			return shutUpCompiler
+		}
+	}
+}

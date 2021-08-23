@@ -252,8 +252,14 @@ data class WalletPaymentOrderRow(
 }
 
 sealed class PaymentRowId {
-    data class IncomingPaymentId(val paymentHash: ByteVector32): PaymentRowId()
-    data class OutgoingPaymentId(val id: UUID): PaymentRowId()
+    companion object {/* allow static extensions */}
+
+    data class IncomingPaymentId(val paymentHash: ByteVector32): PaymentRowId() {
+      companion object {/* allow static extensions */}
+    }
+    data class OutgoingPaymentId(val id: UUID): PaymentRowId() {
+        companion object {/* allow static extensions */}
+    }
 }
 
 /// Implement this function to execute platform specific code when a payment completes.

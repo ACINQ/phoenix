@@ -229,6 +229,7 @@ struct RestoreView: View {
 					.onChange(of: wordInput) { _ in
 						onInput()
 					}
+					.autocapitalization(.none)
 					.disableAutocorrection(true)
 					.disabled(mnemonics.count == 12)
 					.padding(.trailing, 4)
@@ -327,14 +328,15 @@ struct RestoreView: View {
 			onAutocompleteListChanged()
 		}
 		.onReceive(keyboardWillShow) { notification in
-			withAnimation {
-				scrollViewProxy.scrollTo(inputID, anchor: .top)
-			}
+			// Maybe add this for smaller phones like iPhone 8:
+		//	withAnimation {
+		//		scrollViewProxy.scrollTo(inputID, anchor: .top)
+		//	}
 		}
 		.onReceive(keyboardDidHide) { _ in
-			withAnimation {
-				scrollViewProxy.scrollTo(topID, anchor: .top)
-			}
+		//	withAnimation {
+		//		scrollViewProxy.scrollTo(topID, anchor: .top)
+		//	}
 		}
 	}
 	

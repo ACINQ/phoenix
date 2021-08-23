@@ -1,5 +1,6 @@
 package fr.acinq.phoenix
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
@@ -96,10 +97,14 @@ class PhoenixBusiness(
         return MnemonicCode.toSeed(mnemonics, passphrase)
     }
 
-    fun loadWallet(seed: ByteArray): Unit {
+    fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
         if (walletManager.wallet.value == null) {
             walletManager.loadWallet(seed)
+            return walletManager.wallet.value?.let {
+                it.cloudKeyAndEncryptedNodeId(chain)
+            }
         }
+        return null
     }
 
     fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain.isMainnet())

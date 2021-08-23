@@ -421,7 +421,6 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
 		   qrCode.value == m.request,
-			let qrCodeCgImage = qrCode.cgImage,
 		   let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
