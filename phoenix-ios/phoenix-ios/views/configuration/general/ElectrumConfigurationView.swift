@@ -110,13 +110,13 @@ struct ElectrumConfigurationView: MVIView {
 				ListItem(header: Text("Block height")) {
 
 					let height = mvi.model.blockHeight
-					Text(height > 0 ? height.formatInDecimalStyle() : "-")
+					Text(verbatim: height > 0 ? height.formatInDecimalStyle() : "-")
 				}
 				
 				ListItem(header: Text("Tip timestamp")) {
 					
 					let time = mvi.model.tipTimestamp
-					Text(time > 0 ? time.formatDateS() : "-")
+					Text(verbatim: time > 0 ? time.formatDateS() : "-")
 				}
 				
 				ListItem(header: Text("Fee rate")) {

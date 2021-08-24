@@ -1319,7 +1319,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 			
 			switch error {
 			case .emptyInput:
-				altAmount = NSLocalizedString("Any amount", comment: "error message")
+				altAmount = NSLocalizedString("Any amount", comment: "displayed when user doesn't specify an amount")
 			case .invalidInput:
 				altAmount = NSLocalizedString("Enter a valid amount", comment: "error message")
 			}
@@ -1681,7 +1681,7 @@ struct SwapInView: View, ViewName {
 							}
 						}
 				} else {
-					Text("…")
+					Text(verbatim: "…")
 				}
 			}
 			.padding([.leading, .trailing], 40)

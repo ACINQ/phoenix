@@ -567,7 +567,7 @@ fileprivate struct PaymentCell : View, ViewName {
 
 				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
 
-				Text(isOutgoing ? "-" : "+")
+				Text(verbatim: isOutgoing ? "-" : "+")
 					.foregroundColor(color)
 					.padding(.trailing, 1)
 

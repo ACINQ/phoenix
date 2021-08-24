@@ -68,7 +68,7 @@ struct PaymentOptionsView: View {
 					
 					Text(String(format: NSLocalizedString(
 						"%@%% (%@ minimum)",
-						comment: "Minimum fee information"),
+						comment: "Minimum fee information. E.g.: 1% (3,000 sats minimum)"),
 						feePercent, minFee.string
 					))
 				}

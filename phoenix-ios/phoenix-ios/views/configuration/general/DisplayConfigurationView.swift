@@ -30,7 +30,7 @@ struct DisplayConfigurationView: View {
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 						Text("Fiat currency")
 						Spacer()
-						Text(fiatCurrency.shortName)
+						Text(verbatim: fiatCurrency.shortName)
 							.foregroundColor(Color.secondary) +
 						Text(verbatim: "  \(fiatCurrency.longName)")
 							.font(.footnote)
@@ -44,7 +44,7 @@ struct DisplayConfigurationView: View {
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 						Text("Bitcoin unit")
 						Spacer()
-						Text(bitcoinUnit.shortName)
+						Text(verbatim: bitcoinUnit.shortName)
 							.foregroundColor(Color.secondary) +
 						Text(verbatim: "  \(bitcoinUnit.explanation)")
 							.font(.footnote)
