@@ -33,7 +33,7 @@ class CloudDataTest {
 
     fun testRoundtrip(incomingPayment: IncomingPayment) {
         // serialize payment into blob
-        val blob = CloudData(incomingPayment, version = 0).cborSerialize()
+        val blob = CloudData(incomingPayment, version = CloudDataVersion.V0).cborSerialize()
 
         // attempt to deserialize & extract payment
         val data = CloudData.cborDeserialize(blob)
@@ -47,7 +47,7 @@ class CloudDataTest {
 
     fun testRoundtrip(outgoingPayment: OutgoingPayment) {
         // serialize payment into blob
-        val blob = CloudData(outgoingPayment, version = 0).cborSerialize()
+        val blob = CloudData(outgoingPayment, version = CloudDataVersion.V0).cborSerialize()
 
         // attempt to deserialize & extract payment
         val data = CloudData.cborDeserialize(blob)
@@ -185,7 +185,7 @@ class CloudDataTest {
         )
 
         // serialize payment into blob
-        val blob = CloudData(outgoingPayment, version = 0).cborSerialize()
+        val blob = CloudData(outgoingPayment, version = CloudDataVersion.V0).cborSerialize()
 
         // attempt to deserialize & extract payment
         val data = CloudData.cborDeserialize(blob)
