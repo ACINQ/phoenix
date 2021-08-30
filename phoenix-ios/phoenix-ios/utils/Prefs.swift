@@ -24,6 +24,7 @@ class Prefs {
 		case backupTransactions_enabled
 		case backupTransactions_useCellularData
 		case backupTransactions_useUploadDelay
+		case showChannelsRemoteBalance
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -121,30 +122,6 @@ class Prefs {
 		}
 	}
 	
-	var fcmTokenInfo: FcmTokenInfo? {
-		get {
-			let key = Keys.fcmTokenInfo.rawValue
-			let result: FcmTokenInfo? = UserDefaults.standard.getCodable(forKey: key)
-			return result
-		}
-		set {
-			let key = Keys.fcmTokenInfo.rawValue
-			UserDefaults.standard.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
-	var pushPermissionQuery: PushPermissionQuery {
-		get {
-			let key = Keys.pushPermissionQuery.rawValue
-			let saved: PushPermissionQuery? = UserDefaults.standard.getCodable(forKey: key)
-			return saved ?? .neverAskedUser
-		}
-		set {
-			let key = Keys.pushPermissionQuery.rawValue
-			UserDefaults.standard.setCodable(value: newValue, forKey: key)
-		}
-	}
-	
 	var electrumConfig: ElectrumConfigPrefs? {
 		get {
 			let key = Keys.electrumConfig.rawValue
@@ -166,6 +143,43 @@ class Prefs {
 		set {
 			let key = Keys.defaultPaymentDescription.rawValue
 			UserDefaults.standard.setValue(newValue, forKey: key)
+		}
+	}
+	
+	var showChannelsRemoteBalance: Bool {
+		get {
+			UserDefaults.standard.bool(forKey: Keys.showChannelsRemoteBalance.rawValue)
+		}
+		set {
+			UserDefaults.standard.set(newValue, forKey: Keys.showChannelsRemoteBalance.rawValue)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Push Notifications
+	// --------------------------------------------------
+	
+	var fcmTokenInfo: FcmTokenInfo? {
+		get {
+			let key = Keys.fcmTokenInfo.rawValue
+			let result: FcmTokenInfo? = UserDefaults.standard.getCodable(forKey: key)
+			return result
+		}
+		set {
+			let key = Keys.fcmTokenInfo.rawValue
+			UserDefaults.standard.setCodable(value: newValue, forKey: key)
+		}
+	}
+	
+	var pushPermissionQuery: PushPermissionQuery {
+		get {
+			let key = Keys.pushPermissionQuery.rawValue
+			let saved: PushPermissionQuery? = UserDefaults.standard.getCodable(forKey: key)
+			return saved ?? .neverAskedUser
+		}
+		set {
+			let key = Keys.pushPermissionQuery.rawValue
+			UserDefaults.standard.setCodable(value: newValue, forKey: key)
 		}
 	}
 	
