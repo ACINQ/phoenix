@@ -79,7 +79,7 @@ interface LNUrl {
       // special flow for login: do not send GET to url just yet
       return if (url.queryParameter("tag") == "login") {
         val k1 = url.queryParameter("k1")
-        if (k1 == null) {
+        if (k1.isNullOrBlank()) {
           throw LNUrlError.AuthMissingK1
         } else {
           LNUrlAuth(url.toString(), k1)
@@ -90,6 +90,7 @@ interface LNUrl {
         val tag = json.getString("tag")
         val callback = HttpUrl.get(json.getString("callback"))
         require(callback.isHttps) { "invalid callback=${url}, should be https" }
+        require(callback.host() == url.host()) { "callback must use the same host than the original lnurl" }
         return when (tag) {
           "withdrawRequest" -> {
             val walletIdentifier = json.getString("k1")
