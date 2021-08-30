@@ -93,9 +93,9 @@ interface LNUrl {
         require(callback.host() == url.host()) { "callback must use the same host than the original lnurl" }
         return when (tag) {
           "withdrawRequest" -> {
-            val walletIdentifier = json.getString("k1")
-            val maxWithdrawable = MilliSatoshi(json.getLong("maxWithdrawable"))
-            val minWithdrawable = MilliSatoshi(max(maxWithdrawable.toLong(), if (json.has("minWithdrawable")) json.getLong("minWithdrawable") else 1))
+            val walletIdentifier = json.getString("k1").takeIf { it.isNotBlank() } ?: throw RuntimeException("missing k1")
+            val minWithdrawable = MilliSatoshi(json.optLong("minWithdrawable").takeIf { it > 0 } ?: 1)
+            val maxWithdrawable = MilliSatoshi(json.getLong("maxWithdrawable").coerceAtLeast(minWithdrawable.toLong()))
             val desc = json.getString("defaultDescription")
             LNUrlWithdraw(url.toString(), callback.toString(), walletIdentifier, desc, minWithdrawable, maxWithdrawable)
           }
