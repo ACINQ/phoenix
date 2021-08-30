@@ -58,13 +58,8 @@ class NodeParamsManager(
             walletManager.wallet.collect {
                 if (it == null) return@collect
                 log.info { "wallet available: building nodeParams..." }
-                val genesisBlock = when (chain) {
-                    Chain.Mainnet -> Block.LivenetGenesisBlock
-                    Chain.Testnet -> Block.TestnetGenesisBlock
-                    Chain.Regtest -> Block.RegtestGenesisBlock
-                }
 
-                val keyManager = LocalKeyManager(it.seed.toByteVector(), genesisBlock.hash)
+                val keyManager = LocalKeyManager(seed = it.seed, chainHash = chain.chainHash)
                 log.info { "nodeid=${keyManager.nodeId}" }
 
                 val nodeParams = NodeParams(
@@ -109,7 +104,7 @@ class NodeParamsManager(
                     autoReconnect = false,
                     initialRandomReconnectDelaySeconds = 5,
                     maxReconnectIntervalSeconds = 3600,
-                    chainHash = genesisBlock.hash,
+                    chainHash = chain.chainHash,
                     channelFlags = 1,
                     paymentRequestExpirySeconds = 3600,
                     multiPartPaymentExpirySeconds = 60,

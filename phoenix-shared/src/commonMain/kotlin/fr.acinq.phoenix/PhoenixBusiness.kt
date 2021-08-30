@@ -1,5 +1,6 @@
 package fr.acinq.phoenix
 
+import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
@@ -67,7 +68,7 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    internal val walletManager by lazy { WalletManager() }
+    internal val walletManager by lazy { WalletManager(chain) }
     internal val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
 
     val nodeParamsManager by lazy { NodeParamsManager(this) }
@@ -101,13 +102,13 @@ class PhoenixBusiness(
         if (walletManager.wallet.value == null) {
             walletManager.loadWallet(seed)
             return walletManager.wallet.value?.let {
-                it.cloudKeyAndEncryptedNodeId(chain)
+                it.cloudKeyAndEncryptedNodeId()
             }
         }
         return null
     }
 
-    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub(chain.isMainnet())
+    fun getXpub(): Pair<String, String>? = walletManager.wallet.value?.xpub()
 
     fun peerState() = peerManager.peerState
 
