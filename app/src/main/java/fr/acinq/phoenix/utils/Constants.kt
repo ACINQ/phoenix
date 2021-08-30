@@ -31,7 +31,8 @@ object Constants {
 
   // -- apis
   val JSON: MediaType = MediaType.get("application/json; charset=utf-8")
-  const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json"
+  const val WALLET_CONTEXT_URL = "https://acinq.co/phoenix/walletcontext.json2"
+  const val WALLET_CONTEXT_URL_FALLBACK = "https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json"
   const val BLOCKCHAININFO_TICKER = "https://blockchain.info/ticker"
   const val BITSO_MXN_TICKER = "https://api.bitso.com/v3/ticker/?book=btc_mxn"
   const val COINDESK_CZK_TICKER = "https://api.coindesk.com/v1/bpi/currentprice/CZK.json"
