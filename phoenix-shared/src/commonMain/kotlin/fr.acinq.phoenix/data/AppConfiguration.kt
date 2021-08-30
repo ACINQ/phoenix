@@ -9,8 +9,8 @@ import kotlin.math.roundToLong
 
 
 sealed class Chain(val name: String, val block: Block) {
-    object Regtest: Chain("Regtest", Block.LivenetGenesisBlock)
-    object Testnet: Chain("Testnet", Block.LivenetGenesisBlock)
+    object Regtest: Chain("Regtest", Block.RegtestGenesisBlock)
+    object Testnet: Chain("Testnet", Block.TestnetGenesisBlock)
     object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock)
     fun isMainnet(): Boolean = this is Mainnet
     fun isTestnet(): Boolean = this is Testnet
