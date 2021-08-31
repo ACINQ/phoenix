@@ -90,7 +90,6 @@ interface LNUrl {
         val tag = json.getString("tag")
         val callback = HttpUrl.get(json.getString("callback"))
         require(callback.isHttps) { "invalid callback=${url}, should be https" }
-        require(callback.host() == url.host()) { "callback must use the same host than the original lnurl" }
         return when (tag) {
           "withdrawRequest" -> {
             val walletIdentifier = json.getString("k1").takeIf { it.isNotBlank() } ?: throw RuntimeException("missing k1")
