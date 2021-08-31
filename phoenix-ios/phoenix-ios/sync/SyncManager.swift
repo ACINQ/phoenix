@@ -428,7 +428,10 @@ class SyncManager {
 							case .uploading(let progress):
 								progress.cancel()
 							case .waiting(let details):
-								details.skip()
+								// Careful: calling `details.skip` within `queue.sync` will cause deadlock.
+								DispatchQueue.global(qos: .default).async {
+									details.skip()
+								}
 							case .synced:
 								deferToSimplifiedStateFlow = true // defer to updateState()
 							default: break
