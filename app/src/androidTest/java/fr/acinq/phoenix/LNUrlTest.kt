@@ -18,23 +18,26 @@ package fr.acinq.phoenix
 
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.db.LNUrlPayActionData
+import fr.acinq.phoenix.lnurl.LNUrl
+import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import scodec.bits.ByteVector
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import fr.acinq.bitcoin.ByteVector32
-import org.junit.Assert
-import scodec.bits.ByteVector
 
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class LNUrlPayTest {
+class LNUrlTest {
+
   @Test
-  fun decrypt_aes_action() {
+  fun lnurlpay_decrypt_aes_action() {
     val mySecret = "sic transit gloria mundi"
     val iv = `package$`.`MODULE$`.randomBytes32().bytes().take(16)
     val preimage = ByteVector32.fromValidHex("c0f9b692a068450e9362bf1688b1d3dd46132c7540b4f23f44047dcb49931d01")
@@ -47,4 +50,15 @@ class LNUrlPayTest {
     )
     Assert.assertEquals(mySecret, action.decrypt(preimage))
   }
+
+  @Test
+  fun lnurl_non_bech32() {
+    val url = LNUrl.decodeLNUrl("lnurlp:acinq.co/whatever?param1=32159ab")
+    assertEquals("https", url.scheme())
+    assertEquals("acinq.co", url.host())
+    assertEquals("/whatever", url.encodedPath())
+    assertEquals("32159ab", url.queryParameter("param1"))
+    assertEquals(null, url.queryParameter("param2"))
+  }
+
 }
