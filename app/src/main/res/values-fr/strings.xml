@@ -425,10 +425,10 @@
   <string name="paymentdetails_closing_type_other">Autre</string>
   <string name="paymentdetails_closing_channel_label">Identifiant du canal fermé</string>
   <string name="paymentdetails_closing_spending_txs_label">Transactions de clôture</string>
-  <string name="paymentdetails_pubkey_label">Clé public de la cible</string>
+  <string name="paymentdetails_pubkey_label">Clé publique de la cible</string>
   <string name="paymentdetails_payment_hash_label">Payment hash</string>
   <string name="paymentdetails_payment_request_label">Requête de paiement</string>
-  <string name="paymentdetails_preimage_label">Preimage</string>
+  <string name="paymentdetails_preimage_label">Préimage</string>
   <string name="paymentdetails_created_at_label">Date de création</string>
   <string name="paymentdetails_completed_at_label">Date de complétion</string>
 
