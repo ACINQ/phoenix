@@ -152,7 +152,7 @@ dependencies {
   implementation 'com.github.tony19:logback-android:2.0.0'
 
   // eclair core
-  def eclair_version = "0.4.13-android-phoenix"
+  def eclair_version = "0.4.14-android-phoenix"
   implementation "fr.acinq.secp256k1:secp256k1-kmp-jni-android:0.5.1"
   implementation "fr.acinq.eclair:eclair-core_2.11:$eclair_version"
 
