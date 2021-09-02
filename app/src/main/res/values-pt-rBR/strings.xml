@@ -503,7 +503,7 @@
   <string name="accessctrl_full_lock_switch_backup_required">Confirme se você fez o backup da sua frase de recuperação para acessar recursos adicionais de segurança.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Acessar minha frase de recuperação</string>
   <string name="accessctrl_full_lock_switch">Impedir a execução em segundo plano</string>
-  <string name="accessctrl_full_lock_switch_desc">O aplicativo requer desbloqueio manual do usuário para ser executado. O recebimento de pagamento em segundo plano, portanto, não é possível.\n\nSomente autenticação biométrica é compatível.</string>
+  <string name="accessctrl_full_lock_switch_desc">O aplicativo requer desbloqueio manual do usuário para ser executado. O recebimento de pagamento em segundo plano, portanto, não é possível.\n\nSomente autenticação biométrica é compatível. Se sua biometria for modificada, você precisará reinicializar a Phoenix com sua seed. Assegure-se de ter um backup!</string>
   <string name="accessctrl_full_lock_confirm_title">Aviso</string>
   <string name="accessctrl_full_lock_confirm_message">Funções que exigem execução em segundo plano serão desabilitadas. Para receber pagamentos, o aplicativo deverá ser desbloqueado.</string>
 
@@ -681,7 +681,7 @@
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Insira uma taxa base em satoshi</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">(%) de taxa em cada pagamento</string>
   <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Insira uma taxa em %</string>
-  
+
   <string name="paymentsettings_paytoopen_auto_switch_title">Abertura automática de canais</string>
   <string name="paymentsettings_paytoopen_auto_switch_enabled">Se for necessário, novos canais serão abertos, uma taxa será cobrada (ver abaixo)</string>
   <string name="paymentsettings_paytoopen_auto_switch_disabled">Se um pagamento enviado a você exigir a abertura de um novo canal, a transação será rejeitada e irá falhar</string>

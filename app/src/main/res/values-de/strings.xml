@@ -545,7 +545,7 @@
   <string name="accessctrl_full_lock_switch_backup_required">Bestätigen Sie, dass Sie Ihren Wiederherstellungssatz für zusätzliche Sicherheitsfunktionen gesichert haben.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Auf meinen Wiederherstellungssatz zugreifen</string>
   <string name="accessctrl_full_lock_switch">Hintergrundausführung verhindern</string>
-  <string name="accessctrl_full_lock_switch_desc">Die Anwendung erfordert eine manuelle Entsperrung, um ausgeführt zu werden. Ein Zahlungsempfang im Hintergrund ist daher nicht möglich.\n\nEs wird nur die Authentifizierung per Fingerabdruck unterstützt.</string>
+  <string name="accessctrl_full_lock_switch_desc">Die Anwendung erfordert eine manuelle Entsperrung, um ausgeführt zu werden. Ein Zahlungsempfang im Hintergrund ist daher nicht möglich.\n\nEs wird nur die Authentifizierung per Fingerabdruck unterstützt. Wenn Ihre Fingerabdrucke geändert werden, müssen Sie Phoenix mit Ihrem Seed neu initialisieren. Stellen Sie sicher, dass Sie ein Backup haben!</string>
   <string name="accessctrl_full_lock_confirm_title">Beachten Sie</string>
   <string name="accessctrl_full_lock_confirm_message">Hintergrundfunktionen werden deaktiviert. Um Zahlungen zu erhalten, muss die Anwendung entsperrt werden.</string>
 
