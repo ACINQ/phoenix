@@ -15,8 +15,8 @@
   -->
 
 <resources>
-  <string name="app_name">Phoenix (Testnet)</string>
-  
+  <string name="app_name">Phoenix</string>
+
   <!-- //////////////// system notification channels //////////////// -->
 
   <string name="notification_channels_watcher_title">مراقب الخلفية</string>
