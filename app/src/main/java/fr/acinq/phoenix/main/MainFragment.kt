@@ -115,7 +115,6 @@ class MainFragment : BaseFragment(), SharedPreferences.OnSharedPreferenceChangeL
         notificationsAdapter.update(it)
       })
       app.networkInfo.observe(viewLifecycleOwner, {
-        log.debug("update network info=$it")
         if (it.electrumServer == null || !it.lightningConnected) {
           if (mBinding.connectivityButton.animation == null || !mBinding.connectivityButton.animation.hasStarted()) {
             mBinding.connectivityButton.startAnimation(blinkingAnimation)

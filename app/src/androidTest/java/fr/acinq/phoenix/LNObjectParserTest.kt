@@ -18,15 +18,19 @@ package fr.acinq.phoenix
 
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
+import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.lnurl.LNUrlAuth
+import fr.acinq.phoenix.lnurl.LNUrlPay
+import fr.acinq.phoenix.lnurl.LNUrlPayMetadata
 import fr.acinq.phoenix.lnurl.LNUrlWithdraw
 import fr.acinq.phoenix.utils.BitcoinURI
 import fr.acinq.phoenix.utils.UnreadableLightningObject
 import fr.acinq.phoenix.utils.Wallet
+import okhttp3.HttpUrl
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -51,6 +55,20 @@ class LNObjectParserTest {
     Wallet.parseLNObject("https://service.com/giftcard/redeem?id=123&lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94MKJARGV3EXZAELWDJHXUMFDAHR6WPSXU6NYVRRVE3K2VFJX9JXYCF3XA3RZDMPV43NWDPSVCUKXDFHVVEKXDMYXD3XVCN9XSEK2VPHVS6KVERYXUUNJWR9VS6XYCEHX5CQQCJJXZ") as LNUrlWithdraw
     Wallet.parseLNObject("http://foo.bar?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94KX7EMFDCLHGCT884KX7EMFDCNXKVFAX5CRGCFJXANRWVN9VSUK2WTPVF3NXVP4V93KXD3HVS6RWVTZXY6NWVEHV5CNQCFN893RJWF4V9NRQVM9XANRYVR9X4NXGETY8Q6KYDC0Q6NTC") as LNUrlAuth
     Wallet.parseLNObject("foobar://test?lightning=LNURL1DP68GURN8GHJ7MRWW4EXCTNZD9NHXATW9EU8J730D3H82UNV94MKJARGV3EXZAELWDJHXUMFDAHR6WPNXF3KGVFN89JNZENPVY6NSVRP8QCKZCEKVCCRGCTPXY6RJVT9XGMK2DPE893KZEPJXE3RGVFKXYUNWV3EVV6R2DRPXG6RWWP5VDSSSQSUZT") as LNUrlWithdraw
+
+    // non bech32 lnurl
+    var url = Wallet.parseLNObject("lnurlp:lnurl-toolbox.degreesofzero.com/u?q=a07d243eb98af499b538e0b6ad387b014b48181b04a5feb6e55d30993f96635a")
+    Assert.assertTrue(url is LNUrlPay)
+    Assert.assertEquals(MilliSatoshi(10_000), (url as LNUrlPay).minSendable)
+    Assert.assertEquals(MilliSatoshi(20_000), url.maxSendable)
+    Assert.assertEquals(null, url.maxCommentLength)
+    Assert.assertEquals("https://lnurl-toolbox.degreesofzero.com/u/a07d243eb98af499b538e0b6ad387b014b48181b04a5feb6e55d30993f96635a", url.callbackUrl)
+    Assert.assertEquals(LNUrlPayMetadata(raw = "[[\"text/plain\",\"lnurl-toolbox: payRequest\"]]", plainText = "lnurl-toolbox: payRequest", image = null), url.rawMetadata)
+
+    // lightning address
+    url = Wallet.parseLNObject("acinq@zbd.gg")
+    Assert.assertTrue(url is LNUrlPay)
+    Assert.assertEquals("api.zebedee.io", HttpUrl.parse((url as LNUrlPay).callbackUrl)!!.host())
   }
 
   @Test(expected = UnreadableLightningObject::class)

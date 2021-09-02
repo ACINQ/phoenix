@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Parcelable
 import android.util.Base64
+import android.util.Patterns
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.utils.Wallet
@@ -31,8 +32,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.URI
 import java.util.concurrent.TimeUnit
-import kotlin.math.max
 
 sealed class LNUrlError(message: String = "") : RuntimeException(message) {
   data class PayInvalidMeta(val meta: String) : LNUrlError()
@@ -62,10 +63,21 @@ interface LNUrl {
       .readTimeout(5, TimeUnit.SECONDS)
       .build()
 
-    /**
-     * Decodes a Bech32 string and transform it into a https request.
-     */
-    private fun decodeUrl(source: String): HttpUrl {
+    /** Decodes a Bech32 string and transform it into a https request. */
+    fun decodeLNUrl(source: String): HttpUrl {
+      return try {
+        decodeBech32LNUrl(source)
+      } catch (e1: Exception) {
+        try {
+          decodeNonBech32LNUrl(source)
+        } catch (e2: Exception) {
+          log.debug("cannot decode url=$source into a LNUrl object: ${e1.message} / ${e2.message}")
+          throw IllegalArgumentException("${e1.message} / ${e2.message}", e1.initCause(e2))
+        }
+      }
+    }
+
+    private fun decodeBech32LNUrl(source: String): HttpUrl {
       val res = Bech32.decode(source)
       val payload = String(Bech32.five2eight(res._2), Charsets.UTF_8)
       log.info("reading serialized lnurl with hrp=${res._1} and payload=$payload")
@@ -74,12 +86,27 @@ interface LNUrl {
       return url
     }
 
+    private fun decodeNonBech32LNUrl(source: String): HttpUrl {
+      return URI(source).run {
+        // convert this uri into an http url
+        when {
+          listOf("lnurlp", "lnurlw", "keyauth").contains(scheme) -> HttpUrl.parse("https://${rawSchemeSpecificPart}")
+          Patterns.EMAIL_ADDRESS.matcher(source).matches() -> source.split("@", limit = 2).let {
+            val user = it.first()
+            val domain = it.drop(1).joinToString()
+            HttpUrl.parse("https://$domain/.well-known/lnurlp/$user")
+          }
+          else -> null
+        }
+      } ?: throw RuntimeException("unhandled url=$source")
+    }
+
     fun extractLNUrl(source: String): LNUrl {
-      val url = decodeUrl(source)
+      val url = decodeLNUrl(source)
       // special flow for login: do not send GET to url just yet
       return if (url.queryParameter("tag") == "login") {
         val k1 = url.queryParameter("k1")
-        if (k1 == null) {
+        if (k1.isNullOrBlank()) {
           throw LNUrlError.AuthMissingK1
         } else {
           LNUrlAuth(url.toString(), k1)
@@ -92,9 +119,9 @@ interface LNUrl {
         require(callback.isHttps) { "invalid callback=${url}, should be https" }
         return when (tag) {
           "withdrawRequest" -> {
-            val walletIdentifier = json.getString("k1")
-            val maxWithdrawable = MilliSatoshi(json.getLong("maxWithdrawable"))
-            val minWithdrawable = MilliSatoshi(max(maxWithdrawable.toLong(), if (json.has("minWithdrawable")) json.getLong("minWithdrawable") else 1))
+            val walletIdentifier = json.getString("k1").takeIf { it.isNotBlank() } ?: throw RuntimeException("missing k1")
+            val minWithdrawable = MilliSatoshi(json.optLong("minWithdrawable").takeIf { it > 0 } ?: 1)
+            val maxWithdrawable = MilliSatoshi(json.getLong("maxWithdrawable").coerceAtLeast(minWithdrawable.toLong()))
             val desc = json.getString("defaultDescription")
             LNUrlWithdraw(url.toString(), callback.toString(), walletIdentifier, desc, minWithdrawable, maxWithdrawable)
           }
@@ -183,8 +210,10 @@ interface LNUrl {
 class LNUrlAuth(val url: String, val k1: String) : LNUrl, Parcelable
 
 @Parcelize
-class LNUrlWithdraw(val origin: String, val callback: String, val walletIdentifier: String,
-  val description: String, val minWithdrawable: MilliSatoshi, val maxWithdrawable: MilliSatoshi) : LNUrl, Parcelable
+class LNUrlWithdraw(
+  val origin: String, val callback: String, val walletIdentifier: String,
+  val description: String, val minWithdrawable: MilliSatoshi, val maxWithdrawable: MilliSatoshi
+) : LNUrl, Parcelable
 
 @Parcelize
 class LNUrlPay(val callbackUrl: String, val minSendable: MilliSatoshi, val maxSendable: MilliSatoshi, val rawMetadata: LNUrlPayMetadata, val maxCommentLength: Long?) : LNUrl, Parcelable

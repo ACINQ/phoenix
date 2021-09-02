@@ -119,18 +119,18 @@ class LNUrlPayFragment : BaseFragment() {
         }
       }
       mBinding.metadata.text = model.metadata.plainText
-      mBinding.domain.text = Converter.html(getString(R.string.lnurl_pay_domain, callbackUrl.topPrivateDomain()))
+      mBinding.domain.text = Converter.html(getString(R.string.lnurl_pay_domain, callbackUrl.host()))
     }
 
     model.state.observe(viewLifecycleOwner, { state ->
       when (state) {
         is LNUrlPayState.Error -> mBinding.errorMessage.text = when (state.cause) {
-          is InvoiceChainDoesNotMatch -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.topPrivateDomain(), getString(R.string.scan_error_invalid_chain))
-          is LNUrlPayInvalidResponse -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.topPrivateDomain(), state.cause.message)
-          is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_pay_error_unreachable, model.callbackUrl.topPrivateDomain())
-          is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.topPrivateDomain(), state.cause.reason)
-          is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.topPrivateDomain(), "HTTP ${state.cause.code}")
-          else -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.topPrivateDomain(), state.cause.localizedMessage ?: state.cause.javaClass.simpleName)
+          is InvoiceChainDoesNotMatch -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), getString(R.string.scan_error_invalid_chain))
+          is LNUrlPayInvalidResponse -> getString(R.string.lnurl_pay_error_invalid_invoice, model.callbackUrl.host(), state.cause.message)
+          is LNUrlError.RemoteFailure.CouldNotConnect -> getString(R.string.lnurl_pay_error_unreachable, model.callbackUrl.host())
+          is LNUrlError.RemoteFailure.Detailed -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.reason)
+          is LNUrlError.RemoteFailure.Code -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), "HTTP ${state.cause.code}")
+          else -> getString(R.string.lnurl_pay_error_remote_error, model.callbackUrl.host(), state.cause.localizedMessage ?: state.cause.javaClass.simpleName)
         }
         is LNUrlPayState.RequestingInvoice -> mBinding.sendingPaymentProgress.setText(getString(R.string.lnurl_pay_sending_payment))
         is LNUrlPayState.ValidInvoice -> {

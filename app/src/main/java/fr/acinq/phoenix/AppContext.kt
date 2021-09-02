@@ -41,6 +41,7 @@ import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -89,7 +90,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
 
     // poll context and exchange rate api every 60 minutes
     kotlin.concurrent.timer(name = "exchange_rate_timer", daemon = false, initialDelay = 0L, period = 60 * 60 * 1000) {
-      updateWalletContext(applicationContext)
+      fetchWalletContext(applicationContext)
       Wallet.httpClient.newCall(Request.Builder().url(Constants.BLOCKCHAININFO_TICKER).build()).enqueue(handleBlockchainInfoTicker(applicationContext))
       Wallet.httpClient.newCall(Request.Builder().url(Constants.BITSO_MXN_TICKER).build()).enqueue(getMXNRateHandler(applicationContext))
       Wallet.httpClient.newCall(Request.Builder().url(Constants.COINDESK_CZK_TICKER).build()).enqueue(handleCoindeskCZKTicker(applicationContext))
@@ -148,10 +149,13 @@ class AppContext : Application(), DefaultLifecycleObserver {
   //                        TODO: move this to a service                        //
   // ========================================================================== //
 
-  private fun updateWalletContext(context: Context) {
+  /** Get wallet context data from remote endpoint behind cdn. */
+  private fun fetchWalletContext(context: Context) {
+    log.info("fetching context from ${Constants.WALLET_CONTEXT_URL}")
     Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL).build()).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
-        log.warn("could not retrieve wallet context from remote: ", e)
+        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL}: ", e)
+        fetchWalletContextFallback(context)
       }
 
       override fun onResponse(call: Call, response: Response) {
@@ -159,14 +163,43 @@ class AppContext : Application(), DefaultLifecycleObserver {
         try {
           if (response.isSuccessful && body != null) {
             val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
-            log.debug("wallet context responded with {}", json.toString(2))
+            log.debug("fetched context={}", json.toString(2))
             handleWalletContext(json)
             Prefs.saveWalletContext(context, json)
           } else {
-            log.warn("could not retrieve wallet context from remote, code=${response.code()}")
+            throw IllegalStateException("http code=${response.code()}")
           }
         } catch (e: Exception) {
-          log.error("error when reading wallet context body: ", e)
+          log.error("failed to read context from ${Constants.WALLET_CONTEXT_URL}: ", e)
+          fetchWalletContextFallback(context)
+        } finally {
+          body?.close()
+        }
+      }
+    })
+  }
+
+  /** Retrieve wallet context data from remote endpoint using raw s3 url. */
+  private fun fetchWalletContextFallback(context: Context) {
+    log.info("fetching context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}")
+    Wallet.httpClient.newCall(Request.Builder().url(Constants.WALLET_CONTEXT_URL_FALLBACK).build()).enqueue(object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+        log.warn("failed to fetch context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}: ", e)
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        val body = response.body()
+        try {
+          if (response.isSuccessful && body != null) {
+            val json = JSONObject(body.string()).getJSONObject(BuildConfig.CHAIN)
+            log.debug("fetched context={}", json.toString(2))
+            handleWalletContext(json)
+            Prefs.saveWalletContext(context, json)
+          } else {
+            throw IllegalStateException("http code=${response.code()}")
+          }
+        } catch (e: Exception) {
+          log.error("failed to read context from ${Constants.WALLET_CONTEXT_URL_FALLBACK}: ", e)
         } finally {
           body?.close()
         }

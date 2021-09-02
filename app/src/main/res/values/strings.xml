@@ -513,7 +513,7 @@
   <string name="accessctrl_full_lock_switch_backup_required">Confirm that you\'ve backed up your recovery phrase for additional security features.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Access my recovery phrase</string>
   <string name="accessctrl_full_lock_switch">Prevent background execution</string>
-  <string name="accessctrl_full_lock_switch_desc">App requires manual user unlock to run. Background payment reception is therefore not possible.\n\nOnly fingerprint authentication is supported.</string>
+  <string name="accessctrl_full_lock_switch_desc">App requires manual user unlock to run. Autonomous background payment reception is therefore not possible.\n\nOnly fingerprint authentication is supported. If your fingerprints are modified, you\'ll need to reinitialize Phoenix with your seed. Make sure to have a backup!</string>
   <string name="accessctrl_full_lock_confirm_title">Notice</string>
   <string name="accessctrl_full_lock_confirm_message">Background features will be disabled. To receive payments the app will have to be unlocked.</string>
 

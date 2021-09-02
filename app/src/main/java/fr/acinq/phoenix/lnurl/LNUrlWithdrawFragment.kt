@@ -65,6 +65,9 @@ class LNUrlWithdrawFragment : BaseFragment() {
       model = ViewModelProvider(this).get(LNUrlWithdrawViewModel::class.java)
       mBinding.model = model
 
+      model.url.value = args.url
+      model.callback.value = HttpUrl.get(args.url.callback)
+
       model.state.observe(viewLifecycleOwner, Observer { state ->
         when (state) {
           is LNUrlWithdrawState.Error.Internal -> mBinding.errorMessage.text = getString(R.string.lnurl_withdraw_error_internal)
@@ -75,7 +78,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
             is LNUrlError.RemoteFailure.Generic -> Converter.html(getString(R.string.lnurl_withdraw_error_remote_generic, state.error.origin))
             else -> getString(R.string.lnurl_withdraw_error_internal)
           }
-          is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.topDomain.value)
+          is LNUrlWithdrawState.Done -> mBinding.success.text = getString(R.string.lnurl_withdraw_success, model.callback.value!!.host())
           else -> {}
         }
       })
@@ -89,8 +92,6 @@ class LNUrlWithdrawFragment : BaseFragment() {
       mBinding.amountUnit.setSelection(unitList.indexOf(unit.code()))
 
     } ?: findNavController().navigate(R.id.action_lnurl_withdraw_to_main)
-    model.url.value = args.url
-    model.topDomain.value = HttpUrl.get(args.url.callback).run { topPrivateDomain() ?: host() }
   }
 
   override fun onStart() {
@@ -118,7 +119,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
       try {
         val url = HttpUrl.get(it.callback)
         mBinding.confirmButton.setOnClickListener { _ -> sendWithdrawToRemote(url.newBuilder().addEncodedQueryParameter("k1", it.walletIdentifier), it.description) }
-        mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, model.topDomain.value))
+        mBinding.serviceHost.text = Converter.html(getString(R.string.lnurl_withdraw_service_host_label, model.callback.value!!.host()))
         context?.let { ctx -> mBinding.amountValue.setText(Converter.printAmountRaw(it.maxWithdrawable, ctx)) }
         model.editableAmount.value = it.maxWithdrawable.toLong() != it.minWithdrawable.toLong()
       } catch (e: Exception) {
@@ -177,7 +178,7 @@ class LNUrlWithdrawFragment : BaseFragment() {
         val amount = checkAmount()
         if (!amount.isEmpty) {
           model.state.value = LNUrlWithdrawState.InProgress
-          val domain = model.topDomain.value!!
+          val domain = model.callback.value!!.host()
           val pr = app.requireService.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
@@ -222,6 +223,6 @@ class LNUrlWithdrawViewModel : ViewModel() {
 
   val state = MutableLiveData<LNUrlWithdrawState>(LNUrlWithdrawState.Init)
   val url = MutableLiveData<LNUrlWithdraw>()
-  val topDomain = MutableLiveData("")
+  val callback = MutableLiveData<HttpUrl>(null)
   val editableAmount = MutableLiveData(true)
 }

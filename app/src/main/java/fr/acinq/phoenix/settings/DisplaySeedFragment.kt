@@ -149,11 +149,8 @@ class DisplaySeedFragment : BaseFragment() {
       confirmButton.setOnClickListener {
         if (backupDoneCheckbox.isChecked) {
           Prefs.setMnemonicsSeenTimestamp(context, System.currentTimeMillis())
-          dialog.dismiss()
-          findNavController().navigate(R.id.global_action_any_to_main)
-        } else {
-          dialog.dismiss()
         }
+        dialog.dismiss()
       }
     }
     return dialog

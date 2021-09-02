@@ -425,10 +425,10 @@
   <string name="paymentdetails_closing_type_other">Autre</string>
   <string name="paymentdetails_closing_channel_label">Identifiant du canal fermé</string>
   <string name="paymentdetails_closing_spending_txs_label">Transactions de clôture</string>
-  <string name="paymentdetails_pubkey_label">Clé public de la cible</string>
+  <string name="paymentdetails_pubkey_label">Clé publique de la cible</string>
   <string name="paymentdetails_payment_hash_label">Payment hash</string>
   <string name="paymentdetails_payment_request_label">Requête de paiement</string>
-  <string name="paymentdetails_preimage_label">Preimage</string>
+  <string name="paymentdetails_preimage_label">Préimage</string>
   <string name="paymentdetails_created_at_label">Date de création</string>
   <string name="paymentdetails_completed_at_label">Date de complétion</string>
 
@@ -459,7 +459,7 @@
   <string name="accessctrl_full_lock_switch_backup_required">Confirmez d\'abord que vous avez sauvegardé votre clé de sauvegarde pour bénéficier d\'options supplémentaires.</string>
   <string name="accessctrl_full_lock_switch_backup_required_button">Accéder à ma clé de sauvegarde</string>
   <string name="accessctrl_full_lock_switch">Bloquer le fonctionnement en tâche de fond</string>
-  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverrouillez manuellement. La réception de paiements en tâche de fond n\'est plus possible.\n\nSeule l\'authentification par empreinte digitale est acceptée.</string>
+  <string name="accessctrl_full_lock_switch_desc">L\'application ne peut fonctionner que si vous la déverrouillez manuellement. La réception autonome de paiements en arrière plan n\'est pas possible.\n\nSeule l\'authentification par empreintes digitales est acceptée. Si celles-ci sont modifiées, Phoenix devra être réinitialisé avec votre clé privée. Assurez-vous de l\'avoir sauvegardée !</string>
   <string name="accessctrl_full_lock_confirm_title">Information</string>
   <string name="accessctrl_full_lock_confirm_message">Les fonctionnalités en tâche de fond ne seront plus possible. Vous ne pourrez recevoir d\'argent que si l\'application est déverrouillée.</string>
 

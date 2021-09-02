@@ -136,8 +136,8 @@ object Wallet {
       } catch (e2: Exception) {
         try {
           val uri = URI(input)
-          if (uri.scheme != null) {
-            uri.getParams()["lightning"] ?: throw RuntimeException("uri does not contain a valid LNURL fallback")
+          if (uri.scheme != null && uri.getParams().containsKey("lightning")) {
+            uri.getParams()["lightning"]!! // use the lightning fallback
           } else {
             input
           }.let { LNUrl.extractLNUrl(it) }
