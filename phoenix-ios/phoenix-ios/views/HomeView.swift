@@ -97,7 +97,7 @@ struct HomeView : MVIView, ViewName {
 			
 			// === Top-row buttons ===
 			HStack {
-				ConnectionStatusButton()
+				AppStatusButton()
 				Spacer()
 				FaqButton()
 			}
@@ -567,7 +567,7 @@ fileprivate struct PaymentCell : View, ViewName {
 
 				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
 
-				Text(isOutgoing ? "-" : "+")
+				Text(verbatim: isOutgoing ? "-" : "+")
 					.foregroundColor(color)
 					.padding(.trailing, 1)
 
@@ -619,14 +619,9 @@ fileprivate struct PaymentCell : View, ViewName {
 			return (amount, isFailure, isOutgoing)
 
 		} else {
-
-			let type: String
-			switch currencyPrefs.currencyType {
-				case .fiat    : type = currencyPrefs.fiatCurrency.shortName
-				case .bitcoin : type = currencyPrefs.bitcoinUnit.shortName
-			}
-
-			let amount = FormattedAmount(digits: "", type: type, decimalSeparator: " ")
+			
+			let currency = currencyPrefs.currency
+			let amount = FormattedAmount(currency: currency, digits: "", decimalSeparator: " ")
 
 			let isFailure = false
 			let isOutgoing = true
@@ -648,57 +643,150 @@ fileprivate struct PaymentCell : View, ViewName {
 	}
 }
 
-fileprivate struct ConnectionStatusButton : View {
+fileprivate struct AppStatusButton: View, ViewName {
 	
 	@State var dimStatus = false
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	
+	@State var syncState: SyncManagerState = .initializing
+	@State var pendingSettings: PendingSettings? = nil
+	
+	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
+	let syncManager = AppDelegate.get().syncManager!
+	
+	@ViewBuilder
 	var body: some View {
-		let status = connectionsMonitor.connections.global
 		
-		Group {
-			Button {
-				showConnectionsPopover()
-			} label: {
-				HStack {
-					Image("ic_connection_lost")
-						.resizable()
-						.frame(width: 16, height: 16)
-					Text(status.localizedText())
-						.font(.caption2)
-				}
-			}
-			.buttonStyle(PlainButtonStyle())
-			.padding([.leading, .top, .bottom], 5)
-			.padding([.trailing], 10)
-			.background(Color.buttonFill)
-			.cornerRadius(30)
-			.overlay(
-				RoundedRectangle(cornerRadius: 30)
-					.stroke(Color.borderColor, lineWidth: 1)
-			)
-			.opacity(dimStatus ? 0.2 : 1.0)
-			.isHidden(status == Lightning_kmpConnection.established)
+		Button {
+			showAppStatusPopover()
+		} label: {
+			buttonContent
 		}
-		.onAppear {
-			DispatchQueue.main.async {
-				withAnimation(Animation.linear(duration: 1.0).repeatForever()) {
-					self.dimStatus.toggle()
+		.buttonStyle(PlainButtonStyle())
+		.padding(.all, 7)
+		.background(Color.buttonFill)
+		.cornerRadius(30)
+		.overlay(
+			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
+				.stroke(Color.borderColor, lineWidth: 1)
+		)
+		.onReceive(syncManager.statePublisher) {
+			syncManagerStateChanged($0)
+		}
+		.onReceive(syncManager.pendingSettingsPublisher) {
+			syncManagerPendingSettingsChanged($0)
+		}
+	}
+	
+	@ViewBuilder
+	var buttonContent: some View {
+		
+		let connectionStatus = connectionsManager.connections.global
+		if connectionStatus == .closed {
+			HStack(alignment: .firstTextBaseline, spacing: 3) {
+				Image(systemName: "bolt.slash.fill")
+					.imageScale(.large)
+				Text(NSLocalizedString("Offline", comment: "Connection state"))
+					.padding(.trailing, 6)
+			}
+			.font(.caption2)
+		}
+		else if connectionStatus == .establishing {
+			HStack(alignment: .firstTextBaseline, spacing: 3) {
+				Image(systemName: "bolt.slash")
+					.imageScale(.large)
+				Text(NSLocalizedString("Connecting...", comment: "Connection state"))
+					.padding(.trailing, 6)
+			}
+			.font(.caption2)
+		} else /* .established */ {
+			
+			if pendingSettings != nil {
+				// The user enabled/disabled cloud sync.
+				// We are using a 30 second delay before we start operating on the user's decision.
+				// Just in-case it was an accidental change, or the user changes his/her mind.
+				Image(systemName: "hourglass")
+					.imageScale(.large)
+					.font(.caption2)
+					.squareFrame()
+			} else {
+				let (isSyncing, isWaiting, isError) = buttonizeSyncStatus()
+				if isSyncing {
+					Image(systemName: "icloud")
+						.imageScale(.large)
+						.font(.caption2)
+						.squareFrame()
+				} else if isWaiting {
+					Image(systemName: "hourglass")
+						.imageScale(.large)
+						.font(.caption2)
+						.squareFrame()
+				} else if isError {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.font(.caption2)
+						.squareFrame()
+				} else {
+					// Everything is good: connected + {synced|disabled|initializing}
+					Image(systemName: "bolt.fill")
+						.imageScale(.large)
+						.font(.caption2)
+						.squareFrame()
 				}
 			}
 		}
 	}
 	
-	func showConnectionsPopover() -> Void {
-		log.trace("(ConnectionStatusButton) showConnectionsPopover()")
+	func buttonizeSyncStatus() -> (Bool, Bool, Bool) {
 		
-		popoverState.display.send(PopoverItem(
+		var isSyncing = false
+		var isWaiting = false
+		var isError = false
 		
-			ConnectionsPopover().anyView,
-			dismissable: true
-		))
+		switch syncState {
+			case .initializing: break
+			case .updatingCloud: isSyncing = true
+			case .downloading: isSyncing = true
+			case .uploading: isSyncing = true
+			case .waiting(let details):
+				switch details.kind {
+					case .forInternet: break
+					case .forCloudCredentials: break // see discussion below
+					case .exponentialBackoff: isError = true
+					case .randomizedUploadDelay: isWaiting = true
+				}
+			case .synced: break
+			case .disabled: break
+		}
+		
+		// If the user isn't signed into iCloud, is this an error ?
+		// We are choosing to treat it more like the disabled case,
+		// since the user has choosed to not sign in,
+		// or has ignored Apple's continual "sign into iCloud" popups.
+		
+		return (isSyncing, isWaiting, isError)
+	}
+	
+	func syncManagerStateChanged(_ newState: SyncManagerState) -> Void {
+		log.trace("[\(viewName)] syncManagerStateChanged()")
+		
+		syncState = newState
+	}
+	
+	func syncManagerPendingSettingsChanged(_ newPendingSettings: PendingSettings?) -> Void {
+		log.trace("[\(viewName)] syncManagerPendingSettingsChanged()")
+		
+		pendingSettings = newPendingSettings
+	}
+	
+	func showAppStatusPopover() -> Void {
+		log.trace("[\(viewName)] showAppStatusPopover()")
+		
+		popoverState.display(dismissable: true) {
+			AppStatusPopover()
+		}
 	}
 }
 
@@ -708,34 +796,61 @@ fileprivate struct FaqButton: View, ViewName {
 	
 	var body: some View {
 		
-		Button {
-			didTapButton()
-		} label: {
-			HStack {
-				Image(systemName: "questionmark.circle")
-					.renderingMode(.template)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: 16, height: 16)
-				Text("FAQ")
-					.font(.caption2)
+		Menu {
+			Button {
+				faqButtonTapped()
+			} label: {
+				Label("FAQ", systemImage: "safari")
 			}
+			Button {
+				sendFeedbackButtonTapped()
+			} label: {
+				Label("Send feedback", systemImage: "envelope")
+			}
+		} label: {
+			Image(systemName: "questionmark")
+				.renderingMode(.template)
+				.imageScale(.large)
+				.font(.caption2)
+				.foregroundColor(.primary)
+				.squareFrame()
+				.buttonStyle(PlainButtonStyle())
+				.padding(.all, 7)
+				.background(Color.buttonFill)
+				.cornerRadius(30)
+				.overlay(
+					RoundedRectangle(cornerRadius: 30)
+						.stroke(Color.borderColor, lineWidth: 1)
+				)
 		}
-		.buttonStyle(PlainButtonStyle())
-		.padding([.leading, .top, .bottom], 5)
-		.padding([.trailing], 10)
-		.background(Color.buttonFill)
-		.cornerRadius(30)
-		.overlay(
-			RoundedRectangle(cornerRadius: 30)
-				.stroke(Color.borderColor, lineWidth: 1)
-		)
 	}
 	
-	func didTapButton() -> Void {
-		log.trace("[\(viewName)] didTapButton()")
+	func faqButtonTapped() -> Void {
+		log.trace("[\(viewName)] faqButtonTapped()")
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+			openURL(url)
+		}
+	}
+	
+	func sendFeedbackButtonTapped() -> Void {
+		log.trace("[\(viewName)] sendFeedbackButtonTapped()")
+		
+		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+		let device = UIDevice.current
+		
+		var body = "Phoenix v\(appVersion ?? "x.y.z") "
+		body += "(\(device.systemName) \(device.systemVersion))"
+		
+		var comps = URLComponents()
+		comps.scheme = "mailto"
+		comps.path = "phoenix@acinq.co"
+		comps.queryItems = [
+			URLQueryItem(name: "subject", value: "Phoenix iOS Feedback"),
+			URLQueryItem(name: "body", value: body)
+		]
+
+		if let url = comps.url {
 			openURL(url)
 		}
 	}
@@ -845,16 +960,16 @@ fileprivate struct BottomBar: View, ViewName {
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 				.edgesIgnoringSafeArea([.horizontal, .bottom])
 		)
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
 			didReceiveExternalLightningUrl(url)
-		})
-		.onChange(of: selectedTag, perform: { tag in
+		}
+		.onChange(of: selectedTag) { tag in
 			if tag == nil {
 				// If we pushed the SendView with a external lightning url,
 				// we should nil out the url (since the user is finished with it now).
 				self.externalLightningRequest = nil
 			}
-		})
+		}
 	}
 	
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {

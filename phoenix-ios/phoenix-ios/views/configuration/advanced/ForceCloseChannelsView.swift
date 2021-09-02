@@ -222,13 +222,11 @@ fileprivate struct StandardWalletView : View {
 	func forceCloseChannels() -> Void {
 		log.debug("forceCloseChannels()")
 		
-		popoverState.display.send(PopoverItem(
-		
+		popoverState.display(dismissable: false) {
 			ConfirmationPopover(
 				confirmAction: confirmForceCloseChannels
-			).anyView,
-			dismissable: false
-		))
+			)
+		}
 	}
 	
 	func confirmForceCloseChannels() -> Void {
@@ -270,12 +268,17 @@ fileprivate struct FundsSentView : View {
 
 			VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 				
-				if model.channels.count > 1 {
-					Text("Expect to receive \(model.channels.count) separate payments.")
-						.padding(.bottom, 10)
+				let channelsCount = model.channels.count
+				if channelsCount > 1 {
+					Text(String(format: NSLocalizedString(
+						"Expect to receive %d separate payments.",
+						comment:	"label text"),
+						channelsCount
+					))
+					.padding(.bottom, 10)
 				}
 
-				let msg = (model.channels.count <= 1)
+				let msg = (channelsCount <= 1)
 					? NSLocalizedString(
 						"""
 						The closing transaction is in your transactions list on the __main__ screen. \
@@ -292,7 +295,9 @@ fileprivate struct FundsSentView : View {
 					)
 				
 				Text(styled: msg)
-					.lineLimit(nil) // text is getting truncated for some reason
+					.multilineTextAlignment(.leading)
+					.lineLimit(nil)          // Workaround for SwiftUI bugs
+					.minimumScaleFactor(0.5) // Workaround for SwiftUI bugs
 				
 			} // </VStack>
 
@@ -339,12 +344,12 @@ fileprivate struct ConfirmationPopover : View {
 	
 	func didTapCancel() -> Void {
 		log.trace("cancel()")
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didTapConfirm() -> Void {
 		log.trace("confirm()")
-		popoverState.close.send()
+		popoverState.close()
 		confirmAction()
 	}
 }

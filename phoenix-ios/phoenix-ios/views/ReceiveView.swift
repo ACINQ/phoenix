@@ -125,7 +125,6 @@ struct ReceiveLightningView: View, ViewName {
 	enum ReceiveViewSheet {
 		case sharingUrl(url: String)
 		case sharingImg(img: UIImage)
-		case editing(model: Receive.ModelGenerated)
 	}
 	
 	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
@@ -141,7 +140,6 @@ struct ReceiveLightningView: View, ViewName {
 	@State var didAppear = false
 	@State var isFullScreenQrcode = false
 	
-	@State var unit: String = "sat"
 	@State var sheet: ReceiveViewSheet? = nil
 	
 	@State var swapIn_enabled = true
@@ -157,17 +155,22 @@ struct ReceiveLightningView: View, ViewName {
 	@State var badgesDisabled = false
 	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
+	@State var modificationUnit = Currency.bitcoin(.sat)
+	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	let lastIncomingPaymentPublisher = AppDelegate.get().business.paymentsManager.lastIncomingPaymentPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
-	let channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
+	
+	// Saving custom publisher in @State since otherwise it fires on every render
+	@State var channelsPublisher = AppDelegate.get().business.peerPublisher().flatMap { $0.channelsPublisher() }
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -213,16 +216,6 @@ struct ReceiveLightningView: View, ViewName {
 				let items: [Any] = [sharingImg]
 				ActivityView(activityItems: items, applicationActivities: nil)
 			
-			case .editing(let model):
-				
-				ModifyInvoiceSheet(
-					mvi: mvi,
-					dismissSheet: { self.sheet = nil },
-					initialAmount: model.amount,
-					desc: model.desc ?? ""
-				)
-				.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
-			
 			} // </switch>
 		}
 		.navigationBarTitle(
@@ -236,11 +229,35 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if isFullScreenQrcode {
 			fullScreenQrcode()
-		} else if verticalSizeClass == UserInterfaceSizeClass.compact {
-			mainLandscape()
 		} else {
-			mainPortrait()
+			mainWrapper()
 		}
+	}
+	
+	@ViewBuilder
+	func mainWrapper() -> some View {
+		
+		// SwiftUI BUG workaround:
+		//
+		// When the keyboard appears, the main view shouldn't move. At all.
+		// It should perform ZERO keyboard avoidance.
+		// Which means we need to use: `.ignoresSafeArea(.keyboard)`
+		//
+		// But, of course, this doesn't work properly because of a SwiftUI bug.
+		// So the current recommended workaround is to wrap everything in a GeometryReader.
+		//
+		GeometryReader { _ in
+			HStack(alignment: VerticalAlignment.top, spacing: 0) {
+				Spacer(minLength: 0)
+				if verticalSizeClass == UserInterfaceSizeClass.compact {
+					mainLandscape()
+				} else {
+					mainPortrait()
+				}
+				Spacer(minLength: 0)
+			} // </HStack>
+		} // </GeometryReader>
+		.ignoresSafeArea(.keyboard)
 	}
 	
 	@ViewBuilder
@@ -404,7 +421,6 @@ struct ReceiveLightningView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelGenerated,
 		   qrCode.value == m.request,
-			let qrCodeCgImage = qrCode.cgImage,
 		   let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
@@ -412,14 +428,14 @@ struct ReceiveLightningView: View, ViewName {
 				.aspectRatio(contentMode: .fit)
 				.contextMenu {
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						UIPasteboard.general.image = uiImg
-						toast.pop(
-							Text("Copied QR code image to pasteboard!").anyView,
-							colorScheme: colorScheme.opposite
-						)
+						copyImageToPasteboard()
 					}) {
 						Text("Copy")
+					}
+					Button(action: {
+						shareImageToSystem()
+					}) {
+						Text("Share")
 					}
 					Button(action: {
 						// We add a delay here to give the contextMenu time to finish it's own animation.
@@ -431,12 +447,6 @@ struct ReceiveLightningView: View, ViewName {
 						}
 					}) {
 						Text("Full Screen")
-					}
-					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
-					}) {
-						Text("Share")
 					}
 				} // </contextMenu>
 				.matchedGeometryEffect(id: "qrCodeView_inner", in: qrCodeAnimation_inner)
@@ -459,18 +469,30 @@ struct ReceiveLightningView: View, ViewName {
 	func copyButton() -> some View {
 		
 		ReceiveView.copyButton {
-			didTapCopyButton()
+			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressCopyButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapCopyButton()
+		})
 	}
 	
 	@ViewBuilder
 	func shareButton() -> some View {
 		
 		ReceiveView.shareButton {
-			didTapShareButton()
+			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressShareButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapShareButton()
+		})
 	}
 	
 	@ViewBuilder
@@ -671,6 +693,17 @@ struct ReceiveLightningView: View, ViewName {
 			
 			checkPushPermissions()
 		}
+		
+		if currencyPrefs.currencyType == .fiat, currencyPrefs.fiatExchangeRate() != nil {
+			
+			let fiatCurrency = currencyPrefs.fiatCurrency
+			modificationUnit = Currency.fiat(fiatCurrency)
+			
+		} else {
+			
+			let bitcoinUnit = currencyPrefs.bitcoinUnit
+			modificationUnit = Currency.bitcoin(bitcoinUnit)
+		}
 	}
 	
 	func onDisappear() -> Void {
@@ -766,21 +799,17 @@ struct ReceiveLightningView: View, ViewName {
 	func showBgAppRefreshDisabledWarning() -> Void {
 		log.trace("[\(viewName)] showBgAppRefreshDisabledWarning()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			BgAppRefreshDisabledWarning().anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			BgAppRefreshDisabledWarning()
+		}
 	}
 	
 	func showNotificationsDisabledWarning() -> Void {
 		log.trace("[\(viewName)] showNotificationsDisabledWarning()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			NotificationsDisabledWarning().anyView,
-			dismissable: false
-		))
+		popoverState.display(dismissable: false) {
+			NotificationsDisabledWarning()
+		}
 	}
 	
 	func showRequestPushPermissionPopover() -> Void {
@@ -805,15 +834,13 @@ struct ReceiveLightningView: View, ViewName {
 			}
 		}
 		
-		popoverState.display.send(PopoverItem(
-		
-			RequestPushPermissionPopover(callback: callback).anyView,
-			dismissable: true
-		))
+		popoverState.display(dismissable: true) {
+			RequestPushPermissionPopover(callback: callback)
+		}
 	}
 	
-	func didTapCopyButton() -> Void {
-		log.trace("[\(viewName)] didTapCopyButton()")
+	func copyTextToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			UIPasteboard.general.string = m.request
@@ -825,8 +852,43 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
-	func didTapShareButton() -> Void {
-		log.trace("[\(viewName)] didTapShareButton()")
+	func copyImageToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyImageToPasteboard()")
+		
+		if let m = mvi.model as? Receive.ModelGenerated,
+			qrCode.value == m.request,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			UIPasteboard.general.image = uiImg
+			toast.pop(
+				Text("Copied QR code image to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
+		}
+	}
+	
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
+		
+		copyTextToPasteboard()
+	}
+	
+	func didLongPressCopyButton() -> Void {
+		log.trace("[\(viewName)] didLongPressCopyButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			CopyOptionsSheet(copyText: {
+				copyTextToPasteboard()
+			}, copyImage: {
+				copyImageToPasteboard()
+			})
+		}
+	}
+	
+	func shareTextToSystem() -> Void {
+		log.trace("[\(viewName)] shareTextToSystem()")
 		
 		if let m = mvi.model as? Receive.ModelGenerated {
 			withAnimation {
@@ -836,12 +898,50 @@ struct ReceiveLightningView: View, ViewName {
 		}
 	}
 	
+	func shareImageToSystem() -> Void {
+		log.trace("[\(viewName)] shareImageToSystem()")
+		
+		if let m = mvi.model as? Receive.ModelGenerated,
+			qrCode.value == m.request,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+		}
+	}
+	
+	func didTapShareButton() -> Void {
+		log.trace("[\(viewName)] didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() -> Void {
+		log.trace("[\(viewName)] didLongPressShareButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			ShareOptionsSheet(shareText: {
+				shareTextToSystem()
+			}, shareImage: {
+				shareImageToSystem()
+			})
+		}
+	}
+	
 	func didTapEditButton() -> Void {
 		log.trace("[\(viewName)] didTapEditButton()")
 		
 		if let model = mvi.model as? Receive.ModelGenerated {
-			withAnimation {
-				sheet = ReceiveViewSheet.editing(model: model)
+			
+			shortSheetState.display(dismissable: true) {
+				
+				ModifyInvoiceSheet(
+					mvi: mvi,
+					initialAmount: model.amount,
+					desc: model.desc ?? "",
+					unit: $modificationUnit
+				)
 			}
 		}
 	}
@@ -897,23 +997,152 @@ struct ReceiveLightningView: View, ViewName {
 			
 		} else {
 			
-			popoverState.display.send(PopoverItem(
-				
-				SwapInDisabledPopover().anyView,
-				dismissable: true
-			))
+			popoverState.display(dismissable: true) {
+				SwapInDisabledPopover()
+			}
 		}
+	}
+}
+
+struct CopyOptionsSheet: View, ViewName {
+	
+	let copyText: () -> Void
+	let copyImage: () -> Void
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack {
+			
+			Button {
+				shortSheetState.close {
+					copyText()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.on.square")
+						.imageScale(.medium)
+					Text("Copy Text")
+					Spacer()
+					Text("(Lightning invoice)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+			.padding(.bottom, 8)
+			
+			Button {
+				shortSheetState.close {
+					copyImage()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.on.square")
+						.imageScale(.medium)
+					Text("Copy Image")
+					Spacer()
+					Text("(QR code)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+		}
+		.padding(.all)
+	}
+}
+
+struct ShareOptionsSheet: View, ViewName {
+	
+	let shareText: () -> Void
+	let shareImage: () -> Void
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack {
+			
+			Button {
+				shortSheetState.close {
+					shareText()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.and.arrow.up")
+						.imageScale(.medium)
+					Text("Share Text")
+					Spacer()
+					Text("(Lightning invoice)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+			.padding(.bottom, 8)
+			
+			Button {
+				shortSheetState.close {
+					shareImage()
+				}
+			} label: {
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+					Image(systemName: "square.and.arrow.up")
+						.imageScale(.medium)
+					Text("Share Image")
+					Spacer()
+					Text("(QR code)")
+						.font(.footnote)
+						.foregroundColor(.secondary)
+				}
+				.padding([.top, .bottom], 8)
+				.padding([.leading, .trailing], 16)
+				.contentShape(Rectangle()) // make Spacer area tappable
+			}
+			.buttonStyle(
+				ScaleButtonStyle(
+					borderStroke: Color.appAccent
+				)
+			)
+		}
+		.padding(.all)
 	}
 }
 
 struct ModifyInvoiceSheet: View, ViewName {
 
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
-	let dismissSheet: () -> Void
 
 	let initialAmount: Lightning_kmpMilliSatoshi?
 	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var desc: String
+	
+	@Binding var unit: Currency
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -921,9 +1150,17 @@ struct ModifyInvoiceSheet: View, ViewName {
 	@State var isInvalidAmount: Bool = false
 	@State var isEmptyAmount: Bool = false
 	
-	@State var desc: String
-	
 	@EnvironmentObject private var currencyPrefs: CurrencyPrefs
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	// Workaround for SwiftUI bug
+	enum TextHeight: Preference {}
+	let textHeightReader = GeometryPreferenceReader(
+		key: AppendValue<TextHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var textHeight: CGFloat? = nil
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
@@ -934,6 +1171,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 		)
 	}
 
+	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: .leading) {
@@ -946,21 +1184,23 @@ struct ModifyInvoiceSheet: View, ViewName {
 					.keyboardType(.decimalPad)
 					.disableAutocorrection(true)
 					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+					.read(textHeightReader)
 					.padding([.top, .bottom], 8)
 					.padding(.leading, 16)
 					.padding(.trailing, 0)
-
+				
 				Picker(
 					selection: $unit,
 					label: Text(unit.abbrev).frame(minWidth: 40, alignment: Alignment.trailing)
 				) {
-					let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+					let options = Currency.displayable(currencyPrefs: currencyPrefs)
 					ForEach(0 ..< options.count) {
 						let option = options[$0]
 						Text(option.abbrev).tag(option)
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
+				.frame(height: textHeight) // workaround for SwiftUI bug
 				.padding(.trailing, 16)
 			}
 			.background(Capsule().stroke(Color(UIColor.separator)))
@@ -991,8 +1231,8 @@ struct ModifyInvoiceSheet: View, ViewName {
 				Capsule()
 					.strokeBorder(Color(UIColor.separator))
 			)
-
-			Spacer()
+			.padding(.bottom)
+			
 			HStack {
 				Spacer()
 				Button("Save") {
@@ -1005,6 +1245,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 
 		} // </VStack>
 		.padding([.leading, .trailing])
+		.assignMaxPreference(for: textHeightReader.key, to: $textHeight)
 		.onAppear() {
 			onAppear()
 		}
@@ -1020,18 +1261,13 @@ struct ModifyInvoiceSheet: View, ViewName {
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
-        let msat: Int64? = initialAmount?.msat
+		let msat: Int64? = initialAmount?.msat
 		
-		// Regardless of whether or not the invoice currently has an amount,
-		// we should default to the user's preferred currency.
-		// In other words, we should default to fiat, if that's what the user prefers.
-		//
-		if currencyPrefs.currencyType == .fiat, let exchangeRate = currencyPrefs.fiatExchangeRate() {
+		switch unit {
+		case .fiat(let fiatCurrency):
 			
-			let fiatCurrency = currencyPrefs.fiatCurrency
-			unit = CurrencyUnit(fiatCurrency: fiatCurrency)
-			
-			if let msat = msat {
+			if let msat = msat, let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				
 				let targetAmt = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
 				parsedAmount = Result.success(targetAmt)
 				
@@ -1041,12 +1277,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 				refreshAltAmount()
 			}
 			
-		} else {
-			
-			let bitcoinUnit = currencyPrefs.bitcoinUnit
-			unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+		case .bitcoin(let bitcoinUnit):
 			
 			if let msat = msat {
+				
 				let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
 				parsedAmount = Result.success(targetAmt)
 				
@@ -1085,7 +1319,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 			
 			switch error {
 			case .emptyInput:
-				altAmount = NSLocalizedString("Any amount", comment: "error message")
+				altAmount = NSLocalizedString("Any amount", comment: "displayed when user doesn't specify an amount")
 			case .invalidInput:
 				altAmount = NSLocalizedString("Enter a valid amount", comment: "error message")
 			}
@@ -1094,7 +1328,8 @@ struct ModifyInvoiceSheet: View, ViewName {
 			isInvalidAmount = false
 			isEmptyAmount = false
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
 				// amt    => bitcoinUnit
 				// altAmt => fiatCurrency
 				
@@ -1108,7 +1343,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 				
-			} else if let fiatCurrency = unit.fiatCurrency {
+			case .fiat(let fiatCurrency):
 				// amt    => fiatCurrency
 				// altAmt => bitcoinUnit
 				
@@ -1119,7 +1354,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 					
 				} else {
 					// We don't know the exchange rate !
-					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
+					// We shouldn't get into this state since Currency.displayable() already filters for this.
 					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
 				}
 			}
@@ -1129,37 +1364,35 @@ struct ModifyInvoiceSheet: View, ViewName {
 	func didTapSaveButton() -> Void {
 		log.trace("[\(viewName)] didTapSaveButton()")
 		
+		var msat: Lightning_kmpMilliSatoshi? = nil
 		let trimmedDesc = desc.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
 		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
+							
+				msat = Lightning_kmpMilliSatoshi(msat:
+					Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+				)
 				
-				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
-				mvi.intent(Receive.IntentAsk(
-					amount: msat,
-					desc: trimmedDesc
-				))
+			case .fiat(let fiatCurrency):
 				
-			} else if let fiatCurrency = unit.fiatCurrency,
-			          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-			{
-				let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
-				mvi.intent(Receive.IntentAsk(
-					amount: msat,
-					desc: trimmedDesc
-				))
+				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+					msat = Lightning_kmpMilliSatoshi(msat:
+						Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+					)
+				}
 			}
-			
-		} else {
+		}
+		
+		shortSheetState.close {
 			
 			mvi.intent(Receive.IntentAsk(
-				amount: nil,
+				amount: msat,
 				desc: trimmedDesc
 			))
 		}
-		
-		dismissSheet()
 	}
 	
 } // </ModifyInvoiceSheet>
@@ -1204,7 +1437,7 @@ struct BgAppRefreshDisabledWarning: View {
 			
 			HStack {
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("OK").font(.title3)
 				}
@@ -1212,7 +1445,7 @@ struct BgAppRefreshDisabledWarning: View {
 		}
 		.padding()
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
-			popoverState.close.send()
+			popoverState.close()
 		})
 	}
 }
@@ -1246,14 +1479,14 @@ struct NotificationsDisabledWarning: View {
 			HStack {
 				Button {
 					fixIt()
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("Settings").font(.title3)
 				}
 				.padding(.trailing, 20)
 				
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("OK").font(.title3)
 				}
@@ -1261,7 +1494,7 @@ struct NotificationsDisabledWarning: View {
 		}
 		.padding()
 		.onReceive(didEnterBackgroundPublisher, perform: { _ in
-			popoverState.close.send()
+			popoverState.close()
 		})
 	}
 	
@@ -1316,8 +1549,10 @@ struct RequestPushPermissionPopover: View, ViewName {
 			}
 		}
 		.padding()
-		.onReceive(popoverState.close) {
-			willClose()
+		.onReceive(popoverState.publisher) { item in
+			if item  == nil {
+				willClose()
+			}
 		}
 	}
 	
@@ -1326,7 +1561,7 @@ struct RequestPushPermissionPopover: View, ViewName {
 		
 		callback(.denied)
 		userIsIgnoringPopover = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didAccept() -> Void {
@@ -1334,7 +1569,7 @@ struct RequestPushPermissionPopover: View, ViewName {
 		
 		callback(.accepted)
 		userIsIgnoringPopover = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func willClose() -> Void {
@@ -1372,7 +1607,7 @@ fileprivate struct SwapInDisabledPopover: View, ViewName {
 			
 			HStack {
 				Button {
-					popoverState.close.send()
+					popoverState.close()
 				} label : {
 					Text("Try again later").font(.headline)
 				}
@@ -1402,6 +1637,7 @@ struct SwapInView: View, ViewName {
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
@@ -1445,7 +1681,7 @@ struct SwapInView: View, ViewName {
 							}
 						}
 				} else {
-					Text("…")
+					Text(verbatim: "…")
 				}
 			}
 			.padding([.leading, .trailing], 40)
@@ -1454,14 +1690,26 @@ struct SwapInView: View, ViewName {
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
 				
 				ReceiveView.copyButton {
-					didTapCopyButton()
+					// using simultaneousGesture's below
 				}
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.simultaneousGesture(LongPressGesture().onEnded { _ in
+					didLongPressCopyButton()
+				})
+				.simultaneousGesture(TapGesture().onEnded {
+					didTapCopyButton()
+				})
 				
 				ReceiveView.shareButton {
-					didTapShareButton()
+					// using simultaneousGesture's below
 				}
 				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.simultaneousGesture(LongPressGesture().onEnded { _ in
+					didLongPressShareButton()
+				})
+				.simultaneousGesture(TapGesture().onEnded {
+					didTapShareButton()
+				})
 				
 			} // </HStack>
 			
@@ -1508,25 +1756,18 @@ struct SwapInView: View, ViewName {
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated,
 			qrCode.value == m.address,
-			let qrCodeCgImage = qrCode.cgImage,
 			let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
 				.resizable()
 				.contextMenu {
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						UIPasteboard.general.image = uiImg
-						toast.pop(
-							Text("Copied QR code image to pasteboard!").anyView,
-							colorScheme: colorScheme.opposite
-						)
+						copyImageToPasteboard()
 					}) {
 						Text("Copy")
 					}
 					Button(action: {
-						let uiImg = UIImage(cgImage: qrCodeCgImage)
-						sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+						shareImageToSystem()
 					}) {
 						Text("Share")
 					}
@@ -1650,8 +1891,8 @@ struct SwapInView: View, ViewName {
 		swapIn_minFundingSat = context.payToOpen.v1.minFundingSat // not yet segregated for swapIn - future work
 	}
 	
-	func didTapCopyButton() -> Void {
-		log.trace("[\(viewName)] didTapCopyButton()")
+	func copyTextToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			UIPasteboard.general.string = m.address
@@ -1662,12 +1903,78 @@ struct SwapInView: View, ViewName {
 		}
 	}
 	
-	func didTapShareButton() -> Void {
-		log.trace("[\(viewName)] didTapShareButton()")
+	func copyImageToPasteboard() -> Void {
+		log.trace("[\(viewName)] copyImageToPasteboard()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+			qrCode.value == m.address,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			UIPasteboard.general.image = uiImg
+			toast.pop(
+				Text("Copied QR code image to pasteboard!").anyView,
+				colorScheme: colorScheme.opposite
+			)
+		}
+	}
+	
+	func didTapCopyButton() -> Void {
+		log.trace("[\(viewName)] didTapCopyButton()")
+		
+		copyTextToPasteboard()
+	}
+	
+	func didLongPressCopyButton() -> Void {
+		log.trace("[\(viewName)] didLongPressCopyButton()")
+		
+		shortSheetState.display(dismissable: true) {
+			
+			CopyOptionsSheet(copyText: {
+				copyTextToPasteboard()
+			}, copyImage: {
+				copyImageToPasteboard()
+			})
+		}
+	}
+	
+	func shareTextToSystem() {
+		log.trace("[\(viewName)] shareTextToSystem()")
 		
 		if let m = mvi.model as? Receive.ModelSwapInGenerated {
 			let url = "bitcoin:\(m.address)"
 			sheet = ReceiveViewSheet.sharingUrl(url: url)
+		}
+	}
+	
+	func shareImageToSystem() {
+		log.trace("[\(viewName)] shareImageToSystem()")
+		
+		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+			qrCode.value == m.address,
+			let qrCodeCgImage = qrCode.cgImage
+		{
+			let uiImg = UIImage(cgImage: qrCodeCgImage)
+			sheet = ReceiveViewSheet.sharingImg(img: uiImg)
+		}
+	}
+	
+	func didTapShareButton() {
+		log.trace("[\(viewName)] didTapShareButton()")
+		
+		shareTextToSystem()
+	}
+	
+	func didLongPressShareButton() {
+		log.trace("[\(viewName)] didLongPressShareButton()")
+		
+		shortSheetState.display(dismissable: true) {
+					
+			ShareOptionsSheet(shareText: {
+				shareTextToSystem()
+			}, shareImage: {
+				shareImageToSystem()
+			})
 		}
 	}
 }

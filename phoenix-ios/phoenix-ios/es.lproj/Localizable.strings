@@ -2,13 +2,28 @@
 " (not available)" = "(no disponible)";
 
 /* No comment provided by engineer. */
-"…" = "…";
+" (not enrolled)" = "(no inscrito)";
+
+/* No comment provided by engineer. */
+"(coming soon)" = "(proximamente)";
+
+/* Upload progress information */
+"(completed) of (total)" = "(completed) de (total)";
+
+/* Upload progress information */
+"(completed) of (total), pushing batch of (inFlight)" = "(completed) de (total), subiendo en grupos de (inFlight)";
 
 /* No comment provided by engineer. */
 "(derived from your seed)" = "(derivado de tu semilla)";
 
 /* No comment provided by engineer. */
+"(Lightning invoice)" = "(Factura de Lightning)";
+
+/* No comment provided by engineer. */
 "(Phoenix can be running in the background.)" = "(Phoenix puede funcionar en segundo plano.)";
+
+/* No comment provided by engineer. */
+"(QR code)" = "(codigo QR)";
 
 /* No comment provided by engineer. */
 "(This is your address - derived from your seed. You alone possess your seed.)" = "(Esta es tu dirección - derivada de tu semilla. Te eres el único en poseer la semilla.)";
@@ -17,10 +32,13 @@
 "(you provided this address)" = "(proporcionaste esta dirección)";
 
 /* RecoverySeedView */
-"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds.\"" = "**No pierdas esta semilla.** Guárdala en un algún lugar seguro (no en este celular). Si pierdas tu semilla y tu celular, perderás tus fondos.";
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**No pierdas esta semilla.** Guárdala en un algún lugar seguro (no en este celular). Si pierdas tu semilla y tu celular, perderás tus fondos.";
 
 /* RecoverySeedView */
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**No compartas esta semilla con nadie.** Cuidado con el fraude. Los desarrolladores de Phoenix nunca pedirán tu semilla.";
+
+/* No comment provided by engineer. */
+"%@" = "%@";
 
 /* No comment provided by engineer. */
 "%@ milliseconds" = "%@ milisegundos";
@@ -31,7 +49,13 @@
 /* No comment provided by engineer. */
 "%@.%@ seconds" = "%1$@.%2$@ segundos";
 
-/* Minimum fee information */
+/* No comment provided by engineer. */
+"%@% (%@ minimum)" = "%1$@%2$ (%3$@ minimo)";
+
+/* No comment provided by engineer. */
+"%@%@" = "%1$@%2$@";
+
+/* Minimum fee information. E.g.: 1% (3,000 sats minimum) */
 "%@%% (%@ minimum)" = "%1$@%% (%2$@ minimo)";
 
 /* Count != 1 */
@@ -47,7 +71,13 @@
 "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Una semilla de respaldo será generada. Esta información será necesaria para restaurar sus fondos de Bitcoin.";
 
 /* No comment provided by engineer. */
+"A bitcoin can be divided into smaller units. The smallest unit is called a Satoshi, and there are 100 million satoshis in a single bitcoin." = "Un bitcoin se puede dividir en unidades más pequeñas. La unidad más pequeña se llama Satoshi, y hay 100 millones de satoshis en un solo bitcoin.";
+
+/* No comment provided by engineer. */
 "A random electrum server will be selected on each connection attempt." = "Un servidor electrum será seleccionado aleatoriamente en cada intento de conexión.";
+
+/* No comment provided by engineer. */
+"A temporary error occurred, and Phoenix is unable to continue loading." = "Se produjo un error temporal y Phoenix no puede continuar cargando.";
 
 /* Navigation bar title */
 "About" = "Acerca de";
@@ -82,7 +112,7 @@
 /* placeholder: invoice is amount-less */
 "any amount" = "Cualquier valor";
 
-/* error message */
+/* displayed when user doesn't specify an amount */
 "Any amount" = "Cualquier valor";
 
 /* No comment provided by engineer. */
@@ -112,6 +142,15 @@
 /* No comment provided by engineer. */
 "Automatic Channel Creation" = "Creación automática de canales";
 
+/* Explanation for 'Randomize upload delays' toggle */
+"Avoids payment correlation using timestamp metadata." = "Evita la correlación de pagos mediante metadatos de marca de tiempo.";
+
+/* No comment provided by engineer. */
+"Backup seed" = "Semilla de respaldo";
+
+/* No comment provided by engineer. */
+"Backup transactions" = "Transacciones de respaldo";
+
 /* No comment provided by engineer. */
 "Biometrics" = "Biometría";
 
@@ -136,7 +175,7 @@
 /* Label in DetailsView_IncomingPayment */
 "bitcoin txids" = "ID de transacciones de Bitcoin";
 
-/* No comment provided by engineer. */
+/* Navigation bar title */
 "Bitcoin unit" = "Unidad de Bitcoin";
 
 /* No comment provided by engineer. */
@@ -189,6 +228,27 @@
 "Closing Status" = "Estado de cierre";
 
 /* No comment provided by engineer. */
+"Cloud backup" = "Respaldo de la nube";
+
+/* Navigation bar title */
+"Cloud Backup" = "Respaldo de la Nube";
+
+/* No comment provided by engineer. */
+"Cloud sync complete" = "Sincronización en la nube completa";
+
+/* No comment provided by engineer. */
+"Cloud sync disabled" = "Sincronización en la nube inhabilitada";
+
+/* No comment provided by engineer. */
+"Cloud sync error" = "Error de sincronización en la nube";
+
+/* No comment provided by engineer. */
+"Cloud sync initializing" = "Inicio de sincronización en la nube";
+
+/* No comment provided by engineer. */
+"Cloud sync paused" = "Se pausó la sincronización en la nube";
+
+/* No comment provided by engineer. */
 "Coming Soon" = "Próximamente";
 
 /* Label in DetailsView_IncomingPayment */
@@ -234,7 +294,22 @@
 "Copy" = "Copiar";
 
 /* No comment provided by engineer. */
+"Copy Image" = "Copiar imagen";
+
+/* No comment provided by engineer. */
+"Copy Text" = "Copiar texto";
+
+/* No comment provided by engineer. */
 "Create new wallet" = "Crear nueva billetera";
+
+/* No comment provided by engineer. */
+"Creating record zone..." = "Creando zona de registro…";
+
+/* Currency name: HRK */
+"Croation Kuna" = "Kuna croata";
+
+/* Currency name: CZK */
+"Czech Koruna" = "Corona checa";
 
 /* No comment provided by engineer. */
 "Danger zone" = "Zona de peligro";
@@ -247,6 +322,9 @@
 
 /* No comment provided by engineer. */
 "Default payment description" = "Descripción de pago predeterminada";
+
+/* No comment provided by engineer. */
+"Deleting record zone..." = "Eliminando zona de registro…";
 
 /* Minimum amount description. */
 "Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "Los depósitos deben ser de al menos **%@**. La tarifa es **%@%%** (%@ minimo).";
@@ -279,10 +357,16 @@
 "Do not use this feature if you don't fully understand what it does." = "No use esta función si no comprende completamente lo que hace.";
 
 /* No comment provided by engineer. */
+"Downloading payments" = "Descargando pagos";
+
+/* No comment provided by engineer. */
 "Drain my wallet" = "Vaciar mi billetera";
 
 /* No comment provided by engineer. */
 "Edit payment request" = "Editar solicitud de pago";
+
+/* Label in SummaryInfoGrid */
+"Elapsed" = "Tiempo transcurrido";
 
 /* Navigation bar title */
 "Electrum server" = "Servidor Electrum";
@@ -302,11 +386,8 @@
 /* Currency name: EUR */
 "Euro" = "Euro";
 
-/* No comment provided by engineer. */
-"example.com" = "example.com";
-
-/* No comment provided by engineer. */
-"Expect to receive %@ separate payments." = "Espere recibir %@ pagos separados.";
+/* label text */
+"Expect to receive %d separate payments." = "Espere recibir %d pagos separados.";
 
 /* No comment provided by engineer. */
 "External" = "Externo";
@@ -327,6 +408,12 @@
 "Fees" = "Tarifas";
 
 /* No comment provided by engineer. */
+"Fetched %@ item" = "Elemento %@ obtenido";
+
+/* No comment provided by engineer. */
+"Fetched %@ items" = "Elementos %@ obtenidos";
+
+/* Navigation bar title */
 "Fiat currency" = "Moneda fiduciaria";
 
 /* No comment provided by engineer. */
@@ -371,6 +458,9 @@
 /* Currency name: HKD */
 "Hong Kong Dollar" = "Dólar de Hong Kong";
 
+/* Currency name: HUF */
+"Hungarian Forint" = "Florín húngaro";
+
 /* No comment provided by engineer. */
 "I understand" = "Entiendo";
 
@@ -379,6 +469,15 @@
 
 /* Currency name: ISK */
 "Icelandic Kròna" = "Kròna islandesa";
+
+/* No comment provided by engineer. */
+"If done correctly, self-backup is the most secure option." = "Si se hace correctamente, la auto-copia es la opción mas segura.";
+
+/* ErrorView */
+"If the problem persists, please contact support at **phoenix@acinq.co**." = "Si el problema persiste, comuniquese con soporte en **phoenix@acinq.co**.";
+
+/* No comment provided by engineer. */
+"If you switch to a new device (or reinstall the app) then you'll lose your payment history." = "Si cambia a un nuevo dispositivo (o reinstala la aplicación), perderá su historial de pagos.";
 
 /* No comment provided by engineer. */
 "Import" = "Importar";
@@ -537,6 +636,9 @@
 /* Title in DetailsView_IncomingPayment */
 "Payment Sent" = "Pago enviado";
 
+/* Explanation for 'Randomize upload delays' toggle */
+"Payments are uploaded to the cloud immediately upon completion." = "Los pagos se cargan en la nube inmediatamente después de su finalización.";
+
 /* timestamp string for pending transaction */
 "pending" = "Pendiente";
 
@@ -561,6 +663,9 @@
 /* Error message in LockView */
 "Please enabled Face ID" = "Habilite Face ID";
 
+/* No comment provided by engineer. */
+"Please restart Phoenix" = "Reinicia Phoenix";
+
 /* Currency name: PLN */
 "Polish Zloty" = "Zloty polaco";
 
@@ -569,6 +674,12 @@
 
 /* Connection info */
 "Random server" = "Servidor aleatorio";
+
+/* No comment provided by engineer. */
+"Randomize upload delays" = "Usar retrasos aleatorios de cargas";
+
+/* No comment provided by engineer. */
+"Randomized upload delay" = "Usar retrasos aleatorios de carga";
 
 /* Label in DetailsView_IncomingPayment */
 "reason" = "Razón";
@@ -592,6 +703,9 @@
 "Recovery Seed" = "Frase de recuperación";
 
 /* No comment provided by engineer. */
+"Requesting Swap-In Address..." = "Solicitando dirección de intercambio…";
+
+/* No comment provided by engineer. */
 "Require Face ID" = "Requiere Face ID";
 
 /* No comment provided by engineer. */
@@ -600,8 +714,17 @@
 /* Navigation bar title */
 "Restore my wallet" = "Restaurar mi billetera";
 
+/* Currency name: RON */
+"Romanian Leu" = "Leu romano";
+
 /* Currency name: RUB */
 "Russian Ruble" = "Rublo ruso";
+
+/* No comment provided by engineer. */
+"Satoshis are often preferred because it's easier to work with whole numbers rather than fractions." = "A menudo se prefieren los Satoshis porque es más fácil trabajar con números enteros que con fracciones.";
+
+/* No comment provided by engineer. */
+"Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "Guárdelo en un lugar seguro (no en este teléfono). Si pierde su semilla y su teléfono, ha perdido sus fondos.";
 
 /* Navigation bar title */
 "Scan a QR code" = "Escanea un código QR";
@@ -646,7 +769,10 @@
 "Share" = "Compartir";
 
 /* No comment provided by engineer. */
-"Share channel list" = "Compartir lista de canales";
+"Share Image" = "Compartir imagen";
+
+/* No comment provided by engineer. */
+"Share Text" = "Compartir texto";
 
 /* No comment provided by engineer. */
 "Share the logs" = "Compartir registros";
@@ -654,8 +780,14 @@
 /* No comment provided by engineer. */
 "Show a Bitcoin address" = "Mostrar una dirección de Bitcoin";
 
+/* No comment provided by engineer. */
+"Sign into iCloud to backup your payments" = "Inicie sesión en iCloud para hacer una copia de seguridad de sus pagos";
+
 /* Currency name: SGD */
 "Singapore Dollar" = "Dólar de Singapur";
+
+/* No comment provided by engineer. */
+"Skip" = "Saltar";
 
 /* No comment provided by engineer. */
 "Some Services Disabled" = "Algunos servicios están deshabilitados";
@@ -687,6 +819,9 @@
 /* Currency name: TWD */
 "Taiwan New Dollar" = "Nuevo dólar de Taiwán";
 
+/* No comment provided by engineer. */
+"Terminate App" = "Terminar aplicación";
+
 /* Currency name: THB */
 "Thai Baht" = "Baht tailandés";
 
@@ -704,6 +839,9 @@
 
 /* label text */
 "The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "La transacción de cierre está en su lista de transacciones en la pantalla __principal__. Y puede ver el estado de sus canales en la opción __lista de canales__.";
+
+/* No comment provided by engineer. */
+"The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "Los datos almacenados en la nube están encriptados y solo se pueden desencriptar con su semilla.";
 
 /* IntroView */
 "The fee is **%@%%** with a minimum fee of **%@**." = "La tarifa es **%@%%** con una tarifa mínima **%@** ";
@@ -820,7 +958,22 @@
 "Unlock your seed." = "Desbloquea tu semilla";
 
 /* No comment provided by engineer. */
+"Updating cloud" = "Actualización de la nube";
+
+/* No comment provided by engineer. */
+"Uploading payments" = "Subiendo pagos";
+
+/* Explanation for 'Use cellular data' toggle */
+"Uploads can occur over cellular connections." = "Las cargas pueden ocurrir a través de conexiones celulares.";
+
+/* Explanation for 'Use cellular data' toggle */
+"Uploads will only occur over WiFi." = "Las cargas solo se realizarán a través de WiFi.";
+
+/* No comment provided by engineer. */
 "Use a custom server" = "Utilice un servidor personalizado";
+
+/* No comment provided by engineer. */
+"Use cellular data" = "Utilizar datos moviles";
 
 /* CloseChannelsView */
 "Use this feature to transfer __all__ your funds to a Bitcoin address." = "Utilice esta función para transferir __todos__ sus fondos a una dirección Bitcoin.";
@@ -835,6 +988,12 @@
 "waiting for internet" = "Esperando internet";
 
 /* No comment provided by engineer. */
+"Waiting for internet" = "Esperando internet";
+
+/* No comment provided by engineer. */
+"Waiting..." = "Esperando…";
+
+/* No comment provided by engineer. */
 "Warning" = "Advertencia";
 
 /* No comment provided by engineer. */
@@ -844,6 +1003,12 @@
 "Will connect to:" = "Se conectará a:";
 
 /* No comment provided by engineer. */
+"Will disable cloud syncing" = "Se deshabilitará la sincronización en la nube";
+
+/* No comment provided by engineer. */
+"Will enable cloud syncing" = "Se habilitará la sincronización en la nube";
+
+/* No comment provided by engineer. */
 "With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "Con Phoenix, recibir y enviar Bitcoins es seguro, rápido y fácil.";
 
 /* No comment provided by engineer. */
@@ -851,6 +1016,9 @@
 
 /* No comment provided by engineer. */
 "Yes" = "Si";
+
+/* No comment provided by engineer. */
+"You are responsible for backing up your seed." = "Eres responsable de hacer una copia de seguridad de tu semilla.";
 
 /* CloseChannelsView
    ForceCloseChannelsView */
@@ -885,6 +1053,15 @@
 
 /* No comment provided by engineer. */
 "Your Node ID:" = "Su ID de Nodo:";
+
+/* No comment provided by engineer. */
+"Your payment history is only stored on this device." = "Su historial de pagos solo se almacena en este dispositivo.";
+
+/* No comment provided by engineer. */
+"Your payment history will be stored in iCloud." = "Su historial de pagos se almacenará en iCloud.";
+
+/* Minimum amount description. */
+"Your wallet is empty. The first payment you receive must be at least **%@**." = "Tu billetera está vacía. El primer pago que reciba debe ser de al menos **% @ **.";
 
 /* No comment provided by engineer. */
 "Your wallet's seed is a list of 12 english words." = "La semilla de su billetera es una lista de 12 palabras en inglés.";

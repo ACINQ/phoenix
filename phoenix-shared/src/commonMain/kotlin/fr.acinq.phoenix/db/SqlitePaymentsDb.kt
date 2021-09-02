@@ -46,9 +46,11 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         outgoing_paymentsAdapter = Outgoing_payments.Adapter(status_typeAdapter = EnumColumnAdapter(), details_typeAdapter = EnumColumnAdapter()),
         incoming_paymentsAdapter = Incoming_payments.Adapter(origin_typeAdapter = EnumColumnAdapter(), received_with_typeAdapter = EnumColumnAdapter())
     )
-    internal val inQueries = IncomingQueries(database.incomingPaymentsQueries)
-    private val outQueries = OutgoingQueries(database.outgoingPaymentsQueries)
+    internal val inQueries = IncomingQueries(database)
+    internal val outQueries = OutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
+
+    public val cloudKitDb = makeCloudKitDb(database)
 
     override suspend fun addOutgoingParts(parentId: UUID, parts: List<OutgoingPayment.Part>) {
         withContext(Dispatchers.Default) {
@@ -248,3 +250,28 @@ data class WalletPaymentOrderRow(
         return "${id.identifier}|${createdAt}|"
     }
 }
+
+sealed class PaymentRowId {
+    companion object {/* allow static extensions */}
+
+    data class IncomingPaymentId(val paymentHash: ByteVector32): PaymentRowId() {
+      companion object {/* allow static extensions */}
+    }
+    data class OutgoingPaymentId(val id: UUID): PaymentRowId() {
+        companion object {/* allow static extensions */}
+    }
+}
+
+/// Implement this function to execute platform specific code when a payment completes.
+/// For example, on iOS this is used to enqueue the (encrypted) payment for upload to CloudKit.
+///
+/// Important:
+///   This function is invoked inside the same transaction used to add/modify the row.
+///   This means any database operations performed in this function are atomic,
+///   with respect to the referenced row.
+///
+expect fun didCompletePaymentRow(id: PaymentRowId, database: PaymentsDatabase): Unit
+
+/// Implemented on Apple platforms with support for CloudKit.
+///
+expect fun makeCloudKitDb(database: PaymentsDatabase): CloudKitInterface?

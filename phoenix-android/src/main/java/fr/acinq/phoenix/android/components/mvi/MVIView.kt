@@ -20,8 +20,8 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.ctrl.ControllerFactory
-import fr.acinq.phoenix.ctrl.MVI
+import fr.acinq.phoenix.controllers.ControllerFactory
+import fr.acinq.phoenix.controllers.MVI
 
 
 /** Get a composable view that refreshes when the controller's model updates. Uses a generic view model. */

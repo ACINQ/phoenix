@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "CircularCheckmarkProgress",
+        "repositoryURL": "https://github.com/kiliankoe/CircularCheckmarkProgress.git",
+        "state": {
+          "branch": null,
+          "revision": "cffe67e293c6493a489d434e52a19e5627bd904e",
+          "version": "0.4.1"
+        }
+      },
+      {
         "package": "DYPopoverView",
         "repositoryURL": "https://github.com/DominikButz/DYPopoverView.git",
         "state": {

@@ -194,11 +194,11 @@ fileprivate struct SummaryView: View {
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
 					
-					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+					Text(verbatim: isOutgoing ? "-" : "+")
 						.font(.largeTitle)
 						.foregroundColor(Color.secondary)
 						.onTapGesture { toggleCurrencyType() }
-					Text(verbatim: "\(amount.integerDigits)")
+					Text(verbatim: amount.integerDigits)
 						.font(.largeTitle)
 						.onTapGesture { toggleCurrencyType() }
 					Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
@@ -208,7 +208,7 @@ fileprivate struct SummaryView: View {
 						.foregroundColor(Color.secondary)
 						.onTapGesture { toggleCurrencyType() }
 						.padding(.trailing, 6)
-					Text(amount.type)
+					Text(verbatim: amount.type)
 						.font(.title3)
 						.foregroundColor(Color.appAccent)
 						.padding(.bottom, 4)
@@ -216,7 +216,7 @@ fileprivate struct SummaryView: View {
 					
 				} else {
 					
-					Text(verbatim: "\(isOutgoing ? "-" : "+")")
+					Text(verbatim: isOutgoing ? "-" : "+")
 						.font(.largeTitle)
 						.foregroundColor(Color.secondary)
 						.onTapGesture { toggleCurrencyType() }

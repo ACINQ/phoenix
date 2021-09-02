@@ -255,7 +255,7 @@ struct ScanView: View, ViewName {
 		}
 		
 		ignoreScanner = true
-		popoverState.display.send(PopoverItem(
+		popoverState.display(dismissable: false) {
 			
 			DangerousInvoiceAlert(
 				model: model,
@@ -263,9 +263,8 @@ struct ScanView: View, ViewName {
 				paymentRequest: paymentRequest,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
-			).anyView,
-			dismissable: false
-		))
+			)
+		}
 	}
 }
 
@@ -371,7 +370,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		isShowing = false
 		ignoreScanner = false
-		popoverState.close.send()
+		popoverState.close()
 	}
 	
 	func didConfirm() -> Void {
@@ -379,7 +378,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 		
 		isShowing = false
 		postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
-		popoverState.close.send()
+		popoverState.close()
 	}
 }
 
@@ -390,7 +389,7 @@ struct ValidateView: View, ViewName {
 
 	@State var number: Double = 0.0
 	
-	@State var unit: CurrencyUnit = CurrencyUnit(bitcoinUnit: BitcoinUnit.sat)
+	@State var unit = Currency.bitcoin(.sat)
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -398,7 +397,7 @@ struct ValidateView: View, ViewName {
 	@State var isInvalidAmount: Bool = false
 	@State var isExpiredInvoice: Bool = false
 	
-	@StateObject var connectionsMonitor = ObservableConnectionsMonitor()
+	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -415,13 +414,13 @@ struct ValidateView: View, ViewName {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsMonitor.connections.internet != Lightning_kmpConnection.established {
+		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsMonitor.connections.peer != Lightning_kmpConnection.established {
+		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsMonitor.connections.electrum != Lightning_kmpConnection.established {
+		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
@@ -429,7 +428,7 @@ struct ValidateView: View, ViewName {
 	
 	var body: some View {
 		
-		let isDisconnected = connectionsMonitor.connections.global != .established
+		let isDisconnected = connectionsManager.connections.global != .established
 		ZStack {
 		
 			Color.primaryBackground
@@ -463,7 +462,7 @@ struct ValidateView: View, ViewName {
 						.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
 				
 					Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
-						let options = CurrencyUnit.displayable(currencyPrefs: currencyPrefs)
+						let options = Currency.displayable(currencyPrefs: currencyPrefs)
 						ForEach(0 ..< options.count) {
 							let option = options[$0]
 							Text(option.abbrev).tag(option)
@@ -517,7 +516,7 @@ struct ValidateView: View, ViewName {
 				if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
 					
 					Button {
-						showConnectionsPopover()
+						showAppStatusPopover()
 					} label: {
 						HStack {
 							ProgressView()
@@ -553,7 +552,7 @@ struct ValidateView: View, ViewName {
 		log.trace("[\(viewName)] onAppear()")
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
-		unit = CurrencyUnit(bitcoinUnit: bitcoinUnit)
+		unit = Currency.bitcoin(bitcoinUnit)
 		
 		if let msat_kotlin = model.amountMsat {
 			let msat = Int64(truncating: msat_kotlin)
@@ -615,7 +614,8 @@ struct ValidateView: View, ViewName {
 			var msat: Int64? = nil
 			var alt: FormattedAmount? = nil
 			
-			if let bitcoinUnit = unit.bitcoinUnit {
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
 				// amt    => bitcoinUnit
 				// altAmt => fiatCurrency
 				
@@ -628,8 +628,7 @@ struct ValidateView: View, ViewName {
 					// We don't know the exchange rate, so we can't display fiat value.
 					altAmount = ""
 				}
-				
-			} else if let fiatCurrency = unit.fiatCurrency {
+			case .fiat(let fiatCurrency):
 				// amt    => fiatCurrency
 				// altAmt => bitcoinUnit
 				
@@ -640,7 +639,7 @@ struct ValidateView: View, ViewName {
 					
 				} else {
 					// We don't know the exchange rate !
-					// We shouldn't get into this state since CurrencyUnit.displayable() already filters for this.
+					// We shouldn't get into this state since Currency.displayable() already filters for this.
 					altAmount = ""
 				}
 			}
@@ -679,27 +678,33 @@ struct ValidateView: View, ViewName {
 			return
 		}
 		
-		if let bitcoinUnit = unit.bitcoinUnit {
-
-            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit))
-			postIntent(Scan.IntentSend(request: model.request, amount: msat))
+		switch unit {
+		case .bitcoin(let bitcoinUnit):
+			let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+			postIntent(Scan.IntentSend(
+				request: model.request,
+				amount: Lightning_kmpMilliSatoshi(msat: msat)
+			))
 			
-		} else if let fiatCurrency = unit.fiatCurrency,
-		          let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
-		{
-            let msat = Lightning_kmpMilliSatoshi(msat: Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate))
-			postIntent(Scan.IntentSend(request: model.request, amount: msat))
+		case .fiat(let fiatCurrency):
+			
+			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				
+				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+				postIntent(Scan.IntentSend(
+					request: model.request,
+					amount: Lightning_kmpMilliSatoshi(msat: msat)
+				))
+			}
 		}
 	}
 	
-	func showConnectionsPopover() -> Void {
-		log.trace("[\(viewName)] showConnectionsPopover()")
+	func showAppStatusPopover() -> Void {
+		log.trace("[\(viewName)] showAppStatusPopover()")
 		
-		popoverState.display.send(PopoverItem(
-			
-			ConnectionsPopover().anyView,
-			dismissable: true
-		))
+		popoverState.display(dismissable: true) {
+			AppStatusPopover()
+		}
 	}
 }
 

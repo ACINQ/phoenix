@@ -140,7 +140,7 @@ struct InitializationView: MVIView {
 		log.trace("createMnemonics()")
 		
 		let swiftEntropy = AppSecurity.shared.generateEntropy()
-		let kotlinEntropy = KotlinByteArray.fromSwiftData(swiftEntropy)
+		let kotlinEntropy = swiftEntropy.toKotlinByteArray()
 		
 		let intent = Initialization.IntentGenerateWallet(entropy: kotlinEntropy)
 		mvi.intent(intent)

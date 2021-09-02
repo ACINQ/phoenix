@@ -8,12 +8,14 @@ import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
 
 
-sealed class Chain(val name: String, val chainHash: ByteVector32) {
-    object Regtest: Chain("Regtest", Block.LivenetGenesisBlock.hash)
-    object Testnet: Chain("Testnet", Block.LivenetGenesisBlock.hash)
-    object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock.hash)
+sealed class Chain(val name: String, val block: Block) {
+    object Regtest: Chain("Regtest", Block.RegtestGenesisBlock)
+    object Testnet: Chain("Testnet", Block.TestnetGenesisBlock)
+    object Mainnet: Chain("Mainnet", Block.LivenetGenesisBlock)
     fun isMainnet(): Boolean = this is Mainnet
     fun isTestnet(): Boolean = this is Testnet
+
+    val chainHash by lazy { block.hash }
 }
 
 interface CurrencyUnit

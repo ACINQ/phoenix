@@ -22,9 +22,14 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
 import fr.acinq.phoenix.db.IncomingPaymentNotFound
+import fr.acinq.phoenix.db.PaymentRowId
+import fr.acinq.phoenix.db.PaymentsDatabase
+import fr.acinq.phoenix.db.didCompletePaymentRow
 import fracinqphoenixdb.IncomingPaymentsQueries
 
-class IncomingQueries(private val queries: IncomingPaymentsQueries) {
+class IncomingQueries(private val database: PaymentsDatabase) {
+
+    private val queries = database.incomingPaymentsQueries
 
     fun addIncomingPayment(preimage: ByteVector32, origin: IncomingPayment.Origin, createdAt: Long) {
         val (originType, originData) = origin.mapToDb()
@@ -38,9 +43,11 @@ class IncomingQueries(private val queries: IncomingPaymentsQueries) {
     }
 
     fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {
-        queries.transaction {
-            val existingReceivedWith: Set<IncomingPayment.ReceivedWith> = queries.get(payment_hash = paymentHash.toByteArray(), ::mapIncomingPayment)
-                .executeAsOneOrNull()?.received?.receivedWith ?: emptySet()
+        database.transaction {
+            val existingReceivedWith: Set<IncomingPayment.ReceivedWith> = queries.get(
+                payment_hash = paymentHash.toByteArray(),
+                mapper = ::mapIncomingPayment
+            ).executeAsOneOrNull()?.received?.receivedWith ?: emptySet()
             val (receivedWithType, receivedWithBlob) = (existingReceivedWith + receivedWith).mapToDb() ?: null to null
             queries.updateReceived(
                 received_at = receivedAt,
@@ -48,13 +55,19 @@ class IncomingQueries(private val queries: IncomingPaymentsQueries) {
                 received_with_blob = receivedWithBlob,
                 payment_hash = paymentHash.toByteArray()
             )
-            if (queries.changes().executeAsOne() != 1L) throw IncomingPaymentNotFound(paymentHash)
+            if (queries.changes().executeAsOne() != 1L) {
+                throw IncomingPaymentNotFound(paymentHash)
+            }
+            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
         }
     }
 
     fun updateNewChannelReceivedWithChannelId(paymentHash: ByteVector32, channelId: ByteVector32) {
-        queries.transaction {
-            val paymentInDb: IncomingPayment? = queries.get(payment_hash = paymentHash.toByteArray(), ::mapIncomingPayment).executeAsOneOrNull()
+        database.transaction {
+            val paymentInDb: IncomingPayment? = queries.get(
+                payment_hash = paymentHash.toByteArray(),
+                mapper = ::mapIncomingPayment
+            ).executeAsOneOrNull()
             val (receivedWithType, receivedWithBlob) = paymentInDb?.received?.receivedWith?.map {
                 when (it) {
                     is IncomingPayment.ReceivedWith.NewChannel -> it.copy(channelId = channelId)
@@ -67,23 +80,36 @@ class IncomingQueries(private val queries: IncomingPaymentsQueries) {
                 received_with_blob = receivedWithBlob,
                 payment_hash = paymentHash.toByteArray()
             )
-            if (queries.changes().executeAsOne() != 1L) throw IncomingPaymentNotFound(paymentHash)
+            if (queries.changes().executeAsOne() != 1L) {
+                throw IncomingPaymentNotFound(paymentHash)
+            }
+            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
         }
     }
 
-    fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, receivedWith: Set<IncomingPayment.ReceivedWith>, createdAt: Long, receivedAt: Long) {
-        val (originType, originData) = origin.mapToDb()
-        val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: null to null
-        queries.insertAndReceive(
-            payment_hash = Crypto.sha256(preimage).toByteVector32().toByteArray(),
-            preimage = preimage.toByteArray(),
-            origin_type = originType,
-            origin_blob = originData,
-            received_at = receivedAt,
-            received_with_type = receivedWithType,
-            received_with_blob = receivedWithBlob,
-            created_at = createdAt
-        )
+    fun addAndReceivePayment(
+        preimage: ByteVector32,
+        origin: IncomingPayment.Origin,
+        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        createdAt: Long,
+        receivedAt: Long
+    ) {
+        database.transaction {
+            val paymentHash = Crypto.sha256(preimage).toByteVector32()
+            val (originType, originData) = origin.mapToDb()
+            val (receivedWithType, receivedWithBlob) = receivedWith.mapToDb() ?: null to null
+            queries.insertAndReceive(
+                payment_hash = paymentHash.toByteArray(),
+                preimage = preimage.toByteArray(),
+                origin_type = originType,
+                origin_blob = originData,
+                received_at = receivedAt,
+                received_with_type = receivedWithType,
+                received_with_blob = receivedWithBlob,
+                created_at = createdAt
+            )
+            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
+        }
     }
 
     fun getIncomingPayment(paymentHash: ByteVector32): IncomingPayment? {

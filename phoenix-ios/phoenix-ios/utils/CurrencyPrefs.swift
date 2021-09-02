@@ -15,13 +15,21 @@ class CurrencyPrefs: ObservableObject {
 	@Published var bitcoinUnit: BitcoinUnit
 	
 	@Published var fiatExchangeRates: [BitcoinPriceRate] = []
-    private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
+	private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
+	
+	var currency: Currency {
+		switch currencyType {
+		case .bitcoin:
+			return Currency.bitcoin(bitcoinUnit)
+		case .fiat:
+			return Currency.fiat(fiatCurrency)
+		}
+	}
 	
 	private var cancellables = Set<AnyCancellable>()
 	private var unsubscribe: (() -> Void)? = nil
 	
-	private var currencyTypeTimer: Timer? = nil
-	private var currencyTypeNeedsSave: Bool = false
+	private var currencyTypeDelayedSave = DelayedSave()
 
 	init() {
 		currencyType = Prefs.shared.currencyType
@@ -47,11 +55,6 @@ class CurrencyPrefs: ObservableObject {
 				self?.fiatExchangeRates = rates
 			}
 		}
-		
-		let nc = NotificationCenter.default
-		nc.publisher(for: UIApplication.willResignActiveNotification).sink {[weak self] _ in
-			self?.saveCurrencyTypeIfNeeded()
-		}.store(in: &cancellables)
 	}
 	
 	private init(
@@ -64,31 +67,33 @@ class CurrencyPrefs: ObservableObject {
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
 		
-		let exchangeRate = BitcoinPriceRate(fiatCurrency: fiatCurrency, price: exchangeRate, source: "", timestampMillis: 0)
+		let exchangeRate = BitcoinPriceRate(
+			fiatCurrency: fiatCurrency,
+			price: exchangeRate,
+			source: "",
+			timestampMillis: 0
+		)
 		fiatExchangeRates.append(exchangeRate)
 	}
 	
 	deinit {
 		unsubscribe?()
-		currencyTypeTimer?.invalidate()
-        fiatExchangeRatesWatcher?.close()
+		fiatExchangeRatesWatcher?.close()
 	}
 	
 	func toggleCurrencyType() -> Void {
 		
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
+		currencyType = (currencyType == .fiat) ? .bitcoin : .fiat
+		
 		// I don't really want to save the currencyType to disk everytime the user changes it.
 		// Because users tend to toggle back and forth often.
 		// So we're using a timer, plus a listener on applicationWillResignActive.
-		
-		currencyType = (currencyType == .fiat) ? .bitcoin : .fiat
-		currencyTypeNeedsSave = true
-		
-		currencyTypeTimer?.invalidate()
-		currencyTypeTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: false, block: {[weak self] _ in
-			self?.saveCurrencyTypeIfNeeded()
-		})
+		//
+		currencyTypeDelayedSave.save(withDelay: 10.0) {
+			Prefs.shared.currencyType = self.currencyType
+		}
 	}
 	
 	/// Returns the exchangeRate for the currently set fiatCurrency.
@@ -104,18 +109,6 @@ class CurrencyPrefs: ObservableObject {
 		
 		return self.fiatExchangeRates.first { rate -> Bool in
 			return (rate.fiatCurrency == fiatCurrency)
-		}
-	}
-	
-	private func saveCurrencyTypeIfNeeded() -> Void {
-		
-		if currencyTypeNeedsSave {
-			currencyTypeNeedsSave = false
-			
-			Prefs.shared.currencyType = self.currencyType
-			
-			currencyTypeTimer?.invalidate()
-			currencyTypeTimer = nil
 		}
 	}
 	

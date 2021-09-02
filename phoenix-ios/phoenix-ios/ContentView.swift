@@ -30,6 +30,9 @@ struct ContentView: MVIView {
 	@ObservedObject var lockState: LockState
 	@State var unlockedOnce = false
 	
+	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	@State private var shortSheetItem: ShortSheetItem? = nil
+	
 	@Environment(\.popoverState) private var popoverState: PopoverState
 	@State private var popoverItem: PopoverItem? = nil
 	
@@ -46,11 +49,18 @@ struct ContentView: MVIView {
 						unlockedOnce = true
 					}
 
+				if let shortSheetItem = shortSheetItem {
+					ShortSheetWrapper(dismissable: shortSheetItem.dismissable) {
+						shortSheetItem.view
+					}
+					.zIndex(1) // needed for proper animation
+				}
+				
 				if let popoverItem = popoverItem {
 					PopoverWrapper(dismissable: popoverItem.dismissable) {
 						popoverItem.view
 					}
-					.zIndex(1) // needed for proper animation
+					.zIndex(2) // needed for proper animation
 				}
 			
 			} else { // prior to first unlock
@@ -58,7 +68,7 @@ struct ContentView: MVIView {
 				NavigationView {
 					loadingView()
 				}
-				.zIndex(2) // needed for proper animation
+				.zIndex(3) // needed for proper animation
 				.transition(.asymmetric(
 					insertion : .identity,
 					removal   : .opacity
@@ -67,14 +77,14 @@ struct ContentView: MVIView {
 			
 		} // </ZStack>
 		.modifier(GlobalEnvironment())
-		.onReceive(popoverState.display) { (newPopoverItem: PopoverItem) in
+		.onReceive(shortSheetState.publisher) { (item: ShortSheetItem?) in
 			withAnimation {
-				popoverItem = newPopoverItem
+				shortSheetItem = item
 			}
 		}
-		.onReceive(popoverState.close) { _ in
+		.onReceive(popoverState.publisher) { (item: PopoverItem?) in
 			withAnimation {
-				popoverItem = nil
+				popoverItem = item
 			}
 		}
 	}

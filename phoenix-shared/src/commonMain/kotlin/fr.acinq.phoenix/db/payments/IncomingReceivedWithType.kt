@@ -25,7 +25,6 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.SetSerializer
-import kotlinx.serialization.json.Json
 
 
 enum class IncomingReceivedWithTypeVersion {
@@ -45,18 +44,24 @@ sealed class IncomingReceivedWithData {
     @Deprecated("Not used anymore, received-with is now a list of payment parts")
     sealed class NewChannel : IncomingReceivedWithData() {
         @Serializable
-        data class V0(val fees: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32?) : NewChannel()
+        @Suppress("DEPRECATION")
+        data class V0(
+            val fees: MilliSatoshi,
+            @Serializable(with = ByteVector32KSerializer::class)
+            val channelId: ByteVector32?
+        ) : NewChannel()
     }
 
     @Deprecated("Not used anymore, received-with is now a list of payment parts")
     sealed class LightningPayment : IncomingReceivedWithData() {
         @Serializable
         @SerialName("LIGHTNING_PAYMENT_V0")
+        @Suppress("DEPRECATION")
         object V0 : LightningPayment()
     }
 
     @Serializable
-    abstract sealed class Part : IncomingReceivedWithData() {
+    sealed class Part : IncomingReceivedWithData() {
         sealed class Htlc : Part() {
             @Serializable
             data class V0(val amount: MilliSatoshi, @Serializable(with = ByteVector32KSerializer::class) val channelId: ByteVector32, val htlcId: Long) : Htlc()
@@ -83,6 +88,7 @@ sealed class IncomingReceivedWithData {
             amount: MilliSatoshi?,
             originTypeVersion: IncomingOriginTypeVersion
         ) = DbTypesHelper.decodeBlob(blob) { json, format ->
+            @Suppress("DEPRECATION")
             when (typeVersion) {
                 IncomingReceivedWithTypeVersion.LIGHTNING_PAYMENT_V0 -> setOf(IncomingPayment.ReceivedWith.LightningPayment(amount ?: 0.msat, ByteVector32.Zeroes, 0L))
                 IncomingReceivedWithTypeVersion.NEW_CHANNEL_V0 -> setOf(format.decodeFromString<NewChannel.V0>(json).let { IncomingPayment.ReceivedWith.NewChannel(amount ?: 0.msat, it.fees, it.channelId) })

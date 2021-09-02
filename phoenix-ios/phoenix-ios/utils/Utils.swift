@@ -99,17 +99,14 @@ class Utils {
 			return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, hideMsats: hideMsats)
 		} else {
 			let selectedFiat = currencyPrefs.fiatCurrency
-			let exchangeRate = currencyPrefs.fiatExchangeRates.first { rate -> Bool in
-				return (rate.fiatCurrency == selectedFiat)
-			}
-			
-			if let exchangeRate = exchangeRate {
+			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: selectedFiat) {
 				return formatFiat(msat: msat, exchangeRate: exchangeRate)
 			} else {
+				let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
 				return FormattedAmount(
-					digits: "?.??",
-					type: selectedFiat.shortName,
-					decimalSeparator: NumberFormatter().currencyDecimalSeparator
+					currency: Currency.fiat(selectedFiat),
+					digits: "?\(decimalSeparator)??",
+					decimalSeparator: decimalSeparator
 				)
 			}
 		}
@@ -225,8 +222,8 @@ class Utils {
 		}
 		
 		let formattedAmount = FormattedAmount(
+			currency: Currency.bitcoin(bitcoinUnit),
 			digits: digits,
-			type: bitcoinUnit.shortName,
 			decimalSeparator: formatter.decimalSeparator
 		)
 		
@@ -336,8 +333,8 @@ class Utils {
 		}
 		
 		return FormattedAmount(
+			currency: Currency.fiat(exchangeRate.fiatCurrency),
 			digits: digits,
-			type: exchangeRate.fiatCurrency.shortName,
 			decimalSeparator: formatter.currencyDecimalSeparator
 		)
 	}

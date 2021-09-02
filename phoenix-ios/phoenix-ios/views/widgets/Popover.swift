@@ -8,42 +8,43 @@ import Combine
 ///
 /// When you want to display a popover:
 /// ```
-/// popoverState.display.send(PopoverItem(
-///
-///    YourPopoverView().anyView,
-///    dismissable: false
-/// ))
+/// popoverState.display.send(dismissable: false) {
+///    YourPopoverView()
+/// }
 /// ```
 ///
 /// When you want to dismiss the popover:
 /// ```
-/// popoverState.close.send()
+/// popoverState.close()
 /// ```
 ///
 public class PopoverState: ObservableObject {
 
-	/// When you want to present a popover, just send it through this signal
-	public var display = PassthroughSubject<PopoverItem, Never>()
+	public var publisher = PassthroughSubject<PopoverItem?, Never>()
 	
-	/// When you want to close the popover, just send an update on this signal
-	public var close = PassthroughSubject<Void, Never>()
+	func display<Content: View>(dismissable: Bool, @ViewBuilder builder: () -> Content) {
+		publisher.send(PopoverItem(
+			dismissable: dismissable,
+			view: builder().anyView
+		))
+
+	}
+	
+	func close() {
+		publisher.send(nil)
+	}
 }
 
 /// Encompasses the view & options for the popover.
 ///
 public struct PopoverItem {
 	
-	/// The view to be displayed in the popover window.
-	/// (Use the View.anyView extension function.)
-	let view: AnyView
-	
 	/// Whether or not the popover is dimissable by clicking outside the popover.
 	let dismissable: Bool
 	
-	init(_ view: AnyView, dismissable: Bool/* purposefully non-optional parameter */) {
-		self.view = view
-		self.dismissable = dismissable
-	}
+	/// The view to be displayed in the popover window.
+	/// (Use the View.anyView extension function.)
+	let view: AnyView
 }
 
 struct PopoverEnvironmentKey: EnvironmentKey {
@@ -91,7 +92,7 @@ struct PopoverWrapper<Content: View>: View {
 				.edgesIgnoringSafeArea(.all)
 				.onTapGesture {
 					if dismissable {
-						popoverState.close.send()
+						popoverState.close()
 					}
 				}
 		)

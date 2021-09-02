@@ -10,6 +10,12 @@ import PhoenixShared
 ///
 struct FormattedAmount {
 	
+	// The currency type. E.g.:
+	// - .bitcoin(.sat)
+	// - .fiat(.usd)
+	//
+	let currency: Currency
+	
 	/// Only the digits. E.g. "12,345.6789"
 	///
 	/// The value will be formatted for the current locale. E.g.:
@@ -19,15 +25,17 @@ struct FormattedAmount {
 	///
 	let digits: String
 	
-	/// The currency type. E.g. "USD" or "btc"
-	///
-	let type: String
-	
 	/// The locale-specific separator between the integerDigits & fractionDigits.
 	/// If you're doing custom formatting between the two,
 	/// be sure that you use this value. Don't assume it's a dot !
 	///
 	let decimalSeparator: String
+	
+	/// The currency type. E.g. "USD" or "btc"
+	///
+	var type: String {
+		return currency.abbrev
+	}
 	
 	/// The standard string value as typically displayed in the app. E.g.: "42,526 sat"
 	///
@@ -138,8 +146,8 @@ extension FormattedAmount {
 			self.integerDigits + self.decimalSeparator + betterFractionDigits
 		
 		return FormattedAmount(
+			currency: self.currency,
 			digits: betterDigits,
-			type: self.type,
 			decimalSeparator: self.decimalSeparator
 		)
 	}

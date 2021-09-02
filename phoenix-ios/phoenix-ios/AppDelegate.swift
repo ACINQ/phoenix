@@ -37,6 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	let business: PhoenixBusiness
 	
+	private var _syncManager: SyncManager? = nil
+	var syncManager: SyncManager? {
+		_syncManager
+	}
+	
 	private var walletLoaded = false
 	private var fcmToken: String? = nil
 	private var peerConnection: Lightning_kmpConnection? = nil
@@ -105,8 +110,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Connections observer
-		let connectionsMonitor = business.connectionsMonitor
-		connectionsMonitor.publisher.sink {(connections: Connections) in
+		let connectionsManager = business.connectionsManager
+		connectionsManager.publisher.sink {(connections: Connections) in
 			self.connectionsChanged(connections)
 		}.store(in: &cancellables)
 		
@@ -116,7 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		return true
-    }
+	}
 	
 	/// This function isn't called, because Firebase broke it with their stupid swizzling stuff.
 	func applicationDidBecomeActive(_ application: UIApplication) {/* :( */}
@@ -634,6 +639,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	func loadWallet(mnemonics: [String]) -> Void {
 		log.trace("loadWallet(mnemonics:)")
+		assertMainThread()
 		
 		let seed = business.prepWallet(mnemonics: mnemonics, passphrase: "")
 		loadWallet(seed: seed)
@@ -644,10 +650,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		assertMainThread()
 		
 		if !walletLoaded {
-			business.loadWallet(seed: seed)
+			let cloudInfo = business.loadWallet(seed: seed)
 			walletLoaded = true
 			maybeRegisterFcmToken()
 			setupActivePaymentsListener()
+			
+			if let cloudKey = cloudInfo?.first,
+				let encryptedNodeId = cloudInfo?.second
+			{
+				_syncManager = SyncManager(cloudKey: cloudKey, encryptedNodeId: encryptedNodeId as String)
+			}
 		}
 	}
 	
@@ -838,11 +850,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		// Which means their existing channels are going to get force closed by the server.
 		// So we need to inform the user about what just happened.
 		
-//		popoverState.display.send(PopoverItem(
-//			
-//			PardonOurMess().anyView,
-//			dismissable: false
-//		))
+//		popoverState.display(dismissable: false) {
+//			PardonOurMess()
+//		}
 	}
 	
 	private func removeAppDbFile() {

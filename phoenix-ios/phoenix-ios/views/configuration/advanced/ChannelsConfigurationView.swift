@@ -18,15 +18,34 @@ struct ChannelsConfigurationView: MVIView {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
+	@State var sharing: String? = nil
+	@State var showChannelsRemoteBalance = Prefs.shared.showChannelsRemoteBalance
+	
+	@StateObject var toast = Toast()
+	
 	@ViewBuilder
 	var view: some View {
 		
 		Group {
 			if (mvi.model.channels.isEmpty) {
-				NoChannelsView(model: mvi.model, postIntent: mvi.intent)
+				NoChannelsView(
+					mvi: mvi,
+					sharing: $sharing,
+					showChannelsRemoteBalance: $showChannelsRemoteBalance,
+					toast: toast
+				)
 			} else {
-				ChannelsView(model: mvi.model, postIntent: mvi.intent)
+				ChannelsView(
+					mvi: mvi,
+					sharing: $sharing,
+					showChannelsRemoteBalance: $showChannelsRemoteBalance,
+					toast: toast
+				)
 			}
+		}
+		.sharing($sharing)
+		.onDisappear {
+			onDisappear()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle(
@@ -34,12 +53,20 @@ struct ChannelsConfigurationView: MVIView {
 			displayMode: .inline
 		)
 	}
+	
+	func onDisappear() {
+		log.trace("onDisappear()")
+		
+		Prefs.shared.showChannelsRemoteBalance = showChannelsRemoteBalance
+	}
 }
 
 fileprivate struct NoChannelsView : View {
 	
-	let model: ChannelsConfiguration.Model
-	let postIntent: (ChannelsConfiguration.Intent) -> Void
+	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var sharing: String?
+	@Binding var showChannelsRemoteBalance: Bool
+	@ObservedObject var toast: Toast
 	
 	var body: some View {
 		
@@ -48,18 +75,21 @@ fileprivate struct NoChannelsView : View {
 				.padding()
 			
 			Spacer()
-			FooterView(model: model)
+			FooterView(
+				mvi: mvi,
+				showChannelsRemoteBalance: $showChannelsRemoteBalance,
+				toast: toast
+			)
 		}
 	}
 }
 
 fileprivate struct ChannelsView : View {
 	
-	let model: ChannelsConfiguration.Model
-	let postIntent: (ChannelsConfiguration.Intent) -> Void
-	
-	@State var sharing: String? = nil
-	@StateObject var toast = Toast()
+	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var sharing: String?
+	@Binding var showChannelsRemoteBalance: Bool
+	@ObservedObject var toast: Toast
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
@@ -71,58 +101,86 @@ fileprivate struct ChannelsView : View {
 				
 				ScrollView {
 					LazyVStack(pinnedViews: [.sectionHeaders]) {
-						Section(header: ChannelHeaderView(model: model, sharing: $sharing)) {
-							ForEach(model.channels, id: \.id) { channel in
-								ChannelRowView(
-									channel: channel,
-									sharing: $sharing,
-									toast: toast
-								)
+						Section(header: header()) {
+							ForEach(mvi.model.channels, id: \.id) { channel in
+								row(channel: channel)
 							}
 						}
 					}
 					
 				} // </ScrollView>
 				
-				FooterView(model: model)
+				FooterView(
+					mvi: mvi,
+					showChannelsRemoteBalance: $showChannelsRemoteBalance,
+					toast: toast
+				)
 				
 			} // </VStack>
 			
 			toast.view()
 			
 		} // </ZStack>
+		.navigationBarItems(trailing: shareChannelsButton())
+	}
+	
+	@ViewBuilder
+	func shareChannelsButton() -> some View {
+		
+		Button {
+			sharing = mvi.model.json
+		} label: {
+			Image(systemName: "square.and.arrow.up")
+		}
+	}
+	
+	@ViewBuilder
+	func header() -> some View {
+		
+		ChannelHeaderView(
+			mvi: mvi,
+			sharing: $sharing,
+			showChannelsRemoteBalance: $showChannelsRemoteBalance
+		)
+	}
+	
+	@ViewBuilder
+	func row(channel: ChannelsConfiguration.ModelChannel) -> some View {
+		
+		ChannelRowView(
+			channel: channel,
+			sharing: $sharing,
+			showChannelsRemoteBalance: $showChannelsRemoteBalance,
+			toast: toast
+		)
 	}
 }
 
 struct ChannelHeaderView: View {
 	
-	let model: ChannelsConfiguration.Model
+	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
 	@Binding var sharing: String?
+	@Binding var showChannelsRemoteBalance: Bool
 	
 	@Environment(\.colorScheme) var colorScheme
 	
 	var body: some View {
 		HStack {
 			
-			if model.channels.count == 1 {
+			if mvi.model.channels.count == 1 {
 				Text("1 channel")
 			} else {
 				Text(String(format: NSLocalizedString(
 					"%d channels",
 					comment: "Count != 1"),
-					model.channels.count
+					mvi.model.channels.count
 				))
 			}
 			
 			Spacer()
 			
-			Button {
-				sharing = model.json
-			} label: {
-				Image(systemName: "square.and.arrow.up")
-				Text("Share channel list")
-			}
-			.sharing($sharing)
+			let (numerator, denominator) = balances()
+			Text(verbatim: "\(numerator.digits) / \(denominator.digits) sat")
 		}
 		.frame(maxWidth: .infinity)
 		.padding()
@@ -134,12 +192,37 @@ struct ChannelHeaderView: View {
 			)
 		)
 	}
+	
+	func balances() -> (FormattedAmount, FormattedAmount) {
+		
+		let localSats = mvi.model.channels.map { channel in
+			channel.localBalance?.sat ?? Int64(0)
+		}
+		.reduce(into: Int64(0)) { result, next in
+			result += next
+		}
+		let remoteSats = mvi.model.channels.map { channel in
+			channel.remoteBalance?.sat ?? Int64(0)
+		}
+		.reduce(into: Int64(0)) { result, next in
+			result += next
+		}
+		
+		let numerator_sats = localSats
+		let denominator_sats = showChannelsRemoteBalance ? remoteSats : (localSats + remoteSats)
+		
+		let numerator = Utils.formatBitcoin(sat: numerator_sats, bitcoinUnit: .sat)
+		let denominator = Utils.formatBitcoin(sat: denominator_sats, bitcoinUnit: .sat)
+		
+		return (numerator, denominator)
+	}
 }
 
 fileprivate struct ChannelRowView: View {
 	
 	let channel: ChannelsConfiguration.ModelChannel
 	@Binding var sharing: String?
+	@Binding var showChannelsRemoteBalance: Bool
 	@ObservedObject var toast: Toast
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -164,8 +247,8 @@ fileprivate struct ChannelRowView: View {
 					
 					Spacer()
 					
-					if let c = channel.commitments {
-						Text(verbatim: "\(c.first!) / \(c.second!) sat")
+					if let tuple = balances() {
+						Text(verbatim: "\(tuple.0.digits) / \(tuple.1.digits) sat")
 							.foregroundColor(Color.primary)
 					}
 				}
@@ -178,44 +261,96 @@ fileprivate struct ChannelRowView: View {
 		}
 	}
 	
+	func balances() -> (FormattedAmount, FormattedAmount)? {
+		
+		guard let localSats = channel.localBalance?.sat,
+				let remoteSats = channel.remoteBalance?.sat
+		else {
+			return nil
+		}
+		
+		let numerator_sats = localSats
+		let denominator_sats = showChannelsRemoteBalance ? remoteSats : (localSats + remoteSats)
+		
+		let numerator = Utils.formatBitcoin(sat: numerator_sats, bitcoinUnit: .sat)
+		let denominator = Utils.formatBitcoin(sat: denominator_sats, bitcoinUnit: .sat)
+		
+		return (numerator, denominator)
+	}
+	
 	func showChannelInfoPopover() {
 		log.trace("showChannelInfoPopover()")
 		
-		popoverState.display.send(PopoverItem(
-			
+		popoverState.display(dismissable: true) {
 			ChannelInfoPopup(
 				channel: channel,
 				sharing: $sharing,
 				toast: toast
-			).anyView,
-			dismissable: true
-		))
+			)
+		}
 	}
 }
 
-fileprivate struct FooterView: View {
+fileprivate struct FooterView: View, ViewName {
 	
-	let model: ChannelsConfiguration.Model
+	@ObservedObject var mvi: MVIState<ChannelsConfiguration.Model, ChannelsConfiguration.Intent>
+	@Binding var showChannelsRemoteBalance: Bool
+	@ObservedObject var toast: Toast
 	
 	@Environment(\.colorScheme) var colorScheme
 	
 	var body: some View {
 		
-		VStack(alignment: HorizontalAlignment.leading) {
-			Text("Your Node ID:")
-				.font(.footnote)
-				.padding(.bottom, 1)
+		VStack(alignment: HorizontalAlignment.leading, spacing: 12) {
 			
-			Text(model.nodeId)
-				.font(.footnote)
-				.contextMenu {
-					Button(action: {
-						UIPasteboard.general.string = model.nodeId
-					}) {
-						Text("Copy")
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				
+				Text("Channel Balance Display:")
+					.font(.footnote)
+					.padding(.trailing, 4)
+				
+				Spacer()
+				
+				Button {
+					showChannelsRemoteBalance.toggle()
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+						if showChannelsRemoteBalance {
+							Text("local / remote")
+						} else {
+							Text("local / total")
+						}
+						Image(systemName: "arrow.2.squarepath")
+							.imageScale(.medium)
 					}
+					.font(.footnote)
 				}
-		}
+			}
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				
+				Text("Your Node ID:")
+					.font(.footnote)
+					.padding(.trailing, 4)
+				
+				Spacer()
+				
+				Button {
+					copyNodeID(mvi.model.nodeId)
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 4) {
+						Text(mvi.model.nodeId)
+							.lineLimit(1)
+							.truncationMode(.middle)
+						
+						Image(systemName: "square.on.square")
+							.imageScale(.medium)
+					}
+					.font(.footnote)
+				}
+			} // </HStack>
+			
+		} // </VStack>
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding([.top, .bottom], 10)
 		.padding([.leading, .trailing])
@@ -226,6 +361,16 @@ fileprivate struct FooterView: View {
 				: UIColor.secondarySystemGroupedBackground
 			)
 			.edgesIgnoringSafeArea(.bottom)
+		)
+	}
+	
+	func copyNodeID(_ nodeID: String) {
+		log.trace("[\(viewName)] copyNodeID")
+		
+		UIPasteboard.general.string = nodeID
+		toast.pop(
+			Text("Copied to pasteboard!").anyView,
+			colorScheme: colorScheme.opposite
 		)
 	}
 }
@@ -310,7 +455,7 @@ fileprivate struct ChannelInfoPopup: View {
 	func closePopover() -> Void {
 		log.trace("[ChannelInfoPopup] closePopover()")
 		
-		popoverState.close.send()
+		popoverState.close()
 	}
 }
 
@@ -323,7 +468,8 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		id: "b50bf19d16156de8231f6d3d3fb3dd105ba338de5366d0421b0954b9ceb0d4f8",
 		isOk: true,
 		stateName: "Normal",
-		commitments: KotlinPair(first: 50000, second: 200000),
+		localBalance: Bitcoin_kmpSatoshi(sat: 50_000),
+		remoteBalance: Bitcoin_kmpSatoshi(sat: 200_000),
 		json: "{Everything is normal!}",
 		txUrl: "http://google.com"
 	)
@@ -332,7 +478,8 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		id: "e5366d0421b0954b9ceb0d4f8b50bf19d16156de8231f6d3d3fb3dd105ba338d",
 		isOk: false,
 		stateName: "Woops",
-		commitments: nil,
+		localBalance: Bitcoin_kmpSatoshi(sat: 0),
+		remoteBalance: Bitcoin_kmpSatoshi(sat: 0),
 		json: "{Woops!}",
 		txUrl: nil
 	)

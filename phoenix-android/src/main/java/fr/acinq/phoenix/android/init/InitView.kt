@@ -33,8 +33,8 @@ import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.InputText
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.ctrl.Initialization
-import fr.acinq.phoenix.ctrl.RestoreWallet
+import fr.acinq.phoenix.controllers.init.Initialization
+import fr.acinq.phoenix.controllers.init.RestoreWallet
 
 
 @Composable

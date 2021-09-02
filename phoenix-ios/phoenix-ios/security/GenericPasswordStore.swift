@@ -83,6 +83,8 @@ struct GenericPasswordStore {
 		}
 	}
 
+	/// Reads raw Data from the keychain.
+	///
 	func readKey(
 		account : String,
 		mixins  : [String: Any]? = nil
@@ -105,7 +107,7 @@ struct GenericPasswordStore {
 		}
 	}
 	
-	/// Reads a simple String from the keychain.
+	/// Reads data from the keychain, and interprets it as a String.
 	///
 	func readKey(
 		account : String,

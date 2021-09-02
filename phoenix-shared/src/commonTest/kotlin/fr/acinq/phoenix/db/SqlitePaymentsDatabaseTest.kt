@@ -203,8 +203,8 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPart(it.id)) }
 
         // We should never update non-existing parts.
-        assertFails { db.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure)) }
-        assertFails { db.updateOutgoingPart(UUID.randomUUID(), randomBytes32()) }
+        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Other payment parts are added.
         val newParts = listOf(
@@ -212,12 +212,18 @@ class SqlitePaymentsDatabaseTest {
             OutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 120),
         )
         // Parts need a valid parent.
-        // NB: This test fails on iOS !
-        // The problem is that foreign key constraints are disabled.
-        // See iosDbFactory.kt for discussion.
-        assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
-        // New parts must have a unique id.
-        assertFails { db.addOutgoingParts(onePartFailed.id, newParts.map { it.copy(id = p.parts[0].id) }) }
+        if (isIOS()) {
+            // This is a known bug in SQLDelight on iOS.
+            // The problem is that foreign key constraints are disabled.
+            // See iosDbFactory.kt for discussion.
+        } else {
+            assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
+            // New parts must have a unique id.
+            assertFails { db.addOutgoingParts(
+                parentId = onePartFailed.id,
+                parts = newParts.map { it.copy(id = p.parts[0].id) }
+            ) }
+        }
 
         // Can add new parts to existing payment.
         db.addOutgoingParts(onePartFailed.id, newParts)
@@ -245,8 +251,9 @@ class SqlitePaymentsDatabaseTest {
         // Parts are successful BUT parent payment is not successful yet.
         assertTrue(db.getOutgoingPayment(p.id)!!.status is OutgoingPayment.Status.Pending)
 
+        val paymentStatus = OutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, 130)
         val paymentSucceeded = partsSettled.copy(
-            status = OutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, 130),
+            status = paymentStatus,
             parts = partsSettled.parts.drop(1)
         )
         db.completeOutgoingPayment(p.id, preimage, 130)
@@ -255,7 +262,10 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(paymentSucceeded, db.getOutgoingPayment(p.id))
 
         // Cannot succeed a payment that does not exist
-        assertFails { db.completeOutgoingPayment(UUID.randomUUID(), preimage, 130) }
+        assertFalse { db.outQueries.completeOutgoingPayment(
+            id = UUID.randomUUID(),
+            completed = paymentStatus
+        ) }
         // Using failed part id does not return a settled payment
         assertNull(db.getOutgoingPart(partsSettled.parts[0].id))
         partsSettled.parts.drop(1).forEach {
@@ -292,11 +302,17 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(partsFailed, db.getOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(partsFailed, db.getOutgoingPart(it.id)) }
 
-        val paymentFailed = partsFailed.copy(status = OutgoingPayment.Status.Completed.Failed(FinalFailure.NoRouteToRecipient, 120))
-        db.completeOutgoingPayment(p.id, FinalFailure.NoRouteToRecipient, 120)
-        assertFails { db.completeOutgoingPayment(UUID.randomUUID(), FinalFailure.NoRouteToRecipient, 120) }
+        val paymentStatus = OutgoingPayment.Status.Completed.Failed(
+            reason = FinalFailure.NoRouteToRecipient,
+            completedAt = 120
+        )
+        val paymentFailed = partsFailed.copy(status = paymentStatus)
+        db.completeOutgoingPayment(p.id, paymentStatus)
         assertEquals(paymentFailed, db.getOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
+
+        // Cannot fail a payment that does not exist
+        assertFalse { db.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {
@@ -313,3 +329,6 @@ class SqlitePaymentsDatabaseTest {
 }
 
 expect fun testPaymentsDriver(): SqlDriver
+
+// Workaround for known bugs in SQLDelight on native/iOS.
+expect fun isIOS(): Boolean

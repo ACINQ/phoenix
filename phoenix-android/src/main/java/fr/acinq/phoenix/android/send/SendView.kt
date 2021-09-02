@@ -30,7 +30,7 @@ import fr.acinq.phoenix.android.components.AmountInput
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.ctrl.Scan
+import fr.acinq.phoenix.controllers.payments.Scan
 
 @Composable
 fun SendView(request: PaymentRequest?) {

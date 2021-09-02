@@ -47,11 +47,27 @@ CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_parts(part_parent_i
 
 -- queries
 
+hasOutgoingPayment:
+SELECT COUNT(*) FROM outgoing_payments
+WHERE id = ?;
+
 addOutgoingPayment:
-INSERT INTO outgoing_payments (id, recipient_amount_msat, recipient_node_id, payment_hash, created_at, details_type, details_blob) VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO outgoing_payments (
+            id,
+            recipient_amount_msat,
+            recipient_node_id,
+            payment_hash,
+            created_at,
+            details_type,
+            details_blob)
+VALUES (?, ?, ?, ?, ?, ?, ?);
 
 updateOutgoingPayment:
 UPDATE outgoing_payments SET completed_at=?, status_type=?, status_blob=? WHERE id=?;
+
+hasOutgoingPart:
+SELECT COUNT(*) FROM outgoing_payment_parts
+WHERE part_id = ?;
 
 addOutgoingPart:
 INSERT INTO outgoing_payment_parts (
@@ -74,6 +90,20 @@ SELECT * FROM outgoing_payment_parts WHERE part_id=?;
 
 deleteOutgoingPart:
 DELETE FROM outgoing_payment_parts WHERE part_id=?;
+
+getOutgoingPaymentWithoutParts:
+SELECT id,
+       recipient_amount_msat,
+       recipient_node_id,
+       payment_hash,
+       details_type,
+       details_blob,
+       created_at,
+       completed_at,
+       status_type,
+       status_blob
+FROM outgoing_payments
+WHERE id=?;
 
 getOutgoingPayment:
 SELECT parent.id,
@@ -144,6 +174,11 @@ FROM outgoing_payments AS parent
 LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
 ORDER BY parent.completed_at DESC, parent.id DESC
 LIMIT ?, ?;
+
+scanCompleted:
+SELECT id, completed_at
+FROM   outgoing_payments
+WHERE  completed_at IS NOT NULL;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:
