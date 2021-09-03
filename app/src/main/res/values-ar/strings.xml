@@ -16,7 +16,7 @@
 
 <resources>
   <string name="app_name">Phoenix (Testnet)</string>
-  
+
   <!-- //////////////// system notification channels //////////////// -->
 
   <string name="notification_channels_watcher_title">مراقب الخلفية</string>
@@ -25,12 +25,12 @@
   <string name="notification_pay_to_open_missed_desc">ينبهك عند فشل استقبال دفعة بسبب ان خاصية إنشاء قناة سريعة تلقائية معطلة.</string>
   <string name="notification_headless_title">Phoenix يعمل في الخلفية</string>
   <string name="notification_headless_desc">ينبهك أن Phoenix يعمل في الخلفية. يحدث هذا عندما يرسل لك شخص ما أموالًا ولم يتم تشغيل التطبيق بالفعل.</string>
-  
+
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
   <string name="autocreate_generating">جار إنشاء محفظتك...</string>
   <string name="autocreate_error">لم نتمكن من إنشاء محفظتك.\nالسبب: %1$s</string>
-  
+
   <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
   <string name="restore_disclaimer_message">لا تقم باستيراد عبارة استرداد لم يتم إنشاؤها بواسطة هذا التطبيق.\n\nوأيضًا، تأكد من عدم وجود محفظة Phoenix أخرى تعمل بنفس عبارة الاسترداد.</string>
@@ -41,24 +41,24 @@
   <string name="restore_in_progress">استعادة محفظتك...</string>
   <string name="restore_import_button">استيراد</string>
   <string name="restore_error">عبارة الاسترداد هذه غير صالحة ولا يمكن استيرادها.\n\nالرجاء المحاولة مرة أخرى</string>
-  
+
   <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
   <string name="authprompt_title">إلغاء القفل للمتابعة</string>
   <string name="authprompt_hard_negative">الغاء</string>
   <string name="authprompt_error_unsecure">الجهاز غير آمن (الرمز: %1$d)</string>
-  
+
   <!-- //////////////// Pin dialog //////////////////// -->
 
   <string name="pindialog_title_default">الرجاء إدخال PIN الخاص بك</string>
   <string name="pindialog_error">يجب أن يتكون رمز PIN من 6 أرقام.</string>
   <string name="pindialog_error_donotmatch">رموز PIN غير متطابقة.</string>
-  
+
   <!-- //////////////// Biometric dialog //////////////////// -->
 
   <string name="biometricprompt_title">المحفظة مقفلة</string>
   <string name="biometricprompt_negative">افتح مع PIN</string>
-  
+
   <!-- //////////////// Startup //////////////////// -->
 
   <string name="startup_unlock_required">Phoenix مقفلة.\nيرجى المصادقة للمتابعة.</string>
@@ -78,7 +78,7 @@
   <string name="startup_error_no_biometrics_or_key_invalidated">قم بتسجيل بصمة الإصبع في Android أولاً لفتح المحفظة. \n \n او قم باستعادة محفظتك باستخدام العبارة الاحتياطية المكونة من 12 كلمة.</string>
   <string name="startup_error_auth_failed">فشلت المصادقة.</string>
   <string name="startup_error_auth_failed_with_details">فشلت المصادقة. \n — \n %1$s</string>
-  
+
   <!-- //////////////// payment holder //////////////// -->
 
   <string name="paymentholder_sending">إرسال…</string>
@@ -90,7 +90,7 @@
   <string name="paymentholder_no_desc">بدون وصف</string>
   <string name="paymentholder_closing_desc">إغلاق # %1$s</string>
   <string name="paymentholder_swap_in_desc">الدفع عبر السلسلة الرئيسية إلى %1$s</string>
-  
+
   <!-- //////////////// receive //////////////// -->
 
   <string name="receive_edit_title">تحرير فاتورتي</string>
@@ -144,12 +144,9 @@
  <br /> <br />
  سيتم تطبيق رسوم قدرها <b>%1$s%%</b> (بحد أدنى <b> %2$s </b>).
 ]]></string>
-  
+
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">لصق البيانات من الحافظة</string>
-  <string name="send_init_browse">تحميل صورة من الجهاز</string>
-  <string name="send_init_reading">قراءة المسح...</string>
   <string name="send_balance_prefix">الرصيد:</string>
   <string name="send_use_all_balance">إرسال الكل</string>
   <string name="send_loading">جار التحقق من الدفع...</string>
@@ -177,8 +174,12 @@
   <string name="send_swap_complete_recap_fee">رسوم المعدنين</string>
   <string name="send_swap_complete_recap_total">المجموع</string>
   <string name="send_swap_complete_cannot_afford">الإجمالي مع الرسوم اعلى من رصيدك.</string>
-  
+
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">لصق البيانات من الحافظة</string>
+  <string name="readinput_browse">تحميل صورة من الجهاز</string>
+  <string name="readinput_extracting">قراءة المسح...</string>
 
   <string name="scan_request_camera_access">منح إذن الكاميرا</string>
   <string name="scan_instructions">امسح رمز QR الذي يحتوي على طلب دفع أو عنوان بيتكوين أو LNURL</string>
@@ -204,7 +205,7 @@
 ]]></string>
   <string name="scan_amountless_legacy_confirm_button">تأكيد</string>
   <string name="scan_amountless_legacy_cancel_button">الغاء</string>
-  
+
   <!-- //////////////// utilities strings //////////////// -->
 
   <!--#1: sign / #2: integer part / #3: decimal part / #4: unit-->
@@ -226,7 +227,7 @@
   <string name="btn_close">اغلاق</string>
   <string name="btn_pause_connecting">جارٍ الاتصال بالنظير...</string>
   <string name="btn_pause_connecting_electrum">جارٍ الاتصال بـ Electrum...</string>
-  
+
   <!-- //////////////// settings //////////////// -->
 
   <string name="settings_general_title">عام</string>
@@ -244,7 +245,7 @@
   <string name="settings_tor">Tor</string>
   <string name="settings_about">حول</string>
   <string name="settings_payment_settings">خيارات الدفع والرسوم</string>
-  
+
   <!-- //////////////// notification - watcher //////////////// -->
 
   <string name="notif_watcher_cheating_title">الرجاء بدء Phoenix</string>
@@ -263,7 +264,7 @@
   <string name="notif_pay_to_open_missed_message">كان من اللازم انشاء قناة جديدة لتلقي هذه الدفعة. انقر هنا لتمكين الإنشاء التلقائي للقناة.</string>
   <string name="notif__pay_to_open_missed_too_small_title">الدفعات الفائتة (%1$s)</string>
   <string name="notif__pay_to_open_missed_too_small_message">كان المبلغ الوارد صغيرًا جدًا لإنشاء قناة دفع جديدة.</string>
-  
+
   <!-- //////////////// close all channels //////////////// -->
 
   <string name="closechannels_title">إغلاق القنوات</string>
@@ -294,7 +295,7 @@
   <string name="closechannels_message_error">حدثت مشكلة، يرجى تكرار المحاولة لاحقًا</string>
   <string name="closechannels_message_done">تم إرسال الأموال.</string>
   <string name="closechannels_message_in_progress">يرجى الانتظار…</string>
-  
+
   <!-- //////////////// list all channels //////////////// -->
 
   <string name="listallchannels_title">قائمة القنوات</string>
@@ -315,26 +316,26 @@
   <string name="listallchannels_share_subject">بيانات القنوات</string>
   <string name="listallchannels_share_title">مشاركة بيانات القناة</string>
   <string name="listallchannels_serialization_error">تعذر استرداد بيانات القناة</string>
-  
+
   <!-- //////////////// channel details //////////////// -->
 
   <string name="channel_loading">جار استرداد بيانات القناة...</string>
   <string name="channel_error">تعذر استرداد تفاصيل هذه القناة. الرجاء معاودة المحاولة في وقت لاحق.</string>
   <string name="channel_balance">الرصيد</string>
   <string name="channel_capacity">السعة</string>
-  
+
   <!-- //////////////// menu //////////////// -->
 
   <string name="menu_settings">الإعدادات</string>
   <string name="menu_send">ارسال</string>
   <string name="menu_receive">استلام</string>
-  
+
   <!-- //////////////// init wallet //////////////// -->
 
   <string name="initwallet_terms"><![CDATA[لقد قرأت وأوافق على <br/> <a href=\"https://phoenix.acinq.co/terms\"> شروط الاستخدام </a>.]]></string>
   <string name="initwallet_create">إنشاء محفظة جديدة</string>
   <string name="initwallet_restore">استعادة محفظتي</string>
-  
+
   <!-- //////////////// main //////////////////// -->
 
   <string name="main_swapin_incoming">+ %1$s وارد</string>
@@ -342,7 +343,7 @@
   <string name="main_connectivity_button">الاتصال...</string>
   <string name="main_tor_connected_button">تم تمكين Tor</string>
   <string name="main_stores_button">المتاجر</string>
-  
+
   <!-- //////////////// notifications //////////////////// -->
 
   <string name="inappnotif_mnemonics_never_seen">شكرا لاستخدامك Phoenix. يرجى الاحتفاظ بنسخة احتياطية من محفظتك حتى لا تفقد عملات البيتكوين الخاصة بك.</string>
@@ -352,7 +353,7 @@
   <string name="inappnotif_upgrade_critical">تحديث هام متاح. قد تتعطل المحفظة إذا لم يتم تحديثها.</string>
   <string name="inappnotif_mempool_high_usage">الـ mempool (المعاملات المعلقة) الخاص بالبيتكوين ممتلئ والرسوم مرتفعة.</string>
   <string name="inappnotif_mempool_high_usage_action">شاهد كيف يؤثر ذلك على Phoenix</string>
-  
+
   <!-- //////////////// display seed //////////////// -->
 
   <string name="displayseed_title">عبارة استرداد المحفظة</string>
@@ -377,7 +378,7 @@
   <string name="displayseed_words_td"><![CDATA[<td> <font color=\"rgba(100,100,100,.3)\"> <small> # %1$d </small> </font> <b> %2$s </b> </td>]]></string>
   <string name="displayseed_has_saved_seed_checkbox">لقد قمت بعمل نسخة احتياطية من عبارة الاسترداد الخاصة بي، على سبيل المثال على قطعة من الورق.</string>
   <string name="displayseed_dialog_header">حافظ على أمان عبارة الاسترداد هذه.\nلا تشاركها مع احد.</string>
-  
+
   <!-- //////////////// logs settings //////////////// -->
 
   <string name="logs_title">سجلات التطبيق</string>
@@ -387,7 +388,7 @@
   <string name="logs_share_button">مشاركة السجلات...</string>
   <string name="logs_share_subject">سجلات تطبيق Phoenix</string>
   <string name="logs_share_title">مشاركة سجلات Phoenix...</string>
-  
+
   <!-- //////////////// payment details //////////////// -->
 
   <string name="paymentdetails_loading">جارٍ استرداد تفاصيل الدفع...</string>
@@ -428,7 +429,7 @@
   <string name="paymentdetails_failure_invalid_details">تم رفض الدفع من قبل المستلم.\nيحدث هذا عادة عندما يتم يكون تم دفع الفاتورة بالفعل أو عندما تحتوي على تاريخ  صلاحية وتحاول إرسال المبلغ بعد انتهاء صلاحيتها.</string>
   <string name="paymentdetails_failure_trampoline_fees">لم يتم العثور على مسار يتناسب مع إعدادات الرسوم الحالية. جرب برسوم أعلى.</string>
   <string name="paymentdetails_failure_trampoline_fees_action">تحرير إعداد الرسوم الخاصة بي</string>
-  
+
   <!-- //////////////// payment details: technicals data //////////////// -->
 
   <string name="paymentdetails_technicals_title">بيانات الدفع</string>
@@ -446,7 +447,7 @@
   <string name="paymentdetails_preimage_label">الصورة الأصلية</string>
   <string name="paymentdetails_created_at_label">أنشئت في</string>
   <string name="paymentdetails_completed_at_label">اكتمل في</string>
-  
+
   <!-- //////////////// channel state state //////////////// -->
 
   <string name="state_wait_confirmed">يتم تأكيد تمويل الـ tx</string>
@@ -456,7 +457,7 @@
   <string name="state_sync">المزامنة مع النظير</string>
   <string name="state_offline">النظير غير متصل بالإنترنت</string>
   <string name="state_shutdown">ايقاف التشغيل</string>
-  
+
   <!-- //////////////// access control //////////////// -->
 
   <string name="accessctrl_title">الحماية</string>
@@ -478,7 +479,7 @@
   <string name="accessctrl_full_lock_switch_desc">يتطلب التطبيق فتح المستخدم اليدوي ليعمل. لذلك لا يمكن استلام المدفوعات في الخلفية. \n \n يتم دعم مصادقة بصمات الأصابع فقط.</string>
   <string name="accessctrl_full_lock_confirm_title">لاحظ</string>
   <string name="accessctrl_full_lock_confirm_message">سيتم تعطيل ميزات الخلفية. لتلقي المدفوعات، يجب فك قفل التطبيق.</string>
-  
+
   <!-- //////////////// ln url login //////////////// -->
 
   <string name="lnurl_auth_instructions"><![CDATA[يمكنك استخدام محفظتك للتوقيع بشكل مجهول وتفويض إجراء على: <br/> <br/> <b> %1$s </b> <br/> <br/> لن تتم مشاركة أي بيانات شخصية مع هذه الخدمة .]]></string>
@@ -488,7 +489,7 @@
   <string name="lnurl_auth_failure">فشل المصادقة. \n \n التفاصيل: %1$s</string>
   <string name="lnurl_auth_failure_remote_io">تعذر الاتصال بـ %1$s</string>
   <string name="lnurl_auth_failure_remote_details">استجابت الخدمة بـ %1$s</string>
-  
+
   <!-- //////////////// ln url pay //////////////// -->
 
   <string name="lnurl_pay_domain"><![CDATA[تم طلب الدفع بواسطة <br/> <b> %1$s </b>]]></string>
@@ -510,7 +511,7 @@
   <string name="lnurl_pay_error_invalid_invoice">قدمت الخدمة \' %1$s \' فاتورة غير صالحة ( %2$s ).</string>
   <string name="lnurl_pay_error_remote_error">اظهرت الخدمة \' %1$s \' خطأً ( %2$s ).</string>
   <string name="lnurl_pay_error_try_again_button">حاول مجددا.</string>
-  
+
   <!-- //////////////// ln url withdraw //////////////// -->
 
   <string name="lnurl_withdraw_amount_label">المبلغ المطلوب استلامه</string>
@@ -546,7 +547,7 @@
  <br/> <br/> - <br/>
  كرر المحاوله لاحقًا، أو اتصل بالدعم الخاص بهم.
 ]]></string>
-  
+
   <!-- //////////////// display preferences //////////////// -->
 
   <string name="prefs_display_title">خيارات العرض</string>
@@ -556,7 +557,7 @@
   <string name="prefs_display_explorer_label">مستكشف الشبكة الرئيسية</string>
   <string name="prefs_display_balance_display">إظهار الرصيد في الصفحة الرئيسية</string>
   <string name="prefs_display_balance_display_desc">يساعد إخفاء الرصيد التخفي من أعين المتطفلين</string>
-  
+
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">خادم Electrum</string>
@@ -579,12 +580,12 @@
   <string name="electrum_dialog_ssl_tor">تحقق أيضًا من شهادة عنوان Onion هذا</string>
   <string name="electrum_dialog_input">عنوان الخادم (host:port).</string>
   <string name="electrum_empty_custom_address">الرجاء إدخال عنوان خادم Electrum</string>
-  
+
   <!-- ////////////// virtual keyboard hints //////////////// -->
 
   <string name="key_space_desc">أضف مسافة بيضاء</string>
   <string name="key_delete_desc">حذف الحرف الأخير</string>
-  
+
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">إعدادات Tor</string>
@@ -593,7 +594,7 @@
   <string name="tor_settings_disabled">تم تعطيل Tor</string>
   <string name="tor_settings_confirm_disable_title">هل أنت متأكد أنك تريد تعطيل Tor؟</string>
   <string name="tor_settings_confirm_enable_title">هل أنت متأكد أنك تريد تمكين Tor؟ لاحظ أنه للحصول على أفضل نتيجة، يوصى بإنشاء محفظة جديدة أيضًا.</string>
-  
+
   <!-- ////////////// connection issues dialog //////////////// -->
 
   <string name="conndialog_title">حالة الاتصال</string>
@@ -604,7 +605,7 @@
   <string name="conndialog_lightning">نظير البرق</string>
   <string name="conndialog_ok">تم الاتصال</string>
   <string name="conndialog_not_ok">جار الاتصال...</string>
-  
+
   <!-- //////////////// about screen //////////////// -->
 
   <string name="about_title">حول</string>
@@ -626,11 +627,11 @@
 ]]></string>
   <string name="about_terms">شروط الاستخدام</string>
   <string name="about_privacy">الخصوصية</string>
-  
+
   <!-- //////////////// background node service //////////////// -->
 
   <string name="nodeservice_desc">الخدمة التي تحتوي على عقدة المحفظة.</string>
-  
+
   <!-- //////////////// settings: options for payments //////////////// -->
 
   <string name="paymentsettings_title">خيارات الدفع والرسوم</string>
@@ -658,7 +659,7 @@
  <br /> <br />
  راجع <a href=\"https://phoenix.acinq.co/faq#what-are-the-fees\">الأسئلة الشائعة</a> لمزيد من المعلومات.
 ]]></string>
-  
+
   <!-- ftue -->
 
   <string name="ftue__welcome__header">أهلا بك!</string>
@@ -675,18 +676,18 @@
   <string name="ftue__backup_seed__header">ابقى متحكمًا</string>
   <string name="ftue__backup_seed__body">يتم إنشاء عبارة احتياطية، حيث يتم تخزين جميع المعلومات اللازمة لاسترداد مبالغ البيتكوين الخاصة بك. \n \n احتفظ بها في مكان آمن وسري!</string>
   <string name="ftue__backup_seed__button">البدء</string>
-  
+
   <!-- patch notes -->
 
   <string name="patchnotes_title">تم تحديث Phoenix!</string>
   <string name="patchnotes_v15"><![CDATA[
 <h4> استقبال الدفع في الخلفية </h4>
- <p> أصبح بإمكان Phoenix الآن تلقي المدفوعات حتى إذا لم يتم تشغيل التطبيق. </p> 
+ <p> أصبح بإمكان Phoenix الآن تلقي المدفوعات حتى إذا لم يتم تشغيل التطبيق. </p>
 
  <h4> إنشاء تلقائي للقناة </h4>
  <p> سيتم إنشاء قنوات الدفع تلقائيًا لك إذا لزم الأمر. </p>
  <p> هذه الميزة مطلوبة حتى يعمل استقبال الدفع في الخلفية بشكل صحيح ، ولكن يمكنك تعطيلها إذا أردت (في الإعدادات > إعدادات الدفع). </p>
- <p> لا تزال تكلفة إنشاء القناة سارية ( %1$s %% ). </p> 
+ <p> لا تزال تكلفة إنشاء القناة سارية ( %1$s %% ). </p>
 
  <h4> قفل المحفظة المحسن </h4>
  <p> يستخدم قفل التطبيق الآن قفل النظام. لا داعي لتذكر رقم تعريف شخصي آخر! </p>

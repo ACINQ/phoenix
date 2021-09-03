@@ -53,6 +53,7 @@ class ReadInputViewModel : ViewModel() {
   private val log = LoggerFactory.getLogger(ReadInputViewModel::class.java)
 
   val hasCameraAccess = MutableLiveData<Boolean>()
+  val lastFailedInput = MutableLiveData("")
   val inputState = MutableLiveData<ReadInputState>()
 
   init {
@@ -65,6 +66,7 @@ class ReadInputViewModel : ViewModel() {
     log.debug("reading input=$input")
     if (inputState.value is ReadInputState.Scanning) {
       inputState.value = ReadInputState.Reading(input)
+      lastFailedInput.value = ""
       viewModelScope.launch {
         withContext(Dispatchers.Default) {
           try {
@@ -77,6 +79,7 @@ class ReadInputViewModel : ViewModel() {
             })
           } catch (e: Exception) {
             log.info("invalid lightning object: ${e.localizedMessage}")
+            lastFailedInput.postValue(input)
             inputState.postValue(when (e) {
               is LNUrlError -> ReadInputState.Error.ErrorInLNURLResponse(e)
               else -> ReadInputState.Error.UnhandledInput

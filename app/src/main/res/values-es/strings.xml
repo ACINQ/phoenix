@@ -108,9 +108,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Pegar desde el portapapeles</string>
-  <string name="send_init_reading">Escaneando…</string>
-
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar todo</string>
   <string name="send_loading">Verificando pago…</string>
@@ -131,6 +128,9 @@
   <string name="send_swap_complete_cannot_afford">El total después de la comisión excede tu saldo.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Pegar desde el portapapeles</string>
+  <string name="readinput_extracting">Escaneando…</string>
 
   <string name="scan_request_camera_access">Permitir acceso a la cámara</string>
   <string name="scan_instructions">Escanea un código QR que contenga una solicitud de pago, una dirección de Bitcoin o LNURL</string>

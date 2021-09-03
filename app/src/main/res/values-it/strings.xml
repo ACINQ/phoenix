@@ -103,9 +103,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Incolla una richiesta di pagamento</string>
-  <string name="send_init_reading">Leggendo lo scan…</string>
-
   <string name="send_balance_prefix">Bilancio:</string>
   <string name="send_use_all_balance">Invia tutto</string>
   <string name="send_loading">Controllo pagamento in corso…</string>
@@ -126,6 +123,9 @@
   <string name="send_swap_complete_cannot_afford">Il totale è superiore al tuo bilancio.\n\nDecrementa l\'ammontare, o riprova più tardi quando le fee sono diminuite.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Incolla una richiesta di pagamento</string>
+  <string name="readinput_extracting">Leggendo lo scan…</string>
 
   <string name="scan_request_camera_access">Concedi permessi alla fotocamera</string>
   <string name="scan_instructions">Inquadta il QR di una richiesta di pagamento\nall\'interno del rettangolo.</string>

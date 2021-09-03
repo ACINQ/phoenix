@@ -130,9 +130,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Coller les données du presse-papier</string>
-  <string name="send_init_reading">Lecture de la requête…</string>
-
   <string name="send_balance_prefix">Solde:</string>
   <string name="send_use_all_balance">Tout envoyer</string>
   <string name="send_loading">Vérification du paiement…</string>
@@ -163,6 +160,14 @@
 
   <!-- //////////////// scan //////////////// -->
 
+  <string name="readinput_manualinput">Saisie manuelle</string>
+  <string name="readinput_paste">Coller depuis le presse-papier</string>
+  <string name="readinput_extracting">Lecture de la requête…</string>
+
+  <string name="send_input_dialog_title">Saisie manuelle</string>
+  <string name="send_input_dialog_message">Vous pouvez ici entrer une adresse Bitcoin address, une requête de paiement Lightning, une LNUrl, ou bien un adresse Lightning que vous souhaitez payer.</string>
+  <string name="send_input_dialog_hint">Saisissez votre requête ici</string>
+
   <string name="scan_request_camera_access">Donner accès à la caméra du téléphone</string>
   <string name="scan_instructions">Placer le QR code\ndans le rectangle pour le scanner</string>
   <string name="scan_state_reading">Lecture de la requête</string>
@@ -170,15 +175,16 @@
   <string name="scan_error_expired">Ce paiement a expiré.</string>
   <string name="scan_error_pay_to_self">Vous ne pouvez pas vous payer vous-même.</string>
   <string name="scan_error_invalid_chain">Ce paiement n\'utilise pas la même blockchain que vous.</string>
-  <string name="scan_error_lnurl_unsupported">Ce type de LNURL n\'est pas encore supporté!</string>
-  <string name="scan_error_lnurl_failure_generic"><![CDATA[Le service <b>%1$s</b> retourne une erreur.]]></string>
-  <string name="scan_error_lnurl_failure_code"><![CDATA[The service LNURL <b>%1$s</b> retourne un code d\'erreur HTTP %2$d.]]></string>
+  <string name="scan_error_lnurl_unsupported">Ce type de LNUrl n\'est pas encore supporté!</string>
+  <string name="scan_error_lnurl_failure_generic"><![CDATA[Le service <b>%1$s</b> a renvoyé une erreur.]]></string>
+  <string name="scan_error_lnurl_failure_code_404"><![CDATA[Le service <b>%1$s</b> a renvoyé un code d\'erreur HTTP %2$d. Il est possible qu\'il n\'accepte pas ce type de requête.]]></string>
+  <string name="scan_error_lnurl_failure_code"><![CDATA[Le service <b>%1$s</b> a renvoyé un code d\'erreur HTTP %2$d.]]></string>
   <string name="scan_error_lnurl_failure_detailed"><![CDATA[
-    The service LNURL <b>%1$s</b> retourne l\'erreur suivante :
+    Le service <b>%1$s</b> a renvoyé l\'erreur suivante :
     <br/><br/>
     <em>%2$s</em>
   ]]></string>
-  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[The service LNURL <b>%1$s</b> retourne un message invalide.]]></string>
+  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[Le service <b>%1$s</b> a renvoyé un message invalide.]]></string>
   <string name="scan_error_invalid_scan">Cette donnée n\'est pas valide.\nVeuillez réessayer.</string>
 
   <string name="scan_amountless_legacy_title">Attention</string>

@@ -164,9 +164,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Daten aus der Zwischenablage einfügen</string>
-  <string name="send_init_reading">Scan lesen…</string>
-
   <string name="send_balance_prefix">Betrag:</string>
   <string name="send_use_all_balance">Sende alles</string>
   <string name="send_loading">Zahlung überprüfen…</string>
@@ -198,6 +195,9 @@
   <string name="send_swap_complete_cannot_afford">Die Summe nach Gebühren übersteigt Ihr Kontostand.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Daten aus der Zwischenablage einfügen</string>
+  <string name="readinput_extracting">Scan lesen…</string>
 
   <string name="scan_request_camera_access">Kameraerlaubnis erteilen</string>
   <string name="scan_instructions">Scannen Sie einen QR-Code, der eine Zahlungsanforderung, eine Bitcoin Adresse oder eine LNURL enthält</string>

@@ -162,10 +162,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Paste data from clipboard</string>
-  <string name="send_init_browse">Load image from disk</string>
-  <string name="send_init_reading">Reading scan…</string>
-
   <string name="send_balance_prefix">Balance:</string>
   <string name="send_use_all_balance">Send all</string>
   <string name="send_loading">Checking payment…</string>
@@ -196,6 +192,15 @@
 
   <!-- //////////////// scan //////////////// -->
 
+  <string name="readinput_manualinput">Manual input</string>
+  <string name="readinput_paste">Paste from clipboard</string>
+  <string name="readinput_browse">Load image from disk</string>
+  <string name="readinput_extracting">Extracting payment data…</string>
+
+  <string name="send_input_dialog_title">Manual input</string>
+  <string name="send_input_dialog_message">Enter a Bitcoin address, a Lightning invoice, a LNUrl, or a Lightning address you want to send money to.</string>
+  <string name="send_input_dialog_hint">Enter the payment request here</string>
+
   <string name="scan_request_camera_access">Grant camera permission</string>
   <string name="scan_instructions">Scan a QR code containing a payment request, a Bitcoin address or a LNURL</string>
   <string name="scan_state_reading">Reading data</string>
@@ -204,14 +209,15 @@
   <string name="scan_error_pay_to_self">You cannot pay yourself.</string>
   <string name="scan_error_invalid_chain">This payment does not use the same blockchain as your wallet.</string>
   <string name="scan_error_lnurl_unsupported">This type of Lightning URL is not supported yet!</string>
-  <string name="scan_error_lnurl_failure_generic"><![CDATA[The LNURL Service <b>%1$s</b> returned an error.]]></string>
-  <string name="scan_error_lnurl_failure_code"><![CDATA[The LNURL Service <b>%1$s</b> returned a %2$d HTTP error code.]]></string>
+  <string name="scan_error_lnurl_failure_generic"><![CDATA[The service <b>%1$s</b> returned an error.]]></string>
+  <string name="scan_error_lnurl_failure_code_404"><![CDATA[The service <b>%1$s</b> returned a %2$d HTTP error code. It may not support this type of LNUrl.]]></string>
+  <string name="scan_error_lnurl_failure_code"><![CDATA[The service <b>%1$s</b> returned a %2$d HTTP error code.]]></string>
   <string name="scan_error_lnurl_failure_detailed"><![CDATA[
-    The LNURL Service <b>%1$s</b> returned an error:
+    The service <b>%1$s</b> returned an error:
     <br/><br/>
     <em>%2$s</em>
   ]]></string>
-  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[The LNURL Service <b>%1$s</b> returned an invalid message.]]></string>
+  <string name="scan_error_lnurl_failure_unreadable"><![CDATA[The service <b>%1$s</b> returned an invalid message.]]></string>
   <string name="scan_error_invalid_scan">Invalid data.\nPlease try again.</string>
 
   <string name="scan_amountless_legacy_title">Warning</string>

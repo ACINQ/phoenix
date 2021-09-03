@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory
 
 class ReadInputFragment : BaseFragment() {
 
+  private var manualInputDialog: AlertDialog? = null
   override val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   private lateinit var mBinding: FragmentReadInvoiceBinding
@@ -80,14 +81,21 @@ class ReadInputFragment : BaseFragment() {
     model.inputState.observe(viewLifecycleOwner, {
       when (it) {
         is ReadInputState.Scanning -> mBinding.scanView.resume()
-        is ReadInputState.Reading -> mBinding.scanView.pause()
+        is ReadInputState.Reading -> {
+          if (manualInputDialog?.isShowing == true) manualInputDialog?.dismiss()
+          mBinding.scanView.pause()
+        }
         is ReadInputState.Error -> {
           mBinding.errorMessage.text = when (it) {
             is ReadInputState.Error.PayToSelf -> getString(R.string.scan_error_pay_to_self)
             is ReadInputState.Error.InvalidChain -> getString(R.string.scan_error_invalid_chain)
             is ReadInputState.Error.PaymentExpired -> getString(R.string.scan_error_expired)
             is ReadInputState.Error.ErrorInLNURLResponse -> when (it.error) {
-              is LNUrlError.RemoteFailure.Code -> Converter.html(getString(R.string.scan_error_lnurl_failure_code, it.error.origin, it.error.code))
+              is LNUrlError.RemoteFailure.Code -> if (it.error.code == 404) {
+                Converter.html(getString(R.string.scan_error_lnurl_failure_code_404, it.error.origin, it.error.code))
+              } else {
+                Converter.html(getString(R.string.scan_error_lnurl_failure_code, it.error.origin, it.error.code))
+              }
               is LNUrlError.RemoteFailure.Detailed -> Converter.html(getString(R.string.scan_error_lnurl_failure_detailed, it.error.origin, it.error.reason))
               is LNUrlError.RemoteFailure.Unreadable -> Converter.html(getString(R.string.scan_error_lnurl_failure_unreadable, it.error.origin))
               is LNUrlError.RemoteFailure -> Converter.html(getString(R.string.scan_error_lnurl_failure_generic, it.error.origin))
@@ -173,6 +181,20 @@ class ReadInputFragment : BaseFragment() {
       activity?.let { ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.CAMERA), Constants.INTENT_CAMERA_PERMISSION_REQUEST) }
     }
 
+    mBinding.inputButton.setOnClickListener {
+      manualInputDialog = AlertHelper.buildWithInput(layoutInflater,
+        title = getString(R.string.send_input_dialog_title),
+        message = getString(R.string.send_input_dialog_message),
+        callback = {
+          if (it.isNotBlank()) {
+            model.readInput(it)
+          }
+        },
+        defaultValue = "",
+        hint = getString(R.string.send_input_dialog_hint)
+      ).show()
+    }
+
     mBinding.pasteButton.setOnClickListener {
       context?.let { model.readInput(ClipboardHelper.read(it)) }
     }
@@ -184,7 +206,7 @@ class ReadInputFragment : BaseFragment() {
       }, Constants.INTENT_PICK_IMAGE_FILE)
     }
 
-    mBinding.cancelButton.setOnClickListener { findNavController().popBackStack() }
+    mBinding.actionBar.setOnBackAction { findNavController().popBackStack() }
 
     mBinding.errorButton.setOnClickListener {
       if (model.inputState.value is ReadInputState.Error) {

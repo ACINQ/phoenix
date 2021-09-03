@@ -107,8 +107,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Plak betalingsverzoek</string>
-  <string name="send_init_reading">Scan lezen…</string>
   <string name="send_balance_prefix">Balans:</string>
   <string name="send_use_all_balance">Verzend alles</string>
   <string name="send_loading">Betaling controleren…</string>
@@ -129,6 +127,9 @@
   <string name="send_swap_complete_cannot_afford">Het totale bedrag overschrijdt je balans.\n\nVerlaag het bedrag of probeer het later als de vergoedingen lager zijn.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Plak betalingsverzoek</string>
+  <string name="readinput_extracting">Scan lezen…</string>
 
   <string name="scan_request_camera_access">Geef camera toestemming</string>
   <string name="scan_instructions">Plaats een betalingsverzoek QR code\nin de rechthoek het om te scannen</string>
