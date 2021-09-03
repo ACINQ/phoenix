@@ -88,5 +88,6 @@
   <declare-styleable name="ActionBarView">
     <attr name="title" format="string" />
     <attr name="subtitle" />
+    <attr name="arrow_color" format="color" />
   </declare-styleable>
 </resources>

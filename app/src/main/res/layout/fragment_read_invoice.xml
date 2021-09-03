@@ -42,6 +42,23 @@
       app:layout_constraintStart_toStartOf="parent">
 
       <fr.acinq.phoenix.utils.customviews.ButtonView
+        android:id="@+id/input_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg_square"
+        android:padding="@dimen/space_md"
+        app:layout_constraintTop_toTopOf="parent"
+        app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
+        app:icon="@drawable/ic_edit"
+        app:text="@string/readinput_manualinput" />
+
+      <View
+        android:id="@+id/sep_browse"
+        style="@style/HLineSeparator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_button" />
+
+      <fr.acinq.phoenix.utils.customviews.ButtonView
         android:id="@+id/paste_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,8 +66,8 @@
         android:padding="@dimen/space_md"
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_clipboard"
-        app:layout_constraintTop_toTopOf="parent"
-        app:text="@string/send_init_paste" />
+        app:layout_constraintTop_toBottomOf="@id/sep_browse"
+        app:text="@string/readinput_paste" />
 
       <View
         android:id="@+id/sep_paste"
@@ -67,22 +84,7 @@
         app:enableOrFade="@{model.inputState instanceof ReadInputState.Scanning}"
         app:icon="@drawable/ic_image"
         app:layout_constraintTop_toBottomOf="@id/sep_paste"
-        app:text="@string/send_init_browse" />
-
-      <View
-        android:id="@+id/sep_browse"
-        style="@style/HLineSeparator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/browse_button" />
-
-      <fr.acinq.phoenix.utils.customviews.ButtonView
-        android:id="@+id/cancel_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_square"
-        android:padding="@dimen/space_md"
-        app:layout_constraintTop_toBottomOf="@id/sep_browse"
-        app:text="@string/btn_cancel" />
+        app:text="@string/readinput_browse" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -114,7 +116,8 @@
       style="@style/default_textAppearance"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:padding="@dimen/space_sm"
+      android:paddingVertical="@dimen/space_sm"
+      android:paddingHorizontal="@dimen/space_lg"
       android:text="@string/scan_instructions"
       android:textAlignment="center"
       android:textColor="@color/white_mid_op"
@@ -197,7 +200,16 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@id/scan_view"
-      app:text="@string/send_init_reading" />
+      app:text="@string/readinput_extracting" />
+
+    <fr.acinq.phoenix.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:background="@null"
+      app:arrow_color="@color/white" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

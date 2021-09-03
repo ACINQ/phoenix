@@ -106,9 +106,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Vložit platební požadavek</string>
-  <string name="send_init_reading">Zpracovávám sken…</string>
-
   <string name="send_balance_prefix">Zůstatek:</string>
   <string name="send_use_all_balance">Poslat vše</string>
   <string name="send_loading">Kontroluji platbu…</string>
@@ -129,6 +126,9 @@
   <string name="send_swap_complete_cannot_afford">Celkové množství převyšuje váš zůstatek.\n\nSnižte množství, nebo to zkuste později až se sníží poplatky.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Vložit platební požadavek</string>
+  <string name="readinput_extracting">Zpracovávám sken…</string>
 
   <string name="scan_request_camera_access">Povolit přístup ke kameře</string>
   <string name="scan_instructions">Umístěte QR kód platebního požadavku dovnitř obdélníčku, aby mohl být přečten</string>

@@ -51,6 +51,9 @@ class ActionBarView @JvmOverloads constructor(context: Context, attrs: Attribute
       } else {
         mBinding.subtitle.visibility = View.GONE
       }
+      if (arr.hasValue(R.styleable.ActionBarView_arrow_color)) {
+        mBinding.backButton.iconTint = arr.getColorStateList(R.styleable.ActionBarView_arrow_color)
+      }
       arr.recycle()
     }
   }

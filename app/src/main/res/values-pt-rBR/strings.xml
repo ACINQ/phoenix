@@ -163,10 +163,6 @@
 
   <!-- //////////////// send //////////////// -->
 
-  <string name="send_init_paste">Colar dados da área de transferência</string>
-  <string name="send_init_browse">Usar imagem salva de código QR</string>
-  <string name="send_init_reading">Lendo…</string>
-
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
@@ -189,6 +185,10 @@
   <string name="send_swap_complete_cannot_afford">O total após taxas excede seu saldo.</string>
 
   <!-- //////////////// scan //////////////// -->
+
+  <string name="readinput_paste">Colar dados da área de transferência</string>
+  <string name="readinput_browse">Usar imagem salva de código QR</string>
+  <string name="readinput_extracting">Lendo…</string>
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
   <string name="scan_instructions">Aponte a câmera para o código QR contendo uma invoice, endereço bitcoin ou LNURL</string>
