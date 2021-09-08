@@ -12,7 +12,7 @@ Head to our website for more information: https://phoenix.acinq.co
 
 # Releases
 
-This wallet is available for Android, and will hopefully be available for iOS in the future.
+This wallet is available for Android. A Kotlin Multiplatform Mobile version that runs on iOS is currently available in [phoenix-kmm repository](https://github.com/ACINQ/phoenix-kmm).
 
 You can download the binary from the [Release page](https://github.com/ACINQ/phoenix/releases), or from our [Google Play page](https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet).
 
