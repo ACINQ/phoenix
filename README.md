@@ -15,7 +15,7 @@ This is a [Kotlin Multiplatform Mobile](https://kotlinlang.org/docs/mobile/home.
 
 ### Phoenix on iOS
 
-Phoenix is available on TestFlight, and requires iOS 14+. You can apply for the beta by sending an email to phoenix@acinq.co.
+Phoenix is available [in App Store](https://apps.apple.com/us/app/phoenix-wallet/id1544097028), and requires iOS 14+.
 
 ### Phoenix on Android
 
