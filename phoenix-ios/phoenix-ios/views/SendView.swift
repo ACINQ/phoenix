@@ -52,7 +52,7 @@ struct SendView: MVIView {
 				paymentRequest = model.request
 				isWarningDisplayed = true
 			}
-			else if let model = newModel as? Scan.ModelValidate {
+			else if let model = newModel as? Scan.ModelValidateRequest {
 				paymentRequest = model.request
 			}
 			else if newModel is Scan.ModelSending {
@@ -79,12 +79,17 @@ struct SendView: MVIView {
 				isWarningDisplayed: $isWarningDisplayed
 			)
 
-		case let model as Scan.ModelValidate:
+		case let model as Scan.ModelValidateRequest:
 			ValidateView(model: model, postIntent: mvi.intent)
 
-		case let m as Scan.ModelSending:
-			SendingView(model: m)
+		case let model as Scan.ModelSending:
+			SendingView(model: model)
 
+		case _ as Scan.ModelLoginRequest,
+		     _ as Scan.ModelLoggingIn,
+		     _ as Scan.ModelLoginResult:
+			LoginView(mvi: mvi)
+			
 		default:
 			fatalError("Unknown model \(mvi.model)")
 		}
@@ -102,10 +107,10 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 		
-		} else if model.reason is Scan.BadRequestReasonIsLnUrl {
+		} else if model.reason is Scan.BadRequestReasonUnsupportedLnUrl {
 			
 			msg = NSLocalizedString(
-				"Phoenix does not support the LNURL protocol yet",
+				"Phoenix does not support this type of LNURL yet",
 				comment: "Error message - scanning lightning invoice"
 			)
 			
@@ -215,7 +220,7 @@ struct ScanView: View, ViewName {
 			NSLocalizedString("Scan a QR code", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
-		.zIndex(2) // [SendingView, ValidateView, ScanView]
+		.zIndex(3) // [SendingView, ValidateView, LoginView, ScanView]
 		.transition(
 			.asymmetric(
 				insertion: .identity,
@@ -247,10 +252,7 @@ struct ScanView: View, ViewName {
 	func showWarning() -> Void {
 		log.trace("[\(viewName)] showWarning()")
 		
-		guard
-			let paymentRequest = paymentRequest,
-			let model = mvi.model as? Scan.ModelDangerousRequest
-		else {
+		guard let model = mvi.model as? Scan.ModelDangerousRequest else {
 			return
 		}
 		
@@ -260,7 +262,6 @@ struct ScanView: View, ViewName {
 			DangerousInvoiceAlert(
 				model: model,
 				postIntent: mvi.intent,
-				paymentRequest: paymentRequest,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
 			)
@@ -272,7 +273,6 @@ struct DangerousInvoiceAlert : View, ViewName {
 
 	let model: Scan.ModelDangerousRequest
 	let postIntent: (Scan.Intent) -> Void
-	let paymentRequest: String
 
 	@Binding var isShowing: Bool
 	@Binding var ignoreScanner: Bool
@@ -377,14 +377,17 @@ struct DangerousInvoiceAlert : View, ViewName {
 		log.trace("[\(viewName)] didConfirm()")
 		
 		isShowing = false
-		postIntent(Scan.IntentConfirmDangerousRequest(request: paymentRequest))
+		postIntent(Scan.IntentConfirmDangerousRequest(
+			request: model.request,
+			paymentRequest: model.paymentRequest
+		))
 		popoverState.close()
 	}
 }
 
 struct ValidateView: View, ViewName {
 	
-	let model: Scan.ModelValidate
+	let model: Scan.ModelValidateRequest
 	let postIntent: (Scan.Intent) -> Void
 
 	@State var number: Double = 0.0
@@ -535,7 +538,7 @@ struct ValidateView: View, ViewName {
 			NSLocalizedString("Confirm Payment", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
-		.zIndex(1) // [SendingView, ValidateView, ScanView]
+		.zIndex(1) // [SendingView, ValidateView, LoginView, ScanView]
 		.transition(.asymmetric(insertion: .identity, removal: .opacity))
 		.onAppear() {
 			onAppear()
@@ -682,7 +685,7 @@ struct ValidateView: View, ViewName {
 		case .bitcoin(let bitcoinUnit):
 			let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
 			postIntent(Scan.IntentSend(
-				request: model.request,
+				paymentRequest: model.paymentRequest,
 				amount: Lightning_kmpMilliSatoshi(msat: msat)
 			))
 			
@@ -692,7 +695,7 @@ struct ValidateView: View, ViewName {
 				
 				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
 				postIntent(Scan.IntentSend(
-					request: model.request,
+					paymentRequest: model.paymentRequest,
 					amount: Lightning_kmpMilliSatoshi(msat: msat)
 				))
 			}
@@ -711,6 +714,7 @@ struct ValidateView: View, ViewName {
 struct SendingView: View {
 	let model: Scan.ModelSending
 
+	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
@@ -733,7 +737,255 @@ struct SendingView: View {
 			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
-		.zIndex(0) // [SendingView, ValidateView, ScanView]
+		.zIndex(0) // [SendingView, ValidateView, LoginView, ScanView]
+	}
+}
+
+struct LoginView: View, ViewName {
+	
+	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
+	
+	enum MaxImageHeight: Preference {}
+	let maxImageHeightReader = GeometryPreferenceReader(
+		key: AppendValue<MaxImageHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var maxImageHeight: CGFloat? = nil
+	
+	let buttonFont: Font = .title3
+	let buttonImgScale: Image.Scale = .medium
+	
+	@ViewBuilder
+	var body: some View {
+		
+		ZStack {
+		
+			if AppDelegate.showTestnetBackground {
+				Image("testnet_bg")
+					.resizable(resizingMode: .tile)
+			}
+			
+			// I want the height of these 2 components to match exactly:
+			// Button("<img> Login")
+			// HStack("<img> Logged In")
+			//
+			// To accomplish this, I need the images to be same height.
+			// But they're not - unless we measure them, and enforce matching heights.
+			
+			Image(systemName: "bolt")
+				.imageScale(buttonImgScale)
+				.font(buttonFont)
+				.foregroundColor(.clear)
+				.read(maxImageHeightReader)
+			
+			Image(systemName: "hand.thumbsup.fill")
+				.imageScale(buttonImgScale)
+				.font(buttonFont)
+				.foregroundColor(.clear)
+				.read(maxImageHeightReader)
+			
+			main
+		}
+		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
+		.frame(maxHeight: .infinity)
+		.background(Color.primaryBackground)
+		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
+		.navigationBarTitle(
+			NSLocalizedString("lnurl-auth", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+		.zIndex(2) // [SendingView, ValidateView, LoginView, ScanView]
+	}
+	
+	@ViewBuilder
+	var main: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 30) {
+			
+			Spacer()
+			
+			Text("You can use your wallet to anonymously sign and authorize an action on:")
+				.multilineTextAlignment(.center)
+			
+			Text(domain())
+				.font(.headline)
+				.multilineTextAlignment(.center)
+			
+			if let model = mvi.model as? Scan.ModelLoginResult, model.error == nil {
+				
+				HStack(alignment: VerticalAlignment.firstTextBaseline) {
+					Image(systemName: "hand.thumbsup.fill")
+						.renderingMode(.template)
+						.imageScale(buttonImgScale)
+						.frame(minHeight: maxImageHeight)
+					Text(successTitle())
+				}
+				.font(buttonFont)
+				.foregroundColor(Color.appPositive)
+				.padding(.top, 4)
+				.padding(.bottom, 5)
+				.padding([.leading, .trailing], 24)
+				
+			} else {
+				
+				Button {
+					loginButtonTapped()
+				} label: {
+					HStack(alignment: VerticalAlignment.firstTextBaseline) {
+						Image(systemName: "bolt")
+							.renderingMode(.template)
+							.imageScale(buttonImgScale)
+							.frame(minHeight: maxImageHeight)
+						Text(buttonTitle())
+					}
+					.font(buttonFont)
+					.foregroundColor(Color.white)
+					.padding(.top, 4)
+					.padding(.bottom, 5)
+					.padding([.leading, .trailing], 24)
+				}
+				.buttonStyle(ScaleButtonStyle(
+					backgroundFill: Color.appAccent,
+					disabledBackgroundFill: Color(UIColor.systemGray)
+				))
+				.disabled(mvi.model is Scan.ModelLoggingIn)
+			}
+			
+			ZStack {
+				Divider()
+				if mvi.model is Scan.ModelLoggingIn {
+					HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+				}
+			}
+			.frame(width: 100, height: 10)
+			
+			if let errorStr = errorText() {
+				
+				Text(errorStr)
+					.font(.callout)
+					.foregroundColor(.appNegative)
+					.multilineTextAlignment(.center)
+				
+			} else {
+				
+				Text("No personal data will be shared with this service.")
+					.font(.callout)
+					.foregroundColor(.secondary)
+					.multilineTextAlignment(.center)
+			}
+			
+			Spacer()
+			Spacer()
+			
+		} // </VStack>
+		.padding(.horizontal, 20)
+	}
+	
+	var auth: LNUrl.Auth? {
+		
+		if let model = mvi.model as? Scan.ModelLoginRequest {
+			return model.auth
+		} else if let model = mvi.model as? Scan.ModelLoggingIn {
+			return model.auth
+		} else if let model = mvi.model as? Scan.ModelLoginResult {
+			return model.auth
+		} else {
+			return nil
+		}
+	}
+	
+	func domain() -> String {
+		
+		return auth?.url.host ?? "?"
+	}
+	
+	func buttonTitle() -> String {
+		
+		if let action = auth?.action() {
+			switch action {
+				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
+				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
+				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
+				case .auth      : fallthrough
+				default         : break
+			}
+		}
+		return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
+	}
+	
+	func successTitle() -> String {
+		
+		if let action = auth?.action() {
+			switch action {
+				case .register_ : return NSLocalizedString("Registered", comment: "lnurl-auth: success text")
+				case .login     : return NSLocalizedString("Logged In",  comment: "lnurl-auth: success text")
+				case .link      : return NSLocalizedString("Linked",     comment: "lnurl-auth: success text")
+				case .auth      : fallthrough
+				default         : break
+			}
+		}
+		return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
+	}
+	
+	func errorText() -> String? {
+		
+		if let model = mvi.model as? Scan.ModelLoginResult, let error = model.error {
+			
+			if let error = error as? Scan.LoginErrorServerError {
+				if let details = error.details as? LNUrl.ErrorRemoteFailureCode {
+					let frmt = NSLocalizedString("Server returned HTTP status code %d", comment: "error details")
+					return String(format: frmt, details.code.value)
+				
+				} else if let details = error.details as? LNUrl.ErrorRemoteFailureDetailed {
+					let frmt = NSLocalizedString("Server returned error: %@", comment: "error details")
+					return String(format: frmt, details.reason)
+				
+				} else {
+					return NSLocalizedString("Server returned unreadable response", comment: "error details")
+				}
+				
+			} else if error is Scan.LoginErrorNetworkError {
+				return NSLocalizedString("Network error. Check your internet connection.", comment: "error details")
+				
+			} else {
+				return NSLocalizedString("An unknown error occurred.", comment: "error details")
+			}
+		}
+		
+		return nil
+	}
+	
+	func loginButtonTapped() {
+		log.trace("[\(viewName)] loginButtonTapped()")
+		
+		if let model = mvi.model as? Scan.ModelLoginRequest {
+			// There's usually a bit of delay between:
+			// - the successful authentication (when Phoenix receives auth success response from server)
+			// - the webpage updating to reflect the authentication success
+			//
+			// This is probably due to several factors:
+			// Possibly due to client-side polling (webpage asking server for an auth result).
+			// Or perhaps the server pushing the successful auth to the client via websockets.
+			//
+			// But whatever the case, it leads to a bit of confusion for the user.
+			// The wallet says "success", but the website just sits there.
+			// Meanwhile the user is left wondering if the wallet is wrong, or something else is broken.
+			//
+			// For this reason, we're smoothing the user experience with a bit of extra animation in the wallet.
+			// Here's how it works:
+			// - the user taps the button, and we immediately send the HTTP GET to the server for authentication
+			// - the UI starts a pretty animation to show that it's authenticating
+			// - if the server responds too quickly (with succcess), we inject a small delay
+			// - during this small delay, the wallet UI continues the pretty animation
+			// - this gives the website a bit of time to update
+			//
+			// The end result is that the website is usually updating (or updated) by the time
+			// the wallet shows the "authenticated" screen.
+			// This leads to less confusion, and a happier user.
+			// Which hopefully leads to more lnurl-auth adoption.
+			//
+			mvi.intent(Scan.IntentLogin(auth: model.auth, minSuccessDelaySeconds: 1.6))
+		}
 	}
 }
 
@@ -745,18 +997,18 @@ class SendView_Previews: PreviewProvider {
 
 	static var previews: some View {
 		
-		NavigationView {
-			SendView().mock(Scan.ModelValidate(
-				request: request,
-				amountMsat: 1_500,
-				expiryTimestamp: nil,
-				requestDescription: "1 Blockaccino",
-				balanceMsat: 300_000_000
-			))
-		}
-		.modifier(GlobalEnvironment())
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
+//		NavigationView {
+//			SendView().mock(Scan.ModelValidateRequest(
+//				request: request,
+//				amountMsat: 1_500,
+//				expiryTimestamp: nil,
+//				requestDescription: "1 Blockaccino",
+//				balanceMsat: 300_000_000
+//			))
+//		}
+//		.modifier(GlobalEnvironment())
+//		.preferredColorScheme(.light)
+//		.previewDevice("iPhone 8")
 		
 		NavigationView {
 			SendingView(model: Scan.ModelSending())

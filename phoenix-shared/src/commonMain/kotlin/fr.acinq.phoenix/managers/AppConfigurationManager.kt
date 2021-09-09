@@ -4,11 +4,14 @@ import fr.acinq.lightning.blockchain.electrum.ElectrumClient
 import fr.acinq.lightning.blockchain.electrum.HeaderSubscriptionResponse
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.SqliteAppDb
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.utils.io.charsets.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
@@ -41,7 +44,19 @@ class AppConfigurationManager(
         watchElectrumMessages()
     }
 
+    // Called from AppConnectionsDaemon
+    internal fun enableNetworkAccess() {
+        startWalletContextLoop()
+    }
+
+    // Called from AppConnectionsDaemon
+    internal fun disableNetworkAccess() {
+        stopWalletContextLoop()
+    }
+
     private val currentWalletContextVersion = WalletContext.Version.V0
+
+    private val _walletContextInitialized = MutableStateFlow<Boolean>(false)
 
     private val _chainContext = MutableStateFlow<WalletContext.V0.ChainContext?>(null)
     val chainContext: StateFlow<WalletContext.V0.ChainContext?> = _chainContext
@@ -52,7 +67,11 @@ class AppConfigurationManager(
         val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < 48.hours) 2.seconds else max(freshness.inDays.toInt(), 5) * 2.seconds // max=10s
+        val timeout = if (freshness < 48.hours) {
+            2.seconds
+        } else {
+            max(freshness.inDays.toInt(), 5) * 2.seconds
+        } // max=10s
 
         // TODO are we using TOR? -> increase timeout
 
@@ -65,22 +84,27 @@ class AppConfigurationManager(
             localContext
         }
 
-        // _chainContext can be updated by [updateWalletContextLoop] before we reach this block.
-        // In that case, we don't update from here
-        if (_chainContext.value == null) {
-            _chainContext.value = walletContext?.export(chain)
-        }
-
+        _chainContext.value = walletContext?.export(chain)
         logger.info { "chainContext=$chainContext" }
+
+        _walletContextInitialized.value = true
     }
 
     private var updateWalletContextJob: Job? = null
-    public fun startWalletContextLoop() {
-        updateWalletContextJob = updateWalletContextLoop()
+    private fun startWalletContextLoop() {
+        launch {
+            // suspend until `initWalletContext()` is complete
+            _walletContextInitialized.filter { it == true }.first()
+            updateWalletContextJob = updateWalletContextLoop()
+        }
     }
 
-    public fun stopWalletContextLoop() {
-        launch { updateWalletContextJob?.cancelAndJoin() }
+    private fun stopWalletContextLoop() {
+        launch {
+            // suspend until `initWalletContext()` is complete
+            _walletContextInitialized.filter { it == true }.first()
+            updateWalletContextJob?.cancelAndJoin()
+        }
     }
 
     @OptIn(ExperimentalTime::class)
@@ -107,7 +131,45 @@ class AppConfigurationManager(
         }
     }
 
-    /** The flow containing the configuration to use for Electrum. If null, we do not know what conf to use. */
+    private val publicSuffixListKey = "publicSuffixList"
+    private val publicSuffixListDefaultRefresh = 30.days
+
+    public suspend fun fetchPublicSuffixList(
+        refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
+    ): Pair<String, Long>? {
+        val databaseRow = appDb.getValue(publicSuffixListKey) {
+            String(bytes = it, charset = Charsets.UTF_8)
+        }
+        if (databaseRow != null) {
+            val elapsed = currentTimestampMillis() - databaseRow.second
+            if (elapsed.milliseconds <= refreshIfOlderThan) {
+                return databaseRow
+            }
+        }
+
+        val latestList: String = try {
+            httpClient.get("https://acinq.co/phoenix/public_suffix_list.dat")
+        } catch (err: Throwable) {
+            logger.warning { "Error fetching public_suffix_list.dat: $err" }
+            return databaseRow
+        }
+
+        val latestListData = latestList.toByteArray(charset = Charsets.UTF_8)
+        val refreshTimestamp = appDb.setValue(latestListData, publicSuffixListKey)
+        return Pair(latestList, refreshTimestamp)
+    }
+
+    public suspend fun prefetchPublicSuffixList(
+        refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
+    ): Deferred<Pair<String, Long>?> {
+        return async {
+            fetchPublicSuffixList(refreshIfOlderThan)
+        }
+    }
+
+    /* The flow containing the configuration to use for Electrum.
+     * If null, we do not know what conf to use.
+     */
     private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
     fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
 

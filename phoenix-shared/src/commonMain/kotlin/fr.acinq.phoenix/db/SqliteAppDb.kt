@@ -3,9 +3,11 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletContext
 import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.FiatCurrency
+import io.ktor.util.date.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -18,6 +20,7 @@ class SqliteAppDb(driver: SqlDriver) {
     private val database = AppDatabase(driver = driver)
     private val paramsQueries = database.walletParamsQueries
     private val priceQueries = database.bitcoinPriceRatesQueries
+    private val keyValueStoreQueries = database.keyValueStoreQueries
     private val json = Json { ignoreUnknownKeys = true }
 
     /** Save a [BitcoinPriceRate] to the database (update or insert if does not exist). */
@@ -85,5 +88,31 @@ class SqliteAppDb(driver: SqlDriver) {
         }
 
         return updated_at to walletContext
+    }
+
+    suspend fun getValue(key: String): Pair<ByteArray, Long>? {
+        return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
+            Pair(it.value, it.updated_at)
+        }
+    }
+
+    suspend fun <T> getValue(key: String, transform: (ByteArray) -> T): Pair<T, Long>? {
+        return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
+            val tValue = transform(it.value)
+            Pair(tValue, it.updated_at)
+        }
+    }
+
+    suspend fun setValue(value: ByteArray, key: String): Long {
+        return database.transactionWithResult {
+            val exists = keyValueStoreQueries.exists(key).executeAsOne() > 0
+            val now = currentTimestampMillis()
+            if (exists) {
+                keyValueStoreQueries.update(key = key, value = value, updated_at = now)
+            } else {
+                keyValueStoreQueries.insert(key = key, value = value, updated_at = now)
+            }
+            now
+        }
     }
 }

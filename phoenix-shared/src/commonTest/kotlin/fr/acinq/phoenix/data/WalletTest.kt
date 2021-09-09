@@ -16,7 +16,10 @@
 
 package fr.acinq.phoenix.data
 
+import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.secp256k1.Hex
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -42,4 +45,17 @@ class WalletTest {
         // Testnet
         assertEquals(testnetWallet.onchainAddress("m/84'/1'/0'/0/0"), "tb1q6rz28mcfaxtmd6v789l9rrlrusdprr9pqcpvkl")
     }
+
+    @Test
+    fun lnurlAuthPath() {
+        // Test vector from spec:
+        // https://github.com/fiatjaf/lnurl-rfc/blob/luds/05.md
+        val path = mainnetWallet.lnurlAuthPath(
+            domain = "site.com",
+            hashingKey = Hex.decode("0x7d417a6a5e9a6a4a879aeaba11a11838764c8fa2b959c242d43dea682b3e409b01")
+        )
+        println("path = $path")
+        assertEquals(path, KeyPath("m/138'/3751473387/2829804099/4228872783/4134047485"))
+    }
+
 }

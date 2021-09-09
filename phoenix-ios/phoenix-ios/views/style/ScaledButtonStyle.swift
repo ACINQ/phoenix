@@ -32,18 +32,25 @@ struct ScaleButtonStyle: ButtonStyle {
 	let borderStroke: Color
 	let disabledBorderStroke: Color
 	
+	let pressedOpacity: Double
+	let disabledOpacity: Double
+	
 	init(
 		scaleAmount: CGFloat = 0.98,
 		backgroundFill: Color = Color.clear,
 		disabledBackgroundFill: Color = Color.clear,
 		borderStroke: Color = Color.clear,
-		disabledBorderStroke: Color = Color.clear
+		disabledBorderStroke: Color = Color.clear,
+		pressedOpacity: Double = 0.65,
+		disabledOpacity: Double = 0.65
 	) {
 		self.scaleAmount = scaleAmount
 		self.backgroundFill = backgroundFill
 		self.disabledBackgroundFill = disabledBackgroundFill
 		self.borderStroke = borderStroke
 		self.disabledBorderStroke = disabledBorderStroke
+		self.pressedOpacity = pressedOpacity
+		self.disabledOpacity = disabledOpacity
 	}
 	
 	func makeBody(configuration: Self.Configuration) -> some View {
@@ -53,7 +60,9 @@ struct ScaleButtonStyle: ButtonStyle {
 			backgroundFill: backgroundFill,
 			disabledBackgroundFill: disabledBackgroundFill,
 			borderStroke: borderStroke,
-			disabledBorderStroke: disabledBorderStroke
+			disabledBorderStroke: disabledBorderStroke,
+			pressedOpacity: pressedOpacity,
+			disabledOpacity: disabledOpacity
 		)
 	}
 	
@@ -74,11 +83,14 @@ struct ScaleButtonStyle: ButtonStyle {
 		let borderStroke: Color
 		let disabledBorderStroke: Color
 		
+		let pressedOpacity: Double
+		let disabledOpacity: Double
+		
 		@Environment(\.isEnabled) private var isEnabled: Bool
 		
 		var body: some View {
 			configuration.label
-				.opacity(isEnabled ? (configuration.isPressed ? 0.65 : 1.0) : 0.65)
+				.opacity(isEnabled ? (configuration.isPressed ? pressedOpacity : 1.0) : disabledOpacity)
 				.scaleEffect(configuration.isPressed ? scaleAmount : 1.0)
 				.background(isEnabled ? backgroundFill : disabledBackgroundFill)
 				.cornerRadius(100)

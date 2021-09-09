@@ -108,6 +108,7 @@
 		DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF360CF2591018300E92031 /* CloseChannelsView.swift */; };
 		DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA8758260E6F2E00AE8953 /* IntroView.swift */; };
 		DCFA876D260E91E600AE8953 /* IntroContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA876C260E91E600AE8953 /* IntroContainer.swift */; };
+		DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFD079026D84A380020DD8E /* HorizontalActivity.swift */; };
 		F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */; };
 		F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */; };
 /* End PBXBuildFile section */
@@ -261,6 +262,7 @@
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
+		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
 		F4AED295257A50CD009485C1 /* LogsConfigurationViewerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationViewerView.swift; sourceTree = "<group>"; };
 		F4AED296257A50CD009485C1 /* LogsConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogsConfigurationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -323,6 +325,7 @@
 				DC99E93F25BA141000FB20F7 /* LocalWebView.swift */,
 				DC0994AF263A074C003031CA /* InfoGrid.swift */,
 				DC33369726BAF721000E3F49 /* ShortSheet.swift */,
+				DCFD079026D84A380020DD8E /* HorizontalActivity.swift */,
 			);
 			path = widgets;
 			sourceTree = "<group>";
@@ -875,6 +878,7 @@
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
 				DCF360D02591018300E92031 /* CloseChannelsView.swift in Sources */,
+				DCFD079126D84A380020DD8E /* HorizontalActivity.swift in Sources */,
 				C8D7ABC95B979B59AF5A7CA7 /* InitializationView.swift in Sources */,
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
 				DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */,
