@@ -20,10 +20,10 @@ import android.content.Context
 import android.os.Build
 import android.text.Html
 import android.text.Spanned
-import fr.acinq.bitcoin.Btc
-import fr.acinq.bitcoin.BtcAmount
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.`package$`
+import fr.acinq.bitcoin.scala.Btc
+import fr.acinq.bitcoin.scala.BtcAmount
+import fr.acinq.bitcoin.scala.Satoshi
+import fr.acinq.bitcoin.scala.`package$`
 import fr.acinq.eclair.*
 import fr.acinq.phoenix.legacy.R
 import org.slf4j.LoggerFactory

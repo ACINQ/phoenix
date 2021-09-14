@@ -26,7 +26,7 @@ import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
-import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.scala.MnemonicCode
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.databinding.FragmentInitWalletAutoCreateBinding

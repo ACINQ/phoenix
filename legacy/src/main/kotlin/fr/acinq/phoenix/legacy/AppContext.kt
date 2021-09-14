@@ -25,7 +25,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ProcessLifecycleOwner
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.background.BalanceEvent

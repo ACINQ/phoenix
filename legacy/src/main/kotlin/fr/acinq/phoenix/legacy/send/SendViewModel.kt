@@ -18,7 +18,7 @@ package fr.acinq.phoenix.legacy.send
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.*
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.db.OutgoingPaymentStatus
 import fr.acinq.eclair.payment.PaymentRequest
 import fr.acinq.phoenix.legacy.background.EclairNodeService

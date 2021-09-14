@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import androidx.preference.PreferenceManager
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.*
 import fr.acinq.phoenix.legacy.TrampolineFeeSetting
 import org.json.JSONObject

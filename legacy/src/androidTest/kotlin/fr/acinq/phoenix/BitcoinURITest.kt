@@ -17,8 +17,8 @@ package fr.acinq.phoenix
 
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
-import fr.acinq.bitcoin.Btc
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Btc
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.phoenix.legacy.utils.BitcoinURI
 import fr.acinq.phoenix.legacy.utils.BitcoinURIParseException
 import org.junit.Assert

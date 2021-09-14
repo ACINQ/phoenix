@@ -18,9 +18,9 @@ package fr.acinq.phoenix.legacy.db
 
 import android.util.Base64
 import androidx.annotation.WorkerThread
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.Transaction
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.Crypto
+import fr.acinq.bitcoin.scala.Transaction
 import fr.acinq.eclair.`package$`
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

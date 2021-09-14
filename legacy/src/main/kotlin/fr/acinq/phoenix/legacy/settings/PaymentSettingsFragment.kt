@@ -29,7 +29,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.`SatUnit$`
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.R

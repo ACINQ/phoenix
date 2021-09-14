@@ -42,7 +42,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import com.msopentech.thali.toronionproxy.OnionProxyManager
 import com.typesafe.config.ConfigFactory
-import fr.acinq.bitcoin.*
+import fr.acinq.bitcoin.scala.*
 import fr.acinq.eclair.*
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient

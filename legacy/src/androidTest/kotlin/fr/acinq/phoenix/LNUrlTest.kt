@@ -18,7 +18,7 @@ package fr.acinq.phoenix
 
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
-import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.scala.ByteVector32
 import fr.acinq.eclair.`package$`
 import fr.acinq.phoenix.legacy.db.LNUrlPayActionData
 import fr.acinq.phoenix.legacy.lnurl.LNUrl

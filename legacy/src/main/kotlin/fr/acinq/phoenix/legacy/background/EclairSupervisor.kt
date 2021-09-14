@@ -22,8 +22,8 @@ import android.text.format.DateUtils
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
-import fr.acinq.bitcoin.Base58Check
-import fr.acinq.bitcoin.Script
+import fr.acinq.bitcoin.scala.Base58Check
+import fr.acinq.bitcoin.scala.Script
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.blockchain.electrum.ElectrumClient

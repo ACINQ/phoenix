@@ -28,10 +28,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.DeterministicWallet
-import fr.acinq.bitcoin.Protocol
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.Crypto
+import fr.acinq.bitcoin.scala.DeterministicWallet
+import fr.acinq.bitcoin.scala.Protocol
 import fr.acinq.eclair.crypto.`Mac32$`
 import fr.acinq.phoenix.legacy.BaseFragment
 import fr.acinq.phoenix.legacy.R

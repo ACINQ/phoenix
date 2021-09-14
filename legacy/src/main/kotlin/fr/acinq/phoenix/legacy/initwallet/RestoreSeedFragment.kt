@@ -33,8 +33,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.bitcoin.`MnemonicCode$`
+import fr.acinq.bitcoin.scala.MnemonicCode
+import fr.acinq.bitcoin.scala.`MnemonicCode$`
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.databinding.FragmentInitWalletRestoreBinding
 import fr.acinq.phoenix.legacy.utils.Wallet

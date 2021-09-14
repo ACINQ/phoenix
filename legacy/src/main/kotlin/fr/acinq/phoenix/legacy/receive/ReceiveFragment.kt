@@ -30,7 +30,7 @@ import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.*
 import fr.acinq.eclair.channel.`NORMAL$`
 import fr.acinq.eclair.channel.`OFFLINE$`

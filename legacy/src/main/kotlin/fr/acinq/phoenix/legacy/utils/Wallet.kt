@@ -7,10 +7,10 @@ import androidx.annotation.WorkerThread
 import com.google.common.net.HostAndPort
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import fr.acinq.bitcoin.Base58
-import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.DeterministicWallet
+import fr.acinq.bitcoin.scala.Base58
+import fr.acinq.bitcoin.scala.Block
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.DeterministicWallet
 import fr.acinq.eclair.blockchain.singleaddress.SingleAddressEclairWallet
 import fr.acinq.eclair.io.NodeURI
 import fr.acinq.eclair.payment.PaymentRequest

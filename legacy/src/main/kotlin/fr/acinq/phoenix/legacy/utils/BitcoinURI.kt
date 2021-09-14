@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.legacy.utils
 
-import fr.acinq.bitcoin.Btc
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.Btc
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.`package$`
 import fr.acinq.eclair.payment.PaymentRequest
 import org.slf4j.LoggerFactory

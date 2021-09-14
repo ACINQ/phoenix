@@ -17,8 +17,8 @@
 package fr.acinq.phoenix.legacy.db
 
 import androidx.annotation.WorkerThread
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.Satoshi
 
 class PayToOpenMetaRepository private constructor(private val queries: PayToOpenMetaQueries) {
 

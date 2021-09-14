@@ -34,8 +34,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.db.IncomingPayment
 import fr.acinq.eclair.db.IncomingPaymentStatus

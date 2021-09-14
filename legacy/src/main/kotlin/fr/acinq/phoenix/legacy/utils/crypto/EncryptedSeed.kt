@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import com.google.common.io.Files
 import com.tozny.crypto.android.AesCbcWithIntegrity
-import fr.acinq.bitcoin.MnemonicCode
+import fr.acinq.bitcoin.scala.MnemonicCode
 import fr.acinq.phoenix.legacy.utils.Constants
 import fr.acinq.phoenix.legacy.utils.Prefs
 import fr.acinq.phoenix.legacy.utils.Wallet

@@ -16,8 +16,8 @@
 
 package fr.acinq.phoenix.legacy.background
 
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.Transaction
+import fr.acinq.bitcoin.scala.ByteVector32
+import fr.acinq.bitcoin.scala.Transaction
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.Balance
 import fr.acinq.phoenix.legacy.db.ClosingType
