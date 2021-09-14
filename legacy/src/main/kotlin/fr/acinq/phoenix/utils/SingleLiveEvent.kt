@@ -13,61 +13,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package fr.acinq.phoenix.utils
 
-package fr.acinq.phoenix.utils;
-
-import android.util.Log;
-import androidx.annotation.MainThread;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import android.util.Log
+import androidx.annotation.MainThread
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import fr.acinq.phoenix.utils.SingleLiveEvent
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
  * navigation and Snackbar messages.
- * <p>
+ *
+ *
  * This avoids a common problem with events: on configuration change (like rotation) an update
  * can be emitted if the observer is active. This LiveData only calls the observable if there's an
  * explicit call to setValue() or call().
- * <p>
+ *
+ *
  * Note that only one observer is going to be notified of changes.
  */
-public class SingleLiveEvent<T> extends MutableLiveData<T> {
-
-  private static final String TAG = "SingleLiveEvent";
-
-  private final AtomicBoolean mPending = new AtomicBoolean(false);
+class SingleLiveEvent<T> : MutableLiveData<T?>() {
+  private val mPending = AtomicBoolean(false)
 
   @MainThread
-  public void observe(@NotNull LifecycleOwner owner, @NotNull final Observer<? super T> observer) {
+  override fun observe(owner: LifecycleOwner, observer: Observer<in T?>) {
 
     if (hasActiveObservers()) {
-      Log.w(TAG, "Multiple observers registered but only one will be notified of changes.");
+      Log.w(TAG, "Multiple observers registered but only one will be notified of changes.")
     }
 
     // Observe the internal MutableLiveData
-    super.observe(owner, t -> {
+    super.observe(owner, Observer {
       if (mPending.compareAndSet(true, false)) {
-        observer.onChanged(t);
+        observer.onChanged(it)
       }
-    });
+    })
   }
 
   @MainThread
-  public void setValue(@Nullable T t) {
-    mPending.set(true);
-    super.setValue(t);
+  override fun setValue(t: T?) {
+    mPending.set(true)
+    super.setValue(t)
   }
 
-  /**
-   * Used for cases where T is Void, to make calls cleaner.
-   */
+  /** Used for cases where T is Void, to make calls cleaner. */
   @MainThread
-  public void call() {
-    setValue(null);
+  fun call() {
+    value = null
   }
+
+  companion object {
+    private const val TAG = "SingleLiveEvent"
+  }
+
 }
