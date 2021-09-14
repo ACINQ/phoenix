@@ -19,18 +19,18 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.settings.ListChannelsState" />
+    <import type="fr.acinq.phoenix.legacy.settings.ListChannelsState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.settings.ListChannelsViewModel" />
+      type="fr.acinq.phoenix.legacy.settings.ListChannelsViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
       app:layout_constraintTop_toBottomOf="@id/channels_found_header"
       app:layout_constraintTop_toTopOf="@id/share_button" />
 
-    <fr.acinq.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
       android:id="@+id/share_button"
       android:layout_width="0dp"
       android:layout_height="wrap_content"

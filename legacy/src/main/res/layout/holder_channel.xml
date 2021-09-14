@@ -73,7 +73,7 @@
       app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 
-    <fr.acinq.phoenix.utils.customviews.CoinView
+    <fr.acinq.phoenix.legacy.utils.customviews.CoinView
       android:id="@+id/channel_balance_value"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
       app:layout_constraintBaseline_toBaselineOf="@id/channel_capacity_value"
       app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
 
-    <fr.acinq.phoenix.utils.customviews.CoinView
+    <fr.acinq.phoenix.legacy.utils.customviews.CoinView
       android:id="@+id/channel_capacity_value"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

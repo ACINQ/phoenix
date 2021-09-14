@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.initwallet.AutoCreateState" />
+    <import type="fr.acinq.phoenix.legacy.initwallet.AutoCreateState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.initwallet.AutoCreateViewModel" />
+      type="fr.acinq.phoenix.legacy.initwallet.AutoCreateViewModel" />
 
   </data>
 
@@ -32,9 +32,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/space_lg"
-    tools:context=".initwallet.AutoCreateFragment">
+    tools:context=".legacy.initwallet.AutoCreateFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toTopOf="parent"

@@ -20,19 +20,19 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.settings.DisplaySeedState" />
+    <import type="fr.acinq.phoenix.legacy.settings.DisplaySeedState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.settings.DisplaySeedViewModel" />
+      type="fr.acinq.phoenix.legacy.settings.DisplaySeedViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.DisplaySeedFragment">
+    tools:context=".legacy.settings.DisplaySeedFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
           android:text="@string/displayseed_instructions"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/unlock_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

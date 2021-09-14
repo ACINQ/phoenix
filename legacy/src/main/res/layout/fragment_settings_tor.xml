@@ -21,14 +21,14 @@
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.settings.TorSettingViewModel" />
+      type="fr.acinq.phoenix.legacy.settings.TorSettingViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/square_border_hz">
 
-        <fr.acinq.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/tor_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

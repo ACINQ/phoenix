@@ -20,9 +20,9 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.tozny.crypto.android.AesCbcWithIntegrity
-import fr.acinq.phoenix.utils.crypto.EncryptedSeed
-import fr.acinq.phoenix.utils.crypto.KeystoreHelper
-import fr.acinq.phoenix.utils.crypto.SeedManager
+import fr.acinq.phoenix.legacy.utils.crypto.EncryptedSeed
+import fr.acinq.phoenix.legacy.utils.crypto.KeystoreHelper
+import fr.acinq.phoenix.legacy.utils.crypto.SeedManager
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule

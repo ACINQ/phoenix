@@ -20,7 +20,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.eclair.`package$`
-import fr.acinq.phoenix.utils.Converter
+import fr.acinq.phoenix.legacy.utils.Converter
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

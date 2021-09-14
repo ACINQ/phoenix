@@ -15,7 +15,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="fr.acinq.phoenix">
+  package="fr.acinq.phoenix.legacy">
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.INTERNET" />
@@ -75,7 +75,7 @@
 
     <!-- broadcast receivers -->
     <receiver
-      android:name=".background.BootReceiver"
+      android:name="fr.acinq.phoenix.legacy.background.BootReceiver"
       android:enabled="true"
       android:exported="false">
       <intent-filter>
@@ -85,7 +85,7 @@
 
     <!-- firebase cloud messaging -->
     <service
-      android:name=".background.FCMService"
+      android:name="fr.acinq.phoenix.legacy.background.FCMService"
       android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -94,7 +94,7 @@
 
     <!-- node service -->
     <service
-      android:name=".background.EclairNodeService"
+      android:name="fr.acinq.phoenix.legacy.background.EclairNodeService"
       android:description="@string/nodeservice_desc"
       android:stopWithTask="false"
       android:exported="false" />

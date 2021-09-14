@@ -22,9 +22,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context=".settings.DisplaySeedFragment">
+    tools:context=".legacy.settings.DisplaySeedFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

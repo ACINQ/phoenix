@@ -22,7 +22,7 @@
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.initwallet.InitWalletViewModel" />
+      type="fr.acinq.phoenix.legacy.initwallet.InitWalletViewModel" />
   </data>
 
   <ScrollView
@@ -33,9 +33,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      tools:context=".initwallet.InitWalletFragment">
+      tools:context=".legacy.initwallet.InitWalletFragment">
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/create_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         app:text="@string/initwallet_create"
         app:text_color="?attr/altTextColor" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/restore_seed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
         app:layout_constraintTop_toBottomOf="@id/create_seed"
         app:text="@string/initwallet_restore" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

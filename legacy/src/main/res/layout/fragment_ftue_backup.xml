@@ -67,7 +67,7 @@
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintWidth_max="@dimen/max_width_sm" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/finish_button"
         android:layout_width="wrap_content"
         android:background="@drawable/rounded"

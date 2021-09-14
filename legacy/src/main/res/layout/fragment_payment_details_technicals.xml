@@ -20,20 +20,20 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.paymentdetails.PaymentDetailsState" />
+    <import type="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.paymentdetails.PaymentDetailsViewModel" />
+      type="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsViewModel" />
 
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".paymentdetails.PaymentDetailsTechnicalsFragment">
+    tools:context=".legacy.paymentdetails.PaymentDetailsTechnicalsFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

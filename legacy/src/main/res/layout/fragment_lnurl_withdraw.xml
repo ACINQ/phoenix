@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.lnurl.LNUrlWithdrawState" />
+    <import type="fr.acinq.phoenix.legacy.lnurl.LNUrlWithdrawState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.lnurl.LNUrlWithdrawViewModel" />
+      type="fr.acinq.phoenix.legacy.lnurl.LNUrlWithdrawViewModel" />
   </data>
 
   <ScrollView
@@ -38,7 +38,7 @@
       android:layout_height="wrap_content"
       android:paddingBottom="@dimen/space_xs">
 
-      <fr.acinq.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -152,7 +152,7 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="amount_converted,amount_error" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/confirm_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -167,7 +167,7 @@
         app:text="@string/lnurl_withdraw_confirm_button"
         app:text_color="?attr/colorOnPrimary" />
 
-      <fr.acinq.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:id="@+id/processing"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

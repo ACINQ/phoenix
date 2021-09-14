@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.send.ReadInputState" />
+    <import type="fr.acinq.phoenix.legacy.send.ReadInputState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.send.ReadInputViewModel" />
+      type="fr.acinq.phoenix.legacy.send.ReadInputViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent">
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/input_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_button" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/paste_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/paste_button" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/browse_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
       android:visibility="@{model.hasCameraAccess}"
       app:layout_constraintBottom_toBottomOf="@id/scan_view" />
 
-    <fr.acinq.phoenix.utils.customviews.ButtonView
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
       android:id="@+id/camera_access_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -176,7 +176,7 @@
         app:layout_constraintStart_toEndOf="@id/error_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/error_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <fr.acinq.phoenix.utils.customviews.ProgressTextView
+    <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:background="@drawable/rounded"
@@ -202,7 +202,7 @@
       app:layout_constraintTop_toTopOf="@id/scan_view"
       app:text="@string/readinput_extracting" />
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

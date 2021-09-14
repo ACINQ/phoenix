@@ -20,17 +20,17 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.receive.PaymentGenerationState" />
+    <import type="fr.acinq.phoenix.legacy.receive.PaymentGenerationState" />
 
-    <import type="fr.acinq.phoenix.receive.SwapInState" />
+    <import type="fr.acinq.phoenix.legacy.receive.SwapInState" />
 
     <variable
       name="appModel"
-      type="fr.acinq.phoenix.AppViewModel" />
+      type="fr.acinq.phoenix.legacy.AppViewModel" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.receive.ReceiveViewModel" />
+      type="fr.acinq.phoenix.legacy.receive.ReceiveViewModel" />
   </data>
 
   <ScrollView
@@ -40,13 +40,13 @@
     android:overScrollMode="never"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    tools:context=".receive.ReceiveFragment">
+    tools:context=".legacy.receive.ReceiveFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
-      <fr.acinq.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
           app:layout_constraintStart_toStartOf="@id/desc_label"
           app:layout_constraintTop_toBottomOf="@id/desc_label" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/generate_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -168,7 +168,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:id="@+id/invoice_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -304,7 +304,7 @@
           app:layout_constraintWidth_max="@dimen/max_width_sm"
           app:layout_goneMarginTop="@dimen/space_md" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/copy_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -316,7 +316,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/min_funding_pay_to_open" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/enlarge_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -327,7 +327,7 @@
           app:layout_constraintStart_toEndOf="@id/copy_button"
           app:layout_constraintTop_toTopOf="@id/copy_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/share_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -338,7 +338,7 @@
           app:layout_constraintStart_toEndOf="@id/enlarge_button"
           app:layout_constraintTop_toTopOf="@id/copy_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/edit_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -402,7 +402,7 @@
             app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/swap_in_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -417,7 +417,7 @@
           app:paused_text="@string/btn_pause_connecting"
           app:text="@string/receive_swap_in_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/withdraw_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

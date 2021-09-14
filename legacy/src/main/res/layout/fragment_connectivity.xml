@@ -58,7 +58,7 @@
         app:layout_constraintTop_toBottomOf="@id/summary" />
 
       <!-- tor -->
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/tor_conn_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
         app:layout_constraintTop_toBottomOf="@id/tor_conn_label" />
 
       <!-- lightning peer -->
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/lightning_conn_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -119,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@id/lightning_conn_label" />
 
       <!-- electrum -->
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/electrum_conn_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

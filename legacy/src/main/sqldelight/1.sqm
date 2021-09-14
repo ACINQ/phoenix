@@ -1,4 +1,4 @@
-import fr.acinq.phoenix.db.LNUrlPayActionTypeVersion;
+import fr.acinq.phoenix.legacy.db.LNUrlPayActionTypeVersion;
 
 -- Migration file from version 1 to version 2
 --

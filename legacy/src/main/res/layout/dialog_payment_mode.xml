@@ -18,7 +18,7 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content">
 
-  <fr.acinq.phoenix.utils.customviews.ButtonView
+  <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
     android:id="@+id/paymode_onchain_button"
     android:layout_width="match_parent"
     android:background="@drawable/button_bg_square"
@@ -40,7 +40,7 @@
     style="@style/HLineSeparator"
     app:layout_constraintTop_toBottomOf="@id/paymode_onchain_button" />
 
-  <fr.acinq.phoenix.utils.customviews.ButtonView
+  <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
     android:id="@+id/paymode_lightning_button"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

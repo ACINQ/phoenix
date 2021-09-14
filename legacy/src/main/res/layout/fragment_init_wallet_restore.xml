@@ -20,11 +20,11 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.initwallet.RestoreSeedState" />
+    <import type="fr.acinq.phoenix.legacy.initwallet.RestoreSeedState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.initwallet.RestoreSeedViewModel" />
+      type="fr.acinq.phoenix.legacy.initwallet.RestoreSeedViewModel" />
 
   </data>
 
@@ -32,7 +32,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true"
-    tools:context=".initwallet.RestoreSeedFragment">
+    tools:context=".legacy.initwallet.RestoreSeedFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
@@ -63,7 +63,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/disclaimer_message" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/disclaimer_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -146,7 +146,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.phoenix.utils.customviews.VirtualKeyboardView
+      <fr.acinq.phoenix.legacy.utils.customviews.VirtualKeyboardView
         android:id="@+id/keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
         android:visibility="@{model.state != RestoreSeedState.INIT}"
         app:layout_constraintTop_toBottomOf="@id/mnemonics_layout" />
 
-      <fr.acinq.phoenix.utils.customviews.ButtonView
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
         android:id="@+id/import_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
         app:layout_constraintTop_toBottomOf="@id/keyboard"
         app:text="@string/restore_import_button" />
 
-      <fr.acinq.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/space_md"

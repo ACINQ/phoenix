@@ -19,20 +19,20 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.settings.PreChannelsCloseState" />
+    <import type="fr.acinq.phoenix.legacy.settings.PreChannelsCloseState" />
 
-    <import type="fr.acinq.phoenix.settings.ForceCloseState" />
+    <import type="fr.acinq.phoenix.legacy.settings.ForceCloseState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.settings.ForceCloseViewModel" />
+      type="fr.acinq.phoenix.legacy.settings.ForceCloseViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/destination_desc" />
 
-        <fr.acinq.phoenix.utils.customviews.ProgressTextView
+        <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
@@ -122,7 +122,7 @@
           app:layout_constraintTop_toBottomOf="@id/sep_2"
           app:text="@string/closechannels_checking_channels" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/force_confirm_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

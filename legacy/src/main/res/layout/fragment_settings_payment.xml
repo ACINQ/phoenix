@@ -21,9 +21,9 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.PaymentSettingsFragment">
+    tools:context=".legacy.settings.PaymentSettingsFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/square_border_hz">
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/default_description_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_defaultdesc_title" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/trampoline_fees_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_trampoline_fees_title" />
 
-        <fr.acinq.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/pay_to_open_enable_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
           app:text="@string/paymentsettings_paytoopen_auto_switch_title"
           app:layout_constraintTop_toBottomOf="@id/trampoline_fees_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/pay_to_open_fees_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

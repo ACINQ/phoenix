@@ -20,20 +20,20 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.settings.AccessLockState" />
+    <import type="fr.acinq.phoenix.legacy.settings.AccessLockState" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.settings.AccessControlViewModel" />
+      type="fr.acinq.phoenix.legacy.settings.AccessControlViewModel" />
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context=".settings.AccessControlFragment">
+    tools:context=".legacy.settings.AccessControlFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/square_border_hz">
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/soft_auth_unavailable"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
           app:layout_constraintTop_toTopOf="parent"
           app:text="@string/accessctrl_auth_none_enrolled" />
 
-        <fr.acinq.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/screen_lock_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
             android:text="@string/accessctrl_full_lock_switch_backup_required"
             app:layout_constraintTop_toTopOf="parent" />
 
-          <fr.acinq.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
             android:id="@+id/backup_required_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
             app:text_size="@dimen/text_md" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <fr.acinq.phoenix.utils.customviews.SwitchView
+        <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
           android:id="@+id/full_lock_switch"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

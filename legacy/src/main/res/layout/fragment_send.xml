@@ -20,15 +20,15 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.send.SendState" />
+    <import type="fr.acinq.phoenix.legacy.send.SendState" />
 
     <variable
       name="appModel"
-      type="fr.acinq.phoenix.AppViewModel" />
+      type="fr.acinq.phoenix.legacy.AppViewModel" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.send.SendViewModel" />
+      type="fr.acinq.phoenix.legacy.send.SendViewModel" />
   </data>
 
   <ScrollView
@@ -36,7 +36,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:overScrollMode="never"
-    tools:context=".send.SendFragment">
+    tools:context=".legacy.send.SendFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
@@ -76,7 +76,7 @@
         app:tint="?attr/mutedTextColor"
         app:visible="@{model.isFormVisible()}" />
 
-      <fr.acinq.phoenix.utils.customviews.ActionBarView
+      <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
         android:id="@+id/action_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
           app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
           app:layout_constraintStart_toStartOf="parent" />
 
-        <fr.acinq.phoenix.utils.customviews.CoinView
+        <fr.acinq.phoenix.legacy.utils.customviews.CoinView
           android:id="@+id/balance_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 
-      <fr.acinq.phoenix.utils.customviews.ProgressTextView
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_md"
@@ -166,7 +166,7 @@
           android:text="@string/send_invalid_pr_already_paid"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/already_paid_layout_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -361,7 +361,7 @@
         app:layout_constraintTop_toBottomOf="@id/payment_section"
         app:visible="@{model.isFormVisible()}">
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/prepare_swap_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -376,7 +376,7 @@
           app:paused_text="@string/btn_pause_connecting"
           app:text="@string/send_swap_required_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ProgressTextView
+        <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/rounded_border"
@@ -544,7 +544,7 @@
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/swap_recap" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/send_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

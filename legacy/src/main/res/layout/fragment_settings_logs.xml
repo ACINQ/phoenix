@@ -21,9 +21,9 @@
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".settings.LogsSettingsFragment">
+    tools:context=".legacy.settings.LogsSettingsFragment">
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
           android:layout_width="match_parent"
           app:layout_constraintTop_toTopOf="parent" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/view_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
           app:layout_constraintTop_toBottomOf="@id/instructions_sep"
           app:text="@string/logs_view_button" />
 
-        <fr.acinq.phoenix.utils.customviews.ButtonView
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/share_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"

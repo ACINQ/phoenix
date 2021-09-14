@@ -20,20 +20,20 @@
 
   <data>
 
-    <import type="fr.acinq.phoenix.paymentdetails.PaymentDetailsState" />
+    <import type="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsState" />
 
     <import type="android.view.View" />
 
     <variable
       name="model"
-      type="fr.acinq.phoenix.paymentdetails.PaymentDetailsViewModel" />
+      type="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsViewModel" />
 
   </data>
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".paymentdetails.PaymentDetailsFragment">
+    tools:context=".legacy.paymentdetails.PaymentDetailsFragment">
 
     <ScrollView
       android:layout_width="match_parent"
@@ -138,7 +138,7 @@
           android:visibility="@{model.state instanceof PaymentDetailsState.Outgoing || model.state instanceof PaymentDetailsState.Incoming ? View.VISIBLE : View.INVISIBLE}"
           app:layout_constraintTop_toBottomOf="@id/top_section">
 
-          <fr.acinq.phoenix.utils.customviews.CoinView
+          <fr.acinq.phoenix.legacy.utils.customviews.CoinView
             android:id="@+id/amount_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -203,7 +203,7 @@
             app:layout_constraintStart_toEndOf="@id/onchain_address_label"
             app:layout_constraintTop_toTopOf="parent" />
 
-          <fr.acinq.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
             android:id="@+id/onchain_address_explorer_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -328,7 +328,7 @@
 
           </androidx.constraintlayout.widget.ConstraintLayout>
 
-          <fr.acinq.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
             android:id="@+id/custom_desc_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -357,7 +357,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/fees_value"
             app:layout_constraintStart_toStartOf="parent" />
 
-          <fr.acinq.phoenix.utils.customviews.CoinView
+          <fr.acinq.phoenix.legacy.utils.customviews.CoinView
             android:id="@+id/fees_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -384,7 +384,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/pay_to_open_fees_value"
             app:layout_constraintStart_toStartOf="parent" />
 
-          <fr.acinq.phoenix.utils.customviews.CoinView
+          <fr.acinq.phoenix.legacy.utils.customviews.CoinView
             android:id="@+id/pay_to_open_fees_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -439,7 +439,7 @@
             app:layout_constraintStart_toEndOf="@id/error_label"
             app:layout_constraintTop_toBottomOf="@id/pay_to_open_desc" />
 
-          <fr.acinq.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
             android:id="@+id/error_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -500,7 +500,7 @@
 
           </androidx.constraintlayout.widget.ConstraintLayout>
 
-          <fr.acinq.phoenix.utils.customviews.ButtonView
+          <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
             android:id="@+id/show_technicals_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -518,7 +518,7 @@
       </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <fr.acinq.phoenix.utils.customviews.ActionBarView
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
       android:id="@+id/action_bar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

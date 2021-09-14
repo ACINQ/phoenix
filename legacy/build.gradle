@@ -90,7 +90,7 @@ android {
 
 sqldelight {
   Database {
-    packageName = "fr.acinq.phoenix.db"
+    packageName = "fr.acinq.phoenix.legacy.db"
     sourceFolders = ["sqldelight"]
     schemaOutputDirectory = file("src/main/sqldelight/databases")
 //    verifyMigrations = true
