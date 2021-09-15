@@ -1,0 +1,97 @@
+
+
+-- This table stores the CKRecord metadata corresponding to a synced payment.
+-- * type => enum indicating whether payment is incoming or outgoing
+-- * id => stores the primary key of the payment row
+--
+CREATE TABLE IF NOT EXISTS cloudkit_payments_metadata (
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    unpadded_size INTEGER NOT NULL,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL,
+    PRIMARY KEY (type, id)
+);
+
+-- When resuming the download process (e.g. after app relaunch),
+-- we need to fetch the earliest creationDate.
+CREATE INDEX IF NOT EXISTS record_creation_idx
+ON cloudkit_payments_metadata(record_creation);
+
+-- This table stores the queue of items that need to be pushed to the cloud.
+-- * type => enum indicating whether payment is incoming or outgoing
+-- * id => stores the primary key of the payment row
+--
+CREATE TABLE IF NOT EXISTS cloudkit_payments_queue (
+    rowid INTEGER PRIMARY KEY,
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    date_added INTEGER NOT NULL
+);
+
+-- ########## cloudkit_payments_metadata ##########
+
+addMetadata:
+INSERT INTO cloudkit_payments_metadata (
+            type,
+            id,
+            unpadded_size,
+            record_creation,
+            record_blob)
+VALUES (?, ?, ?, ?, ?);
+
+updateMetadata:
+UPDATE cloudkit_payments_metadata
+SET    unpadded_size = ?,
+       record_blob = ?
+WHERE  type = ? AND id = ?;
+
+existsMetadata:
+SELECT COUNT(*) FROM cloudkit_payments_metadata
+WHERE type = ? AND id = ?;
+
+fetchMetadata:
+SELECT * FROM cloudkit_payments_metadata
+WHERE type = ? AND id = ?;
+
+scanMetadata:
+SELECT type, id FROM cloudkit_payments_metadata;
+
+scanSizes:
+SELECT type, id, unpadded_size FROM cloudkit_payments_metadata;
+
+fetchOldestCreation:
+SELECT type, id, record_creation FROM cloudkit_payments_metadata
+ORDER BY record_creation ASC
+LIMIT 1;
+
+deleteMetadata:
+DELETE FROM cloudkit_payments_metadata
+WHERE type = ? AND id = ?;
+
+deleteAllFromMetadata:
+DELETE FROM cloudkit_payments_metadata;
+
+-- ########## cloudkit_payments_queue ##########
+
+addToQueue:
+INSERT INTO cloudkit_payments_queue (
+            type,
+            id,
+            date_added)
+VALUES (?, ?, ?);
+
+fetchQueueBatch:
+SELECT * FROM cloudkit_payments_queue
+ORDER BY date_added ASC
+LIMIT :limit;
+
+fetchQueueCount:
+SELECT COUNT(*) FROM cloudkit_payments_queue;
+
+deleteFromQueue:
+DELETE FROM cloudkit_payments_queue
+WHERE rowid = ?;
+
+deleteAllFromQueue:
+DELETE FROM cloudkit_payments_queue;

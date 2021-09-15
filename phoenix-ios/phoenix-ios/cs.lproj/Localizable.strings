@@ -1,0 +1,1067 @@
+/* No comment provided by engineer. */
+" (not available)" = "(není k dispozici)";
+
+/* No comment provided by engineer. */
+" (not enrolled)" = "(not enrolled)";
+
+/* No comment provided by engineer. */
+"(coming soon)" = "(již brzy)";
+
+/* Upload progress information */
+"(completed) of (total)" = "(dokončeno) z (celkem)";
+
+/* Upload progress information */
+"(completed) of (total), pushing batch of (inFlight)" = "(dokončeno) z (celkem), posílání (inFlight)";
+
+/* No comment provided by engineer. */
+"(derived from your seed)" = "(odvozeno z vašeho seedu)";
+
+/* No comment provided by engineer. */
+"(Lightning invoice)" = "(Lightning faktura)";
+
+/* No comment provided by engineer. */
+"(Phoenix can be running in the background.)" = "(Phoenix může být spuštěn na pozadí.)";
+
+/* No comment provided by engineer. */
+"(QR code)" = "(QR kód)";
+
+/* No comment provided by engineer. */
+"(This is your address - derived from your seed. You alone possess your seed.)" = "(Toto je vaše adresa - odvozená z vašeho seedu. Jste jediný kdo seed vidí.)";
+
+/* No comment provided by engineer. */
+"(you provided this address)" = "(uvedli jste tuto adresu)";
+
+/* RecoverySeedView */
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "** Neztraťte tento seed. ** Uložte ho někam na bezpečné místo (ne na tento telefon). Pokud ztratíte svůj seed a telefon, ztratíte své finanční prostředky.";
+
+/* RecoverySeedView */
+"**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**Nesdílejte s nikým tento seed.** Dejte si pozor na phishing. Vývojáři z Phoenixu o váš seed nikdy nepožádají.";
+
+/* No comment provided by engineer. */
+"%@" = "%@";
+
+/* No comment provided by engineer. */
+"%@ milliseconds" = "%@ vteřin";
+
+/* No comment provided by engineer. */
+"%@ sat/byte" = "%@ sat/byte";
+
+/* No comment provided by engineer. */
+"%@.%@ seconds" = "%1$@.%2$@ vteřin";
+
+/* No comment provided by engineer. */
+"%@% (%@ minimum)" = "%1$@%2$ (%3$@ minimálně)";
+
+/* No comment provided by engineer. */
+"%@%@" = "%1$@%2$@";
+
+/* Minimum fee information. E.g.: 1% (3,000 sats minimum) */
+"%@%% (%@ minimum)" = "%1$@%% (%2$@ minimálně)";
+
+/* Count != 1 */
+"%d channels" = "%d kanál";
+
+/* No comment provided by engineer. */
+"+%@ incoming" = "+%@ příchozích";
+
+/* No comment provided by engineer. */
+"1 channel" = "1 kanál";
+
+/* No comment provided by engineer. */
+"A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Bude vytvořena záložní fráze, ve které jsou uloženy všechny informace, které jsou potřebné k obnovení vašich bitcoinových prostředků.";
+
+/* No comment provided by engineer. */
+"A bitcoin can be divided into smaller units. The smallest unit is called a Satoshi, and there are 100 million satoshis in a single bitcoin." = "Bitcoin je rozdělitelný na menší jednotky. Nejmenší jednotka se nazývá satoshi a v jednom bitcoinu je 100 milionů satoshi.";
+
+/* No comment provided by engineer. */
+"A random electrum server will be selected on each connection attempt." = "Při každém pokusu o připojení bude vybrán náhodný Electrum server.";
+
+/* No comment provided by engineer. */
+"A temporary error occurred, and Phoenix is unable to continue loading." = "Došlo k dočasné chybě a Phoenix nemůže pokračovat v načítání.";
+
+/* Navigation bar title */
+"About" = "O aplikaci";
+
+/* No comment provided by engineer. */
+"Access to Phoenix is protected by biometrics." = "Přístup do Phoenixu je chráněn biometrií.";
+
+/* No comment provided by engineer. */
+"Address" = "Adresa";
+
+/* Label in DetailsView_IncomingPayment */
+"address type" = "Typ adresy";
+
+/* No comment provided by engineer. */
+"Advanced" = "Pokročilé";
+
+/* No comment provided by engineer. */
+"Advanced security" = "Pokročilé zabezpečení";
+
+/* No comment provided by engineer. */
+"Amount (optional)" = "Částka (volitelné)";
+
+/* error message */
+"Amount exceeds your balance" = "Částka převyšuje váš zůstatek";
+
+/* Label in DetailsView_IncomingPayment */
+"amount received" = "přijatá částka";
+
+/* Label in DetailsView_IncomingPayment */
+"amount requested" = "požadovaná částka";
+
+/* placeholder: invoice is amount-less */
+"any amount" = "libovolná částka";
+
+/* displayed when user doesn't specify an amount */
+"Any amount" = "Libovolná částka";
+
+/* No comment provided by engineer. */
+"App access" = "Přístup k aplikaci";
+
+/* Navigation bar title */
+"App Access" = "Přístup k aplikaci";
+
+/* Biometrics prompt to unlock the Phoenix app */
+"App is locked" = "Aplikace je uzamčena";
+
+/* No comment provided by engineer. */
+"App theme" = "Motiv aplikace";
+
+/* No comment provided by engineer. */
+"Are you sure you want to pay this invoice?" = "Opravdu chcete zaplatit tuto fakturu?";
+
+/* No comment provided by engineer. */
+"Are you sure you want to proceed?" = "Opravdu chcete pokračovat?";
+
+/* Currency name: AUD */
+"Australian Dollar" = "Australský dolar";
+
+/* User prompt */
+"Authenticate to disable biometrics." = "Přihlášení k deaktivaci biometrie.";
+
+/* No comment provided by engineer. */
+"Automatic Channel Creation" = "Automatické vytváření kanálů";
+
+/* Explanation for 'Randomize upload delays' toggle */
+"Avoids payment correlation using timestamp metadata." = "Vyhněte se korelaci plateb pomocí metadat časových razítek.";
+
+/* No comment provided by engineer. */
+"Backup seed" = "Zálohovat seed";
+
+/* No comment provided by engineer. */
+"Backup transactions" = "Záložní transakce";
+
+/* No comment provided by engineer. */
+"Biometrics" = "Biometrie";
+
+/* No comment provided by engineer. */
+"BIP39 seed with standard BIP84 derivation path" = "BIP39 seed se standardní derivační cestou BIP84 ";
+
+/* Label in DetailsView_IncomingPayment */
+"bitcoin address" = "bitcoinová adresa";
+
+/* No comment provided by engineer. */
+"Bitcoin address" = "Bitcoinová adresa";
+
+/* No comment provided by engineer. */
+"Bitcoin mempool is full and fees are high." = "Bitcoin mempool je plný a poplatky jsou vysoké.";
+
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction." = "Poplatky za bitcoinovou síť zaplacené za on-chain transakce. Platba vyžaduje 1 transakci.";
+
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transactions. Payment required (txCount) transactions." = "Poplatky za bitcoinovou síť zaplacené za on-chain transakce. Vyžadovaných transakcí (txCount).";
+
+/* Label in DetailsView_IncomingPayment */
+"bitcoin txids" = "ID transakce bitcoinu";
+
+/* Navigation bar title */
+"Bitcoin unit" = "Bitcoinová jednotka";
+
+/* No comment provided by engineer. */
+"Block height" = "Velikost bloku";
+
+/* No comment provided by engineer. */
+"blockchain tx" = "Blockchainová transakce";
+
+/* Currency name: BRL */
+"Brazilian Real" = "Brazilský real";
+
+/* No comment provided by engineer. */
+"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Ve výchozím nastavení se Phoenix připojuje k náhodným Electrum serverům, aby získal přístup k bitcoinovému blockchainu. Můžete si také zvolit připojit se k vlastnímu serveru Electrum.";
+
+/* Currency name: CAD */
+"Canadian Dollar" = "Kanadský dolar";
+
+/* No comment provided by engineer. */
+"Cancel" = "Zrušit";
+
+/* Title in DetailsView_IncomingPayment
+   Transaction Info: Value */
+"Channel Closing" = "Zavření kanálu";
+
+/* No comment provided by engineer. */
+"Channel creation has been temporarily disabled. You may not be able to receive some payments." = "Vytvoření kanálu bylo dočasně deaktivováno. Je možné, že nebudete moci přijímat některé platby.";
+
+/* Label in DetailsView_IncomingPayment */
+"channel id" = "ID kanálu";
+
+/* No comment provided by engineer. */
+"Checking channel state..." = "Kontrola stavu kanálu ...";
+
+/* Currency name: CLP */
+"Chilean Peso" = "Chilské peso";
+
+/* Currency name: CNY */
+"Chinese Yuan" = "Čínský jüan";
+
+/* Label in DetailsView_IncomingPayment */
+"claimed amount" = "nárokovaná částka";
+
+/* No comment provided by engineer. */
+"Close all channels" = "Zavřít všechny kanály";
+
+/* Navigation bar title */
+"Close channels" = "Zavřít kanály";
+
+/* Title in DetailsView_IncomingPayment */
+"Closing Status" = "Status zavírání";
+
+/* No comment provided by engineer. */
+"Cloud backup" = "Cloudová záloha";
+
+/* Navigation bar title */
+"Cloud Backup" = "Záloha na Cloudu";
+
+/* No comment provided by engineer. */
+"Cloud sync complete" = "Cloudová synchronizace dokončena";
+
+/* No comment provided by engineer. */
+"Cloud sync disabled" = "Cloudová synchronizace zakázána";
+
+/* No comment provided by engineer. */
+"Cloud sync error" = "Chyba synchronizace s cloudem";
+
+/* No comment provided by engineer. */
+"Cloud sync initializing" = "Inicializace cloudové synchronizace";
+
+/* No comment provided by engineer. */
+"Cloud sync paused" = "Cloudová synchronizace pozastavena";
+
+/* No comment provided by engineer. */
+"Coming Soon" = "Již brzy";
+
+/* Label in DetailsView_IncomingPayment */
+"completed at" = "Dokončeno v ";
+
+/* No comment provided by engineer. */
+"Configuration" = "Konfigurace";
+
+/* No comment provided by engineer. */
+"Confirm" = "Potvrdit";
+
+/* Navigation bar title */
+"Confirm Payment" = "Potvrdit platbu";
+
+/* Connection state */
+"Connected" = "Připojeno";
+
+/* Connection status */
+"Connected to:" = "Připojeno k:";
+
+/* button text */
+"connecting to electrum" = "Připojení k Electrum";
+
+/* button text */
+"connecting to peer" = "Připojení k peeru";
+
+/* Connection status */
+"Connecting to:" = "Připojování k:";
+
+/* Connection state */
+"Connecting..." = "Připojování ...";
+
+/* No comment provided by engineer. */
+"Connection status" = "Stav připojení";
+
+/* No comment provided by engineer. */
+"Copied QR code image to pasteboard!" = "Obrázek QR kódu byl zkopírován do schránky!";
+
+/* No comment provided by engineer. */
+"Copied to pasteboard!" = "Zkopírováno do schránky!";
+
+/* No comment provided by engineer. */
+"Copy" = "Kopírovat";
+
+/* No comment provided by engineer. */
+"Copy Image" = "Kopírovat obrázek";
+
+/* No comment provided by engineer. */
+"Copy Text" = "Kopírovat text";
+
+/* No comment provided by engineer. */
+"Create new wallet" = "Vytvořit novou peněženku";
+
+/* No comment provided by engineer. */
+"Creating record zone..." = "Vytváření zóny záznamu ...";
+
+/* Currency name: HRK */
+"Croation Kuna" = "Chorvatská kuna";
+
+/* Currency name: CZK */
+"Czech Koruna" = "Česká koruna";
+
+/* No comment provided by engineer. */
+"Danger zone" = "Nebezpečná zóna";
+
+/* Currency name: DKK */
+"Danish Krone" = "Dánská koruna";
+
+/* App theme option */
+"Dark" = "Tmavý";
+
+/* No comment provided by engineer. */
+"Default payment description" = "Popis výchozí platby";
+
+/* No comment provided by engineer. */
+"Deleting record zone..." = "Mazání záznamu zóny ...";
+
+/* Minimum amount description. */
+"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "Vklady musí být alespoň **%@**. Poplatek je **%@%%** (%@ minimálně).";
+
+/* Label in SummaryInfoGrid */
+"Desc" = "Popis";
+
+/* No comment provided by engineer. */
+"Description (optional)" = "Popis (volitelné)";
+
+/* Navigation bar title */
+"Details" = "Podrobnosti";
+
+/* No comment provided by engineer. */
+"Display" = "Zobrazení";
+
+/* Navigation bar title */
+"Display options" = "Možnosti zobrazení";
+
+/* No comment provided by engineer. */
+"Display seed" = "Zobrazit seed";
+
+/* No comment provided by engineer. */
+"Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don't have another Phoenix wallet running with the same seed." = "Neimportujte seed, který NENÍ vytvořen touto aplikací.\n\n Také se ujistěte, že nemáte spuštěnou jinou peněženku Phoenix se stejným seedem.";
+
+/* No comment provided by engineer. */
+"DO NOT SHARE." = "NESDÍLEJTE.";
+
+/* No comment provided by engineer. */
+"Do not use this feature if you don't fully understand what it does." = "Nepoužívejte tuto funkci, pokud plně nerozumíte tomu, co dělá.";
+
+/* No comment provided by engineer. */
+"Downloading payments" = "Stahování plateb";
+
+/* No comment provided by engineer. */
+"Drain my wallet" = "Vyprázdnit moji peněženku";
+
+/* No comment provided by engineer. */
+"Edit payment request" = "Upravit žádost o platbu";
+
+/* Label in SummaryInfoGrid */
+"Elapsed" = "Uplynulý čas";
+
+/* Navigation bar title */
+"Electrum server" = "Electrum server";
+
+/* error message */
+"Enter a valid amount" = "Zadejte platnou hodnotu";
+
+/* error message */
+"Enter an amount" = "Zadejte částku";
+
+/* No comment provided by engineer. */
+"Enter keywords from your seed" = "Vložtě klíčová slova ze svého seedu";
+
+/* Label in SummaryInfoGrid */
+"Error" = "Error";
+
+/* Currency name: EUR */
+"Euro" = "Euro";
+
+/* label text */
+"Expect to receive %d separate payments." = "Doručení očekáváno  %d oddělených platbách.";
+
+/* No comment provided by engineer. */
+"External" = "Externí";
+
+/* No comment provided by engineer. */
+"FAILED" = "Neúspěšné";
+
+/* No comment provided by engineer. */
+"FAQ" = "Často kladené dotazy";
+
+/* No comment provided by engineer. */
+"Fee for on-the-fly channel creation:" = "Poplatek za vytvoření kanálu za běhu:";
+
+/* No comment provided by engineer. */
+"Fee rate" = "Sazba poplatku";
+
+/* Label in SummaryInfoGrid */
+"Fees" = "Poplatek";
+
+/* No comment provided by engineer. */
+"Fetched %@ item" = "Vyzvednuta %@ položka";
+
+/* No comment provided by engineer. */
+"Fetched %@ items" = "Vyzvednuto %@ položek";
+
+/* Navigation bar title */
+"Fiat currency" = "Fiat měna";
+
+/* No comment provided by engineer. */
+"For more information, see the FAQ" = "Více informací se dozvíte ve FAQ";
+
+/* No comment provided by engineer. */
+"Force close allows you to unilaterally close your channels." = "Vynucené zavření vám umožní jednostranně zavřít kanály.";
+
+/* Navigation bar title */
+"Force close channels" = "Vynutit uzavření kanálů";
+
+/* ForceCloseChannelsView */
+"Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "Vynucené uzavření kanálů vás bude stát peníze (na pokrytí poplatků na on-chainu) a způsobí, že vaše prostředky budou na několik dní zablokovány. **Neodinstalujte aplikaci, dokud nebudou kanály plně uzavřeny, nebo přijdete o své peníze. **";
+
+/* No comment provided by engineer. */
+"Full Screen" = "Celá obrazovka";
+
+/* No comment provided by engineer. */
+"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "Finanční prostředky lze poslat do bitcoinové peněženky. Před odesláním se ujistěte, že je adresa správná.";
+
+/* No comment provided by engineer. */
+"Funds sent" = "Odeslané prostředky";
+
+/* No comment provided by engineer. */
+"Funds will eventually be sent to:" = "Finanční prostředky budou případně zaslány na:";
+
+/* No comment provided by engineer. */
+"General" = "Obecné";
+
+/* No comment provided by engineer. */
+"Generating QRCode..." = "Generování QR kódu...";
+
+/* No comment provided by engineer. */
+"Get started" = "Začít";
+
+/* Currency name: GBP */
+"Great British Pound" = "Britská Libra";
+
+/* No comment provided by engineer. */
+"Here you can extract and visualize application logs, as well as share them." = "Zde můžete extrahovat a zobrazovat protokoly aplikací, a také je sdílet.";
+
+/* Currency name: HKD */
+"Hong Kong Dollar" = "Hongkongský dolar";
+
+/* Currency name: HUF */
+"Hungarian Forint" = "Maďarský forint";
+
+/* No comment provided by engineer. */
+"I understand" = "Rozumím";
+
+/* No comment provided by engineer. */
+"I understand." = "Rozumím.";
+
+/* Currency name: ISK */
+"Icelandic Kròna" = "Islandská koruna";
+
+/* No comment provided by engineer. */
+"If done correctly, self-backup is the most secure option." = "Správně provedená vlastní záloha je nejbezpečnější možností.";
+
+/* ErrorView */
+"If the problem persists, please contact support at **phoenix@acinq.co**." = "Pokud problém přetrvává, kontaktujte prosím podporu e-mailem na adrese **phoenix@acinq.co**.";
+
+/* No comment provided by engineer. */
+"If you switch to a new device (or reinstall the app) then you'll lose your payment history." = "Pokud měníte zařízení (nebo reinstalujete aplikaci), tak ztratíte svou historii plateb.";
+
+/* No comment provided by engineer. */
+"Import" = "Importovat";
+
+/* Fees explanation */
+"In order to receive this payment, a new payment channel was opened. This is not always required." = "Aby bylo možné tuto platbu přijmout, byl otevřen nový platební kanál. To není vždy nutné.";
+
+/* Currency name: INR */
+"Indian Rupee" = "Indická rupie";
+
+/* toast warning */
+"Invalid Lightning Request" = "Neplatný Lighning požadavek";
+
+/* No comment provided by engineer. */
+"Invalid port. Valid range: [1 - 65535]" = "Špatný rozsah portu. Povolený rozsah je [1 - 65535]";
+
+/* No comment provided by engineer. */
+"Invalid server. Use format: domain.tld" = "Špatný server. Použijte formát: doména.tld";
+
+/* Label in DetailsView_IncomingPayment */
+"invoice created" = "faktura vytvořena";
+
+/* error message */
+"Invoice is expired" = "Faktura vypršela";
+
+/* Currency name: JPY */
+"Japanese Yen" = "Japonský jen";
+
+/* No comment provided by engineer. */
+"Keep Control" = "Udržujte kontrolu";
+
+/* No comment provided by engineer. */
+"Keep it safe and secret!" = "Uchovejte to v tajnosti!";
+
+/* No comment provided by engineer. */
+"KEEP THIS SEED SAFE." = "TENTO SEED UCHOVÁVEJTE BEZPEČNĚ.";
+
+/* Currency name: KRW */
+"Korean Won" = "Korejský Won";
+
+/* Transaction Info: Explanation */
+"layer 1 -> 2" = "vrstva 1 -> 2";
+
+/* Transaction Info: Explanation */
+"layer 2 -> 1" = "vrstva 2 -> 1";
+
+/* App theme option */
+"Light" = "Světlý";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required %d hops." = "Lightning poplatky za směrování platby. Platba vyžadovuje %d skoků.";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required 1 hop." = "Lightning poplatky za směrování platby. Platba vyžadovuje 1 skok.";
+
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops." = "Lightning poplatky za směrování platby. Platba byla rozdělena na %d částí, pomocí %d skoků. ";
+
+/* No comment provided by engineer. */
+"Lightning network" = "Sít Lightning";
+
+/* Navigation bar title */
+"Logs" = "Protokoly";
+
+/* No comment provided by engineer. */
+"Look at the logs" = "Podívejte se na protokoly";
+
+/* No comment provided by engineer. */
+"Master public key" = "Hlavní veřejný klíč";
+
+/* Currency name: MXN */
+"Mexican Peso" = "Mexické Peso";
+
+/* No comment provided by engineer. */
+"Modify" = "Upravit";
+
+/* No comment provided by engineer. */
+"New Channel (auto-created)" = "Nový kanál (automaticky vytvořen)";
+
+/* Currency name: NZD */
+"New Zealand Dollar" = "Novozélandský dolar";
+
+/* No comment provided by engineer. */
+"Next" = "Další";
+
+/* No comment provided by engineer. */
+"No" = "Ne";
+
+/* placeholder: invoice is description-less */
+"no description" = "bez popisu";
+
+/* placeholder text */
+"No description" = "Bez popisu";
+
+/* No comment provided by engineer. */
+"NO FUNDS HAVE BEEN SENT" = "Nebyly poslány žádné finanční prostředky";
+
+/* Transaction Info: Explanation */
+"non-invoice payment" = "Platba bez faktury";
+
+/* No comment provided by engineer. */
+"None" = "Žádný";
+
+/* No comment provided by engineer. */
+"Note: Server must have a valid certificate" = "Poznámka: Server musí mít platný certifikát";
+
+/* Connection state */
+"Offline" = "Offline";
+
+/* No comment provided by engineer. */
+"OK" = "OK";
+
+/* No comment provided by engineer. */
+"Only you alone possess this seed. Keep it private." = "Tento seed vlastníš jen ty sám. Uchovej ho v tajnosti.";
+
+/* Label in SummaryInfoGrid */
+"Output" = "Výstup";
+
+/* No comment provided by engineer. */
+"Paste from clipboard" = "Vložit ze schránky";
+
+/* No comment provided by engineer. */
+"Path" = "Cesta";
+
+/* No comment provided by engineer. */
+"Pay" = "Zaplatit";
+
+/* Navigation bar title */
+"Payment channels" = "Platební kanály";
+
+/* No comment provided by engineer. */
+"Payment channels are automatically created when needed." = "Platební kanály jsou vytvořeny automaticky když jsou potřeba.";
+
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Platební kanály jsou vytvořeny automaticky, když dostanete platbu. K přijímání plateb prostřednictvím sítě Lightning použijte obrazovku **Přijmout**.";
+
+/* Label in DetailsView_IncomingPayment */
+"payment hash" = "hash platby";
+
+/* Navigation Bar Title */
+"Payment Options" = "Možnosti platby";
+
+/* No comment provided by engineer. */
+"Payment options & fees" = "Možnosti platby a poplatků ";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Parts" = "Platební části";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Received" = "Platba přijata";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Request" = "Platební žádost";
+
+/* Title in DetailsView_IncomingPayment */
+"Payment Sent" = "Platba odeslána";
+
+/* Explanation for 'Randomize upload delays' toggle */
+"Payments are uploaded to the cloud immediately upon completion." = "Platby se nahrávají do cloudu ihned po dokončení.";
+
+/* timestamp string for pending transaction */
+"pending" = "Čekající";
+
+/* No comment provided by engineer. */
+"PENDING" = "ČEKÁNÍ";
+
+/* No comment provided by engineer. */
+"Phoenix" = "Phoenix";
+
+/* No comment provided by engineer. */
+"Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "Phoenix je přístupný bez přihlašovacích údajů. Ujistěte se, že jste pro iOS povolili příslušné ochrany.";
+
+/* Error message - scanning lightning invoice */
+"Phoenix does not support the LNURL protocol yet" = "Phoenix zatím protokol LNURL nepodporuje";
+
+/* No comment provided by engineer. */
+"Phoenix generated" = "Phoenix vygenerováno";
+
+/* Error message in LockView */
+"Please enable Touch ID" = "Povolte prosím Touch ID";
+
+/* Error message in LockView */
+"Please enabled Face ID" = "Povolte prosím Face ID";
+
+/* No comment provided by engineer. */
+"Please restart Phoenix" = "Restartujte Phoenix";
+
+/* Currency name: PLN */
+"Polish Zloty" = "Polský zlotý";
+
+/* No comment provided by engineer. */
+"Port" = "Port";
+
+/* Connection info */
+"Random server" = "Náhodný server";
+
+/* No comment provided by engineer. */
+"Randomize upload delays" = "Použít náhodné zpoždění při nahrávání";
+
+/* No comment provided by engineer. */
+"Randomized upload delay" = "Náhodné zpoždění při nahrávání";
+
+/* Label in DetailsView_IncomingPayment */
+"reason" = "Důvod";
+
+/* Navigation bar title */
+"Receive" = "Přijmout";
+
+/* No comment provided by engineer. */
+"RECEIVED" = "PŘIJMUTO";
+
+/* Label in DetailsView_IncomingPayment */
+"received at" = "přijmuto v";
+
+/* Label in DetailsView_IncomingPayment */
+"recipient pubkey" = "Příjemce veřejného klíče";
+
+/* No comment provided by engineer. */
+"Recovery phrase" = "Fráze pro obnovení";
+
+/* Navigation bar title */
+"Recovery Seed" = "Recovery Seed";
+
+/* No comment provided by engineer. */
+"Requesting Swap-In Address..." = "Žádost o Swap-In adresu...";
+
+/* No comment provided by engineer. */
+"Require Face ID" = "Vyžadováno Face ID";
+
+/* No comment provided by engineer. */
+"Require Touch ID" = "Vyžadováno Touch ID";
+
+/* Navigation bar title */
+"Restore my wallet" = "Obnovit mou peněženku";
+
+/* Currency name: RON */
+"Romanian Leu" = "Rumunský Leu";
+
+/* Currency name: RUB */
+"Russian Ruble" = "Ruský rubl";
+
+/* No comment provided by engineer. */
+"Satoshis are often preferred because it's easier to work with whole numbers rather than fractions." = "Satoshi jsou více preferované, jelikož je jednodušší pracovat s celými čísly než se zlomky.";
+
+/* No comment provided by engineer. */
+"Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "Uložte na bezpečné místo (ne na tento telefon). Pokud ztratíte svůj seed a telefon, ztratíte své finanční prostředky";
+
+/* Navigation bar title */
+"Scan a QR code" = "Skenovat QR kód";
+
+/* No comment provided by engineer. */
+"Scan Bitcoin Address" = "Skenovat bitcoinovou adresu";
+
+/* No comment provided by engineer. */
+"Security" = "Zabezpečení";
+
+/* No comment provided by engineer. */
+"See how Phoenix is affected" = "Podívejte se, jak je Phoenix ovlivněn";
+
+/* No comment provided by engineer. */
+"Send" = "Odeslat";
+
+/* Title in DetailsView_IncomingPayment */
+"Send Failed" = "Odeslání se nezdařilo";
+
+/* No comment provided by engineer. */
+"Send Funds" = "Odeslat prostředky";
+
+/* Navigation bar title */
+"Sending payment" = "Odesílání platby";
+
+/* No comment provided by engineer. */
+"Sending Payment..." = "Odesílání platby...";
+
+/* No comment provided by engineer. */
+"SENT" = "ODESLAT";
+
+/* Label in DetailsView_IncomingPayment */
+"sent at" = "odeslat na";
+
+/* No comment provided by engineer. */
+"Server" = "Server";
+
+/* Navigation bar title */
+"Settings" = "Nastavení";
+
+/* No comment provided by engineer. */
+"Share" = "Sdílet";
+
+/* No comment provided by engineer. */
+"Share Image" = "Sdílet obrázek";
+
+/* No comment provided by engineer. */
+"Share Text" = "Sdílet Text";
+
+/* No comment provided by engineer. */
+"Share the logs" = "Sdílet protokoly";
+
+/* No comment provided by engineer. */
+"Show a Bitcoin address" = "Zobrazit bitcoinovou adresu ";
+
+/* No comment provided by engineer. */
+"Sign into iCloud to backup your payments" = "Přihlaste se do služby iCloud a zálohujte své platby";
+
+/* Currency name: SGD */
+"Singapore Dollar" = "Singapurský dolar";
+
+/* No comment provided by engineer. */
+"Skip" = "Přeskočit";
+
+/* No comment provided by engineer. */
+"Some Services Disabled" = "Některé služby jsou deaktivovány";
+
+/* No comment provided by engineer. */
+"Something is amiss with this invoice..." = "S touto fakturou není něco v pořádku...";
+
+/* No comment provided by engineer. */
+"Status" = "Stav";
+
+/* Navigation bar title */
+"Swap In" = "Swap In";
+
+/* Transaction Info: Value */
+"Swap-In" = "Swap-In";
+
+/* Transaction Info: Value */
+"Swap-Out" = "Swap-out";
+
+/* Currency name: SEK */
+"Swedish Krona" = "Švédská koruna";
+
+/* Currency name: CHF */
+"Swiss Franc" = "Švýcarský frank";
+
+/* App theme option */
+"System" = "Systém";
+
+/* Currency name: TWD */
+"Taiwan New Dollar" = "Nový tchajwanský dolar";
+
+/* No comment provided by engineer. */
+"Terminate App" = "Ukončit aplikaci";
+
+/* Currency name: THB */
+"Thai Baht" = "Thajský baht";
+
+/* Error message - parsing bitcoin address */
+"The address is for %@, but you're on %@" = "Adresa je pro %@, ale jste na %@";
+
+/* No comment provided by engineer. */
+"The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "Záložní fráze, známá jako seed, je seznam 12 anglických slov. V případě potřeby vám umožní obnovit plný přístup k vašim finančním prostředkům.";
+
+/* No comment provided by engineer. */
+"The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Bitcoinový mempool je přetížený a poplatky jsou velmi vysoké. Služba swapu na on-chainu byla dočasně deaktivována.";
+
+/* label text */
+"The closing transaction is in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "Uzavírací transakce je ve vašem seznamu transakcí na __hlavní__ obrazovce. A stav svých kanálů můžete zobrazit na obrazovce __list kanálů__.";
+
+/* label text */
+"The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "Uzavírací transakce jsou ve vašem seznamu transakcí na __hlavní__ obrazovce. A stav svých kanálů můžete zobrazit na obrazovce __list kanálů__.";
+
+/* No comment provided by engineer. */
+"The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "Data uložená v cloudu jsou šifrována a lze je dešifrovat pouze pomocí jejich seedu.";
+
+/* IntroView */
+"The fee is **%@%%** with a minimum fee of **%@**." = "Poplatek je **%@%%** s minimálním poplatkem **%@** ";
+
+/* SendView */
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "Faktura neobsahuje žádnou částku. To může být nebezpečné: škodlivé uzly mohou být schopné vaši platbu ukrást. Pro jistotu ** požádejte příjemce, aby v žádosti o platbu uvedl částku **.";
+
+/* Error message - scanning lightning invoice */
+"The invoice is for (requestChain), but you're on (reason.myChain.name)" = "Faktura je pro (requestChain),ale vy jste na (reason.myChain.name)";
+
+/* No comment provided by engineer. */
+"The invoice is for you. You are about to pay yourself." = "Faktura je pro vás. Chystáte se zaplatit sami sobě.";
+
+/* Error message - parsing bitcoin address */
+"The scanned QR code is not a bitcoin address" = "Naskenovaný QR kód není bitcoinová adresa";
+
+/* Warning for iOS Simulator (only for devs) */
+"The simulator cannot access the camera. Please use the clipboard." = "Simulátor nemá přístup ke kameře. Použijte prosím schránku.";
+
+/* No comment provided by engineer. */
+"This address is derived from your seed and belongs to you." = "Tato adresa je odvozena z vašeho seedu a patří vám.";
+
+/* No comment provided by engineer. */
+"This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co." = "Tato aplikace je experimentální. Zálohujte prosím svůj seed. Problémy můžete nahlásit na phoenix@acinq.co.";
+
+/* Error message - scanning lightning invoice */
+"This doesn't appear to be a Lightning invoice" = "Toto nevypadá jako Lightning faktura";
+
+/* ForceCloseChannelsView */
+"This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "Tato funkce není \" tlačítko kouzelného opravení \". Je zde jako bezpečnostní opatření a ** by mělo být používáno pouze v extrémních případech **. Pokud například váš peer (ACINQ) trvale zmizí, což vám znemožní utrácení peněz. Ve všech ostatních případech, ** pokud máte problémy s Phoenixem, měli byste kontaktovat podporu **.";
+
+/* No comment provided by engineer. */
+"This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "Tento poplatek platí, když obdržíte platbu přes Lightning, a je třeba vytvořit nový kanál.";
+
+/* No comment provided by engineer. */
+"This fee is dynamic, and may change depending on the conditions of the bitcoin network." = "Tento poplatek je dynamický a může se měnit v závislosti na podmínkách bitcoinové sítě.";
+
+/* No comment provided by engineer. */
+"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Tento poplatek platí pouze v případě, pokud je potřebna vytvořit nový kanál. Platby využívající stávající kanály tento poplatek neplatí. Poplatek je dynamický a může se měnit v závislosti na podmínkách bitcoinové sítě.";
+
+/* No comment provided by engineer. */
+"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Toto je adresa pro výměnu. Není kontrolována vaší peněženkou. Vklady On-chain zaslané na tuto adresu budou převedeny na Lightning kanály.";
+
+/* No comment provided by engineer. */
+"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "To znamená, že nebudete moci přijímat platby, když je Phoenix na pozadí. Abyste mohli přijímat platby, musí být Phoenix otevřený a v popředí.";
+
+/* No comment provided by engineer. */
+"This means you will not be notified if you receive a payment while Phoenix is in the background." = "To znamená, že nedostanete upozornění, pokud je Phoenix na pozadí a vy obdržíte platbu.";
+
+/* No comment provided by engineer. */
+"This seed is invalid and cannot be imported.\n\nPlease try again" = "Tento seed je neplatný a nelze jej importovat.\n\nZkuste to znovu";
+
+/* No comment provided by engineer. */
+"Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." = "V celé aplikaci můžete přepínat mezi bitcoiny a fiatem klepnutím na částku .";
+
+/* Label in DetailsView_IncomingPayment */
+"timestamp" = "Časová značka";
+
+/* No comment provided by engineer. */
+"Tip timestamp" = "Tip timestamp";
+
+/* No comment provided by engineer. */
+"To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" = "Chcete-li povolit aktualizaci aplikace na pozadí, zvolte: Nastavení -> Obecné -> Aktualizace aplikace na pozadí";
+
+/* No comment provided by engineer. */
+"To receive incoming payments, Phoenix must be running, and you must have unlocked the app once." = "Chcete-li přijímat platby, aplikace Phoenix musí být spuštěna a je nezbytné aplikaci jednou odemknout.";
+
+/* No comment provided by engineer. */
+"To receive incoming payments, Phoenix must be running." = "Abyste mohli přijímat platby, aplikace Phoenix musí být spuštěna.";
+
+/* Informational warning in SendView */
+"To scan a QR code you must give Phoenix permission to access the camera." = "Abyste mohli naskenovat QR kód, musíte aplikaci Phoenix udělit přístup k fotoaparátu.";
+
+/* No comment provided by engineer. */
+"Tor" = "Tor";
+
+/* No comment provided by engineer. */
+"Tor is disabled" = "Tor je deaktivován";
+
+/* No comment provided by engineer. */
+"Tor is enabled" = "Tor je povolen";
+
+/* Navigation bar title */
+"Tor Settings" = "Tor Nastavení";
+
+/* Label in DetailsView_IncomingPayment */
+"total amount" = "celková částka";
+
+/* No comment provided by engineer. */
+"Try again later" = "Zkuste to znovu později";
+
+/* No comment provided by engineer. */
+"Tx" = "Transakce";
+
+/* Label in DetailsView_IncomingPayment */
+"type" = "typ";
+
+/* Label in SummaryInfoGrid */
+"Type" = "Typ";
+
+/* Currency name: USD */
+"United States Dollar" = "Americký dolar";
+
+/* Connection state */
+"Unknown" = "Neznámý";
+
+/* Error message - parsing bitcoin address */
+"Unknown Bech32 version" = "Neznámý verze Bech32";
+
+/* Error message in LockView */
+"Unknown biometrics" = "Neznámá biometrie";
+
+/* Biometrics prompt */
+"Unlock your seed." = "Odemkněte svůj seed";
+
+/* No comment provided by engineer. */
+"Updating cloud" = "Aktualizace cloudu";
+
+/* No comment provided by engineer. */
+"Uploading payments" = "Odesílání plateb";
+
+/* Explanation for 'Use cellular data' toggle */
+"Uploads can occur over cellular connections." = "Nahrávání může probíhat přes mobilní připojení.";
+
+/* Explanation for 'Use cellular data' toggle */
+"Uploads will only occur over WiFi." = "Nahrávání bude probíhat pouze přes WiFi.";
+
+/* No comment provided by engineer. */
+"Use a custom server" = "Použít vlastní server";
+
+/* No comment provided by engineer. */
+"Use cellular data" = "Použít mobilní data";
+
+/* CloseChannelsView */
+"Use this feature to transfer __all__ your funds to a Bitcoin address." = "Pomocí této funkce převeďte __všechny__ své prostředky na bitcoinovou adresu.";
+
+/* No comment provided by engineer. */
+"Version %@" = "Verze %@";
+
+/* Label in DetailsView_IncomingPayment */
+"via" = "Přes";
+
+/* button text */
+"waiting for internet" = "čekání na internet";
+
+/* No comment provided by engineer. */
+"Waiting for internet" = "Čekání na internet";
+
+/* No comment provided by engineer. */
+"Waiting..." = "Čekání...";
+
+/* No comment provided by engineer. */
+"Warning" = "Varování";
+
+/* No comment provided by engineer. */
+"Welcome!" = "Vítejte!";
+
+/* Connection status */
+"Will connect to:" = "Připojí se k:";
+
+/* No comment provided by engineer. */
+"Will disable cloud syncing" = "Synchronizace na cloud bude deaktivována";
+
+/* No comment provided by engineer. */
+"Will enable cloud syncing" = "Synchronizace na cloud bude povolena";
+
+/* No comment provided by engineer. */
+"With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "Ve Phoenixu je přijímání a odesílání bitcoinů bezpečné, rychlé a snadné.";
+
+/* No comment provided by engineer. */
+"Would you like to be notified when somebody sends you a payment?" = "Chcete být upozorněni, když vám někdo pošle platbu?";
+
+/* No comment provided by engineer. */
+"Yes" = "Ano";
+
+/* No comment provided by engineer. */
+"You are responsible for backing up your seed." = "Jste zodpovědní za vytvoření záložní kopie vašeho seedu.";
+
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"You can also use the **Payment Channels** screen to inspect the state of your channels." = "Ke kontrole stavu svých kanálů můžete také použít obrazovku **Platební kanály**.";
+
+/* No comment provided by engineer. */
+"You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "Své soukromí můžete zlepšit pouze tím, že použijete Tor při připojení k serveru Electrum nebo k vašemu Lightning peeru.";
+
+/* No comment provided by engineer. */
+"You currenly have 1 Lightning channel with a balance of %@." = "Aktuálně máte 1 Lightning kanál se zůstatkem %@.";
+
+/* No comment provided by engineer. */
+"You currently don't have any channels that can be closed." = "Aktuálně nemáte žádné kanály, které můžou být uzavřeny.";
+
+/* No comment provided by engineer. */
+"You currently have %@ Lightning channels with an aggragate balance of %@." = "Aktuálně máte %1$@ Lightning kanálů s celkovým zůstatkem %2$@.";
+
+/* No comment provided by engineer. */
+"You don't have any payment channels." = "Nemáte žádné platební kanály.";
+
+/* No comment provided by engineer. */
+"You have disabled Background App Refresh for this app." = "Pro tuto aplikaci jste deaktivovali aktualizaci na pozadí.";
+
+/* No comment provided by engineer. */
+"You have disabled notifications for this app." = "Pro tuto aplikaci jste deaktivovali oznámení.";
+
+/* Error message - scanning lightning invoice */
+"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." = "Naskenovali jste bitcoinovou adresu. Phoenix v současné době podporuje pouze odesílání plateb Lightning. K provedení offchain-> onchain výměny můžete použít službu třetí strany.";
+
+/* Error message - scanning lightning invoice */
+"You've already paid this invoice. Paying it again could result in stolen funds." = "Tuto fakturu jste již zaplatili. Opětovné zaplacení může vést ke krádeži finančních prostředků.";
+
+/* No comment provided by engineer. */
+"Your Node ID:" = "ID vašeho uzlu:";
+
+/* No comment provided by engineer. */
+"Your payment history is only stored on this device." = "Vaše historie plateb je uložena pouze v tomto zařízení.";
+
+/* No comment provided by engineer. */
+"Your payment history will be stored in iCloud." = "Vaše historie plateb bude uložena na iCloudu.";
+
+/* Minimum amount description. */
+"Your wallet is empty. The first payment you receive must be at least **%@**." = "Vaše peněženka je prázdná. První platba kterou dostanete musí být nejméně **% @ **.";
+
+/* No comment provided by engineer. */
+"Your wallet's seed is a list of 12 english words." = "Seed vaší peněženky je seznam 12 anglických slov.";

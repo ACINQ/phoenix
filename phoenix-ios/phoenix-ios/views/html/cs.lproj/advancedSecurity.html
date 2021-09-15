@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='UTF-8'>
+	<meta name='viewport' content='width=device-width initial-scale=1'>
+	<style></style>
+</head>
+<body>
+
+<p>Standard security:</p>
+<ul>
+	<li>Access to the user interface is protected by biometrics.</li>
+	<li>Phoenix can receive incoming payments as long as the app is running.</li>
+</ul>
+
+<p>Advanced security:</p>
+<ul>
+	<li>Access to your seed is protected by biometrics.</li>
+	<li>Phoenix can receive incoming payments as long as the app is running <strong>AND</strong> you&#39;ve unlocked the app at least once.</li>
+</ul>
+
+<h4>Reduced app functionality:</h4>
+<p>
+	With advanced security enabled: If the device is restarted, and Phoenix is re-launched automatically (e.g. operating system upgrade), then incoming payments will fail until you unlock Phoenix.
+</p>
+
+<h4>Technical details:</h4>
+<p>
+	Your seed is wrapped using ChaCha20-Poly1305 with a 256-bit lockingKey, and the resulting {ciphertext, nonce, tag} is stored in a JSON file on disk. The lockingKey is stored in the iOS keychain.
+</p>
+<p>
+	With normal security, the app can access the lockingKey on app launch, and immediately unlock the bitcoin wallet. Enabled security options restrict access to the user interface.
+</p>
+<p>
+	With advanced security, the lockingKey is encumbered such that it cannot be accessed unless you authenticate with biometrics. Thus the app is incapable of unlocking the bitcoin wallet without your assistance.
+</p>
+</body>
+</html>

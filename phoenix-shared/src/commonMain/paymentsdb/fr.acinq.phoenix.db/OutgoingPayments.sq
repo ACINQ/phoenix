@@ -1,0 +1,185 @@
+import fr.acinq.lightning.db.HopDesc;
+import fr.acinq.phoenix.db.payments.OutgoingDetailsTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion;
+import kotlin.collections.List;
+
+PRAGMA foreign_keys = 1;
+
+-- outgoing payments
+-- Stores an outgoing payment in a flat row. Some columns can be null.
+CREATE TABLE IF NOT EXISTS outgoing_payments (
+    id TEXT NOT NULL PRIMARY KEY,
+    recipient_amount_msat INTEGER NOT NULL,
+    recipient_node_id TEXT NOT NULL,
+    payment_hash BLOB NOT NULL,
+    created_at INTEGER NOT NULL,
+    -- details
+    details_type TEXT AS OutgoingDetailsTypeVersion NOT NULL,
+    details_blob BLOB NOT NULL,
+    -- status
+    completed_at INTEGER DEFAULT NULL,
+    status_type TEXT AS OutgoingStatusTypeVersion DEFAULT NULL,
+    status_blob BLOB DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
+    part_id TEXT NOT NULL PRIMARY KEY,
+    part_parent_id TEXT NOT NULL,
+    part_amount_msat INTEGER NOT NULL,
+    part_route TEXT AS List<HopDesc> NOT NULL,
+    part_created_at INTEGER NOT NULL,
+    -- status
+    part_completed_at INTEGER DEFAULT NULL,
+    part_status_type TEXT AS OutgoingPartStatusTypeVersion DEFAULT NULL,
+    part_status_blob BLOB DEFAULT NULL,
+
+    FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
+);
+
+-- A FOREIGN KEY does NOT create an implicit index.
+-- One would expect it to, but it doesn't.
+-- As per the docs (https://sqlite.org/foreignkeys.html):
+-- > Indices are not required for child key columns but they are almost always beneficial.
+-- > [...] So, in most real systems, an index should be created on the child key columns
+-- > of each foreign key constraint.
+CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_parts(part_parent_id);
+
+-- queries
+
+hasOutgoingPayment:
+SELECT COUNT(*) FROM outgoing_payments
+WHERE id = ?;
+
+addOutgoingPayment:
+INSERT INTO outgoing_payments (
+            id,
+            recipient_amount_msat,
+            recipient_node_id,
+            payment_hash,
+            created_at,
+            details_type,
+            details_blob)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+updateOutgoingPayment:
+UPDATE outgoing_payments SET completed_at=?, status_type=?, status_blob=? WHERE id=?;
+
+hasOutgoingPart:
+SELECT COUNT(*) FROM outgoing_payment_parts
+WHERE part_id = ?;
+
+addOutgoingPart:
+INSERT INTO outgoing_payment_parts (
+            part_id,
+            part_parent_id,
+            part_amount_msat,
+            part_route,
+            part_created_at)
+VALUES (?, ?, ?, ?, ?);
+
+updateOutgoingPart:
+UPDATE outgoing_payment_parts
+SET    part_status_type=?,
+       part_status_blob=?,
+       part_completed_at=?
+WHERE  part_id=?;
+
+getOutgoingPart:
+SELECT * FROM outgoing_payment_parts WHERE part_id=?;
+
+deleteOutgoingPart:
+DELETE FROM outgoing_payment_parts WHERE part_id=?;
+
+getOutgoingPaymentWithoutParts:
+SELECT id,
+       recipient_amount_msat,
+       recipient_node_id,
+       payment_hash,
+       details_type,
+       details_blob,
+       created_at,
+       completed_at,
+       status_type,
+       status_blob
+FROM outgoing_payments
+WHERE id=?;
+
+getOutgoingPayment:
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
+FROM outgoing_payments AS parent
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+WHERE parent.id=?;
+
+listOutgoingForPaymentHash:
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
+FROM outgoing_payments AS parent
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+WHERE payment_hash=?;
+
+listOutgoingInOffset:
+SELECT parent.id,
+       parent.recipient_amount_msat,
+       parent.recipient_node_id,
+       parent.payment_hash,
+       parent.details_type,
+       parent.details_blob,
+       parent.created_at,
+       parent.completed_at,
+       parent.status_type,
+       parent.status_blob,
+       -- parts
+       parts.part_id,
+       parts.part_amount_msat,
+       parts.part_route,
+       parts.part_created_at,
+       parts.part_completed_at,
+       parts.part_status_type,
+       parts.part_status_blob
+FROM outgoing_payments AS parent
+LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+ORDER BY parent.completed_at DESC, parent.id DESC
+LIMIT ?, ?;
+
+scanCompleted:
+SELECT id, completed_at
+FROM   outgoing_payments
+WHERE  completed_at IS NOT NULL;
+
+-- use this in a `transaction` block to know how many rows were changed after an UPDATE
+changes:
+SELECT changes();

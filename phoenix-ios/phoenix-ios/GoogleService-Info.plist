@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>358118532563-6mk6vj5juts2ek7on7c8ej3fpd5686mr.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCThStqY87eRgaLzC1kTe0zrPCtGMRleow</string>
+	<key>GCM_SENDER_ID</key>
+	<string>358118532563</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>co.acinq.phoenix</string>
+	<key>PROJECT_ID</key>
+	<string>phoenix-testnet-dc948</string>
+	<key>STORAGE_BUCKET</key>
+	<string>phoenix-testnet-dc948.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:358118532563:ios:2312a2c09fd90a9ae4fb26</string>
+	<key>DATABASE_URL</key>
+	<string>https://phoenix-testnet-dc948.firebaseio.com</string>
+</dict>
+</plist>

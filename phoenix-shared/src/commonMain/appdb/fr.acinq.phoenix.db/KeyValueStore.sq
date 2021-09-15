@@ -1,0 +1,22 @@
+-- Generic key/value store
+
+CREATE TABLE IF NOT EXISTS key_value_store (
+    key TEXT NOT NULL PRIMARY KEY,
+    value BLOB NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+get:
+SELECT * FROM key_value_store WHERE key = ?;
+
+exists:
+SELECT COUNT(*) FROM key_value_store WHERE key = ?;
+
+insert:
+INSERT INTO key_value_store(key, value, updated_at) VALUES (?, ?, ?);
+
+update:
+UPDATE key_value_store SET value = ?, updated_at = ? WHERE key = ?;
+
+delete:
+DELETE FROM key_value_store WHERE key = ?;

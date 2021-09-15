@@ -1,85 +1,70 @@
-# How-to build Phoenix
+# Building
 
-This section explains how to install a development environment for Phoenix. If you simply want to build the Phoenix APK, check the [Release section below](#release-phoenix).
+This document explains how to build the new Phoenix application using the Kotlin MultiPlatform stack. For the legacy version, see [here](https://github.com/ACINQ/phoenix/blob/master/phoenix-legacy/BUILD.md).
 
-First you'll have to build the various dependencies for the application.
+The new Phoenix app is a [Kotlin Multiplatform Mobile](https://kotlinlang.org/docs/mobile/home.html) application.
+It can run on many different platforms, including mobile devices (iOS and Android).
 
-## Building eclair-core for Phoenix
+## Requirements
 
-1. Clone the eclair project from https://github.com/ACINQ/eclair
-2. Checkout the `android-phoenix` branch
-3. Follow the instructions provided in the [BUILD.md](https://github.com/ACINQ/eclair/blob/master/BUILD.md) file of the eclair project
+You'll need to install the following:
+- [Git LFS](https://git-lfs.github.com/): large files like png are stored using the Large File Storage Git extension.
+- [Xcode](https://developer.apple.com/xcode/): if you build the iOS app.
+- [Android Studio](https://developer.android.com/studio): if you want to build the Android app. It is also recommended if you want to contribute to the `phoenix-shared` module which contains shared code used by both iOS and Android apps.
 
-## Building the TOR proxy library
+## Build lightning-kmp
 
-Phoenix uses a library to manage the communication with the tor binary. This library must be built locally
+First you must build the lightning-kmp library. See the build instructions [here](https://github.com/ACINQ/lightning-kmp/blob/master/BUILD.md).
 
-1. Clone the library from https://github.com/ACINQ/Tor_Onion_Proxy_Library
-2. At the root of this project, run:
-```shell
-./gradlew install
-./gradlew :universal:build
-./gradlew :android:build
-./gradlew :android:publishToMaven
+## Build the application
+
+Start by cloning the repository locally:
+
+```sh
+git clone git@github.com:ACINQ/phoenix-kmm.git
+cd phoenix-kmm
 ```
 
-## Building the app proper
+### The phoenix-shared module
 
-[Android Studio](https://developer.android.com/studio) is the recommended development environment.
+This module is where [Kotlin Multiplatform Mobile](https://kotlinlang.org/docs/mobile/home.html) is used. The code written in Kotlin is shared between the Android and the iOS application. It contains common logic, such as the database queries, or the MVI controllers. Open this project with IntelliJ or Android Studio.
 
-1. Install Android Studio
-2. Clone the phoenix project from https://github.com/ACINQ/phoenix
-3. Checkout the `master` branch (this is the default development branch, using the `TESTNET` blockchain)
-4. Open Android Studio, and click on `File` > `Open...`, and open the cloned folder
-5. Project initialization will proceed.
+You do not need to build this module yourself:
 
-Note:
-- If you have an error mentioning that the `eclair-core` library could not be found, it's because you need to build it first (see above).
-- The version of eclair-core used by Phoenix often changes; tagged version of the app (aka releases) always depends on a tagged version of eclair-core. The current `android-phoenix` branch may be a SNAPSHOT version which does not correspond to what the current Phoenix `master` depends on.
-- You can check what eclair-core `.jar` file you have built by checking your local maven repository (`path/to/repo/fr/acinq/eclair/eclair-core_2.11/<version>/`). Default repository is `~/.m2`.
+- For Android, the Android app has a direct dependency to this module and Android Studio will build it automatically when building the Android app.
 
-# Release Phoenix
+- For iOS, when building the iOS app, XCode will automatically call this command:
 
-Phoenix releases are deterministically built using a dockerized Linux environment. This allow anyone to recreate the same APK that is published in the release page (minus the release signing part which is obviously not public).
-
-Notes:
-- This tool works on Linux and Windows.
-- Following instructions only work for releases after v.1.3.1 (excluded).
-
-### Prerequisites
-
- You don't have to worry about installing any development tool, except:
-
-1. Docker (Community Edition)
-
-Note: on Windows at least, it is strongly recommended to bump the resources allocation settings from the default values, especially for Memory.
-
-### Build the APK
-
-1. Clone the phoenix project from https://github.com/ACINQ/phoenix ;
-
-2. Open a terminal at the root of the cloned project ;
-
-3. Checkout the tag you want to build, for example:
-
-```shell
-git checkout v1.4.0
+```
+./gradlew :phoenix-shared:packForXCode -PXCODE_CONFIGURATION=Debug -PXCODE_PLATFORM_NAME=iphoneos -PskipAndroid=true
 ```
 
-4. Build the docker image mirroring the release environment (this typically takes ~20min):
+Which generates the phoenix-ios-framework for iOS.
 
-```shell
-docker build -t phoenix_build .
+#### Skip the Android app
+
+If you are only interested in the iOS application, create a `local.properties` file at the root of the project, and add the following line:
+
+```
+skip.android=true
 ```
 
-5. Build the APKs using the docker image (takes typically ~10min):
+### Build the iOS app
 
-```shell
-# If you're on linux:
-docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble
+Open XCode, then open the `phoenix-ios` project. Once the project is properly imported, click on Product > Build.
 
-# If you're on Windows:
-docker run --rm -v ${pwd}:/home/ubuntu/phoenix/app/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew assemble
-```
+If the project builds successfully, you can then run it on a device or an emulator.
 
-6. Built artifacts are in `.apk/release`.
+### Build the Android app
+
+Open the entire phoenix-kmm project in Android Studio, then build the application. Note that the Android app uses Jetpack compose, which currently requires Android Studio Canary. Using a regular Android Studio release may cause issues.
+
+## Troubleshooting
+
+### lightning-kmp versions
+
+Make sure that the lightning-kmp version that phoenix-kmm depends on is the same that the lightning-kmp version you are building. Your local lightning-kmp repository may not be pointing to the version that phoenix-kmm requires.
+
+Phoenix-kmm defines its lightning-kmp version in `phoenix-shared/build.gradle.kts`, with `val lightningkmpVersion = "xxx"`.
+
+If this value is `snapshot` it means that the current phoenix `master` branch is in development and depends on a floating version of lightning-kmp. In that case, there may be API changes in lightning-kmp and build may fail. In that case, you can checkout a tag of phoenix-kmm, which will always use a stable, tagged version of lightning-kmp.

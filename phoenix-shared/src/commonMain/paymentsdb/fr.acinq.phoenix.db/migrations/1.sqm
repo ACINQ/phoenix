@@ -1,0 +1,24 @@
+-- Migration: v1 -> v2
+--
+-- Changes:
+-- * Added table cloudkit_payments_metadata
+-- * Added table cloudkit_payments_queue
+
+CREATE TABLE IF NOT EXISTS cloudkit_payments_metadata (
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    unpadded_size INTEGER NOT NULL,
+    record_creation INTEGER NOT NULL,
+    record_blob BLOB NOT NULL,
+    PRIMARY KEY (type, id)
+);
+
+CREATE INDEX IF NOT EXISTS record_creation_idx
+ON cloudkit_payments_metadata(record_creation);
+
+CREATE TABLE IF NOT EXISTS cloudkit_payments_queue (
+    rowid INTEGER PRIMARY KEY,
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    date_added INTEGER NOT NULL
+);

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_xxs">4dp</dimen>
+    <dimen name="space_lg">32dp</dimen>
+
+    <dimen name="icon_size">18dp</dimen>
+
+    <!-- scanner -->
+    <dimen name="scanner_size">250dp</dimen>
+</resources>

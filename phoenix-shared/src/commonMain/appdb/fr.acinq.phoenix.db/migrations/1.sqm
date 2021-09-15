@@ -1,0 +1,10 @@
+-- Migration: v1 -> v2
+--
+-- Changes:
+-- * Added table key_value_store
+
+CREATE TABLE IF NOT EXISTS key_value_store (
+    key TEXT NOT NULL PRIMARY KEY,
+    value BLOB NOT NULL,
+    updated_at INTEGER NOT NULL
+);
