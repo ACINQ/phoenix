@@ -63,6 +63,7 @@ jobs:
       run: |
         cd phoenix
         ./gradlew clean
+        printf "\nskip.android=false" >> local.properties
         ./gradlew :phoenix-legacy:assembleDebug --stacktrace
 
     # 4 - sign apk
