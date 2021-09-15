@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-include ':legacy'
+include ':phoenix-legacy'

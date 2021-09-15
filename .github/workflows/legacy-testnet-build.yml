@@ -63,7 +63,7 @@ jobs:
       run: |
         cd phoenix
         ./gradlew clean
-        ./gradlew :legacy:assembleDebug --stacktrace
+        ./gradlew :phoenix-legacy:assembleDebug --stacktrace
 
     # 4 - sign apk
 
