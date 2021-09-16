@@ -8,12 +8,13 @@ pluginManagement {
 
 rootProject.name = "phoenix"
 
-// The Android app is optional and skipped by default to make life easier on iOS developers.
-// The `skip.android` property in `local.properties` define whether the android application is built or not.
+// Android apps (legacy and kmm) may be skipped to make life easier on iOS developers.
+// Use `skip.android` in `local.properties` to define whether android app are built or not.
+// By default, Android apps are NOT skipped.
 val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
     ?.inputStream()?.use { java.util.Properties().apply { load(it) } }
-    ?.run { getProperty("skip.android", "true")?.toBoolean() }
-    ?: true
+    ?.run { getProperty("skip.android", "false")?.toBoolean() }
+    ?: false
 
 // Inject the skip value in System properties so that it can be used in other gradle build files.
 System.setProperty("includeAndroid", (!skipAndroid).toString())
