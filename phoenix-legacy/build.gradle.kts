@@ -30,7 +30,7 @@ android {
     minSdk = 24
     targetSdk = 30
     versionCode = 33
-    versionName = "${gitCommitHash()}"
+    versionName = gitCommitHash()
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -85,83 +85,61 @@ sqldelight {
 dependencies {
   implementation(fileTree("dir" to "libs", "include" to listOf("*.jar")))
 
-  // base dependencies
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.32")
-  implementation("androidx.core:core-ktx:1.3.2")
-  implementation("androidx.appcompat:appcompat:1.2.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+  implementation("com.google.android.material:material:${Versions.AndroidLegacy.material}")
 
-  // ANDROIDX - material
-  implementation("com.google.android.material:material:1.4.0-alpha02")
-
+  // ANDROIDX
+  implementation("androidx.core:core-ktx:${Versions.Android.ktx}")
+  implementation("androidx.appcompat:appcompat:${Versions.AndroidLegacy.appCompat}")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}")
   // ANDROIDX - navigation
-  val nav_version = "2.3.5"
-  implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
-  implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
-
+  implementation("androidx.navigation:navigation-fragment-ktx:${Versions.AndroidLegacy.navigation}")
+  implementation("androidx.navigation:navigation-ui-ktx:${Versions.AndroidLegacy.navigation}")
   // ANDROIDX - constraint layout
-  val constraint_version = "2.0.4"
-  implementation("androidx.constraintlayout:constraintlayout:$constraint_version")
-
+  implementation("androidx.constraintlayout:constraintlayout:${Versions.AndroidLegacy.constraint}")
   // ANDROIDX - viewmodel + livedata
-  val lifecycle_version = "2.3.1"
-  implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
-  implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
-
+  implementation("androidx.lifecycle:lifecycle-extensions:${Versions.AndroidLegacy.lifecycleExtensions}")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidLegacy.lifecycle}")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.AndroidLegacy.lifecycle}")
+  implementation("androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidLegacy.lifecycle}")
   // ANDROIDX - biometric
-  val biometric_version = "1.1.0"
-  implementation("androidx.biometric:biometric:$biometric_version")
-
+  implementation("androidx.biometric:biometric:${Versions.AndroidLegacy.biometrics}")
   // ANDROIDX - preferences
-  val preference_version = "1.1.1"
-  implementation("androidx.preference:preference-ktx:$preference_version")
-
+  implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
   // ANDROIDX - work manager
-  val work_version = "2.5.0"
-  implementation("androidx.work:work-runtime-ktx:$work_version") {
+  implementation("androidx.work:work-runtime-ktx:${Versions.AndroidLegacy.work}") {
     exclude(group = "com.google.guava", module = "listenablefuture")
   }
-
   // ANDROIDX - view pager 2
-  val view_pager_version = "1.0.0"
-  implementation("androidx.viewpager2:viewpager2:$view_pager_version")
+  implementation("androidx.viewpager2:viewpager2:${Versions.AndroidLegacy.viewpager}")
 
   // SQLDelight
-  implementation("com.squareup.sqldelight:android-driver:1.5.0")
+  implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
 
   // logging
-  implementation("org.slf4j:slf4j-api:1.7.30")
-  implementation("com.github.tony19:logback-android:2.0.0")
+  implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
+  implementation("com.github.tony19:logback-android:${Versions.Android.logback}")
 
   // eclair core
-  val eclair_version = "0.4.15-android-phoenix-SNAPSHOT"
-  implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:0.5.1")
-  implementation("fr.acinq.eclair:eclair-core_2.11:$eclair_version")
+  implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
+  implementation("fr.acinq.eclair:eclair-core_2.11:${Versions.AndroidLegacy.eclair}")
 
   // eventbus
-  val eventbus_version = "3.1.1"
-  implementation("org.greenrobot:eventbus:$eventbus_version")
+  implementation("org.greenrobot:eventbus:${Versions.AndroidLegacy.eventbus}")
 
   // zxing
-  val zxing_version = "4.1.0"
-  implementation("com.journeyapps:zxing-android-embedded:$zxing_version")
+  implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")
 
   // tests
   implementation("androidx.legacy:legacy-support-v4:1.0.0")
   testImplementation("junit:junit:4.13.2")
-  androidTestImplementation("androidx.test:runner:1.3.0")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+  androidTestImplementation("androidx.test:runner:${Versions.Android.testRunner}")
+  androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.Android.espresso}")
 
   // tor
-  val tor_ctl_version = "0.4"
-  val tor_wrapper_version = "0.0.5"
-  implementation("info.guardianproject:jtorctl:$tor_ctl_version") // controlling tor instance via its control port
-  implementation("com.msopentech.thali:universal:$tor_wrapper_version") // core library for the tor wrapper
-  implementation("com.msopentech.thali.toronionproxy.android:android:$tor_wrapper_version@aar")
+  implementation("info.guardianproject:jtorctl:${Versions.AndroidLegacy.torCtl}") // controlling tor instance via its control port
+  implementation("com.msopentech.thali:universal:${Versions.AndroidLegacy.torWrapper}") // core library for the tor wrapper
+  implementation("com.msopentech.thali.toronionproxy.android:android:${Versions.AndroidLegacy.torWrapper}@aar")
 
   // firebase cloud messaging
-  val fcm_version = "21.1.0"
-  implementation("com.google.firebase:firebase-messaging:$fcm_version")
+  implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
 }
