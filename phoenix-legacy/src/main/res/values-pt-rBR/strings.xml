@@ -105,17 +105,17 @@
 
   <!-- //////////////// receive //////////////// -->
 
-  <string name="receive_edit_title">Invoice</string>
+  <string name="receive_edit_title">Fatura</string>
   <string name="receive_edit_subtitle">Você pode alterar o valor e a descrição.</string>
   <string name="receive_in_progress_message">Favor aguardar…</string>
-  <string name="receive_error_message">Ocorreu um erro ao gerar a invoice…\n\nTente novamente.</string>
+  <string name="receive_error_message">Ocorreu um erro ao gerar a fatura…\n\nTente novamente.</string>
   <string name="receive_amount_label">Quantidade (opcional)</string>
   <string name="receive_desc_label">Descrição do pagamento (opcional):</string>
   <string name="receive_default_desc">Pagamento Phoenix</string>
   <string name="receive_generate_button">Solicitar</string>
 
   <string name="receive_share_subject">Pagamento solicitado</string>
-  <string name="receive_share_title">Compartilhe esta invoice com…</string>
+  <string name="receive_share_title">Compartilhe esta fatura com…</string>
   <string name="receive_share_button">Compartilhar…</string>
 
   <string name="receive_min_amount_pay_to_open"><![CDATA[Carteira vazia. O primeiro pagamento que você receber precisa ser de no mínimo <b>%1$s</b>.]]></string>
@@ -166,7 +166,7 @@
   <string name="send_balance_prefix">Saldo:</string>
   <string name="send_use_all_balance">Enviar tudo</string>
   <string name="send_loading">Verificando pagamento…</string>
-  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma invoice de bitcoins.\n\nTente novamente.</string>
+  <string name="send_invalid_pr_generic">Este pagamento não é válido. Você pode estar lendo um código que não representa uma fatura de bitcoins.\n\nTente novamente.</string>
   <string name="send_invalid_pr_already_paid">Este pagamento já foi realizado.</string>
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
@@ -186,12 +186,17 @@
 
   <!-- //////////////// scan //////////////// -->
 
+  <string name="readinput_manualinput">Inserir manualmente</string>
   <string name="readinput_paste">Colar dados da área de transferência</string>
   <string name="readinput_browse">Usar imagem salva de código QR</string>
-  <string name="readinput_extracting">Lendo…</string>
+  <string name="readinput_extracting">Verificando…</string>
+  
+  <string name="send_input_dialog_title">Inserir manualmente</string>
+  <string name="send_input_dialog_message">Insira um endereço Bitcoin, fatura Lightning, LNUrl, ou um endereço Lightning que você deseja enviar dinheiro.</string>
+  <string name="send_input_dialog_hint">Insira os dados aqui</string>
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma invoice, endereço bitcoin ou LNURL</string>
+  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma fatura, endereço bitcoin ou LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_expired">O pagamento expirou.</string>
@@ -210,9 +215,9 @@
 
   <string name="scan_amountless_legacy_title">Advertência</string>
   <string name="scan_amountless_legacy_message"><![CDATA[
-    Esta invoice não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na invoice.
+    Esta fatura não inclui um valor. Isso pode ser perigoso: servidores maliciosos podem interceptar e roubar seu pagamento. Para que a transação seja segura, você deve <b>solicitar ao recebedor que especifique um valor</b> na fatura.
     <br /><br />
-    Tem certeza de que deseja pagar esta invoice?
+    Tem certeza de que deseja pagar esta fatura?
   ]]></string>
   <string name="scan_amountless_legacy_confirm_button">Confirmar</string>
   <string name="scan_amountless_legacy_cancel_button">Cancelar</string>
@@ -450,7 +455,7 @@
   <string name="paymentdetails_technicals_button">Mostrar detalhes</string>
 
   <string name="paymentdetails_failure_recipient_unknown_or_liquidity">O destinatário não está acessível ou não possui liquidez necessária para receber pagamentos.</string>
-  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a invoice já foi paga ou quando a invoice contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
+  <string name="paymentdetails_failure_invalid_details">Pagamento rejeitado pelo destinatário.\nIsso geralmente ocorre quando a fatura já foi paga ou quando a fatura contém prazo de validade e você tentou enviar o pagamento após esse prazo.</string>
   <string name="paymentdetails_failure_trampoline_fees">Não foi possível encontrar rota de pagamento com essa configuração de taxa. Tente com taxas mais altas.</string>
   <string name="paymentdetails_failure_trampoline_fees_action">Mudar taxa</string>
 
@@ -467,7 +472,7 @@
   <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
   <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
-  <string name="paymentdetails_payment_request_label">Invoice</string>
+  <string name="paymentdetails_payment_request_label">Fatura</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>
@@ -525,8 +530,8 @@
   <string name="lnurl_pay_comment_message">Você pode inserir uma descrição ao pagamento (max %1$d caracteres). Será enviado ao destinatário.</string>
   <string name="lnurl_pay_comment_hint">Sem descrição</string>
   <string name="lnurl_pay_pay_button">Pagar</string>
-  <string name="lnurl_pay_requesting_invoice">Solicitando invoice…</string>
-  <string name="lnurl_pay_checking_invoice">Verificando invoice…</string>
+  <string name="lnurl_pay_requesting_invoice">Solicitando fatura…</string>
+  <string name="lnurl_pay_checking_invoice">Verificando fatura…</string>
   <string name="lnurl_pay_sending_payment">Enviando pagamento…</string>
 
   <string name="lnurl_pay_amount_empty">Insira uma quantidade</string>
@@ -537,7 +542,7 @@
 
   <string name="lnurl_pay_error_header">Pagamento não enviado.</string>
   <string name="lnurl_pay_error_unreachable">O serviço \'%1$s\' não está acessível, por favor, verifique sua conexão.</string>
-  <string name="lnurl_pay_error_invalid_invoice">O serviço \'%1$s\' forneceu uma invoice inválida (%2$s).</string>
+  <string name="lnurl_pay_error_invalid_invoice">O serviço \'%1$s\' forneceu uma fatura inválida (%2$s).</string>
   <string name="lnurl_pay_error_remote_error">O serviço \'%1$s\' retornou um erro (%2$s).</string>
   <string name="lnurl_pay_error_try_again_button">Tente novamente.</string>
 
@@ -671,7 +676,7 @@
   <string name="paymentsettings_defaultdesc_title">Descrição de pagamento padrão</string>
   <string name="paymentsettings_defaultdesc_none">Sem descrição definida…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
-  <string name="paymentsettings_defaultdesc_dialog_description">As invoices que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
+  <string name="paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
   <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
