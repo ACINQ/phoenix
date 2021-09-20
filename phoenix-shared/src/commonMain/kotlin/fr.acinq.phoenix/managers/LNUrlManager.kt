@@ -18,6 +18,7 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
@@ -98,7 +99,54 @@ class LNUrlManager(
      */
     suspend fun continueLnUrl(url: Url): LNUrl {
         val json = LNUrl.handleLNUrlResponse(httpClient.get(url))
-        return LNUrl.parseLNUrlMetadata(json)
+        return LNUrl.parseLNUrlResponse(url, json)
+    }
+
+    /**
+     * May throw errors of type:
+     * - LNUrl.Error.RemoteFailure
+     * - LNUrl.Error.PayInvoice
+     */
+    suspend fun requestPayInvoice(
+        lnurlPay: LNUrl.Pay,
+        amount: MilliSatoshi,
+        comment: String?
+    ): LNUrl.PayInvoice {
+        val builder = URLBuilder(lnurlPay.callback)
+        builder.parameters.append(name = "amount", value = amount.msat.toString())
+        if (comment != null && comment.isNotEmpty()) {
+            builder.parameters.append(name = "comment", value = comment)
+        }
+        val callback = builder.build()
+        val origin = callback.host
+
+        // may throw: LNUrl.Error.RemoteFailure
+        val json = LNUrl.handleLNUrlResponse(httpClient.get(callback))
+
+        // may throw: LNUrl.Error.PayInvoice
+        val invoice = LNUrl.parseLNUrlPayResponse(origin, json)
+
+        // From the [spec](https://github.com/fiatjaf/lnurl-rfc/blob/luds/06.md):
+        //
+        // - LN WALLET Verifies that h tag in provided invoice is a hash of
+        //   metadata string converted to byte array in UTF-8 encoding.
+        //
+        // Note: h tag == descriptionHash
+
+        val expectedHash = Crypto.sha256(lnurlPay.metadata.raw.encodeToByteArray())
+        val actualHash = invoice.paymentRequest.descriptionHash?.toByteArray()
+        if (!expectedHash.contentEquals(actualHash)) {
+            throw LNUrl.Error.PayInvoice.InvalidHash(origin)
+        }
+
+        // - LN WALLET Verifies that amount in provided invoice equals an
+        //   amount previously specified by user.
+
+        if (amount != invoice.paymentRequest.amount) {
+            throw LNUrl.Error.PayInvoice.InvalidAmount(origin)
+        }
+
+        return invoice
     }
 
     suspend fun requestAuth(auth: LNUrl.Auth, publicSuffixList: PublicSuffixList) {

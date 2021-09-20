@@ -5,6 +5,7 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.phoenix.data.Chain
 
 /**
  * Standardized location for extending types from: fr.acinq.lightning
@@ -149,6 +150,18 @@ fun OutgoingPayment.Status.asOnChain(): OutgoingPayment.Status.Completed.Succeed
 // In Objective-C, the function name `description()` is already in use (part of NSObject).
 // So we need to alias it.
 fun PaymentRequest.desc(): String? = this.description
+
+// Since unix epoch
+fun PaymentRequest.expiryTimestampSeconds(): Long? = this.expirySeconds?.let {
+    this.timestampSeconds + it
+}
+
+fun PaymentRequest.chain(): Chain? = when (this.prefix) {
+    "lnbc" -> Chain.Mainnet
+    "lntb" -> Chain.Testnet
+    "lnbcrt" -> Chain.Regtest
+    else -> null
+}
 
 // Class type not exported to iOS unless we explicitly reference it in PhoenixShared.
 fun ChannelState.asOffline(): Offline? = when (this) {

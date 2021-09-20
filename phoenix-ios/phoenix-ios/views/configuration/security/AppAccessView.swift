@@ -16,8 +16,6 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct AppAccessView : View {
 	
-	var cancellables = Set<AnyCancellable>()
-	
 	@State var biometricStatus = AppSecurity.shared.deviceBiometricSupport()
 	@State var biometricsEnabled = AppSecurity.shared.enabledSecurity.value.contains(.biometrics)
 	@State var advancedSecurityEnabled = AppSecurity.shared.enabledSecurity.value.contains(.advancedSecurity)

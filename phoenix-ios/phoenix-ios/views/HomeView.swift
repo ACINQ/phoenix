@@ -894,7 +894,7 @@ fileprivate struct BottomBar: View, ViewName {
 	}
 	
 	@State var temp: [AppScanController] = []
-	@State var externalLightningRequest: Scan.ModelValidateRequest? = nil
+	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -1011,7 +1011,7 @@ fileprivate struct BottomBar: View, ViewName {
 				return
 			}
 			
-			if let model = model as? Scan.ModelValidateRequest {
+			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
 				self.externalLightningRequest = model
 				self.selectedTag = Tag.SendView.rawValue
 				

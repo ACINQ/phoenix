@@ -1,6 +1,5 @@
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
@@ -18,6 +17,7 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.PublicSuffixList
+import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import io.ktor.http.*
 import kotlinx.coroutines.Deferred
@@ -46,6 +46,7 @@ class AppScanController(
     firstModel = firstModel ?: Scan.Model.Ready
 ) {
     private var prefetchPublicSuffixListTask: Deferred<Pair<String, Long>?>? = null
+    private var lnurlRequestId = 1
 
     constructor(business: PhoenixBusiness, firstModel: Scan.Model?): this(
         loggerFactory = business.loggerFactory,
@@ -61,19 +62,24 @@ class AppScanController(
     init {
         launch {
             peerManager.getPeer().channelsFlow.collect { channels ->
-                val balanceMsat = balanceMsat(channels)
-                model {
-                    if (this is Scan.Model.ValidateRequest) {
-                        this.copy(balanceMsat = balanceMsat)
-                    } else {
-                        this
+                val balance = calculateBalance(channels)
+                model { when (this) {
+                    is Scan.Model.InvoiceFlow.InvoiceRequest -> {
+                        this.copy(balanceMsat = balance.msat)
                     }
-                }
+                    is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
+                        this.copy(balanceMsat = balance.msat)
+                    }
+                    is Scan.Model.LnurlPayFlow.LnUrlPayFetch -> {
+                        this.copy(balanceMsat = balance.msat)
+                    }
+                    else -> this
+                }}
             }
         }
     }
 
-    private fun balanceMsat(channels: Map<ByteVector32, ChannelState>): Long {
+    private fun calculateBalance(channels: Map<ByteVector32, ChannelState>): MilliSatoshi {
         return channels.values.map {
             when (it) {
                 is Closing -> MilliSatoshi(0)
@@ -82,27 +88,41 @@ class AppScanController(
                 is ErrorInformationLeak -> MilliSatoshi(0)
                 else -> it.localCommitmentSpec?.toLocal ?: MilliSatoshi(0)
             }
-        }.sum().toLong()
+        }.sum()
+    }
+
+    private suspend fun getBalance(): MilliSatoshi {
+        return calculateBalance(peerManager.getPeer().channels)
     }
 
     override fun process(intent: Scan.Intent) {
         when (intent) {
             is Scan.Intent.Parse -> launch {
-                processParse(intent)
+                processIntent(intent)
             }
-            is Scan.Intent.ConfirmDangerousRequest -> launch {
-                processConfirmDangerousRequest(intent)
+            is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch {
+                processIntent(intent)
             }
-            is Scan.Intent.Send -> launch {
-                processSend(intent)
+            is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
+                processIntent(intent)
             }
-            is Scan.Intent.Login -> launch {
-                processLogin(intent)
+            is Scan.Intent.CancelLnurlServiceFetch -> launch {
+                processIntent(intent)
+            }
+            is Scan.Intent.LnurlPayFlow.SendLnurlPayment -> launch {
+                processIntent(intent)
+            }
+            is Scan.Intent.LnurlPayFlow.CancelLnurlPayment -> launch {
+                processIntent(intent)
+            }
+            is Scan.Intent.LnurlAuthFlow.Login -> launch {
+                processIntent(intent)
             }
         }
     }
 
-    private suspend fun processParse(
+    @OptIn(ExperimentalTime::class)
+    private suspend fun processIntent(
         intent: Scan.Intent.Parse
     ) {
         val input = intent.request.replace("\\u00A0", "").trim() // \u00A0 = '\n'
@@ -121,20 +141,29 @@ class AppScanController(
                     val features = Features(paymentRequest.features)
                     !features.hasFeature(Feature.TrampolinePayment)
                 }
-                if (isDangerousAmountless) {
-                    model(Scan.Model.DangerousRequest(
-                        reason = Scan.DangerousRequestReason.IsAmountlessInvoice,
-                        request = intent.request,
-                        paymentRequest = paymentRequest
-                    ))
-                } else if (paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId) {
-                    model(Scan.Model.DangerousRequest(
-                        reason = Scan.DangerousRequestReason.IsOwnInvoice,
-                        request = intent.request,
-                        paymentRequest = paymentRequest
-                    ))
-                } else {
-                    model(makeValidateRequest(intent.request, paymentRequest))
+                when {
+                    isDangerousAmountless -> {
+                        model(Scan.Model.InvoiceFlow.DangerousRequest(
+                            reason = Scan.DangerousRequestReason.IsAmountlessInvoice,
+                            request = intent.request,
+                            paymentRequest = paymentRequest
+                        ))
+                    }
+                    paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId -> {
+                        model(Scan.Model.InvoiceFlow.DangerousRequest(
+                            reason = Scan.DangerousRequestReason.IsOwnInvoice,
+                            request = intent.request,
+                            paymentRequest = paymentRequest
+                        ))
+                    }
+                    else -> {
+                        val balance = getBalance()
+                        model(Scan.Model.InvoiceFlow.InvoiceRequest(
+                            request = intent.request,
+                            paymentRequest = paymentRequest,
+                            balanceMsat = balance.msat
+                        ))
+                    }
                 }
             }
         }}
@@ -143,27 +172,62 @@ class AppScanController(
         readLNURL(input)?.let { return when (it) {
             is Either.Left -> { // it.value: LnUrl.Auth
                 prefetchPublicSuffixListTask = appConfigManager.prefetchPublicSuffixList()
-                model(Scan.Model.LoginRequest(auth = it.value))
+                model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = it.value))
             }
             is Either.Right -> { // it.value: Url
-                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnUrl))
+                val requestId = lnurlRequestId
+                model(Scan.Model.LnurlServiceFetch)
+                val result: Either<Scan.BadRequestReason, LNUrl> = try {
+                    val lnurl = lnurlManager.continueLnUrl(it.value)
+                    Either.Right(lnurl)
+                } catch (t: Throwable) {
+                    Either.Left(Scan.BadRequestReason.InvalidLnUrl)
+                }
+                if (requestId != lnurlRequestId) {
+                    // Intent.CancelLnurlServiceFetch has been issued
+                    return
+                }
+                when (result) {
+                    is Either.Left -> {
+                        model(Scan.Model.BadRequest(result.value))
+                    }
+                    is Either.Right -> {
+                        when (val lnurl = result.value) {
+                            is LNUrl.Pay -> {
+                                val balance = getBalance()
+                                model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
+                                    lnurlPay = lnurl,
+                                    balanceMsat = balance.msat,
+                                    error = null
+                                ))
+                            }
+                            else -> {
+                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnUrl))
+                            }
+                        }
+                    }
+                }
             }
         }}
 
         // Is it a bitcoin address ?
-        readBitcoinAddress(input).let {
-            model(Scan.Model.BadRequest(it))
-        }
+        val badRequestReason = readBitcoinAddress(input)
+        model(Scan.Model.BadRequest(badRequestReason))
     }
 
-    private suspend fun processConfirmDangerousRequest(
-        intent: Scan.Intent.ConfirmDangerousRequest
+    private suspend fun processIntent(
+        intent: Scan.Intent.InvoiceFlow.ConfirmDangerousRequest
     ) {
-        model(makeValidateRequest(intent.request, intent.paymentRequest))
+        val balance = getBalance()
+        model(Scan.Model.InvoiceFlow.InvoiceRequest(
+            request = intent.request,
+            paymentRequest = intent.paymentRequest,
+            balanceMsat = balance.msat
+        ))
     }
 
-    private suspend fun processSend(
-        intent: Scan.Intent.Send
+    private suspend fun processIntent(
+        intent: Scan.Intent.InvoiceFlow.SendInvoicePayment
     ) {
         val paymentRequest = intent.paymentRequest
         val paymentId = UUID.randomUUID()
@@ -175,18 +239,107 @@ class AppScanController(
                 details = OutgoingPayment.Details.Normal(paymentRequest)
             )
         )
-        model(Scan.Model.Sending)
+        model(Scan.Model.InvoiceFlow.Sending)
+    }
+
+    private suspend fun processIntent(
+        @Suppress("UNUSED_PARAMETER")
+        intent: Scan.Intent.CancelLnurlServiceFetch
+    ) {
+        lnurlRequestId += 1
+        model(Scan.Model.Ready)
+    }
+
+    private suspend fun processIntent(
+        intent: Scan.Intent.LnurlPayFlow.SendLnurlPayment
+    ) {
+        run { // scoping
+            val balance = getBalance()
+            model(Scan.Model.LnurlPayFlow.LnUrlPayFetch(
+                lnurlPay = intent.lnurlPay,
+                balanceMsat = balance.msat
+            ))
+        }
+
+        val requestId = lnurlRequestId
+        val result: Either<Scan.LNUrlPayError, LNUrl.PayInvoice> = try {
+            val invoice = lnurlManager.requestPayInvoice(
+                lnurlPay = intent.lnurlPay,
+                amount = intent.amount,
+                comment = intent.comment
+            )
+
+            val requestChain = invoice.paymentRequest.chain()
+            if (chain != requestChain) {
+                Either.Left(Scan.LNUrlPayError.ChainMismatch(chain, requestChain))
+            } else {
+                val db = databaseManager.databases.filterNotNull().first()
+                val previousPayment = db.payments.listOutgoingPayments(
+                    paymentHash = invoice.paymentRequest.paymentHash
+                ).find {
+                    it.status is OutgoingPayment.Status.Completed.Succeeded
+                }
+                if (previousPayment != null) {
+                    Either.Left(Scan.LNUrlPayError.AlreadyPaidInvoice)
+                } else {
+                    Either.Right(invoice)
+                }
+            }
+        } catch (err: LNUrl.Error.RemoteFailure) {
+            Either.Left(Scan.LNUrlPayError.RemoteError(err))
+        } catch (err: LNUrl.Error.PayInvoice) {
+            Either.Left(Scan.LNUrlPayError.BadResponseError(err))
+        }
+        if (requestId != lnurlRequestId) {
+            // Intent.LnurlPayFlow.CancelLnurlPayment has been issued
+            return
+        }
+        when (result) {
+            is Either.Left -> {
+                val balance = getBalance()
+                model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
+                    lnurlPay = intent.lnurlPay,
+                    balanceMsat = balance.msat,
+                    error = result.value
+                ))
+            }
+            is Either.Right -> {
+                val paymentRequest = result.value.paymentRequest
+                val paymentId = UUID.randomUUID()
+                peerManager.getPeer().send(
+                    SendPayment(
+                        paymentId = paymentId,
+                        amount = intent.amount,
+                        recipient = paymentRequest.nodeId,
+                        details = OutgoingPayment.Details.Normal(paymentRequest)
+                    )
+                )
+                model(Scan.Model.LnurlPayFlow.Sending)
+            }
+        }
+    }
+
+    private suspend fun processIntent(
+        intent: Scan.Intent.LnurlPayFlow.CancelLnurlPayment
+    ) {
+        lnurlRequestId += 1
+        val balance = getBalance()
+        model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
+            lnurlPay = intent.lnurlPay,
+            balanceMsat = balance.msat,
+            error = null
+        ))
     }
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun processLogin(
-        intent: Scan.Intent.Login
+    private suspend fun processIntent(
+        intent: Scan.Intent.LnurlAuthFlow.Login
     ) {
-        model(Scan.Model.LoggingIn(auth = intent.auth))
+        model(Scan.Model.LnurlAuthFlow.LoggingIn(auth = intent.auth))
         val start = TimeSource.Monotonic.markNow()
         val psl = prefetchPublicSuffixListTask?.await()
         if (psl == null) {
-            model(Scan.Model.LoginResult(
+            model(Scan.Model.LnurlAuthFlow.LoginResult(
                 auth = intent.auth,
                 error = Scan.LoginError.OtherError(details = LNUrl.Error.MissingPublicSuffixList)
             ))
@@ -206,32 +359,14 @@ class AppScanController(
             Scan.LoginError.OtherError(details = e)
         }
         if (error != null) {
-            model(Scan.Model.LoginResult(auth = intent.auth, error = error))
+            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
         } else {
             val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
             if (pending > Duration.ZERO) {
                 delay(pending)
             }
-            model(Scan.Model.LoginResult(auth = intent.auth, error = error))
+            model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
         }
-    }
-
-    private suspend fun makeValidateRequest(
-        request: String,
-        paymentRequest: PaymentRequest
-    ): Scan.Model.ValidateRequest {
-        val balanceMsat = balanceMsat(peerManager.getPeer().channels)
-        val expiryTimestamp = paymentRequest.expirySeconds?.let {
-            paymentRequest.timestampSeconds + it
-        }
-        return Scan.Model.ValidateRequest(
-            request = request,
-            paymentRequest = paymentRequest,
-            amountMsat = paymentRequest.amount?.toLong(),
-            expiryTimestamp = expiryTimestamp,
-            requestDescription = paymentRequest.description,
-            balanceMsat = balanceMsat
-        )
     }
 
     private fun trimMatchingPrefix(
@@ -266,12 +401,7 @@ class AppScanController(
             return null
         }
 
-        val requestChain = when (paymentRequest.prefix) {
-            "lnbc" -> Chain.Mainnet
-            "lntb" -> Chain.Testnet
-            "lnbcrt" -> Chain.Regtest
-            else -> null
-        }
+        val requestChain = paymentRequest.chain()
         if (chain != requestChain) {
             return Either.Left(Scan.BadRequestReason.ChainMismatch(chain, requestChain))
         }
