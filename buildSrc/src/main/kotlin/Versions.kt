@@ -1,13 +1,13 @@
 object Versions {
-    const val lightningKmp = "1.0-beta17"
-    const val secp256k1 = "0.5.1"
+    const val lightningKmp = "1.1-SNAPSHOT"
+    const val secp256k1 = "0.6.0-SNAPSHOT"
 
-    const val kotlin = "1.4.32"
-    const val coroutines = "1.4.3-native-mt"
-    const val serialization = "1.1.0"
+    const val kotlin = "1.5.30"
+    const val coroutines = "1.5.2-native-mt"
+    const val serialization = "1.2.2"
     const val datetime = "0.1.1"
 
-    const val ktor = "1.5.3"
+    const val ktor = "1.6.3"
     const val sqlDelight = "1.5.0"
     const val kodeinMemory = "0.8.0"
 
@@ -20,9 +20,9 @@ object Versions {
         const val ktx = "1.5.0"
         const val lifecycle = "2.3.1"
         const val prefs = "1.1.1"
-        const val compose = "1.0.0-beta07"
-        const val navCompose = "2.4.0-alpha01"
-        const val constraintLayoutCompose = "1.0.0-alpha07"
+        const val compose = "1.1.0-alpha04"
+        const val navCompose = "2.4.0-alpha09"
+        const val constraintLayoutCompose = "1.0.0-beta02"
 
         const val zxing = "4.1.0"
         const val fcm = "21.1.0"

@@ -12,10 +12,10 @@ plugins {
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
-        compileSdk = 30
+        compileSdk = 31
         defaultConfig {
             minSdk = 24
-            targetSdk = 30
+            targetSdk = 31
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
