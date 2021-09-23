@@ -29,10 +29,9 @@ import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.wire.FailureMessage
-import fr.acinq.phoenix.db.PaymentRowId.*
-import fr.acinq.phoenix.db.OutgoingPaymentPartNotFound
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompletePaymentRow
+import fr.acinq.phoenix.db.didCompleteWalletPayment
 import fracinqphoenixdb.OutgoingPaymentsQueries
 
 class OutgoingQueries(val database: PaymentsDatabase) {
@@ -57,7 +56,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
 
     fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
         val (detailsTypeVersion, detailsData) = outgoingPayment.details.mapToDb()
-        database.transaction {
+        database.transaction(noEnclosing = false) {
             queries.addOutgoingPayment(
                 id = outgoingPayment.id.toString(),
                 recipient_amount_msat = outgoingPayment.recipientAmount.msat,
@@ -92,7 +91,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             if (queries.changes().executeAsOne() != 1L) {
                 result = false
             } else {
-                didCompletePaymentRow(OutgoingPaymentId(id), database)
+                didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(id), database)
             }
         }
         return result
@@ -119,7 +118,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                     part_id = partId.toString()
                 ).executeAsOneOrNull()?.let {
                     val parentId = UUID.fromString(it.part_parent_id)
-                    didCompletePaymentRow(OutgoingPaymentId(parentId), database)
+                    didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(parentId), database)
                 }
             }
         }
@@ -147,7 +146,7 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                     part_id = partId.toString()
                 ).executeAsOneOrNull()?.let {
                     val parentId = UUID.fromString(it.part_parent_id)
-                    didCompletePaymentRow(OutgoingPaymentId(parentId), database)
+                    didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(parentId), database)
                 }
             }
         }
@@ -174,7 +173,10 @@ class OutgoingQueries(val database: PaymentsDatabase) {
     }
 
     fun getOutgoingPayment(id: UUID): OutgoingPayment? {
-        return queries.getOutgoingPayment(id = id.toString(), ::mapOutgoingPayment).executeAsList().run {
+        return queries.getOutgoingPayment(
+            id = id.toString(),
+            mapper = ::mapOutgoingPayment
+        ).executeAsList().run {
             groupByRawOutgoing(this).firstOrNull()
         }?.run {
             filterUselessParts(this)

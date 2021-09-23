@@ -21,9 +21,11 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.db.cloud.b64Decode
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 import org.kodein.log.LoggerFactory
@@ -35,8 +37,9 @@ import org.kodein.log.newLogger
  * - pay
  * - withdraw
  *
- * It also contains the possible errors related to the LNUrl flow: erros that break the specs, or errors
- * raised when the data returned by the LNUrl service are not valid.
+ * It also contains the possible errors related to the LNUrl flow:
+ * errors that break the specs, or errors raised when the data returned
+ * by the LNUrl service are not valid.
  *
  * A companion object contains utility methods to parse the urls, read a response from a LNURL service, and
  * transform this response in a valid LNUrl object.
@@ -53,7 +56,7 @@ sealed class LNUrl {
         }
 
         fun action(): Action? {
-            return url.parameters.get("action")?.let { action ->
+            return url.parameters["action"]?.let { action ->
                 when (action.toLowerCase()) {
                     "register" -> Action.Register
                     "login" -> Action.Login
@@ -87,13 +90,36 @@ sealed class LNUrl {
             val plainText: String,
             val longDesc: String?,
             val imagePng: ByteVector?,
-            val imageJpg: ByteVector?
+            val imageJpg: ByteVector?,
+            val unknown: JsonArray?
         )
     }
 
     data class PayInvoice(
-        val paymentRequest: PaymentRequest
-    ): LNUrl()
+        val paymentRequest: PaymentRequest,
+        val successAction: SuccessAction?
+    ): LNUrl() {
+        sealed class SuccessAction {
+            data class Message(
+                val message: String
+            ): SuccessAction()
+            data class Url(
+                val description: String,
+                val url: io.ktor.http.Url
+            ): SuccessAction()
+            data class Aes(
+                val description: String,
+                val ciphertext: ByteVector,
+                val iv: ByteVector
+            ): SuccessAction()
+
+            enum class Tag(val label: String) {
+                Message("message"),
+                Url("url"),
+                Aes("aes")
+            }
+        }
+    }
 
     enum class Tag(val label: String) {
         Auth("login"),
@@ -125,10 +151,11 @@ sealed class LNUrl {
         sealed class PayInvoice(override val message: String?) : Error(message) {
             abstract val origin: String
 
-            data class MissingPr(override val origin: String) : PayInvoice("missing pr value")
-            data class MalformedPr(override val origin: String) : PayInvoice("malformed pr value")
-            data class InvalidHash(override val origin: String) : PayInvoice("paymentRequest.h value doesn't match metadata hash")
-            data class InvalidAmount(override val origin: String) : PayInvoice("paymentRequest.amount doesn't match user input")
+            data class Malformed(override val origin: String): PayInvoice("malformed json")
+            data class MissingPr(override val origin: String): PayInvoice("missing pr value")
+            data class MalformedPr(override val origin: String): PayInvoice("malformed pr value")
+            data class InvalidHash(override val origin: String): PayInvoice("paymentRequest.h value doesn't match metadata hash")
+            data class InvalidAmount(override val origin: String): PayInvoice("paymentRequest.amount doesn't match user input")
         }
 
         object Invalid : Error("url cannot be parsed as a bech32 or as a human readable url")
@@ -192,9 +219,9 @@ sealed class LNUrl {
                 if (response.status.isSuccess()) {
                     val json: JsonObject = response.receive()
                     log.debug { "lnurl service=${url.host} returned response=$json" }
-                    if (json.get("status")?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
+                    if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         log.error { "lnurl service=${url.host} returned error=$json" }
-                        val message = json.get("reason")?.jsonPrimitive?.content ?: ""
+                        val message = json["reason"]?.jsonPrimitive?.content ?: ""
                         throw Error.RemoteFailure.Detailed(url.host, message.take(160).replace("<", ""))
                     } else {
                         json
@@ -250,12 +277,14 @@ sealed class LNUrl {
         }
 
         /** Decode a serialized [LNUrl.Pay.Metadata] object. */
-        private fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata = try {
+        @OptIn(ExperimentalSerializationApi::class)
+        internal fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata = try {
             val array = format.decodeFromString<JsonArray>(raw)
             var plainText: String? = null
             var longDesc: String? = null
             var imagePng: String? = null
             var imageJpg: String? = null
+            val unknown = mutableListOf<JsonElement>()
             array.forEach {
                 try {
                     when (it.jsonArray[0].jsonPrimitive.content) {
@@ -263,7 +292,7 @@ sealed class LNUrl {
                         "text/long-desc" -> longDesc = it.jsonArray[1].jsonPrimitive.content
                         "image/png;base64" -> imagePng = it.jsonArray[1].jsonPrimitive.content
                         "image/jpeg;base64" -> imageJpg = it.jsonArray[1].jsonPrimitive.content
-                        else -> throw RuntimeException("unhandled metadata type=$it")
+                        else -> unknown.add(it)
                     }
                 } catch (e: Exception) {
                     log.warning { "could not decode raw meta=$it: ${e.message}" }
@@ -274,7 +303,10 @@ sealed class LNUrl {
                 plainText = plainText!!,
                 longDesc = longDesc,
                 imagePng = imagePng?.let { ByteVector(it.encodeToByteArray()) },
-                imageJpg = imageJpg?.let { ByteVector(it.encodeToByteArray()) }
+                imageJpg = imageJpg?.let { ByteVector(it.encodeToByteArray()) },
+                unknown = unknown.takeIf { it.isNotEmpty() }?.let {
+                    JsonArray(it.toList())
+                }
             )
         } catch (e: Exception) {
             log.error(e) { "could not decode raw meta=$raw: " }
@@ -291,13 +323,66 @@ sealed class LNUrl {
             origin: String,
             json: JsonObject
         ): PayInvoice {
-            val pr = json["pr"]?.jsonPrimitive?.content ?: throw Error.PayInvoice.MissingPr(origin)
-            val paymentRequest = try {
-                PaymentRequest.read(pr) // <- throws
+            try {
+                val pr =
+                    json["pr"]?.jsonPrimitive?.content ?: throw Error.PayInvoice.MissingPr(origin)
+                val paymentRequest = try {
+                    PaymentRequest.read(pr) // <- throws
+                } catch (t: Throwable) {
+                    throw Error.PayInvoice.MalformedPr(origin)
+                }
+                val successAction = extractSuccessAction(origin, json)
+                return PayInvoice(paymentRequest, successAction)
             } catch (t: Throwable) {
-                throw Error.PayInvoice.MalformedPr(origin)
+                when (t) {
+                    is Error.PayInvoice -> throw t
+                    else -> throw Error.PayInvoice.Malformed(origin)
+                }
             }
-            return PayInvoice(paymentRequest)
+        }
+
+        private fun extractSuccessAction(
+            origin: String,
+            json: JsonObject
+        ): PayInvoice.SuccessAction? {
+            val obj = json["successAction"]?.jsonObject ?: return null
+
+            return when (obj["tag"]?.jsonPrimitive?.content) {
+                PayInvoice.SuccessAction.Tag.Message.label -> {
+                    val message = obj["message"]?.jsonPrimitive?.content ?: return null
+                    if (message.isBlank() || message.length > 144) {
+                        throw Error.PayInvoice.Malformed(origin)
+                    }
+                    PayInvoice.SuccessAction.Message(message)
+                }
+                PayInvoice.SuccessAction.Tag.Url.label -> {
+                    val description = obj["description"]?.jsonPrimitive?.content ?: return null
+                    if (description.length > 144) {
+                        throw Error.PayInvoice.Malformed(origin)
+                    }
+                    val urlStr = obj["url"]?.jsonPrimitive?.content ?: return null
+                    val url = Url(urlStr)
+                    PayInvoice.SuccessAction.Url(description, url)
+                }
+                PayInvoice.SuccessAction.Tag.Aes.label -> {
+                    val description = obj["description"]?.jsonPrimitive?.content ?: return null
+                    if (description.length > 144) {
+                        throw Error.PayInvoice.Malformed(origin)
+                    }
+                    val ciphertextStr = obj["ciphertext"]?.jsonPrimitive?.content ?: return null
+                    val ciphertext = ByteVector(ciphertextStr.b64Decode())
+                    if (ciphertext.size() > (4*1024)) {
+                        throw Error.PayInvoice.Malformed(origin)
+                    }
+                    val ivStr = obj["iv"]?.jsonPrimitive?.content ?: return null
+                    if (ivStr.length != 24) {
+                        throw Error.PayInvoice.Malformed(origin)
+                    }
+                    val iv = ByteVector(ivStr.b64Decode())
+                    PayInvoice.SuccessAction.Aes(description, ciphertext = ciphertext, iv = iv)
+                }
+                else -> null
+            }
         }
     }
 }

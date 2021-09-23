@@ -21,25 +21,32 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.utils.*
-import fr.acinq.phoenix.db.IncomingPaymentNotFound
-import fr.acinq.phoenix.db.PaymentRowId
-import fr.acinq.phoenix.db.PaymentsDatabase
-import fr.acinq.phoenix.db.didCompletePaymentRow
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.db.*
 import fracinqphoenixdb.IncomingPaymentsQueries
 
 class IncomingQueries(private val database: PaymentsDatabase) {
 
     private val queries = database.incomingPaymentsQueries
 
-    fun addIncomingPayment(preimage: ByteVector32, origin: IncomingPayment.Origin, createdAt: Long) {
+    /**
+     * @return The paymentHash (= SHA256(preimage))
+     */
+    fun addIncomingPayment(
+        preimage: ByteVector32,
+        origin: IncomingPayment.Origin,
+        createdAt: Long
+    ): ByteVector32 {
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
         val (originType, originData) = origin.mapToDb()
         queries.insert(
-            payment_hash = Crypto.sha256(preimage).toByteVector32().toByteArray(),
+            payment_hash = paymentHash.toByteArray(),
             preimage = preimage.toByteArray(),
             origin_type = originType,
             origin_blob = originData,
             created_at = createdAt
         )
+        return paymentHash
     }
 
     fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {
@@ -58,7 +65,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             if (queries.changes().executeAsOne() != 1L) {
                 throw IncomingPaymentNotFound(paymentHash)
             }
-            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
+            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
         }
     }
 
@@ -83,7 +90,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             if (queries.changes().executeAsOne() != 1L) {
                 throw IncomingPaymentNotFound(paymentHash)
             }
-            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
+            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
         }
     }
 
@@ -108,7 +115,7 @@ class IncomingQueries(private val database: PaymentsDatabase) {
                 received_with_blob = receivedWithBlob,
                 created_at = createdAt
             )
-            didCompletePaymentRow(PaymentRowId.IncomingPaymentId(paymentHash), database)
+            didCompleteWalletPayment(WalletPaymentId.IncomingPaymentId(paymentHash), database)
         }
     }
 

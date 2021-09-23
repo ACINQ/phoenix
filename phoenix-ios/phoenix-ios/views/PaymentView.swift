@@ -17,7 +17,7 @@ fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
 
 struct PaymentView : View {
 
-	let payment: PhoenixShared.Lightning_kmpWalletPayment
+	let paymentInfo: WalletPaymentInfo
 	
 	// We need an explicit close operation here because:
 	// - we're going to use a NavigationView
@@ -32,7 +32,7 @@ struct PaymentView : View {
 		
 		NavigationView {
 			
-			SummaryView(payment: payment, closeSheet: closeSheet)
+			SummaryView(paymentInfo: paymentInfo, closeSheet: closeSheet)
 				.navigationBarTitle("", displayMode: .inline)
 				.navigationBarHidden(true)
 		}
@@ -46,7 +46,7 @@ struct PaymentView : View {
 
 fileprivate struct SummaryView: View {
 	
-	@State var payment: PhoenixShared.Lightning_kmpWalletPayment
+	@State var paymentInfo: WalletPaymentInfo
 	let closeSheet: () -> Void
 	
 	@State var explainFeesText: String = ""
@@ -55,11 +55,11 @@ fileprivate struct SummaryView: View {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	init(payment: PhoenixShared.Lightning_kmpWalletPayment, closeSheet: @escaping () -> Void) {
+	init(paymentInfo: WalletPaymentInfo, closeSheet: @escaping () -> Void) {
 	//	self.payment = payment
 		// ^^^ This compiles on Xcode 12.5, but crashes on the device.
 		// To be more specific, it seems to crash on _some_ devices, and only when running in Release mode.
-		self._payment = State<PhoenixShared.Lightning_kmpWalletPayment>(initialValue: payment)
+		self._paymentInfo = State<WalletPaymentInfo>(initialValue: paymentInfo)
 		
 		self.closeSheet = closeSheet
 	}
@@ -116,6 +116,8 @@ fileprivate struct SummaryView: View {
 	
 	@ViewBuilder
 	var main: some View {
+		
+		let payment = paymentInfo.payment
 		
 		VStack {
 			switch payment.state() {
@@ -244,11 +246,14 @@ fileprivate struct SummaryView: View {
 			.padding(.bottom, 24)
 			
 			SummaryInfoGrid(
-				payment: $payment,
+				paymentInfo: $paymentInfo,
 				explainFeesPopoverVisible: $explainFeesPopoverVisible
 			)
 			
-			NavigationLink(destination: DetailsView(payment: $payment, closeSheet: closeSheet)) {
+			NavigationLink(destination: DetailsView(
+				paymentInfo: $paymentInfo,
+				closeSheet: closeSheet
+			)) {
 				Text("Details")
 			}
 			.padding([.top, .bottom])
@@ -261,7 +266,7 @@ fileprivate struct SummaryView: View {
 	
 	func explainFeesPopoverText() -> String {
 		
-		let feesInfo = payment.paymentFees(currencyPrefs: currencyPrefs)
+		let feesInfo = paymentInfo.payment.paymentFees(currencyPrefs: currencyPrefs)
 		return feesInfo?.1 ?? ""
 	}
 	
@@ -271,23 +276,18 @@ fileprivate struct SummaryView: View {
 		// Update text in explainFeesPopover
 		explainFeesText = explainFeesPopoverText()
 		
-		if let outgoingPayment = payment as? PhoenixShared.Lightning_kmpOutgoingPayment {
+		// We don't have the full payment information.
+		// We need to fetch all the metadata.
+		
+		let paymentId = paymentInfo.id()
+		let options = WalletPaymentFetchOptions.Companion().All
+		
+		AppDelegate.get().business.paymentsManager.getPayment(id: paymentId, options: options) {
+			(result: WalletPaymentInfo?, error: Error?) in
 			
-			// If this is an outgoingPayment, then we don't have the proper parts list.
-			// That is, the outgoingPayment was fetched via listPayments(),
-			// which gives us a fake parts list.
-			//
-			// Let's fetch the full outgoingPayment (with parts list),
-			// so we can improve our fees description.
-			
-			let paymentId = outgoingPayment.component1()
-			AppDelegate.get().business.paymentsManager.getOutgoingPayment(id: paymentId) {
-				(fullOutgoingPayment: Lightning_kmpOutgoingPayment?, error: Error?) in
-				
-				if let fullOutgoingPayment = fullOutgoingPayment {
-					payment = fullOutgoingPayment
-					explainFeesText = explainFeesPopoverText()
-				}
+			if let result = result {
+				paymentInfo = result
+				explainFeesText = explainFeesPopoverText()
 			}
 		}
 	}
@@ -297,7 +297,7 @@ fileprivate struct SummaryView: View {
 //
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
-	@Binding var payment: PhoenixShared.Lightning_kmpWalletPayment
+	@Binding var paymentInfo: WalletPaymentInfo
 	
 	@Binding var explainFeesPopoverVisible: Bool
 	
@@ -350,7 +350,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var paymentDescriptionRow: some View {
 		
-		if let pDescription = payment.paymentDescription() {
+		if let pDescription = paymentInfo.paymentDescription() {
 			
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -373,7 +373,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var paymentTypeRow: some View {
 		
-		if let pType = payment.paymentType() {
+		if let pType = paymentInfo.payment.paymentType() {
 			
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -388,7 +388,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						.font(.footnote)
 						.foregroundColor(.secondary)
 					
-					if let link = payment.paymentLink() {
+					if let link = paymentInfo.payment.paymentLink() {
 						Button {
 							openURL(link)
 						} label: {
@@ -403,7 +403,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var channelClosingRow: some View {
 		
-		if let pClosingInfo = payment.channelClosing() {
+		if let pClosingInfo = paymentInfo.payment.channelClosing() {
 			
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -437,7 +437,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var paymentFeesRow: some View {
 		
-		if let pFees = payment.paymentFees(currencyPrefs: currencyPrefs) {
+		if let pFees = paymentInfo.payment.paymentFees(currencyPrefs: currencyPrefs) {
 
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -490,7 +490,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var timeElapsedRow: some View {
 		
-		if let pElapsed = payment.paymentTimeElapsed() {
+		if let pElapsed = paymentInfo.payment.paymentTimeElapsed() {
 			
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -513,7 +513,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var paymentErrorRow: some View {
 		
-		if let pError = payment.paymentFinalError() {
+		if let pError = paymentInfo.payment.paymentFinalError() {
 			
 			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
 				
@@ -582,7 +582,7 @@ fileprivate struct ExplainFeesPopoverHeight: PreferenceKey {
 
 fileprivate struct DetailsView: View {
 	
-	@Binding var payment: Lightning_kmpWalletPayment
+	@Binding var paymentInfo: WalletPaymentInfo
 	let closeSheet: () -> Void
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -610,7 +610,7 @@ fileprivate struct DetailsView: View {
 			.padding()
 				
 			ScrollView {
-				DetailsInfoGrid(payment: $payment)
+				DetailsInfoGrid(paymentInfo: $paymentInfo)
 					.padding([.leading, .trailing])
 			}
 		}
@@ -624,7 +624,7 @@ fileprivate struct DetailsView: View {
 
 fileprivate struct DetailsInfoGrid: InfoGridView {
 	
-	@Binding var payment: Lightning_kmpWalletPayment
+	@Binding var paymentInfo: WalletPaymentInfo
 	
 	@State var calculatedKeyColumnWidth: CGFloat? = nil
 	
@@ -649,11 +649,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: verticalSpacingBetweenRows) {
 			
-			if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
+			if let incomingPayment = paymentInfo.payment as? Lightning_kmpIncomingPayment {
 				
 				rows_incomingPayment(incomingPayment)
 				
-			} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+			} else if let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment {
 				
 				rows_outgoingPayment(outgoingPayment)
 			}
@@ -822,7 +822,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let paymentHash = payment.paymentHashString()
+			let paymentHash = paymentInfo.payment.paymentHashString()
 			Text(paymentHash)
 				.contextMenu {
 					Button(action: {
@@ -1319,24 +1319,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 
 extension Lightning_kmpWalletPayment {
 	
-	fileprivate func paymentDescription() -> String? {
-		
-		if let incomingPayment = self as? Lightning_kmpIncomingPayment {
-			
-			if let invoice = incomingPayment.origin.asInvoice() {
-				return invoice.paymentRequest.desc()
-			}
-			
-		} else if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
-			
-			if let normal = outgoingPayment.details.asNormal() {
-				return normal.paymentRequest.desc()
-			}
-		}
-		
-		return nil
-	}
-	
 	fileprivate func paymentType() -> (String, String)? {
 		
 		// Will be displayed in the UI as:
@@ -1563,32 +1545,5 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
-	}
-}
-
-// --------------------------------------------------
-// MARK:-
-// --------------------------------------------------
-
-class PaymentView_Previews : PreviewProvider {
-	
-	static var previews: some View {
-		let mock = PhoenixShared.Mock()
-		
-		PaymentView(payment: mock.outgoingPending(), closeSheet: {})
-			.preferredColorScheme(.light)
-			.environmentObject(CurrencyPrefs.mockEUR())
-
-		PaymentView(payment: mock.outgoingSuccessful(), closeSheet: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-
-		PaymentView(payment: mock.outgoingFailed(), closeSheet: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
-
-		PaymentView(payment: mock.incomingPaymentReceived(), closeSheet: {})
-			.preferredColorScheme(.dark)
-			.environmentObject(CurrencyPrefs.mockEUR())
 	}
 }

@@ -12,9 +12,7 @@ import fr.acinq.phoenix.db.createPaymentsDbDriver
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
@@ -55,5 +53,10 @@ class DatabaseManager(
                 }
             }
         }
+    }
+
+    suspend fun paymentsDb(): SqlitePaymentsDb {
+        val db = databases.filterNotNull().first()
+        return db.payments as SqlitePaymentsDb
     }
 }

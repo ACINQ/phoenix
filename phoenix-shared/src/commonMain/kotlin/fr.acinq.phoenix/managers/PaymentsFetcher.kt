@@ -3,7 +3,10 @@ package fr.acinq.phoenix.managers
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.phoenix.db.WalletPaymentId
+import fr.acinq.phoenix.data.Wallet
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.Cache
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +27,7 @@ import kotlin.coroutines.suspendCoroutine
  * always provide an up-to-date WalletPayment instance in response to your query.
  */
 class PaymentsFetcher(
-    paymentsManager: PaymentsManager,
+    private var paymentsManager: PaymentsManager,
     cacheSizeLimit: Int
 ): CoroutineScope by MainScope() {
 
@@ -33,56 +36,68 @@ class PaymentsFetcher(
     //   we want to cache the fact that the row doesn't exist.
     //   And this is easier to do if we have a non-null Result item in the cache.
     //
-    data class Result(val payment: WalletPayment?) {
+    private data class Result(
+        val info: WalletPaymentInfo?
+    )
 
-        val incomingPayment: IncomingPayment? get() {
-            return payment as? IncomingPayment
-        }
-        val outgoingPayment: OutgoingPayment? get() {
-            return payment as? OutgoingPayment
-        }
-    }
+    // Using a strict cache to ensure eviction based on actual usage
+    private var cache = Cache<String, Result>(sizeLimit = cacheSizeLimit)
 
-    /// Used to reference database
-    private var _paymentsManager: PaymentsManager = paymentsManager
-
-    /// Using a strict cache to ensure eviction based on actual usage
-    private var _cache = Cache<String, Result>(sizeLimit = cacheSizeLimit)
-
-    /// Used to consolidate database lookups for the same item
-    private var pendingFetches = mutableMapOf<String, List<Continuation<Result>>>()
+    // Used to consolidate database lookups for the same item
+    private var pendingFetches = mutableMapOf<String, List<Continuation<WalletPaymentInfo?>>>()
 
     var cacheSizeLimit: Int
-        get() = _cache.sizeLimit
+        get() = cache.sizeLimit
         set(value) {
-            _cache.sizeLimit = value
+            cache.sizeLimit = value
         }
+
+    private fun cacheKey(
+        row: WalletPaymentOrderRow,
+        options: WalletPaymentFetchOptions
+    ): String {
+        // The row.identifier looks like this:
+        // - "incoming|<id>|<createdAt>|<completedAt || null>"
+        // - "outgoing|<id>|<createdAt>|<completedAt || null>"
+        //
+        // So the full key will look like:
+        // - "<options>|incoming|<id>|<createdAt>|<completedAt || null>"
+        // - "<options>|outgoing|<id>|<createdAt>|<completedAt || null>"
+        //
+        return "${options.flags}|${row.identifier}"
+    }
+
+    private fun staleCacheKeyPrefix(
+        row: WalletPaymentOrderRow,
+        options: WalletPaymentFetchOptions
+    ): String {
+        return "${options.flags}|${row.staleIdentifierPrefix}"
+    }
 
     /**
      * Returns the payment if it exists in the cache.
      * A database fetch is not performed.
      */
-    fun getCachedPayment(row: WalletPaymentOrderRow): Result {
+    fun getCachedPayment(
+        row: WalletPaymentOrderRow,
+        options: WalletPaymentFetchOptions
+    ): WalletPaymentInfo? {
 
-        val key = row.identifier
-        return _cache[key] ?: Result(payment = null)
+        val key = cacheKey(row, options)
+        return cache[key]?.info
     }
 
     /**
      * Searches the cache for a stale version of the payment.
      * Sometimes a stale version of the object is better than nothing.
      */
-    fun getCachedStalePayment(row: WalletPaymentOrderRow): Result {
+    fun getCachedStalePayment(
+        row: WalletPaymentOrderRow,
+        options: WalletPaymentFetchOptions
+    ): WalletPaymentInfo? {
 
-        // The keys in the cache look like:
-        // - "incoming|<id>|<createdAt>|<completedAt || null>"
-        // - "outgoing|<id>|<createdAt>|<completedAt || null>"
-        //
-        // When a row is updated, only the `completedAt` value changes.
-        // So we can find a stale value by searching for another key with the same prefix.
-
-        val prefix = row.staleIdentifierPrefix
-        val mostRecentStaleEntry = _cache.filteredKeys { key ->
+        val prefix = staleCacheKeyPrefix(row, options)
+        val mostRecentStaleEntry = cache.filteredKeys { key ->
             key.startsWith(prefix)
         }.associateWith { key ->
             val suffix = key.substring(prefix.length)
@@ -92,10 +107,10 @@ class PaymentsFetcher(
         }
 
         val mostRecentStaleValue = mostRecentStaleEntry?.let {
-            _cache[it.key]
+            cache[it.key]
         }
 
-        return mostRecentStaleValue ?: Result(payment = null)
+        return mostRecentStaleValue?.info
     }
 
     /**
@@ -104,11 +119,14 @@ class PaymentsFetcher(
      * If multiple queries for the same row arrive simultaneously,
      * they will be automatically consolidated into a single database fetch.
      */
-    suspend fun getPayment(row: WalletPaymentOrderRow): Result = suspendCoroutine { continuation ->
+    suspend fun getPayment(
+        row: WalletPaymentOrderRow,
+        options: WalletPaymentFetchOptions
+    ): WalletPaymentInfo? = suspendCoroutine { continuation ->
 
-        val key = row.identifier
-        _cache[key]?.let {
-            continuation.resumeWith(kotlin.Result.success(it))
+        val key = cacheKey(row, options)
+        cache[key]?.let {
+            continuation.resumeWith(kotlin.Result.success(it.info))
             return@suspendCoroutine
         }
 
@@ -129,25 +147,21 @@ class PaymentsFetcher(
 
         val completion = { result: Result ->
 
-            _cache[key] = result
+            cache[key] = result
             pendingFetches.remove(key)?.let { pendingContinuations ->
 
                 pendingContinuations.forEach { pendingContinuation ->
-                    pendingContinuation.resumeWith(kotlin.Result.success(result))
+                    pendingContinuation.resumeWith(kotlin.Result.success(result.info))
                 }
             }
         }
 
         launch {
-            val payment = when (val paymentId = row.id) {
-                is WalletPaymentId.IncomingPaymentId -> {
-                    _paymentsManager.getIncomingPayment(paymentId.paymentHash)
-                }
-                is WalletPaymentId.OutgoingPaymentId -> {
-                    _paymentsManager.getOutgoingPayment(paymentId.id)
-                }
+            paymentsManager.getPayment(row.id, options)?.let {
+                completion(Result(it))
+            } ?: run {
+                completion(Result(null))
             }
-            completion(Result(payment))
         }
     }
 }
