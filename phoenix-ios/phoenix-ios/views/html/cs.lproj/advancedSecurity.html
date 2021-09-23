@@ -7,32 +7,31 @@
 </head>
 <body>
 
-<p>Standard security:</p>
+<p>Standardní zabezpečení:</p>
 <ul>
-	<li>Access to the user interface is protected by biometrics.</li>
-	<li>Phoenix can receive incoming payments as long as the app is running.</li>
+	<li>Přístup k uživatelskému rozhraní je chráněn biometrií.</li>
+	<li>Phoenix může přijímat příchozí platby, pokud je aplikace spuštěna.</li>
 </ul>
 
-<p>Advanced security:</p>
+<p>Pokročilé zabezpečení:</p>
 <ul>
-	<li>Access to your seed is protected by biometrics.</li>
-	<li>Phoenix can receive incoming payments as long as the app is running <strong>AND</strong> you&#39;ve unlocked the app at least once.</li>
+	<li>Přístup k vašemu seedu je chráněn biometrií.</li>
+	<li>Phoenix může přijímat příchozí platby, pokud je aplikace spuštěna <strong>A</strong> odemknuli jste&#39; alespoň jednou aplikaci .</li>
 </ul>
 
-<h4>Reduced app functionality:</h4>
+<h4>Omezená funkce aplikace:</h4>
 <p>
-	With advanced security enabled: If the device is restarted, and Phoenix is re-launched automatically (e.g. operating system upgrade), then incoming payments will fail until you unlock Phoenix.
+	Pokud je povoleno pokročilé zabezpečení: Pokud je zařízení restartováno a Phoenix se automaticky znovu spustí (např. Aktualizace operačního systému), příchozí platby selžou, dokud Phoenix neodemknete.
 </p>
 
-<h4>Technical details:</h4>
+<h4>Technické detaily:</h4>
 <p>
-	Your seed is wrapped using ChaCha20-Poly1305 with a 256-bit lockingKey, and the resulting {ciphertext, nonce, tag} is stored in a JSON file on disk. The lockingKey is stored in the iOS keychain.
+	Váš seed je zabalen pomocí ChaCha20-Poly1305 s 256-bitovým Klíčem uzamčení, a vyplývající {ciphertext, nonce, tag} je uložen v souboru JSON na disku. Klíč uzamčení je uložen v iOS klíčence.
 </p>
 <p>
-	With normal security, the app can access the lockingKey on app launch, and immediately unlock the bitcoin wallet. Enabled security options restrict access to the user interface.
+  Při standardním zabezpečení může aplikace přistupovat ke Klíči uzamčení při spuštění aplikace a okamžitě odemknout bitcoinovou peněženku. Povolené možnosti zabezpečení omezují přístup k uživatelskému rozhraní.
 </p>
 <p>
-	With advanced security, the lockingKey is encumbered such that it cannot be accessed unless you authenticate with biometrics. Thus the app is incapable of unlocking the bitcoin wallet without your assistance.
-</p>
+S pokročilým zabezpečením je Klíč uzamčení zatížen tak, že k němu nelze přistupovat, pokud se neověříte pomocí biometrie. Aplikace tedy není schopna bez vaší pomoci odemknout bitcoinovou peněženku.</p>
 </body>
 </html>
