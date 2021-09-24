@@ -1,8 +1,8 @@
 object Versions {
     const val lightningKmp = "1.1-SNAPSHOT"
-    const val secp256k1 = "0.6.0-SNAPSHOT"
+    const val secp256k1 = "0.6.0"
 
-    const val kotlin = "1.5.30"
+    const val kotlin = "1.5.31"
     const val coroutines = "1.5.2-native-mt"
     const val serialization = "1.2.2"
 
