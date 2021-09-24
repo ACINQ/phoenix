@@ -72,7 +72,6 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                 version { strictly(Versions.coroutines) }
             }
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.datetime}")
             implementation("io.ktor:ktor-client-core:${Versions.ktor}")
             implementation("io.ktor:ktor-client-json:${Versions.ktor}")
             implementation("io.ktor:ktor-client-serialization:${Versions.ktor}")

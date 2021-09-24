@@ -5,7 +5,6 @@ object Versions {
     const val kotlin = "1.5.30"
     const val coroutines = "1.5.2-native-mt"
     const val serialization = "1.2.2"
-    const val datetime = "0.1.1"
 
     const val ktor = "1.6.3"
     const val sqlDelight = "1.5.0"
