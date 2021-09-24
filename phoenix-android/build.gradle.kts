@@ -6,11 +6,11 @@ plugins {
 val chain: String by project
 
 android {
-    compileSdk = 30
+    compileSdk = 31
     defaultConfig {
         applicationId = "fr.acinq.phoenix.android"
         minSdk = 24
-        targetSdk = 30
+        targetSdk = 31
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

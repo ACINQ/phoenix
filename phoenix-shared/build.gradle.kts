@@ -12,10 +12,10 @@ plugins {
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: false
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
-        compileSdk = 30
+        compileSdk = 31
         defaultConfig {
             minSdk = 24
-            targetSdk = 30
+            targetSdk = 31
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
@@ -72,7 +72,6 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core") {
                 version { strictly(Versions.coroutines) }
             }
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.datetime}")
             implementation("io.ktor:ktor-client-core:${Versions.ktor}")
             implementation("io.ktor:ktor-client-json:${Versions.ktor}")
             implementation("io.ktor:ktor-client-serialization:${Versions.ktor}")

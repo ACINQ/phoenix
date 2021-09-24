@@ -475,7 +475,7 @@ class PaymentDetailsViewModel(
         payments.filter { p -> p.status() is OutgoingPaymentStatus.Succeeded }.also {
           val total = MilliSatoshi(it.map { p -> p.amount().`$plus`((p.status() as OutgoingPaymentStatus.Succeeded).feesPaid()).toLong() }.sum())
           val fees = total.`$minus`(amountToRecipient)
-          val completedAt = it.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.map { s -> s.completedAt() }.max()!!
+          val completedAt = it.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.map { s -> s.completedAt() }.maxOrNull()!!
           val head = it.first()
           if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
             val feeSwapOut = Satoshi(paymentMeta.swap_out_fee_sat)
