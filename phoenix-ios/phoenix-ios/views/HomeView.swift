@@ -534,9 +534,11 @@ fileprivate struct PaymentCell : View, ViewName {
 							)
 					case .pending:
 						Image("payment_holder_def_pending")
+							.foregroundColor(Color.appAccent)
 							.padding(4)
 					case .failure:
 						Image("payment_holder_def_failed")
+							.foregroundColor(Color.appAccent)
 							.padding(4)
 					default:
 						Image(systemName: "doc.text.magnifyingglass")
