@@ -1,0 +1,30 @@
+/* Credits:
+ * https://useyourloaf.com/blog/using-dynamic-type-with-web-views/
+ * https://useyourloaf.com/blog/supporting-dark-mode-in-wkwebview
+**/
+
+:root {
+	background: [[background_color]];
+	color: [[foreground_color]];
+	--link-color: [[link_color]];
+}
+
+body {
+	font: -apple-system-body;
+}
+
+a {
+	color: var(--link-color);
+}
+
+p {
+	margin-top: 0pt;
+	margin-bottom: 0pt;
+	padding-top: 5pt;
+	padding-bottom: 5pt;
+}
+
+ul {
+	margin-top: 0;
+	padding-top: 0;
+}

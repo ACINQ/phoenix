@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/nav_graph_main"
+  app:startDestination="@id/main_fragment">
+
+  <!-- global to main -->
+  <action
+    android:id="@+id/global_action_any_to_main"
+    app:destination="@id/main_fragment" />
+  <!-- global to startup -->
+  <action
+    android:id="@+id/global_action_any_to_startup"
+    app:destination="@id/startup_fragment"
+    app:enterAnim="@anim/fade_in"
+    app:exitAnim="@anim/fade_out"
+    app:launchSingleTop="true" />
+  <!-- global to wallet initialization -->
+  <action
+    android:id="@+id/global_action_any_to_init_wallet"
+    app:destination="@id/init_wallet_fragment"
+    app:enterAnim="@anim/slide_up"
+    app:exitAnim="@anim/fade_out"
+    app:launchSingleTop="true" />
+  <!-- global to send -->
+  <action
+    android:id="@+id/global_action_any_to_send"
+    app:destination="@id/send_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+  <!-- global to read input -->
+  <action
+    android:id="@+id/global_action_any_to_read_input"
+    app:destination="@id/read_input"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+  <!-- global to payment details page -->
+  <action
+    android:id="@+id/global_action_any_to_payment_details"
+    app:destination="@id/nav_graph_payment_details"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment">
+    <argument
+      android:name="direction"
+      app:argType="string" />
+    <argument
+      android:name="identifier"
+      app:argType="string" />
+    <argument
+      android:name="fromEvent"
+      android:defaultValue="false"
+      app:argType="boolean" />
+  </action>
+  <!-- global to electrum server -->
+  <action
+    android:id="@+id/global_action_any_to_electrum"
+    app:destination="@id/electrum_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+  <!-- global to tor settings -->
+  <action
+    android:id="@+id/global_action_any_to_tor"
+    app:destination="@id/tor_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+  <!-- global to payments settings -->
+  <action
+    android:id="@+id/global_action_any_to_payments_setting"
+    app:destination="@id/payment_settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+  <!-- global to global settings -->
+  <action
+    android:id="@+id/global_action_any_to_settings"
+    app:destination="@id/settings_fragment"
+    app:launchSingleTop="true"
+    app:popUpTo="@id/main_fragment" />
+
+  <!-- main fragment -->
+  <fragment
+    android:id="@+id/main_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.MainFragment"
+    android:label="MainFragment">
+    <action
+      android:id="@+id/action_main_to_receive"
+      app:destination="@id/receive_fragment"
+      app:enterAnim="@anim/slide_in_left"
+      app:exitAnim="@anim/slide_out_right" />
+    <action
+      android:id="@+id/action_main_to_read_input"
+      app:destination="@id/read_input"
+      app:launchSingleTop="true" />
+    <action
+      android:id="@+id/action_main_to_settings"
+      app:destination="@id/settings_fragment" />
+    <action
+      android:id="@+id/action_main_to_display_seed"
+      app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_main_to_access_control"
+      app:destination="@id/access_control" />
+    <action
+      android:id="@+id/action_main_to_connectivity"
+      app:destination="@id/connectivity_dialog" />
+  </fragment>
+
+  <!-- init wallet -->
+  <fragment
+    android:id="@+id/init_wallet_fragment"
+    android:name="fr.acinq.phoenix.legacy.initwallet.InitWalletFragment"
+    android:label="InitSeedFragment">
+    <action
+      android:id="@+id/action_init_wallet_to_ftue"
+      app:destination="@id/ftue_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left" />
+    <action
+      android:id="@+id/action_init_wallet_to_restore"
+      app:destination="@id/restore_seed_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left" />
+    <action
+      android:id="@+id/action_init_wallet_to_auto_create"
+      app:destination="@id/auto_create_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left" />
+  </fragment>
+
+  <!-- init wallet: restore seed -->
+  <fragment
+    android:id="@+id/restore_seed_fragment"
+    android:name="fr.acinq.phoenix.legacy.initwallet.RestoreSeedFragment"
+    android:label="RestoreSeedFragment" />
+
+  <!-- init wallet: automated seed creation -->
+  <fragment
+    android:id="@+id/auto_create_fragment"
+    android:name="fr.acinq.phoenix.legacy.initwallet.AutoCreateFragment"
+    android:label="AutoCreateFragment" />
+
+  <!-- startup node -->
+  <fragment
+    android:id="@+id/startup_fragment"
+    android:name="fr.acinq.phoenix.legacy.startup.StartupFragment"
+    android:label="StartupFragment">
+    <action
+      android:id="@+id/action_startup_to_main"
+      app:destination="@id/main_fragment"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/fade_out"
+      app:launchSingleTop="true"
+      app:popUpTo="@id/main_fragment" />
+    <action
+      android:id="@+id/action_startup_to_patch_note"
+      app:destination="@id/patch_notes"
+      app:enterAnim="@anim/slide_up"
+      app:exitAnim="@anim/slide_down" />
+  </fragment>
+
+  <!-- receive money -->
+  <fragment
+    android:id="@+id/receive_fragment"
+    android:name="fr.acinq.phoenix.legacy.receive.ReceiveFragment"
+    android:label="ReceiveFragment">
+    <action
+      android:id="@+id/action_receive_to_main"
+      app:destination="@id/main_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popEnterAnim="@anim/slide_in_right"
+      app:popExitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
+
+  <!-- send money -->
+  <fragment
+    android:id="@+id/send_fragment"
+    android:name="fr.acinq.phoenix.legacy.send.SendFragment"
+    android:label="SendFragment">
+    <action
+      android:id="@+id/action_send_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+    <argument
+      android:name="payload"
+      app:argType="string" />
+  </fragment>
+
+  <!-- prepare send money (scan/paste invoice) -->
+  <fragment
+    android:id="@+id/read_input"
+    android:name="fr.acinq.phoenix.legacy.send.ReadInputFragment"
+    android:label="ReadInputFragment">
+    <argument
+      android:name="payload"
+      android:defaultValue="@null"
+      app:argType="string"
+      app:nullable="true" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_auth"
+      app:destination="@id/lnurl_auth"
+      app:launchSingleTop="true"
+      app:popUpTo="@id/main_fragment" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_pay"
+      app:destination="@+id/lnurl_pay" />
+    <action
+      android:id="@+id/action_read_input_to_lnurl_withdraw"
+      app:destination="@+id/lnurl_withdraw"
+      app:launchSingleTop="true"
+      app:popUpTo="@id/main_fragment" />
+  </fragment>
+
+  <!-- nested graph with shared view model for payment details -->
+  <navigation
+    android:id="@+id/nav_graph_payment_details"
+    app:startDestination="@id/payment_details">
+
+    <!-- payment details overview -->
+    <fragment
+      android:id="@+id/payment_details"
+      android:name="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsFragment"
+      android:label="PaymentDetailsFragment">
+      <action
+        android:id="@+id/action_payment_details_to_payment_details_technicals"
+        app:destination="@id/payment_details_technicals"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right" />
+      <argument
+        android:name="identifier"
+        app:argType="string" />
+      <argument
+        android:name="direction"
+        app:argType="string" />
+      <argument
+        android:name="fromEvent"
+        android:defaultValue="false"
+        app:argType="boolean" />
+    </fragment>
+
+    <!-- payment details technical data -->
+    <fragment
+      android:id="@+id/payment_details_technicals"
+      android:name="fr.acinq.phoenix.legacy.paymentdetails.PaymentDetailsTechnicalsFragment"
+      android:label="PaymentDetailsTechnicalsFragment" />
+
+    <!-- navigate to payment settings -->
+    <action
+      android:id="@+id/global_payment_details_to_payment_settings_fragment"
+      app:destination="@id/payment_settings_fragment"
+      app:popUpTo="@id/main_fragment" />
+  </navigation>
+
+  <!-- LNURL: auth -->
+  <fragment
+    android:id="@+id/lnurl_auth"
+    android:name="fr.acinq.phoenix.legacy.lnurl.LNUrlAuthFragment"
+    android:label="LNUrlAuth">
+    <argument
+      android:name="url"
+      app:argType="fr.acinq.phoenix.legacy.lnurl.LNUrlAuth" />
+    <action
+      android:id="@+id/action_lnurl_auth_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
+
+  <!-- LNURL: pay -->
+  <fragment
+    android:id="@+id/lnurl_pay"
+    android:name="fr.acinq.phoenix.legacy.lnurl.LNUrlPayFragment"
+    android:label="LNUrlPayFragment">
+    <argument
+      android:name="url"
+      app:argType="fr.acinq.phoenix.legacy.lnurl.LNUrlPay" />
+    <action
+      android:id="@+id/action_lnurl_pay_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
+
+  <!-- LNURL: withdraw -->
+  <fragment
+    android:id="@+id/lnurl_withdraw"
+    android:name="fr.acinq.phoenix.legacy.lnurl.LNUrlWithdrawFragment"
+    android:label="LNUrlWithdrawFragment">
+    <argument
+      android:name="url"
+      app:argType="fr.acinq.phoenix.legacy.lnurl.LNUrlWithdraw" />
+    <action
+      android:id="@+id/action_lnurl_withdraw_to_main"
+      app:destination="@id/main_fragment"
+      app:popUpTo="@id/main_fragment"
+      app:popUpToInclusive="true" />
+  </fragment>
+
+  <!-- settings: root -->
+  <fragment
+    android:id="@+id/settings_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.SettingsFragment"
+    android:label="SettingsFragment">
+    <action
+      android:id="@+id/action_settings_to_mutual_close"
+      app:destination="@id/mutual_close_fragment" />
+    <action
+      android:id="@+id/action_settings_to_force_close"
+      app:destination="@id/force_close_fragment" />
+    <action
+      android:id="@+id/action_settings_to_list_channels"
+      app:destination="@id/channels_list_fragment" />
+    <action
+      android:id="@+id/action_settings_to_display_seed"
+      app:destination="@id/display_seed" />
+    <action
+      android:id="@+id/action_settings_to_logs"
+      app:destination="@id/logs_fragment" />
+    <action
+      android:id="@+id/action_settings_to_access_control"
+      app:destination="@id/access_control" />
+    <action
+      android:id="@+id/action_settings_to_prefs_display"
+      app:destination="@id/prefs_display" />
+    <action
+      android:id="@+id/action_settings_to_electrum"
+      app:destination="@id/electrum_fragment" />
+    <action
+      android:id="@+id/action_settings_to_tor"
+      app:destination="@id/tor_fragment" />
+    <action
+      android:id="@+id/action_settings_to_about"
+      app:destination="@id/about_fragment" />
+    <action
+      android:id="@+id/action_settings_to_payment_settings"
+      app:destination="@id/payment_settings_fragment" />
+  </fragment>
+
+  <!-- settings: mutual close all channels -->
+  <fragment
+    android:id="@+id/mutual_close_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.MutualCloseFragment"
+    android:label="MutualCloseFragment" />
+
+  <!-- settings: force close all channels -->
+  <fragment
+    android:id="@+id/force_close_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.ForceCloseFragment"
+    android:label="ForceCloseFragment" />
+
+  <!-- settings: list all channels -->
+  <fragment
+    android:id="@+id/channels_list_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.ListChannelsFragment"
+    android:label="ListChannelsFragment">
+    <action
+      android:id="@+id/action_list_channels_to_channel_details"
+      app:destination="@id/channel_details" />
+  </fragment>
+
+  <!-- settings: channel details dialog -->
+  <dialog
+    android:id="@+id/channel_details"
+    android:name="fr.acinq.phoenix.legacy.settings.ChannelDetailsDialog"
+    android:label="channel_details">
+    <argument
+      android:name="channel_id"
+      app:argType="string" />
+  </dialog>
+
+  <!-- settings: share logs -->
+  <fragment
+    android:id="@+id/logs_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.LogsSettingsFragment"
+    android:label="LogsSettingsFragment" />
+
+  <!-- settings: change electrum server -->
+  <fragment
+    android:id="@+id/electrum_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.ElectrumServerFragment"
+    android:label="ElectrumServerFragment" />
+
+  <!-- settings: display wallet seed -->
+  <fragment
+    android:id="@+id/display_seed"
+    android:name="fr.acinq.phoenix.legacy.settings.DisplaySeedFragment"
+    android:label="DisplaySeedFragment" />
+
+  <!-- settings: wallet access control (screen lock,...) -->
+  <fragment
+    android:id="@+id/access_control"
+    android:name="fr.acinq.phoenix.legacy.settings.AccessControlFragment"
+    android:label="access_control">
+    <action
+      android:id="@+id/action_access_control_to_display_seed"
+      app:destination="@id/display_seed" />
+  </fragment>
+
+  <!-- settings: change display settings (theme, currency...) -->
+  <fragment
+    android:id="@+id/prefs_display"
+    android:name="fr.acinq.phoenix.legacy.settings.DisplayPrefsFragment"
+    android:label="DisplayPrefsFragment" />
+
+  <!-- settings: TOR -->
+  <fragment
+    android:id="@+id/tor_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.TorSettingFragment"
+    android:label="TorSettingFragment" />
+
+  <!-- main: connectivity feedback dialog -->
+  <dialog
+    android:id="@+id/connectivity_dialog"
+    android:name="fr.acinq.phoenix.legacy.main.ConnectivityFragmentDialog"
+    android:label="connectivity_dialog" />
+
+  <!-- settings: about -->
+  <fragment
+    android:id="@+id/about_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.AboutFragment"
+    android:label="AboutFragment" />
+
+  <!-- settings: payment -->
+  <fragment
+    android:id="@+id/payment_settings_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.PaymentSettingsFragment"
+    android:label="PaymentSettingsFragment" />
+
+  <!-- first time user exp -->
+  <fragment
+    android:id="@+id/ftue_fragment"
+    android:name="fr.acinq.phoenix.legacy.initwallet.FtueFragment"
+    android:label="FtueFragment">
+    <action
+      android:id="@+id/action_ftue_to_initwallet"
+      app:destination="@id/init_wallet_fragment"
+      app:enterAnim="@anim/slide_in_right"
+      app:exitAnim="@anim/slide_out_left"
+      app:popUpTo="@id/init_wallet_fragment" />
+  </fragment>
+
+  <!-- prepare send money (scan/paste invoice) -->
+  <fragment
+    android:id="@+id/patch_notes"
+    android:name="fr.acinq.phoenix.legacy.startup.PatchNotesFragment"
+    android:label="PatchNotesFragment">
+    <argument
+      android:name="version"
+      app:argType="long" />
+  </fragment>
+
+</navigation>

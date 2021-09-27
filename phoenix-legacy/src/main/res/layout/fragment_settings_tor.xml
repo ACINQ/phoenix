@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2020 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <variable
+      name="model"
+      type="fr.acinq.phoenix.legacy.settings.TorSettingViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
+      android:id="@+id/action_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toTopOf="parent"
+      app:subtitle="@string/tor_settings_subtitle"
+      app:title="@string/tor_settings_title" />
+
+    <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:overScrollMode="never"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/action_bar">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/square_border_hz">
+
+        <fr.acinq.phoenix.legacy.utils.customviews.SwitchView
+          android:id="@+id/tor_switch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toTopOf="parent"
+          app:icon="@drawable/ic_tor_shield"
+          app:text="@string/tor_settings_disabled" />
+
+        <View
+          android:id="@+id/switch_sep"
+          style="@style/HSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/tor_switch" />
+
+        <HorizontalScrollView
+          android:id="@+id/getinfo_scroll"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/switch_sep">
+
+          <TextView
+            android:id="@+id/getinfo_value"
+            style="@style/MonospaceView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/space_md" />
+        </HorizontalScrollView>
+
+        <View
+          android:id="@+id/getinfo_sep"
+          style="@style/HSeparator"
+          android:layout_width="match_parent"
+          app:layout_constraintTop_toBottomOf="@id/getinfo_scroll" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

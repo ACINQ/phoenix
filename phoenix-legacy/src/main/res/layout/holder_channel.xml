@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@drawable/button_bg_square_border"
+  android:padding="@dimen/space_sm">
+
+  <ImageView
+    android:id="@+id/channel_icon"
+    android:layout_width="8dp"
+    android:layout_height="8dp"
+    android:adjustViewBounds="true"
+    android:contentDescription="@null"
+    android:scaleType="fitCenter"
+    android:src="@drawable/ic_bullet"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+    android:id="@+id/channel_state"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/space_sm"
+    android:layout_marginEnd="@dimen/space_lg"
+    android:ellipsize="end"
+    android:textSize="@dimen/text_md"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/channel_balance_layout"
+    app:layout_constraintHorizontal_bias="0"
+    app:layout_constraintStart_toEndOf="@+id/channel_icon"
+    app:layout_constraintTop_toTopOf="parent" />
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/channel_balance_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.constraintlayout.widget.Barrier
+      android:id="@+id/channel_value_barrier"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:barrierDirection="start"
+      app:constraint_referenced_ids="channel_balance_value,channel_capacity_value" />
+
+    <TextView
+      android:id="@+id/channel_balance_label"
+      style="@style/MutedLabelView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_xs"
+      android:text="@string/channel_balance"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_balance_value"
+      app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.CoinView
+      android:id="@+id/channel_balance_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:amount_size="@dimen/text_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1"
+      app:layout_constraintTop_toTopOf="parent"
+      app:thin="false"
+      app:unit_size="@dimen/text_sm" />
+
+    <TextView
+      android:id="@+id/channel_capacity_label"
+      style="@style/MutedLabelView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/space_xs"
+      android:text="@string/channel_capacity"
+      app:layout_constraintBaseline_toBaselineOf="@id/channel_capacity_value"
+      app:layout_constraintEnd_toStartOf="@id/channel_value_barrier" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.CoinView
+      android:id="@+id/channel_capacity_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:amount_size="@dimen/text_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1"
+      app:layout_constraintTop_toBottomOf="@id/channel_balance_value"
+      app:thin="false"
+      app:unit_size="@dimen/text_sm" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

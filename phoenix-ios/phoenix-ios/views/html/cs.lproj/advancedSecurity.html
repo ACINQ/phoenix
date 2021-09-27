@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='UTF-8'>
+	<meta name='viewport' content='width=device-width initial-scale=1'>
+	<style></style>
+</head>
+<body>
+
+<p>Standardní zabezpečení:</p>
+<ul>
+	<li>Přístup k uživatelskému rozhraní je chráněn biometrií.</li>
+	<li>Phoenix může přijímat příchozí platby, pokud je aplikace spuštěna.</li>
+</ul>
+
+<p>Pokročilé zabezpečení:</p>
+<ul>
+	<li>Přístup k vašemu seedu je chráněn biometrií.</li>
+	<li>Phoenix může přijímat příchozí platby, pokud je aplikace spuštěna <strong>A</strong> odemknuli jste&#39; alespoň jednou aplikaci .</li>
+</ul>
+
+<h4>Omezená funkce aplikace:</h4>
+<p>
+	Pokud je povoleno pokročilé zabezpečení: Pokud je zařízení restartováno a Phoenix se automaticky znovu spustí (např. Aktualizace operačního systému), příchozí platby selžou, dokud Phoenix neodemknete.
+</p>
+
+<h4>Technické detaily:</h4>
+<p>
+	Váš seed je zabalen pomocí ChaCha20-Poly1305 s 256-bitovým Klíčem uzamčení, a vyplývající {ciphertext, nonce, tag} je uložen v souboru JSON na disku. Klíč uzamčení je uložen v iOS klíčence.
+</p>
+<p>
+  Při standardním zabezpečení může aplikace přistupovat ke Klíči uzamčení při spuštění aplikace a okamžitě odemknout bitcoinovou peněženku. Povolené možnosti zabezpečení omezují přístup k uživatelskému rozhraní.
+</p>
+<p>
+S pokročilým zabezpečením je Klíč uzamčení zatížen tak, že k němu nelze přistupovat, pokud se neověříte pomocí biometrie. Aplikace tedy není schopna bez vaší pomoci odemknout bitcoinovou peněženku.</p>
+</body>
+</html>

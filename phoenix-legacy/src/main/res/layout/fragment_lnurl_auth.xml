@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.phoenix.legacy.lnurl.LNUrlAuthState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.phoenix.legacy.lnurl.LNUrlAuthViewModel" />
+  </data>
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    tools:context=".lnurl.LNUrlAuthFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
+        android:id="@+id/action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <TextView
+        android:id="@+id/instructions"
+        android:layout_width="wrap_content"
+        android:textAlignment="center"
+        android:maxWidth="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:text="@string/lnurl_auth_instructions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_bar" />
+
+      <View
+        android:id="@+id/instructions_sep"
+        style="@style/HSeparator"
+        android:layout_marginTop="@dimen/space_md_p"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructions" />
+
+      <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md_p"
+        android:visibility="@{model.state instanceof LNUrlAuthState.Init}"
+        android:backgroundTint="?attr/colorPrimary"
+        app:icon="@drawable/ic_check_circle"
+        app:icon_tint="?attr/colorOnPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
+        app:text="@string/lnurl_auth_button"
+        app:text_color="?attr/colorOnPrimary" />
+
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md_p"
+        android:padding="@dimen/space_sm"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:visibility="@{model.state instanceof LNUrlAuthState.InProgress}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
+        app:text="@string/lnurl_auth_in_progress" />
+
+      <ImageView
+        android:id="@+id/success_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="@dimen/space_md_p"
+        android:visibility="@{model.state instanceof LNUrlAuthState.Done}"
+        android:src="@drawable/ic_check"
+        android:contentDescription="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
+        app:tint="?attr/positiveColor" />
+
+      <TextView
+        android:id="@+id/success"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_sm"
+        android:text="@string/lnurl_auth_success"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:textAlignment="center"
+        android:visibility="@{model.state instanceof LNUrlAuthState.Done}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/success_image"
+        app:text="@string/lnurl_auth_success" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/error_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md_p"
+        android:layout_marginStart="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_lg"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_md_p"
+        android:visibility="@{model.state instanceof LNUrlAuthState.Error}"
+        app:layout_constraintTop_toBottomOf="@id/instructions_sep"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_max="@dimen/max_width_md">
+
+        <ImageView
+          android:id="@+id/error_icon"
+          android:layout_width="24dp"
+          android:layout_height="24dp"
+          android:src="@drawable/ic_alert_triangle"
+          android:contentDescription="@null"
+          app:layout_constraintBaseline_toBaselineOf="@id/error_message"
+          app:layout_constraintStart_toStartOf="parent"
+          app:tint="?attr/negativeColor" />
+
+        <TextView
+          android:id="@+id/error_message"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_sm"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/error_icon"
+          android:text="@string/lnurl_auth_failure"
+          app:layout_constraintTop_toTopOf="parent" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
+</layout>

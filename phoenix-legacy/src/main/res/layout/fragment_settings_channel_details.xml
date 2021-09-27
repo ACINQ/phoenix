@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.phoenix.legacy.settings.ChannelDetailsState" />
+
+    <variable
+      name="model"
+      type="fr.acinq.phoenix.legacy.settings.ChannelDetailsViewModel" />
+  </data>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".legacy.settings.ChannelDetailsDialog">
+
+    <ScrollView
+      android:id="@+id/raw_data_layout"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:background="?attr/mutedBgColor"
+      app:layout_constrainedHeight="true"
+      app:layout_constraintHeight_default="percent"
+      app:layout_constraintHeight_percent="0.85"
+      app:layout_constraintTop_toTopOf="parent">
+
+      <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+          android:id="@+id/raw_data"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:fontFamily="monospace"
+          android:padding="@dimen/space_md"
+          android:textIsSelectable="true"
+          android:textSize="@dimen/text_xs"
+          app:layout_constrainedHeight="true"
+          app:layout_constrainedWidth="true" />
+      </HorizontalScrollView>
+    </ScrollView>
+
+    <View
+      android:id="@+id/sep"
+      style="@style/HLineSeparator"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+      android:id="@+id/copy_button"
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:background="@drawable/button_bg_square"
+      android:contentDescription="@string/listallchannels_copy"
+      android:padding="@dimen/space_md"
+      app:icon="@drawable/ic_copy"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintHorizontal_bias="0"
+      app:layout_constraintHorizontal_chainStyle="packed"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+
+    <View
+      style="@style/VSeparator"
+      android:layout_marginTop="@dimen/space_md"
+      android:layout_marginBottom="@dimen/space_md"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/copy_button"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+      android:id="@+id/share_button"
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:background="@drawable/button_bg_square"
+      android:contentDescription="@string/listallchannels_share"
+      android:padding="@dimen/space_md"
+      app:icon="@drawable/ic_share"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/copy_button"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+
+    <View
+      style="@style/VSeparator"
+      android:layout_marginTop="@dimen/space_md"
+      android:layout_marginBottom="@dimen/space_md"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/share_button"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+      android:id="@+id/funding_tx_button"
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:background="@drawable/button_bg_square"
+      android:contentDescription="@string/listallchannels_funding_tx_desc"
+      android:padding="@dimen/space_md"
+      android:visibility="@{model.fundingTxId != null &amp;&amp; !model.fundingTxId.empty}"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/share_button"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout"
+      app:text="@string/listallchannels_funding_tx" />
+
+    <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+      android:id="@+id/close_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/button_bg_square"
+      android:padding="@dimen/space_md"
+      app:layout_constrainedWidth="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/raw_data_layout"
+      app:text="@string/listallchannels_close" />
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/rounded"
+      android:backgroundTint="@color/white_mid_op"
+      android:padding="@dimen/space_md_p"
+      android:text="@string/channel_loading"
+      android:textAlignment="center"
+      android:visibility="@{model.state == ChannelDetailsState.INIT || model.state == ChannelDetailsState.IN_PROGRESS}"
+      app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/rounded"
+      android:backgroundTint="@color/white_mid_op"
+      android:padding="@dimen/space_md_p"
+      android:text="@string/channel_error"
+      android:textAlignment="center"
+      android:visibility="@{model.state == ChannelDetailsState.ERROR}"
+      app:layout_constraintBottom_toBottomOf="@id/raw_data_layout"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

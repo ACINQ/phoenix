@@ -1,0 +1,12 @@
+/* Bundle name */
+"CFBundleName" = "Phoenix";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "A Phoenix le gustaría usar la cámara para escanear solicitudes de pago.\n";
+
+/* Privacy - Face ID Usage Description */
+"NSFaceIDUsageDescription" = "Iniciar sesión con Face ID.";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "A Phoenix le gustaría guardar una imagen de código QR en la biblioteca de fotos.";
+

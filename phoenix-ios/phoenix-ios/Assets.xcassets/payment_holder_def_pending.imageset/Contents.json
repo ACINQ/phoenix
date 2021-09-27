@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "payment_holder_def_pending.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}

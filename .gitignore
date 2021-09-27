@@ -1,20 +1,27 @@
+# Build
+build/
+
+# Idea
+.idea
 *.iml
+
+# Gradle
 .gradle
-.cxx
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+local.properties
+.gradletasknamecache
+
+# OS
 .DS_Store
-/build
-/captures
+
+# XCode
+xcuserdata/
+
+# Android
+phoenix-android/debug/
+phoenix-android/release/
 .externalNativeBuild
-/.idea
-app/release
-app/debug
-apk
-logs
 sdk-dependencies
+apk
+phoenix-legacy/release
+phoenix-legacy/debug
+.cxx

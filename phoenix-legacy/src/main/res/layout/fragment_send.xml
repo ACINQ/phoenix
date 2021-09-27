@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 ACINQ SAS
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <data>
+
+    <import type="fr.acinq.phoenix.legacy.send.SendState" />
+
+    <variable
+      name="appModel"
+      type="fr.acinq.phoenix.legacy.AppViewModel" />
+
+    <variable
+      name="model"
+      type="fr.acinq.phoenix.legacy.send.SendViewModel" />
+  </data>
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    tools:context=".legacy.send.SendFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <ImageView
+        android:id="@+id/shape"
+        android:layout_width="match_parent"
+        android:layout_height="146dp"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_bg1"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintTop_toTopOf="@id/buttons_section"
+        app:visible="@{model.isFormVisible()}" />
+
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/bgColor"
+        android:minHeight="@dimen/space_xl"
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/shape" />
+
+      <ImageView
+        android:layout_width="124dp"
+        android:layout_height="124dp"
+        android:layout_marginTop="@dimen/space_lg"
+        android:layout_marginEnd="@dimen/space_xxl"
+        android:alpha=".15"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_send_lg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:tint="?attr/mutedTextColor"
+        app:visible="@{model.isFormVisible()}" />
+
+      <fr.acinq.phoenix.legacy.utils.customviews.ActionBarView
+        android:id="@+id/action_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/balance_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:padding="@dimen/space_md"
+        android:visibility="@{model.isFormVisible()}"
+        app:layout_constraintBottom_toBottomOf="@id/action_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/action_bar"
+        app:layout_constraintTop_toTopOf="@id/action_bar">
+
+        <TextView
+          android:id="@+id/balance_prefix"
+          style="@style/MutedLabelView"
+          android:text="@string/send_balance_prefix"
+          app:layout_constraintBaseline_toBaselineOf="@id/balance_value"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.CoinView
+          android:id="@+id/balance_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xxs"
+          app:amount_size="@dimen/text_md"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toEndOf="@id/balance_prefix"
+          app:layout_constraintTop_toTopOf="parent"
+          app:thin="false"
+          app:unit_color="?attr/mutedTextColor"
+          app:unit_size="@dimen/text_sm" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_md"
+        android:layout_marginTop="@dimen/space_lg"
+        android:visibility="@{model.state instanceof SendState.CheckingInvoice}"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:text="@string/send_loading"
+        app:text_size="@dimen/text_lg" />
+
+      <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_md"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_lg"
+        android:text="@string/send_invalid_pr_generic"
+        android:visibility="@{model.state instanceof SendState.InvalidInvoice.Generic}"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:layout_constraintWidth_max="@dimen/max_width_sm" />
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/already_paid_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_lg"
+        android:background="@drawable/rounded"
+        android:padding="@dimen/space_lg"
+        android:visibility="@{model.state instanceof SendState.InvalidInvoice.AlreadyPaid}"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:layout_constraintWidth_max="@dimen/max_width_sm">
+
+        <TextView
+          android:id="@+id/already_paid_layout_message"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/send_invalid_pr_already_paid"
+          app:layout_constraintTop_toTopOf="parent" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/already_paid_layout_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/already_paid_layout_message"
+          app:text="@string/send_invalid_pr_already_paid_button" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/payment_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_xl"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balance_section"
+        app:layout_constraintWidth_max="@dimen/max_width_md"
+        app:visible="@{model.isFormVisible()}">
+
+        <EditText
+          android:id="@+id/amount"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@null"
+          android:fontFamily="sans-serif-light"
+          android:importantForAutofill="no"
+          android:inputType="numberDecimal"
+          android:minWidth="48dp"
+          android:overScrollMode="always"
+          android:paddingStart="@dimen/space_xs"
+          android:paddingEnd="@dimen/space_xs"
+          android:singleLine="true"
+          android:text=""
+          android:textAlignment="viewEnd"
+          android:textSize="48sp"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
+          app:layout_constrainedHeight="true"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toStartOf="@id/unit"
+          app:layout_constraintHorizontal_chainStyle="packed"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          tools:ignore="LabelFor" />
+
+        <Spinner
+          android:id="@+id/unit"
+          style="@style/default_spinnerStyle"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
+          app:layout_constraintBaseline_toBaselineOf="@+id/amount"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/amount"
+          tools:ignore="RtlHardcoded" />
+
+        <View
+          android:id="@+id/amount_underline"
+          android:layout_width="0dp"
+          android:layout_height="2dp"
+          android:background="@drawable/line_dots"
+          android:backgroundTint="?attr/colorPrimary"
+          android:layerType="software"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintBottom_toBottomOf="@id/amount"
+          app:layout_constraintEnd_toEndOf="@id/unit"
+          app:layout_constraintStart_toStartOf="@id/amount" />
+
+        <TextView
+          android:id="@+id/amount_converted"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount_underline" />
+
+        <TextView
+          android:id="@+id/amount_error"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_xs"
+          android:text="@string/send_amount_error"
+          android:textAlignment="center"
+          android:textColor="?attr/negativeColor"
+          android:textSize="@dimen/text_md"
+          android:visibility="gone"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount" />
+
+        <androidx.constraintlayout.widget.Barrier
+          android:id="@+id/amount_feedback_barrier"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:barrierDirection="bottom"
+          app:constraint_referenced_ids="amount_converted,amount_error" />
+
+        <CheckBox
+          android:id="@+id/max_checkbox"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:backgroundTint="?attr/colorPrimary"
+          android:buttonTint="?attr/colorPrimary"
+          android:checked="@={model.useMaxBalance}"
+          android:text="@string/send_use_all_balance"
+          android:textSize="@dimen/text_sm"
+          android:visibility="@{model.state instanceof SendState.Lightning}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0.5"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
+
+        <androidx.constraintlayout.widget.Guideline
+          android:id="@+id/payment_labels_guideline"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          app:layout_constraintGuide_percent=".35" />
+
+        <TextView
+          android:id="@+id/destination_label"
+          style="@style/MutedLabelView"
+          android:layout_width="wrap_content"
+          android:layout_marginStart="@dimen/space_md"
+          android:text="@string/send_destination_label"
+          android:textAlignment="viewEnd"
+          app:layout_constraintBaseline_toBaselineOf="@id/destination_value"
+          app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
+          app:layout_constraintHorizontal_bias="1"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+          android:id="@+id/destination_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_md"
+          android:ellipsize="none"
+          android:singleLine="@{model.state instanceof SendState.Lightning}"
+          android:text="@{model.destination}"
+          android:textIsSelectable="true"
+          app:drawableTint="?attr/colorPrimary"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
+          app:layout_constraintTop_toBottomOf="@id/max_checkbox" />
+
+        <TextView
+          android:id="@+id/description_label"
+          style="@style/MutedLabelView"
+          android:layout_width="wrap_content"
+          android:layout_marginStart="@dimen/space_md"
+          android:text="@string/send_description_label"
+          android:textAlignment="viewEnd"
+          android:visibility="@{model.description.length() > 0}"
+          app:layout_constraintBaseline_toBaselineOf="@id/description_value"
+          app:layout_constraintEnd_toStartOf="@id/payment_labels_guideline"
+          app:layout_constraintHorizontal_bias="1"
+          app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+          android:id="@+id/description_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_xs"
+          android:layout_marginTop="@dimen/space_xs"
+          android:layout_marginEnd="@dimen/space_lg_p"
+          android:text="@{model.description}"
+          android:visibility="@{model.description.length() > 0}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintHorizontal_bias="0"
+          app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
+          app:layout_constraintTop_toBottomOf="@id/destination_value" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttons_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="38dp"
+        android:paddingBottom="@dimen/space_xl"
+        app:layout_constraintTop_toBottomOf="@id/payment_section"
+        app:visible="@{model.isFormVisible()}">
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/prepare_swap_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_primary_border"
+          android:visibility="@{model.state instanceof SendState.Onchain.SwapRequired}"
+          app:icon="@drawable/ic_build"
+          app:icon_tint="?attr/colorPrimary"
+          app:is_paused="@{!appModel.networkInfo.lightningConnected}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:paused_text="@string/btn_pause_connecting"
+          app:text="@string/send_swap_required_button" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ProgressTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/rounded_border"
+          android:padding="@dimen/text_md"
+          android:visibility="@{model.state instanceof SendState.Onchain.Swapping}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:progress_tint="?attr/colorPrimary"
+          app:text="@string/send_swap_in_progress" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/swap_recap"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_md"
+          android:layout_marginEnd="@dimen/space_md"
+          android:background="@drawable/rounded_border"
+          android:paddingHorizontal="@dimen/space_lg"
+          android:paddingVertical="@dimen/space_md_p"
+          android:visibility="@{model.state instanceof SendState.Onchain.Ready || model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintWidth_max="@dimen/max_width_md">
+
+          <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/swap_mid_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+          <TextView
+            android:id="@+id/swap_recap_amount_label"
+            style="@style/MutedLabelView"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="@dimen/space_xs"
+            android:text="@string/send_swap_complete_recap_amount"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_amount_value"
+            app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_amount_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_amount_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_label"
+            style="@style/MutedLabelView"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="@dimen/space_xs"
+            android:clickable="true"
+            android:drawablePadding="@dimen/space_xs"
+            android:focusable="true"
+            android:text="@string/send_swap_complete_recap_fee"
+            app:drawableStartCompat="@drawable/ic_info"
+            app:drawableTint="?attr/colorPrimary"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_fee_value"
+            app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xxs"
+            android:textStyle="bold"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_amount_value_fiat" />
+
+          <TextView
+            android:id="@+id/swap_recap_fee_value_fiat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/mutedTextColor"
+            android:textSize="@dimen/text_md"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value" />
+
+          <View
+            android:id="@+id/swap_recap_total_separator"
+            android:layout_width="50dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/space_sm"
+            android:background="?attr/mutedTextColor"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_fee_value_fiat" />
+
+          <TextView
+            android:id="@+id/swap_recap_total_label"
+            style="@style/MutedLabelView"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="@dimen/space_xs"
+            android:text="@string/send_swap_complete_recap_total"
+            app:layout_constraintBaseline_toBaselineOf="@id/swap_recap_total_value"
+            app:layout_constraintEnd_toStartOf="@id/swap_mid_guideline"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent" />
+
+          <TextView
+            android:id="@+id/swap_recap_total_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:textStyle="bold"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/swap_mid_guideline"
+            app:layout_constraintTop_toBottomOf="@id/swap_recap_total_separator" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+          android:id="@+id/swap_recap_exceed_balance"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginTop="@dimen/space_md_p"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:drawableStart="@drawable/ic_alert_triangle"
+          android:drawableTint="?attr/negativeColor"
+          android:maxWidth="260dp"
+          android:text="@string/send_swap_complete_cannot_afford"
+          android:visibility="@{model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap" />
+
+        <View
+          android:id="@+id/swap_recap_pay_separator"
+          android:layout_width="wrap_content"
+          android:layout_height="24dp"
+          android:visibility="@{model.state instanceof SendState.Onchain.Ready || model.state instanceof SendState.Onchain.Error.ExceedsBalance}"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/send_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:backgroundTint="?attr/colorPrimary"
+          android:filterTouchesWhenObscured="true"
+          android:visibility="@{model.state instanceof SendState.Lightning || model.state instanceof SendState.Onchain.Ready}"
+          app:enableOrFade="@{model.state instanceof SendState.Lightning.Ready || model.state instanceof SendState.Onchain.Ready}"
+          app:icon="@drawable/ic_send"
+          app:icon_tint="?attr/altTextColor"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/swap_recap_pay_separator"
+          app:text="@string/send_pay_button"
+          app:text_color="?attr/altTextColor" />
+
+        <TextView
+          android:id="@+id/error_sending"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/space_lg"
+          android:layout_marginEnd="@dimen/space_lg"
+          android:padding="@dimen/space_sm"
+          android:text="@string/send_error_sending"
+          android:textAlignment="center"
+          android:visibility="@{model.state instanceof SendState.Lightning.Error.SendingFailure || model.state instanceof SendState.Onchain.Error.SendingFailure}"
+          app:layout_constrainedWidth="true"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/send_button" />
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
+</layout>
