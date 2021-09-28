@@ -78,7 +78,10 @@ class CurrencyPrefs: ObservableObject {
 	
 	deinit {
 		unsubscribe?()
-		fiatExchangeRatesWatcher?.close()
+		let _watcher = fiatExchangeRatesWatcher
+		DispatchQueue.main.async {
+			_watcher?.close()
+		}
 	}
 	
 	func toggleCurrencyType() -> Void {

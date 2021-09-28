@@ -25,7 +25,10 @@ extension DatabaseManager {
 				
 				if let databases = databases {
 					promise(.success(databases))
-					watcher?.close()
+					let _watcher = watcher
+					DispatchQueue.main.async {
+						_watcher?.close()
+					}
 				}
 			}
 		}

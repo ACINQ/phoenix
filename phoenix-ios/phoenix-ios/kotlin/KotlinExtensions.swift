@@ -262,7 +262,10 @@ class ObservableConnectionsManager: ObservableObject {
 	#endif
 	
 	deinit {
-		watcher?.close()
+		let _watcher = watcher
+		DispatchQueue.main.async {
+			_watcher?.close()
+		}
 	}
 }
 
