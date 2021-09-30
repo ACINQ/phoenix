@@ -75,7 +75,7 @@ sealed class LNUrlMetadata {
         )
 
         fun unwrap(): LNUrl.Pay.Metadata {
-            return LNUrl.decodeLNUrlPayMetadata(this.raw)
+            return LNUrl.Helper.decodeLNUrlPayMetadata(this.raw)
         }
     }
 

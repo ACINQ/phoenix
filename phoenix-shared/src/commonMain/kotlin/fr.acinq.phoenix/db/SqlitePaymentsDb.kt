@@ -22,10 +22,12 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.toByteVector32
 import fr.acinq.lightning.wire.FailureMessage
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
@@ -38,9 +40,10 @@ import fracinqphoenixdb.Outgoing_payments
 import fracinqphoenixdb.Payments_metadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
-class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
+class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
 
     private val database = PaymentsDatabase(
         driver = driver,
@@ -62,14 +65,14 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
             lnurl_successAction_typeAdapter = EnumColumnAdapter()
         )
     )
-    internal val inQueries = IncomingQueries(database)
+    private val inQueries = IncomingQueries(database)
     internal val outQueries = OutgoingQueries(database)
     private val aggrQueries = database.aggregatedQueriesQueries
     private val metaQueries = MetadataQueries(database)
 
     val cloudKitDb = makeCloudKitDb(database)
 
-    private var metadataQueue = mutableMapOf<WalletPaymentId, WalletPaymentMetadataRow>()
+    private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
 
     override suspend fun addOutgoingParts(parentId: UUID, parts: List<OutgoingPayment.Part>) {
         withContext(Dispatchers.Default) {
@@ -78,14 +81,15 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
     }
 
     override suspend fun addOutgoingPayment(outgoingPayment: OutgoingPayment) {
+        val paymentId = outgoingPayment.walletPaymentId()
+        val metadataRow = dequeueMetadata(paymentId)
         withContext(Dispatchers.Default) {
             database.transaction {
                 outQueries.addOutgoingPayment(outgoingPayment)
                 // If there is pending metadata for the given payment,
                 // add it to the database now, within the same atomic database transaction.
-                val id = outgoingPayment.walletPaymentId()
-                metadataQueue.remove(id)?.let { row ->
-                    metaQueries.addMetadata(id, row)
+                metadataRow?.let { row ->
+                    metaQueries.addMetadata(paymentId, row)
                 }
             }
 
@@ -161,14 +165,21 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         origin: IncomingPayment.Origin,
         createdAt: Long
     ) {
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
+        val metadataRow = dequeueMetadata(paymentId)
         withContext(Dispatchers.Default) {
             database.transaction {
-                val paymentHash = inQueries.addIncomingPayment(preimage, origin, createdAt)
+                inQueries.addIncomingPayment(
+                    preimage = preimage,
+                    paymentHash = paymentHash,
+                    origin = origin,
+                    createdAt = createdAt
+                )
                 // If there is pending metadata for the given payment,
                 // add it to the database now, within the same atomic database transaction.
-                val id = WalletPaymentId.IncomingPaymentId(paymentHash)
-                metadataQueue.remove(id)?.let { row ->
-                    metaQueries.addMetadata(id, row)
+                metadataRow?.let { row ->
+                    metaQueries.addMetadata(paymentId, row)
                 }
             }
         }
@@ -261,37 +272,48 @@ class SqlitePaymentsDb(private val driver: SqlDriver) : PaymentsDb {
         filters: Set<PaymentTypeFilter>
     ): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
 
-    private fun allPaymentsCountMapper(
-        result: Long?
-    ): Long {
-        return result ?: 0
-    }
-
-    private fun allPaymentsOrderMapper(
-        direction: String,
-        outgoing_payment_id: String?,
-        incoming_payment_id: ByteArray?,
-        @Suppress("UNUSED_PARAMETER") created_at: Long,
-        @Suppress("UNUSED_PARAMETER") completed_at: Long?
-    ): WalletPaymentOrderRow {
-        val paymentId = when(direction.toLowerCase()) {
-            "outgoing" -> WalletPaymentId.OutgoingPaymentId(
-                id = UUID.fromString(outgoing_payment_id!!)
-            )
-            "incoming" -> WalletPaymentId.IncomingPaymentId(
-                paymentHash = ByteVector32(incoming_payment_id!!)
-            )
-            else -> throw UnhandledDirection(direction)
-        }
-        return WalletPaymentOrderRow(
-            id = paymentId,
-            createdAt = created_at,
-            completedAt = completed_at
-        )
-    }
-
     internal fun enqueueMetadata(row: WalletPaymentMetadataRow, id: WalletPaymentId) {
-        metadataQueue.put(id, row)
+        val oldMap = metadataQueue.value
+        val newMap = oldMap + (id to row)
+        metadataQueue.value = newMap
+    }
+
+    private fun dequeueMetadata(id: WalletPaymentId): WalletPaymentMetadataRow? {
+        val oldMap = metadataQueue.value
+        val newMap = oldMap - id
+        metadataQueue.value = newMap
+        return oldMap[id]
+    }
+
+    companion object {
+        private fun allPaymentsCountMapper(
+            result: Long?
+        ): Long {
+            return result ?: 0
+        }
+
+        private fun allPaymentsOrderMapper(
+            direction: String,
+            outgoing_payment_id: String?,
+            incoming_payment_id: ByteArray?,
+            @Suppress("UNUSED_PARAMETER") created_at: Long,
+            @Suppress("UNUSED_PARAMETER") completed_at: Long?
+        ): WalletPaymentOrderRow {
+            val paymentId = when (direction.lowercase()) {
+                "outgoing" -> WalletPaymentId.OutgoingPaymentId(
+                    id = UUID.fromString(outgoing_payment_id!!)
+                )
+                "incoming" -> WalletPaymentId.IncomingPaymentId(
+                    paymentHash = ByteVector32(incoming_payment_id!!)
+                )
+                else -> throw UnhandledDirection(direction)
+            }
+            return WalletPaymentOrderRow(
+                id = paymentId,
+                createdAt = created_at,
+                completedAt = completed_at
+            )
+        }
     }
 }
 

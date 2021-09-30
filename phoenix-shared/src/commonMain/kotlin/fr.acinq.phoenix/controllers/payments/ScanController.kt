@@ -15,6 +15,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
@@ -306,6 +308,13 @@ class AppScanController(
             is Either.Right -> {
                 val paymentRequest = result.value.paymentRequest
                 val paymentId = UUID.randomUUID()
+                databaseManager.paymentsDb().enqueueMetadata(
+                    row = WalletPaymentMetadataRow.serialize(
+                        pay = intent.lnurlPay,
+                        payInvoice = result.value
+                    ),
+                    id = WalletPaymentId.OutgoingPaymentId(paymentId)
+                )
                 peerManager.getPeer().send(
                     SendPayment(
                         paymentId = paymentId,

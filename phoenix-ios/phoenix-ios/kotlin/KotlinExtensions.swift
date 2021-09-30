@@ -46,10 +46,6 @@ extension WalletPaymentInfo {
 		
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
-		//	is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
-		//	is IncomingPayment.Origin.KeySend -> "donation"
-		//	is IncomingPayment.Origin.SwapIn -> o.address
-			
 			if let invoice = incomingPayment.origin.asInvoice() {
 				return invoice.paymentRequest.description_
 			} else if let _ = incomingPayment.origin.asKeySend() {
@@ -59,11 +55,6 @@ extension WalletPaymentInfo {
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
-			
-		//	is OutgoingPayment.Details.Normal -> d.paymentRequest.description
-		//	is OutgoingPayment.Details.KeySend -> "donation"
-		//	is OutgoingPayment.Details.SwapOut -> d.address
-		//	is OutgoingPayment.Details.ChannelClosing -> "channel closing"
 			
 			if let normal = outgoingPayment.details.asNormal() {
 				return normal.paymentRequest.desc()

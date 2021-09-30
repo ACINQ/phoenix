@@ -38,6 +38,21 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         createdAt: Long
     ): ByteVector32 {
         val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        addIncomingPayment(
+            preimage = preimage,
+            paymentHash = paymentHash,
+            origin = origin,
+            createdAt = createdAt
+        )
+        return paymentHash
+    }
+
+    fun addIncomingPayment(
+        preimage: ByteVector32,
+        paymentHash: ByteVector32,
+        origin: IncomingPayment.Origin,
+        createdAt: Long
+    ) {
         val (originType, originData) = origin.mapToDb()
         queries.insert(
             payment_hash = paymentHash.toByteArray(),
@@ -46,7 +61,6 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             origin_blob = originData,
             created_at = createdAt
         )
-        return paymentHash
     }
 
     fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {

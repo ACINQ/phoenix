@@ -28,6 +28,7 @@ import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
+import org.kodein.log.Logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -278,40 +279,8 @@ sealed class LNUrl {
 
         /** Decode a serialized [LNUrl.Pay.Metadata] object. */
         @OptIn(ExperimentalSerializationApi::class)
-        internal fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata = try {
-            val array = format.decodeFromString<JsonArray>(raw)
-            var plainText: String? = null
-            var longDesc: String? = null
-            var imagePng: String? = null
-            var imageJpg: String? = null
-            val unknown = mutableListOf<JsonElement>()
-            array.forEach {
-                try {
-                    when (it.jsonArray[0].jsonPrimitive.content) {
-                        "text/plain" -> plainText = it.jsonArray[1].jsonPrimitive.content
-                        "text/long-desc" -> longDesc = it.jsonArray[1].jsonPrimitive.content
-                        "image/png;base64" -> imagePng = it.jsonArray[1].jsonPrimitive.content
-                        "image/jpeg;base64" -> imageJpg = it.jsonArray[1].jsonPrimitive.content
-                        else -> unknown.add(it)
-                    }
-                } catch (e: Exception) {
-                    log.warning { "could not decode raw meta=$it: ${e.message}" }
-                }
-            }
-            Pay.Metadata(
-                raw = raw,
-                plainText = plainText!!,
-                longDesc = longDesc,
-                imagePng = imagePng?.let { ByteVector(it.encodeToByteArray()) },
-                imageJpg = imageJpg?.let { ByteVector(it.encodeToByteArray()) },
-                unknown = unknown.takeIf { it.isNotEmpty() }?.let {
-                    JsonArray(it.toList())
-                }
-            )
-        } catch (e: Exception) {
-            log.error(e) { "could not decode raw meta=$raw: " }
-            throw Error.Pay.InvalidMetadata(raw)
-        }
+        internal fun decodeLNUrlPayMetadata(raw: String): Pay.Metadata =
+            Helper.decodeLNUrlPayMetadata(raw = raw, log = log)
 
         /**
          * Reads the json response from a LNUrl.Pay request,
@@ -383,6 +352,63 @@ sealed class LNUrl {
                 }
                 else -> null
             }
+        }
+    }
+
+    /* Why do we have a separate Helper object ?
+     *
+     * Since the `companion object` has a logger, this somehow freezes the companion object,
+     * which prevents us from calling any LNUrl.staticFunctions() from a background thread.
+     *
+     * > Uncaught Kotlin exception:
+     * >   kotlin.native.IncorrectDereferenceException:
+     * >   Trying to access top level value not marked as @ThreadLocal or @SharedImmutable
+     * >   from non-main thread
+     *
+     * This is partly due to Kotlin-native imposing its unworkable threading model on us.
+     * And partly due to something in the logger which triggers a freeze.
+     *
+     * This Helper is a temporary workaround until we fix the problem properly.
+     */
+    object Helper {
+        @OptIn(ExperimentalSerializationApi::class)
+        internal fun decodeLNUrlPayMetadata(
+            raw: String,
+            log: Logger? = null
+        ): Pay.Metadata = try {
+            val format = Json { ignoreUnknownKeys = true }
+            val array = format.decodeFromString<JsonArray>(raw)
+            var plainText: String? = null
+            var longDesc: String? = null
+            var imagePng: String? = null
+            var imageJpg: String? = null
+            val unknown = mutableListOf<JsonElement>()
+            array.forEach {
+                try {
+                    when (it.jsonArray[0].jsonPrimitive.content) {
+                        "text/plain" -> plainText = it.jsonArray[1].jsonPrimitive.content
+                        "text/long-desc" -> longDesc = it.jsonArray[1].jsonPrimitive.content
+                        "image/png;base64" -> imagePng = it.jsonArray[1].jsonPrimitive.content
+                        "image/jpeg;base64" -> imageJpg = it.jsonArray[1].jsonPrimitive.content
+                        else -> unknown.add(it)
+                    }
+                } catch (e: Exception) {
+                    log?.warning { "could not decode raw meta=$it: ${e.message}" }
+                }
+            }
+            Pay.Metadata(
+                raw = raw,
+                plainText = plainText!!,
+                longDesc = longDesc,
+                imagePng = imagePng?.let { ByteVector(it.encodeToByteArray()) },
+                imageJpg = imageJpg?.let { ByteVector(it.encodeToByteArray()) },
+                unknown = unknown.takeIf { it.isNotEmpty() }?.let {
+                    JsonArray(it.toList())
+                }
+            )
+        } catch (e: Exception) {
+            log?.error(e) { "could not decode raw meta=$raw: " }
+            throw Error.Pay.InvalidMetadata(raw)
         }
     }
 }

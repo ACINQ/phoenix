@@ -298,13 +298,20 @@ fileprivate struct SummaryView: View {
 fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
-	
 	@Binding var explainFeesPopoverVisible: Bool
 	
-	@State private var calculatedKeyColumnWidth: CGFloat? = nil
-	
+	// <InfoGridView Protocol>
+	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 200
+	
+	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
+		keyColumnWidths = value
+	}
+	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
+		return keyColumnWidths
+	}
+	// </InfoGridView Protocol>
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
@@ -323,22 +330,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			// Splitting this up into separate ViewBuilders,
 			// because the compiler will sometimes choke while processing this method.
 			
+			paymentServiceRow
 			paymentDescriptionRow
+			paymentMessaegRow
 			paymentTypeRow
 			channelClosingRow
 			paymentFeesRow
-			timeElapsedRow
 			paymentErrorRow
 		}
 		.padding([.leading, .trailing])
-	}
-	
-	// Needed for InfoGridView protocol
-	func setCalculatedKeyColumnWidth(_ value: CGFloat?) -> Void {
-		calculatedKeyColumnWidth = value
-	}
-	func getCalculatedKeyColumnWidth() -> CGFloat? {
-		return calculatedKeyColumnWidth
 	}
 	
 	@ViewBuilder
@@ -348,11 +348,37 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	var paymentServiceRow: some View {
+		let identifier: String = #function
+		
+		if let lnurlPay = paymentInfo.metadata.lnurl as? LNUrl.Pay {
+			
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("Service", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
+				
+				Text(lnurlPay.lnurl.host)
+			}
+		}
+	}
+	
+	@ViewBuilder
 	var paymentDescriptionRow: some View {
+		let identifier: String = #function
 		
 		if let pDescription = paymentInfo.paymentDescription() {
 			
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
 				
@@ -371,11 +397,68 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	var paymentMessaegRow: some View {
+		let identifier: String = #function
+		
+		// Note: We support AES too.
+		// But we don't have any real-world examples of its usage, and the spec doesn't given a clear example.
+		// What the heck do we get when we decode the ciphertext ?
+		// So, without an example, we're unsure of how to proceed.
+		
+		if let sa_message = paymentInfo.metadata.lnurlSuccessAction as? LNUrl.PayInvoiceSuccessActionMessage {
+			
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
+				
+				Text(sa_message.message)
+			}
+			
+		} else if let sa_url = paymentInfo.metadata.lnurlSuccessAction as? LNUrl.PayInvoiceSuccessActionUrl {
+			
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					
+					Text(sa_url.description_)
+					
+					if let url = URL(string: sa_url.url.description()) {
+						Button {
+							openURL(url)
+						} label: {
+							Text("open link")
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
 	var paymentTypeRow: some View {
+		let identifier: String = #function
 		
 		if let pType = paymentInfo.payment.paymentType() {
 			
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("Type", comment: "Label in SummaryInfoGrid"))
 				
@@ -402,10 +485,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	var channelClosingRow: some View {
+		let identifier: String = #function
 		
 		if let pClosingInfo = paymentInfo.payment.channelClosing() {
 			
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("Output", comment: "Label in SummaryInfoGrid"))
 				
@@ -436,10 +524,15 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	var paymentFeesRow: some View {
+		let identifier: String = #function
 		
 		if let pFees = paymentInfo.payment.paymentFees(currencyPrefs: currencyPrefs) {
 
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("Fees", comment: "Label in SummaryInfoGrid"))
 				
@@ -488,34 +581,16 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var timeElapsedRow: some View {
-		
-		if let pElapsed = paymentInfo.payment.paymentTimeElapsed() {
-			
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
-				
-				keyColumn(NSLocalizedString("Elapsed", comment: "Label in SummaryInfoGrid"))
-				
-			} valueColumn: {
-				
-				if pElapsed < 1_000 {
-					Text("\(pElapsed) milliseconds")
-				} else {
-					let seconds = pElapsed / 1_000
-					let millis = pElapsed % 1_000
-					
-					Text("\(seconds).\(millis) seconds")
-				}
-			}
-		}
-	}
-	
-	@ViewBuilder
 	var paymentErrorRow: some View {
+		let identifier: String = #function
 		
 		if let pError = paymentInfo.payment.paymentFinalError() {
 			
-			InfoGridRow(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: self.keyColumnWidth) {
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("Error", comment: "Label in SummaryInfoGrid"))
 				
@@ -626,23 +701,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@Binding var paymentInfo: WalletPaymentInfo
 	
-	@State var calculatedKeyColumnWidth: CGFloat? = nil
-	
+	// <InfoGridView Protocol>
+	@State var keyColumnWidths: [InfoGridRow_KeyColumn_Width] = []
 	let minKeyColumnWidth: CGFloat = 50
 	let maxKeyColumnWidth: CGFloat = 140
+	
+	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) {
+		keyColumnWidths = value
+	}
+	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width] {
+		return keyColumnWidths
+	}
+	// </InfoGridView Protocol>
 	
 	private let verticalSpacingBetweenRows: CGFloat = 12
 	private let horizontalSpacingBetweenColumns: CGFloat = 8
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
-	
-	// Needed for InfoGridView protocol
-	func setCalculatedKeyColumnWidth(_ value: CGFloat?) -> Void {
-		calculatedKeyColumnWidth = value
-	}
-	func getCalculatedKeyColumnWidth() -> CGFloat? {
-		return calculatedKeyColumnWidth
-	}
 	
 	@ViewBuilder
 	var infoGridRows: some View {
@@ -694,6 +769,14 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@ViewBuilder
 	func rows_outgoingPayment(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		
+		if let lnurlPay = paymentInfo.metadata.lnurl as? LNUrl.Pay {
+			
+			header(NSLocalizedString("lnurl-pay", comment: "Title in DetailsView_IncomingPayment"))
+			
+			lnurl_service(lnurlPay)
+			lnurl_range(lnurlPay)
+		}
+		
 		if let paymentRequest = outgoingPayment.details.asNormal()?.paymentRequest {
 		
 			header(NSLocalizedString("Payment Request", comment: "Title in DetailsView_IncomingPayment"))
@@ -719,6 +802,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			header(NSLocalizedString("Payment Sent", comment: "Title in DetailsView_IncomingPayment"))
 			
 			offChain_completedAt(offChain)
+			offChain_elapsed(outgoingPayment)
 			offChain_totalAmount(outgoingPayment)
 			offChain_recipientPubkey(outgoingPayment)
 		
@@ -784,9 +868,98 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+	func lnurl_service(_ lnurlPay: LNUrl.Pay) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(NSLocalizedString("service", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			Text(lnurlPay.lnurl.host)
+		}
+	}
+	
+	@ViewBuilder
+	func lnurl_range(_ lnurlPay: LNUrl.Pay) -> some View {
+		let identifier: String = #function
+		
+		if lnurlPay.maxSendable.msat > lnurlPay.minSendable.msat {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("range", comment: "Label in DetailsView_IncomingPayment"))
+				
+			} valueColumn: {
+				
+				let minFormatted = Utils.formatBitcoin(msat: lnurlPay.minSendable, bitcoinUnit: .sat, hideMsats: false)
+				let maxFormatted = Utils.formatBitcoin(msat: lnurlPay.maxSendable, bitcoinUnit: .sat, hideMsats: false)
+				
+				// is there a cleaner way to do this ???
+				if minFormatted.hasFractionDigits {
+				
+					if maxFormatted.hasFractionDigits {
+						
+						Text("\(minFormatted.integerDigits)") +
+						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+							.foregroundColor(.secondary) +
+						Text(" – ") +
+						Text("\(maxFormatted.integerDigits)") +
+						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+							.foregroundColor(.secondary) +
+						Text(" \(maxFormatted.type)")
+						
+					} else {
+						
+						Text("\(minFormatted.integerDigits)") +
+						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+							.foregroundColor(.secondary) +
+						Text(" – ") +
+						Text(maxFormatted.digits) +
+						Text(" \(maxFormatted.type)")
+					}
+					
+				} else {
+					
+					if maxFormatted.hasFractionDigits {
+						
+						Text(minFormatted.digits) +
+						Text(" – ") +
+						Text("\(maxFormatted.integerDigits)") +
+						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+							.foregroundColor(.secondary) +
+						Text(" \(maxFormatted.type)")
+						
+					} else {
+						
+						Text(minFormatted.digits) +
+						Text(" – ") +
+						Text(maxFormatted.digits) +
+						Text(" \(maxFormatted.type)")
+					}
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func paymentRequest_invoiceCreated(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("invoice created", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -798,8 +971,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentRequest_amountRequested(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("amount requested", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -815,8 +993,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentRequest_paymentHash(_ paymentRequest: Lightning_kmpPaymentRequest) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("payment hash", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -836,8 +1019,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_receivedAt(_ received: Lightning_kmpIncomingPayment.Received) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 					
 			keyColumn(NSLocalizedString("received at", comment: "Label in DetailsView_IncomingPayment"))
 					
@@ -849,8 +1037,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_amountReceived(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("amount received", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -862,8 +1055,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_via(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 		
 			keyColumn(NSLocalizedString("via", comment: "Label in DetailsView_IncomingPayment"))
 		
@@ -883,10 +1081,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func paymentReceived_channelId(_ receivedWith: Lightning_kmpIncomingPayment.ReceivedWith) -> some View {
+		let identifier: String = #function
 		
 		if let newChannel = receivedWith.asNewChannel() {
 			
-			InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
 				
 				keyColumn(NSLocalizedString("channel id", comment: "Label in DetailsView_IncomingPayment"))
 				
@@ -907,8 +1110,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func channelClosing_channelId(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("channel id", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -928,8 +1136,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func channelClosing_btcAddress(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("bitcoin address", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -949,8 +1162,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func channelClosing_addrType(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("address type", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -970,8 +1188,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func offChain_completedAt(_ offChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOffChain) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 					
 			keyColumn(NSLocalizedString("sent at", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -982,22 +1205,63 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func offChain_totalAmount(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+	func offChain_elapsed(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		if let milliseconds = outgoingPayment.paymentTimeElapsed() {
+			
+			InfoGridRowWrapper(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("elapsed", comment: "Label in DetailsView_IncomingPayment"))
+				
+			} valueColumn: {
+				
+				if milliseconds < 1_000 {
+					Text("\(milliseconds) milliseconds")
+					
+				} else if milliseconds < (90 * 1_000) {
+					Text("\(displayElapsedSeconds(milliseconds: milliseconds)) seconds")
+					
+				} else {
+					let (minutes, seconds) = displayElapsedMinutes(milliseconds: milliseconds)
+					
+					Text("\(minutes):\(seconds) minutes")
+				}
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func offChain_totalAmount(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("total amount", comment: "Label in DetailsView_IncomingPayment"))
 			
 		} valueColumn: {
 			
-			commonValue_amount(msat: outgoingPayment.recipientAmount)
+			commonValue_amount(msat: outgoingPayment.amount)
 		}
 	}
 	
 	@ViewBuilder
 	func offChain_recipientPubkey(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("recipient pubkey", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1009,8 +1273,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func onChain_type(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("type", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1029,8 +1298,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func onChain_completedAt(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("completed at", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1042,8 +1316,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func onChain_claimed(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("claimed amount", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1063,8 +1342,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func onChain_btcTxids(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("bitcoin txids", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1090,8 +1374,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func failed_failedAt(_ failed: Lightning_kmpOutgoingPayment.StatusCompletedFailed) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("timestamp", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1103,8 +1392,13 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func failed_reason(_ failed: Lightning_kmpOutgoingPayment.StatusCompletedFailed) -> some View {
+		let identifier: String = #function
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			keyColumn(NSLocalizedString("reason", comment: "Label in DetailsView_IncomingPayment"))
 			
@@ -1116,10 +1410,14 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	@ViewBuilder
 	func part_row(_ part: Lightning_kmpOutgoingPayment.Part) -> some View {
-		
+		let identifier: String = #function
 		let imgSize: CGFloat = 20
 		
-		InfoGridRowWrapper(hSpacing: horizontalSpacingBetweenColumns, keyColumnWidth: keyColumnWidth) {
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
 			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
 				keyColumn(shortDisplayTime(date: part_succeeded.completedAtDate))
@@ -1256,6 +1554,38 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		return formatter.string(from: date)
 	}
 	
+	func displayElapsedSeconds(milliseconds: Int64) -> String {
+		
+		let seconds = Double(milliseconds) / Double(1_000)
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.usesGroupingSeparator = true
+		formatter.minimumFractionDigits = 3
+		formatter.maximumFractionDigits = 3
+		
+		return formatter.string(from: NSNumber(value: seconds))!
+	}
+	
+	func displayElapsedMinutes(milliseconds: Int64) -> (String, String) {
+		
+		let minutes = milliseconds / (60 * 1_000)
+		let seconds = milliseconds % (60 * 1_000) % 1_000
+		
+		let mFormatter = NumberFormatter()
+		mFormatter.numberStyle = .decimal
+		mFormatter.usesGroupingSeparator = true
+		
+		let minutesStr = mFormatter.string(from: NSNumber(value: minutes))!
+		
+		let sFormatter = NumberFormatter()
+		sFormatter.minimumIntegerDigits = 2
+		
+		let secondsStr = sFormatter.string(from: NSNumber(value: seconds))!
+		
+		return (minutesStr, secondsStr)
+	}
+	
 	func displayAmounts(msat: Lightning_kmpMilliSatoshi) -> (FormattedAmount, FormattedAmount?) {
 		
 		let display_msat = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, hideMsats: false)
@@ -1282,17 +1612,20 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
 		
+		let identifier: String
 		let hSpacing: CGFloat
 		let keyColumnWidth: CGFloat
 		let keyColumn: KeyColumn
 		let valueColumn: ValueColumn
 		
 		init(
+			identifier: String,
 			hSpacing: CGFloat,
 			keyColumnWidth: CGFloat,
 			@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
 			@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
 		) {
+			self.identifier = identifier
 			self.hSpacing = hSpacing
 			self.keyColumnWidth = keyColumnWidth
 			self.keyColumn = keyColumnBuilder()
@@ -1301,7 +1634,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		var body: some View {
 			
-			InfoGridRow(hSpacing: hSpacing, keyColumnWidth: keyColumnWidth) {
+			InfoGridRow(identifier: identifier, hSpacing: hSpacing, keyColumnWidth: keyColumnWidth) {
 				
 				keyColumn
 				
@@ -1516,7 +1849,7 @@ extension Lightning_kmpWalletPayment {
 
 		if let outgoingPayment = self as? Lightning_kmpOutgoingPayment {
 			
-			let started = self.completedAt()
+			let started = outgoingPayment.createdAt
 			var finished: Int64? = nil
 			
 			if let failed = outgoingPayment.status.asFailed() {

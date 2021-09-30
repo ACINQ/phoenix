@@ -67,10 +67,10 @@ class AppConfigurationManager(
         val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < 48.hours) {
-            2.seconds
+        val timeout = if (freshness < Duration.hours(48)) {
+            Duration.seconds(2)
         } else {
-            max(freshness.inDays.toInt(), 5) * 2.seconds
+            max(freshness.inDays.toInt(), 5) * Duration.seconds(2)
         } // max=10s
 
         // TODO are we using TOR? -> increase timeout
