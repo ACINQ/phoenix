@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     PRIMARY KEY (type, id)
 );
 
+hasMetadata:
+SELECT COUNT(*) FROM payments_metadata
+WHERE type = ? AND id = ?;
+
 addMetadata:
 INSERT INTO payments_metadata (
             type,

@@ -311,7 +311,7 @@ class AppScanController(
                 databaseManager.paymentsDb().enqueueMetadata(
                     row = WalletPaymentMetadataRow.serialize(
                         pay = intent.lnurlPay,
-                        payInvoice = result.value
+                        successAction = result.value.successAction
                     ),
                     id = WalletPaymentId.OutgoingPaymentId(paymentId)
                 )

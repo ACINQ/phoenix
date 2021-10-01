@@ -29,6 +29,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate let record_table_name = "payments"
 fileprivate let record_column_data = "encryptedData"
+fileprivate let record_column_meta = "encryptedMeta"
 
 /// See `SyncManagerState.swift` for state machine diagrams
 /// 
@@ -68,7 +69,8 @@ fileprivate struct AtomicState {
 fileprivate struct DownloadedItem {
 	let record: CKRecord
 	let unpaddedSize: Int
-	let decrypted: CloudData
+	let payment: Lightning_kmpWalletPayment
+	let metadata: WalletPaymentMetadataRow?
 }
 
 fileprivate struct UploadOperationInfo {
@@ -989,14 +991,25 @@ class SyncManager {
 				log.debug(" - recordID: \(record.recordID)")
 				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 				
-				var encryptedData: Data? = nil
+				var unpaddedSize: Int = 0
+				var payment: Lightning_kmpWalletPayment? = nil
+				var metadata: WalletPaymentMetadataRow? = nil
 				
-				if let data = record[record_column_data] as? Data {
-					log.debug(" - data.count: \(data.count)")
-					encryptedData = data
-				}
+				// Reminder: Kotlin-MPP has horrible multithreading support.
+				// It basically doesn't allow you to use multiple threads.
+				// Any Kotlin objects we create here will be tied to this background thread.
+				// And when we attempt to use them from another thread,
+				// Kotlin will throw an exception:
+				//
+				// > kotlin.native.IncorrectDereferenceException:
+				// >   illegal attempt to access non-shared
+				// >   fr.acinq.phoenix.db.WalletPaymentId.IncomingPaymentId@2881e28 from other thread
+				//
+				// We are working around this restriction by freezing objects via `doCopyAndFreeze()`.
 				
-				if let ciphertext = encryptedData {
+				if let ciphertext = record[record_column_data] as? Data {
+					log.debug(" - data.count: \(ciphertext.count)")
+					
 					do {
 						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
 						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
@@ -1004,21 +1017,7 @@ class SyncManager {
 						let cleartext_kotlin = cleartext.toKotlinByteArray()
 						let wrapper = CloudData.Companion().cborDeserialize(blob: cleartext_kotlin)
 						
-						// Reminder: Kotlin-MPP has horrible multithreading support.
-						// It basically doesn't allow you to use multiple threads.
-						// Any Kotlin objects we create here will be tied to this background thread.
-						// And when we attempt to use them from another thread,
-						// Kotlin will throw an exception:
-						//
-						// > kotlin.native.IncorrectDereferenceException:
-						// >   illegal attempt to access non-shared
-						// >   fr.acinq.phoenix.db.WalletPaymentId.IncomingPaymentId@2881e28 from other thread
-						//
-						// We are working around this restriction by freezing the `wrapper`,
-						// which we do via `doCopyAndFreeze()`.
-						// But we should avoid creating any other Kotlin objects in this thread.
-						// 
-						if let wrapper = wrapper?.doCopyAndFreeze() {
+						if let wrapper = wrapper {
 							
 							#if DEBUG
 						//	let jsonData = wrapper.jsonSerialize().toSwiftData()
@@ -1028,19 +1027,53 @@ class SyncManager {
 							
 							let paddedSize = cleartext.count
 							let paddingSize = Int(wrapper.padding?.size ?? 0)
-							let unpaddedSize = paddedSize - paddingSize
+							unpaddedSize = paddedSize - paddingSize
 							
-							items.append(DownloadedItem(
-								record: record,
-								unpaddedSize: unpaddedSize,
-								decrypted: wrapper
-							))
+							payment = wrapper.unwrap()?.doCopyAndFreeze()
 						}
 						
 					} catch {
-						log.error("decryption error: \(String(describing: error))")
+						log.error("data decryption error: \(String(describing: error))")
 					}
 				}
+				
+				if let asset = record[record_column_meta] as? CKAsset {
+					
+					var ciphertext: Data? = nil
+					if let fileURL = asset.fileURL {
+						
+						do {
+							ciphertext = try Data(contentsOf: fileURL)
+						} catch {
+							log.error("asset read error: \(String(describing: error))")
+						}
+						
+						if let ciphertext = ciphertext {
+							do {
+								let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+								let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+								
+								let cleartext_kotlin = cleartext.toKotlinByteArray()
+								let row = CloudAsset.Companion().cloudDeserialize(blob: cleartext_kotlin)
+								
+								metadata = row?.doCopyAndFreeze()
+								
+							} catch {
+								log.error("meta decryption error: \(String(describing: error))")
+							}
+						}
+					}
+				}
+				
+				if let payment = payment {
+					items.append(DownloadedItem(
+						record: record,
+						unpaddedSize: unpaddedSize,
+						payment: payment,
+						metadata: metadata
+					))
+				}
+				
 			}
 			
 			operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
@@ -1080,28 +1113,30 @@ class SyncManager {
 			// Kotlin will crash if we try to use multiple threads (like a real app)
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
-			var rows: [Lightning_kmpWalletPayment] = []
+			var paymentRows: [Lightning_kmpWalletPayment] = []
+			var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
 			var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
 			
 			for item in items {
-				if let paymentRow = item.decrypted.walletPayment() {
-					
-					rows.append(paymentRow)
-					
-					let paymentId = paymentRow.walletPaymentId()
-					let creation = self.dateToMillis(item.record.creationDate ?? Date())
-					let metadata = self.metadataForRecord(item.record)
-					
-					metadataMap[paymentId] = CloudKitDb.MetadataRow(
-						unpaddedSize: Int64(item.unpaddedSize),
-						recordCreation: creation,
-						recordBlob: metadata.toKotlinByteArray()
-					)
-				}
+				
+				paymentRows.append(item.payment)
+				
+				let paymentId = item.payment.walletPaymentId()
+				paymentMetadataRows[paymentId] = item.metadata
+				
+				let creation = self.dateToMillis(item.record.creationDate ?? Date())
+				let metadata = self.metadataForRecord(item.record)
+				
+				metadataMap[paymentId] = CloudKitDb.MetadataRow(
+					unpaddedSize: Int64(item.unpaddedSize),
+					recordCreation: creation,
+					recordBlob: metadata.toKotlinByteArray()
+				)
 			}
 			
 			self.cloudKitDb.updateRows(
-				downloadedPayments: rows,
+				downloadedPayments: paymentRows,
+				downloadedPaymentsMetadata: paymentMetadataRows,
 				updateMetadata: metadataMap
 			) { (_: KotlinUnit?, error: Error?) in
 		
@@ -1266,7 +1301,7 @@ class SyncManager {
 				
 				if let row = batch.rowMap[paymentId] {
 					
-					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptRow(row, batch) {
+					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptPayment(row.payment, batch) {
 						
 						let record = existingRecord ?? CKRecord(
 							recordType: record_table_name,
@@ -1274,6 +1309,10 @@ class SyncManager {
 						)
 						
 						record[record_column_data] = ciphertext
+						
+						if let fileUrl = self.serializeAndEncryptMetadata(row.metadata) {
+							record[record_column_meta] = CKAsset(fileURL: fileUrl)
+						}
 						
 						recordsToSave.append(record)
 						reverseMap[record.recordID] = paymentId
@@ -1647,7 +1686,7 @@ class SyncManager {
 	/// - adds randomized padding to obfuscate payment type
 	/// - encrypts the blob using the cloudKey
 	///
-	private func serializeAndEncryptRow(
+	private func serializeAndEncryptPayment(
 		_ row: Lightning_kmpWalletPayment,
 		_ batch: FetchQueueBatchResult
 	) -> (Data, Int)? {
@@ -1763,7 +1802,7 @@ class SyncManager {
 				ciphertext = box.combined
 				
 			} catch {
-				log.error("Error encrypting with ChaChaPoly: \(String(describing: error))")
+				log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
 			}
 		}
 		
@@ -1772,6 +1811,45 @@ class SyncManager {
 		} else {
 			return nil
 		}
+	}
+	
+	private func serializeAndEncryptMetadata(
+		_ metadata: WalletPaymentMetadata
+	) -> URL? {
+		
+		guard let lnurlPay = metadata.lnurl as? LNUrl.Pay else {
+			return nil
+		}
+		
+		let cleartext = WalletPaymentMetadataRow.Companion().serialize(
+			pay: lnurlPay,
+			successAction: metadata.lnurlSuccessAction
+		)
+		.cloudSerialize()
+		.toSwiftData()
+		
+		let ciphertext: Data
+		do {
+			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
+			ciphertext = box.combined
+			
+		} catch {
+			log.error("Error encrypting assets with ChaChaPoly: \(String(describing: error))")
+			return nil
+		}
+		
+		let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+		let fileName = UUID().uuidString
+		let filePath = tempDir.appendingPathComponent(fileName, isDirectory: false)
+		
+		do {
+			try ciphertext.write(to: filePath)
+		} catch {
+			log.error("Error encrypting assets with ChaChaPoly: \(String(describing: error))")
+			return nil
+		}
+		
+		return filePath
 	}
 	
 	func createProgress(for operation: CKModifyRecordsOperation) -> (Progress, [CKRecord.ID: Progress]) {

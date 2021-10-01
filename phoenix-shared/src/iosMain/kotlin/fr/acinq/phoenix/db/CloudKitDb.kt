@@ -8,11 +8,11 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.db.payments.CloudKitInterface
-import fr.acinq.phoenix.db.payments.IncomingQueries
-import fr.acinq.phoenix.db.payments.OutgoingQueries
-import fr.acinq.phoenix.db.payments.mapToDb
+import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.db.payments.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.kodein.memory.util.freeze
@@ -65,7 +65,7 @@ class CloudKitDb(
 
         // Maps to the fetch payment information in the database.
         // If missing from the map, then the payment has been deleted from the database.
-        val rowMap: Map<WalletPaymentId, WalletPayment>,
+        val rowMap: Map<WalletPaymentId, WalletPaymentInfo>,
 
         // Maps to `cloudkit_payments_metadata.ckrecord_info`.
         // If missing from the map, then then record doesn't exist in the database.
@@ -83,10 +83,11 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = IncomingQueries(database)
             val outQueries = OutgoingQueries(database)
+            val metaQueries = MetadataQueries(database)
 
             val rowids = mutableListOf<Long>()
             val rowidMap = mutableMapOf<Long, WalletPaymentId>()
-            val rowMap = mutableMapOf<WalletPaymentId, WalletPayment>()
+            val rowMap = mutableMapOf<WalletPaymentId, WalletPaymentInfo>()
             val metadataMap = mutableMapOf<WalletPaymentId, ByteArray>()
             var incomingStats = MetadataStats()
             var outgoingStats = MetadataStats()
@@ -107,17 +108,14 @@ class CloudKitDb(
                     when (row.type) {
                         WalletPaymentId.DbType.INCOMING.value -> {
                             try {
-                                val paymentHash = ByteVector32(row.id)
-                                WalletPaymentId.IncomingPaymentId(paymentHash)
+                                WalletPaymentId.IncomingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
-
                         }
                         WalletPaymentId.DbType.OUTGOING.value -> {
                             try {
-                                val uuid = UUID.fromString(row.id)
-                                WalletPaymentId.OutgoingPaymentId(uuid)
+                                WalletPaymentId.OutgoingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
@@ -129,36 +127,51 @@ class CloudKitDb(
                 } // </batch.forEach>
 
                 // Remember: there could be duplicates
-                val uniquePaymentRowIds = rowidMap.values.toSet()
+                val uniquePaymentIds = rowidMap.values.toSet()
 
                 // Step 3 of 5:
                 // Fetch the corresponding payment info from the database.
                 // Depending on the type of WalletPaymentId, this will be either:
                 // - IncomingPayment
                 // - OutgoingPayment
+                //
+                // In order to optimize disk access, we fetch from 1 table at a time.
 
-                uniquePaymentRowIds.forEach { paymentId ->
-                    when (paymentId) {
-                        is WalletPaymentId.IncomingPaymentId -> {
-                            inQueries.getIncomingPayment(
-                                paymentHash = paymentId.paymentHash
-                            )
-                        }
-                        is WalletPaymentId.OutgoingPaymentId -> {
-                            outQueries.getOutgoingPayment(
-                                id = paymentId.id
-                            )
-                            // NB: "useless" parts have been filtered out
-                        }
-                    }?.let { payment ->
-                        rowMap[paymentId] = payment
+                val metadataPlaceholder = WalletPaymentMetadata()
+
+                uniquePaymentIds.filterIsInstance<
+                    WalletPaymentId.IncomingPaymentId
+                >().forEach { paymentId ->
+                    inQueries.getIncomingPayment(
+                        paymentHash = paymentId.paymentHash
+                    )?.let { payment ->
+                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
                     }
-                } // </rowidMap.forEach>
+                } // </incoming_payments>
+
+                uniquePaymentIds.filterIsInstance<
+                    WalletPaymentId.OutgoingPaymentId
+                >().forEach { paymentId ->
+                    outQueries.getOutgoingPayment(
+                        id = paymentId.id
+                    )?.let { payment ->
+                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
+                    }
+                } // </outgoing_payments>
+
+                val fetchOptions = WalletPaymentFetchOptions.All
+                uniquePaymentIds.forEach { paymentId ->
+                    metaQueries.getMetadata(paymentId, fetchOptions)?.let { metadata ->
+                        rowMap[paymentId]?.let {
+                            rowMap[paymentId] = it.copy(metadata = metadata)
+                        }
+                    }
+                } // </payments_metadata>
 
                 // Step 4 of 5:
                 // Fetch the corresponding `cloudkit_payments_metadata.ckrecord_info`
 
-                uniquePaymentRowIds.forEach { paymentId ->
+                uniquePaymentIds.forEach { paymentId ->
 
                     ckQueries.fetchMetadata(
                         type = paymentId.dbType.value,
@@ -294,6 +307,7 @@ class CloudKitDb(
 
     suspend fun updateRows(
         downloadedPayments: List<WalletPayment>,
+        downloadedPaymentsMetadata: Map<WalletPaymentId, WalletPaymentMetadataRow>,
         updateMetadata: Map<WalletPaymentId, MetadataRow>
     ) {
         // We are seeing crashes when accessing the values within the List<PaymentRow>.
@@ -312,6 +326,7 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = database.incomingPaymentsQueries
             val outQueries = database.outgoingPaymentsQueries
+            val metaQueries = database.paymentsMetadataQueries
 
             database.transaction {
 
@@ -345,7 +360,7 @@ class CloudKitDb(
                             payment_hash = incomingPayment.paymentHash.toByteArray()
                         )
                     }
-                }
+                } // </incoming_payments table>
 
                 for (outgoingPayment in outgoingList) {
 
@@ -413,7 +428,28 @@ class CloudKitDb(
                             status_blob = statusBlob
                         )
                     }
-                }
+                } // </outgoing_payments table>
+
+                downloadedPaymentsMetadata.forEach { (paymentId, row) ->
+                    val rowExists = metaQueries.hasMetadata(
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
+                    ).executeAsOne() > 0
+                    if (!rowExists) {
+                        metaQueries.addMetadata(
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId,
+                            lnurl_base_type = row.lnurl_base?.first,
+                            lnurl_base_blob = row.lnurl_base?.second,
+                            lnurl_metadata_type = row.lnurl_metadata?.first,
+                            lnurl_metadata_blob = row.lnurl_metadata?.second,
+                            lnurl_successAction_type = row.lnurl_successAction?.first,
+                            lnurl_successAction_blob = row.lnurl_successAction?.second,
+                            lnurl_description = row.lnurl_description,
+                            user_description = row.user_description
+                        )
+                    }
+                } // </payments_metadata table>
 
                 sanitizedMetadata.forEach { (paymentId, row) ->
                     val rowExists = ckQueries.existsMetadata(
@@ -436,7 +472,7 @@ class CloudKitDb(
                             record_blob = row.recordBlob
                         )
                     }
-                }
+                } // </cloudkit_payments_metadata table>
             }
         }
     }

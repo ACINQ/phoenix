@@ -105,7 +105,7 @@ extension PaymentsManager {
 struct FetchQueueBatchResult {
 	let rowids: [Int64]
 	let rowidMap: [Int64: WalletPaymentId]
-	let rowMap: [WalletPaymentId : Lightning_kmpWalletPayment]
+	let rowMap: [WalletPaymentId : WalletPaymentInfo]
 	let metadataMap: [WalletPaymentId : KotlinByteArray]
 	let incomingStats: CloudKitDb.MetadataStats
 	let outgoingStats: CloudKitDb.MetadataStats

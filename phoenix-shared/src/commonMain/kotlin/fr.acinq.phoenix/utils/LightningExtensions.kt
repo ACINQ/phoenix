@@ -6,6 +6,7 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
+import org.kodein.memory.util.freeze
 
 /**
  * Standardized location for extending types from: fr.acinq.lightning
@@ -56,6 +57,13 @@ fun WalletPayment.errorMessage(): String? = when (this) {
         else -> null
     }
     is IncomingPayment -> null
+}
+
+// This function exists because the `freeze()`
+// function isn't exposed to iOS.
+//
+fun WalletPayment.copyAndFreeze(): WalletPayment {
+    return this.freeze()
 }
 
 /**

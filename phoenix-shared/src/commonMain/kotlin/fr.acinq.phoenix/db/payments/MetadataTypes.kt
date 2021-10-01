@@ -2,12 +2,14 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
+import org.kodein.memory.util.freeze
 
 sealed class LNUrlBase {
 
@@ -236,17 +238,25 @@ data class WalletPaymentMetadataRow(
         )
     }
 
+    /**
+     * This function exists because the `freeze()`
+     * function isn't exposed to iOS.
+     */
+    fun copyAndFreeze(): WalletPaymentMetadataRow {
+        return this.freeze()
+    }
+
     companion object {
         fun serialize(
             pay: LNUrl.Pay,
-            payInvoice: LNUrl.PayInvoice?
+            successAction: LNUrl.PayInvoice.SuccessAction?
         ): WalletPaymentMetadataRow {
 
             return WalletPaymentMetadataRow(
                 lnurl_base = LNUrlBase.serialize(pay),
                 lnurl_metadata = LNUrlMetadata.serialize(pay.metadata),
                 lnurl_description = pay.metadata.plainText,
-                lnurl_successAction = payInvoice?.successAction?.let {
+                lnurl_successAction = successAction?.let {
                     LNUrlSuccessAction.serialize(it)
                 }
             )
