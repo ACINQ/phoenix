@@ -39,7 +39,7 @@ extension WalletPaymentInfo {
 		if let description = metadata.userDescription {
 			return description
 		}
-		if let description = metadata.lnurlDescription {
+		if let description = metadata.lnurl?.description_ {
 			return description
 		}
 		
@@ -74,10 +74,8 @@ extension WalletPaymentMetadata {
 	
 	static func empty() -> WalletPaymentMetadata {
 		return WalletPaymentMetadata(
-			lnurl: nil,
-			lnurlDescription: nil,
-			lnurlSuccessAction: nil,
-			userDescription: nil
+			userDescription: nil,
+			lnurl: nil
 		)
 	}
 }

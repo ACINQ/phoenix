@@ -99,11 +99,17 @@ data class WalletPaymentInfo(
  * Represents information from the `payments_metadata` table.
  */
 data class WalletPaymentMetadata(
-    val lnurl: LNUrl? = null,
-    val lnurlDescription: String? = null,
-    val lnurlSuccessAction: LNUrl.PayInvoice.SuccessAction? = null,
-    val userDescription: String? = null
+    val userDescription: String? = null,
+    val lnurl: LnurlPayMetadata? = null,
 )
+
+data class LnurlPayMetadata(
+    val pay: LNUrl.Pay,
+    val description: String,
+    val successAction: LNUrl.PayInvoice.SuccessAction?
+) {
+    companion object {/* allow companion extensions */}
+}
 
 /**
  * Represents options when fetching data from the `payments_metadata` table.

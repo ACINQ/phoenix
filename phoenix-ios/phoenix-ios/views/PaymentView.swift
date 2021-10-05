@@ -351,7 +351,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	var paymentServiceRow: some View {
 		let identifier: String = #function
 		
-		if let lnurlPay = paymentInfo.metadata.lnurl as? LNUrl.Pay {
+		if let lnurlPay = paymentInfo.metadata.lnurl?.pay {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -405,7 +405,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 		// What the heck do we get when we decode the ciphertext ?
 		// So, without an example, we're unsure of how to proceed.
 		
-		if let sa_message = paymentInfo.metadata.lnurlSuccessAction as? LNUrl.PayInvoiceSuccessActionMessage {
+		if let sa_message = paymentInfo.metadata.lnurl?.successAction as? LNUrl.PayInvoiceSuccessActionMessage {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -420,7 +420,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 				Text(sa_message.message)
 			}
 			
-		} else if let sa_url = paymentInfo.metadata.lnurlSuccessAction as? LNUrl.PayInvoiceSuccessActionUrl {
+		} else if let sa_url = paymentInfo.metadata.lnurl?.successAction as? LNUrl.PayInvoiceSuccessActionUrl {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -769,7 +769,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	@ViewBuilder
 	func rows_outgoingPayment(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		
-		if let lnurlPay = paymentInfo.metadata.lnurl as? LNUrl.Pay {
+		if let lnurlPay = paymentInfo.metadata.lnurl?.pay {
 			
 			header(NSLocalizedString("lnurl-pay", comment: "Title in DetailsView_IncomingPayment"))
 			

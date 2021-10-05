@@ -1,10 +1,9 @@
 package fr.acinq.phoenix.db.payments
 
-import fr.acinq.phoenix.data.LNUrl
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.PaymentsDatabase
+import io.ktor.http.*
 
 class MetadataQueries(val database: PaymentsDatabase) {
 
@@ -72,8 +71,10 @@ class MetadataQueries(val database: PaymentsDatabase) {
             user_description: String?
         ): WalletPaymentMetadata {
             return WalletPaymentMetadata(
-                lnurlDescription = lnurl_description,
-                userDescription = user_description
+                userDescription = user_description,
+                lnurl = if (lnurl_description != null) {
+                    LnurlPayMetadata.placeholder(lnurl_description)
+                } else null
             )
         }
 
@@ -115,3 +116,23 @@ class MetadataQueries(val database: PaymentsDatabase) {
         }
     }
 }
+
+fun LnurlPayMetadata.Companion.placeholder(description: String) = LnurlPayMetadata(
+    pay = LNUrl.Pay(
+        lnurl = Url("https://phoenix.acinq.co/"),
+        callback = Url("https://phoenix.acinq.co/"),
+        minSendable = MilliSatoshi(0),
+        maxSendable = MilliSatoshi(0),
+        metadata = LNUrl.Pay.Metadata(
+            raw = "",
+            plainText = description,
+            longDesc = null,
+            imageJpg = null,
+            imagePng = null,
+            unknown = null
+        ),
+        maxCommentLength = null
+    ),
+    description = description,
+    successAction = null
+)

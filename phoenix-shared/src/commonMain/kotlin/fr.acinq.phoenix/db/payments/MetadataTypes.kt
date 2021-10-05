@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.data.LNUrl
+import fr.acinq.phoenix.data.LnurlPayMetadata
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import io.ktor.http.*
 import kotlinx.serialization.*
@@ -225,11 +226,11 @@ data class WalletPaymentMetadataRow(
 ) {
 
     fun deserialize(): WalletPaymentMetadata {
-        val lnurl = lnurl_base?.let {
+        val base = lnurl_base?.let {
             when (val base = LNUrlBase.deserialize(it.first, it.second)) {
                 is LNUrlBase.Pay -> {
-                    lnurl_metadata?.let {
-                        when (val metadata = LNUrlMetadata.deserialize(it.first, it.second)) {
+                    lnurl_metadata?.let { (type, blob) ->
+                        when (val metadata = LNUrlMetadata.deserialize(type, blob)) {
                             is LNUrlMetadata.PayMetadata -> {
                                 metadata.unwrap()
                             }
@@ -245,10 +246,16 @@ data class WalletPaymentMetadataRow(
             LNUrlSuccessAction.deserialize(it.first, it.second)
         }
 
+        val lnurl = base?.let {
+            LnurlPayMetadata(
+                pay = it,
+                description = lnurl_description ?: it.metadata.plainText,
+                successAction = successAction
+            )
+        }
+
         return WalletPaymentMetadata(
             lnurl = lnurl,
-            lnurlDescription = lnurl_description,
-            lnurlSuccessAction = successAction,
             userDescription = user_description
         )
     }
