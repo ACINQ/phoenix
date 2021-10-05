@@ -7,7 +7,6 @@ extension PhoenixBusiness {
 	
 	func getPeer() -> Lightning_kmpPeer? {
 		self.peerManager.peerState.value_ as? Lightning_kmpPeer
-	//	self.peerManager.peerState.value as? Lightning_kmpPeer
 	}
 }
 

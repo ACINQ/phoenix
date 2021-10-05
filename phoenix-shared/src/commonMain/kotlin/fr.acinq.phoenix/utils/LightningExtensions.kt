@@ -12,20 +12,6 @@ import org.kodein.memory.util.freeze
  * Standardized location for extending types from: fr.acinq.lightning
  */
 
-fun WalletPayment.desc(): String? = when (this) {
-    is OutgoingPayment -> when (val d = this.details) {
-        is OutgoingPayment.Details.Normal -> d.paymentRequest.description
-        is OutgoingPayment.Details.KeySend -> "donation"
-        is OutgoingPayment.Details.SwapOut -> d.address
-        is OutgoingPayment.Details.ChannelClosing -> "channel closing"
-    }
-    is IncomingPayment -> when (val o = this.origin) {
-        is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
-        is IncomingPayment.Origin.KeySend -> "donation"
-        is IncomingPayment.Origin.SwapIn -> o.address
-    }
-}.takeIf { !it.isNullOrBlank() }
-
 enum class WalletPaymentState { Success, Pending, Failure }
 
 fun WalletPayment.id(): String = when (this) {
