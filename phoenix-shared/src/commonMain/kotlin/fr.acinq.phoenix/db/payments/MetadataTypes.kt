@@ -11,6 +11,11 @@ import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
 import org.kodein.memory.util.freeze
 
+/**
+ * Represents the data stored in the `payments_metadata` table, within columns:
+ * - lnurl_base_type
+ * - lnurl_base_blob
+ */
 sealed class LNUrlBase {
 
     enum class TypeVersion {
@@ -62,6 +67,11 @@ sealed class LNUrlBase {
     }
 }
 
+/**
+ * Represents the data stored in the `payments_metadata` table, within columns:
+ * - lnurl_metadata_type
+ * - lnurl_metadata_blob
+ */
 sealed class LNUrlMetadata {
 
     enum class TypeVersion {
@@ -100,6 +110,11 @@ sealed class LNUrlMetadata {
     }
 }
 
+/**
+ * Represents the data stored in the `payments_metadata` table, within columns:
+ * - lnurl_successAction_type
+ * - lnurl_successAction_blob
+ */
 sealed class LNUrlSuccessAction {
 
     enum class TypeVersion {

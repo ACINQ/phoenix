@@ -129,14 +129,14 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
     suspend fun getOutgoingPayment(
         id: UUID,
         options: WalletPaymentFetchOptions
-    ): Pair<OutgoingPayment, WalletPaymentMetadata>? {
+    ): Pair<OutgoingPayment, WalletPaymentMetadata?>? {
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
                 outQueries.getOutgoingPayment(id)?.let { payment ->
                     val metadata = metaQueries.getMetadata(
                         id = WalletPaymentId.OutgoingPaymentId(id),
                         options = options
-                    ) ?: WalletPaymentMetadata()
+                    )
                     Pair(payment, metadata)
                 }
             }
@@ -212,14 +212,14 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
     suspend fun getIncomingPayment(
         paymentHash: ByteVector32,
         options: WalletPaymentFetchOptions
-    ): Pair<IncomingPayment, WalletPaymentMetadata>? {
+    ): Pair<IncomingPayment, WalletPaymentMetadata?>? {
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
                 inQueries.getIncomingPayment(paymentHash)?.let { payment ->
                     val metadata = metaQueries.getMetadata(
                         id = WalletPaymentId.IncomingPaymentId(paymentHash),
                         options = options
-                    ) ?: WalletPaymentMetadata()
+                    )
                     Pair(payment, metadata)
                 }
             }

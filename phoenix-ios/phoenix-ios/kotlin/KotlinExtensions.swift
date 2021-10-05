@@ -70,6 +70,18 @@ extension WalletPaymentInfo {
 	}
 }
 
+extension WalletPaymentMetadata {
+	
+	static func empty() -> WalletPaymentMetadata {
+		return WalletPaymentMetadata(
+			lnurl: nil,
+			lnurlDescription: nil,
+			lnurlSuccessAction: nil,
+			userDescription: nil
+		)
+	}
+}
+
 extension PaymentsManager {
 	
 	func getCachedPayment(

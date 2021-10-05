@@ -11,6 +11,7 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
@@ -150,12 +151,18 @@ class PaymentsManager(
     ): WalletPaymentInfo? = when (id) {
         is WalletPaymentId.IncomingPaymentId -> {
             paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
-                WalletPaymentInfo(it.first, it.second)
+                WalletPaymentInfo(
+                    payment = it.first,
+                    metadata = it.second ?: WalletPaymentMetadata()
+                )
             }
         }
         is WalletPaymentId.OutgoingPaymentId -> {
             paymentsDb().getOutgoingPayment(id.id, options)?.let {
-                WalletPaymentInfo(it.first, it.second)
+                WalletPaymentInfo(
+                    payment = it.first,
+                    metadata = it.second ?: WalletPaymentMetadata()
+                )
             }
         }
     }

@@ -90,23 +90,20 @@ class MetadataQueries(val database: PaymentsDatabase) {
             lnurl_successAction_blob: ByteArray?,
             user_description: String?
         ): WalletPaymentMetadata {
-            val lnurl_base = if(
-                lnurl_base_type != null && lnurl_base_blob != null
-            ) {
-                Pair(lnurl_base_type, lnurl_base_blob)
-            } else { null }
+            val lnurl_base =
+                if (lnurl_base_type != null && lnurl_base_blob != null) {
+                    Pair(lnurl_base_type, lnurl_base_blob)
+                } else null
 
-            val lnurl_metadata = if(
-                lnurl_metadata_type != null && lnurl_metadata_blob != null
-            ) {
-                Pair(lnurl_metadata_type, lnurl_metadata_blob)
-            } else { null }
+            val lnurl_metadata =
+                if (lnurl_metadata_type != null && lnurl_metadata_blob != null) {
+                    Pair(lnurl_metadata_type, lnurl_metadata_blob)
+                } else null
 
-            val lnurl_successsAction = if(
-                lnurl_successAction_type != null && lnurl_successAction_blob != null
-            ) {
-                Pair(lnurl_successAction_type, lnurl_successAction_blob)
-            } else { null }
+            val lnurl_successsAction =
+                if (lnurl_successAction_type != null && lnurl_successAction_blob != null) {
+                    Pair(lnurl_successAction_type, lnurl_successAction_blob)
+                } else null
 
             return WalletPaymentMetadataRow(
                 lnurl_base = lnurl_base,

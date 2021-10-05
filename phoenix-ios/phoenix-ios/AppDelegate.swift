@@ -339,8 +339,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			let currencyPrefs = CurrencyPrefs()
 			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amount)
 
+			let paymentInfo = WalletPaymentInfo(payment: payment, metadata: WalletPaymentMetadata.empty())
+			
 			var body: String
-			if let desc = payment.desc(), desc.count > 0 {
+			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {
 				body = "\(formattedAmt.string): \(desc)"
 			} else {
 				body = formattedAmt.string
