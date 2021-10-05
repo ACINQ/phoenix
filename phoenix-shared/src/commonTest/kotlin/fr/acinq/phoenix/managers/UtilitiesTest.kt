@@ -19,6 +19,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.phoenix.managers.Utilities.BitcoinAddressType
 import fr.acinq.phoenix.managers.Utilities.BitcoinAddressError
 import fr.acinq.phoenix.data.Chain
+import io.ktor.http.*
 import org.kodein.log.LoggerFactory
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -60,6 +61,18 @@ class UtilitiesTest {
         ),
         TestInput("17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhe",
             Chain.Testnet, BitcoinAddressType.Base58PubKeyHash, isValid = false
+        ),
+        TestInput("bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash
+        ),
+        TestInput("bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar",
+            Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash
+        ),
+        TestInput("bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash
+        ),
+        TestInput("bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar",
+            Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash
         )
     )
 
@@ -100,5 +113,30 @@ class UtilitiesTest {
             }
 
         }
+    }
+
+    @Test
+    fun bitcoinParametersParsing() {
+
+        val loggerFactory = LoggerFactory.default
+        val util = Utilities(loggerFactory, Chain.Mainnet)
+
+        val result1 = util.parseBitcoinAddress(
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar"
+        )
+
+        val info1 = result1.right
+        assertNotNull(info1)
+        assertTrue { info1.params.get("foo") == "bar" }
+
+        val result2 = util.parseBitcoinAddress(
+            "bitcoin://bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?foo=bar&lightning=abc123"
+        )
+
+        val info2 = result2.right
+        assertNotNull(info2)
+
+        assertTrue { info2.params.get("foo") == "bar" }
+        assertTrue { info2.params.get("lightning") == "abc123" }
     }
 }

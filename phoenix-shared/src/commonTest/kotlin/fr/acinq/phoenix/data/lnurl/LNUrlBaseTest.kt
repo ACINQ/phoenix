@@ -26,7 +26,11 @@ import kotlin.test.assertTrue
 
 class LNUrlBaseTest {
 
-    private fun encode(source: String) = Bech32.encode("lnurl", Bech32.eight2five(source.encodeToByteArray()).toByteArray())
+    private fun encode(source: String) = Bech32.encode(
+        hrp = "lnurl",
+        int5s = Bech32.eight2five(source.encodeToByteArray()).toByteArray(),
+        encoding = Bech32.Encoding.Bech32
+    )
 
     @Test
     fun parseBech32Url() {
