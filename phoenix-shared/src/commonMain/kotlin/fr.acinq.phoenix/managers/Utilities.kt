@@ -4,6 +4,7 @@ import fr.acinq.bitcoin.*
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.Chain
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import org.kodein.log.LoggerFactory
@@ -32,7 +33,8 @@ class Utilities(
         val address: String, // may be different than input; e.g. input is "bitcoin:xyz"
         val chain: Chain,
         val type: BitcoinAddressType,
-        val hash: ByteArray
+        val hash: ByteVector,
+        val params: Parameters
     )
 
     sealed class BitcoinAddressError {
@@ -47,19 +49,37 @@ class Utilities(
         input: String
     ): Either<BitcoinAddressError, BitcoinAddressInfo> {
 
-        var addr = input.replace("\\u00A0", "").trim() // \u00A0 = '\n'
-        val isUrl = when {
-            addr.startsWith("bitcoin://", true) -> { addr = addr.drop(10); true }
-            addr.startsWith("bitcoin:", true) -> { addr = addr.drop(8); true }
-            else -> false
+        // Ignore excess input, including additional lines, and whitespace
+        var addr = input.lines().firstOrNull { it.isNotBlank() }?.let {
+            it
+                .replace("\\u00A0", "") // \u00A0 = 'non-breaking space'
+                .trim() // leading & trailing whitespace
+        } ?: ""
+        val (prefixLength, isUrl) = when {
+            addr.startsWith("bitcoin://", true) -> Pair(10, true)
+            addr.startsWith("bitcoin:", true) -> Pair(8, true)
+            else -> Pair(0, false)
         }
+        var parameters = Parameters.Empty
         if (isUrl) {
             // The input might look like:
             // bitcoin:tb1qla78tll0eua3l5f4nvfq3tx58u35yc3m44flfu?time=1618931109&exp=604800
-            // We want to trim any url parameters
-            val idx = addr.indexOf("?")
-            if (idx >= 0) {
-                addr = addr.dropLast(addr.length - idx)
+            // We want to parse the parameters too.
+            try {
+                val url = Url(addr)
+                parameters = url.parameters
+                // Can we extract the bitcoin address string from the Url ?
+                // Surprisingly, the Url api lacks a simple property for this:
+                // - url.host == localhost
+                // - url.authority == localhost
+                // - url.encodedPath = "/tb1..."
+                addr = addr.drop(prefixLength)
+                val idx = addr.indexOf("?")
+                if (idx >= 0) {
+                    addr = addr.dropLast(addr.length - idx)
+                }
+            } catch (e: Throwable) {
+                return Either.Left(BitcoinAddressError.UnknownFormat)
             }
         }
 
@@ -93,7 +113,13 @@ class Utilities(
             if (addrChain != chain) {
                 return Either.Left(BitcoinAddressError.ChainMismatch(chain, addrChain))
             }
-            return Either.Right(BitcoinAddressInfo(addr, addrChain, type, bin))
+            return Either.Right(BitcoinAddressInfo(
+                address = addr,
+                chain = addrChain,
+                type = type,
+                hash = bin.byteVector(),
+                params = parameters
+            ))
         } catch (e: Throwable) {
             // Not Base58Check
         }
@@ -105,10 +131,7 @@ class Utilities(
                 "tb" -> Chain.Testnet
                 "bcrt" -> Chain.Regtest
                 else -> null
-            }
-            if (addrChain == null) {
-                return Either.Left(BitcoinAddressError.UnknownBech32Prefix(hrp))
-            }
+            } ?: return Either.Left(BitcoinAddressError.UnknownBech32Prefix(hrp))
             if (addrChain != chain) {
                 return Either.Left(BitcoinAddressError.ChainMismatch(chain, addrChain))
             }
@@ -117,11 +140,14 @@ class Utilities(
                     20 -> BitcoinAddressType.SegWitPubKeyHash
                     32 -> BitcoinAddressType.SegWitScriptHash
                     else -> null
-                }
-                if (type == null) {
-                    return Either.Left(BitcoinAddressError.UnknownFormat)
-                }
-                return Either.Right(BitcoinAddressInfo(addr, addrChain, type, bin))
+                } ?: return Either.Left(BitcoinAddressError.UnknownFormat)
+                return Either.Right(BitcoinAddressInfo(
+                    address = addr,
+                    chain = addrChain,
+                    type = type,
+                    hash = bin.byteVector(),
+                    params = parameters
+                ))
             } else {
                 // Unknown version - we don't have any validation logic in place for it
                 return Either.Left(BitcoinAddressError.UnknownBech32Version(version))
@@ -136,13 +162,17 @@ class Utilities(
     fun addressToPublicKeyScript(address: String): ByteArray? {
         val info = parseBitcoinAddress(address).right ?: return null
         val script = when (info.type) {
-            BitcoinAddressType.Base58PubKeyHash -> Script.pay2pkh(pubKeyHash = info.hash)
+            BitcoinAddressType.Base58PubKeyHash -> Script.pay2pkh(
+                pubKeyHash = info.hash.toByteArray()
+            )
             BitcoinAddressType.Base58ScriptHash -> {
                 // We cannot use Script.pay2sh() here, because that function expects a script.
                 // And what we have is a script hash.
                 listOf(OP_HASH160, OP_PUSHDATA(info.hash), OP_EQUAL)
             }
-            BitcoinAddressType.SegWitPubKeyHash -> Script.pay2wpkh(pubKeyHash = info.hash)
+            BitcoinAddressType.SegWitPubKeyHash -> Script.pay2wpkh(
+                pubKeyHash = info.hash.toByteArray()
+            )
             BitcoinAddressType.SegWitScriptHash -> {
                 // We cannot use Script.pay2wsh() here, because that function expects a script.
                 // And what we have is a script hash.

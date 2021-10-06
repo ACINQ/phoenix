@@ -18,6 +18,7 @@ import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
+import fr.acinq.phoenix.managers.Utilities.BitcoinAddressInfo
 import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.localCommitmentSpec
@@ -213,8 +214,16 @@ class AppScanController(
         }}
 
         // Is it a bitcoin address ?
-        val badRequestReason = readBitcoinAddress(input)
-        model(Scan.Model.BadRequest(badRequestReason))
+        readBitcoinAddress(input).let { return when (it) {
+            is Either.Left -> { // it.value: Scan.BadRequestReason
+                model(Scan.Model.BadRequest(it.value))
+            }
+            is Either.Right -> {
+                it.value.params.get("lightning")?.let { lnParam ->
+                    processParse(Scan.Intent.Parse(lnParam))
+                } ?: model(Scan.Model.BadRequest(Scan.BadRequestReason.IsBitcoinAddress))
+            }
+        }}
     }
 
     private suspend fun processIntent(
@@ -387,9 +396,9 @@ class AppScanController(
         // Because often QR codes will use upper-case, such as:
         // LIGHTNING:LNURL1...
 
-        val inputLowerCase = input.toLowerCase()
+        val inputLowerCase = input.lowercase()
         for (prefix in prefixes) {
-            if (inputLowerCase.startsWith(prefix.toLowerCase())) {
+            if (inputLowerCase.startsWith(prefix.lowercase())) {
                 return Pair(true, input.drop(prefix.length))
             }
         }
@@ -439,7 +448,9 @@ class AppScanController(
         }
     }
 
-    private fun readBitcoinAddress(input: String): Scan.BadRequestReason {
+    private fun readBitcoinAddress(
+        input: String
+    ): Either<Scan.BadRequestReason, BitcoinAddressInfo> {
 
         return when (val result = utilities.parseBitcoinAddress(input)) {
             is Either.Left -> {
@@ -448,20 +459,19 @@ class AppScanController(
                         // Two problems here:
                         // - they're scanning a bitcoin address, but we don't support swap-out yet
                         // - the bitcoin address is for the wrong chain
-                        Scan.BadRequestReason.ChainMismatch(
+                        Either.Left(Scan.BadRequestReason.ChainMismatch(
                             myChain = reason.myChain,
                             requestChain = reason.addrChain
-                        )
+                        ))
                     }
                     else -> {
-                        Scan.BadRequestReason.UnknownFormat
+                        Either.Left(Scan.BadRequestReason.UnknownFormat)
                     }
                 }
             }
             is Either.Right -> {
-                // Yup, it's a bitcoin address.
-                // But we don't support swap-out yet.
-                Scan.BadRequestReason.IsBitcoinAddress
+                // Yup, it's a bitcoin address
+                Either.Right(result.value)
             }
         }
     }
