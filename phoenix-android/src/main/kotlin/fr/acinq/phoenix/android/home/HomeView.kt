@@ -69,7 +69,9 @@ import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -101,7 +103,8 @@ fun HomeView(appVM: AppViewModel) {
         }
 
         val paymentsManager = business.paymentsManager
-        val paymentsPage by remember { mutableStateOf(paymentsManager.paymentsPage) }
+        val paymentsPage = paymentsManager.paymentsPage.collectAsState()
+
         DisposableEffect(key1 = "homeview") {
             log.debug { "subscribing to changes in payments page" }
             paymentsManager.subscribeToPaymentsPage(0, 50)
