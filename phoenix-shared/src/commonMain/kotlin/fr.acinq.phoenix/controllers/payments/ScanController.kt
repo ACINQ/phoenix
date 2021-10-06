@@ -220,7 +220,7 @@ class AppScanController(
             }
             is Either.Right -> {
                 it.value.params.get("lightning")?.let { lnParam ->
-                    processParse(Scan.Intent.Parse(lnParam))
+                    processIntent(Scan.Intent.Parse(lnParam))
                 } ?: model(Scan.Model.BadRequest(Scan.BadRequestReason.IsBitcoinAddress))
             }
         }}
