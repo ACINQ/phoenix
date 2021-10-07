@@ -1983,16 +1983,6 @@ struct LnurlPayErrorNotice: View, ViewName {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 		
 			errorMessage
-			
-			HStack {
-				Spacer()
-				Button {
-					closeButtonTapped()
-				} label: {
-					Text("Close")
-				}
-			}
-			.padding(.top)
 		}
 		.padding()
 	}
@@ -2012,7 +2002,7 @@ struct LnurlPayErrorNotice: View, ViewName {
 				
 				} else if let details = err.err as? LNUrl.ErrorRemoteFailureCode {
 					
-					Text("Host returned status code \(details.code):")
+					Text("Host returned status code \(details.code.value):")
 				 	Text(err.err.origin)
 						.font(.system(.subheadline, design: .monospaced))
 				 

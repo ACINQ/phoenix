@@ -98,7 +98,12 @@ class LNUrlManager(
      * into an actionable LNUrl object.
      */
     suspend fun continueLnUrl(url: Url): LNUrl {
-        val json = LNUrl.handleLNUrlResponse(httpClient.get(url))
+        val response: HttpResponse = try {
+            httpClient.safeGet(url)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
+        }
+        val json = LNUrl.handleLNUrlResponse(response)
         return LNUrl.parseLNUrlResponse(url, json)
     }
 
@@ -120,8 +125,14 @@ class LNUrlManager(
         val callback = builder.build()
         val origin = callback.host
 
+        val response: HttpResponse = try {
+            httpClient.safeGet(callback)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin)
+        }
+
         // may throw: LNUrl.Error.RemoteFailure
-        val json = LNUrl.handleLNUrlResponse(httpClient.get(callback))
+        val json = LNUrl.handleLNUrlResponse(response)
 
         // may throw: LNUrl.Error.PayInvoice
         val invoice = LNUrl.parseLNUrlPayResponse(origin, json)
@@ -165,15 +176,23 @@ class LNUrlManager(
         val url = builder.build()
 
         val response: HttpResponse = try {
-            httpClient.get(url)
-        } catch (sre: io.ktor.client.features.ServerResponseException) {
-            // ktor throws an exception when we get a non-200 response from the server.
-            // That's not what we want. We'd like to handle the JSON error ourselves.
-            sre.response
+            httpClient.safeGet(url)
         } catch (t: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }
 
         LNUrl.handleLNUrlResponse(response) // throws on any/all non-success
+    }
+}
+
+suspend fun HttpClient.safeGet(url: Url): HttpResponse {
+    // ktor throws an exception when we get a non-200 response from the server.
+    // That's not what we want. We'd like to handle the JSON error ourselves.
+    return try {
+        this.get(url)
+    } catch (err: io.ktor.client.features.ServerResponseException) {
+        err.response
+    } catch (err: io.ktor.client.features.ClientRequestException) {
+        err.response
     }
 }

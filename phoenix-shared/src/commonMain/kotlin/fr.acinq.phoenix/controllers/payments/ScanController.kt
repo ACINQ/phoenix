@@ -296,11 +296,21 @@ class AppScanController(
                     Either.Right(invoice)
                 }
             }
-        } catch (err: LNUrl.Error.RemoteFailure) {
-            Either.Left(Scan.LNUrlPayError.RemoteError(err))
-        } catch (err: LNUrl.Error.PayInvoice) {
-            Either.Left(Scan.LNUrlPayError.BadResponseError(err))
-        }
+        } catch (err: Throwable) { when (err) {
+            is LNUrl.Error.RemoteFailure -> {
+                Either.Left(Scan.LNUrlPayError.RemoteError(err))
+            }
+            is LNUrl.Error.PayInvoice -> {
+                Either.Left(Scan.LNUrlPayError.BadResponseError(err))
+            }
+            else -> { // unexpected exception: map to generic error
+                Either.Left(Scan.LNUrlPayError.RemoteError(
+                    LNUrl.Error.RemoteFailure.Unreadable(
+                        origin = intent.lnurlPay.callback.host
+                    )
+                ))
+            }
+        }}
         if (requestId != lnurlRequestId) {
             // Intent.LnurlPayFlow.CancelLnurlPayment has been issued
             return
