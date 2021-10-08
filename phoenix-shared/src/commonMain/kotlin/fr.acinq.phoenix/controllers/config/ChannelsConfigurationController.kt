@@ -70,14 +70,8 @@ class AppChannelsConfigurationController(
                                 fr.acinq.lightning.serialization.v1.ChannelState.serializer(),
                                 fr.acinq.lightning.serialization.v1.ChannelState.import(state)
                             ),
-                            txUrl = if (state is ChannelStateWithCommitments) {
-                                val txId = state.commitments.commitInput.outPoint.txid
-                                val base = "https://mempool.space"
-                                when (chain) {
-                                    Chain.Mainnet -> "$base/tx/$txId"
-                                    Chain.Testnet -> "$base/testnet/tx/$txId"
-                                    Chain.Regtest -> "$base/_REGTEST_/tx/$txId"
-                                }
+                            txId = if (state is ChannelStateWithCommitments) {
+                                state.commitments.commitInput.outPoint.txid.toString()
                             } else null
                         )
                     }

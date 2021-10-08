@@ -18,7 +18,7 @@ object ChannelsConfiguration {
             val localBalance: Satoshi?,
             val remoteBalance: Satoshi?,
             val json: String,
-            val txUrl: String?
+            val txId: String?
         )
     }
 

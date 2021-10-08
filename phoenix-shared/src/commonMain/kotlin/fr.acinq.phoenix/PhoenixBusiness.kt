@@ -80,6 +80,7 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
     val util by lazy { Utilities(this) }
+    val blockchainExplorer by lazy { BlockchainExplorer(chain) }
 
     init {
         setLightningLoggerFactory(loggerFactory)

@@ -375,11 +375,13 @@ fileprivate struct FooterView: View, ViewName {
 	}
 }
 
-fileprivate struct ChannelInfoPopup: View {
+fileprivate struct ChannelInfoPopup: View, ViewName {
 	
 	let channel: ChannelsConfiguration.ModelChannel
 	@Binding var sharing: String?
 	@ObservedObject var toast: Toast
+	
+	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -422,17 +424,37 @@ fileprivate struct ChannelInfoPopup: View {
 						.frame(width: 22, height: 22)
 				}
 
-				if let txUrl = channel.txUrl {
+				if let txId = channel.txId {
 					Divider()
 						.frame(height: 30)
 						.padding([.leading, .trailing], 8)
 
-					Button {
-						if let url = URL(string: txUrl) {
-							UIApplication.shared.open(url)
+					if #available(iOS 15.0, *) {
+						Button {
+							showBlockchainExplorerOptions = true
+						} label: {
+							Text("Tx").font(.title2)
 						}
-					} label: {
-						Text("Tx").font(.title2)
+						.confirmationDialog("Blockchain Explorer",
+							isPresented: $showBlockchainExplorerOptions,
+							titleVisibility: .automatic
+						) {
+							Button("Mempool.space") {
+								exploreTx(txId: txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+							}
+							Button("Blockstream.info") {
+								exploreTx(txId: txId, website: BlockchainExplorer.WebsiteBlockstreamInfo())
+							}
+							Button("Copy transaction id") {
+								copyTxId(txId: txId)
+							}
+						}
+					} else { // same functionality as before
+						Button {
+							exploreTx(txId: txId, website: BlockchainExplorer.WebsiteMempoolSpace())
+						} label: {
+							Text("Tx").font(.title2)
+						}
 					}
 				}
 
@@ -452,8 +474,24 @@ fileprivate struct ChannelInfoPopup: View {
 		} // </VStack>
 	}
 	
+	func exploreTx(txId: String, website: BlockchainExplorer.Website) {
+		log.trace("[\(viewName)] exploreTx()")
+		
+		let business = AppDelegate.get().business
+		let txUrlStr = business.blockchainExplorer.txUrl(txId: txId, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyTxId(txId: String) {
+		log.trace("[\(viewName)] copyTxId()")
+		
+		UIPasteboard.general.string = txId
+	}
+	
 	func closePopover() -> Void {
-		log.trace("[ChannelInfoPopup] closePopover()")
+		log.trace("[\(viewName)] closePopover()")
 		
 		popoverState.close()
 	}
@@ -471,7 +509,7 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		localBalance: Bitcoin_kmpSatoshi(sat: 50_000),
 		remoteBalance: Bitcoin_kmpSatoshi(sat: 200_000),
 		json: "{Everything is normal!}",
-		txUrl: "http://google.com"
+		txId: nil
 	)
 	
 	static let channel2 = ChannelsConfiguration.ModelChannel(
@@ -481,7 +519,7 @@ class ChannelsConfigurationView_Previews : PreviewProvider {
 		localBalance: Bitcoin_kmpSatoshi(sat: 0),
 		remoteBalance: Bitcoin_kmpSatoshi(sat: 0),
 		json: "{Woops!}",
-		txUrl: nil
+		txId: nil
 	)
 
 	static var previews: some View {
