@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.ServerAddress
 import kotlinx.serialization.Serializable

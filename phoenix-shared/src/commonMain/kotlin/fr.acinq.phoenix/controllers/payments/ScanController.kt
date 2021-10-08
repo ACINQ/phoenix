@@ -173,7 +173,7 @@ class AppScanController(
         // Is it an LNURL ?
         readLNURL(input)?.let { return when (it) {
             is Either.Left -> { // it.value: LnUrl.Auth
-                prefetchPublicSuffixListTask = appConfigManager.prefetchPublicSuffixList()
+                prefetchPublicSuffixListTask = appConfigManager.fetchPublicSuffixListAsync()
                 model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = it.value))
             }
             is Either.Right -> { // it.value: Url

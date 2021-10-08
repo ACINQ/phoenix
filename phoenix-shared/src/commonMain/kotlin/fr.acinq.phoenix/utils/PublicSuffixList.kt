@@ -168,19 +168,20 @@ class PublicSuffixList(
             }
         }
 
-        val prevailingRule =
-            if (matchingRules.isEmpty()) {
+        val prevailingRule = when {
+            matchingRules.isEmpty() -> {
                 Rule(labels = listOf("*"), isExceptionRule = false)
-            } else if (matchingRules.size == 1) {
+            }
+            matchingRules.size == 1 -> {
                 matchingRules.first()
-            } else {
-                matchingRules.firstOrNull { it.isExceptionRule }?.let {
-                    it
-                } ?: kotlin.run {
+            }
+            else -> {
+                matchingRules.firstOrNull { it.isExceptionRule } ?: kotlin.run {
                     val longestSize = matchingRules.maxOf { it.labels.size }
                     matchingRules.first { it.labels.size == longestSize }
                 }
             }
+        }
 
         return Match(matchingRules, prevailingRule, domainComponents)
     }

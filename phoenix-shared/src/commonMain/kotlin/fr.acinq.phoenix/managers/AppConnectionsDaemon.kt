@@ -276,7 +276,7 @@ class AppConnectionsDaemon(
         val http get() = (flags and Http.flags) != 0
     }
 
-    fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All): Unit {
+    fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
             if (target.peer) { peerControlChanges.send { incrementDisconnectCount() } }
             if (target.electrum) { electrumControlChanges.send { incrementDisconnectCount() } }
@@ -284,7 +284,7 @@ class AppConnectionsDaemon(
         }
     }
 
-    fun decrementDisconnectCount(target: ControlTarget = ControlTarget.All): Unit {
+    fun decrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
             if (target.peer) { peerControlChanges.send { decrementDisconnectCount() } }
             if (target.electrum) { electrumControlChanges.send { decrementDisconnectCount() } }

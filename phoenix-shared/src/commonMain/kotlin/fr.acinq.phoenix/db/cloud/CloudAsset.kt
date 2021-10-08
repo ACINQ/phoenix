@@ -76,26 +76,23 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
 
 @OptIn(ExperimentalSerializationApi::class)
 fun CloudAsset.Companion.cloudDeserialize(blob: ByteArray): WalletPaymentMetadataRow? {
-    var wrapper: CloudAsset? = null
-    try {
-        wrapper = Cbor.decodeFromByteArray(blob)
-    } catch (e: Throwable) {}
-
-    return wrapper?.let { wrapper ->
-        WalletPaymentMetadataRow(
-            lnurl_base = wrapper.lnurl_base?.let {
-                Pair(it.typeVersion, it.blob)
-            },
-            lnurl_metadata = wrapper.lnurl_metadata?.let {
-                Pair(it.typeVersion, it.blob)
-            },
-            lnurl_successAction = wrapper.lnurl_successAction?.let {
-                Pair(it.typeVersion, it.blob)
-            },
-            lnurl_description = wrapper.lnurl_description,
-            user_description = wrapper.user_description
-        )
+    val wrapper: CloudAsset = try {
+        Cbor.decodeFromByteArray(blob)
+    } catch (e: Throwable) {
+        return null
     }
+
+    return WalletPaymentMetadataRow(
+        lnurl_base = wrapper.lnurl_base?.let {
+            Pair(it.typeVersion, it.blob)
+        },
+        lnurl_metadata = wrapper.lnurl_metadata?.let {
+            Pair(it.typeVersion, it.blob)
+        },
+        lnurl_successAction = wrapper.lnurl_successAction?.let {
+            Pair(it.typeVersion, it.blob)
+        },
+        lnurl_description = wrapper.lnurl_description,
+        user_description = wrapper.user_description
+    )
 }
-
-

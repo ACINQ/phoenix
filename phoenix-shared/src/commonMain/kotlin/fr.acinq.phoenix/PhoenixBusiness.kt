@@ -1,6 +1,5 @@
 package fr.acinq.phoenix
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
@@ -103,9 +102,7 @@ class PhoenixBusiness(
     fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
         if (walletManager.wallet.value == null) {
             walletManager.loadWallet(seed)
-            return walletManager.wallet.value?.let {
-                it.cloudKeyAndEncryptedNodeId()
-            }
+            return walletManager.wallet.value?.cloudKeyAndEncryptedNodeId()
         }
         return null
     }

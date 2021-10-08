@@ -29,7 +29,7 @@ class CurrencyManager(
     private val log = newLogger(loggerFactory)
 
     val ratesFlow: Flow<List<BitcoinPriceRate>> = appDb.listBitcoinRates()
-    var priceRatesPollingJob: Job? = null
+    private var priceRatesPollingJob: Job? = null
 
     fun start() {
         priceRatesPollingJob = startRatesPollingJob()
