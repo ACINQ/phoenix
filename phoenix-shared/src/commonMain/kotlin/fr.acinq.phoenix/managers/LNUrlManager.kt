@@ -29,6 +29,7 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filterNotNull
@@ -131,9 +132,9 @@ class LNUrlManager(
         comment: String?
     ): LNUrl.PayInvoice {
         val builder = URLBuilder(lnurlPay.callback)
-        builder.parameters.append(name = "amount", value = amount.msat.toString())
+        builder.appendParameter(name = "amount", value = amount.msat.toString())
         if (comment != null && comment.isNotEmpty()) {
-            builder.parameters.append(name = "comment", value = comment)
+            builder.appendParameter(name = "comment", value = comment)
         }
         val callback = builder.build()
         val origin = callback.host
@@ -184,8 +185,8 @@ class LNUrlManager(
         )).toHex()
 
         val builder = URLBuilder(auth.url)
-        builder.parameters.append(name = "sig", value = signedK1)
-        builder.parameters.append(name = "key", value = key.publicKey().toString())
+        builder.appendParameter(name = "sig", value = signedK1)
+        builder.appendParameter(name = "key", value = key.publicKey().toString())
         val url = builder.build()
 
         val response: HttpResponse = try {
@@ -196,4 +197,9 @@ class LNUrlManager(
 
         LNUrl.handleLNUrlResponse(response) // throws on any/all non-success
     }
+}
+
+fun URLBuilder.appendParameter(name: String, value: String) {
+    @OptIn(InternalAPI::class)
+    this.parameters.append(name = name, value = value)
 }
