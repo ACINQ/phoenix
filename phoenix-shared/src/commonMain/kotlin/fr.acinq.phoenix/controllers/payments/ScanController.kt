@@ -33,7 +33,6 @@ import org.kodein.log.LoggerFactory
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
-import kotlin.time.seconds
 
 class AppScanController(
     loggerFactory: LoggerFactory,
@@ -389,7 +388,7 @@ class AppScanController(
         if (error != null) {
             model(Scan.Model.LnurlAuthFlow.LoginResult(auth = intent.auth, error = error))
         } else {
-            val pending = intent.minSuccessDelaySeconds.seconds - start.elapsedNow()
+            val pending = Duration.seconds(intent.minSuccessDelaySeconds) - start.elapsedNow()
             if (pending > Duration.ZERO) {
                 delay(pending)
             }

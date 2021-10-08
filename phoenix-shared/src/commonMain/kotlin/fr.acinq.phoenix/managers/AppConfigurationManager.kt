@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import kotlin.math.max
+import kotlin.math.*
 import kotlin.time.*
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
@@ -64,13 +64,13 @@ class AppConfigurationManager(
     private fun initWalletContext() = launch {
         val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
-        val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
+        val freshness = Duration.milliseconds(Clock.System.now().toEpochMilliseconds() - timestamp)
         logger.info { "local context was updated $freshness ago" }
 
         val timeout = if (freshness < Duration.hours(48)) {
             Duration.seconds(2)
         } else {
-            max(freshness.inDays.toInt(), 5) * Duration.seconds(2)
+            Duration.seconds(2) * max(freshness.inWholeDays.toInt(), 5)
         } // max=10s
 
         // TODO are we using TOR? -> increase timeout
@@ -109,13 +109,13 @@ class AppConfigurationManager(
 
     @OptIn(ExperimentalTime::class)
     private fun updateWalletContextLoop() = launch {
-        var pause = 0.5.seconds
+        var pause = Duration.seconds(0.5)
         while (isActive) {
-            pause = (pause * 2).coerceAtMost(5.minutes)
+            pause = (pause * 2).coerceAtMost(Duration.minutes(5))
             fetchAndStoreWalletContext()?.let {
                 val chainContext = it.export(chain)
                 _chainContext.value = chainContext
-                pause = 60.minutes
+                pause = Duration.minutes(60)
             }
             delay(pause)
         }
@@ -132,7 +132,7 @@ class AppConfigurationManager(
     }
 
     private val publicSuffixListKey = "publicSuffixList"
-    private val publicSuffixListDefaultRefresh = 30.days
+    private val publicSuffixListDefaultRefresh = Duration.days(30)
 
     public suspend fun fetchPublicSuffixList(
         refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
@@ -142,7 +142,7 @@ class AppConfigurationManager(
         }
         if (databaseRow != null) {
             val elapsed = currentTimestampMillis() - databaseRow.second
-            if (elapsed.milliseconds <= refreshIfOlderThan) {
+            if (Duration.milliseconds(elapsed) <= refreshIfOlderThan) {
                 return databaseRow
             }
         }
