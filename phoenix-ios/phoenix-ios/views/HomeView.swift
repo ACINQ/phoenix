@@ -247,7 +247,7 @@ struct HomeView : MVIView, ViewName {
 		log.trace("[\(viewName)] didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		let options = WalletPaymentFetchOptions.Companion().Descriptions
+		let options = WalletPaymentFetchOptions.companion.Descriptions
 		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 			
 			if let result = result {
@@ -286,7 +286,7 @@ struct HomeView : MVIView, ViewName {
 		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
 		
 		let paymentId = payment.walletPaymentId()
-		let options = WalletPaymentFetchOptions.Companion().Descriptions
+		let options = WalletPaymentFetchOptions.companion.Descriptions
 		phoenixBusiness.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
 			if selectedItem == nil {
@@ -342,7 +342,7 @@ struct HomeView : MVIView, ViewName {
 		let row = paymentsPage.rows[idx]
 		log.debug("[\(viewName)] Pre-fetching: \(row.identifiable)")
 
-		let options = WalletPaymentFetchOptions.Companion().Descriptions
+		let options = WalletPaymentFetchOptions.companion.Descriptions
 		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { _ in
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
@@ -511,7 +511,7 @@ fileprivate struct PaymentCell : View, ViewName {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
 		
-		let options = WalletPaymentFetchOptions.Companion().Descriptions
+		let options = WalletPaymentFetchOptions.companion.Descriptions
 		var result = phoenixBusiness.paymentsManager.getCachedPayment(row: row, options: options)
 		if let _ = result {
 			
@@ -644,7 +644,7 @@ fileprivate struct PaymentCell : View, ViewName {
 		
 		if fetched == nil || fetchedIsStale {
 			
-			let options = WalletPaymentFetchOptions.Companion().Descriptions
+			let options = WalletPaymentFetchOptions.companion.Descriptions
 			phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 				self.fetched = result
 			}

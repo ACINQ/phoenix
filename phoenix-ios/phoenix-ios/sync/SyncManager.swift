@@ -1015,7 +1015,7 @@ class SyncManager {
 						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
 						
 						let cleartext_kotlin = cleartext.toKotlinByteArray()
-						let wrapper = CloudData.Companion().cborDeserialize(blob: cleartext_kotlin)
+						let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
 						
 						if let wrapper = wrapper {
 							
@@ -1054,7 +1054,7 @@ class SyncManager {
 								let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
 								
 								let cleartext_kotlin = cleartext.toKotlinByteArray()
-								let row = CloudAsset.Companion().cloudDeserialize(blob: cleartext_kotlin)
+								let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
 								
 								metadata = row?.doCopyAndFreeze()
 								
@@ -1821,7 +1821,7 @@ class SyncManager {
 			return nil
 		}
 		
-		let cleartext = WalletPaymentMetadataRow.Companion().serialize(
+		let cleartext = WalletPaymentMetadataRow.companion.serialize(
 			pay: lnurlPay,
 			successAction: metadata.lnurl?.successAction
 		)

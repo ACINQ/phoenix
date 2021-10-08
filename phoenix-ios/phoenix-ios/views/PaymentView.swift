@@ -280,7 +280,7 @@ fileprivate struct SummaryView: View {
 		// We need to fetch all the metadata.
 		
 		let paymentId = paymentInfo.id()
-		let options = WalletPaymentFetchOptions.Companion().All
+		let options = WalletPaymentFetchOptions.companion.All
 		
 		AppDelegate.get().business.paymentsManager.getPayment(id: paymentId, options: options) {
 			(result: WalletPaymentInfo?, error: Error?) in
