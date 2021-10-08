@@ -56,7 +56,7 @@ class AppReceiveController(
                                 paymentPreimage = preimage,
                                 amount = intent.amount,
                                 description = intent.description,
-                                expirySeconds = 3600 * 24 * 7, // one week
+                                expirySeconds = (3600 * 24 * 7).toLong(), // one week
                                 result = deferred
                             )
                         )
