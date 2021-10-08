@@ -16,6 +16,20 @@ extension KotlinByteArray {
 	}
 }
 
+extension Bitcoin_kmpByteVector {
+	
+	func toSwiftData() -> Data {
+		
+		let size = self.size()
+		var data = Data(count: Int(size))
+		for idx in 0 ..< size {
+			let byte: Int8 = self.get(i: idx)
+			data[Int(idx)] = UInt8(bitPattern: byte)
+		}
+		return data
+	}
+}
+
 extension Data {
 	
 	func toKotlinByteArray() -> KotlinByteArray {

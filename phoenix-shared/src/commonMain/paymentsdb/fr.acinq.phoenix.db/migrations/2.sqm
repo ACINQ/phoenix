@@ -1,0 +1,22 @@
+-- Migration: v2 -> v3
+--
+-- Changes:
+-- * Added table payments_metadata
+
+import fr.acinq.phoenix.db.payments.LNUrlBase;
+import fr.acinq.phoenix.db.payments.LNUrlMetadata;
+import fr.acinq.phoenix.db.payments.LNUrlSuccessAction;
+
+CREATE TABLE IF NOT EXISTS payments_metadata (
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    lnurl_base_type TEXT AS LNUrlBase.TypeVersion,
+    lnurl_base_blob BLOB,
+    lnurl_description TEXT,
+    lnurl_metadata_type TEXT AS LNUrlMetadata.TypeVersion,
+    lnurl_metadata_blob BLOB,
+    lnurl_successAction_type TEXT AS LNUrlSuccessAction.TypeVersion,
+    lnurl_successAction_blob BLOB,
+    user_description TEXT,
+    PRIMARY KEY (type, id)
+);

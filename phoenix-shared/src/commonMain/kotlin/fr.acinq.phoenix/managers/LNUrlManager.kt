@@ -18,11 +18,14 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.utils.PublicSuffixList
 import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -30,18 +33,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 class LNUrlManager(
     loggerFactory: LoggerFactory,
-    private val httpClient: HttpClient,
     private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
+    // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
+    private val httpClient: HttpClient by lazy {
+        HttpClient {
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                })
+                expectSuccess = false
+            }
+        }
+    }
+
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
-        httpClient = business.httpClient,
         walletManager = business.walletManager
     )
 
@@ -97,8 +111,66 @@ class LNUrlManager(
      * into an actionable LNUrl object.
      */
     suspend fun continueLnUrl(url: Url): LNUrl {
-        val json = LNUrl.handleLNUrlResponse(httpClient.get(url))
-        return LNUrl.parseLNUrlMetadata(json)
+        val response: HttpResponse = try {
+            httpClient.get(url)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
+        }
+        val json = LNUrl.handleLNUrlResponse(response)
+        return LNUrl.parseLNUrlResponse(url, json)
+    }
+
+    /**
+     * May throw errors of type:
+     * - LNUrl.Error.RemoteFailure
+     * - LNUrl.Error.PayInvoice
+     */
+    suspend fun requestPayInvoice(
+        lnurlPay: LNUrl.Pay,
+        amount: MilliSatoshi,
+        comment: String?
+    ): LNUrl.PayInvoice {
+        val builder = URLBuilder(lnurlPay.callback)
+        builder.parameters.append(name = "amount", value = amount.msat.toString())
+        if (comment != null && comment.isNotEmpty()) {
+            builder.parameters.append(name = "comment", value = comment)
+        }
+        val callback = builder.build()
+        val origin = callback.host
+
+        val response: HttpResponse = try {
+            httpClient.get(callback)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin)
+        }
+
+        // may throw: LNUrl.Error.RemoteFailure
+        val json = LNUrl.handleLNUrlResponse(response)
+
+        // may throw: LNUrl.Error.PayInvoice
+        val invoice = LNUrl.parseLNUrlPayResponse(origin, json)
+
+        // From the [spec](https://github.com/fiatjaf/lnurl-rfc/blob/luds/06.md):
+        //
+        // - LN WALLET Verifies that h tag in provided invoice is a hash of
+        //   metadata string converted to byte array in UTF-8 encoding.
+        //
+        // Note: h tag == descriptionHash
+
+        val expectedHash = Crypto.sha256(lnurlPay.metadata.raw.encodeToByteArray())
+        val actualHash = invoice.paymentRequest.descriptionHash?.toByteArray()
+        if (!expectedHash.contentEquals(actualHash)) {
+            throw LNUrl.Error.PayInvoice.InvalidHash(origin)
+        }
+
+        // - LN WALLET Verifies that amount in provided invoice equals an
+        //   amount previously specified by user.
+
+        if (amount != invoice.paymentRequest.amount) {
+            throw LNUrl.Error.PayInvoice.InvalidAmount(origin)
+        }
+
+        return invoice
     }
 
     suspend fun requestAuth(auth: LNUrl.Auth, publicSuffixList: PublicSuffixList) {
@@ -118,10 +190,6 @@ class LNUrlManager(
 
         val response: HttpResponse = try {
             httpClient.get(url)
-        } catch (sre: io.ktor.client.features.ServerResponseException) {
-            // ktor throws an exception when we get a non-200 response from the server.
-            // That's not what we want. We'd like to handle the JSON error ourselves.
-            sre.response
         } catch (t: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }

@@ -16,9 +16,11 @@ class LNUrlWithdrawTest {
     private val defaultDesc = "Lorem ipsum dolor sit amet"
     private val defaultMin = 4000.msat
     private val defaultMax = 16000.msat
+    private val defaultLnurl = URLBuilder("https://lnurl.fiatjaf.com/foobar").build()
     private val defaultCallback = URLBuilder("https://lnurl.fiatjaf.com/lnurl-withdraw/callback/6e667d407298a7381f4bb02b228e72b3b86c0666b0662f751d089e30bd729b18").build()
     private val defaultK1 = "36352c79b25544ce2cb8b7fccaaf591ed00ad42989614aafcc569ba3d384b1bb"
     private val defaultWithdraw = LNUrl.Withdraw(
+        lnurl = defaultLnurl,
         callback = defaultCallback,
         walletIdentifier = defaultK1,
         description = defaultDesc,
@@ -26,7 +28,7 @@ class LNUrlWithdrawTest {
         maxWithdrawable = defaultMax,
     )
 
-    private fun makeMetadata(
+    private fun makeJson(
         tag: String? = "withdrawRequest",
         k1: String? = defaultK1,
         callback: String? = defaultCallback.toString(),
@@ -45,27 +47,27 @@ class LNUrlWithdrawTest {
     }
 
     @Test
-    fun testMetadata_ok() {
-        val url = LNUrl.parseLNUrlMetadata(makeMetadata())
+    fun testJson_ok() {
+        val url = LNUrl.parseLNUrlResponse(defaultLnurl, makeJson())
         assertTrue { url is LNUrl.Withdraw }
         assertEquals(defaultWithdraw, url)
     }
 
     @Test
-    fun testMetadata_callback_unsafe() {
+    fun testJson_callback_unsafe() {
         assertFailsWith(LNUrl.Error.UnsafeCallback::class) {
-            LNUrl.parseLNUrlMetadata(
-                makeMetadata(callback = "http://lnurl.fiatjaf.com/lnurl-withdraw/callback/6e667d407298a7381")
+            val json = makeJson(
+                callback = "http://lnurl.fiatjaf.com/lnurl-withdraw/callback/6e667d407298a7381"
             )
+            LNUrl.parseLNUrlResponse(defaultLnurl, json)
         }
     }
 
     @Test
-    fun testMetadata_callback_missing() {
+    fun testJson_callback_missing() {
         assertFailsWith(LNUrl.Error.MissingCallback::class) {
-            LNUrl.parseLNUrlMetadata(
-                makeMetadata(callback = null)
-            )
+            val json = makeJson(callback = null)
+            LNUrl.parseLNUrlResponse(defaultLnurl, json)
         }
     }
 }

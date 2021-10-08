@@ -58,7 +58,7 @@ fun SendView(request: PaymentRequest?) {
                     icon = R.drawable.ic_send,
                     onClick = {
                         if (request != null) {
-                            postIntent(Scan.Intent.Send(request, amount))
+                            postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, amount))
                             nc.navigate(Screen.Home)
                         }
                     })

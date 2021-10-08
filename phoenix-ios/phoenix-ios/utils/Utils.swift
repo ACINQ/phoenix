@@ -3,10 +3,10 @@ import PhoenixShared
 
 class Utils {
 	
-	private static let Millisatoshis_Per_Satoshi      =           1_000.0
-	private static let Millisatoshis_Per_Bit          =         100_000.0
-	private static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
-	private static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
+	public static let Millisatoshis_Per_Satoshi      =           1_000.0
+	public static let Millisatoshis_Per_Bit          =         100_000.0
+	public static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
+	public static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
 	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
 	///
@@ -33,6 +33,10 @@ class Utils {
 		} else {
 			return (msat > 0) ? Int64.max : Int64.min
 		}
+	}
+	
+	static func convertBitcoin(msat: Lightning_kmpMilliSatoshi, bitcoinUnit: BitcoinUnit) -> Double {
+		return convertBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit)
 	}
 	
 	static func convertBitcoin(msat: Int64, bitcoinUnit: BitcoinUnit) -> Double {
@@ -102,14 +106,19 @@ class Utils {
 			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: selectedFiat) {
 				return formatFiat(msat: msat, exchangeRate: exchangeRate)
 			} else {
-				let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
-				return FormattedAmount(
-					currency: Currency.fiat(selectedFiat),
-					digits: "?\(decimalSeparator)??",
-					decimalSeparator: decimalSeparator
-				)
+				return unknownFiatAmount(fiatCurrency: selectedFiat)
 			}
 		}
+	}
+	
+	static func unknownFiatAmount(fiatCurrency: FiatCurrency) -> FormattedAmount {
+		
+		let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
+		return FormattedAmount(
+			currency: Currency.fiat(fiatCurrency),
+			digits: "?\(decimalSeparator)??",
+			decimalSeparator: decimalSeparator
+		)
 	}
 	
 	/// Returns a formatter that's appropriate for the given BitcoinUnit & configuration.

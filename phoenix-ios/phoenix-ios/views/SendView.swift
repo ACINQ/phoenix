@@ -1,10 +1,11 @@
 import SwiftUI
+import Combine
 import AVFoundation
 import PhoenixShared
 import UIKit
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "SendView"
@@ -12,6 +13,43 @@ fileprivate var log = Logger(
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
+
+extension Scan {
+	typealias Model_Ready = ModelReady
+	typealias Model_BadRequest = ModelBadRequest
+	
+	typealias Model_InvoiceFlow_DangerousRequest = ModelInvoiceFlowDangerousRequest
+	typealias Model_InvoiceFlow_InvoiceRequest = ModelInvoiceFlowInvoiceRequest
+	typealias Model_InvoiceFlow_Sending = ModelInvoiceFlowSending
+	
+	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
+	
+	typealias Model_LnurlPayFlow_LnurlPayRequest = ModelLnurlPayFlowLnurlPayRequest
+	typealias Model_LnurlPayFlow_LnUrlPayFetch = ModelLnurlPayFlowLnUrlPayFetch
+	typealias Model_LnurlPayFlow_Sending = ModelLnurlPayFlowSending
+	
+	typealias Model_LnurlAuthFlow_LoginRequest = ModelLnurlAuthFlowLoginRequest
+	typealias Model_LnurlAuthFlow_LoggingIn = ModelLnurlAuthFlowLoggingIn
+	typealias Model_LnurlAuthFlow_LoginResult = ModelLnurlAuthFlowLoginResult
+	
+	typealias Intent_Parse = IntentParse
+	
+	typealias Intent_InvoiceFlow_ConfirmDangerousRequest = IntentInvoiceFlowConfirmDangerousRequest
+	typealias Intent_InvoiceFlow_SendInvoicePayment = IntentInvoiceFlowSendInvoicePayment
+	
+	typealias Intent_CancelLnurlServiceFetch = IntentCancelLnurlServiceFetch
+	
+	typealias Intent_LnurlPayFlow_SendLnurlPayment = IntentLnurlPayFlowSendLnurlPayment
+	typealias Intent_LnurlPayFlow_CancelLnurlPayment = IntentLnurlPayFlowCancelLnurlPayment
+	
+	typealias Intent_LnurlAuthFlow_Login = IntentLnurlAuthFlowLogin
+	
+	typealias LNUrlPay_Error_RemoteError = LNUrlPayErrorRemoteError
+	typealias LNUrlPay_Error_BadResponseError = LNUrlPayErrorBadResponseError
+	typealias LNUrlPay_Error_ChainMismatch = LNUrlPayErrorChainMismatch
+	typealias LNUrlPay_Error_AlreadyPaidInvoice = LNUrlPayErrorAlreadyPaidInvoice
+}
+
 
 struct SendView: MVIView {
 	
@@ -31,7 +69,7 @@ struct SendView: MVIView {
 	init(firstModel: Scan.Model? = nil) {
 		
 		self._mvi = StateObject.init(wrappedValue: MVIState.init {
-			$0.scan(firstModel: firstModel ?? Scan.ModelReady())
+			$0.scan(firstModel: firstModel ?? Scan.Model_Ready())
 		})
 	}
 	
@@ -39,39 +77,26 @@ struct SendView: MVIView {
 	var view: some View {
 		
 		ZStack {
-			main
+			content
 			toast.view()
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.onChange(of: mvi.model, perform: { newModel in
-
-			if let newModel = newModel as? Scan.ModelBadRequest {
-				showErrorToast(newModel)
-			}
-			else if let model = newModel as? Scan.ModelDangerousRequest {
-				paymentRequest = model.request
-				isWarningDisplayed = true
-			}
-			else if let model = newModel as? Scan.ModelValidateRequest {
-				paymentRequest = model.request
-			}
-			else if newModel is Scan.ModelSending {
-				// Pop self from NavigationStack; Back to HomeView
-				presentationMode.wrappedValue.dismiss()
-			}
-		})
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher, perform: { (url: URL) in
+		.onChange(of: mvi.model) { newModel in
+			modelDidChange(newModel)
+		}
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
 			didReceiveExternalLightningUrl(url)
-		})
+		}
 	}
 
 	@ViewBuilder
-	var main: some View {
+	var content: some View {
 		
 		switch mvi.model {
-		case _ as Scan.ModelReady,
-		     _ as Scan.ModelBadRequest,
-		     _ as Scan.ModelDangerousRequest:
+		case _ as Scan.Model_Ready,
+		     _ as Scan.Model_BadRequest,
+		     _ as Scan.Model_InvoiceFlow_DangerousRequest,
+		     _ as Scan.Model_LnurlServiceFetch:
 
 			ScanView(
 				mvi: mvi,
@@ -79,23 +104,50 @@ struct SendView: MVIView {
 				isWarningDisplayed: $isWarningDisplayed
 			)
 
-		case let model as Scan.ModelValidateRequest:
-			ValidateView(model: model, postIntent: mvi.intent)
+		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
+		     _ as Scan.Model_LnurlPayFlow_LnurlPayRequest,
+		     _ as Scan.Model_LnurlPayFlow_LnUrlPayFetch:
 
-		case let model as Scan.ModelSending:
-			SendingView(model: model)
+			ValidateView(mvi: mvi)
 
-		case _ as Scan.ModelLoginRequest,
-		     _ as Scan.ModelLoggingIn,
-		     _ as Scan.ModelLoginResult:
+		case _ as Scan.Model_InvoiceFlow_Sending,
+		     _ as Scan.Model_LnurlPayFlow_Sending:
+
+			SendingView(mvi: mvi)
+
+		case _ as Scan.Model_LnurlAuthFlow_LoginRequest,
+		     _ as Scan.Model_LnurlAuthFlow_LoggingIn,
+		     _ as Scan.Model_LnurlAuthFlow_LoginResult:
+
 			LoginView(mvi: mvi)
-			
+
 		default:
 			fatalError("Unknown model \(mvi.model)")
 		}
 	}
 	
-	func showErrorToast(_ model: Scan.ModelBadRequest) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) -> Void {
+		log.trace("modelDidChange()")
+		
+		if let newModel = newModel as? Scan.Model_BadRequest {
+			showErrorToast(newModel)
+		}
+		else if let model = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
+			paymentRequest = model.request
+			isWarningDisplayed = true
+		}
+		else if let model = newModel as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			paymentRequest = model.request
+		}
+		else if newModel is Scan.Model_InvoiceFlow_Sending ||
+		        newModel is Scan.Model_LnurlPayFlow_Sending
+		{
+			// Pop self from NavigationStack; Back to HomeView
+			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	func showErrorToast(_ model: Scan.Model_BadRequest) -> Void {
 		log.trace("showErrorToast()")
 		
 		let msg: String
@@ -151,7 +203,7 @@ struct SendView: MVIView {
 	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		mvi.intent(Scan.IntentParse(request: url.absoluteString))
+		mvi.intent(Scan.Intent_Parse(request: url.absoluteString))
 	}
 }
 
@@ -185,6 +237,7 @@ struct ScanView: View, ViewName {
 	// - library sends us ModelValidate
 	// - library sends us ModelRequestWithoutAmount
 
+	@ViewBuilder
 	var body: some View {
 		
 		ZStack {
@@ -198,22 +251,7 @@ struct ScanView: View, ViewName {
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
 			
-			VStack {
-				
-				QrCodeScannerView {(request: String) in
-					didScanQRCode(request)
-				}
-				
-				Button {
-					pasteFromClipboard()
-				} label: {
-					Image(systemName: "arrow.right.doc.on.clipboard")
-					Text("Paste from clipboard")
-						.font(.title2)
-				}
-				.disabled(!UIPasteboard.general.hasStrings)
-				.padding([.top, .bottom])
-			}
+			content
 		}
 		.frame(maxHeight: .infinity)
 		.navigationBarTitle(
@@ -234,25 +272,67 @@ struct ScanView: View, ViewName {
 		}
 	}
 	
-	func didScanQRCode(_ request: String) -> Void {
+	@ViewBuilder
+	var content: some View {
 		
-		if !isWarningDisplayed && !ignoreScanner {
-			mvi.intent(Scan.IntentParse(request: request))
+		ZStack {
+			
+			VStack {
+				
+				QrCodeScannerView {(request: String) in
+					didScanQRCode(request)
+				}
+				
+				Button {
+					pasteFromClipboard()
+				} label: {
+					Image(systemName: "arrow.right.doc.on.clipboard")
+					Text("Paste from clipboard")
+						.font(.title2)
+				}
+				.disabled(!UIPasteboard.general.hasStrings)
+				.padding([.top, .bottom])
+			}
+			
+			if mvi.model is Scan.Model_LnurlServiceFetch {
+				LnurlFetchNotice(
+					title: NSLocalizedString("Fetching Lightning URL", comment: "Progress title"),
+					onCancel: { didCancelLnurlServiceFetch() }
+				)
+			}
 		}
 	}
 	
-	func pasteFromClipboard() -> Void {
+	func didScanQRCode(_ request: String) {
+		
+		var isFetchingLnurl = false
+		if let _ = mvi.model as? Scan.Model_LnurlServiceFetch {
+			isFetchingLnurl = true
+		}
+		
+		if !ignoreScanner && !isWarningDisplayed && !isFetchingLnurl {
+			mvi.intent(Scan.Intent_Parse(request: request))
+		}
+	}
+	
+	func didCancelLnurlServiceFetch() {
+		log.trace("[\(viewName)] didCancelLnurlServiceFetch()")
+		
+		mvi.intent(Scan.Intent_CancelLnurlServiceFetch())
+	}
+	
+	func pasteFromClipboard() {
 		log.trace("[\(viewName)] pasteFromClipboard()")
 		
 		if let request = UIPasteboard.general.string {
-			mvi.intent(Scan.IntentParse(request: request))
+			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 	}
 	
-	func showWarning() -> Void {
+	func showWarning() {
 		log.trace("[\(viewName)] showWarning()")
 		
-		guard let model = mvi.model as? Scan.ModelDangerousRequest else {
+		guard let model = mvi.model as? Scan.Model_InvoiceFlow_DangerousRequest else {
 			return
 		}
 		
@@ -261,7 +341,7 @@ struct ScanView: View, ViewName {
 			
 			DangerousInvoiceAlert(
 				model: model,
-				postIntent: mvi.intent,
+				intent: mvi.intent,
 				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
 			)
@@ -269,16 +349,51 @@ struct ScanView: View, ViewName {
 	}
 }
 
+struct LnurlFetchNotice: View, ViewName {
+	
+	let title: String
+	let onCancel: () -> Void
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 8) {
+			Text(title)
+			
+			ZStack {
+				Divider()
+				HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
+			}
+			.frame(width: 125, height: 10)
+			
+			Button {
+				didTapCancel()
+			} label: {
+				Text("Cancel")
+			}
+		}
+		.padding()
+		.background(Color(UIColor.systemBackground))
+		.cornerRadius(16)
+	}
+	
+	func didTapCancel() {
+		log.trace("[\(viewName)] didTapCancel()")
+		onCancel()
+	}
+}
+
 struct DangerousInvoiceAlert : View, ViewName {
 
-	let model: Scan.ModelDangerousRequest
-	let postIntent: (Scan.Intent) -> Void
+	let model: Scan.Model_InvoiceFlow_DangerousRequest
+	let intent: (Scan.Intent) -> Void
 
 	@Binding var isShowing: Bool
 	@Binding var ignoreScanner: Bool
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
+	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -377,7 +492,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 		log.trace("[\(viewName)] didConfirm()")
 		
 		isShowing = false
-		postIntent(Scan.IntentConfirmDangerousRequest(
+		intent(Scan.Intent_InvoiceFlow_ConfirmDangerousRequest(
 			request: model.request,
 			paymentRequest: model.paymentRequest
 		))
@@ -387,10 +502,7 @@ struct DangerousInvoiceAlert : View, ViewName {
 
 struct ValidateView: View, ViewName {
 	
-	let model: Scan.ModelValidateRequest
-	let postIntent: (Scan.Intent) -> Void
-
-	@State var number: Double = 0.0
+	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@State var unit = Currency.bitcoin(.sat)
 	@State var amount: String = ""
@@ -400,10 +512,14 @@ struct ValidateView: View, ViewName {
 	@State var isInvalidAmount: Bool = false
 	@State var isExpiredInvoice: Bool = false
 	
+	@State var comment: String = ""
+	@State var hasPromptedForComment = false
+	
 	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.colorScheme) var colorScheme
 	@Environment(\.popoverState) var popoverState: PopoverState
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -431,7 +547,6 @@ struct ValidateView: View, ViewName {
 	
 	var body: some View {
 		
-		let isDisconnected = connectionsManager.connections.global != .established
 		ZStack {
 		
 			Color.primaryBackground
@@ -453,85 +568,14 @@ struct ValidateView: View, ViewName {
 					}
 			}
 			
-			VStack {
-		
-				HStack(alignment: .firstTextBaseline) {
-					TextField(verbatim: "123", text: currencyStyler().amountProxy)
-						.keyboardType(.decimalPad)
-						.disableAutocorrection(true)
-						.fixedSize()
-						.font(.title)
-						.multilineTextAlignment(.trailing)
-						.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
-				
-					Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
-						let options = Currency.displayable(currencyPrefs: currencyPrefs)
-						ForEach(0 ..< options.count) {
-							let option = options[$0]
-							Text(option.abbrev).tag(option)
-						}
-					}
-					.pickerStyle(MenuPickerStyle())
-	
-				} // </HStack>
-				.padding([.leading, .trailing])
-				.background(
-					VStack {
-						Spacer()
-						Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, dash: [3]))
-							.frame(height: 1)
-					}
-				)
-				
-				Text(altAmount)
-					.font(.caption)
-					.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appNegative : .secondary)
-					.padding(.top, 4)
-				
-				Text(model.requestDescription ?? "")
-					.padding()
-					.padding([.top, .bottom])
-				
-				Button {
-					sendPayment()
-				} label: {
-					HStack {
-						Image("ic_send")
-							.renderingMode(.template)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.foregroundColor(Color.white)
-							.frame(width: 22, height: 22)
-						Text("Pay")
-							.font(.title2)
-							.foregroundColor(Color.white)
-					}
-					.padding(.top, 4)
-					.padding(.bottom, 5)
-					.padding([.leading, .trailing], 24)
-				}
-				.buttonStyle(ScaleButtonStyle(
-					backgroundFill: Color.appAccent,
-					disabledBackgroundFill: Color.gray
-				))
-				.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)
+			content
 			
-				if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
-					
-					Button {
-						showAppStatusPopover()
-					} label: {
-						HStack {
-							ProgressView()
-								.progressViewStyle(CircularProgressViewStyle())
-								.padding(.trailing, 1)
-							Text(disconnectedText())
-						}
-					}
-					.padding(.top, 4)
-				}
-				
-			} // </VStack>
+			if mvi.model is Scan.Model_LnurlPayFlow_LnUrlPayFetch {
+				LnurlFetchNotice(
+					title: NSLocalizedString("Fetching Invoice", comment: "Progress title"),
+					onCancel: { didCancelLnurlPayFetch() }
+				)
+			}
 			
 		}// </ZStack>
 		.navigationBarTitle(
@@ -539,9 +583,17 @@ struct ValidateView: View, ViewName {
 			displayMode: .inline
 		)
 		.zIndex(1) // [SendingView, ValidateView, LoginView, ScanView]
-		.transition(.asymmetric(insertion: .identity, removal: .opacity))
+		.transition(
+			.asymmetric(
+				insertion: .identity,
+				removal: .opacity
+			)
+		)
 		.onAppear() {
 			onAppear()
+		}
+		.onChange(of: mvi.model) { newModel in
+			modelDidChange(newModel)
 		}
 		.onChange(of: amount) { _ in
 			amountDidChange()
@@ -551,20 +603,317 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
+	@ViewBuilder
+	var content: some View {
+	
+		let isDisconnected = connectionsManager.connections.global != .established
+		VStack {
+	
+			if let host = paymentRequestHost() {
+				VStack(alignment: HorizontalAlignment.center, spacing: 10) {
+					Text("Payment requested by")
+					Text(host).bold()
+				}
+				.padding(.bottom)
+				.padding(.bottom)
+			}
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline) {
+				TextField(verbatim: "123", text: currencyStyler().amountProxy)
+					.keyboardType(.decimalPad)
+					.disableAutocorrection(true)
+					.fixedSize()
+					.font(.title)
+					.multilineTextAlignment(.trailing)
+					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+			
+				Picker(selection: $unit, label: Text(unit.abbrev).frame(minWidth: 40)) {
+					let options = Currency.displayable(currencyPrefs: currencyPrefs)
+					ForEach(0 ..< options.count) {
+						let option = options[$0]
+						Text(option.abbrev).tag(option)
+					}
+				}
+				.pickerStyle(MenuPickerStyle())
+
+			} // </HStack>
+			.padding([.leading, .trailing])
+			.background(
+				VStack {
+					Spacer()
+					Line().stroke(Color.appAccent, style: StrokeStyle(lineWidth: 2, dash: [3]))
+						.frame(height: 1)
+				}
+			)
+			
+			Text(altAmount)
+				.font(.caption)
+				.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appNegative : .secondary)
+				.padding(.top, 4)
+				.padding(.bottom)
+			
+			if isLnurlPayRequest() {
+				HStack(alignment: VerticalAlignment.center, spacing: 20) {
+					if hasExtendedMetadata() {
+						metadataButton()
+					}
+					priceTargetButton()
+					if supportsComment() {
+						commentButton()
+					}
+				}
+				.padding(.horizontal)
+			}
+			
+			if let description = requestDescription() {
+				Text(description)
+					.padding()
+					.padding(.bottom)
+			} else {
+				Text("No description")
+					.foregroundColor(.secondary)
+					.padding()
+					.padding(.bottom)
+			}
+			
+			Button {
+				sendPayment()
+			} label: {
+				HStack {
+					Image("ic_send")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.foregroundColor(Color.white)
+						.frame(width: 22, height: 22)
+					Text("Pay")
+						.font(.title2)
+						.foregroundColor(Color.white)
+				}
+				.padding(.top, 4)
+				.padding(.bottom, 5)
+				.padding([.leading, .trailing], 24)
+			}
+			.buttonStyle(ScaleButtonStyle(
+				backgroundFill: Color.appAccent,
+				disabledBackgroundFill: Color.gray
+			))
+			.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)
+		
+			if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
+				
+				Button {
+					showAppStatusPopover()
+				} label: {
+					HStack {
+						ProgressView()
+							.progressViewStyle(CircularProgressViewStyle())
+							.padding(.trailing, 1)
+						Text(disconnectedText())
+					}
+				}
+				.padding(.top, 4)
+			}
+			
+		} // </VStack>
+	}
+	
+	@ViewBuilder
+	func actionButton(
+		image: Image,
+		width: CGFloat = 20,
+		height: CGFloat = 20,
+		xOffset: CGFloat = 0,
+		yOffset: CGFloat = 0,
+		action: @escaping () -> Void
+	) -> some View {
+		
+		Button(action: action) {
+			ZStack {
+				Color.buttonFill
+					.frame(width: 30, height: 30)
+					.cornerRadius(50)
+					.overlay(
+						RoundedRectangle(cornerRadius: 50)
+							.stroke(Color(UIColor.separator), lineWidth: 1)
+					)
+				
+				image
+					.renderingMode(.template)
+					.resizable()
+					.scaledToFit()
+					.frame(width: width, height: height)
+					.offset(x: xOffset, y: yOffset)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func metadataButton() -> some View {
+		
+		actionButton(
+			image: Image(systemName: "info.circle"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0
+		) {
+			metadataButtonTapped()
+		}
+	}
+	
+	@ViewBuilder
+	func priceTargetButton() -> some View {
+		
+		let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest
+		let minMsat = model?.lnurlPay.minSendable.msat ?? 0
+		let maxMsat = model?.lnurlPay.maxSendable.msat ?? 0
+		let isRange = maxMsat > minMsat
+		
+		actionButton(
+			image: Image(systemName: isRange ? "target" : "asterisk.circle"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0
+		) {
+			priceTargetButtonTapped()
+		}
+	}
+	
+	@ViewBuilder
+	func commentButton() -> some View {
+		
+		actionButton(
+			image: Image(systemName: "pencil.tip"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0
+		) {
+			commentButtonTapped()
+		}
+	}
+	
+	func lnurlPay() -> LNUrl.Pay? {
+		
+		if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+			return model.lnurlPay
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnUrlPayFetch {
+			return model.lnurlPay
+		} else {
+			return nil
+		}
+	}
+	
+	func paymentRequestHost() -> String? {
+		
+		if let lnurlPay = lnurlPay() {
+			return lnurlPay.lnurl.host
+		} else {
+			return nil
+		}
+	}
+	
+	func requestDescription() -> String? {
+		
+		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			return model.paymentRequest.desc()
+		} else if let lnurlPay = lnurlPay() {
+			return lnurlPay.metadata.plainText
+		} else {
+			return nil
+		}
+	}
+	
+	func isLnurlPayRequest() -> Bool {
+		
+		return mvi.model is Scan.Model_LnurlPayFlow_LnurlPayRequest ||
+		       mvi.model is Scan.Model_LnurlPayFlow_LnUrlPayFetch
+	}
+	
+	func hasExtendedMetadata() -> Bool {
+		
+		guard let lnurlPay = lnurlPay() else {
+			return false
+		}
+		
+		if lnurlPay.metadata.longDesc != nil {
+			return true
+		}
+		if lnurlPay.metadata.imagePng != nil {
+			return true
+		}
+		if lnurlPay.metadata.imageJpg != nil {
+			return true
+		}
+		
+		return false
+	}
+	
+	func supportsComment() -> Bool {
+		
+		guard let lnurlPay = lnurlPay() else {
+			return false
+		}
+		
+		let maxCommentLength = lnurlPay.maxCommentLength?.int64Value ?? 0
+		return maxCommentLength > 0
+	}
+	
+	func supportsPriceRange() -> Bool {
+		
+		guard let lnurlPay = lnurlPay() else {
+			return false
+		}
+
+		let min = lnurlPay.minSendable.msat
+		let max = lnurlPay.maxSendable.msat
+		return max > min
+	}
+	
+	func balanceMsat() -> Int64? {
+		
+		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			return model.balanceMsat
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+			return model.balanceMsat
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnUrlPayFetch {
+			return model.balanceMsat
+		} else {
+			return nil
+		}
+	}
+	
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
 		unit = Currency.bitcoin(bitcoinUnit)
 		
-		if let msat_kotlin = model.amountMsat {
-			let msat = Int64(truncating: msat_kotlin)
+		var amount_msat: Lightning_kmpMilliSatoshi? = nil
+		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			amount_msat = model.paymentRequest.amount
+		} else if let lnurlPay = lnurlPay() {
+			amount_msat = lnurlPay.minSendable
+		}
+		
+		if let amount_msat = amount_msat {
 			
-			let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-			let formattedAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
+			let targetAmt = Utils.convertBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit)
+			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
 			
 			parsedAmount = Result.success(targetAmt) // do this first !
 			amount = formattedAmt.digits
+		} else {
+			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
+			isInvalidAmount = false // display in gray at very beginning
+		}
+	}
+	
+	func modelDidChange(_ newModel: Scan.Model) -> Void {
+		log.trace("[\(viewName)] modelDidChange()")
+		
+		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest,
+		   let error = model.error
+		{
+			popoverState.display(dismissable: true) {
+				LnurlPayErrorNotice(error: error)
+			}
 		}
 	}
 	
@@ -622,9 +971,9 @@ struct ValidateView: View, ViewName {
 				// amt    => bitcoinUnit
 				// altAmt => fiatCurrency
 				
+				msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+				
 				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-					
-					msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
 					alt = Utils.formatFiat(msat: msat!, exchangeRate: exchangeRate)
 					
 				} else {
@@ -647,18 +996,21 @@ struct ValidateView: View, ViewName {
 				}
 			}
 			
-			if let msat = msat, let alt = alt {
-				if msat > model.balanceMsat {
+			if let msat = msat {
+				
+				let balanceMsat = balanceMsat() ?? 0
+				if msat > balanceMsat {
 					isInvalidAmount = true
 					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
 					
-				} else {
+				} else if let alt = alt {
 					altAmount = "≈ \(alt.string)"
 				}
 			}
 			
-			if let expiryTimestamp = model.expiryTimestamp?.doubleValue,
-			   Date(timeIntervalSince1970: expiryTimestamp) <= Date()
+			if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest,
+			   let expiryTimestampSeconds = model.paymentRequest.expiryTimestampSeconds()?.doubleValue,
+			   Date(timeIntervalSince1970: expiryTimestampSeconds) <= Date()
 			{
 				isExpiredInvoice = true
 				if !isInvalidAmount {
@@ -668,41 +1020,278 @@ struct ValidateView: View, ViewName {
 				isExpiredInvoice = false
 			}
 			
+			if !isInvalidAmount,
+			   let msat = msat,
+			   let lnurlPay = lnurlPay()
+			{
+				let minMsat = lnurlPay.minSendable.msat
+				let maxMsat = lnurlPay.maxSendable.msat
+				
+				let isRange = maxMsat > minMsat
+				
+				var bitcoinUnit: BitcoinUnit
+				if case .bitcoin(let unit) = unit {
+					bitcoinUnit = unit
+				} else {
+					bitcoinUnit = currencyPrefs.bitcoinUnit
+				}
+				
+				// Since amounts are specified in bitcoin, there are challenges surrounding fiat conversion.
+				// The min/max amounts in bitcoin may not properly round to fiat amounts.
+				// Which could lead to weird UI issues such as:
+				// - User types in 0.01 USD
+				// - Max amount is 20 sats, which converts to less than 0.01 USD
+				// - Error message says: Amount must be at most 0.01 USD
+				//
+				// So we should instead display error messages using exact BTC amounts.
+				// And render fiat conversions as approximate.
+				
+				if !isRange && msat != minMsat { // amount must be exact
+					isInvalidAmount = true
+					
+					let exactBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
+					
+					if case .fiat(let fiatCurrency) = unit,
+						let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+					{
+						let approxFiat = Utils.formatFiat(msat: minMsat, exchangeRate: exchangeRate)
+						altAmount = NSLocalizedString(
+							"Amount must be \(exactBitcoin.string) (≈ \(approxFiat.string))",
+							comment: "error message"
+						)
+					} else {
+						altAmount = NSLocalizedString(
+							"Amount must be \(exactBitcoin.string)",
+							comment: "error message"
+						)
+					}
+					
+				} else if msat < minMsat { // amount is too low
+					isInvalidAmount = true
+					
+					let minBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
+					
+					if case .fiat(let fiatCurrency) = unit,
+						let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+					{
+						let approxFiat = Utils.formatFiat(msat: minMsat, exchangeRate: exchangeRate)
+						altAmount = NSLocalizedString(
+							"Amount must be at least \(minBitcoin.string) (≈ \(approxFiat.string))",
+							comment: "error message"
+						)
+					} else {
+						altAmount = NSLocalizedString(
+							"Amount must be at least \(minBitcoin.string)",
+							comment: "error message"
+						)
+					}
+					
+				} else if msat > maxMsat { // amount is too high
+					isInvalidAmount = true
+					
+					let maxBitcoin = Utils.formatBitcoin(msat: maxMsat, bitcoinUnit: bitcoinUnit)
+					
+					if case .fiat(let fiatCurrency) = unit,
+						let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency)
+					{
+						let approxFiat = Utils.formatFiat(msat: maxMsat, exchangeRate: exchangeRate)
+						altAmount = NSLocalizedString(
+							"Amount must be at most \(maxBitcoin.string) (≈ \(approxFiat.string))",
+							comment: "error message"
+						)
+					} else {
+						altAmount = NSLocalizedString(
+							"Amount must be at most \(maxBitcoin.string)",
+							comment: "error message"
+						)
+					}
+				}
+			}
+			
 		} // </switch parsedAmount>
 	}
 	
-	func sendPayment() -> Void {
+	func metadataButtonTapped() {
+		log.trace("[\(viewName)] metadataButtonTapped()")
+		
+		guard let lnurlPay = lnurlPay() else {
+			return
+		}
+		
+		dismissKeyboardIfVisible()
+		shortSheetState.display(dismissable: true) {
+		
+			MetadataSheet(lnurlPay: lnurlPay)
+		}
+	}
+	
+	func priceTargetButtonTapped() {
+		log.trace("[\(viewName)] priceTargetButtonTapped()")
+		
+		guard let lnurlPay = lnurlPay() else {
+			return
+		}
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let maxMsat = lnurlPay.maxSendable.msat
+		
+		var msat = minMsat
+		if let amt = try? parsedAmount.get(), amt > 0 {
+			
+			switch unit {
+			case .bitcoin(let bitcoinUnit):
+				msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+				
+			case .fiat(let fiatCurrency):
+				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+					msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+				}
+			}
+		}
+		
+		let isRange = maxMsat > minMsat
+		if isRange {
+			
+			// A range of valid amounts are possible.
+			// Show the PriceSliderSheet.
+			
+			if msat < minMsat {
+				msat = minMsat
+			} else if msat > maxMsat {
+				msat = maxMsat
+			}
+			
+			dismissKeyboardIfVisible()
+			shortSheetState.display(dismissable: true) {
+				
+				PriceSliderSheet(
+					lnurlPay: lnurlPay,
+					msat: msat,
+					valueChanged: priceSliderChanged
+				)
+			}
+			
+		} else if msat != minMsat {
+			msat = minMsat
+			
+			// There is only one valid amount.
+			// We set the amount directly via the button tap.
+			
+			priceSliderChanged(minMsat)
+		}
+	}
+	
+	func priceSliderChanged(_ msat: Int64) {
+		log.trace("[\(viewName)] priceSliderChanged()")
+		
+		let preferredBitcoinUnit = currencyPrefs.bitcoinUnit
+		unit = Currency.bitcoin(preferredBitcoinUnit)
+		
+		// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
+		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
+		
+		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
+		let result = TextFieldCurrencyStyler.format(input: amt.digits, unit: unit, hideMsats: false)
+		
+		parsedAmount = result.1
+		amount = result.0
+	}
+	
+	func commentButtonTapped() {
+		log.trace("[\(viewName)] commentButtonTapped()")
+		
+		guard let lnurlPay = lnurlPay() else {
+			return
+		}
+		
+		let maxCommentLength = lnurlPay.maxCommentLength?.intValue ?? 140
+		
+		dismissKeyboardIfVisible()
+		shortSheetState.display(dismissable: true) {
+			
+			CommentSheet(
+				comment: $comment,
+				maxCommentLength: maxCommentLength
+			)
+		}
+	}
+	
+	func sendPayment() {
 		log.trace("[\(viewName)] sendPayment()")
 		
 		guard
 			let amt = try? parsedAmount.get(),
 			amt > 0
 		else {
+			isInvalidAmount = true
 			return
 		}
 		
+		var msat: Int64? = nil
 		switch unit {
 		case .bitcoin(let bitcoinUnit):
-			let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
-			postIntent(Scan.IntentSend(
-				paymentRequest: model.paymentRequest,
-				amount: Lightning_kmpMilliSatoshi(msat: msat)
-			))
-			
+			msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
 		case .fiat(let fiatCurrency):
-			
 			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-				
-				let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-				postIntent(Scan.IntentSend(
+				msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+			}
+		}
+		
+		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			
+			if let msat = msat {
+				mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 					paymentRequest: model.paymentRequest,
 					amount: Lightning_kmpMilliSatoshi(msat: msat)
+				))
+			}
+			
+		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+			
+			if supportsComment() && comment.count == 0 && !hasPromptedForComment {
+				
+				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
+				
+				shortSheetState.onNextWillDisappear {
+					
+					log.debug("shortSheetState.onNextWillDisappear {}")
+					hasPromptedForComment = true
+				}
+				
+				dismissKeyboardIfVisible()
+				shortSheetState.display(dismissable: true) {
+					
+					CommentSheet(
+						comment: $comment,
+						maxCommentLength: maxCommentLength,
+						sendButtonAction: { sendPayment() }
+					)
+				}
+				
+			} else if let msat = msat {
+				
+				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
+					lnurlPay: model.lnurlPay,
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					comment: comment
 				))
 			}
 		}
 	}
 	
-	func showAppStatusPopover() -> Void {
+	func didCancelLnurlPayFetch() {
+		log.trace("[\(viewName)] didCancelLnurlPayFetch()")
+		
+		guard let lnurlPay = lnurlPay() else {
+			return
+		}
+		
+		mvi.intent(Scan.Intent_LnurlPayFlow_CancelLnurlPayment(
+			lnurlPay: lnurlPay
+		))
+	}
+	
+	func showAppStatusPopover() {
 		log.trace("[\(viewName)] showAppStatusPopover()")
 		
 		popoverState.display(dismissable: true) {
@@ -711,8 +1300,820 @@ struct ValidateView: View, ViewName {
 	}
 }
 
+struct MetadataSheet: View, ViewName {
+	
+	let lnurlPay: LNUrl.Pay
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Metadata")
+					.font(.title3)
+				Spacer()
+				Button {
+					closeButtonTapped()
+				} label: {
+					Image("ic_cross")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
+			}
+			.padding(.horizontal)
+			.padding(.vertical, 8)
+			.background(
+				Color(UIColor.secondarySystemBackground)
+					.cornerRadius(15, corners: [.topLeft, .topRight])
+			)
+			.padding(.bottom, 4)
+			
+			content
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		ScrollView {
+			VStack(alignment: HorizontalAlignment.leading, spacing: 20) {
+			
+				VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+					
+					Text("Short Description")
+						.font(Font.system(.body, design: .serif))
+						.bold()
+					
+					Text(lnurlPay.metadata.plainText)
+						.multilineTextAlignment(.leading)
+						.lineLimit(nil)
+						.padding(.leading)
+				}
+				
+				if let longDesc = lnurlPay.metadata.longDesc {
+					VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+						
+						Text("Long Description")
+							.font(Font.system(.body, design: .serif))
+							.bold()
+						
+						Text(longDesc)
+							.multilineTextAlignment(.leading)
+							.lineLimit(nil)
+							.padding(.leading)
+					}
+				}
+				
+				if let imagePng = lnurlPay.metadata.imagePng {
+					VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+						
+						Text("Image")
+							.font(Font.system(.body, design: .serif))
+							.bold()
+						
+						if let image = UIImage(data: imagePng.toSwiftData()) {
+							Image(uiImage: image)
+								.padding(.leading)
+						} else {
+							Text("Malformed PNG image data")
+								.padding(.leading)
+						}
+					}
+				}
+				
+				if let imageJpg = lnurlPay.metadata.imageJpg {
+					VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+						
+						Text("Image")
+							.font(Font.system(.body, design: .serif))
+							.bold()
+						
+						if let image = UIImage(data: imageJpg.toSwiftData()) {
+							Image(uiImage: image)
+								.padding(.leading)
+						} else {
+							Text("Malformed JPG image data")
+								.padding(.leading)
+						}
+					}
+				}
+				
+			} // </VStack>
+			.padding(.horizontal)
+			
+		} // </ScrollView>
+		.frame(maxHeight: 250)
+		.padding(.vertical)
+	}
+	
+	func closeButtonTapped() {
+		log.trace("[\(viewName)] closeButtonTapped()")
+		
+		shortSheetState.close()
+	}
+}
+
+struct PriceSliderSheet: View, ViewName {
+	
+	let lnurlPay: LNUrl.Pay
+	let valueChanged: (Int64) -> Void
+	
+	init(lnurlPay: LNUrl.Pay, msat: Int64, valueChanged: @escaping (Int64) -> Void) {
+		self.lnurlPay = lnurlPay
+		self.amountSats = Utils.convertBitcoin(msat: msat, bitcoinUnit: .sat)
+		self.valueChanged = valueChanged
+	}
+	
+	// The Slider family works with BinaryFloatingPoint.
+	// So we're going to switch to `sats: Double` for simplicity.
+	
+	@State var amountSats: Double
+	
+	var rangeSats: ClosedRange<Double> {
+		let minSat: Double = Double(lnurlPay.minSendable.msat) / Utils.Millisatoshis_Per_Satoshi
+		let maxSat: Double = Double(lnurlPay.maxSendable.msat) / Utils.Millisatoshis_Per_Satoshi
+		
+		return minSat...maxSat
+	}
+	
+	enum MaxPercentWidth: Preference {}
+	let maxPercentWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxPercentWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxPercentWidth: CGFloat? = nil
+	
+	enum MaxAmountWidth: Preference {}
+	let maxAmountWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxAmountWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxAmountWidth: CGFloat? = nil
+	
+	enum ContentHeight: Preference {}
+	let contentHeightReader = GeometryPreferenceReader(
+		key: AppendValue<ContentHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var contentHeight: CGFloat? = nil
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	
+	@ViewBuilder
+	var body: some View {
+		
+		ZStack {
+			Text(maxPercentAmount())
+				.foregroundColor(.clear)
+				.read(maxPercentWidthReader)
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					Text("Customize amount")
+						.font(.title3)
+					Spacer()
+					Button {
+						closeButtonTapped()
+					} label: {
+						Image("ic_cross")
+							.resizable()
+							.frame(width: 30, height: 30)
+					}
+				}
+				.padding(.horizontal)
+				.padding(.vertical, 8)
+				.background(
+					Color(UIColor.secondarySystemBackground)
+						.cornerRadius(15, corners: [.topLeft, .topRight])
+				)
+				.padding(.bottom, 4)
+				
+				content
+			}
+		}
+		.assignMaxPreference(for: maxPercentWidthReader.key, to: $maxPercentWidth)
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 20) {
+			
+			GeometryReader { proxy in
+				
+				// We have 3 columns:
+				//
+				// | bitcoin prices | vslider | fiat prices |
+				//
+				// We want:
+				// - column 0 & 2 to be exactly the same width
+				// - column 1 to be perfectly centered
+				
+				let vsliderWidth = CGFloat(50)
+				let columnWidth = (proxy.size.width - vsliderWidth) / CGFloat(2)
+				
+				HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					
+					// Column 0: (left)
+					// - Amounts in Bitcoin
+					VStack(alignment: HorizontalAlignment.trailing, spacing: 40) {
+						
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+							Text("Max: ")
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+							Text(maxBitcoinAmount().string)
+								.foregroundColor(.secondary)
+								.read(maxAmountWidthReader)
+						}
+						
+						Text(bitcoinAmount().string)
+						
+						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+							Text("Min: ")
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+							Text(minBitcoinAmount().string)
+								.foregroundColor(.secondary)
+								.frame(width: maxAmountWidth, alignment: .trailing)
+						}
+						
+					} // </VStack: column 0>
+					.frame(width: columnWidth)
+					.read(contentHeightReader)
+					
+					// Column 1: (center)
+					// - Vertical slider
+					VSlider(value: $amountSats, in: rangeSats) { value in
+						log.debug("VSlider.onEditingChanged")
+					}
+					.frame(width: vsliderWidth, height: contentHeight, alignment: .center)
+					
+					// Column 2: (right)
+					// - Amounts in fiat
+					VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text(verbatim: "≈ ")
+								.font(.footnote)
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+							Text(maxFiatAmount().string)
+								.foregroundColor(.secondary)
+						}
+						Spacer()
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text(verbatim: "≈ ")
+								.font(.footnote)
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+							Text(fiatAmount().string)
+						}
+						Spacer()
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text(verbatim: "≈ ")
+								.font(.footnote)
+								.foregroundColor(Color(UIColor.tertiaryLabel))
+							Text(minFiatAmount().string)
+								.foregroundColor(.secondary)
+						}
+					
+					} // </VStack: column 2>
+					.frame(width: columnWidth, height: contentHeight)
+				
+				} // </HStack>
+				
+			} // </GeometryReader>
+			.frame(height: contentHeight)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 10) {
+				
+				Button {
+					minusButtonTapped()
+				} label: {
+					Image(systemName: "minus.circle")
+						.imageScale(.large)
+				}
+				Text(percentAmount())
+					.frame(minWidth: maxPercentWidth, alignment: Alignment.center)
+				Button {
+					plusButtonTapped()
+				} label: {
+					Image(systemName: "plus.circle")
+						.imageScale(.large)
+				}
+			
+			} // </HStack>
+			
+		} // </VStack>
+		.padding()
+		.assignMaxPreference(for: maxAmountWidthReader.key, to: $maxAmountWidth)
+		.assignMaxPreference(for: contentHeightReader.key, to: $contentHeight)
+		.onChange(of: amountSats) {
+			valueChanged(Utils.toMsat(from: $0, bitcoinUnit: .sat))
+		}
+	}
+	
+	func msat() -> Int64 {
+		
+		return Utils.toMsat(from: amountSats, bitcoinUnit: .sat)
+	}
+	
+	func formatBitcoinAmount(msat: Int64) -> FormattedAmount {
+		return Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+	}
+	
+	func maxBitcoinAmount() -> FormattedAmount {
+		return formatBitcoinAmount(msat: lnurlPay.maxSendable.msat)
+	}
+	
+	func bitcoinAmount() -> FormattedAmount {
+		return formatBitcoinAmount(msat: msat())
+	}
+	
+	func minBitcoinAmount() -> FormattedAmount {
+		return formatBitcoinAmount(msat: lnurlPay.minSendable.msat)
+	}
+	
+	func formatFiatAmount(msat: Int64) -> FormattedAmount {
+		if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: currencyPrefs.fiatCurrency) {
+			return Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+		} else {
+			return Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+		}
+	}
+	
+	func maxFiatAmount() -> FormattedAmount {
+		return formatFiatAmount(msat: lnurlPay.maxSendable.msat)
+	}
+	
+	func fiatAmount() -> FormattedAmount {
+		return formatFiatAmount(msat: msat())
+	}
+	
+	func minFiatAmount() -> FormattedAmount {
+		return formatFiatAmount(msat: lnurlPay.minSendable.msat)
+	}
+	
+	func formatPercent(_ percent: Double) -> String {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		
+		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
+	}
+	
+	func percentAmount() -> String {
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let curMsat = msat()
+		
+		let percent = Double(curMsat - minMsat) / Double(minMsat)
+		
+		return formatPercent(percent)
+	}
+	
+	func maxPercentAmount() -> String {
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let maxMsat = lnurlPay.maxSendable.msat
+		
+		let percent = Double(maxMsat - minMsat) / Double(minMsat)
+		
+		return formatPercent(percent)
+	}
+	
+	func willUserInterfaceChange(percent: Double) -> Bool {
+		
+		if formatPercent(percent) != percentAmount() {
+			return true
+		}
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let newMsat = Int64(Double(minMsat) * (1.0 + percent))
+		
+		if formatBitcoinAmount(msat: newMsat).digits != bitcoinAmount().digits {
+			return true
+		}
+		
+		if formatFiatAmount(msat: newMsat).digits != fiatAmount().digits {
+			return true
+		}
+		
+		return false
+	}
+	
+	func minusButtonTapped() {
+		log.trace("[\(viewName)] minusButtonTapped()")
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let curMsat = msat()
+		
+		let minPercent = 0.0
+		let curPercent = Double(curMsat - minMsat) / Double(minMsat) * 100.0
+		
+		var floorPercent = curPercent.rounded(.down)
+		
+		// The previous percent may have been something like "8.7%".
+		// And the new percent may be "8%".
+		//
+		// The question is, if we change the percent to "8%",
+		// does this create any kind of change in the UI.
+		//
+		// If the answer is YES, then it's a valid change.
+		// If the answer is NO, then we should drop another percentage point.
+		
+		if !willUserInterfaceChange(percent: (floorPercent / 100.0)) {
+			floorPercent -= 1.0
+		}
+		if floorPercent < minPercent {
+			floorPercent = minPercent
+		}
+		
+		let newPercent = floorPercent / 100.0
+		let newMsat = Int64(Double(minMsat) * (1.0 + newPercent))
+		
+		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+	}
+	
+	func plusButtonTapped() {
+		log.trace("[\(viewName)] plusButtonTapped()")
+		
+		let minMsat = lnurlPay.minSendable.msat
+		let maxMsat = lnurlPay.maxSendable.msat
+		let curMsat = msat()
+		
+		let maxPercent = Double(maxMsat - minMsat) / Double(minMsat) * 100.0
+		let curPercent = Double(curMsat - minMsat) / Double(minMsat) * 100.0
+		
+		var ceilingPercent = curPercent.rounded(.up)
+		
+		// The previous percent may have been something like "8.7%".
+		// And the new percent may be "9%".
+		//
+		// The question is, if we change the percent to "9%",
+		// does this create any kind of change in the UI.
+		//
+		// If the answer is YES, then it's a valid change.
+		// If the answer is NO, then we should add another percentage point.
+		
+		if !willUserInterfaceChange(percent: (ceilingPercent / 100.0)) {
+			ceilingPercent += 1.0
+		}
+		if ceilingPercent > maxPercent {
+			ceilingPercent = maxPercent
+		}
+		
+		let newPercent = ceilingPercent / 100.0
+		let newMsat = Int64(Double(minMsat) * (1.0 + newPercent))
+		
+		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+	}
+	
+	func closeButtonTapped() {
+		log.trace("[\(viewName)] closeButtonTapped()")
+		
+		shortSheetState.close()
+	}
+}
+
+struct CommentSheet: View, ViewName {
+	
+	@State var text: String
+	@Binding var comment: String
+	
+	let maxCommentLength: Int
+	@State var remainingCount: Int
+	
+	let sendButtonAction: (() -> Void)?
+	
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	init(comment: Binding<String>, maxCommentLength: Int, sendButtonAction: (() -> Void)? = nil) {
+		self._comment = comment
+		self.maxCommentLength = maxCommentLength
+		self.sendButtonAction = sendButtonAction
+		
+		text = comment.wrappedValue
+		remainingCount = maxCommentLength - comment.wrappedValue.count
+	}
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Text("Add optional comment")
+					.font(.title3)
+				Spacer()
+				Button {
+					closeButtonTapped()
+				} label: {
+					Image("ic_cross")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
+			}
+			.padding(.horizontal)
+			.padding(.vertical, 8)
+			.background(
+				Color(UIColor.secondarySystemBackground)
+					.cornerRadius(15, corners: [.topLeft, .topRight])
+			)
+			.padding(.bottom, 4)
+			
+			content
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Your comment will be sent when you pay.")
+				.font(.callout)
+				.foregroundColor(.secondary)
+				.padding(.bottom)
+			
+			TextEditor(text: $text)
+				.frame(maxWidth: .infinity, maxHeight: 75)
+				.padding(.all, 4)
+				.background(
+					RoundedRectangle(cornerRadius: 4)
+						.stroke(Color(UIColor.separator), lineWidth: 1)
+				)
+			
+			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				Text("\(remainingCount) remaining")
+					.foregroundColor(remainingCount >= 0 ? Color.primary : Color.appNegative)
+				
+				Spacer()
+				
+				Button {
+					clearButtonTapped()
+				} label: {
+					Text("Clear")
+				}
+				.disabled(text.count == 0)
+			}
+			.padding(.top, 4)
+			
+			if sendButtonAction != nil {
+				sendButton
+					.padding(.top, 16)
+			}
+			
+		} // </VStack>
+		.padding()
+		.onChange(of: text) {
+			textDidChange($0)
+		}
+	}
+	
+	@ViewBuilder
+	var sendButton: some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			Spacer()
+			Button {
+				sendButtonTapped()
+			} label: {
+				HStack {
+					Image("ic_send")
+						.renderingMode(.template)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.foregroundColor(Color.white)
+						.frame(width: 22, height: 22)
+					Text("Pay")
+						.font(.title2)
+						.foregroundColor(Color.white)
+				}
+				.padding(.top, 4)
+				.padding(.bottom, 5)
+				.padding([.leading, .trailing], 24)
+			}
+			.buttonStyle(ScaleButtonStyle(
+				backgroundFill: Color.appAccent,
+				disabledBackgroundFill: Color.gray
+			))
+			Spacer()
+			
+		} // </HStack>
+	}
+	
+	func textDidChange(_ newText: String) {
+		log.trace("[\(viewName)] textDidChange()")
+		
+		if newText.count <= maxCommentLength {
+			comment = newText
+		} else {
+			let endIdx = newText.index(newText.startIndex, offsetBy: maxCommentLength)
+			let substr = newText[newText.startIndex ..< endIdx]
+			comment = String(substr)
+		}
+		
+		remainingCount = maxCommentLength - newText.count
+	}
+	
+	func clearButtonTapped() {
+		log.trace("[\(viewName)] clearButtonTapped()")
+		
+		text = ""
+	}
+	
+	func closeButtonTapped() {
+		log.trace("[\(viewName)] closeButtonTapped()")
+		
+		shortSheetState.close()
+	}
+	
+	func sendButtonTapped() {
+		log.trace("[\(viewName)] sendButtonTapped()")
+		
+		shortSheetState.close {
+			sendButtonAction!()
+		}
+	}
+}
+
+struct LnurlPayErrorNotice: View, ViewName {
+	
+	let error: Scan.LNUrlPayError
+	
+	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Image(systemName: "exclamationmark.triangle")
+					.imageScale(.medium)
+					.padding(.trailing, 6)
+					.foregroundColor(Color.appNegative)
+				
+				Text(title())
+					.font(.headline)
+				
+				Spacer()
+				
+				Button {
+					closeButtonTapped()
+				} label: {
+					Image("ic_cross")
+						.resizable()
+						.frame(width: 30, height: 30)
+				}
+			}
+			.padding(.horizontal)
+			.padding(.vertical, 8)
+			.background(
+				Color(UIColor.secondarySystemBackground)
+					.cornerRadius(15, corners: [.topLeft, .topRight])
+			)
+			.padding(.bottom, 4)
+			
+			content
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+		
+			errorMessage
+		}
+		.padding()
+	}
+	
+	@ViewBuilder
+	var errorMessage: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 8) {
+			
+			if let err = error as? Scan.LNUrlPay_Error_RemoteError {
+				
+				if let _ = err.err as? LNUrl.ErrorRemoteFailureCouldNotConnect {
+					
+					Text("Could not connect to host:")
+					Text(err.err.origin)
+						.font(.system(.subheadline, design: .monospaced))
+				
+				} else if let details = err.err as? LNUrl.ErrorRemoteFailureCode {
+					
+					Text("Host returned status code \(details.code.value):")
+				 	Text(err.err.origin)
+						.font(.system(.subheadline, design: .monospaced))
+				 
+				} else if let details = err.err as? LNUrl.ErrorRemoteFailureDetailed {
+				
+					Text("Host returned error response.")
+					Text("Host: \(details.origin)")
+						.font(.system(.subheadline, design: .monospaced))
+					Text("Error: \(details.reason)")
+						.font(.system(.subheadline, design: .monospaced))
+			 
+				} else if let _ = err.err as? LNUrl.ErrorRemoteFailureUnreadable {
+				
+					Text("Host returned unreadable response:", comment: "error details")
+				 	Text(err.err.origin)
+						.font(.system(.subheadline, design: .monospaced))
+					
+				} else {
+					genericErrorMessage
+				}
+				
+			} else if let err = error as? Scan.LNUrlPay_Error_BadResponseError {
+				
+				if let details = err.err as? LNUrl.ErrorPayInvoiceMissingPr {
+					
+					Text("Host: \(details.origin)")
+						.font(.system(.subheadline, design: .monospaced))
+					Text("Error: missing payment request")
+						.font(.system(.subheadline, design: .monospaced))
+					
+				} else if let details = err.err as? LNUrl.ErrorPayInvoiceMalformedPr {
+					
+					Text("Host: \(details.origin)")
+						.font(.system(.subheadline, design: .monospaced))
+					Text("Error: malformed payment request")
+						.font(.system(.subheadline, design: .monospaced))
+					
+				} else if let details = err.err as? LNUrl.ErrorPayInvoiceInvalidHash {
+					
+					Text("Host: \(details.origin)")
+						.font(.system(.subheadline, design: .monospaced))
+					Text("Error: invalid hash")
+						.font(.system(.subheadline, design: .monospaced))
+					
+				} else if let details = err.err as? LNUrl.ErrorPayInvoiceInvalidAmount {
+				 
+					Text("Host: \(details.origin)")
+						.font(.system(.subheadline, design: .monospaced))
+					Text("Error: invalid amount")
+						.font(.system(.subheadline, design: .monospaced))
+					
+				} else {
+					genericErrorMessage
+				}
+			 
+			} else if let err = error as? Scan.LNUrlPay_Error_ChainMismatch {
+				
+				let lChain = err.myChain.name
+				let rChain = err.requestChain?.name ?? "Unknown"
+				
+				Text("You are on bitcoin chain \(lChain), but the invoice is for \(rChain).")
+				
+			} else if let _ = error as? Scan.LNUrlPay_Error_AlreadyPaidInvoice {
+				
+				Text("You have already paid this invoice.")
+				
+		 	} else {
+				genericErrorMessage
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var genericErrorMessage: some View {
+		
+		Text("Please try again")
+	}
+	
+	func title() -> String {
+		
+		if let err = error as? Scan.LNUrlPayErrorRemoteError {
+			if err.err is LNUrl.ErrorRemoteFailureCouldNotConnect {
+				return NSLocalizedString("Connection failure", comment: "Error title")
+			} else {
+				return NSLocalizedString("Invalid response", comment: "Error title")
+			}
+			
+		} else if let _ = error as? Scan.LNUrlPayErrorBadResponseError {
+			return NSLocalizedString("Invalid response", comment: "Error title")
+			
+		} else if let _ = error as? Scan.LNUrlPayErrorChainMismatch {
+			return NSLocalizedString("Chain mismatch", comment: "Error title")
+			
+		} else if let _ = error as? Scan.LNUrlPayErrorAlreadyPaidInvoice {
+			return NSLocalizedString("Already paid", comment: "Error title")
+			
+		} else {
+			return NSLocalizedString("Unknown error", comment: "Error title")
+		}
+	}
+	
+	func closeButtonTapped() {
+		log.trace("[\(viewName)] closeButtonTapped()")
+		
+		popoverState.close()
+	}
+}
+
 struct SendingView: View {
-	let model: Scan.ModelSending
+	
+	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 
 	@ViewBuilder
 	var body: some View {
@@ -784,7 +2185,7 @@ struct LoginView: View, ViewName {
 				.foregroundColor(.clear)
 				.read(maxImageHeightReader)
 			
-			main
+			content
 		}
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
@@ -798,7 +2199,7 @@ struct LoginView: View, ViewName {
 	}
 	
 	@ViewBuilder
-	var main: some View {
+	var content: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 30) {
 			
@@ -811,7 +2212,7 @@ struct LoginView: View, ViewName {
 				.font(.headline)
 				.multilineTextAlignment(.center)
 			
-			if let model = mvi.model as? Scan.ModelLoginResult, model.error == nil {
+			if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginResult, model.error == nil {
 				
 				HStack(alignment: VerticalAlignment.firstTextBaseline) {
 					Image(systemName: "hand.thumbsup.fill")
@@ -848,12 +2249,12 @@ struct LoginView: View, ViewName {
 					backgroundFill: Color.appAccent,
 					disabledBackgroundFill: Color(UIColor.systemGray)
 				))
-				.disabled(mvi.model is Scan.ModelLoggingIn)
+				.disabled(mvi.model is Scan.Model_LnurlAuthFlow_LoggingIn)
 			}
 			
 			ZStack {
 				Divider()
-				if mvi.model is Scan.ModelLoggingIn {
+				if mvi.model is Scan.Model_LnurlAuthFlow_LoggingIn {
 					HorizontalActivity(color: .appAccent, diameter: 10, speed: 1.6)
 				}
 			}
@@ -883,11 +2284,11 @@ struct LoginView: View, ViewName {
 	
 	var auth: LNUrl.Auth? {
 		
-		if let model = mvi.model as? Scan.ModelLoginRequest {
+		if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginRequest {
 			return model.auth
-		} else if let model = mvi.model as? Scan.ModelLoggingIn {
+		} else if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoggingIn {
 			return model.auth
-		} else if let model = mvi.model as? Scan.ModelLoginResult {
+		} else if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginResult {
 			return model.auth
 		} else {
 			return nil
@@ -903,9 +2304,9 @@ struct LoginView: View, ViewName {
 		
 		if let action = auth?.action() {
 			switch action {
-				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
-				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
-				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
+				case .register_ : return NSLocalizedString("Register", comment: "lnurl-auth: login button title")
+				case .login     : return NSLocalizedString("Login",    comment: "lnurl-auth: login button title")
+				case .link      : return NSLocalizedString("Link",     comment: "lnurl-auth: login button title")
 				case .auth      : fallthrough
 				default         : break
 			}
@@ -929,7 +2330,7 @@ struct LoginView: View, ViewName {
 	
 	func errorText() -> String? {
 		
-		if let model = mvi.model as? Scan.ModelLoginResult, let error = model.error {
+		if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginResult, let error = model.error {
 			
 			if let error = error as? Scan.LoginErrorServerError {
 				if let details = error.details as? LNUrl.ErrorRemoteFailureCode {
@@ -958,7 +2359,7 @@ struct LoginView: View, ViewName {
 	func loginButtonTapped() {
 		log.trace("[\(viewName)] loginButtonTapped()")
 		
-		if let model = mvi.model as? Scan.ModelLoginRequest {
+		if let model = mvi.model as? Scan.Model_LnurlAuthFlow_LoginRequest {
 			// There's usually a bit of delay between:
 			// - the successful authentication (when Phoenix receives auth success response from server)
 			// - the webpage updating to reflect the authentication success
@@ -984,44 +2385,10 @@ struct LoginView: View, ViewName {
 			// This leads to less confusion, and a happier user.
 			// Which hopefully leads to more lnurl-auth adoption.
 			//
-			mvi.intent(Scan.IntentLogin(auth: model.auth, minSuccessDelaySeconds: 1.6))
+			mvi.intent(Scan.Intent_LnurlAuthFlow_Login(
+				auth: model.auth,
+				minSuccessDelaySeconds: 1.6
+			))
 		}
-	}
-}
-
-// MARK:-
-
-class SendView_Previews: PreviewProvider {
-	
-	static let request = "lntb15u1p0hxs84pp5662ywy9px43632le69s5am03m6h8uddgln9cx9l8v524v90ylmesdq4xysyymr0vd4kzcmrd9hx7cqp2xqrrss9qy9qsqsp5xr4khzu3xter2z7dldnl3eqggut200vzth6cj8ppmqvx29hzm30q0as63ks9zddk3l5vf46lmkersynge3fy9nywwn8z8ttfdpak5ka9dvcnfrq95e6s06jacnsdryq8l8mrjkrfyd3vxgyv4axljvplmwsqae7yl9"
-
-	static var previews: some View {
-		
-//		NavigationView {
-//			SendView().mock(Scan.ModelValidateRequest(
-//				request: request,
-//				amountMsat: 1_500,
-//				expiryTimestamp: nil,
-//				requestDescription: "1 Blockaccino",
-//				balanceMsat: 300_000_000
-//			))
-//		}
-//		.modifier(GlobalEnvironment())
-//		.preferredColorScheme(.light)
-//		.previewDevice("iPhone 8")
-		
-		NavigationView {
-			SendingView(model: Scan.ModelSending())
-		}
-		.modifier(GlobalEnvironment())
-		.preferredColorScheme(.light)
-		.previewDevice("iPhone 8")
-
-		NavigationView {
-			SendingView(model: Scan.ModelSending())
-		}
-		.modifier(GlobalEnvironment())
-		.preferredColorScheme(.dark)
-		.previewDevice("iPhone 8")
 	}
 }

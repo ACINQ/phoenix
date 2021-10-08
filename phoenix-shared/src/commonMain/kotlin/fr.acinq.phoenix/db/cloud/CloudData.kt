@@ -2,6 +2,7 @@ package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
 import kotlinx.serialization.cbor.Cbor
@@ -93,11 +94,10 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
        return this.copy(padding = padding)
     }
 
-    // This function exists because the `freeze()`
-    // function isn't exposed to iOS.
-    //
-    fun copyAndFreeze(): CloudData {
-        return this.freeze()
+    fun unwrap(): WalletPayment? = when {
+        incoming != null -> incoming.unwrap()
+        outgoing != null -> outgoing.unwrap()
+        else -> null
     }
 }
 

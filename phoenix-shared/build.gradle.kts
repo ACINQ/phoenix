@@ -82,6 +82,7 @@ kotlin {
         sourceSets["commonTest"].dependencies {
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
+            implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
         }
 
         if (includeAndroid) {

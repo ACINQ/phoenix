@@ -20,9 +20,16 @@ import Combine
 ///
 public class ShortSheetState: ObservableObject {
 
+	// Fires when:
+	// - sheet view will animate on screen (onWillAppear)
+	// - sheet view has animated off screen (onDidDisappear)
+	//
 	var publisher = PassthroughSubject<ShortSheetItem?, Never>()
 	
-	fileprivate var closePublisher = PassthroughSubject<Void, Never>()
+	// Fires when:
+	// - sheet view will animate off screen (onWillDisapper)
+	// 
+	var closePublisher = PassthroughSubject<Void, Never>()
 	
 	func display<Content: View>(dismissable: Bool, @ViewBuilder builder: () -> Content) {
 		publisher.send(ShortSheetItem(
@@ -47,6 +54,30 @@ public class ShortSheetState: ObservableObject {
 		}.store(in: &cancellables)
 		
 		closePublisher.send()
+	}
+	
+	func onNextWillDisappear(_ action: @escaping () -> Void) {
+		
+		var cancellables = Set<AnyCancellable>()
+		closePublisher.sink { _ in
+			
+			action()
+			cancellables.removeAll()
+			
+		}.store(in: &cancellables)
+	}
+	
+	func onNextDidDisappear(_ action: @escaping () -> Void) {
+		
+		var cancellables = Set<AnyCancellable>()
+		publisher.sink { (item: ShortSheetItem?) in
+			
+			if item == nil {
+				action()
+				cancellables.removeAll()
+			}
+			
+		}.store(in: &cancellables)
 	}
 }
 

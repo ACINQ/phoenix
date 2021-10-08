@@ -64,6 +64,7 @@ import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.controllers.HomeController
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.CoroutineScope
@@ -305,7 +306,7 @@ private fun PreparePaymentLine(row: WalletPaymentOrderRow) {
     val paymentsManager = business.paymentsManager
     var payment by remember { mutableStateOf<WalletPayment?>(null) }
     LaunchedEffect(key1 = row.id) {
-        payment = paymentsManager.fetcher.getPayment(row).payment
+        payment = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.payment
     }
     payment?.let { PaymentLine(it) } ?: Text("Loading...")
 }

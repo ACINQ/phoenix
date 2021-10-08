@@ -95,7 +95,7 @@ class KotlinCurrentValueSubject<Input: AnyObject, Output: Any>: Publisher {
 		// Because the SwiftStateFlow instance itself doesn't maintain any state.
 		// All state is encapsulated in the watch method.
 		
-		let initialValue = swiftStateFlow.value as! Output
+		let initialValue = swiftStateFlow.value_ as! Output
 		wrapped = CurrentValueSubject(initialValue)
 		
 		watcher = swiftStateFlow.watch {[weak self](value: Input?) in

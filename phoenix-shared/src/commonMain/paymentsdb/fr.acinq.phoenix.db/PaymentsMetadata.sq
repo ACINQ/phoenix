@@ -1,0 +1,51 @@
+import fr.acinq.phoenix.db.payments.LNUrlBase;
+import fr.acinq.phoenix.db.payments.LNUrlMetadata;
+import fr.acinq.phoenix.db.payments.LNUrlSuccessAction;
+
+-- This table stores metadata corresponding to a payment.
+-- * type => enum indicating whether payment is incoming or outgoing
+-- * id => stores the primary key of the payment row
+--
+CREATE TABLE IF NOT EXISTS payments_metadata (
+    type INTEGER NOT NULL,
+    id TEXT NOT NULL,
+    lnurl_base_type TEXT AS LNUrlBase.TypeVersion,
+    lnurl_base_blob BLOB,
+    lnurl_description TEXT,
+    lnurl_metadata_type TEXT AS LNUrlMetadata.TypeVersion,
+    lnurl_metadata_blob BLOB,
+    lnurl_successAction_type TEXT AS LNUrlSuccessAction.TypeVersion,
+    lnurl_successAction_blob BLOB,
+    user_description TEXT,
+    PRIMARY KEY (type, id)
+);
+
+hasMetadata:
+SELECT COUNT(*) FROM payments_metadata
+WHERE type = ? AND id = ?;
+
+addMetadata:
+INSERT INTO payments_metadata (
+            type,
+            id,
+            lnurl_base_type, lnurl_base_blob,
+            lnurl_description,
+            lnurl_metadata_type, lnurl_metadata_blob,
+            lnurl_successAction_type, lnurl_successAction_blob,
+            user_description)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateUserDescription:
+UPDATE payments_metadata
+SET    user_description = ?
+WHERE  type = ? AND id = ?;
+
+fetchDescriptions:
+SELECT lnurl_description,
+       user_description
+FROM   payments_metadata
+WHERE  type = ? AND id = ?;
+
+fetchMetadata:
+SELECT * FROM payments_metadata
+WHERE type = ? AND id = ?;
