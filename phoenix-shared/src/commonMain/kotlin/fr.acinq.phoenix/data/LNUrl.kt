@@ -58,7 +58,7 @@ sealed class LNUrl {
 
         fun action(): Action? {
             return url.parameters["action"]?.let { action ->
-                when (action.toLowerCase()) {
+                when (action.lowercase()) {
                     "register" -> Action.Register
                     "login" -> Action.Login
                     "link" -> Action.Link

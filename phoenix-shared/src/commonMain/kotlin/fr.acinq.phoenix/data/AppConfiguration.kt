@@ -25,7 +25,7 @@ enum class BitcoinUnit : CurrencyUnit {
     Sat, Bit, MBtc, Btc;
 
     override fun toString(): String {
-        return super.toString().toLowerCase()
+        return super.toString().lowercase()
     }
 
     companion object default {

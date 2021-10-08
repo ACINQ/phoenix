@@ -47,7 +47,7 @@ class PublicSuffixList(
                 val labels = suffix.split('.').filter {
                     it.isNotBlank()
                 }.map {
-                    it.toLowerCase()
+                    it.lowercase()
                 }
                 if (labels.isEmpty()) {
                     return null
@@ -123,7 +123,7 @@ class PublicSuffixList(
                 domainComponents.subList(
                     fromIndex = domainComponents.size - desiredCount, // inclusive
                     toIndex = domainComponents.size // exclusive
-                ).joinToString(separator = ".").toLowerCase()
+                ).joinToString(separator = ".").lowercase()
             }
         }
     }
@@ -147,7 +147,7 @@ class PublicSuffixList(
             .split('.')
             .filter { it.isNotEmpty() }
 
-        val domainLabels = domainComponents.map { it.toLowerCase() }
+        val domainLabels = domainComponents.map { it.lowercase() }
 
         // Algorithm:
         // 1. Match domain against all rules and take note of the matching ones.
