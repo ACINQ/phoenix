@@ -24,6 +24,8 @@ import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.utils.PublicSuffixList
 import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -31,18 +33,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 class LNUrlManager(
     loggerFactory: LoggerFactory,
-    private val httpClient: HttpClient,
     private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
+    // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
+    private val httpClient: HttpClient by lazy {
+        HttpClient {
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                })
+                expectSuccess = false
+            }
+        }
+    }
+
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
-        httpClient = business.httpClient,
         walletManager = business.walletManager
     )
 
@@ -99,7 +112,7 @@ class LNUrlManager(
      */
     suspend fun continueLnUrl(url: Url): LNUrl {
         val response: HttpResponse = try {
-            httpClient.safeGet(url)
+            httpClient.get(url)
         } catch (err: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }
@@ -126,7 +139,7 @@ class LNUrlManager(
         val origin = callback.host
 
         val response: HttpResponse = try {
-            httpClient.safeGet(callback)
+            httpClient.get(callback)
         } catch (err: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin)
         }
@@ -176,23 +189,11 @@ class LNUrlManager(
         val url = builder.build()
 
         val response: HttpResponse = try {
-            httpClient.safeGet(url)
+            httpClient.get(url)
         } catch (t: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }
 
         LNUrl.handleLNUrlResponse(response) // throws on any/all non-success
-    }
-}
-
-suspend fun HttpClient.safeGet(url: Url): HttpResponse {
-    // ktor throws an exception when we get a non-200 response from the server.
-    // That's not what we want. We'd like to handle the JSON error ourselves.
-    return try {
-        this.get(url)
-    } catch (err: io.ktor.client.features.ServerResponseException) {
-        err.response
-    } catch (err: io.ktor.client.features.ClientRequestException) {
-        err.response
     }
 }

@@ -22,9 +22,9 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.db.cloud.b64Decode
-import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
@@ -218,7 +218,7 @@ sealed class LNUrl {
             val url = response.request.url
             return try {
                 if (response.status.isSuccess()) {
-                    val json: JsonObject = response.receive()
+                    val json: JsonObject = Json.decodeFromString(response.readText(Charsets.UTF_8))
                     log.debug { "lnurl service=${url.host} returned response=$json" }
                     if (json["status"]?.jsonPrimitive?.content?.trim()?.equals("error", true) == true) {
                         log.error { "lnurl service=${url.host} returned error=$json" }
