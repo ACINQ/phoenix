@@ -2120,9 +2120,13 @@ struct SendingView: View {
 		
 		ZStack {
 		
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
 			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
+					.ignoresSafeArea(.all, edges: .all)
 			}
 			
 			VStack {
@@ -2132,7 +2136,6 @@ struct SendingView: View {
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle(
 			NSLocalizedString("Sending payment", comment: "Navigation bar title"),
@@ -2161,9 +2164,13 @@ struct LoginView: View, ViewName {
 		
 		ZStack {
 		
+			Color.primaryBackground
+				.edgesIgnoringSafeArea(.all)
+			
 			if AppDelegate.showTestnetBackground {
 				Image("testnet_bg")
 					.resizable(resizingMode: .tile)
+					.ignoresSafeArea(.all, edges: .all)
 			}
 			
 			// I want the height of these 2 components to match exactly:
@@ -2189,7 +2196,6 @@ struct LoginView: View, ViewName {
 		}
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
-		.background(Color.primaryBackground)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
 		.navigationBarTitle(
 			NSLocalizedString("lnurl-auth", comment: "Navigation bar title"),
