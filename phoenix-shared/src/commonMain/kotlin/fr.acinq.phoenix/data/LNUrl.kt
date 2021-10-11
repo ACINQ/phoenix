@@ -112,7 +112,12 @@ sealed class LNUrl {
                 val description: String,
                 val ciphertext: ByteVector,
                 val iv: ByteVector
-            ): SuccessAction()
+            ): SuccessAction() {
+                data class Decrypted(
+                    val description: String,
+                    val plaintext: String
+                )
+            }
 
             enum class Tag(val label: String) {
                 Message("message"),

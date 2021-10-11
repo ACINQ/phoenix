@@ -399,13 +399,9 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	@ViewBuilder
 	var paymentMessaegRow: some View {
 		let identifier: String = #function
+		let successAction = paymentInfo.metadata.lnurl?.successAction
 		
-		// Note: We support AES too.
-		// But we don't have any real-world examples of its usage, and the spec doesn't given a clear example.
-		// What the heck do we get when we decode the ciphertext ?
-		// So, without an example, we're unsure of how to proceed.
-		
-		if let sa_message = paymentInfo.metadata.lnurl?.successAction as? LNUrl.PayInvoiceSuccessActionMessage {
+		if let sa_message = successAction as? LNUrl.PayInvoice_SuccessAction_Message {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -418,9 +414,16 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			} valueColumn: {
 				
 				Text(sa_message.message)
+					.contextMenu {
+						Button(action: {
+							UIPasteboard.general.string = sa_message.message
+						}) {
+							Text("Copy")
+						}
+					}
 			}
 			
-		} else if let sa_url = paymentInfo.metadata.lnurl?.successAction as? LNUrl.PayInvoiceSuccessActionUrl {
+		} else if let sa_url = successAction as? LNUrl.PayInvoice_SuccessAction_Url {
 			
 			InfoGridRow(
 				identifier: identifier,
@@ -442,6 +445,61 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						} label: {
 							Text("open link")
 						}
+						.contextMenu {
+							Button(action: {
+								UIPasteboard.general.string = url.absoluteString
+							}) {
+								Text("Copy link")
+							}
+						}
+					}
+				}
+			}
+		
+		} else if let sa_aes = successAction as? LNUrl.PayInvoice_SuccessAction_Aes {
+			
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("Message", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
+				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+					
+					Text(sa_aes.description_)
+					
+					if let sa_aes_decrypted = decrypt(aes: sa_aes) {
+					
+						if let url = URL(string: sa_aes_decrypted.plaintext) {
+							Button {
+								openURL(url)
+							} label: {
+								Text("open link")
+							}
+							.contextMenu {
+								Button(action: {
+									UIPasteboard.general.string = url.absoluteString
+								}) {
+									Text("Copy link")
+								}
+							}
+						} else {
+							Text(sa_aes_decrypted.plaintext)
+								.contextMenu {
+									Button(action: {
+										UIPasteboard.general.string = sa_aes_decrypted.plaintext
+									}) {
+										Text("Copy")
+									}
+								}
+						}
+						
+					} else {
+						Text("<decryption error>")
 					}
 				}
 			}
@@ -600,7 +658,38 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			}
 		}
 	}
-	
+
+	func decrypt(aes sa_aes: LNUrl.PayInvoice_SuccessAction_Aes) -> LNUrl.PayInvoice_SuccessAction_Aes_Decrypted? {
+		
+		guard
+			let outgoingPayment = paymentInfo.payment as? Lightning_kmpOutgoingPayment,
+			let offchainSuccess = outgoingPayment.status.asOffChain()
+		else {
+			return nil
+		}
+		
+		do {
+			let aes = try AES256(
+				key: offchainSuccess.preimage.toSwiftData(),
+				iv: sa_aes.iv.toSwiftData()
+			)
+			
+			let plaintext_data = try aes.decrypt(sa_aes.ciphertext.toSwiftData(), padding: .PKCS7)
+			if let plaintext_str = String(bytes: plaintext_data, encoding: .utf8) {
+				
+				return LNUrl.PayInvoice_SuccessAction_Aes_Decrypted(
+					description: sa_aes.description_,
+					plaintext: plaintext_str
+				)
+			}
+			
+		} catch {
+			log.error("Error decrypting LNUrl.PayInvoice_SuccessAction_Aes: \(String(describing: error))")
+		}
+		
+		return nil
+	}
+
 	func toggleCurrencyType() -> Void {
 		currencyPrefs.toggleCurrencyType()
 	}

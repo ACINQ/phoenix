@@ -70,6 +70,8 @@
 		DC72C32F25A51797008A927A /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC72C32E25A51797008A927A /* UserDefaults+Codable.swift */; };
 		DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC72C33325A51AAC008A927A /* CurrencyPrefs.swift */; };
 		DC72C33925A663CA008A927A /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC72C33825A663CA008A927A /* QRCode.swift */; };
+		DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174A270F332700F7E3E3 /* KotlinTypes.swift */; };
+		DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74174C270F455D00F7E3E3 /* AES256.swift */; };
 		DC8107D3255F1FC1002084A3 /* RecoverySeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */; };
 		DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC81B79E25BF2AA200F5A52C /* MVI.swift */; };
 		DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */; };
@@ -229,6 +231,8 @@
 		DC72C32E25A51797008A927A /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DC72C33325A51AAC008A927A /* CurrencyPrefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyPrefs.swift; sourceTree = "<group>"; };
 		DC72C33825A663CA008A927A /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
+		DC74174A270F332700F7E3E3 /* KotlinTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KotlinTypes.swift; sourceTree = "<group>"; };
+		DC74174C270F455D00F7E3E3 /* AES256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AES256.swift; sourceTree = "<group>"; };
 		DC8107D2255F1FC1002084A3 /* RecoverySeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverySeedView.swift; sourceTree = "<group>"; };
 		DC81B79E25BF2AA200F5A52C /* MVI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVI.swift; sourceTree = "<group>"; };
 		DC89857E25914747007B253F /* UIApplicationState+Phoenix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplicationState+Phoenix.swift"; sourceTree = "<group>"; };
@@ -353,6 +357,7 @@
 				DCB04684260D162C007FDA37 /* ViewName.swift */,
 				DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */,
 				DCD777D126DE9FE800979A12 /* DelayedSave.swift */,
+				DC74174C270F455D00F7E3E3 /* AES256.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -483,6 +488,7 @@
 				DC46BAEE26CACCF700E760A6 /* KotlinFlow.swift */,
 				DC46BAF026CACCF700E760A6 /* KotlinFutures.swift */,
 				DC46BAEF26CACCF700E760A6 /* KotlinPublishers.swift */,
+				DC74174A270F332700F7E3E3 /* KotlinTypes.swift */,
 			);
 			path = kotlin;
 			sourceTree = "<group>";
@@ -851,6 +857,7 @@
 				DCB493CF269F859E001B0F09 /* SyncManagerState.swift in Sources */,
 				DCB493C92694F69B001B0F09 /* CloudOptionsView.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
+				DC74174B270F332700F7E3E3 /* KotlinTypes.swift in Sources */,
 				DC142135261E72320075857A /* AboutHTML.swift in Sources */,
 				DC1706D926A71D8E00BAFCD0 /* ErrorView.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
@@ -927,6 +934,7 @@
 				F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
+				DC74174D270F455D00F7E3E3 /* AES256.swift in Sources */,
 				53BEF98CDD61115030E87C12 /* uikitAppearance.swift in Sources */,
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 			);
@@ -1215,8 +1223,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XD77LN4376;
 				INFOPLIST_FILE = "phoenix-iosTests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1225,8 +1233,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/phoenix-ios.app/phoenix-ios";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Phoenix.app/Phoenix";
 			};
 			name = Debug;
 		};
@@ -1236,8 +1243,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XD77LN4376;
 				INFOPLIST_FILE = "phoenix-iosTests/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1246,8 +1253,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "orgIdentifier.phoenix-iosTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/phoenix-ios.app/phoenix-ios";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Phoenix.app/Phoenix";
 			};
 			name = Release;
 		};
