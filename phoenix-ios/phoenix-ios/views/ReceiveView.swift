@@ -15,6 +15,11 @@ struct ReceiveView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.receive() })
 	
+	@State var lastDescription: String? = nil
+	@State var lastAmount: Lightning_kmpMilliSatoshi? = nil
+	
+	@State var receiveLightningView_didAppear = false
+	
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 	
@@ -34,22 +39,43 @@ struct ReceiveView: MVIView {
 					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
 			}
 			
-			if mvi.model is Receive.ModelSwapIn {
+			if mvi.model is Receive.Model_SwapIn {
 				
-				// Receive.ModelSwapInRequesting : Receive.ModelSwapIn
-				// Receive.ModelSwapInGenerated : Receive.ModelSwapIn
+				// Receive.Model_SwapIn_Requesting : Receive.Model_SwapIn
+				// Receive.Model_SwapIn_Generated : Receive.Model_SwapIn
 				
-				SwapInView(mvi: mvi, toast: toast)
+				SwapInView(
+					mvi: mvi,
+					toast: toast,
+					lastDescription: $lastDescription,
+					lastAmount: $lastAmount
+				)
 				
 			} else {
 			
-				ReceiveLightningView(mvi: mvi, toast: toast)
+				ReceiveLightningView(
+					mvi: mvi,
+					toast: toast,
+					didAppear: $receiveLightningView_didAppear
+				)
 			}
 			
 			toast.view()
 			
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.onChange(of: mvi.model) { newModel in
+			onModelChange(model: newModel)
+		}
+	}
+	
+	func onModelChange(model: Receive.Model) -> Void {
+		log.trace("onModelChange()")
+		
+		if let m = model as? Receive.Model_Generated {
+			lastDescription = m.desc
+			lastAmount = m.amount
+		}
 	}
 	
 	/// Shared logic. Used by:
@@ -135,9 +161,10 @@ struct ReceiveLightningView: View, ViewName {
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast
 	
+	@Binding var didAppear: Bool
+	
 	@StateObject var qrCode = QRCode()
 
-	@State var didAppear = false
 	@State var isFullScreenQrcode = false
 	
 	@State var sheet: ReceiveViewSheet? = nil
@@ -419,7 +446,7 @@ struct ReceiveLightningView: View, ViewName {
 	@ViewBuilder
 	var qrCodeView: some View {
 		
-		if let m = mvi.model as? Receive.ModelGenerated,
+		if let m = mvi.model as? Receive.Model_Generated,
 		   qrCode.value == m.request,
 		   let qrCodeImage = qrCode.image
 		{
@@ -471,7 +498,7 @@ struct ReceiveLightningView: View, ViewName {
 		ReceiveView.copyButton {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.disabled(!(mvi.model is Receive.Model_Generated))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressCopyButton()
 		})
@@ -486,7 +513,7 @@ struct ReceiveLightningView: View, ViewName {
 		ReceiveView.shareButton {
 			// using simultaneousGesture's below
 		}
-		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.disabled(!(mvi.model is Receive.Model_Generated))
 		.simultaneousGesture(LongPressGesture().onEnded { _ in
 			didLongPressShareButton()
 		})
@@ -505,7 +532,7 @@ struct ReceiveLightningView: View, ViewName {
 		) {
 			didTapEditButton()
 		}
-		.disabled(!(mvi.model is Receive.ModelGenerated))
+		.disabled(!(mvi.model is Receive.Model_Generated))
 	}
 	
 	@ViewBuilder
@@ -627,7 +654,7 @@ struct ReceiveLightningView: View, ViewName {
 	
 	func invoiceAmount() -> String {
 		
-		if let m = mvi.model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.Model_Generated {
 			if let msat = m.amount?.msat {
 				let btcAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit)
 				
@@ -650,7 +677,7 @@ struct ReceiveLightningView: View, ViewName {
 	
 	func invoiceDescription() -> String {
 		
-		if let m = mvi.model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.Model_Generated {
 			if let desc = m.desc, desc.count > 0 {
 				return desc
 			} else {
@@ -715,7 +742,7 @@ struct ReceiveLightningView: View, ViewName {
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("[\(viewName)] onModelChange()")
 		
-		if let m = model as? Receive.ModelGenerated {
+		if let m = model as? Receive.Model_Generated {
 			log.debug("[\(viewName)] updating qr code...")
 			qrCode.generate(value: m.request)
 		}
@@ -842,7 +869,7 @@ struct ReceiveLightningView: View, ViewName {
 	func copyTextToPasteboard() -> Void {
 		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
-		if let m = mvi.model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.Model_Generated {
 			UIPasteboard.general.string = m.request
 			toast.pop(
 				Text("Copied to pasteboard!").anyView,
@@ -855,7 +882,7 @@ struct ReceiveLightningView: View, ViewName {
 	func copyImageToPasteboard() -> Void {
 		log.trace("[\(viewName)] copyImageToPasteboard()")
 		
-		if let m = mvi.model as? Receive.ModelGenerated,
+		if let m = mvi.model as? Receive.Model_Generated,
 			qrCode.value == m.request,
 			let qrCodeCgImage = qrCode.cgImage
 		{
@@ -890,7 +917,7 @@ struct ReceiveLightningView: View, ViewName {
 	func shareTextToSystem() -> Void {
 		log.trace("[\(viewName)] shareTextToSystem()")
 		
-		if let m = mvi.model as? Receive.ModelGenerated {
+		if let m = mvi.model as? Receive.Model_Generated {
 			withAnimation {
 				let url = "lightning:\(m.request)"
 				sheet = ReceiveViewSheet.sharingUrl(url: url)
@@ -901,7 +928,7 @@ struct ReceiveLightningView: View, ViewName {
 	func shareImageToSystem() -> Void {
 		log.trace("[\(viewName)] shareImageToSystem()")
 		
-		if let m = mvi.model as? Receive.ModelGenerated,
+		if let m = mvi.model as? Receive.Model_Generated,
 			qrCode.value == m.request,
 			let qrCodeCgImage = qrCode.cgImage
 		{
@@ -932,7 +959,7 @@ struct ReceiveLightningView: View, ViewName {
 	func didTapEditButton() -> Void {
 		log.trace("[\(viewName)] didTapEditButton()")
 		
-		if let model = mvi.model as? Receive.ModelGenerated {
+		if let model = mvi.model as? Receive.Model_Generated {
 			
 			shortSheetState.display(dismissable: true) {
 				
@@ -949,7 +976,7 @@ struct ReceiveLightningView: View, ViewName {
 	func lastIncomingPaymentChanged(_ lastIncomingPayment: Lightning_kmpIncomingPayment) {
 		log.trace("[\(viewName)] lastIncomingPaymentChanged()")
 		
-		guard let model = mvi.model as? Receive.ModelGenerated else {
+		guard let model = mvi.model as? Receive.Model_Generated else {
 			return
 		}
 		
@@ -1627,6 +1654,9 @@ struct SwapInView: View, ViewName {
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast
 	
+	@Binding var lastDescription: String?
+	@Binding var lastAmount: Lightning_kmpMilliSatoshi?
+	
 	@StateObject var qrCode = QRCode()
 	
 	@State var sheet: ReceiveViewSheet? = nil
@@ -1692,7 +1722,7 @@ struct SwapInView: View, ViewName {
 				ReceiveView.copyButton {
 					// using simultaneousGesture's below
 				}
-				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
 				.simultaneousGesture(LongPressGesture().onEnded { _ in
 					didLongPressCopyButton()
 				})
@@ -1703,7 +1733,7 @@ struct SwapInView: View, ViewName {
 				ReceiveView.shareButton {
 					// using simultaneousGesture's below
 				}
-				.disabled(!(mvi.model is Receive.ModelSwapInGenerated))
+				.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
 				.simultaneousGesture(LongPressGesture().onEnded { _ in
 					didLongPressShareButton()
 				})
@@ -1715,6 +1745,18 @@ struct SwapInView: View, ViewName {
 			
 			feesInfoView
 				.padding([.top, .leading, .trailing])
+			
+			Button {
+				didTapLightningButton()
+			} label: {
+				HStack {
+					Image(systemName: "repeat") // alt: "arrowshape.bounce.forward.fill"
+						.imageScale(.small)
+
+					Text("Show a Lightning invoice")
+				}
+			}
+			.padding(.top)
 			
 			Spacer()
 			
@@ -1754,7 +1796,7 @@ struct SwapInView: View, ViewName {
 	@ViewBuilder
 	var qrCodeView: some View {
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
 			qrCode.value == m.address,
 			let qrCodeImage = qrCode.image
 		{
@@ -1781,7 +1823,7 @@ struct SwapInView: View, ViewName {
 					.padding(.bottom, 10)
 			
 				Group {
-					if mvi.model is Receive.ModelSwapInRequesting {
+					if mvi.model is Receive.Model_SwapIn_Requesting {
 						Text("Requesting Swap-In Address...")
 					} else {
 						Text("Generating QRCode...")
@@ -1839,7 +1881,7 @@ struct SwapInView: View, ViewName {
 	
 	func bitcoinAddress() -> String? {
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
 			return m.address
 		} else {
 			return nil
@@ -1858,7 +1900,7 @@ struct SwapInView: View, ViewName {
 	func onModelChange(model: Receive.Model) -> Void {
 		log.trace("[\(viewName)] onModelChange()")
 		
-		if let m = model as? Receive.ModelSwapInGenerated {
+		if let m = model as? Receive.Model_SwapIn_Generated {
 			log.debug("[\(viewName)] updating qr code...")
 			qrCode.generate(value: m.address)
 		}
@@ -1894,7 +1936,7 @@ struct SwapInView: View, ViewName {
 	func copyTextToPasteboard() -> Void {
 		log.trace("[\(viewName)] copyTextToPasteboard()")
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
 			UIPasteboard.general.string = m.address
 			toast.pop(
 				Text("Copied to pasteboard!").anyView,
@@ -1906,7 +1948,7 @@ struct SwapInView: View, ViewName {
 	func copyImageToPasteboard() -> Void {
 		log.trace("[\(viewName)] copyImageToPasteboard()")
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
 			qrCode.value == m.address,
 			let qrCodeCgImage = qrCode.cgImage
 		{
@@ -1941,7 +1983,7 @@ struct SwapInView: View, ViewName {
 	func shareTextToSystem() {
 		log.trace("[\(viewName)] shareTextToSystem()")
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated {
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated {
 			let url = "bitcoin:\(m.address)"
 			sheet = ReceiveViewSheet.sharingUrl(url: url)
 		}
@@ -1950,7 +1992,7 @@ struct SwapInView: View, ViewName {
 	func shareImageToSystem() {
 		log.trace("[\(viewName)] shareImageToSystem()")
 		
-		if let m = mvi.model as? Receive.ModelSwapInGenerated,
+		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
 			qrCode.value == m.address,
 			let qrCodeCgImage = qrCode.cgImage
 		{
@@ -1977,6 +2019,15 @@ struct SwapInView: View, ViewName {
 			})
 		}
 	}
+	
+	func didTapLightningButton() {
+		log.trace("[\(viewName)] didTapLightningButton()")
+		
+		mvi.intent(Receive.IntentAsk(
+			amount: lastAmount,
+			desc: lastDescription
+		))
+	}
 }
 
 // MARK:-
@@ -1988,13 +2039,13 @@ class ReceiveView_Previews: PreviewProvider {
 	static var previews: some View {
 
 		NavigationView {
-			ReceiveView().mock(Receive.ModelAwaiting())
+			ReceiveView().mock(Receive.Model_Awaiting())
 		}
 		.modifier(GlobalEnvironment())
 		.previewDevice("iPhone 11")
 
 		NavigationView {
-			ReceiveView().mock(Receive.ModelGenerated(
+			ReceiveView().mock(Receive.Model_Generated(
 				request: request,
 				paymentHash: "foobar",
 				amount: Lightning_kmpMilliSatoshi(msat: 170000),
