@@ -372,27 +372,26 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	var paymentDescriptionRow: some View {
 		let identifier: String = #function
 		
-		if let pDescription = paymentInfo.paymentDescription() {
+		InfoGridRow(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
 			
-			InfoGridRow(
-				identifier: identifier,
-				hSpacing: horizontalSpacingBetweenColumns,
-				keyColumnWidth: keyColumnWidth(identifier: identifier)
-			) {
-				
-				keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
-				
-			} valueColumn: {
-				
-				Text(pDescription.count > 0 ? pDescription : "No description")
-					.contextMenu {
-						Button(action: {
-							UIPasteboard.general.string = pDescription
-						}) {
-							Text("Copy")
-						}
+			keyColumn(NSLocalizedString("Desc", comment: "Label in SummaryInfoGrid"))
+			
+		} valueColumn: {
+			
+			let description = paymentInfo.paymentDescription() ??
+			                  NSLocalizedString("No description", comment: "placeholder text")
+			Text(description)
+				.contextMenu {
+					Button(action: {
+						UIPasteboard.general.string = description
+					}) {
+						Text("Copy")
 					}
-			}
+				}
 		}
 	}
 	

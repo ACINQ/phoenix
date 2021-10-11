@@ -36,31 +36,42 @@ extension WalletPaymentInfo {
 	
 	func paymentDescription() -> String? {
 		
-		if let description = metadata.userDescription {
+		let sanitize = { (input: String?) -> String? in
+			
+			if let trimmedInput = input?.trimmingCharacters(in: .whitespacesAndNewlines) {
+				if trimmedInput.count > 0 {
+					return trimmedInput
+				}
+			}
+			
+			return nil
+		}
+		
+		if let description = sanitize(metadata.userDescription) {
 			return description
 		}
-		if let description = metadata.lnurl?.description_ {
+		if let description = sanitize(metadata.lnurl?.description_) {
 			return description
 		}
 		
 		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
 			
 			if let invoice = incomingPayment.origin.asInvoice() {
-				return invoice.paymentRequest.description_
+				return sanitize(invoice.paymentRequest.description_)
 			} else if let _ = incomingPayment.origin.asKeySend() {
 				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
 			} else if let swapIn = incomingPayment.origin.asSwapIn() {
-				return swapIn.address
+				return sanitize(swapIn.address)
 			}
 			
 		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
 			
 			if let normal = outgoingPayment.details.asNormal() {
-				return normal.paymentRequest.desc()
+				return sanitize(normal.paymentRequest.desc())
 			} else if let _ = outgoingPayment.details.asKeySend() {
 				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
 			} else if let swapOut = outgoingPayment.details.asSwapOut() {
-				return swapOut.address
+				return sanitize(swapOut.address)
 			} else if let _ = outgoingPayment.details.asChannelClosing() {
 				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
 			}
