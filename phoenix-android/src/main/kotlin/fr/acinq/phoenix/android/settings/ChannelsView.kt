@@ -118,7 +118,7 @@ private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
                 Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(channel.txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
+                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(channel.txId))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
                 Spacer(modifier = Modifier.weight(1.0f))
                 Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
             }
