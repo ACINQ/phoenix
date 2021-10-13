@@ -1,16 +1,13 @@
 package fr.acinq.phoenix.controllers.payments
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
-import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.Chain
@@ -21,7 +18,7 @@ import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.managers.Utilities.BitcoinAddressInfo
 import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
-import fr.acinq.phoenix.utils.localCommitmentSpec
+import fr.acinq.phoenix.utils.calculateBalance
 import io.ktor.http.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.delay
@@ -79,18 +76,6 @@ class AppScanController(
                 }}
             }
         }
-    }
-
-    private fun calculateBalance(channels: Map<ByteVector32, ChannelState>): MilliSatoshi {
-        return channels.values.map {
-            when (it) {
-                is Closing -> MilliSatoshi(0)
-                is Closed -> MilliSatoshi(0)
-                is Aborted -> MilliSatoshi(0)
-                is ErrorInformationLeak -> MilliSatoshi(0)
-                else -> it.localCommitmentSpec?.toLocal ?: MilliSatoshi(0)
-            }
-        }.sum()
     }
 
     private suspend fun getBalance(): MilliSatoshi {

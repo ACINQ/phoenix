@@ -16,6 +16,11 @@ jobs:
       uses: actions/checkout@v2
       with:
         path: phoenix
+        lfs: true
+    - name: Checkout LFS objects
+      run: |
+        cd phoenix
+        git lfs checkout
 
     - name: Checkout eclair-core
       uses: actions/checkout@v2
