@@ -4,8 +4,12 @@ name: Build
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'phoenix-legacy/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'phoenix-legacy/**'
 
 jobs:
   build:
