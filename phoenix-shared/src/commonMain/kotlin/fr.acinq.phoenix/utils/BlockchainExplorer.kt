@@ -29,4 +29,25 @@ class BlockchainExplorer(private val chain: Chain) {
             }
         }
     }
+
+    fun addressUrl(addr: String, website: Website = Website.MempoolSpace): String {
+        return when (website) {
+            Website.MempoolSpace -> {
+                val base = "https://mempool.space"
+                when (chain) {
+                    Chain.Mainnet -> "$base/address/$addr"
+                    Chain.Testnet -> "$base/testnet/address/$addr"
+                    Chain.Regtest -> "$base/_REGTEST_/address/$addr"
+                }
+            }
+            Website.BlockstreamInfo -> {
+                val base = "https://blockstream.info"
+                when (chain) {
+                    Chain.Mainnet -> "$base/address/$addr"
+                    Chain.Testnet -> "$base/testnet/address/$addr"
+                    Chain.Regtest -> "$base/_REGTEST_/address/$addr"
+                }
+            }
+        }
+    }
 }
