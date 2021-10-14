@@ -55,7 +55,7 @@ fun AmountView(
             )
         }
         Text(
-            text = amount.toPrettyString(unit, localRate),
+            text = amount.toPrettyString(unit, fiatRate),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )

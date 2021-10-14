@@ -19,6 +19,7 @@ object Versions {
         const val ktx = "1.5.0"
         const val lifecycle = "2.3.1"
         const val prefs = "1.1.1"
+        const val datastore = "1.0.0"
         const val compose = "1.1.0-alpha04"
         const val navCompose = "2.4.0-alpha09"
         const val constraintLayoutCompose = "1.0.0-beta02"

@@ -111,7 +111,12 @@ class AppConnectionsDaemon(
                                 name = "Electrum",
                                 statusStateFlow = electrumClient.connectionState
                             ) {
-                                val electrumServerAddress = configurationManager.electrumServerAddress()
+                                val electrumServerAddress : ServerAddress? = configurationManager.electrumConfig().value?.let { electrumConfig ->
+                                    when (electrumConfig) {
+                                        is ElectrumConfig.Custom -> electrumConfig.server
+                                        is ElectrumConfig.Random -> configurationManager.randomElectrumServer()
+                                    }
+                                }
                                 if (electrumServerAddress == null) {
                                     logger.info { "ignored electrum connection opportunity because no server is configured yet" }
                                 } else {
@@ -222,6 +227,7 @@ class AppConnectionsDaemon(
         launch {
             var previousElectrumConfig: ElectrumConfig? = null
             configurationManager.electrumConfig().collect { newElectrumConfig ->
+                logger.info { "electrum config changed from=$previousElectrumConfig to $newElectrumConfig" }
                 val changed = when (val oldElectrumConfig = previousElectrumConfig) {
                     is ElectrumConfig.Custom -> {
                         when (newElectrumConfig) {

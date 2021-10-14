@@ -21,6 +21,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.controllers.ControllerFactory
@@ -35,11 +36,12 @@ typealias CF = ControllerFactory
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavHostController?> { null }
-val LocalKeyState = compositionLocalOf<KeyState> { KeyState.Unknown }
+val LocalKeyState = staticCompositionLocalOf<KeyState> { KeyState.Unknown }
 val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalFiatRates = compositionLocalOf<List<BitcoinPriceRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
+val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 
 val navController: NavHostController
     @Composable
@@ -49,11 +51,11 @@ val keyState
     @Composable
     get() = LocalKeyState.current
 
-val localUnit: CurrencyUnit
+val amountUnit: CurrencyUnit
     @Composable
     get() = if (LocalShowInFiat.current) LocalFiatCurrency.current else LocalBitcoinUnit.current
 
-val localRate: BitcoinPriceRate?
+val fiatRate: BitcoinPriceRate?
     @Composable
     get() = LocalFiatCurrency.current.let { prefFiat -> LocalFiatRates.current.find { it.fiatCurrency == prefFiat } }
 

@@ -17,51 +17,64 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.Context
-import androidx.preference.PreferenceManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import org.slf4j.LoggerFactory
+import java.io.IOException
+
+
+val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = Prefs.DATASTORE_FILE)
 
 object Prefs {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private const val PREFS_LAST_VERSION_USED: String = "PREFS_LAST_VERSION_USED"
+    const val DATASTORE_FILE = "settings"
 
     // -- unit, fiat, conversion...
-    const val PREFS_SHOW_AMOUNT_IN_FIAT: String = "PREFS_SHOW_AMOUNT_IN_FIAT"
-    const val PREFS_FIAT_CURRENCY: String = "PREFS_FIAT_CURRENCY"
-    const val PREFS_BITCOIN_UNIT: String = "PREFS_COIN_UNIT"
-
-    // -- payment configuration
-    const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
+    val PREFS_SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("PREFS_SHOW_AMOUNT_IN_FIAT")
+    val PREFS_BITCOIN_UNIT = stringPreferencesKey("PREFS_BITCOIN_UNIT")
+    val PREFS_FIAT_CURRENCY = stringPreferencesKey("PREFS_FIAT_CURRENCY")
 
     // -- node configuration
-    const val PREFS_ELECTRUM_ADDRESS = "PREFS_ELECTRUM_ADDRESS"
+    val PREFS_ELECTRUM_ADDRESS = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS")
     const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
 
-    private fun prefs(context: Context) = PreferenceManager.getDefaultSharedPreferences(context)
+    private fun prefs(context: Context): Flow<Preferences> {
+        return context.datastore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+    }
 
     // -- ==================================
 
-    fun getLastVersionUsed(context: Context): Int = prefs(context).getInt(PREFS_LAST_VERSION_USED, 0)
-    fun saveLastVersionUsed(context: Context, version: Int) = prefs(context).edit().putInt(PREFS_LAST_VERSION_USED, version).apply()
+    fun getBitcoinUnit(context: Context): Flow<BitcoinUnit> = prefs(context).map { BitcoinUnit.valueOf(it[PREFS_BITCOIN_UNIT] ?: BitcoinUnit.Sat.name) }
+    suspend fun saveBitcoinUnit(context: Context, coinUnit: BitcoinUnit) = context.datastore.edit { it[PREFS_BITCOIN_UNIT] = coinUnit.name }
+    fun getFiatCurrency(context: Context): Flow<FiatCurrency> = prefs(context).map { FiatCurrency.valueOf(it[PREFS_FIAT_CURRENCY] ?: FiatCurrency.USD.name) }
+    suspend fun saveFiatCurrency(context: Context, currency: FiatCurrency) = context.datastore.edit { it[PREFS_FIAT_CURRENCY] = currency.name }
+    fun getIsAmountInFiat(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SHOW_AMOUNT_IN_FIAT] ?: false }
+    suspend fun saveIsAmountInFiat(context: Context, inFiat: Boolean) = context.datastore.edit { it[PREFS_SHOW_AMOUNT_IN_FIAT] = inFiat }
 
-    fun getFiatCurrency(context: Context): FiatCurrency = FiatCurrency.valueOf(prefs(context).getString(PREFS_FIAT_CURRENCY, FiatCurrency.USD.name) ?: FiatCurrency.USD.name)
-    fun getBitcoinUnit(context: Context): BitcoinUnit = BitcoinUnit.valueOf(prefs(context).getString(PREFS_BITCOIN_UNIT, BitcoinUnit.Sat.name) ?: BitcoinUnit.Sat.name)
-
-    fun useFiat(context: Context): Boolean = prefs(context).getBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, false)
-    fun saveUseFiat(context: Context, inFiat: Boolean) = prefs(context).edit().putBoolean(PREFS_SHOW_AMOUNT_IN_FIAT, inFiat).apply()
-
-    fun getDefaultDescription(context: Context): String = prefs(context).getString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, "") ?: ""
-
-    fun getElectrumServer(context: Context): ServerAddress? = prefs(context).getString(PREFS_ELECTRUM_ADDRESS, null)?.run {
-        log.info("using pref electrum=$this")
-        if (contains(":")) {
-            val (host, port) =  split(":")
-            ServerAddress(host, port.toInt())
-        } else null
+    fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
+        it[PREFS_ELECTRUM_ADDRESS]?.takeIf { it.isNotBlank() }?.let { address ->
+            log.info("retrieved preferred electrum=$address from datastore")
+            if (address.contains(":")) {
+                val (host, port) = address.split(":")
+                ServerAddress(host, port.toInt())
+            } else ServerAddress(address, 50002)
+        }
     }
-    fun saveElectrumServer(context: Context, address: String) = prefs(context).edit().putString(PREFS_ELECTRUM_ADDRESS, address).apply()
-    fun saveElectrumServer(context: Context, address: ServerAddress) = prefs(context).edit().putString(PREFS_ELECTRUM_ADDRESS, "${address.host}:${address.port}").apply()
+
+    suspend fun saveElectrumServer(context: Context, address: String) = context.datastore.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
+    suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
 }

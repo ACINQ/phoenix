@@ -80,8 +80,8 @@ dependencies {
     // -- AndroidX: preferences
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.Android.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Android.lifecycle}")
-    // -- AndroidX: preferences
-    implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
+    // -- AndroidX: preferences datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // -- jetpack compose
     implementation("androidx.compose.ui:ui:${Versions.Android.compose}")

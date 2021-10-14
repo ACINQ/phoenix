@@ -212,3 +212,34 @@ fun Button(
         }
     }
 }
+
+@Composable
+fun Clickable(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    backgroundColor: Color = Color.Unspecified, // transparent by default!
+    content: @Composable () -> Unit,
+) {
+    val colors = ButtonDefaults.buttonColors(
+        backgroundColor = backgroundColor,
+        contentColor = LocalContentColor.current,
+    )
+    val contentColor by colors.contentColor(true)
+    Surface(
+        shape = RectangleShape,
+        contentColor = contentColor,
+        elevation = 0.dp,
+        modifier = modifier
+            .clickable(
+                onClick = onClick,
+                role = Role.Button,
+            )
+    ) {
+        CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
+            ProvideTextStyle(value = textStyle) {
+                content()
+            }
+        }
+    }
+}

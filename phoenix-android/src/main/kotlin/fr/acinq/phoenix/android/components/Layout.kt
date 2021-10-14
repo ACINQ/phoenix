@@ -68,8 +68,7 @@ fun ScreenHeader(
 
 @Composable
 fun ScreenBody(
-    modifier: Modifier = Modifier,
-    padding: PaddingValues = PaddingValues(start = 50.dp, top = 16.dp, bottom = 16.dp, end = 24.dp),
+    modifier: Modifier = Modifier.padding(PaddingValues(start = 50.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)),
     content: @Composable () -> Unit
 ) {
     Column(
@@ -79,9 +78,7 @@ fun ScreenBody(
     ) {
         HSeparator()
         Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(padding)
+            modifier = modifier.fillMaxWidth()
         ) {
             content()
         }
@@ -120,6 +117,7 @@ fun Dialog(
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
         Column(
             Modifier
+                .padding(vertical = 50.dp) // vertical padding for tall dialogs
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)

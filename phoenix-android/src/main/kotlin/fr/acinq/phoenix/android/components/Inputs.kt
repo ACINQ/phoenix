@@ -96,7 +96,7 @@ fun AmountInput(
     // get unit ambients
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
-    val rate = localRate
+    val rate = fiatRate
     val units = if (rate != null) {
         listOf<CurrencyUnit>(
             BitcoinUnit.Sat,

@@ -47,6 +47,7 @@ import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.share
 import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
+import fr.acinq.phoenix.data.Chain
 
 @Composable
 fun ChannelsView() {
@@ -70,7 +71,7 @@ fun ChannelsView() {
                 Text(text = stringResource(id = R.string.listallchannels_no_channels))
             }
         } else {
-            ScreenBody(padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)) {
+            ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(model.channels) {
                         ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
@@ -112,13 +113,24 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
 @Composable
 private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
     val context = LocalContext.current
+    val business = business
     Dialog(
         onDismiss = onDismiss,
         buttons = {
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
                 Button(onClick = { share(context, channel.json, subject = "") }, icon = R.drawable.ic_share)
-                Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(channel.txUrl))) }, text = stringResource(id = R.string.listallchannels_funding_tx))
+                Button(
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://mempool.space/${if (business.chain == Chain.Testnet) "testnet/tx" else "tx"}/${channel.txId}")
+                            )
+                        )
+                    },
+                    text = stringResource(id = R.string.listallchannels_funding_tx)
+                )
                 Spacer(modifier = Modifier.weight(1.0f))
                 Button(onClick = onDismiss, text = stringResource(id = R.string.listallchannels_close))
             }

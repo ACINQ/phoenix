@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,8 +39,12 @@ import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.receive.ReceiveView
 import fr.acinq.phoenix.android.send.SendView
 import fr.acinq.phoenix.android.settings.*
+import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.last
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
@@ -48,15 +53,22 @@ fun AppView(appVM: AppViewModel) {
     val log = logger()
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
+    val context = LocalContext.current
+    val isAmountInFiat = Prefs.getIsAmountInFiat(context).collectAsState(false)
+    val fiatCurrency = Prefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
+    val bitcoinUnit = Prefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
+    val electrumServer = Prefs.getElectrumServer(context).collectAsState(initial = null)
+
     CompositionLocalProvider(
         LocalBusiness provides application.business,
         LocalControllerFactory provides application.business.controllers,
         LocalNavController provides navController,
         LocalKeyState provides appVM.keyState,
         LocalFiatRates provides fiatRates.value,
-        LocalBitcoinUnit provides appVM.bitcoinUnit,
-        LocalFiatCurrency provides appVM.fiatCurrency,
-        LocalShowInFiat provides appVM.showInFiat,
+        LocalBitcoinUnit provides bitcoinUnit.value,
+        LocalFiatCurrency provides fiatCurrency.value,
+        LocalShowInFiat provides isAmountInFiat.value,
+        LocalElectrumServer provides electrumServer.value
     ) {
         Column(
             Modifier
@@ -106,6 +118,9 @@ fun AppView(appVM: AppViewModel) {
                 }
                 composable(Screen.MutualClose.fullRoute) {
                     MutualCloseView()
+                }
+                composable(Screen.Preferences.fullRoute) {
+                    PreferencesView()
                 }
             }
         }

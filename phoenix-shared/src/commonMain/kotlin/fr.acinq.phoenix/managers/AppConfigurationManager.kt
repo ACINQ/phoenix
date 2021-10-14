@@ -173,21 +173,12 @@ class AppConfigurationManager(
     private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
     fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
 
-    fun electrumServerAddress(): ServerAddress? {
-        return _electrumConfig.value?.let {
-            when (it) {
-                is ElectrumConfig.Custom -> it.server
-                is ElectrumConfig.Random -> randomElectrumServer()
-            }
-        }
-    }
-
     /** Use this method to set a server to connect to. If null, will connect to a random server. */
     fun updateElectrumConfig(server: ServerAddress?) {
         _electrumConfig.value = server?.let { ElectrumConfig.Custom(it) } ?: ElectrumConfig.Random
     }
 
-    private fun randomElectrumServer() = when (chain) {
+    fun randomElectrumServer() = when (chain) {
         Chain.Mainnet -> electrumMainnetConfigurations.random()
         Chain.Testnet -> electrumTestnetConfigurations.random()
         Chain.Regtest -> platformElectrumRegtestConf()

@@ -176,6 +176,9 @@ fun PhoenixAndroidTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Co
 }
 
 @Composable
+fun mutedTypo(): TextStyle = MaterialTheme.typography.body1.copy(color = mutedTextColor())
+
+@Composable
 fun monoTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
 
 @Composable

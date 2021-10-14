@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -51,7 +52,7 @@ fun SettingsView() {
         // -- general
         SettingCategory(R.string.settings_general_title)
         SettingButton(text = R.string.settings_about, icon = R.drawable.ic_help_circle, onClick = { })
-        SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { })
+        SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
         SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
         SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { })
         SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { })
@@ -79,4 +80,24 @@ fun SettingCategory(textResId: Int) {
             .fillMaxWidth()
             .padding(start = 50.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
     )
+}
+
+@Composable
+fun Setting(modifier: Modifier = Modifier, title: String, description: String?, onClick: (() -> Unit)? = null) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(onClick = onClick)
+                } else {
+                    Modifier
+                }
+            )
+            .then(modifier)
+            .padding(start = 50.dp, top = 10.dp, bottom = 10.dp, end = 16.dp)
+    ) {
+        Text(title, style = MaterialTheme.typography.subtitle2)
+        Text(description ?: "", style = MaterialTheme.typography.caption)
+    }
 }
