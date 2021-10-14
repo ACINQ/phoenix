@@ -77,6 +77,7 @@
     <string name="startup_unlock_button">Unlock</string>
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Loading…</string>
+    <string name="startup_starting">Starting…</string>
     <string name="startup_wait_tor">Starting Tor…</string>
     <string name="startup_start_button">Restart</string>
     <string name="startup_settings_button">Settings</string>
@@ -515,6 +516,42 @@
 
     <string name="prefs_display_title">Display options</string>
     <string name="prefs_display_coin_label">Bitcoin unit</string>
+    <string name="prefs_display_coin_sat_label">Satoshi (sat)</string>
+    <string name="prefs_display_coin_sat_desc">1 sat is 0.00000001 btc</string>
+    <string name="prefs_display_coin_bit_label">Bit (bit)</string>
+    <string name="prefs_display_coin_bit_desc">1 bit is 0.000001 btc</string>
+    <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
+    <string name="prefs_display_coin_mbtc_desc">1 mbtc is 0.001 btc</string>
+    <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
+
+    <string name="prefs_display_fiat_AUD">Australian Dollar (AUD)</string>
+    <string name="prefs_display_fiat_BRL">Brazilian Real (BRL)</string>
+    <string name="prefs_display_fiat_CAD">Canadian Dollar (CAD)</string>
+    <string name="prefs_display_fiat_CHF">Swiss Franc (CHF)</string>
+    <string name="prefs_display_fiat_CLP">Chilean Peso (CLP)</string>
+    <string name="prefs_display_fiat_CNY">Chinese Yuan (CNY)</string>
+    <string name="prefs_display_fiat_CZK">Czech Koruna (CZK)</string>
+    <string name="prefs_display_fiat_DKK">Danish Krone (DKK)</string>
+    <string name="prefs_display_fiat_EUR">Euro (EUR)</string>
+    <string name="prefs_display_fiat_GBP">Great British Pound (GBP)</string>
+    <string name="prefs_display_fiat_HKD">Hong Kong Dollar (HKD)</string>
+    <string name="prefs_display_fiat_HRK">Croatian Kuna (HRK)</string>
+    <string name="prefs_display_fiat_HUF">Hungarian Forint (HUF)</string>
+    <string name="prefs_display_fiat_INR">Indian Rupee (HRK)</string>
+    <string name="prefs_display_fiat_ISK">Icelandic Kròna (ISK)</string>
+    <string name="prefs_display_fiat_JPY">Japanese Yen (INR) (JPY)</string>
+    <string name="prefs_display_fiat_KRW">Korean Won (KRW)</string>
+    <string name="prefs_display_fiat_MXN">Mexican Peso (MXN)</string>
+    <string name="prefs_display_fiat_NZD">New Zealand Dollar (NZD)</string>
+    <string name="prefs_display_fiat_PLN">Polish Zloty (PLN)</string>
+    <string name="prefs_display_fiat_RON">Romanian New Leu (RON)</string>
+    <string name="prefs_display_fiat_RUB">Russian Ruble (RUB)</string>
+    <string name="prefs_display_fiat_SEK">Swedish Krona (SEK)</string>
+    <string name="prefs_display_fiat_SGD">Singapore Dollar (SGD)</string>
+    <string name="prefs_display_fiat_THB">Thai Baht (THB)</string>
+    <string name="prefs_display_fiat_TWD">Taiwan New Dollar (TWD)</string>
+    <string name="prefs_display_fiat_USD">United States Dollar (USD)</string>
+
     <string name="prefs_display_fiat_label">Fiat currency</string>
     <string name="prefs_display_theme_label">Application theme</string>
     <string name="prefs_display_explorer_label">Onchain explorer</string>

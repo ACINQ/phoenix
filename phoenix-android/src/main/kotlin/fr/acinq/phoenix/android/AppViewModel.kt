@@ -42,23 +42,9 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
     val log: Logger = newLogger(LoggerFactory.default)
     var keyState: KeyState by mutableStateOf(KeyState.Unknown)
         private set
-    var bitcoinUnit: BitcoinUnit by mutableStateOf(BitcoinUnit.Sat)
-    var fiatCurrency: FiatCurrency by mutableStateOf(FiatCurrency.USD)
-    var showInFiat: Boolean by mutableStateOf(false)
 
     init {
         refreshSeed()
-        refreshPrefs()
-    }
-
-    fun refreshPrefs() {
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-            log.error(e) { "error when refreshing preferences" }
-        }) {
-            bitcoinUnit = Prefs.getBitcoinUnit(applicationContext)
-            fiatCurrency = Prefs.getFiatCurrency(applicationContext)
-            showInFiat = Prefs.useFiat(applicationContext)
-        }
     }
 
     private fun refreshSeed() {

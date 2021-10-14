@@ -45,6 +45,8 @@ struct HomeView : MVIView, ViewName {
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	
+	@State var showBlockchainExplorerOptions = false
+	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
 	
@@ -124,12 +126,47 @@ struct HomeView : MVIView, ViewName {
 				if let incoming = incomingAmount() {
 					
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					
+						if #available(iOS 15.0, *) {
 						
-						Image(systemName: "link")
-							.padding(.trailing, 2)
-						
-						Text("+\(incoming.string) incoming".lowercased())
-							.onTapGesture { toggleCurrencyType() }
+							Image(systemName: "link") // 
+								.padding(.trailing, 2)
+								.onTapGesture { showBlockchainExplorerOptions = true }
+							
+							Text("+\(incoming.string) incoming".lowercased())
+								.onTapGesture { showBlockchainExplorerOptions = true }
+								.confirmationDialog("Blockchain Explorer",
+									isPresented: $showBlockchainExplorerOptions,
+									titleVisibility: .automatic
+								) {
+									Button("Mempool.space") {
+										exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
+									}
+									Button("Blockstream.info") {
+										exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+									}
+									
+									let addrCount = lastIncomingSwaps.count
+									if addrCount >= 2 {
+										Button("Copy bitcoin addresses (\(addrCount)") {
+											copyIncomingSwap()
+										}
+									} else {
+										Button("Copy bitcoin address") {
+											copyIncomingSwap()
+										}
+									}
+									
+								}
+							
+						} else { // same functionality as before
+							
+							Image(systemName: "link")
+								.padding(.trailing, 2)
+							
+							Text("+\(incoming.string) incoming".lowercased())
+								.onTapGesture { toggleCurrencyType() }
+						}
 					}
 					.font(.callout)
 					.foregroundColor(.secondary)
@@ -302,7 +339,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("[\(viewName)] onIncomingSwapsChanged()")
+		log.trace("[\(viewName)] onIncomingSwapsChanged(): \(incomingSwaps)")
 		
 		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
 			return sum + item.msat
@@ -488,6 +525,33 @@ struct HomeView : MVIView, ViewName {
 					count: newCount
 				)
 			}
+		}
+	}
+	
+	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
+		log.trace("[\(viewName)] exploreIncomingSwap()")
+		
+		guard let addr = lastIncomingSwaps.keys.first else {
+			return
+		}
+		
+		let business = AppDelegate.get().business
+		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyIncomingSwap() {
+		log.trace("[\(viewName)] copyIncomingSwap()")
+		
+		let addresses = lastIncomingSwaps.keys
+		
+		if addresses.count == 1 {
+			UIPasteboard.general.string = addresses.first
+			
+		} else if addresses.count >= 2 {
+			UIPasteboard.general.string = addresses.joined(separator: ", ")
 		}
 	}
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -38,6 +39,9 @@ import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.launch
 
 @Composable
 fun ElectrumView() {
@@ -50,20 +54,30 @@ fun ElectrumView() {
         title = stringResource(id = R.string.electrum_title),
         subtitle = stringResource(id = R.string.electrum_subtitle)
     )
-    ScreenBody(padding = PaddingValues(horizontal = 0.dp, vertical = 8.dp)) {
+
+    ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
         MVIView(CF::electrumConfiguration) { model, postIntent ->
             val showServerDialog = remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
+            val prefElectrumServer = LocalElectrumServer.current
             if (showServerDialog.value) {
                 ElectrumServerDialog(
-                    onConfirm = {
-                        postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(it))
-                        Prefs.saveElectrumServer(context, it)
-                        showServerDialog.value = false
+                    initialAddress = prefElectrumServer,
+                    onConfirm = { address ->
+                        scope.launch {
+                            Prefs.saveElectrumServer(context, address)
+                            postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address = address))
+                            showServerDialog.value = false
+                        }
                     },
                     onCancel = { showServerDialog.value = false })
             }
             val connection = model.connection
             val config = model.configuration
+            val error = model.error
+            if (error != null) {
+                Text("error! cannot connect to ${config} ${error.message}")
+            }
             val title = when {
                 connection == Connection.CLOSED && config is ElectrumConfig.Random -> stringResource(id = R.string.electrum_not_connected)
                 connection == Connection.CLOSED && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
@@ -93,17 +107,33 @@ fun ElectrumView() {
 
 @Composable
 private fun ElectrumServerDialog(
+    initialAddress: ServerAddress?,
     onConfirm: (String) -> Unit,
     onCancel: () -> Unit
 ) {
-    val prefElectrumServer = Prefs.getElectrumServer(LocalContext.current)
-    var useCustomServer by remember { mutableStateOf(prefElectrumServer != null) }
-    var address by remember { mutableStateOf(prefElectrumServer?.run { "$host:$port" } ?: "") }
+
+    var useCustomServer by remember { mutableStateOf(initialAddress != null) }
+    var address by remember { mutableStateOf(initialAddress?.run { "$host:$port" } ?: "") }
+    var addressError by remember { mutableStateOf(false) }
     Dialog(
         onDismiss = onCancel,
         buttons = {
             Button(onClick = { onCancel() }, text = stringResource(id = R.string.btn_cancel), padding = PaddingValues(8.dp))
-            Button(onClick = { onConfirm(if (useCustomServer) address else "") }, text = stringResource(id = R.string.btn_ok), padding = PaddingValues(8.dp))
+            Button(
+                onClick = {
+                    if (useCustomServer) {
+                        if (address.matches("""(.*):(\d*)""".toRegex())) {
+                            onConfirm(address)
+                        } else {
+                            addressError = true
+                        }
+                    } else {
+                        onConfirm("")
+                    }
+                },
+                text = stringResource(id = R.string.btn_ok),
+                padding = PaddingValues(8.dp)
+            )
         }
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -122,7 +152,17 @@ private fun ElectrumServerDialog(
             ) {
                 Text(text = stringResource(id = R.string.electrum_dialog_input), style = MaterialTheme.typography.subtitle1)
                 Spacer(Modifier.height(8.dp))
-                InputText(text = address, onTextChange = { address = it }, enabled = useCustomServer)
+                InputText(
+                    text = address,
+                    onTextChange = {
+                        addressError = false
+                        address = it
+                    },
+                    enabled = useCustomServer
+                )
+                if (addressError) {
+                    Text("Invalid address, must be <host>:<port>")
+                }
             }
             Spacer(Modifier.height(16.dp))
             Box(
@@ -135,25 +175,5 @@ private fun ElectrumServerDialog(
                 Text(stringResource(id = R.string.electrum_dialog_ssl))
             }
         }
-    }
-}
-
-@Composable
-fun Setting(modifier: Modifier = Modifier, title: String, description: String?, onClick: (() -> Unit)? = null) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
-                } else {
-                    Modifier
-                }
-            )
-            .then(modifier)
-            .padding(start = 50.dp, top = 10.dp, bottom = 10.dp, end = 16.dp)
-    ) {
-        Text(title, style = MaterialTheme.typography.subtitle2)
-        Text(description ?: "", style = MaterialTheme.typography.caption)
     }
 }

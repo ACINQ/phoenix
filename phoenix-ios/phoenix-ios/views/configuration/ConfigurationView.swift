@@ -69,26 +69,6 @@ struct ConfigurationView: MVIView {
 				}
 				
 				NavigationLink(
-					destination: ElectrumConfigurationView(),
-					tag: Tag.ElectrumConfigurationView,
-					selection: $selectedTag
-				) {
-					Label { Text("Electrum server") } icon: {
-						Image(systemName: "link")
-					}
-				}
-				
-				NavigationLink(
-					destination: ComingSoonView(title: "Tor"),
-					tag: Tag.TorView,
-					selection: $selectedTag
-				) {
-					Label { Text("Tor") } icon: {
-						Image(systemName: "shield.lefthalf.fill")
-					}
-				}
-				
-				NavigationLink(
 					destination: PaymentOptionsView(),
 					tag: Tag.PaymentOptionsView,
 					selection: $selectedTag
@@ -134,6 +114,26 @@ struct ConfigurationView: MVIView {
 			}
 
 			Section(header: Text("Advanced")) {
+				
+				NavigationLink(
+					destination: ElectrumConfigurationView(),
+					tag: Tag.ElectrumConfigurationView,
+					selection: $selectedTag
+				) {
+					Label { Text("Electrum server") } icon: {
+						Image(systemName: "link")
+					}
+				}
+				
+				NavigationLink(
+					destination: ComingSoonView(title: "Tor"),
+					tag: Tag.TorView,
+					selection: $selectedTag
+				) {
+					Label { Text("Tor") } icon: {
+						Image(systemName: "shield.lefthalf.fill")
+					}
+				}
 				
 				NavigationLink(
 					destination: LogsConfigurationView(),

@@ -17,7 +17,6 @@
 package fr.acinq.phoenix.android
 
 import android.Manifest
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -29,12 +28,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import fr.acinq.phoenix.android.components.mvi.MockView
-import fr.acinq.phoenix.android.utils.Prefs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 @ExperimentalCoroutinesApi
-class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class MainActivity : AppCompatActivity() {
 
     private val appViewModel by viewModels<AppViewModel> { AppViewModel.Factory(applicationContext) }
 
@@ -59,13 +57,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         // (application as? PhoenixApplication)?.business?.incrementDisconnectCount()
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when(key) {
-            Prefs.PREFS_SHOW_AMOUNT_IN_FIAT, Prefs.PREFS_FIAT_CURRENCY, Prefs.PREFS_BITCOIN_UNIT -> {
-                appViewModel.refreshPrefs()
-            }
-        }
-    }
 }
 
 @Preview(device = Devices.PIXEL_3)
