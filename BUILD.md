@@ -8,7 +8,6 @@ It can run on many different platforms, including mobile devices (iOS and Androi
 ## Requirements
 
 You'll need to install the following:
-- [Git LFS](https://git-lfs.github.com/): large files like png are stored using the Large File Storage Git extension.
 - [Xcode](https://developer.apple.com/xcode/): if you build the iOS app.
 - [Android Studio](https://developer.android.com/studio): if you want to build the Android app. It is also recommended if you want to contribute to the `phoenix-shared` module which contains shared code used by both iOS and Android apps.
 
