@@ -226,8 +226,10 @@ sealed class LNUrl {
 
             val token = line.split("\\s+".toRegex()).firstOrNull() ?: return null
 
-            // The format is: format <username>@<domain.tld>
-            // The username is limited to: a-z0-9-_.
+            // The format is: <username>@<domain.tld>
+            //
+            // The username is technically limited to: a-z0-9-_.
+            // But we don't enforce it, as it's a bit restrictive for a global audience.
             //
             // Note that, in the real world, users will type with capital letters.
             // So we need to auto-convert to lowercase.
@@ -239,10 +241,6 @@ sealed class LNUrl {
 
             val username = components[0].lowercase()
             val domain = components[1]
-
-            if (!Regex("[a-z0-9._-]+").matches(username)) {
-                return null
-            }
 
             // May throw an exception if domain is invalid
             return Url("https://$domain/.well-known/lnurlp/$username")
