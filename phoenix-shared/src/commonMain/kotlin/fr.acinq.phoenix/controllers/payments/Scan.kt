@@ -13,12 +13,13 @@ import kotlin.time.ExperimentalTime
 object Scan {
 
     sealed class BadRequestReason {
-        data class ChainMismatch(val myChain: Chain, val requestChain: Chain?): BadRequestReason()
-        object InvalidLnUrl: BadRequestReason()
-        object UnsupportedLnUrl: BadRequestReason()
-        object IsBitcoinAddress: BadRequestReason()
         object UnknownFormat: BadRequestReason()
+        object IsBitcoinAddress: BadRequestReason()
         object AlreadyPaidInvoice: BadRequestReason()
+        data class ChainMismatch(val myChain: Chain, val requestChain: Chain?): BadRequestReason()
+        data class ServiceError(val url: Url, val error: LNUrl.Error.RemoteFailure): BadRequestReason()
+        data class InvalidLnUrl(val url: Url): BadRequestReason()
+        data class UnsupportedLnUrl(val url: Url): BadRequestReason()
     }
 
     sealed class DangerousRequestReason {

@@ -216,6 +216,37 @@ sealed class LNUrl {
         }
 
         /**
+         * LUD-16 support:
+         * https://github.com/fiatjaf/lnurl-rfc/blob/luds/16.md
+         */
+        fun parseInternetIdentifier(source: String): Url? {
+
+            // Ignore excess input, including additional lines, and leding/trailing whitespace
+            val line = source.lines().firstOrNull { it.isNotBlank() }?.trim() ?: return null
+
+            val token = line.split("\\s+".toRegex()).firstOrNull() ?: return null
+
+            // The format is: <username>@<domain.tld>
+            //
+            // The username is technically limited to: a-z0-9-_.
+            // But we don't enforce it, as it's a bit restrictive for a global audience.
+            //
+            // Note that, in the real world, users will type with capital letters.
+            // So we need to auto-convert to lowercase.
+
+            val components = token.split("@")
+            if (components.size != 2) {
+                return null
+            }
+
+            val username = components[0].lowercase()
+            val domain = components[1]
+
+            // May throw an exception if domain is invalid
+            return Url("https://$domain/.well-known/lnurlp/$username")
+        }
+
+        /**
          * Read the response from a LNUrl service and throw an [LNUrl.Error.RemoteFailure] exception if the service returns a http error code,
          * an invalid JSON body, or a response of such format: `{ status: "error", reason: "..." }`.
          */
