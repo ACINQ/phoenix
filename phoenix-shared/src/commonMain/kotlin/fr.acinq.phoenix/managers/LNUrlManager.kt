@@ -82,16 +82,27 @@ class LNUrlManager(
      * Throws an exception if source is malformed, or invalid.
      */
     fun interactiveExtractLNUrl(source: String): Either<LNUrl.Auth, Url> {
-        val url = try {
+        var url = try {
             LNUrl.parseBech32Url(source)
-        } catch (e1: Exception) {
-            log.debug { "cannot parse source=$source as a bech32 lnurl" }
-            try {
-                LNUrl.parseNonBech32Url(source)
-            } catch (e2: Exception) {
-                log.error { "cannot extract lnurl from source=$source: ${e1.message ?: e1::class} / ${e2.message ?: e2::class}"}
-                throw LNUrl.Error.Invalid
-            }
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as bech32 lnurl: ${e.message ?: e::class}" }
+            null
+        }
+        url = url ?: try {
+            LNUrl.parseNonBech32Url(source)
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as non-bech32 lnurl: ${e.message ?: e::class}" }
+            null
+        }
+        url = url ?: try {
+            LNUrl.parseInternetIdentifier(source)
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as lnurl-id: ${e.message ?: e::class}" }
+            null
+        }
+
+        if (url == null) {
+            throw LNUrl.Error.Invalid
         }
         return when (url.parameters["tag"]) {
             // auth urls must not be called just yet

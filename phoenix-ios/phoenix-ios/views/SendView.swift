@@ -23,7 +23,6 @@ struct SendView: MVIView {
 	var factory: ControllerFactory { return factoryEnv }
 
 	@State var paymentRequest: String? = nil
-	@State var isWarningDisplayed: Bool = false
 	
 	@StateObject var toast = Toast()
 	
@@ -64,8 +63,7 @@ struct SendView: MVIView {
 
 			ScanView(
 				mvi: mvi,
-				paymentRequest: $paymentRequest,
-				isWarningDisplayed: $isWarningDisplayed
+				paymentRequest: $paymentRequest
 			)
 
 		case _ as Scan.Model_InvoiceFlow_InvoiceRequest,
@@ -98,7 +96,6 @@ struct SendView: MVIView {
 		}
 		else if let model = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
 			paymentRequest = model.request
-			isWarningDisplayed = true
 		}
 		else if let model = newModel as? Scan.Model_InvoiceFlow_InvoiceRequest {
 			paymentRequest = model.request
@@ -176,10 +173,11 @@ struct ScanView: View, ViewName {
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
 	
 	@Binding var paymentRequest: String?
-	@Binding var isWarningDisplayed: Bool
 	
-	@State var ignoreScanner: Bool = false // subtle timing bug described below
+	@State var displayWarning: Bool = false
+	@State var ignoreScanner: Bool = false
 	
+	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
 	// Subtle timing bug:
@@ -216,6 +214,14 @@ struct ScanView: View, ViewName {
 			}
 			
 			content
+			
+			if mvi.model is Scan.Model_LnurlServiceFetch {
+				LnurlFetchNotice(
+					title: NSLocalizedString("Fetching Lightning URL", comment: "Progress title"),
+					onCancel: { didCancelLnurlServiceFetch() }
+				)
+				.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+			}
 		}
 		.frame(maxHeight: .infinity)
 		.navigationBarTitle(
@@ -229,7 +235,10 @@ struct ScanView: View, ViewName {
 				removal: .move(edge: .bottom)
 			)
 		)
-		.onChange(of: isWarningDisplayed) { newValue in
+		.onChange(of: mvi.model) { newModel in
+			modelDidChange(newModel)
+		}
+		.onChange(of: displayWarning) { newValue in
 			if newValue {
 				showWarning()
 			}
@@ -239,31 +248,52 @@ struct ScanView: View, ViewName {
 	@ViewBuilder
 	var content: some View {
 		
-		ZStack {
+		VStack {
 			
-			VStack {
-				
-				QrCodeScannerView {(request: String) in
-					didScanQRCode(request)
-				}
-				
-				Button {
-					pasteFromClipboard()
-				} label: {
-					Image(systemName: "arrow.right.doc.on.clipboard")
-					Text("Paste from clipboard")
-						.font(.title2)
-				}
-				.disabled(!UIPasteboard.general.hasStrings)
-				.padding([.top, .bottom])
+			QrCodeScannerView {(request: String) in
+				didScanQRCode(request)
 			}
 			
-			if mvi.model is Scan.Model_LnurlServiceFetch {
-				LnurlFetchNotice(
-					title: NSLocalizedString("Fetching Lightning URL", comment: "Progress title"),
-					onCancel: { didCancelLnurlServiceFetch() }
-				)
+			Button {
+				manualInput()
+			} label: {
+				Image(systemName: "square.and.pencil")
+				Text("Manual input")
 			}
+			.font(.title3)
+			.padding(.top, 10)
+			
+			Divider()
+				.padding([.top, .bottom], 10)
+			
+			Button {
+				pasteFromClipboard()
+			} label: {
+				Image(systemName: "arrow.right.doc.on.clipboard")
+				Text("Paste from clipboard")
+			}
+			.font(.title3)
+			.disabled(!UIPasteboard.general.hasStrings)
+			.padding(.bottom, 10)
+		}
+		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+	}
+	
+	func modelDidChange(_ newModel: Scan.Model) -> Void {
+		log.trace("[\(viewName)] modelDidChange()")
+		
+		if ignoreScanner {
+			// Flow:
+			// - User taps "manual input"
+			// - User types in something and taps "OK"
+			// - We send Scan.Intent.Parse()
+			// - We just got back a response from our request
+			//
+			ignoreScanner = false
+		}
+		
+		if let _ = newModel as? Scan.Model_InvoiceFlow_DangerousRequest {
+			displayWarning = true
 		}
 	}
 	
@@ -274,7 +304,7 @@ struct ScanView: View, ViewName {
 			isFetchingLnurl = true
 		}
 		
-		if !ignoreScanner && !isWarningDisplayed && !isFetchingLnurl {
+		if !ignoreScanner && !isFetchingLnurl {
 			mvi.intent(Scan.Intent_Parse(request: request))
 		}
 	}
@@ -283,6 +313,16 @@ struct ScanView: View, ViewName {
 		log.trace("[\(viewName)] didCancelLnurlServiceFetch()")
 		
 		mvi.intent(Scan.Intent_CancelLnurlServiceFetch())
+	}
+	
+	func manualInput() {
+		log.trace("[\(viewName)] manualInput()")
+		
+		ignoreScanner = true
+		shortSheetState.display(dismissable: true) {
+			
+			ManualInput(mvi: mvi, ignoreScanner: $ignoreScanner)
+		}
 	}
 	
 	func pasteFromClipboard() {
@@ -300,13 +340,13 @@ struct ScanView: View, ViewName {
 			return
 		}
 		
+		displayWarning = false
 		ignoreScanner = true
 		popoverState.display(dismissable: false) {
 			
 			DangerousInvoiceAlert(
 				model: model,
 				intent: mvi.intent,
-				isShowing: $isWarningDisplayed,
 				ignoreScanner: $ignoreScanner
 			)
 		}
@@ -347,12 +387,99 @@ struct LnurlFetchNotice: View, ViewName {
 	}
 }
 
-struct DangerousInvoiceAlert : View, ViewName {
+struct ManualInput: View, ViewName {
+	
+	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
+	@Binding var ignoreScanner: Bool
+	
+	@State var input = ""
+	
+	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Manual Input")
+				.font(.title2)
+				.padding(.bottom)
+			
+			Text(
+				"""
+				Enter a Lightning invoice, LNURL, or Lightning address \
+				you want to send money to.
+				"""
+			)
+			.padding(.bottom)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				TextField("", text: $input)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					input = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
+				}
+				.isHidden(input == "")
+			}
+			.padding(.all, 8)
+			.overlay(
+				RoundedRectangle(cornerRadius: 8)
+					.stroke(Color(UIColor.separator), lineWidth: 1)
+			)
+			.padding(.bottom)
+			.padding(.bottom)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				
+				Button("Cancel") {
+					didCancel()
+				}
+				.font(.title3)
+				
+				Divider()
+					.frame(maxHeight: 20, alignment: Alignment.center)
+					.padding([.leading, .trailing])
+				
+				Button("OK") {
+					didConfirm()
+				}
+				.font(.title3)
+			}
+			
+		} // </VStack>
+		.padding()
+	}
+	
+	func didCancel() -> Void {
+		log.trace("[\(viewName)] didCancel()")
+		
+		shortSheetState.close {
+			ignoreScanner = false
+		}
+	}
+	
+	func didConfirm() -> Void {
+		log.trace("[\(viewName)] didConfirm()")
+		
+		let request = input.trimmingCharacters(in: .whitespacesAndNewlines)
+		if request.count > 0 {
+			mvi.intent(Scan.Intent_Parse(request: request))
+		}
+		
+		shortSheetState.close()
+	}
+}
+
+struct DangerousInvoiceAlert: View, ViewName {
 
 	let model: Scan.Model_InvoiceFlow_DangerousRequest
 	let intent: (Scan.Intent) -> Void
 
-	@Binding var isShowing: Bool
 	@Binding var ignoreScanner: Bool
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -447,15 +574,14 @@ struct DangerousInvoiceAlert : View, ViewName {
 	func didCancel() -> Void {
 		log.trace("[\(viewName)] didCancel()")
 		
-		isShowing = false
-		ignoreScanner = false
-		popoverState.close()
+		popoverState.close {
+			ignoreScanner = false
+		}
 	}
 	
 	func didConfirm() -> Void {
 		log.trace("[\(viewName)] didConfirm()")
 		
-		isShowing = false
 		intent(Scan.Intent_InvoiceFlow_ConfirmDangerousRequest(
 			request: model.request,
 			paymentRequest: model.paymentRequest
