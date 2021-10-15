@@ -47,6 +47,14 @@ extension Scan {
 	typealias LNUrlPay_Error_BadResponseError = LNUrlPayErrorBadResponseError
 	typealias LNUrlPay_Error_ChainMismatch = LNUrlPayErrorChainMismatch
 	typealias LNUrlPay_Error_AlreadyPaidInvoice = LNUrlPayErrorAlreadyPaidInvoice
+	
+	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
+	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
+	typealias BadRequestReason_InvalidLnUrl = BadRequestReasonInvalidLnUrl
+	typealias BadRequestReason_IsBitcoinAddress = BadRequestReasonIsBitcoinAddress
+	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
+	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
+	typealias BadRequestReason_UnsupportedLnUrl = BadRequestReasonUnsupportedLnUrl
 }
 
 extension LNUrl {
@@ -57,4 +65,10 @@ extension LNUrl {
 	typealias PayInvoice_SuccessAction_Aes = PayInvoiceSuccessActionAes
 	
 	typealias PayInvoice_SuccessAction_Aes_Decrypted = PayInvoiceSuccessActionAesDecrypted
+	
+	typealias Error_RemoteFailure = ErrorRemoteFailure
+	typealias Error_RemoteFailure_Code = ErrorRemoteFailureCode
+	typealias Error_RemoteFailure_Detailed = ErrorRemoteFailureDetailed
+	typealias Error_RemoteFailure_Unreadable = ErrorRemoteFailureUnreadable
+	typealias Error_RemoteFailure_CouldNotConnect = ErrorRemoteFailureCouldNotConnect
 }

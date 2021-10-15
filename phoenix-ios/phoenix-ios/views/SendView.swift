@@ -112,7 +112,7 @@ struct SendView: MVIView {
 		log.trace("showErrorToast()")
 		
 		let msg: String
-		if let reason = model.reason as? Scan.BadRequestReasonChainMismatch {
+		if let reason = model.reason as? Scan.BadRequestReason_ChainMismatch {
 			
 			let requestChain = reason.requestChain?.name ?? "unknown"
 			msg = NSLocalizedString(
@@ -120,14 +120,14 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 		
-		} else if model.reason is Scan.BadRequestReasonUnsupportedLnUrl {
+		} else if model.reason is Scan.BadRequestReason_UnsupportedLnUrl {
 			
 			msg = NSLocalizedString(
 				"Phoenix does not support this type of LNURL yet",
 				comment: "Error message - scanning lightning invoice"
 			)
 			
-		} else if model.reason is Scan.BadRequestReasonIsBitcoinAddress {
+		} else if model.reason is Scan.BadRequestReason_IsBitcoinAddress {
 			
 			msg = NSLocalizedString(
 				"""
@@ -137,13 +137,44 @@ struct SendView: MVIView {
 				comment: "Error message - scanning lightning invoice"
 			)
 			
-		} else if model.reason is Scan.BadRequestReasonAlreadyPaidInvoice {
+		} else if model.reason is Scan.BadRequestReason_AlreadyPaidInvoice {
 			
 			msg = NSLocalizedString(
 				"You've already paid this invoice. Paying it again could result in stolen funds.",
 				comment: "Error message - scanning lightning invoice"
 			)
 		
+		} else if let serviceError = model.reason as? Scan.BadRequestReason_ServiceError {
+			
+			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
+			
+			switch serviceError.error {
+			case is LNUrl.Error_RemoteFailure_CouldNotConnect:
+				msg = NSLocalizedString(
+					"Could not connect to service",
+					comment: "Error message - scanning lightning invoice"
+				)
+			case is LNUrl.Error_RemoteFailure_Unreadable:
+				msg = NSLocalizedString(
+					"Service returned unreadable response",
+					comment: "Error message - scanning lightning invoice"
+				)
+			default:
+				// is LNUrl.Error_RemoteFailure_Code
+				// is LNUrl.Error_RemoteFailure_Detailed
+				if isLightningAddress {
+					msg = NSLocalizedString(
+						"Service doesn't support Lightning addresses, or doesn't know this user",
+						comment: "Error message - scanning lightning invoice"
+					)
+				} else {
+					msg = NSLocalizedString(
+						"Service appears to be offline, or they have a down server",
+						comment: "Error message - scanning lightning invoice"
+					)
+				}
+			}
+			
 		} else {
 		
 			msg = NSLocalizedString(

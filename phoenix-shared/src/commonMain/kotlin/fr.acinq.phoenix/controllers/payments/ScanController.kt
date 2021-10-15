@@ -162,23 +162,30 @@ class AppScanController(
                 model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = it.value))
             }
             is Either.Right -> { // it.value: Url
+                val url = it.value
                 val requestId = lnurlRequestId
                 model(Scan.Model.LnurlServiceFetch)
                 val result: Either<Scan.BadRequestReason, LNUrl> = try {
-                    val lnurl = lnurlManager.continueLnUrl(it.value)
+                    val lnurl = lnurlManager.continueLnUrl(url)
                     Either.Right(lnurl)
-                } catch (t: Throwable) {
-                    Either.Left(Scan.BadRequestReason.InvalidLnUrl)
+                } catch (e: Exception) {
+                    when (e) {
+                        is LNUrl.Error.RemoteFailure -> {
+                            Either.Left(Scan.BadRequestReason.ServiceError(url, e))
+                        } else -> {
+                            Either.Left(Scan.BadRequestReason.InvalidLnUrl(url))
+                        }
+                    }
                 }
                 if (requestId != lnurlRequestId) {
                     // Intent.CancelLnurlServiceFetch has been issued
                     return
                 }
                 when (result) {
-                    is Either.Left -> {
+                    is Either.Left -> { // result: BadRequestReason
                         model(Scan.Model.BadRequest(result.value))
                     }
-                    is Either.Right -> {
+                    is Either.Right -> { // result: LNUrl
                         when (val lnurl = result.value) {
                             is LNUrl.Pay -> {
                                 val balance = getBalance()
@@ -189,7 +196,9 @@ class AppScanController(
                                 ))
                             }
                             else -> {
-                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnUrl))
+                                model(Scan.Model.BadRequest(
+                                    Scan.BadRequestReason.UnsupportedLnUrl(url))
+                                )
                             }
                         }
                     }

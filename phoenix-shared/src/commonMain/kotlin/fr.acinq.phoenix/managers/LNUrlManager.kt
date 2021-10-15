@@ -46,6 +46,7 @@ class LNUrlManager(
     // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
     private val httpClient: HttpClient by lazy {
         HttpClient {
+            expectSuccess = false // required for non-json responses
             install(JsonFeature) {
                 serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
                     ignoreUnknownKeys = true
@@ -128,8 +129,15 @@ class LNUrlManager(
         } catch (err: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }
-        val json = LNUrl.handleLNUrlResponse(response)
-        return LNUrl.parseLNUrlResponse(url, json)
+        try {
+            val json = LNUrl.handleLNUrlResponse(response)
+            return LNUrl.parseLNUrlResponse(url, json)
+        } catch (e: Exception) {
+            when (e) {
+                is LNUrl.Error.RemoteFailure -> throw e
+                else -> throw LNUrl.Error.RemoteFailure.Unreadable(url.host)
+            }
+        }
     }
 
     /**

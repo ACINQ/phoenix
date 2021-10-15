@@ -221,10 +221,8 @@ sealed class LNUrl {
          */
         fun parseInternetIdentifier(source: String): Url? {
 
-            // Ignore excess input, including additional lines, and whitespace
-            val line = source.lines().firstOrNull { it.isNotBlank() }?.let {
-                it.trim() // leading & trailing whitespace
-            } ?: return null
+            // Ignore excess input, including additional lines, and leding/trailing whitespace
+            val line = source.lines().firstOrNull { it.isNotBlank() }?.trim() ?: return null
 
             val token = line.split("\\s+".toRegex()).firstOrNull() ?: return null
 
