@@ -22,6 +22,7 @@ import fr.acinq.bitcoin.scala.ByteVector32
 import fr.acinq.bitcoin.scala.Crypto
 import fr.acinq.bitcoin.scala.Transaction
 import fr.acinq.eclair.`package$`
+import fr.acinq.phoenix.legacy.lnurl.LNUrlPayMetadata
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -111,10 +112,17 @@ class PaymentMetaRepository private constructor(private val queries: PaymentMeta
     }
   }
 
-  fun saveLNUrlPayInfo(paymentId: String, url: HttpUrl, action: LNUrlPayActionData?) {
+  fun saveLNUrlPayInfo(paymentId: String, url: HttpUrl, metadata: LNUrlPayMetadata, action: LNUrlPayActionData?) {
     queries.transaction {
       get(paymentId) ?: insert(paymentId)
       queries.setLNUrlPayUrl(url.toString(), paymentId)
+      queries.setLNUrlPayMeta(
+        desc = metadata.plainText,
+        longDesc = metadata.longDesc,
+        identifier = metadata.identifier,
+        email = metadata.email,
+        paymentId = paymentId
+      )
       val (typeversion, data) = when (action) {
         is LNUrlPayActionData.Message.V0 -> LNUrlPayActionTypeVersion.MESSAGE_V0 to Json.encodeToString(action)
         is LNUrlPayActionData.Url.V0 -> LNUrlPayActionTypeVersion.URL_V0 to Json.encodeToString(action)

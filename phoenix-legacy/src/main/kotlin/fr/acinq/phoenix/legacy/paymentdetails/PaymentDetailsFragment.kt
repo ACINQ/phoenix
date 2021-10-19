@@ -110,6 +110,12 @@ class PaymentDetailsFragment : BaseFragment() {
               getString(R.string.utils_unknown)
             }
           }
+          if (meta?.lnurlpay_meta_description != null) {
+            mBinding.lnurlPayDescValue.text = meta.lnurlpay_meta_long_description ?: meta.lnurlpay_meta_description
+          }
+          if (meta?.lnurlpay_meta_email != null || meta?.lnurlpay_meta_identifier != null) {
+            mBinding.lnurlPayIdentifierValue.text = meta.lnurlpay_meta_identifier ?: meta.lnurlpay_meta_email
+          }
           when (state) {
             is PaymentDetailsState.Outgoing.Pending -> {
               mBinding.statusText.text = Converter.html(getString(R.string.paymentdetails_status_sent_pending))

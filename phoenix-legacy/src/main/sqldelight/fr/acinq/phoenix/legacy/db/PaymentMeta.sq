@@ -31,7 +31,11 @@ CREATE TABLE PaymentMeta (
 
   lnurlpay_url TEXT DEFAULT NULL,
   lnurlpay_action_typeversion TEXT AS LNUrlPayActionTypeVersion DEFAULT NULL,
-  lnurlpay_action_data TEXT DEFAULT NULL
+  lnurlpay_action_data TEXT DEFAULT NULL,
+  lnurlpay_meta_description TEXT DEFAULT NULL,
+  lnurlpay_meta_long_description TEXT DEFAULT NULL,
+  lnurlpay_meta_identifier TEXT DEFAULT NULL,
+  lnurlpay_meta_email TEXT DEFAULT NULL
 );
 
 CREATE INDEX IF NOT EXISTS payment_closing_channel_id_index ON PaymentMeta(closing_channel_id);
@@ -62,6 +66,11 @@ setLNUrlPayUrl:
 UPDATE PaymentMeta
 SET lnurlpay_url=?
 WHERE id=?;
+
+setLNUrlPayMeta:
+UPDATE PaymentMeta
+SET lnurlpay_meta_description=:desc, lnurlpay_meta_long_description=:longDesc, lnurlpay_meta_identifier=:identifier, lnurlpay_meta_email=:email
+WHERE id=:paymentId;
 
 setLNUrlPayAction:
 UPDATE PaymentMeta

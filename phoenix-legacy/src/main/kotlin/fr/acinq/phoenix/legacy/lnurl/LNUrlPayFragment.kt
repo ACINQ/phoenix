@@ -347,13 +347,12 @@ class LNUrlPayViewModel(
   val maxCommentLength: Long?,
   private val paymentMetaRepository: PaymentMetaRepository,
 ) : ViewModel() {
-  private val log = LoggerFactory.getLogger(this::class.java)
 
   val state = MutableLiveData<LNUrlPayState>(LNUrlPayState.Init)
   val amountState = MutableLiveData<LNUrlPayAmountState>(LNUrlPayAmountState.Pristine)
 
   suspend fun saveLNUrlInfo(paymentId: String, action: LNUrlPayActionData?) {
-    paymentMetaRepository.saveLNUrlPayInfo(paymentId, callbackUrl, action)
+    paymentMetaRepository.saveLNUrlPayInfo(paymentId, callbackUrl, metadata, action)
   }
 
   class Factory(
