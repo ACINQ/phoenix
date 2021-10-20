@@ -33,7 +33,7 @@ import SwiftUI
 // This was super easy with UIKit.
 // We could simply add constraints such that all keys are equal width.
 //
-// In SwiftUI, it's not that simple. But it's not that bad either.
+// In SwiftUI, it's not that simple.
 //
 // - we use a GeometryReader to measure the width of each KeyColumn
 // - we use InfoGrid_KeyColumn_MeasuredWidth to communicate the width
@@ -52,17 +52,17 @@ import SwiftUI
 protocol InfoGridView: View {
 	
 	// Add this to your implementation:
-	// @State var calculatedKeyColumnWidth: CGFloat? = nil
+	// @State var keyColumnWidths: [CGFloat] = []
 	//
 	// And then implement these methods to get/set the @State property.
 	//
-	func setCalculatedKeyColumnWidth(_ value: CGFloat?) -> Void
-	func getCalculatedKeyColumnWidth() -> CGFloat?
+	func setKeyColumnWidths(_ value: [InfoGridRow_KeyColumn_Width]) -> Void
+	func getKeyColumnWidths() -> [InfoGridRow_KeyColumn_Width]
 	
 	// Do NOT override this.
 	// It has a default implementation which is correct.
 	//
-	var keyColumnWidth: CGFloat { get }
+	func keyColumnWidth(identifier: String) -> CGFloat
 	
 	var minKeyColumnWidth: CGFloat { get }
 	var maxKeyColumnWidth: CGFloat { get }
@@ -78,40 +78,47 @@ protocol InfoGridView: View {
 
 extension InfoGridView {
 	
-	var keyColumnWidth: CGFloat {
-		get {
-			// Normally what happens is:
-			// - During the first rendering pass,
-			//   all of the InfoGrid_Column0 items receive a proposed size.width=some_BIG_number
-			// - Each calculates it's desired width
-			// - That information is passed back up the view hierarchy, and stored in widthColumn0
-			// - The second rendering pass then uses widthColumn0 to lay out everything,
-			//   and it looks beautiful
-			//
-			// But what sometimes happens is:
-			// - During the first rendering pass,
-			//   all of the InfoGrid_Column0 items receive a proposed size.width=some_SMALL_number
-			// - Each calculates it's desired width, which ends up being too small
-			// - That information is passed back up the view hierarchy, and stored in widthColumn0
-			// - The second rendering pass then uses widthColumn0 to lay out everything,
-			//   and it looks horrible
-			//
-			// So during the first rendering pass, we need to ensure
-			// that proposed size.width is big enough to achieve our goals.
-			
-			return getCalculatedKeyColumnWidth() ?? maxKeyColumnWidth
+	func keyColumnWidth(identifier: String) -> CGFloat {
+		// Normally what happens is:
+		// - During the first rendering pass,
+		//   all of the InfoGridRow_KeyColumn items receive a proposed size.width=some_BIG_number
+		// - Each calculates it's desired width
+		// - That information is passed back up the view hierarchy, and stored in @State
+		// - The second rendering pass then uses keyColumnWidth() during the layout process,
+		//   and it looks beautiful
+		//
+		// But what sometimes happens is:
+		// - During the first rendering pass,
+		//   all of the InfoGridRow_KeyColumn items receive a proposed size.width=some_SMALL_number
+		// - Each calculates it's desired width, which ends up being too small
+		// - That information is passed back up the view hierarchy, and stored in @State
+		// - The second rendering pass then uses keyColumnWidth() during the layout process,
+		//   and it looks horrible
+		//
+		// So during the first rendering pass, we need to ensure
+		// that the proposed size.width is big enough to achieve our goals.
+		
+		let values = getKeyColumnWidths()
+		
+		// If we recently added a new row, then it's identifier won't be in the list.
+		// In this case, we must not use the calculated value, since it might be too small.
+		//
+		if !values.contains(where: { $0.identifier == identifier }) {
+			return maxKeyColumnWidth
 		}
+		
+		let calculatedMaxWidth = values.reduce(0) { partialResult, value in
+			max(partialResult, value.width)
+		}
+		return min(max(calculatedMaxWidth, minKeyColumnWidth), maxKeyColumnWidth)
 	}
 	
 	var body: some View {
 		
-		infoGridRows.onPreferenceChange(InfoGrid_KeyColumn_MeasuredWidth.self) {
+		infoGridRows.onPreferenceChange(InfoGridRow_KeyColumn_MeasuredWidth.self) {
+			(values: [InfoGridRow_KeyColumn_Width]) in
 			
-			if let width = $0 {
-				setCalculatedKeyColumnWidth(min(max(width, minKeyColumnWidth), maxKeyColumnWidth))
-			} else {
-				setCalculatedKeyColumnWidth(nil)
-			}
+			setKeyColumnWidths(values)
 		}
 	}
 }
@@ -119,6 +126,7 @@ extension InfoGridView {
 
 struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 	
+	let identifier: String
 	let keyColumnWidth: CGFloat
 	let keyColumn: KeyColumn
 	let valueColumn: ValueColumn
@@ -126,11 +134,13 @@ struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 	private let horizontalSpacingBetweenColumns: CGFloat // = 8
 	
 	init(
+		identifier: String,
 		hSpacing: CGFloat,
 		keyColumnWidth: CGFloat,
 		@ViewBuilder keyColumn keyColumnBuilder: () -> KeyColumn,
 		@ViewBuilder valueColumn valueColumnBuilder: () -> ValueColumn
 	) {
+		self.identifier = identifier
 		self.horizontalSpacingBetweenColumns = hSpacing
 		self.keyColumnWidth = keyColumnWidth
 		self.keyColumn = keyColumnBuilder()
@@ -148,8 +158,8 @@ struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 				keyColumn.background(GeometryReader { proxy in
 				
 					Color.clear.preference(
-						key: InfoGrid_KeyColumn_MeasuredWidth.self,
-						value: proxy.size.width
+						key: InfoGridRow_KeyColumn_MeasuredWidth.self,
+						value: [InfoGridRow_KeyColumn_Width(identifier: identifier, width: proxy.size.width)]
 					)
 				})
 			}
@@ -160,23 +170,17 @@ struct InfoGridRow<KeyColumn: View, ValueColumn: View>: View {
 	}
 }
 
+struct InfoGridRow_KeyColumn_Width: Equatable {
+	let identifier: String
+	let width: CGFloat
+}
 
-fileprivate struct InfoGrid_KeyColumn_MeasuredWidth: PreferenceKey {
-	static let defaultValue: CGFloat? = nil
+fileprivate struct InfoGridRow_KeyColumn_MeasuredWidth: PreferenceKey {
+	typealias Value = [InfoGridRow_KeyColumn_Width]
+	static let defaultValue: Value = []
 	
-	static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
-		
-		// This function is called with the measured width of each individual column0 item.
-		// We want to determine the maximum measured width here.
-		if let prv = value {
-			if let nxt = nextValue() {
-				value = prv >= nxt ? prv : nxt
-			} else {
-				value = prv
-			}
-		} else {
-			value = nextValue()
-		}
+	static func reduce(value: inout Value, nextValue: () -> Value) {
+		value.append(contentsOf: nextValue())
 	}
 }
 

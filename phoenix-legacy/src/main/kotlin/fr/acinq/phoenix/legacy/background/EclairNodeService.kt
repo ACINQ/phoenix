@@ -414,7 +414,7 @@ class EclairNodeService : Service() {
     setup.nodeParams().db().peers().addOrUpdatePeer(Wallet.ACINQ.nodeId(), acinqNodeAddress)
     log.info("added/updated ACINQ to peer database address=${acinqNodeAddress}")
 
-    val nodeSupervisor = system!!.actorOf(Props.create { EclairSupervisor(applicationContext) }, "EclairSupervisor")
+    val nodeSupervisor = system!!.actorOf(Props.create(EclairSupervisor::class.java, applicationContext), "EclairSupervisor")
     system.eventStream().subscribe(nodeSupervisor, ChannelStateChanged::class.java)
     system.eventStream().subscribe(nodeSupervisor, ChannelSignatureSent::class.java)
     system.eventStream().subscribe(nodeSupervisor, Relayer.OutgoingChannels::class.java)

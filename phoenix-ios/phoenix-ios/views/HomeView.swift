@@ -25,7 +25,7 @@ struct HomeView : MVIView, ViewName {
 	@Environment(\.controllerFactory) var factoryEnv
 	var factory: ControllerFactory { return factoryEnv }
 
-	@State var selectedPayment: Lightning_kmpWalletPayment? = nil
+	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
 	@StateObject var toast = Toast()
@@ -44,6 +44,8 @@ struct HomeView : MVIView, ViewName {
 	@State var incomingSwapAnimationsRemaining = 0
 	
 	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
+	
+	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
@@ -124,12 +126,47 @@ struct HomeView : MVIView, ViewName {
 				if let incoming = incomingAmount() {
 					
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
+					
+						if #available(iOS 15.0, *) {
 						
-						Image(systemName: "link")
-							.padding(.trailing, 2)
-						
-						Text("+\(incoming.string) incoming".lowercased())
-							.onTapGesture { toggleCurrencyType() }
+							Image(systemName: "link") // 
+								.padding(.trailing, 2)
+								.onTapGesture { showBlockchainExplorerOptions = true }
+							
+							Text("+\(incoming.string) incoming".lowercased())
+								.onTapGesture { showBlockchainExplorerOptions = true }
+								.confirmationDialog("Blockchain Explorer",
+									isPresented: $showBlockchainExplorerOptions,
+									titleVisibility: .automatic
+								) {
+									Button("Mempool.space") {
+										exploreIncomingSwap(website: BlockchainExplorer.WebsiteMempoolSpace())
+									}
+									Button("Blockstream.info") {
+										exploreIncomingSwap(website: BlockchainExplorer.WebsiteBlockstreamInfo())
+									}
+									
+									let addrCount = lastIncomingSwaps.count
+									if addrCount >= 2 {
+										Button("Copy bitcoin addresses (\(addrCount)") {
+											copyIncomingSwap()
+										}
+									} else {
+										Button("Copy bitcoin address") {
+											copyIncomingSwap()
+										}
+									}
+									
+								}
+							
+						} else { // same functionality as before
+							
+							Image(systemName: "link")
+								.padding(.trailing, 2)
+							
+							Text("+\(incoming.string) incoming".lowercased())
+								.onTapGesture { toggleCurrencyType() }
+						}
 					}
 					.font(.callout)
 					.foregroundColor(.secondary)
@@ -219,13 +256,13 @@ struct HomeView : MVIView, ViewName {
 			onAppear()
 		}
 		.sheet(isPresented: Binding(
-			get: { selectedPayment != nil },
-			set: { if !$0 { selectedPayment = nil }} // needed if user slides the sheet to dismiss
+			get: { selectedItem != nil },
+			set: { if !$0 { selectedItem = nil }} // needed if user slides the sheet to dismiss
 		)) {
 
 			PaymentView(
-				payment: selectedPayment!,
-				closeSheet: { self.selectedPayment = nil }
+				paymentInfo: selectedItem!,
+				closeSheet: { self.selectedItem = nil }
 			)
 			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 		}
@@ -247,10 +284,11 @@ struct HomeView : MVIView, ViewName {
 		log.trace("[\(viewName)] didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
-		phoenixBusiness.paymentsManager.getPayment(row: row) { (result: PaymentsFetcher.Result) in
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 			
-			if let payment = result.payment {
-				selectedPayment = payment
+			if let result = result {
+				selectedItem = result
 			}
 		}
 	}
@@ -284,8 +322,13 @@ struct HomeView : MVIView, ViewName {
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
 		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
 		
-		if selectedPayment == nil {
-			selectedPayment = payment // selection triggers display of PaymentView sheet
+		let paymentId = payment.walletPaymentId()
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		phoenixBusiness.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
+			
+			if selectedItem == nil {
+				selectedItem = result // triggers display of PaymentView sheet
+			}
 		}
 	}
 	
@@ -296,7 +339,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("[\(viewName)] onIncomingSwapsChanged()")
+		log.trace("[\(viewName)] onIncomingSwapsChanged(): \(incomingSwaps)")
 		
 		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
 			return sum + item.msat
@@ -336,7 +379,8 @@ struct HomeView : MVIView, ViewName {
 		let row = paymentsPage.rows[idx]
 		log.debug("[\(viewName)] Pre-fetching: \(row.identifiable)")
 
-		phoenixBusiness.paymentsManager.getPayment(row: row) { _ in
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { _ in
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
@@ -439,7 +483,7 @@ struct HomeView : MVIView, ViewName {
 		//
 		// Note:
 		// In the original design, we didn't increase the count forever.
-		// At some poing we incremented the offset instead.
+		// At some point we incremented the offset instead.
 		// However, this doesn't work well with LazyVStack, because the contentOffset isn't adjusted.
 		// So the end result is that the user's position within the scrollView jumps,
 		// and results in a very confusing user experience.
@@ -483,6 +527,33 @@ struct HomeView : MVIView, ViewName {
 			}
 		}
 	}
+	
+	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
+		log.trace("[\(viewName)] exploreIncomingSwap()")
+		
+		guard let addr = lastIncomingSwaps.keys.first else {
+			return
+		}
+		
+		let business = AppDelegate.get().business
+		let txUrlStr = business.blockchainExplorer.addressUrl(addr: addr, website: website)
+		if let txUrl = URL(string: txUrlStr) {
+			UIApplication.shared.open(txUrl)
+		}
+	}
+	
+	func copyIncomingSwap() {
+		log.trace("[\(viewName)] copyIncomingSwap()")
+		
+		let addresses = lastIncomingSwaps.keys
+		
+		if addresses.count == 1 {
+			UIPasteboard.general.string = addresses.first
+			
+		} else if addresses.count >= 2 {
+			UIPasteboard.general.string = addresses.joined(separator: ", ")
+		}
+	}
 }
 
 fileprivate struct PaymentCell : View, ViewName {
@@ -492,7 +563,7 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	let phoenixBusiness: PhoenixBusiness = AppDelegate.get().business
 	
-	@State var fetched: PaymentsFetcher.Result
+	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
@@ -504,14 +575,15 @@ fileprivate struct PaymentCell : View, ViewName {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
 		
-		var result = phoenixBusiness.paymentsManager.getCachedPayment(row: row)
-		if let _ = result.payment {
+		let options = WalletPaymentFetchOptions.companion.Descriptions
+		var result = phoenixBusiness.paymentsManager.getCachedPayment(row: row, options: options)
+		if let _ = result {
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: false)
 		} else {
 			
-			result = phoenixBusiness.paymentsManager.getCachedStalePayment(row: row)
+			result = phoenixBusiness.paymentsManager.getCachedStalePayment(row: row, options: options)
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: true)
@@ -521,7 +593,7 @@ fileprivate struct PaymentCell : View, ViewName {
 	var body: some View {
 		
 		HStack {
-			if let payment = fetched.payment {
+			if let payment = fetched?.payment {
 				
 				switch payment.state() {
 					case .success:
@@ -590,8 +662,8 @@ fileprivate struct PaymentCell : View, ViewName {
 
 	func paymentDescription() -> String {
 
-		if let payment = fetched.payment {
-			return payment.desc() ?? NSLocalizedString("No description", comment: "placeholder text")
+		if let fetched = fetched {
+			return fetched.paymentDescription() ?? NSLocalizedString("No description", comment: "placeholder text")
 		} else {
 			return ""
 		}
@@ -599,7 +671,7 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	func paymentTimestamp() -> String {
 
-		if let payment = fetched.payment {
+		if let payment = fetched?.payment {
 			let timestamp = payment.completedAt()
 			return timestamp > 0
 				? timestamp.formatDateMS()
@@ -611,7 +683,7 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {
 
-		if let payment = fetched.payment {
+		if let payment = fetched?.payment {
 
 			let amount = Utils.format(currencyPrefs, msat: payment.amount)
 
@@ -634,9 +706,10 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	func onAppear() -> Void {
 		
-		if fetched.payment == nil || fetchedIsStale {
+		if fetched == nil || fetchedIsStale {
 			
-			phoenixBusiness.paymentsManager.getPayment(row: row) { (result: PaymentsFetcher.Result) in
+			let options = WalletPaymentFetchOptions.companion.Descriptions
+			phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 				self.fetched = result
 			}
 		}
@@ -894,7 +967,7 @@ fileprivate struct BottomBar: View, ViewName {
 	}
 	
 	@State var temp: [AppScanController] = []
-	@State var externalLightningRequest: Scan.ModelValidateRequest? = nil
+	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
 	
 	@Environment(\.colorScheme) var colorScheme
 	
@@ -1011,7 +1084,7 @@ fileprivate struct BottomBar: View, ViewName {
 				return
 			}
 			
-			if let model = model as? Scan.ModelValidateRequest {
+			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
 				self.externalLightningRequest = model
 				self.selectedTag = Tag.SendView.rawValue
 				

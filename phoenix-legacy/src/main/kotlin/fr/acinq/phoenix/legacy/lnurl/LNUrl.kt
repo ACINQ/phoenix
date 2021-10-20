@@ -177,6 +177,9 @@ interface LNUrl {
       val array = JSONArray(raw)
       var plainText: String? = null
       var rawImage: String? = null
+      var longDesc: String? = null
+      var identifier: String? = null
+      var email: String? = null
       for (i in 0 until array.length()) {
         val rawMeta = array.getJSONArray(i)
         try {
@@ -184,13 +187,23 @@ interface LNUrl {
             "text/plain" -> plainText = rawMeta.getString(1)
             "image/png;base64" -> rawImage = rawMeta.getString(1)
             "image/jpeg;base64" -> rawImage = rawMeta.getString(1)
+            "text/long-desc" -> longDesc = rawMeta.getString(1)
+            "text/identifier" -> identifier = rawMeta.getString(1)
+            "text/email" -> email = rawMeta.getString(1)
             else -> throw RuntimeException("unhandled metadata type=${rawMeta[i]}")
           }
         } catch (e: Exception) {
           log.warn("could not process raw meta=$rawMeta at index=$i: ${e.message}")
         }
       }
-      LNUrlPayMetadata(raw, plainText!!, rawImage?.let { decodeBase64Image(it) })
+      LNUrlPayMetadata(
+        raw = raw,
+        plainText = plainText ?: throw IllegalArgumentException("missing plain description"),
+        image = rawImage?.let { decodeBase64Image(it) },
+        longDesc = longDesc,
+        identifier = identifier,
+        email = email
+      )
     } catch (e: Exception) {
       log.error("could not read raw meta=$raw: ", e)
       throw LNUrlError.PayInvalidMeta(raw)
@@ -219,4 +232,4 @@ class LNUrlWithdraw(
 class LNUrlPay(val callbackUrl: String, val minSendable: MilliSatoshi, val maxSendable: MilliSatoshi, val rawMetadata: LNUrlPayMetadata, val maxCommentLength: Long?) : LNUrl, Parcelable
 
 @Parcelize
-data class LNUrlPayMetadata(val raw: String, val plainText: String, val image: Bitmap?) : Parcelable
+data class LNUrlPayMetadata(val raw: String, val plainText: String, val image: Bitmap?, val longDesc: String?, val identifier: String?, val email: String?) : Parcelable

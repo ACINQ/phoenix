@@ -1,6 +1,5 @@
 package fr.acinq.phoenix
 
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.lightning.blockchain.electrum.ElectrumClient
@@ -24,6 +23,7 @@ import fr.acinq.phoenix.utils.*
 import io.ktor.client.*
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.*
+import io.ktor.http.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.serialization.json.Json
@@ -80,6 +80,7 @@ class PhoenixBusiness(
     val connectionsManager by lazy { ConnectionsManager(this) }
     val lnUrlManager by lazy { LNUrlManager(this) }
     val util by lazy { Utilities(this) }
+    val blockchainExplorer by lazy { BlockchainExplorer(chain) }
 
     init {
         setLightningLoggerFactory(loggerFactory)
@@ -102,9 +103,7 @@ class PhoenixBusiness(
     fun loadWallet(seed: ByteArray): Pair<ByteVector32, String>? {
         if (walletManager.wallet.value == null) {
             walletManager.loadWallet(seed)
-            return walletManager.wallet.value?.let {
-                it.cloudKeyAndEncryptedNodeId()
-            }
+            return walletManager.wallet.value?.cloudKeyAndEncryptedNodeId()
         }
         return null
     }

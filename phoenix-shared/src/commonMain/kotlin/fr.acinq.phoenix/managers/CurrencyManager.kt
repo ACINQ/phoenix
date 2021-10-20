@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.minutes
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
@@ -29,7 +29,7 @@ class CurrencyManager(
     private val log = newLogger(loggerFactory)
 
     val ratesFlow: Flow<List<BitcoinPriceRate>> = appDb.listBitcoinRates()
-    var priceRatesPollingJob: Job? = null
+    private var priceRatesPollingJob: Job? = null
 
     fun start() {
         priceRatesPollingJob = startRatesPollingJob()
@@ -44,7 +44,7 @@ class CurrencyManager(
             refreshFromBlockchainInfo()
             refreshFromBitso()
             yield()
-            delay(20.minutes)
+            delay(Duration.minutes(20))
         }
     }
 

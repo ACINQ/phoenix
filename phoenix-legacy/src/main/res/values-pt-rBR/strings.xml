@@ -472,7 +472,7 @@
   <string name="paymentdetails_closing_spending_txs_label">Transações de encerramento de canais</string>
   <string name="paymentdetails_pubkey_label">Chave pública de destino</string>
   <string name="paymentdetails_payment_hash_label">Hash do pagamento</string>
-  <string name="paymentdetails_payment_request_label">Fatura</string>
+  <string name="paymentdetails_payment_request_label">ID da fatura</string>
   <string name="paymentdetails_preimage_label">Preimage</string>
   <string name="paymentdetails_created_at_label">Realizado em</string>
   <string name="paymentdetails_completed_at_label">Concluído em</string>

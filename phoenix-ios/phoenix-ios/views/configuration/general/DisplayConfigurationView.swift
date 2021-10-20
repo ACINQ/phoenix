@@ -144,7 +144,7 @@ struct FiatCurrencySelector: View, ViewName {
 		
 		ZStack {
 			
-			let fiatCurrencies = FiatCurrency.default().values
+			let fiatCurrencies = FiatCurrency.companion.values
 			
 			// We want to vertically align the text:
 			//
@@ -249,7 +249,7 @@ struct BitcoinUnitSelector: View, ViewName {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			List {
-				let bitcoinUnits = BitcoinUnit.default().values
+				let bitcoinUnits = BitcoinUnit.companion.values
 				ForEach(0 ..< bitcoinUnits.count) {
 					let bitcoinUnit = bitcoinUnits[$0]
 					Button {

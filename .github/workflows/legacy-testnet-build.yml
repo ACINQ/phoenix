@@ -4,6 +4,8 @@ name: Build
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'phoenix-legacy/**'
 
 jobs:
   build:

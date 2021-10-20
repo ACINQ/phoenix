@@ -24,7 +24,7 @@ import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.utils.PlatformContext
 
 actual fun createChannelsDbDriver(ctx: PlatformContext, chain: Chain, nodeIdHash: String): SqlDriver {
-    return NativeSqliteDriver(ChannelsDatabase.Schema, "channels-${chain.name.toLowerCase()}-$nodeIdHash.sqlite")
+    return NativeSqliteDriver(ChannelsDatabase.Schema, "channels-${chain.name.lowercase()}-$nodeIdHash.sqlite")
 }
 
 actual fun createPaymentsDbDriver(
@@ -33,7 +33,7 @@ actual fun createPaymentsDbDriver(
     nodeIdHash: String
 ): SqlDriver {
     val schema = PaymentsDatabase.Schema
-    val name = "payments-${chain.name.toLowerCase()}-$nodeIdHash.sqlite"
+    val name = "payments-${chain.name.lowercase()}-$nodeIdHash.sqlite"
 
     // The foreign_keys constraint isn't properly enabled for native/iOS.
     // More information can be found here:

@@ -6,7 +6,7 @@ import CryptoKit
 extension PhoenixBusiness {
 	
 	func getPeer() -> Lightning_kmpPeer? {
-		self.peerManager.peerState.value as? Lightning_kmpPeer
+		self.peerManager.peerState.value_ as? Lightning_kmpPeer
 	}
 }
 
@@ -32,43 +32,109 @@ extension WalletPaymentOrderRow: Identifiable {
 	}
 }
 
+extension WalletPaymentInfo {
+	
+	func paymentDescription() -> String? {
+		
+		let sanitize = { (input: String?) -> String? in
+			
+			if let trimmedInput = input?.trimmingCharacters(in: .whitespacesAndNewlines) {
+				if trimmedInput.count > 0 {
+					return trimmedInput
+				}
+			}
+			
+			return nil
+		}
+		
+		if let description = sanitize(metadata.userDescription) {
+			return description
+		}
+		if let description = sanitize(metadata.lnurl?.description_) {
+			return description
+		}
+		
+		if let incomingPayment = payment as? Lightning_kmpIncomingPayment {
+			
+			if let invoice = incomingPayment.origin.asInvoice() {
+				return sanitize(invoice.paymentRequest.description_)
+			} else if let _ = incomingPayment.origin.asKeySend() {
+				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+			} else if let swapIn = incomingPayment.origin.asSwapIn() {
+				return sanitize(swapIn.address)
+			}
+			
+		} else if let outgoingPayment = payment as? Lightning_kmpOutgoingPayment {
+			
+			if let normal = outgoingPayment.details.asNormal() {
+				return sanitize(normal.paymentRequest.desc())
+			} else if let _ = outgoingPayment.details.asKeySend() {
+				return NSLocalizedString("Donation", comment: "Payment description for received KeySend")
+			} else if let swapOut = outgoingPayment.details.asSwapOut() {
+				return sanitize(swapOut.address)
+			} else if let _ = outgoingPayment.details.asChannelClosing() {
+				return NSLocalizedString("Channel closing", comment: "Payment description for channel closing")
+			}
+		}
+		
+		return nil
+	}
+}
+
+extension WalletPaymentMetadata {
+	
+	static func empty() -> WalletPaymentMetadata {
+		return WalletPaymentMetadata(
+			userDescription: nil,
+			lnurl: nil
+		)
+	}
+}
+
 extension PaymentsManager {
 	
-	func getCachedPayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+	func getCachedPayment(
+		row: WalletPaymentOrderRow,
+		options: WalletPaymentFetchOptions
+	) -> WalletPaymentInfo? {
 		
-		return fetcher.getCachedPayment(row: row)
+		return fetcher.getCachedPayment(row: row, options: options)
 	}
 	
-	func getCachedStalePayment(row: WalletPaymentOrderRow) -> PaymentsFetcher.Result {
+	func getCachedStalePayment(
+		row: WalletPaymentOrderRow,
+		options: WalletPaymentFetchOptions
+	) -> WalletPaymentInfo? {
 		
-		return fetcher.getCachedStalePayment(row: row)
+		return fetcher.getCachedStalePayment(row: row, options: options)
 	}
 	
 	func getPayment(
 		row: WalletPaymentOrderRow,
-		completion: @escaping (PaymentsFetcher.Result) -> Void
+		options: WalletPaymentFetchOptions,
+		completion: @escaping (WalletPaymentInfo?) -> Void
 	) -> Void {
 		
-		fetcher.getPayment(row: row) { (result: PaymentsFetcher.Result?, _: Error?) in
+		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _: Error?) in
 			
-			completion(result ?? PaymentsFetcher.Result(payment: nil))
+			completion(result)
 		}
 	}
 }
 
 struct FetchQueueBatchResult {
 	let rowids: [Int64]
-	let rowidMap: [Int64: PaymentRowId]
-	let rowMap: [PaymentRowId : PaymentRow]
-	let metadataMap: [PaymentRowId : KotlinByteArray]
+	let rowidMap: [Int64: WalletPaymentId]
+	let rowMap: [WalletPaymentId : WalletPaymentInfo]
+	let metadataMap: [WalletPaymentId : KotlinByteArray]
 	let incomingStats: CloudKitDb.MetadataStats
 	let outgoingStats: CloudKitDb.MetadataStats
 	
-	func uniquePaymentRowIds() -> Set<PaymentRowId> {
-		return Set<PaymentRowId>(rowidMap.values)
+	func uniquePaymentIds() -> Set<WalletPaymentId> {
+		return Set<WalletPaymentId>(rowidMap.values)
 	}
 	
-	func rowidsMatching(_ query: PaymentRowId) -> [Int64] {
+	func rowidsMatching(_ query: WalletPaymentId) -> [Int64] {
 		var results = [Int64]()
 		for (rowid, paymentRowId) in rowidMap {
 			if paymentRowId == query {
@@ -106,7 +172,7 @@ extension CloudKitDb.FetchQueueBatchResult {
 		// And we need to do so without swift-style enumeration in order to avoid crashing.
 		
 		var _rowids = [Int64]()
-		var _rowidMap = [Int64: PaymentRowId]()
+		var _rowidMap = [Int64: WalletPaymentId]()
 		
 		for i in 0 ..< self.rowids.count { // cannot enumerate self.rowidMap
 			
@@ -222,7 +288,7 @@ extension Bitcoin_kmpByteVector32 {
 extension ConnectionsManager {
 	
 	var currentValue: Connections {
-		return connections.value as! Connections
+		return connections.value_ as! Connections
 	}
 	
 	var publisher: CurrentValueSubject<Connections, Never> {

@@ -47,7 +47,7 @@ class PublicSuffixList(
                 val labels = suffix.split('.').filter {
                     it.isNotBlank()
                 }.map {
-                    it.toLowerCase()
+                    it.lowercase()
                 }
                 if (labels.isEmpty()) {
                     return null
@@ -123,7 +123,7 @@ class PublicSuffixList(
                 domainComponents.subList(
                     fromIndex = domainComponents.size - desiredCount, // inclusive
                     toIndex = domainComponents.size // exclusive
-                ).joinToString(separator = ".").toLowerCase()
+                ).joinToString(separator = ".").lowercase()
             }
         }
     }
@@ -147,7 +147,7 @@ class PublicSuffixList(
             .split('.')
             .filter { it.isNotEmpty() }
 
-        val domainLabels = domainComponents.map { it.toLowerCase() }
+        val domainLabels = domainComponents.map { it.lowercase() }
 
         // Algorithm:
         // 1. Match domain against all rules and take note of the matching ones.
@@ -168,19 +168,20 @@ class PublicSuffixList(
             }
         }
 
-        val prevailingRule =
-            if (matchingRules.isEmpty()) {
+        val prevailingRule = when {
+            matchingRules.isEmpty() -> {
                 Rule(labels = listOf("*"), isExceptionRule = false)
-            } else if (matchingRules.size == 1) {
+            }
+            matchingRules.size == 1 -> {
                 matchingRules.first()
-            } else {
-                matchingRules.firstOrNull { it.isExceptionRule }?.let {
-                    it
-                } ?: kotlin.run {
+            }
+            else -> {
+                matchingRules.firstOrNull { it.isExceptionRule } ?: kotlin.run {
                     val longestSize = matchingRules.maxOf { it.labels.size }
                     matchingRules.first { it.labels.size == longestSize }
                 }
             }
+        }
 
         return Match(matchingRules, prevailingRule, domainComponents)
     }

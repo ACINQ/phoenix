@@ -1,7 +1,6 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Block
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.ServerAddress
 import kotlinx.serialization.Serializable
@@ -25,11 +24,11 @@ enum class BitcoinUnit : CurrencyUnit {
     Sat, Bit, MBtc, Btc;
 
     override fun toString(): String {
-        return super.toString().toLowerCase()
+        return super.toString().lowercase()
     }
 
-    companion object default {
-        val values = BitcoinUnit.values().toList()
+    companion object {
+        val values = values().toList()
     }
 }
 
@@ -56,8 +55,8 @@ fun MilliSatoshi.toUnit(unit: BitcoinUnit): Double = when (unit) {
 enum class FiatCurrency : CurrencyUnit {
     AUD, BRL, CAD, CHF, CLP, CNY, CZK, DKK, EUR, GBP, HKD, HRK, HUF, INR, ISK, JPY, KRW, MXN, NZD, PLN, RON, RUB, SEK, SGD, THB, TWD, USD;
 
-    companion object default {
-        val values = FiatCurrency.values().toList()
+    companion object {
+        val values = values().toList()
         fun valueOfOrNull(code: String): FiatCurrency? = try {
             valueOf(code)
         } catch (e: Exception) {

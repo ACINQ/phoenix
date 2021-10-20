@@ -8,7 +8,6 @@ It can run on many different platforms, including mobile devices (iOS and Androi
 ## Requirements
 
 You'll need to install the following:
-- [Git LFS](https://git-lfs.github.com/): large files like png are stored using the Large File Storage Git extension.
 - [Xcode](https://developer.apple.com/xcode/): if you build the iOS app.
 - [Android Studio](https://developer.android.com/studio): if you want to build the Android app. It is also recommended if you want to contribute to the `phoenix-shared` module which contains shared code used by both iOS and Android apps.
 
@@ -21,8 +20,8 @@ First you must build the lightning-kmp library. See the build instructions [here
 Start by cloning the repository locally:
 
 ```sh
-git clone git@github.com:ACINQ/phoenix-kmm.git
-cd phoenix-kmm
+git clone git@github.com:ACINQ/phoenix.git
+cd phoenix
 ```
 
 ### The phoenix-shared module
@@ -57,14 +56,14 @@ If the project builds successfully, you can then run it on a device or an emulat
 
 ### Build the Android app
 
-Open the entire phoenix-kmm project in Android Studio, then build the application. Note that the Android app uses Jetpack compose, which currently requires Android Studio Canary. Using a regular Android Studio release may cause issues.
+Open the entire phoenix project in Android Studio, then build the application. Note that the Android app uses Jetpack compose, which currently requires Android Studio Canary. Using a regular Android Studio release may cause issues.
 
 ## Troubleshooting
 
 ### lightning-kmp versions
 
-Make sure that the lightning-kmp version that phoenix-kmm depends on is the same that the lightning-kmp version you are building. Your local lightning-kmp repository may not be pointing to the version that phoenix-kmm requires.
+Make sure that the lightning-kmp version that phoenix depends on is the same that the lightning-kmp version you are building. Your local lightning-kmp repository may not be pointing to the version that phoenix-kmm requires.
 
-Phoenix-kmm defines its lightning-kmp version in `phoenix-shared/build.gradle.kts`, with `val lightningkmpVersion = "xxx"`.
+Phoenix defines its lightning-kmp version in `phoenix-shared/build.gradle.kts`, with `val lightningkmpVersion = "xxx"`.
 
-If this value is `snapshot` it means that the current phoenix `master` branch is in development and depends on a floating version of lightning-kmp. In that case, there may be API changes in lightning-kmp and build may fail. In that case, you can checkout a tag of phoenix-kmm, which will always use a stable, tagged version of lightning-kmp.
+If this value is `snapshot` it means that the current phoenix `master` branch is in development and depends on a floating version of lightning-kmp. In that case, there may be API changes in lightning-kmp and build may fail. In that case, you can checkout a tag of phoenix, which will always use a stable, tagged version of lightning-kmp.

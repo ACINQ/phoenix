@@ -18,30 +18,46 @@ package fr.acinq.phoenix.managers
 
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.utils.PublicSuffixList
 import io.ktor.client.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 class LNUrlManager(
     loggerFactory: LoggerFactory,
-    private val httpClient: HttpClient,
     private val walletManager: WalletManager
 ) : CoroutineScope by MainScope() {
 
+    // use special client for lnurl since we dont want ktor to break when receiving non-2xx response
+    private val httpClient: HttpClient by lazy {
+        HttpClient {
+            expectSuccess = false // required for non-json responses
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                    ignoreUnknownKeys = true
+                })
+                expectSuccess = false
+            }
+        }
+    }
+
     constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
-        httpClient = business.httpClient,
         walletManager = business.walletManager
     )
 
@@ -67,16 +83,27 @@ class LNUrlManager(
      * Throws an exception if source is malformed, or invalid.
      */
     fun interactiveExtractLNUrl(source: String): Either<LNUrl.Auth, Url> {
-        val url = try {
+        var url = try {
             LNUrl.parseBech32Url(source)
-        } catch (e1: Exception) {
-            log.debug { "cannot parse source=$source as a bech32 lnurl" }
-            try {
-                LNUrl.parseNonBech32Url(source)
-            } catch (e2: Exception) {
-                log.error { "cannot extract lnurl from source=$source: ${e1.message ?: e1::class} / ${e2.message ?: e2::class}"}
-                throw LNUrl.Error.Invalid
-            }
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as bech32 lnurl: ${e.message ?: e::class}" }
+            null
+        }
+        url = url ?: try {
+            LNUrl.parseNonBech32Url(source)
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as non-bech32 lnurl: ${e.message ?: e::class}" }
+            null
+        }
+        url = url ?: try {
+            LNUrl.parseInternetIdentifier(source)
+        } catch (e: Exception) {
+            log.info { "cannot parse source=$source as lnurl-id: ${e.message ?: e::class}" }
+            null
+        }
+
+        if (url == null) {
+            throw LNUrl.Error.Invalid
         }
         return when (url.parameters["tag"]) {
             // auth urls must not be called just yet
@@ -97,8 +124,73 @@ class LNUrlManager(
      * into an actionable LNUrl object.
      */
     suspend fun continueLnUrl(url: Url): LNUrl {
-        val json = LNUrl.handleLNUrlResponse(httpClient.get(url))
-        return LNUrl.parseLNUrlMetadata(json)
+        val response: HttpResponse = try {
+            httpClient.get(url)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
+        }
+        try {
+            val json = LNUrl.handleLNUrlResponse(response)
+            return LNUrl.parseLNUrlResponse(url, json)
+        } catch (e: Exception) {
+            when (e) {
+                is LNUrl.Error.RemoteFailure -> throw e
+                else -> throw LNUrl.Error.RemoteFailure.Unreadable(url.host)
+            }
+        }
+    }
+
+    /**
+     * May throw errors of type:
+     * - LNUrl.Error.RemoteFailure
+     * - LNUrl.Error.PayInvoice
+     */
+    suspend fun requestPayInvoice(
+        lnurlPay: LNUrl.Pay,
+        amount: MilliSatoshi,
+        comment: String?
+    ): LNUrl.PayInvoice {
+        val builder = URLBuilder(lnurlPay.callback)
+        builder.appendParameter(name = "amount", value = amount.msat.toString())
+        if (comment != null && comment.isNotEmpty()) {
+            builder.appendParameter(name = "comment", value = comment)
+        }
+        val callback = builder.build()
+        val origin = callback.host
+
+        val response: HttpResponse = try {
+            httpClient.get(callback)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin)
+        }
+
+        // may throw: LNUrl.Error.RemoteFailure
+        val json = LNUrl.handleLNUrlResponse(response)
+
+        // may throw: LNUrl.Error.PayInvoice
+        val invoice = LNUrl.parseLNUrlPayResponse(origin, json)
+
+        // From the [spec](https://github.com/fiatjaf/lnurl-rfc/blob/luds/06.md):
+        //
+        // - LN WALLET Verifies that h tag in provided invoice is a hash of
+        //   metadata string converted to byte array in UTF-8 encoding.
+        //
+        // Note: h tag == descriptionHash
+
+        val expectedHash = Crypto.sha256(lnurlPay.metadata.raw.encodeToByteArray())
+        val actualHash = invoice.paymentRequest.descriptionHash?.toByteArray()
+        if (!expectedHash.contentEquals(actualHash)) {
+            throw LNUrl.Error.PayInvoice.InvalidHash(origin)
+        }
+
+        // - LN WALLET Verifies that amount in provided invoice equals an
+        //   amount previously specified by user.
+
+        if (amount != invoice.paymentRequest.amount) {
+            throw LNUrl.Error.PayInvoice.InvalidAmount(origin)
+        }
+
+        return invoice
     }
 
     suspend fun requestAuth(auth: LNUrl.Auth, publicSuffixList: PublicSuffixList) {
@@ -112,20 +204,21 @@ class LNUrlManager(
         )).toHex()
 
         val builder = URLBuilder(auth.url)
-        builder.parameters.append(name = "sig", value = signedK1)
-        builder.parameters.append(name = "key", value = key.publicKey().toString())
+        builder.appendParameter(name = "sig", value = signedK1)
+        builder.appendParameter(name = "key", value = key.publicKey().toString())
         val url = builder.build()
 
         val response: HttpResponse = try {
             httpClient.get(url)
-        } catch (sre: io.ktor.client.features.ServerResponseException) {
-            // ktor throws an exception when we get a non-200 response from the server.
-            // That's not what we want. We'd like to handle the JSON error ourselves.
-            sre.response
         } catch (t: Throwable) {
             throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin = url.host)
         }
 
         LNUrl.handleLNUrlResponse(response) // throws on any/all non-success
     }
+}
+
+fun URLBuilder.appendParameter(name: String, value: String) {
+    @OptIn(InternalAPI::class)
+    this.parameters.append(name = name, value = value)
 }

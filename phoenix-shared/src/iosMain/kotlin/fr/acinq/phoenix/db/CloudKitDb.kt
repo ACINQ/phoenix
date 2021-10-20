@@ -3,13 +3,16 @@ package fr.acinq.phoenix.db
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.db.payments.CloudKitInterface
-import fr.acinq.phoenix.db.payments.IncomingQueries
-import fr.acinq.phoenix.db.payments.OutgoingQueries
-import fr.acinq.phoenix.db.payments.mapToDb
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.db.payments.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.kodein.memory.util.freeze
@@ -58,15 +61,15 @@ class CloudKitDb(
         // Maps `cloudkit_payments_queue.rowid` to the corresponding PaymentRowId.
         // If missing from the map, then the `cloudkit_payments_queue` row was
         // malformed or unrecognized.
-        val rowidMap: Map<Long, PaymentRowId>,
+        val rowidMap: Map<Long, WalletPaymentId>,
 
         // Maps to the fetch payment information in the database.
         // If missing from the map, then the payment has been deleted from the database.
-        val rowMap: Map<PaymentRowId, PaymentRow>,
+        val rowMap: Map<WalletPaymentId, WalletPaymentInfo>,
 
         // Maps to `cloudkit_payments_metadata.ckrecord_info`.
         // If missing from the map, then then record doesn't exist in the database.
-        val metadataMap: Map<PaymentRowId, ByteArray>,
+        val metadataMap: Map<WalletPaymentId, ByteArray>,
 
         // The `cloudkit_payments_metadata` stores the size of the non-padded record.
         // Statistics about these values are returned, rowMap is non-empty.
@@ -80,11 +83,12 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = IncomingQueries(database)
             val outQueries = OutgoingQueries(database)
+            val metaQueries = MetadataQueries(database)
 
             val rowids = mutableListOf<Long>()
-            val rowidMap = mutableMapOf<Long, PaymentRowId>()
-            val rowMap = mutableMapOf<PaymentRowId, PaymentRow>()
-            val metadataMap = mutableMapOf<PaymentRowId, ByteArray>()
+            val rowidMap = mutableMapOf<Long, WalletPaymentId>()
+            val rowMap = mutableMapOf<WalletPaymentId, WalletPaymentInfo>()
+            val metadataMap = mutableMapOf<WalletPaymentId, ByteArray>()
             var incomingStats = MetadataStats()
             var outgoingStats = MetadataStats()
 
@@ -102,70 +106,78 @@ class CloudKitDb(
                 batch.forEach { row ->
                     rowids.add(row.rowid)
                     when (row.type) {
-                        CloudKitRowType.INCOMING_PAYMENT.value -> {
+                        WalletPaymentId.DbType.INCOMING.value -> {
                             try {
-                                val paymentHash = ByteVector32(row.id)
-                                PaymentRowId.IncomingPaymentId(paymentHash)
+                                WalletPaymentId.IncomingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
-
                         }
-                        CloudKitRowType.OUTGOING_PAYMENT.value -> {
+                        WalletPaymentId.DbType.OUTGOING.value -> {
                             try {
-                                val uuid = UUID.fromString(row.id)
-                                PaymentRowId.OutgoingPaymentId(uuid)
+                                WalletPaymentId.OutgoingPaymentId.fromString(row.id)
                             } catch (e: Exception) {
                                 null
                             }
                         }
                         else -> null
-                    }?.let { paymentRowId ->
-                        rowidMap[row.rowid] = paymentRowId
+                    }?.let { paymentId ->
+                        rowidMap[row.rowid] = paymentId
                     }
                 } // </batch.forEach>
 
                 // Remember: there could be duplicates
-                val uniquePaymentRowIds = rowidMap.values.toSet()
+                val uniquePaymentIds = rowidMap.values.toSet()
 
                 // Step 3 of 5:
                 // Fetch the corresponding payment info from the database.
-                // Depending on the type of PaymentRowId, this will be either:
+                // Depending on the type of WalletPaymentId, this will be either:
                 // - IncomingPayment
                 // - OutgoingPayment
+                //
+                // In order to optimize disk access, we fetch from 1 table at a time.
 
-                uniquePaymentRowIds.forEach { paymentRowId ->
-                    when (paymentRowId) {
-                        is PaymentRowId.IncomingPaymentId -> {
-                            inQueries.getIncomingPayment(
-                                paymentHash = paymentRowId.paymentHash
-                            )?.let { row ->
-                                PaymentRow.Incoming(row)
-                            }
-                        }
-                        is PaymentRowId.OutgoingPaymentId -> {
-                            outQueries.getOutgoingPayment(
-                                id = paymentRowId.id
-                            )?.let { row ->
-                                // NB: "useless" parts have been filtered out
-                                PaymentRow.Outgoing(row)
-                            }
-                        }
-                    }?.let { paymentRow ->
-                        rowMap[paymentRowId] = paymentRow
+                val metadataPlaceholder = WalletPaymentMetadata()
+
+                uniquePaymentIds.filterIsInstance<
+                    WalletPaymentId.IncomingPaymentId
+                >().forEach { paymentId ->
+                    inQueries.getIncomingPayment(
+                        paymentHash = paymentId.paymentHash
+                    )?.let { payment ->
+                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
                     }
-                } // </rowidMap.forEach>
+                } // </incoming_payments>
+
+                uniquePaymentIds.filterIsInstance<
+                    WalletPaymentId.OutgoingPaymentId
+                >().forEach { paymentId ->
+                    outQueries.getOutgoingPayment(
+                        id = paymentId.id
+                    )?.let { payment ->
+                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
+                    }
+                } // </outgoing_payments>
+
+                val fetchOptions = WalletPaymentFetchOptions.All
+                uniquePaymentIds.forEach { paymentId ->
+                    metaQueries.getMetadata(paymentId, fetchOptions)?.let { metadata ->
+                        rowMap[paymentId]?.let {
+                            rowMap[paymentId] = it.copy(metadata = metadata)
+                        }
+                    }
+                } // </payments_metadata>
 
                 // Step 4 of 5:
                 // Fetch the corresponding `cloudkit_payments_metadata.ckrecord_info`
 
-                uniquePaymentRowIds.forEach { paymentRowId ->
+                uniquePaymentIds.forEach { paymentId ->
 
                     ckQueries.fetchMetadata(
-                        type = paymentRowId.db_type.value,
-                        id = paymentRowId.db_id
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
                     ).executeAsOneOrNull()?.let { row ->
-                        metadataMap[paymentRowId] = row.record_blob
+                        metadataMap[paymentId] = row.record_blob
                     }
                 }
 
@@ -194,9 +206,9 @@ class CloudKitDb(
                     ckQueries.scanSizes().executeAsList().forEach { row ->
                         if (row.unpadded_size > 0) {
                             when (row.type) {
-                                CloudKitRowType.INCOMING_PAYMENT.value ->
+                                WalletPaymentId.DbType.INCOMING.value ->
                                     incoming.add(row.unpadded_size)
-                                CloudKitRowType.OUTGOING_PAYMENT.value ->
+                                WalletPaymentId.DbType.OUTGOING.value ->
                                     outgoing.add(row.unpadded_size)
                             }
                         }
@@ -221,8 +233,8 @@ class CloudKitDb(
 
     suspend fun updateRows(
         deleteFromQueue: List<Long>,
-        deleteFromMetadata: List<PaymentRowId>,
-        updateMetadata: Map<PaymentRowId, MetadataRow>
+        deleteFromMetadata: List<WalletPaymentId>,
+        updateMetadata: Map<WalletPaymentId, MetadataRow>
     ) {
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -237,29 +249,29 @@ class CloudKitDb(
                     ckQueries.deleteFromQueue(rowid)
                 }
 
-                deleteFromMetadata.forEach { paymentRowId ->
+                deleteFromMetadata.forEach { paymentId ->
                     ckQueries.deleteMetadata(
-                        type = paymentRowId.db_type.value,
-                        id = paymentRowId.db_id
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
                     )
                 }
 
-                sanitizedMetadata.forEach { (paymentRowId, row) ->
+                sanitizedMetadata.forEach { (paymentId, row) ->
                     val rowExists = ckQueries.existsMetadata(
-                        type = paymentRowId.db_type.value,
-                        id = paymentRowId.db_id
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
                     ).executeAsOne() > 0
                     if (rowExists) {
                         ckQueries.updateMetadata(
                             unpadded_size = row.unpaddedSize,
                             record_blob = row.recordBlob,
-                            type = paymentRowId.db_type.value,
-                            id = paymentRowId.db_id
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId
                         )
                     } else {
                         ckQueries.addMetadata(
-                            type = paymentRowId.db_type.value,
-                            id = paymentRowId.db_id,
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId,
                             unpadded_size = row.unpaddedSize,
                             record_creation = row.recordCreation,
                             record_blob = row.recordBlob
@@ -294,15 +306,16 @@ class CloudKitDb(
     }
 
     suspend fun updateRows(
-        downloadedPayments: List<PaymentRow>,
-        updateMetadata: Map<PaymentRowId, MetadataRow>
+        downloadedPayments: List<WalletPayment>,
+        downloadedPaymentsMetadata: Map<WalletPaymentId, WalletPaymentMetadataRow>,
+        updateMetadata: Map<WalletPaymentId, MetadataRow>
     ) {
         // We are seeing crashes when accessing the values within the List<PaymentRow>.
         // Perhaps because the List was created in Swift ?
         // The workaround seems to be to copy the list here,
         // or otherwise process it outside of the `withContext` below.
-        val incomingList = downloadedPayments.mapNotNull { it as? PaymentRow.Incoming }
-        val outgoingList = downloadedPayments.mapNotNull { it as? PaymentRow.Outgoing }
+        val incomingList = downloadedPayments.mapNotNull { it as? IncomingPayment }
+        val outgoingList = downloadedPayments.mapNotNull { it as? OutgoingPayment }
 
         // We are seeing crashes when accessing the ByteArray values in updateMetadata.
         // So we need a workaround.
@@ -313,11 +326,11 @@ class CloudKitDb(
             val ckQueries = database.cloudKitPaymentsQueries
             val inQueries = database.incomingPaymentsQueries
             val outQueries = database.outgoingPaymentsQueries
+            val metaQueries = database.paymentsMetadataQueries
 
             database.transaction {
 
-                for (item in incomingList) {
-                    val incomingPayment = item.row
+                for (incomingPayment in incomingList) {
 
                     val existing = inQueries.get(
                         payment_hash = incomingPayment.paymentHash.toByteArray(),
@@ -347,10 +360,9 @@ class CloudKitDb(
                             payment_hash = incomingPayment.paymentHash.toByteArray()
                         )
                     }
-                }
+                } // </incoming_payments table>
 
-                for (item in outgoingList) {
-                    val outgoingPayment = item.row
+                for (outgoingPayment in outgoingList) {
 
                     val existing = outQueries.getOutgoingPaymentWithoutParts(
                         id = outgoingPayment.id.toString(),
@@ -416,37 +428,58 @@ class CloudKitDb(
                             status_blob = statusBlob
                         )
                     }
-                }
+                } // </outgoing_payments table>
 
-                sanitizedMetadata.forEach { (paymentRowId, row) ->
+                downloadedPaymentsMetadata.forEach { (paymentId, row) ->
+                    val rowExists = metaQueries.hasMetadata(
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
+                    ).executeAsOne() > 0
+                    if (!rowExists) {
+                        metaQueries.addMetadata(
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId,
+                            lnurl_base_type = row.lnurl_base?.first,
+                            lnurl_base_blob = row.lnurl_base?.second,
+                            lnurl_metadata_type = row.lnurl_metadata?.first,
+                            lnurl_metadata_blob = row.lnurl_metadata?.second,
+                            lnurl_successAction_type = row.lnurl_successAction?.first,
+                            lnurl_successAction_blob = row.lnurl_successAction?.second,
+                            lnurl_description = row.lnurl_description,
+                            user_description = row.user_description
+                        )
+                    }
+                } // </payments_metadata table>
+
+                sanitizedMetadata.forEach { (paymentId, row) ->
                     val rowExists = ckQueries.existsMetadata(
-                        type = paymentRowId.db_type.value,
-                        id = paymentRowId.db_id
+                        type = paymentId.dbType.value,
+                        id = paymentId.dbId
                     ).executeAsOne() > 0
                     if (rowExists) {
                         ckQueries.updateMetadata(
                             unpadded_size = row.unpaddedSize,
                             record_blob = row.recordBlob,
-                            type = paymentRowId.db_type.value,
-                            id = paymentRowId.db_id
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId
                         )
                     } else {
                         ckQueries.addMetadata(
-                            type = paymentRowId.db_type.value,
-                            id = paymentRowId.db_id,
+                            type = paymentId.dbType.value,
+                            id = paymentId.dbId,
                             unpadded_size = row.unpaddedSize,
                             record_creation = row.recordCreation,
                             record_blob = row.recordBlob
                         )
                     }
-                }
+                } // </cloudkit_payments_metadata table>
             }
         }
     }
 
     private fun sanitizeMetadata(
-        metadata: Map<PaymentRowId, MetadataRow>
-    ): Map<PaymentRowId, MetadataRow> {
+        metadata: Map<WalletPaymentId, MetadataRow>
+    ): Map<WalletPaymentId, MetadataRow> {
 
         // We are seeing crashes when accessing the ByteArray values in the map:
         // > "illegal attempt to access non-shared kotlin.ByteArray"
@@ -461,7 +494,7 @@ class CloudKitDb(
     }
 
     data class MissingItem(
-        val paymentRowId: PaymentRowId,
+        val paymentId: WalletPaymentId,
         val timestamp: Long
     )
 
@@ -474,9 +507,9 @@ class CloudKitDb(
 
             database.transaction {
 
-                val existing = mutableSetOf<PaymentRowId>()
+                val existing = mutableSetOf<WalletPaymentId>()
                 ckQueries.scanMetadata().executeAsList().forEach { row ->
-                    PaymentRowId.create(row.type, row.id)?.let {
+                    WalletPaymentId.create(row.type, row.id)?.let {
                         existing.add(it)
                     }
                 }
@@ -484,14 +517,14 @@ class CloudKitDb(
                 val missing = mutableListOf<MissingItem>()
 
                 inQueries.scanCompleted().executeAsList().forEach { row ->
-                    val rowId = PaymentRowId.IncomingPaymentId.fromByteArray(row.payment_hash)
+                    val rowId = WalletPaymentId.IncomingPaymentId.fromByteArray(row.payment_hash)
                     if (!existing.contains(rowId)) {
                         missing.add(MissingItem(rowId, row.received_at))
                     }
                 }
 
                 outQueries.scanCompleted().executeAsList().forEach { row ->
-                    val rowId = PaymentRowId.OutgoingPaymentId.fromString(row.id)
+                    val rowId = WalletPaymentId.OutgoingPaymentId.fromString(row.id)
                     if (!existing.contains(rowId)) {
                         missing.add(MissingItem(rowId, row.completed_at))
                     }
@@ -514,8 +547,8 @@ class CloudKitDb(
                 val now = currentTimestampMillis()
                 missing.forEachIndexed { idx, item ->
                     ckQueries.addToQueue(
-                        type = item.paymentRowId.db_type.value,
-                        id = item.paymentRowId.db_id,
+                        type = item.paymentId.dbType.value,
+                        id = item.paymentId.dbId,
                         date_added = now - idx
                     )
                 }

@@ -295,7 +295,7 @@ extension FiatCurrency {
 	}
 	
 	static func deserialize(_ str: String) -> FiatCurrency? {
-		for value in FiatCurrency.default().values {
+		for value in FiatCurrency.companion.values {
 			if str == value.serialize() {
 				return value
 			}
@@ -312,7 +312,7 @@ extension FiatCurrency {
 		// - "USD"
 		// - "JPY"
 		
-		for fiat in FiatCurrency.default().values {
+		for fiat in FiatCurrency.companion.values {
 			
 			let fiatCode = fiat.name // e.g. "AUD", "BRL"
 			
@@ -332,7 +332,7 @@ extension BitcoinUnit {
 	}
 	
 	static func deserialize(_ str: String) -> BitcoinUnit? {
-		for value in BitcoinUnit.default().values {
+		for value in BitcoinUnit.companion.values {
 			if str == value.serialize() {
 				return value
 			}

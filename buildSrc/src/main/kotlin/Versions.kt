@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.1.0"
+    const val lightningKmp = "1.2.0"
     const val secp256k1 = "0.6.0"
 
     const val kotlin = "1.5.30"
@@ -19,6 +19,7 @@ object Versions {
         const val ktx = "1.5.0"
         const val lifecycle = "2.3.1"
         const val prefs = "1.1.1"
+        const val datastore = "1.0.0"
         const val compose = "1.1.0-alpha04"
         const val navCompose = "2.4.0-alpha09"
         const val constraintLayoutCompose = "1.0.0-beta02"
@@ -32,11 +33,11 @@ object Versions {
     }
 
     object AndroidLegacy {
-        const val eclair = "0.4.15-android-phoenix-SNAPSHOT"
+        const val eclair = "0.4.15-android-phoenix"
 
         const val safeArgs = "2.3.5"
-        const val appCompat = "1.3.1"
-        const val material = "1.4.0"
+        const val appCompat = "1.2.0"
+        const val material = "1.4.0-alpha02"
         const val navigation = "2.3.5"
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"

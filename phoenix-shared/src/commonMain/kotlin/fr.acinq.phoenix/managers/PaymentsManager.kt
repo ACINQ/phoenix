@@ -1,9 +1,6 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.io.*
 import fr.acinq.lightning.utils.UUID
@@ -11,6 +8,10 @@ import fr.acinq.lightning.utils.getValue
 import fr.acinq.lightning.utils.setValue
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.WalletPaymentInfo
+import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.SqlitePaymentsDb
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import kotlinx.coroutines.*
@@ -106,7 +107,7 @@ class PaymentsManager(
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
                     }
                     is PaymentNotSent -> {
-                        getOutgoingPayment(event.request.paymentId)?.let {
+                        paymentsDb().getOutgoingPayment(event.request.paymentId)?.let {
                             _lastCompletedPayment.value = it
                         }
                         removeFromInFlightOutgoingPayments(event.request.paymentId)
@@ -140,19 +141,30 @@ class PaymentsManager(
         _inFlightOutgoingPayments.value = newSet
     }
 
-    fun db() = databaseManager.databases.value?.payments
-
     private suspend fun paymentsDb(): SqlitePaymentsDb {
-        val db = databaseManager.databases.filterNotNull().first()
-        return db.payments as SqlitePaymentsDb
+        return databaseManager.paymentsDb()
     }
 
-    suspend fun getOutgoingPayment(id: UUID): OutgoingPayment? {
-        return paymentsDb().getOutgoingPayment(id)
-    }
-
-    suspend fun getIncomingPayment(paymentHash: ByteVector32): IncomingPayment? {
-        return paymentsDb().getIncomingPayment(paymentHash)
+    suspend fun getPayment(
+        id: WalletPaymentId,
+        options: WalletPaymentFetchOptions
+    ): WalletPaymentInfo? = when (id) {
+        is WalletPaymentId.IncomingPaymentId -> {
+            paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
+                WalletPaymentInfo(
+                    payment = it.first,
+                    metadata = it.second ?: WalletPaymentMetadata()
+                )
+            }
+        }
+        is WalletPaymentId.OutgoingPaymentId -> {
+            paymentsDb().getOutgoingPayment(id.id, options)?.let {
+                WalletPaymentInfo(
+                    payment = it.first,
+                    metadata = it.second ?: WalletPaymentMetadata()
+                )
+            }
+        }
     }
 
     fun subscribeToPaymentsPage(offset: Int, count: Int) {

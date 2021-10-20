@@ -57,7 +57,12 @@ kotlin {
                 baseName = "PhoenixShared"
             }
             compilations.all {
-                kotlinOptions.freeCompilerArgs += "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
+                kotlinOptions.freeCompilerArgs +=
+                    "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi"
+                kotlinOptions.freeCompilerArgs +=
+                    "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
+                kotlinOptions.freeCompilerArgs +=
+                    "-Xoverride-konan-properties=osVersionMin.ios_x64=14.0;osVersionMin.ios_arm64=14.0"
             }
         }
     }
@@ -82,6 +87,7 @@ kotlin {
         sourceSets["commonTest"].dependencies {
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
+            implementation("io.ktor:ktor-client-mock:${Versions.ktor}")
         }
 
         if (includeAndroid) {

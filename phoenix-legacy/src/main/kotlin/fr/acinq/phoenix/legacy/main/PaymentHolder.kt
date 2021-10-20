@@ -161,6 +161,8 @@ class PaymentHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       item.meta.swap_in_address
     } else if (item.meta?.swap_out_address != null) {
       item.meta.swap_out_address
+    } else if (item.meta?.lnurlpay_meta_description != null) {
+      item.meta.lnurlpay_meta_description
     } else if (item.payment.paymentRequest().isDefined) {
       PaymentRequest.fastReadDescription(item.payment.paymentRequest().get())
     } else if (item.payment is PlainOutgoingPayment && (item.payment.paymentType() == "ClosingChannel" || (item.payment.externalId().isDefined && item.payment.externalId().get().startsWith("closing-")))) {

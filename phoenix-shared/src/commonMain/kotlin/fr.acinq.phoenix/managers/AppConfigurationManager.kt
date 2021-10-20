@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
-import kotlin.math.max
+import kotlin.math.*
 import kotlin.time.*
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
@@ -64,13 +64,13 @@ class AppConfigurationManager(
     private fun initWalletContext() = launch {
         val (timestamp, localContext) = appDb.getWalletContextOrNull(currentWalletContextVersion)
 
-        val freshness = (Clock.System.now().toEpochMilliseconds() - timestamp).milliseconds
+        val freshness = Duration.milliseconds(Clock.System.now().toEpochMilliseconds() - timestamp)
         logger.info { "local context was updated $freshness ago" }
 
-        val timeout = if (freshness < 48.hours) {
-            2.seconds
+        val timeout = if (freshness < Duration.hours(48)) {
+            Duration.seconds(2)
         } else {
-            max(freshness.inDays.toInt(), 5) * 2.seconds
+            Duration.seconds(2) * max(freshness.inWholeDays.toInt(), 5)
         } // max=10s
 
         // TODO are we using TOR? -> increase timeout
@@ -109,13 +109,13 @@ class AppConfigurationManager(
 
     @OptIn(ExperimentalTime::class)
     private fun updateWalletContextLoop() = launch {
-        var pause = 0.5.seconds
+        var pause = Duration.seconds(0.5)
         while (isActive) {
-            pause = (pause * 2).coerceAtMost(5.minutes)
+            pause = (pause * 2).coerceAtMost(Duration.minutes(5))
             fetchAndStoreWalletContext()?.let {
                 val chainContext = it.export(chain)
                 _chainContext.value = chainContext
-                pause = 60.minutes
+                pause = Duration.minutes(60)
             }
             delay(pause)
         }
@@ -132,9 +132,9 @@ class AppConfigurationManager(
     }
 
     private val publicSuffixListKey = "publicSuffixList"
-    private val publicSuffixListDefaultRefresh = 30.days
+    private val publicSuffixListDefaultRefresh = Duration.days(30)
 
-    public suspend fun fetchPublicSuffixList(
+    suspend fun fetchPublicSuffixList(
         refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
     ): Pair<String, Long>? {
         val databaseRow = appDb.getValue(publicSuffixListKey) {
@@ -142,7 +142,7 @@ class AppConfigurationManager(
         }
         if (databaseRow != null) {
             val elapsed = currentTimestampMillis() - databaseRow.second
-            if (elapsed.milliseconds <= refreshIfOlderThan) {
+            if (Duration.milliseconds(elapsed) <= refreshIfOlderThan) {
                 return databaseRow
             }
         }
@@ -159,7 +159,7 @@ class AppConfigurationManager(
         return Pair(latestList, refreshTimestamp)
     }
 
-    public suspend fun prefetchPublicSuffixList(
+    suspend fun fetchPublicSuffixListAsync(
         refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
     ): Deferred<Pair<String, Long>?> {
         return async {
@@ -173,21 +173,12 @@ class AppConfigurationManager(
     private val _electrumConfig by lazy { MutableStateFlow<ElectrumConfig?>(null) }
     fun electrumConfig(): StateFlow<ElectrumConfig?> = _electrumConfig
 
-    fun electrumServerAddress(): ServerAddress? {
-        return _electrumConfig.value?.let {
-            when (it) {
-                is ElectrumConfig.Custom -> it.server
-                is ElectrumConfig.Random -> randomElectrumServer()
-            }
-        }
-    }
-
     /** Use this method to set a server to connect to. If null, will connect to a random server. */
     fun updateElectrumConfig(server: ServerAddress?) {
         _electrumConfig.value = server?.let { ElectrumConfig.Custom(it) } ?: ElectrumConfig.Random
     }
 
-    private fun randomElectrumServer() = when (chain) {
+    fun randomElectrumServer() = when (chain) {
         Chain.Mainnet -> electrumMainnetConfigurations.random()
         Chain.Testnet -> electrumTestnetConfigurations.random()
         Chain.Regtest -> platformElectrumRegtestConf()

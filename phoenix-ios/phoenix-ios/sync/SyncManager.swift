@@ -29,6 +29,7 @@ fileprivate var log = Logger(OSLog.disabled)
 
 fileprivate let record_table_name = "payments"
 fileprivate let record_column_data = "encryptedData"
+fileprivate let record_column_meta = "encryptedMeta"
 
 /// See `SyncManagerState.swift` for state machine diagrams
 /// 
@@ -68,18 +69,19 @@ fileprivate struct AtomicState {
 fileprivate struct DownloadedItem {
 	let record: CKRecord
 	let unpaddedSize: Int
-	let decrypted: CloudData
+	let payment: Lightning_kmpWalletPayment
+	let metadata: WalletPaymentMetadataRow?
 }
 
 fileprivate struct UploadOperationInfo {
 	let batch: FetchQueueBatchResult
 	
-	var reverseMap: [CKRecord.ID: PaymentRowId] = [:]
-	var unpaddedMap: [PaymentRowId: Int] = [:]
+	var reverseMap: [CKRecord.ID: WalletPaymentId] = [:]
+	var unpaddedMap: [WalletPaymentId: Int] = [:]
 	
 	var completedRowids: [Int64] = []
 	
-	var partialFailures: [PaymentRowId: CKError?] = [:]
+	var partialFailures: [WalletPaymentId: CKError?] = [:]
 	
 	var savedRecords: [CKRecord] = []
 	var deletedRecordIds: [CKRecord.ID] = []
@@ -129,7 +131,7 @@ class SyncManager {
 	private let networkMonitor: NWPathMonitor
 	
 	private var consecutiveErrorCount = 0
-	private var consecutivePartialFailures: [PaymentRowId: ConsecutivePartialFailure] = [:]
+	private var consecutivePartialFailures: [WalletPaymentId: ConsecutivePartialFailure] = [:]
 	
 	private var _paymentsDb: SqlitePaymentsDb? = nil // see getter method
 	private var _cloudKitDb: CloudKitDb? = nil       // see getter method
@@ -629,6 +631,10 @@ class SyncManager {
 					log.debug("CKAccountStatus.couldNotDetermine")
 					hasCloudCredentials = false
 					
+				case .temporarilyUnavailable:
+					log.debug("CKAccountStatus.temporarilyUnavailable")
+					hasCloudCredentials = false
+				
 				@unknown default:
 					log.debug("CKAccountStatus.unknown")
 					hasCloudCredentials = false
@@ -985,36 +991,33 @@ class SyncManager {
 				log.debug(" - recordID: \(record.recordID)")
 				log.debug(" - creationDate: \(record.creationDate ?? Date.distantPast)")
 				
-				var encryptedData: Data? = nil
+				var unpaddedSize: Int = 0
+				var payment: Lightning_kmpWalletPayment? = nil
+				var metadata: WalletPaymentMetadataRow? = nil
 				
-				if let data = record[record_column_data] as? Data {
-					log.debug(" - data.count: \(data.count)")
-					encryptedData = data
-				}
+				// Reminder: Kotlin-MPP has horrible multithreading support.
+				// It basically doesn't allow you to use multiple threads.
+				// Any Kotlin objects we create here will be tied to this background thread.
+				// And when we attempt to use them from another thread,
+				// Kotlin will throw an exception:
+				//
+				// > kotlin.native.IncorrectDereferenceException:
+				// >   illegal attempt to access non-shared
+				// >   fr.acinq.phoenix.db.WalletPaymentId.IncomingPaymentId@2881e28 from other thread
+				//
+				// We are working around this restriction by freezing objects via `doCopyAndFreeze()`.
 				
-				if let ciphertext = encryptedData {
+				if let ciphertext = record[record_column_data] as? Data {
+					log.debug(" - data.count: \(ciphertext.count)")
+					
 					do {
 						let box = try ChaChaPoly.SealedBox(combined: ciphertext)
 						let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
 						
 						let cleartext_kotlin = cleartext.toKotlinByteArray()
-						let wrapper = CloudData.Companion().cborDeserialize(blob: cleartext_kotlin)
+						let wrapper = CloudData.companion.cborDeserialize(blob: cleartext_kotlin)
 						
-						// Reminder: Kotlin-MPP has horrible multithreading support.
-						// It basically doesn't allow you to use multiple threads.
-						// Any Kotlin objects we create here will be tied to this background thread.
-						// And when we attempt to use them from another thread,
-						// Kotlin will throw an exception:
-						//
-						// > kotlin.native.IncorrectDereferenceException:
-						// >   illegal attempt to access non-shared
-						// >   fr.acinq.phoenix.db.PaymentRowId.IncomingPaymentId@2881e28 from other thread
-						//
-						// We are working around this restriction by freezing the `wrapper`,
-						// which we do via `doCopyAndFreeze()`.
-						// But we should avoid creating any other Kotlin objects in this thread.
-						// 
-						if let wrapper = wrapper?.doCopyAndFreeze() {
+						if let wrapper = wrapper {
 							
 							#if DEBUG
 						//	let jsonData = wrapper.jsonSerialize().toSwiftData()
@@ -1024,19 +1027,53 @@ class SyncManager {
 							
 							let paddedSize = cleartext.count
 							let paddingSize = Int(wrapper.padding?.size ?? 0)
-							let unpaddedSize = paddedSize - paddingSize
+							unpaddedSize = paddedSize - paddingSize
 							
-							items.append(DownloadedItem(
-								record: record,
-								unpaddedSize: unpaddedSize,
-								decrypted: wrapper
-							))
+							payment = wrapper.unwrap()?.doCopyAndFreeze()
 						}
 						
 					} catch {
-						log.error("decryption error: \(String(describing: error))")
+						log.error("data decryption error: \(String(describing: error))")
 					}
 				}
+				
+				if let asset = record[record_column_meta] as? CKAsset {
+					
+					var ciphertext: Data? = nil
+					if let fileURL = asset.fileURL {
+						
+						do {
+							ciphertext = try Data(contentsOf: fileURL)
+						} catch {
+							log.error("asset read error: \(String(describing: error))")
+						}
+						
+						if let ciphertext = ciphertext {
+							do {
+								let box = try ChaChaPoly.SealedBox(combined: ciphertext)
+								let cleartext = try ChaChaPoly.open(box, using: self.cloudKey)
+								
+								let cleartext_kotlin = cleartext.toKotlinByteArray()
+								let row = CloudAsset.companion.cloudDeserialize(blob: cleartext_kotlin)
+								
+								metadata = row?.doCopyAndFreeze()
+								
+							} catch {
+								log.error("meta decryption error: \(String(describing: error))")
+							}
+						}
+					}
+				}
+				
+				if let payment = payment {
+					items.append(DownloadedItem(
+						record: record,
+						unpaddedSize: unpaddedSize,
+						payment: payment,
+						metadata: metadata
+					))
+				}
+				
 			}
 			
 			operation.queryCompletionBlock = { (cursor: CKQueryOperation.Cursor?, error: Error?) in
@@ -1076,28 +1113,30 @@ class SyncManager {
 			// Kotlin will crash if we try to use multiple threads (like a real app)
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
-			var rows: [PaymentRow] = []
-			var metadataMap: [PaymentRowId: CloudKitDb.MetadataRow] = [:]
+			var paymentRows: [Lightning_kmpWalletPayment] = []
+			var paymentMetadataRows: [WalletPaymentId: WalletPaymentMetadataRow] = [:]
+			var metadataMap: [WalletPaymentId: CloudKitDb.MetadataRow] = [:]
 			
 			for item in items {
-				if let paymentRow = item.decrypted.paymentRow() {
-					
-					rows.append(paymentRow)
-					
-					let paymentRowId = paymentRow.paymentRowId()
-					let creation = self.dateToMillis(item.record.creationDate ?? Date())
-					let metadata = self.metadataForRecord(item.record)
-					
-					metadataMap[paymentRowId] = CloudKitDb.MetadataRow(
-						unpaddedSize: Int64(item.unpaddedSize),
-						recordCreation: creation,
-						recordBlob: metadata.toKotlinByteArray()
-					)
-				}
+				
+				paymentRows.append(item.payment)
+				
+				let paymentId = item.payment.walletPaymentId()
+				paymentMetadataRows[paymentId] = item.metadata
+				
+				let creation = self.dateToMillis(item.record.creationDate ?? Date())
+				let metadata = self.metadataForRecord(item.record)
+				
+				metadataMap[paymentId] = CloudKitDb.MetadataRow(
+					unpaddedSize: Int64(item.unpaddedSize),
+					recordCreation: creation,
+					recordBlob: metadata.toKotlinByteArray()
+				)
 			}
 			
 			self.cloudKitDb.updateRows(
-				downloadedPayments: rows,
+				downloadedPayments: paymentRows,
+				downloadedPaymentsMetadata: paymentMetadataRows,
 				updateMetadata: metadataMap
 			) { (_: KotlinUnit?, error: Error?) in
 		
@@ -1244,36 +1283,40 @@ class SyncManager {
 			var recordsToSave = [CKRecord]()
 			var recordIDsToDelete = [CKRecord.ID]()
 			
-			var reverseMap = [CKRecord.ID: PaymentRowId]()
-			var unpaddedMap = [PaymentRowId: Int]()
+			var reverseMap = [CKRecord.ID: WalletPaymentId]()
+			var unpaddedMap = [WalletPaymentId: Int]()
 			
 			// NB: batch.rowidMap may contain the same paymentRowId multiple times.
 			// And if we include the same record multiple times in the CKModifyRecordsOperation,
 			// then the operation will fail.
 			//
-			for paymentRowId in batch.uniquePaymentRowIds() {
+			for paymentId in batch.uniquePaymentIds() {
 				
 				var existingRecord: CKRecord? = nil
-				if let metadata = batch.metadataMap[paymentRowId] {
+				if let metadata = batch.metadataMap[paymentId] {
 					
 					let data = metadata.toSwiftData()
 					existingRecord = self.recordFromMetadata(data)
 				}
 				
-				if let row = batch.rowMap[paymentRowId] {
+				if let row = batch.rowMap[paymentId] {
 					
-					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptRow(row, batch) {
+					if let (ciphertext, unpaddedSize) = self.serializeAndEncryptPayment(row.payment, batch) {
 						
 						let record = existingRecord ?? CKRecord(
 							recordType: record_table_name,
-							recordID: self.recordID(for: paymentRowId)
+							recordID: self.recordID(for: paymentId)
 						)
 						
 						record[record_column_data] = ciphertext
 						
+						if let fileUrl = self.serializeAndEncryptMetadata(row.metadata) {
+							record[record_column_meta] = CKAsset(fileURL: fileUrl)
+						}
+						
 						recordsToSave.append(record)
-						reverseMap[record.recordID] = paymentRowId
-						unpaddedMap[paymentRowId] = unpaddedSize
+						reverseMap[record.recordID] = paymentId
+						unpaddedMap[paymentId] = unpaddedSize
 					}
 					
 				} else {
@@ -1281,10 +1324,10 @@ class SyncManager {
 					// The payment has been deleted from the local database.
 					// So we're going to delete it from the cloud database (if it exists there).
 					
-					let recordID = existingRecord?.recordID ?? self.recordID(for: paymentRowId)
+					let recordID = existingRecord?.recordID ?? self.recordID(for: paymentId)
 					
 					recordIDsToDelete.append(recordID)
-					reverseMap[recordID] = paymentRowId
+					reverseMap[recordID] = paymentId
 				}
 			}
 			
@@ -1506,8 +1549,8 @@ class SyncManager {
 			assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
 			
 			var deleteFromQueue = [KotlinLong]()
-			var deleteFromMetadata = [PaymentRowId]()
-			var updateMetadata = [PaymentRowId: CloudKitDb.MetadataRow]()
+			var deleteFromMetadata = [WalletPaymentId]()
+			var updateMetadata = [WalletPaymentId: CloudKitDb.MetadataRow]()
 			
 			for (rowid) in opInfo.completedRowids {
 				deleteFromQueue.append(KotlinLong(longLong: rowid))
@@ -1643,18 +1686,18 @@ class SyncManager {
 	/// - adds randomized padding to obfuscate payment type
 	/// - encrypts the blob using the cloudKey
 	///
-	private func serializeAndEncryptRow(
-		_ row: PaymentRow,
+	private func serializeAndEncryptPayment(
+		_ row: Lightning_kmpWalletPayment,
 		_ batch: FetchQueueBatchResult
 	) -> (Data, Int)? {
 		
 		var wrapper: CloudData? = nil
 		
-		if let incoming = row as? PaymentRow.Incoming {
-			wrapper = CloudData(incoming: incoming.row, version: CloudDataVersion.v0)
+		if let incoming = row as? Lightning_kmpIncomingPayment {
+			wrapper = CloudData(incoming: incoming, version: CloudDataVersion.v0)
 			
-		} else if let outgoing = row as? PaymentRow.Outgoing {
-			wrapper = CloudData(outgoing: outgoing.row, version: CloudDataVersion.v0)
+		} else if let outgoing = row as? Lightning_kmpOutgoingPayment {
+			wrapper = CloudData(outgoing: outgoing, version: CloudDataVersion.v0)
 		}
 		
 		var cleartext: Data? = nil
@@ -1759,7 +1802,7 @@ class SyncManager {
 				ciphertext = box.combined
 				
 			} catch {
-				log.error("Error encrypting with ChaChaPoly: \(String(describing: error))")
+				log.error("Error encrypting row with ChaChaPoly: \(String(describing: error))")
 			}
 		}
 		
@@ -1768,6 +1811,45 @@ class SyncManager {
 		} else {
 			return nil
 		}
+	}
+	
+	private func serializeAndEncryptMetadata(
+		_ metadata: WalletPaymentMetadata
+	) -> URL? {
+		
+		guard let lnurlPay = metadata.lnurl?.pay else {
+			return nil
+		}
+		
+		let cleartext = WalletPaymentMetadataRow.companion.serialize(
+			pay: lnurlPay,
+			successAction: metadata.lnurl?.successAction
+		)
+		.cloudSerialize()
+		.toSwiftData()
+		
+		let ciphertext: Data
+		do {
+			let box = try ChaChaPoly.seal(cleartext, using: self.cloudKey)
+			ciphertext = box.combined
+			
+		} catch {
+			log.error("Error encrypting assets with ChaChaPoly: \(String(describing: error))")
+			return nil
+		}
+		
+		let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+		let fileName = UUID().uuidString
+		let filePath = tempDir.appendingPathComponent(fileName, isDirectory: false)
+		
+		do {
+			try ciphertext.write(to: filePath)
+		} catch {
+			log.error("Error encrypting assets with ChaChaPoly: \(String(describing: error))")
+			return nil
+		}
+		
+		return filePath
 	}
 	
 	func createProgress(for operation: CKModifyRecordsOperation) -> (Progress, [CKRecord.ID: Progress]) {
@@ -1819,7 +1901,7 @@ class SyncManager {
 	/// Incorporates failures from the last CKModifyRecordsOperation,
 	/// and returns a list of permanently failed items.
 	///
-	func updateConsecutivePartialFailures(_ partialFailures: [PaymentRowId: CKError?]) -> [PaymentRowId] {
+	func updateConsecutivePartialFailures(_ partialFailures: [WalletPaymentId: CKError?]) -> [WalletPaymentId] {
 		
 		// Handle partial failures.
 		// The rules are:
@@ -1827,12 +1909,12 @@ class SyncManager {
 		// - unless the failure was serverChangeError,
 		//   which must fail 3 times in a row before being dropped
 		
-		var permanentFailures: [PaymentRowId] = []
+		var permanentFailures: [WalletPaymentId] = []
 		
-		for (paymentRowId, ckerror) in partialFailures {
+		for (paymentId, ckerror) in partialFailures {
 			
-			guard var cpf = consecutivePartialFailures[paymentRowId] else {
-				consecutivePartialFailures[paymentRowId] = ConsecutivePartialFailure(
+			guard var cpf = consecutivePartialFailures[paymentId] else {
+				consecutivePartialFailures[paymentId] = ConsecutivePartialFailure(
 					count: 1,
 					error: ckerror
 				)
@@ -1864,19 +1946,19 @@ class SyncManager {
 				if isPermanentFailure {
 					log.debug(
 						"""
-						Permanent failure: \(paymentRowId), count=\(cpf.count): \
+						Permanent failure: \(paymentId), count=\(cpf.count): \
 						\( ckerror == nil ? "<nil>" : String(describing: ckerror!) )
 						"""
 					)
 					
-					permanentFailures.append(paymentRowId)
-					self.consecutivePartialFailures[paymentRowId] = nil
+					permanentFailures.append(paymentId)
+					self.consecutivePartialFailures[paymentId] = nil
 				} else {
-					self.consecutivePartialFailures[paymentRowId] = cpf
+					self.consecutivePartialFailures[paymentId] = cpf
 				}
 				
 			} else {
-				self.consecutivePartialFailures[paymentRowId] = ConsecutivePartialFailure(
+				self.consecutivePartialFailures[paymentId] = ConsecutivePartialFailure(
 					count: 1,
 					error: ckerror
 				)
@@ -1894,14 +1976,14 @@ class SyncManager {
 		)
 	}
 	
-	private func recordID(for paymentRowId: PaymentRowId) -> CKRecord.ID {
+	private func recordID(for paymentId: WalletPaymentId) -> CKRecord.ID {
 		
 		// The recordID is:
 		// - deterministic => by hashing the paymentId
 		// - secure => by mixing in the secret cloudKey (derived from seed)
 		
 		let prefix = SHA256.hash(data: cloudKey.rawRepresentation)
-		let suffix = paymentRowId.db_id.data(using: .utf8)!
+		let suffix = paymentId.dbId.data(using: .utf8)!
 		
 		let hashMe = prefix + suffix
 		let digest = SHA256.hash(data: hashMe)

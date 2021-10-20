@@ -26,7 +26,7 @@ extension Currency {
 		
 		var all = [Currency]()
 		
-		for bitcoinUnit in BitcoinUnit.default().values {
+		for bitcoinUnit in BitcoinUnit.companion.values {
 			all.append(Currency.bitcoin(bitcoinUnit))
 		}
 		
