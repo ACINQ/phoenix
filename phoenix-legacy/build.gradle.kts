@@ -30,7 +30,7 @@ android {
     minSdk = 24
     targetSdk = 30
     versionCode = 34
-    versionName = gitCommitHash()
+    versionName = "1.4.19"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
