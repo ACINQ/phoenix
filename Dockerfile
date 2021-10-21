@@ -2,8 +2,8 @@
 FROM adoptopenjdk/openjdk11:jdk-11.0.12_7-alpine as ECLAIR_CORE_BUILD
 
 # this is necessary to extract the eclair-core version that we need to clone for the build
-COPY ./app/build.gradle .
-RUN cat build.gradle | grep "def eclair_version" | cut -d '"' -f2 | sed 's/^/v/' > eclair-core-version.txt
+COPY ./buildSrc/src/main/kotlin/Versions.kt .
+RUN cat Versions.kt | grep "const val eclair =" | cut -d '"' -f 2 > eclair-core-version.txt
 
 ARG MAVEN_VERSION=3.6.3
 ARG USER_HOME_DIR="/root"
@@ -24,7 +24,7 @@ ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
 # clone eclair at the specified branch
-RUN git clone https://github.com/ACINQ/eclair -b $(cat eclair-core-version.txt)
+RUN git clone https://github.com/ACINQ/eclair -b v$(cat eclair-core-version.txt)
 
 # build eclair-core
 RUN cd eclair && mvn install -pl eclair-core -am -Dmaven.test.skip=true
@@ -74,7 +74,7 @@ RUN git clone https://github.com/ACINQ/Tor_Onion_Proxy_Library && \
     ./gradlew :android:build && \
     ./gradlew :android:publishToMaven
 
-# copy eclair-core dependendency
+# copy eclair-core dependency
 COPY --from=ECLAIR_CORE_BUILD /root/.m2/repository/fr/acinq/eclair /root/.m2/repository/fr/acinq/eclair
 # copy phoenix project over to docker image
 COPY . /home/ubuntu/phoenix
