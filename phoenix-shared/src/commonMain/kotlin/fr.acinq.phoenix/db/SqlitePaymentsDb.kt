@@ -285,6 +285,20 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         return oldMap[id]
     }
 
+    suspend fun updateMetadata(
+        id: WalletPaymentId,
+        userDescription: String?,
+        userNotes: String?
+    ) {
+        withContext(Dispatchers.Default) {
+            metaQueries.updateUserInfo(
+                id = id,
+                userDescription = userDescription,
+                userNotes = userNotes
+            )
+        }
+    }
+
     companion object {
         private fun allPaymentsCountMapper(
             result: Long?
@@ -293,25 +307,26 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         }
 
         private fun allPaymentsOrderMapper(
-            direction: String,
-            outgoing_payment_id: String?,
-            incoming_payment_id: ByteArray?,
-            @Suppress("UNUSED_PARAMETER") created_at: Long,
-            @Suppress("UNUSED_PARAMETER") completed_at: Long?
+            type: Long,
+            id: String,
+            created_at: Long,
+            completed_at: Long?,
+            metadata_modified_at: Long?
         ): WalletPaymentOrderRow {
-            val paymentId = when (direction.lowercase()) {
-                "outgoing" -> WalletPaymentId.OutgoingPaymentId(
-                    id = UUID.fromString(outgoing_payment_id!!)
-                )
-                "incoming" -> WalletPaymentId.IncomingPaymentId(
-                    paymentHash = ByteVector32(incoming_payment_id!!)
-                )
-                else -> throw UnhandledDirection(direction)
+            val paymentId = when (type) {
+                WalletPaymentId.DbType.OUTGOING.value -> {
+                    WalletPaymentId.OutgoingPaymentId.fromString(id)
+                }
+                WalletPaymentId.DbType.INCOMING.value -> {
+                    WalletPaymentId.IncomingPaymentId.fromString(id)
+                }
+                else -> throw UnhandledPaymentType(type)
             }
             return WalletPaymentOrderRow(
                 id = paymentId,
                 createdAt = created_at,
-                completedAt = completed_at
+                completedAt = completed_at,
+                metadataModifiedAt = metadata_modified_at
             )
         }
     }
@@ -319,42 +334,58 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
 
 class OutgoingPaymentPartNotFound(partId: UUID) : RuntimeException("could not find outgoing payment part with part_id=$partId")
 class IncomingPaymentNotFound(paymentHash: ByteVector32) : RuntimeException("missing payment for payment_hash=$paymentHash")
-class UnhandledDirection(direction: String) : RuntimeException("unhandled direction=$direction")
+class UnhandledPaymentType(type: Long) : RuntimeException("unhandled payment type=$type")
 
 data class WalletPaymentOrderRow(
     val id: WalletPaymentId,
     val createdAt: Long,
-    val completedAt: Long?
+    val completedAt: Long?,
+    val metadataModifiedAt: Long?
 ) {
-    /// Returns a unique identifier, suitable for use in a HashMap.
-    /// Form is:
-    /// - "outgoing|id|createdAt|completedAt"
-    /// - "incoming|paymentHash|createdAt|completedAt"
-    ///
+    /**
+     * Returns a unique identifier, suitable for use in a HashMap.
+     * Form is:
+     * - "outgoing|id|createdAt|completedAt|metadataModifiedAt"
+     * - "incoming|paymentHash|createdAt|completedAt|metadataModifiedAt"
+     */
     val identifier: String get() {
-        return "${this.staleIdentifierPrefix}${completedAt?.toString() ?: "null"}"
+        return this.staleIdentifierPrefix +
+                (completedAt?.toString() ?: "null") + "|" +
+                (metadataModifiedAt?.toString() ?: "null")
     }
 
-    /// Returns a prefix that can be used to detect older (stale) versions of the row.
-    /// Form is:
-    /// - "outgoing|id|createdAt|"
-    /// - "incoming|paymentHash|createdAt|"
-    ///
+    /**
+     * Returns a prefix that can be used to detect older (stale) versions of the row.
+     * Form is:
+     * - "outgoing|id|createdAt|"
+     * - "incoming|paymentHash|createdAt|"
+     */
     val staleIdentifierPrefix: String get() {
         return "${id.identifier}|${createdAt}|"
     }
 }
 
-/// Implement this function to execute platform specific code when a payment completes.
-/// For example, on iOS this is used to enqueue the (encrypted) payment for upload to CloudKit.
-///
-/// Important:
-///   This function is invoked inside the same transaction used to add/modify the row.
-///   This means any database operations performed in this function are atomic,
-///   with respect to the referenced row.
-///
+/**
+ * Implement this function to execute platform specific code when a payment completes.
+ * For example, on iOS this is used to enqueue the (encrypted) payment for upload to CloudKit.
+ *
+ * This function is invoked inside the same transaction used to add/modify the row.
+ * This means any database operations performed in this function are atomic,
+ * with respect to the referenced row.
+ */
 expect fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
 
-/// Implemented on Apple platforms with support for CloudKit.
-///
+/**
+ * Implement this function to execute platform specific code when a payment's metdata is updated.
+ * For example: the user modifies the payment description.
+ *
+ * This function is invoked inside the same transaction used to add/modify the row.
+ * This means any database operations performed in this function are atomic,
+ * with respect to the referenced row.
+ */
+expect fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase)
+
+/**
+ * Implemented on Apple platforms with support for CloudKit.
+ */
 expect fun makeCloudKitDb(database: PaymentsDatabase): CloudKitInterface?

@@ -1,0 +1,12 @@
+-- Migration: v3 -> v4
+--
+-- Changes:
+-- * Added column: payments_metadata.user_notes
+-- * Added column: payments_metadata.modified_at
+-- * Added indexes to improve performance of listAllPaymentsOrder query
+
+ALTER TABLE payments_metadata ADD COLUMN user_notes TEXT DEFAULT NULL;
+ALTER TABLE payments_metadata ADD COLUMN modified_at INTEGER DEFAULT NULL;
+
+CREATE INDEX IF NOT EXISTS incoming_payments_created_at_idx ON incoming_payments(created_at);
+CREATE INDEX IF NOT EXISTS outgoing_payments_created_at_idx ON outgoing_payments(created_at);

@@ -32,7 +32,7 @@ struct HomeView : MVIView, ViewName {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let paymentsPagerPublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
+	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	let lastCompletedPaymentPublisher = phoenixBusiness.paymentsManager.lastCompletedPaymentPublisher()
@@ -78,7 +78,7 @@ struct HomeView : MVIView, ViewName {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(paymentsPagerPublisher) {
+		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
 		.onReceive(lastCompletedPaymentPublisher) {

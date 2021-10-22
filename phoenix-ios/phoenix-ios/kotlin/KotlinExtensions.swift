@@ -34,7 +34,7 @@ extension WalletPaymentOrderRow: Identifiable {
 
 extension WalletPaymentInfo {
 	
-	func paymentDescription() -> String? {
+	func paymentDescription(includingUserDescription: Bool = true) -> String? {
 		
 		let sanitize = { (input: String?) -> String? in
 			
@@ -47,8 +47,10 @@ extension WalletPaymentInfo {
 			return nil
 		}
 		
-		if let description = sanitize(metadata.userDescription) {
-			return description
+		if includingUserDescription {
+			if let description = sanitize(metadata.userDescription) {
+				return description
+			}
 		}
 		if let description = sanitize(metadata.lnurl?.description_) {
 			return description
@@ -85,8 +87,10 @@ extension WalletPaymentMetadata {
 	
 	static func empty() -> WalletPaymentMetadata {
 		return WalletPaymentMetadata(
+			lnurl: nil,
 			userDescription: nil,
-			lnurl: nil
+			userNotes: nil,
+			modifiedAt: nil
 		)
 	}
 }

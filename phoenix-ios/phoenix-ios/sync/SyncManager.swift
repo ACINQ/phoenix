@@ -1817,16 +1817,11 @@ class SyncManager {
 		_ metadata: WalletPaymentMetadata
 	) -> URL? {
 		
-		guard let lnurlPay = metadata.lnurl?.pay else {
+		guard let row = WalletPaymentMetadataRow.companion.serialize(metadata: metadata) else {
 			return nil
 		}
 		
-		let cleartext = WalletPaymentMetadataRow.companion.serialize(
-			pay: lnurlPay,
-			successAction: metadata.lnurl?.successAction
-		)
-		.cloudSerialize()
-		.toSwiftData()
+		let cleartext = row.cloudSerialize().toSwiftData()
 		
 		let ciphertext: Data
 		do {

@@ -1,8 +1,10 @@
 package fr.acinq.phoenix.db.payments
 
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.PaymentsDatabase
+import fr.acinq.phoenix.db.didUpdateWalletPaymentMetadata
 import io.ktor.http.*
 
 class MetadataQueries(val database: PaymentsDatabase) {
@@ -23,7 +25,9 @@ class MetadataQueries(val database: PaymentsDatabase) {
             lnurl_metadata_blob = data.lnurl_metadata?.second,
             lnurl_successAction_type = data.lnurl_successAction?.first,
             lnurl_successAction_blob = data.lnurl_successAction?.second,
-            user_description = data.user_description
+            user_description = data.user_description,
+            user_notes = data.user_notes,
+            modified_at = data.modified_at
         )
     }
 
@@ -65,6 +69,45 @@ class MetadataQueries(val database: PaymentsDatabase) {
         ).executeAsOneOrNull()
     }
 
+    fun updateUserInfo(
+        id: WalletPaymentId,
+        userDescription: String?,
+        userNotes: String?
+    ) {
+        database.transaction {
+            val rowExists = queries.hasMetadata(
+                type = id.dbType.value,
+                id = id.dbId
+            ).executeAsOne() > 0
+            val modifiedAt = currentTimestampMillis()
+            if (rowExists) {
+                queries.updateUserInfo(
+                    type = id.dbType.value,
+                    id = id.dbId,
+                    user_description = userDescription,
+                    user_notes = userNotes,
+                    modified_at = modifiedAt
+                )
+            } else {
+                queries.addMetadata(
+                    type = id.dbType.value,
+                    id = id.dbId,
+                    lnurl_base_type = null,
+                    lnurl_base_blob = null,
+                    lnurl_description = null,
+                    lnurl_metadata_type = null,
+                    lnurl_metadata_blob = null,
+                    lnurl_successAction_type = null,
+                    lnurl_successAction_blob = null,
+                    user_description = userDescription,
+                    user_notes = userNotes,
+                    modified_at = modifiedAt
+                )
+            }
+            didUpdateWalletPaymentMetadata(id, database)
+        }
+    }
+
     companion object {
         fun mapDescriptions(
             lnurl_description: String?,
@@ -89,29 +132,33 @@ class MetadataQueries(val database: PaymentsDatabase) {
             lnurl_metadata_blob: ByteArray?,
             lnurl_successAction_type: LNUrlSuccessAction.TypeVersion?,
             lnurl_successAction_blob: ByteArray?,
-            user_description: String?
+            user_description: String?,
+            user_notes: String?,
+            modified_at: Long?
         ): WalletPaymentMetadata {
-            val lnurl_base =
+            val lnurlBase =
                 if (lnurl_base_type != null && lnurl_base_blob != null) {
                     Pair(lnurl_base_type, lnurl_base_blob)
                 } else null
 
-            val lnurl_metadata =
+            val lnurlMetadata =
                 if (lnurl_metadata_type != null && lnurl_metadata_blob != null) {
                     Pair(lnurl_metadata_type, lnurl_metadata_blob)
                 } else null
 
-            val lnurl_successsAction =
+            val lnurlSuccesssAction =
                 if (lnurl_successAction_type != null && lnurl_successAction_blob != null) {
                     Pair(lnurl_successAction_type, lnurl_successAction_blob)
                 } else null
 
             return WalletPaymentMetadataRow(
-                lnurl_base = lnurl_base,
-                lnurl_metadata = lnurl_metadata,
-                lnurl_successAction = lnurl_successsAction,
+                lnurl_base = lnurlBase,
+                lnurl_metadata = lnurlMetadata,
+                lnurl_successAction = lnurlSuccesssAction,
                 lnurl_description = lnurl_description,
-                user_description = user_description
+                user_description = user_description,
+                user_notes = user_notes,
+                modified_at = modified_at
             ).deserialize()
         }
     }
