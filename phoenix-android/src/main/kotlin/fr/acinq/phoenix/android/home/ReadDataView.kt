@@ -48,7 +48,7 @@ import fr.acinq.phoenix.android.utils.readClipboard
 @ExperimentalMaterialApi
 @Composable
 fun ReadDataView() {
-    requireWalletPresent(inScreen = Screen.ReadData) {
+    requireKeyPresence(inScreen = Screen.ReadData) {
         val context = LocalContext.current.applicationContext
         val nc = navController
         val log = logger()

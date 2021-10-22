@@ -34,7 +34,7 @@ import fr.acinq.phoenix.controllers.payments.Scan
 
 @Composable
 fun SendView(request: PaymentRequest?) {
-    requireWalletPresent(inScreen = Screen.Send) {
+    requireKeyPresence(inScreen = Screen.Send) {
         val log = logger()
         log.info { "init sendview amount=${request?.amount} desc=${request?.description}" }
         MVIView(CF::scan) { model, postIntent ->

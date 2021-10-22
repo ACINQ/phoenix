@@ -44,7 +44,6 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.last
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
@@ -78,7 +77,7 @@ fun AppView(appVM: AppViewModel) {
         ) {
             NavHost(navController = navController, startDestination = Screen.Startup.route) {
                 composable(Screen.Startup.fullRoute) {
-                    StartupView()
+                    StartupView(appVM)
                 }
                 composable(Screen.InitWallet.fullRoute) {
                     InitWallet()

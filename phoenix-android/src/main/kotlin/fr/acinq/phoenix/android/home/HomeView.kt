@@ -60,18 +60,15 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.controllers.HomeController
+import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -91,7 +88,7 @@ private class HomeViewModel(val connectionsFlow: StateFlow<Connections>, control
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(appVM: AppViewModel) {
-    requireWalletPresent(inScreen = Screen.Home) {
+    requireKeyPresence(inScreen = Screen.Home) {
         val log = logger()
 
         val connectionsFlow = business.connectionsManager.connections
@@ -147,7 +144,7 @@ fun HomeView(appVM: AppViewModel) {
                         Spacer(modifier = Modifier.height(24.dp))
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(paymentsPage.value.rows) {
-                                PreparePaymentLine(it)
+                                PreparePaymentLine(row = it)
                             }
                         }
                         BottomBar(scope, drawerState)

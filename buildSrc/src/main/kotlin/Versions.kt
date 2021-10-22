@@ -25,7 +25,7 @@ object Versions {
         const val constraintLayoutCompose = "1.0.0-beta02"
 
         const val zxing = "4.1.0"
-        const val fcm = "21.1.0"
+        const val fcm = "22.0.0"
         const val logback = "2.0.0"
 
         const val testRunner = "1.3.0"

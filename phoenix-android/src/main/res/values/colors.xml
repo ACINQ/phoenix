@@ -24,4 +24,5 @@
     <color name="white">#ffffff</color>
     <color name="mutedbg">#f0f5f7</color>
     <color name="mutedbg_night">#3e4556</color>
+    <color name="black">#000000</color>
 </resources>

@@ -47,7 +47,7 @@ sealed class Screen(val route: String, val arg: String? = null) {
 }
 
 @Composable
-fun requireWalletPresent(
+fun requireKeyPresence(
     inScreen: Screen,
     children: @Composable () -> Unit
 ) {

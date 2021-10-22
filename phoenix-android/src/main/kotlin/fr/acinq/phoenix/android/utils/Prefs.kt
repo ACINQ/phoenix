@@ -34,17 +34,7 @@ val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = Pre
 
 object Prefs {
     private val log = LoggerFactory.getLogger(this::class.java)
-
     const val DATASTORE_FILE = "settings"
-
-    // -- unit, fiat, conversion...
-    val PREFS_SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("PREFS_SHOW_AMOUNT_IN_FIAT")
-    val PREFS_BITCOIN_UNIT = stringPreferencesKey("PREFS_BITCOIN_UNIT")
-    val PREFS_FIAT_CURRENCY = stringPreferencesKey("PREFS_FIAT_CURRENCY")
-
-    // -- node configuration
-    val PREFS_ELECTRUM_ADDRESS = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS")
-    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
 
     private fun prefs(context: Context): Flow<Preferences> {
         return context.datastore.data.catch { exception ->
@@ -56,7 +46,11 @@ object Prefs {
         }
     }
 
-    // -- ==================================
+    // -- unit, fiat, conversion...
+
+    val PREFS_SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("PREFS_SHOW_AMOUNT_IN_FIAT")
+    val PREFS_BITCOIN_UNIT = stringPreferencesKey("PREFS_BITCOIN_UNIT")
+    val PREFS_FIAT_CURRENCY = stringPreferencesKey("PREFS_FIAT_CURRENCY")
 
     fun getBitcoinUnit(context: Context): Flow<BitcoinUnit> = prefs(context).map { BitcoinUnit.valueOf(it[PREFS_BITCOIN_UNIT] ?: BitcoinUnit.Sat.name) }
     suspend fun saveBitcoinUnit(context: Context, coinUnit: BitcoinUnit) = context.datastore.edit { it[PREFS_BITCOIN_UNIT] = coinUnit.name }
@@ -64,6 +58,11 @@ object Prefs {
     suspend fun saveFiatCurrency(context: Context, currency: FiatCurrency) = context.datastore.edit { it[PREFS_FIAT_CURRENCY] = currency.name }
     fun getIsAmountInFiat(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SHOW_AMOUNT_IN_FIAT] ?: false }
     suspend fun saveIsAmountInFiat(context: Context, inFiat: Boolean) = context.datastore.edit { it[PREFS_SHOW_AMOUNT_IN_FIAT] = inFiat }
+
+    // -- electrum
+
+    val PREFS_ELECTRUM_ADDRESS = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS")
+    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
 
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
         it[PREFS_ELECTRUM_ADDRESS]?.takeIf { it.isNotBlank() }?.let { address ->
@@ -74,7 +73,12 @@ object Prefs {
             } else ServerAddress(address, 50002)
         }
     }
-
     suspend fun saveElectrumServer(context: Context, address: String) = context.datastore.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
     suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
+
+    // -- FCM
+    val PREFS_FCM_TOKEN = stringPreferencesKey("PREFS_FCM_TOKEN")
+
+    fun getFcmToken(context: Context): Flow<String?> = prefs(context).map { it[PREFS_FCM_TOKEN] }
+    suspend fun saveFcmToken(context: Context, token: String) = context.datastore.edit { it[PREFS_FCM_TOKEN] = token }
 }

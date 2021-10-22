@@ -116,7 +116,7 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 
 @Composable
 fun ReceiveView() {
-    requireWalletPresent(inScreen = Screen.Receive) {
+    requireKeyPresence(inScreen = Screen.Receive) {
         val log = logger()
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
         when (val state = vm.state) {
