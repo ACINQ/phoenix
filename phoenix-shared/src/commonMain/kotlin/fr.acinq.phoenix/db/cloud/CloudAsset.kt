@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.db.cloud
 
+import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.db.payments.LNUrlBase
 import fr.acinq.phoenix.db.payments.LNUrlMetadata
 import fr.acinq.phoenix.db.payments.LNUrlSuccessAction
@@ -23,7 +24,8 @@ data class CloudAsset(
     val lnurl_metadata: LNUrlMetadataWrapper?,
     val lnurl_successAction: LNUrlSuccessActionWrapper?,
     val lnurl_description: String?,
-    val user_description: String?
+    val user_description: String?,
+    val user_notes: String?,
 ) {
     @Serializable
     @OptIn(ExperimentalSerializationApi::class)
@@ -69,7 +71,8 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
             CloudAsset.LNUrlSuccessActionWrapper(it.first.name, it.second)
         },
         lnurl_description = lnurl_description,
-        user_description = user_description
+        user_description = user_description,
+        user_notes = user_notes
     )
     return Cbor.encodeToByteArray(wrapper)
 }
@@ -77,7 +80,9 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
 @OptIn(ExperimentalSerializationApi::class)
 fun CloudAsset.Companion.cloudDeserialize(blob: ByteArray): WalletPaymentMetadataRow? {
     val wrapper: CloudAsset = try {
-        Cbor.decodeFromByteArray(blob)
+        Cbor {
+            ignoreUnknownKeys = true
+        }.decodeFromByteArray(blob)
     } catch (e: Throwable) {
         return null
     }
@@ -93,6 +98,8 @@ fun CloudAsset.Companion.cloudDeserialize(blob: ByteArray): WalletPaymentMetadat
             Pair(it.typeVersion, it.blob)
         },
         lnurl_description = wrapper.lnurl_description,
-        user_description = wrapper.user_description
+        user_description = wrapper.user_description,
+        user_notes = wrapper.user_notes,
+        modified_at = currentTimestampMillis()
     )
 }

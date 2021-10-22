@@ -446,7 +446,9 @@ class CloudKitDb(
                             lnurl_successAction_type = row.lnurl_successAction?.first,
                             lnurl_successAction_blob = row.lnurl_successAction?.second,
                             lnurl_description = row.lnurl_description,
-                            user_description = row.user_description
+                            user_description = row.user_description,
+                            user_notes = row.user_notes,
+                            modified_at = row.modified_at
                         )
                     }
                 } // </payments_metadata table>

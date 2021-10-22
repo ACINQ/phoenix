@@ -7,9 +7,19 @@ import fracinqphoenixdb.Cloudkit_payments_queue
 
 
 actual fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
-    val now = currentTimestampMillis()
-    val ckq = database.cloudKitPaymentsQueries
-    ckq.addToQueue(type = id.dbType.value, id = id.dbId, date_added = now)
+    database.cloudKitPaymentsQueries.addToQueue(
+        type = id.dbType.value,
+        id = id.dbId,
+        date_added = currentTimestampMillis()
+    )
+}
+
+actual fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase) {
+    database.cloudKitPaymentsQueries.addToQueue(
+        type = id.dbType.value,
+        id = id.dbId,
+        date_added = currentTimestampMillis()
+    )
 }
 
 actual fun makeCloudKitDb(database: PaymentsDatabase): CloudKitInterface? {

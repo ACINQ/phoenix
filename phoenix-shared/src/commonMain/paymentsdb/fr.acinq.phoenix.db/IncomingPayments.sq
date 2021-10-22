@@ -17,7 +17,11 @@ CREATE TABLE IF NOT EXISTS incoming_payments (
     received_with_blob BLOB DEFAULT NULL
 );
 
--- The received_amount_msat column is used regularly as a filter within AggragateQueries.
+-- The created_at column is used by AggregatedQueries.listAllPaymentsOrder for sorting.
+-- And that query is used constantly by the app.
+CREATE INDEX IF NOT EXISTS incoming_payments_created_at_idx ON incoming_payments(created_at);
+
+-- The received_amount_msat column is used regularly as a filter within AggregatedQueries.
 CREATE INDEX IF NOT EXISTS received_amount_msat_idx ON incoming_payments(received_amount_msat);
 
 -- queries

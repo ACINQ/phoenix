@@ -222,7 +222,9 @@ data class WalletPaymentMetadataRow(
     val lnurl_metadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null,
     val lnurl_successAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null,
     val lnurl_description: String? = null,
-    val user_description: String? = null
+    val user_description: String? = null,
+    val user_notes: String? = null,
+    val modified_at: Long? = null
 ) {
 
     fun deserialize(): WalletPaymentMetadata {
@@ -256,7 +258,9 @@ data class WalletPaymentMetadataRow(
 
         return WalletPaymentMetadata(
             lnurl = lnurl,
-            userDescription = user_description
+            userDescription = user_description,
+            userNotes = user_notes,
+            modifiedAt = modified_at
         )
     }
 
@@ -270,17 +274,40 @@ data class WalletPaymentMetadataRow(
 
     companion object {
         fun serialize(
-            pay: LNUrl.Pay,
-            successAction: LNUrl.PayInvoice.SuccessAction?
-        ): WalletPaymentMetadataRow {
+            metadata: WalletPaymentMetadata
+        ): WalletPaymentMetadataRow? {
+
+            var lnurlBase: Pair<LNUrlBase.TypeVersion, ByteArray>? = null
+            var lnurlMetadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null
+            var lnurlSuccessAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null
+            var lnurlDescription: String? = null
+
+            metadata.lnurl?.let {
+                lnurlBase = LNUrlBase.serialize(it.pay)
+                lnurlMetadata = LNUrlMetadata.serialize(it.pay.metadata)
+                lnurlSuccessAction = it.successAction?.let { successAction ->
+                    LNUrlSuccessAction.serialize(successAction)
+                }
+                lnurlDescription = it.pay.metadata.plainText
+            }
+
+            if (lnurlBase == null
+             && lnurlMetadata == null
+             && lnurlSuccessAction == null
+             && lnurlDescription == null
+             && metadata.userDescription == null
+             && metadata.userNotes == null) {
+                return null
+            }
 
             return WalletPaymentMetadataRow(
-                lnurl_base = LNUrlBase.serialize(pay),
-                lnurl_metadata = LNUrlMetadata.serialize(pay.metadata),
-                lnurl_description = pay.metadata.plainText,
-                lnurl_successAction = successAction?.let {
-                    LNUrlSuccessAction.serialize(it)
-                }
+                lnurl_base = lnurlBase,
+                lnurl_metadata = lnurlMetadata,
+                lnurl_successAction = lnurlSuccessAction,
+                lnurl_description = lnurlDescription,
+                user_description = metadata.userDescription,
+                user_notes = metadata.userNotes,
+                modified_at = metadata.modifiedAt
             )
         }
     }
