@@ -10,7 +10,7 @@ class Utils {
 	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
 	///
-	static func toMsat(fromFiat amount: Double, exchangeRate: BitcoinPriceRate) -> Int64 {
+	static func toMsat(fromFiat amount: Double, exchangeRate: ExchangeRate.BitcoinPriceRate) -> Int64 {
 		
 		let btc = amount / exchangeRate.price
 		return toMsat(from: btc, bitcoinUnit: .btc)
@@ -49,7 +49,7 @@ class Utils {
 		}
 	}
 	
-	static func convertToFiat(msat: Int64, exchangeRate: BitcoinPriceRate) -> Double {
+	static func convertToFiat(msat: Int64, exchangeRate: ExchangeRate.BitcoinPriceRate) -> Double {
 		
 		// exchangeRate.fiatCurrency: FiatCurrency { get }
 		// exchangeRate.price: Double { get }
@@ -296,7 +296,10 @@ class Utils {
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatFiat(sat: Bitcoin_kmpSatoshi, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+	static func formatFiat(
+		sat: Bitcoin_kmpSatoshi,
+		exchangeRate: ExchangeRate.BitcoinPriceRate
+	) -> FormattedAmount {
 		
 		return formatFiat(sat: sat.toLong(), exchangeRate: exchangeRate)
 	}
@@ -305,7 +308,10 @@ class Utils {
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatFiat(sat: Int64, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+	static func formatFiat(
+		sat: Int64,
+		exchangeRate: ExchangeRate.BitcoinPriceRate
+	) -> FormattedAmount {
 		
 		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
 		return formatFiat(msat: msat, exchangeRate: exchangeRate)
@@ -315,7 +321,10 @@ class Utils {
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatFiat(msat: Lightning_kmpMilliSatoshi, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+	static func formatFiat(
+		msat: Lightning_kmpMilliSatoshi,
+		exchangeRate: ExchangeRate.BitcoinPriceRate
+	) -> FormattedAmount {
 		
 		return formatFiat(msat: msat.toLong(), exchangeRate: exchangeRate)
 	}
@@ -324,7 +333,10 @@ class Utils {
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatFiat(msat: Int64, exchangeRate: BitcoinPriceRate) -> FormattedAmount {
+	static func formatFiat(
+		msat: Int64,
+		exchangeRate: ExchangeRate.BitcoinPriceRate
+	) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
 		let formatter = fiatFormatter()

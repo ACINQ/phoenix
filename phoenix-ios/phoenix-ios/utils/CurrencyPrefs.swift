@@ -14,7 +14,7 @@ class CurrencyPrefs: ObservableObject {
 	@Published var fiatCurrency: FiatCurrency
 	@Published var bitcoinUnit: BitcoinUnit
 	
-	@Published var fiatExchangeRates: [BitcoinPriceRate] = []
+	@Published var fiatExchangeRates: [ExchangeRate] = []
 	private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
 	
 	var currency: Currency {
@@ -51,7 +51,7 @@ class CurrencyPrefs: ObservableObject {
 		let business = AppDelegate.get().business
 		let ratesFlow = SwiftFlow<NSArray>(origin: business.currencyManager.ratesFlow)
 		fiatExchangeRatesWatcher = ratesFlow.watch {[weak self](rates: NSArray?) in
-			if let rates = rates as? Array<BitcoinPriceRate> {
+			if let rates = rates as? Array<ExchangeRate> {
 				self?.fiatExchangeRates = rates
 			}
 		}
@@ -67,7 +67,7 @@ class CurrencyPrefs: ObservableObject {
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
 		
-		let exchangeRate = BitcoinPriceRate(
+		let exchangeRate = ExchangeRate.BitcoinPriceRate(
 			fiatCurrency: fiatCurrency,
 			price: exchangeRate,
 			source: "",
@@ -101,18 +101,47 @@ class CurrencyPrefs: ObservableObject {
 	
 	/// Returns the exchangeRate for the currently set fiatCurrency.
 	///
-	func fiatExchangeRate() -> BitcoinPriceRate? {
+	func fiatExchangeRate() -> ExchangeRate.BitcoinPriceRate? {
 		
 		return fiatExchangeRate(fiatCurrency: self.fiatCurrency)
 	}
 	
 	/// Returns the exchangeRate for the given fiatCurrency.
 	///
-	func fiatExchangeRate(fiatCurrency: FiatCurrency) -> BitcoinPriceRate? {
+	func fiatExchangeRate(fiatCurrency: FiatCurrency) -> ExchangeRate.BitcoinPriceRate? {
 		
-		return self.fiatExchangeRates.first { rate -> Bool in
-			return (rate.fiatCurrency == fiatCurrency)
+		let btcExchangeRates: [ExchangeRate.BitcoinPriceRate] = fiatExchangeRates.compactMap { rate in
+			return rate as? ExchangeRate.BitcoinPriceRate
 		}
+		
+		if let paramToBtc = btcExchangeRates.first(where: { (rate: ExchangeRate.BitcoinPriceRate) in
+			rate.fiatCurrency == fiatCurrency
+		}) {
+			return paramToBtc
+		}
+		
+		let usdExchangeRates: [ExchangeRate.UsdPriceRate] = fiatExchangeRates.compactMap { rate in
+			return rate as? ExchangeRate.UsdPriceRate
+		}
+		
+		guard let paramToUsd = usdExchangeRates.first(where: { (rate: ExchangeRate.UsdPriceRate) in
+			rate.fiatCurrency == fiatCurrency
+		}) else {
+			return nil
+		}
+		
+		guard let usdToBtc = btcExchangeRates.first(where: { (rate: ExchangeRate.BitcoinPriceRate) in
+			rate.fiatCurrency == FiatCurrency.usd
+		}) else {
+			return nil
+		}
+		
+		return ExchangeRate.BitcoinPriceRate(
+			fiatCurrency: fiatCurrency,
+			price: usdToBtc.price * paramToUsd.price,
+			source: "\(usdToBtc.source), \(paramToUsd.source)",
+			timestampMillis: min(usdToBtc.timestampMillis, paramToUsd.timestampMillis)
+		)
 	}
 	
 	static func mockUSD() -> CurrencyPrefs {
