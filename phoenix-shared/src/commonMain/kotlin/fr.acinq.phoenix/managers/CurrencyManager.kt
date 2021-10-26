@@ -9,13 +9,34 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+
+/**
+ * Notes:
+ *
+ * At the time of implementation, it was determined that the bitcoin markets for both USD & EUR
+ * were sufficiently deep & liquid enough to provide reliable rates.
+ *
+ * That is to say, if you fetch the BTC-USD rate, and the BTC-EUR rate,
+ * you would then be able to reliably approximate the USD-EUR rate.
+ * I.e. calculated rate would reliably approximate official USD-EUR mid-market rate.
+ *
+ * However, the same is not true for every fiat currency.
+ * For example, fetching the BTC-COP rate produces an unreliable approximate for USD-COP.
+ *
+ * It is expected that this will improve over time as the markets mature.
+ * However, for the time being, we rely on the more liquid USD-FIAT exchange rates.
+ * Thus, if we fetch both BTC-USD & USD-COP, we can easily convert between any of the 3 currencies.
+ */
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
@@ -44,15 +65,77 @@ class CurrencyManager(
     }
 
     private fun startRatesPollingJob() = launch {
-        while (isActive) {
-            refreshFromBlockchainInfo()
-            refreshFromCoinDesk()
-            yield()
-            delay(Duration.minutes(20))
+        launch {
+            // This Job refreshes the BitcoinPriceRates from the blockchain.info API.
+            // Since these rates are volatile, we refresh them often.
+            val standardDelay = Duration.minutes(20)
+            val initialDelay = ratesFlow.filterNotNull().first()
+                .filterIsInstance<ExchangeRate.BitcoinPriceRate>()
+                .maxByOrNull { it.timestampMillis }
+                ?.let { initialDelay(it.timestampMillis, standardDelay) }
+            if (initialDelay != null && initialDelay > Duration.ZERO) {
+                // We have fresh data from last app launch
+                log.info { "BitcoinPriceRate's are fresh - initialDelay: $initialDelay" }
+                delay(initialDelay)
+            }
+            while (isActive) {
+                val success = refreshFromBlockchainInfo()
+                if (success) {
+                    delay(standardDelay)
+                } else {
+                    delay(standardDelay / 4)
+                }
+            }
+        }
+        launch {
+            // This Job refreshes the UsdPriceRates from the coindesk.com API.
+            // Since these rates are updated at most once per hour (according to coindesk),
+            // it doesn't make sense to update them more often than that.
+            val standardDelay = Duration.minutes(60)
+            val initialDelay = ratesFlow.filterNotNull().first()
+                .filterIsInstance<ExchangeRate.UsdPriceRate>()
+                .maxByOrNull { it.timestampMillis }
+                ?.let { initialDelay(it.timestampMillis, standardDelay) }
+            if (initialDelay != null && initialDelay > Duration.ZERO) {
+                // We have fresh data from last app launch
+                log.info { "UsdPriceRate's are fresh - initialDelay: $initialDelay" }
+                delay(initialDelay)
+            }
+            while (isActive) {
+                val success = refreshFromCoinDesk()
+                if (success) {
+                    delay(standardDelay)
+                } else {
+                    delay(standardDelay / 4)
+                }
+            }
         }
     }
 
-    private suspend fun refreshFromBlockchainInfo() = try {
+    /**
+     * Utility function:
+     * After launching the app, we may not need to immediately refresh the exchange rates.
+     * For example, if the user quits & immediately relaunches Phoenix,
+     * then the rates are still fresh.
+     */
+    private fun initialDelay(timestampMillis: Long, standardDelay: Duration): Duration {
+        // The given `timestampMillis` parameter comes from the
+        // latest associated ExchangeRate in the database.
+        val latest = Instant.fromEpochMilliseconds(timestampMillis)
+        // The typical delay would be after the given standardDelay.
+        val afterDelay = latest + standardDelay
+        val now = Clock.System.now()
+        return if (afterDelay <= now) {
+            // No delay - refresh exchange rates immediately
+            Duration.ZERO
+        } else {
+            // Existing rates are fresh - add delay (with max for safety)
+            val delay = afterDelay - now
+            if (delay < standardDelay) delay else standardDelay
+        }
+    }
+
+    private suspend fun refreshFromBlockchainInfo(): Boolean = try {
         log.info { "fetching bitcoin prices from blockchain.info" }
         httpClient.get<Map<String, BlockchainInfoPriceObject>>("https://blockchain.info/ticker")
             .mapNotNull {
@@ -73,11 +156,13 @@ class CurrencyManager(
                 appDb.saveExchangeRates(fetchedRates)
             }
         log.info { "successfully refreshed bitcoin prices from blockchain.info" }
+        true
     } catch (e: Exception) {
         log.error(e) { "failed to refresh bitcoin price rates from blockchain.info ticker: $e" }
+        false
     }
 
-    private suspend fun refreshFromCoinDesk() {
+    private suspend fun refreshFromCoinDesk(): Boolean {
         log.info { "fetching exchange rates from coindesk.com" }
         // Performance notes:
         // If we use zero concurrency, by fetching each URL one-at-a-time,
@@ -91,9 +176,13 @@ class CurrencyManager(
             threadsCount = 1
             pipelining = true
         }}
-        FiatCurrency.values.filter {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val fiatCurrencies = FiatCurrency.values.filter {
             it != FiatCurrency.USD && it != FiatCurrency.EUR
-        }.map { fiatCurrency ->
+        }
+        return fiatCurrencies.map { fiatCurrency ->
             val fiat = fiatCurrency.name // e.g.: "AUD"
             async {
                 val response = try {
@@ -105,9 +194,7 @@ class CurrencyManager(
                     return@async null
                 }
                 val result = try {
-                    Json {
-                        ignoreUnknownKeys = true
-                    }.decodeFromString<CoinDeskResponse>(response.receive())
+                    json.decodeFromString<CoinDeskResponse>(response.receive())
                 } catch (e: Exception) {
                     log.error { "failed to parse $fiat price from api.coindesk.com: $e" }
                     return@async null
@@ -118,7 +205,7 @@ class CurrencyManager(
                     log.error { "failed to extract USD or $fiat price from api.coindesk.com" }
                     return@async null
                 }
-                log.debug { "$fiat = ${fiatRate.rate}" }
+                // log.debug { "$fiat = ${fiatRate.rate}" }
                 // Example (fiat = "ILS"):
                 // usdRate.rate = 62,980.0572
                 // fiatRate.rate = 202,056.4047
@@ -131,7 +218,7 @@ class CurrencyManager(
                     fiatCurrency = fiatCurrency,
                     price = price,
                     source = "coindesk.com",
-                    timestampMillis = result.time.updatedISO.toEpochMilliseconds()
+                    timestampMillis = Clock.System.now().toEpochMilliseconds()
                 )
             }
         }.mapNotNull { request ->
@@ -144,8 +231,11 @@ class CurrencyManager(
             try {
                 appDb.saveExchangeRates(fetchedRates)
                 log.info { "successfully refreshed exchange rates from coindesk.com" }
+                // We consider the fetch to be successful if we fetched at least 2/3 of the list
+                fetchedRates.size >= (fiatCurrencies.size * 2 / 3)
             } catch (e: Exception) {
                 log.error(e) { "failed to refresh fiat exchange rates: $e" }
+                false
             }
         }
     }
