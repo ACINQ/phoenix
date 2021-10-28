@@ -2,7 +2,7 @@ object Versions {
     const val lightningKmp = "1.2.0"
     const val secp256k1 = "0.6.0"
 
-    const val kotlin = "1.5.30"
+    const val kotlin = "1.5.31"
     const val coroutines = "1.5.2-native-mt"
     const val serialization = "1.2.2"
 
@@ -20,8 +20,8 @@ object Versions {
         const val lifecycle = "2.3.1"
         const val prefs = "1.1.1"
         const val datastore = "1.0.0"
-        const val compose = "1.1.0-alpha04"
-        const val navCompose = "2.4.0-alpha09"
+        const val compose = "1.1.0-alpha06"
+        const val navCompose = "2.4.0-alpha10"
         const val constraintLayoutCompose = "1.0.0-beta02"
 
         const val zxing = "4.1.0"

@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
@@ -40,15 +39,23 @@ fun SendView(request: PaymentRequest?) {
         MVIView(CF::scan) { model, postIntent ->
             val nc = navController
             Column(
-                modifier = Modifier.padding(32.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(32.dp)
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                var amount by remember { mutableStateOf(request?.amount ?: MilliSatoshi(0)) }
-
+                var amount by remember { mutableStateOf(request?.amount) }
                 Spacer(modifier = Modifier.height(80.dp))
                 AmountInput(
                     initialAmount = amount,
-                    onAmountChange = { a, fiat, fiatUnit -> amount = a ?: MilliSatoshi(0) },
+                    onAmountChange = { msat, fiat, fiatUnit ->
+                        if (msat == null) {
+                            amount = null
+
+                        } else {
+                            amount = msat
+                        }
+                    },
                     useBasicInput = true,
                     inputTextSize = 48.sp,
                 )
@@ -56,9 +63,11 @@ fun SendView(request: PaymentRequest?) {
                 FilledButton(
                     text = R.string.send_pay_button,
                     icon = R.drawable.ic_send,
+                    enabled = amount != null,
                     onClick = {
-                        if (request != null) {
-                            postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, amount))
+                        val finalAmount = amount
+                        if (request != null && finalAmount != null) {
+                            postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, finalAmount))
                             nc.navigate(Screen.Home)
                         }
                     })
