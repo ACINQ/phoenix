@@ -139,6 +139,12 @@ fun typography(palette: Colors) = Typography(
         fontSize = 16.sp,
         color = palette.onSurface,
     ),
+    body2 = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Light,
+        fontSize = 16.sp,
+        color = palette.onSurface,
+    ),
     button = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
