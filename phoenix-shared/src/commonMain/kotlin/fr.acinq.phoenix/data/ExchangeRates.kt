@@ -1,11 +1,14 @@
 package fr.acinq.phoenix.data
 
-import kotlinx.serialization.Serializable
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 sealed class ExchangeRate {
 
+    abstract val fiatCurrency: FiatCurrency
+
+    /** An exchange rate may be between a fiat currency and Bitcoin, or between a fiat currency and the US Dollar. */
     enum class Type {
         BTC,
         USD
@@ -23,7 +26,8 @@ sealed class ExchangeRate {
      * Price: 1 BTC = $price FIAT
      */
     data class BitcoinPriceRate(
-        val fiatCurrency: FiatCurrency,
+        override val fiatCurrency: FiatCurrency,
+        /** The price of 1 BTC in this currency */
         val price: Double,
         val source: String,
         val timestampMillis: Long
@@ -41,7 +45,8 @@ sealed class ExchangeRate {
      * Price: 1 USD = $price FIAT
      */
     data class UsdPriceRate(
-        val fiatCurrency: FiatCurrency,
+        override val fiatCurrency: FiatCurrency,
+        /** The price of one US Dollar in this currency */
         val price: Double,
         val source: String,
         val timestampMillis: Long

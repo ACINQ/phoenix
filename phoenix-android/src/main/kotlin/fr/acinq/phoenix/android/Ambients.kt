@@ -21,13 +21,14 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.data.BitcoinPriceRate
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
+import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
 
 
@@ -39,7 +40,7 @@ val LocalNavController = staticCompositionLocalOf<NavHostController?> { null }
 val LocalKeyState = staticCompositionLocalOf<KeyState> { KeyState.Unknown }
 val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
-val LocalFiatRates = compositionLocalOf<List<BitcoinPriceRate>> { listOf() }
+val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
 val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 
@@ -55,9 +56,25 @@ val amountUnit: CurrencyUnit
     @Composable
     get() = if (LocalShowInFiat.current) LocalFiatCurrency.current else LocalBitcoinUnit.current
 
-val fiatRate: BitcoinPriceRate?
+val fiatRate: ExchangeRate.BitcoinPriceRate?
     @Composable
-    get() = LocalFiatCurrency.current.let { prefFiat -> LocalFiatRates.current.find { it.fiatCurrency == prefFiat } }
+    get() = LocalFiatCurrency.current.let { prefFiat ->
+        return when (val rate = LocalExchangeRates.current.find { it.fiatCurrency == prefFiat }) {
+            is ExchangeRate.BitcoinPriceRate -> rate
+            is ExchangeRate.UsdPriceRate -> {
+                (LocalExchangeRates.current.find { it.fiatCurrency == FiatCurrency.USD } as? ExchangeRate.BitcoinPriceRate)?.let { usdRate ->
+                    // create a BTC/Fiat price rate using the USD/BTC rate and the Fiat/USD rate.
+                    ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = rate.fiatCurrency,
+                        price = rate.price * usdRate.price,
+                        source = rate.source,
+                        timestampMillis = rate.timestampMillis
+                    )
+                }
+            }
+             else -> null
+        }
+    }
 
 val controllerFactory: ControllerFactory
     @Composable

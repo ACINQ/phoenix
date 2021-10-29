@@ -72,7 +72,7 @@ object Converter {
         if (withUnit) "$this $unit" else this
     }
 
-    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: BitcoinPriceRate? = null, withUnit: Boolean = false): String = when {
+    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false): String = when {
         unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)
         else -> "?!"

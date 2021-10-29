@@ -70,4 +70,5 @@ fun FiatCurrency.label(): String = when (this) {
     FiatCurrency.THB -> stringResource(R.string.prefs_display_fiat_THB)
     FiatCurrency.TWD -> stringResource(R.string.prefs_display_fiat_TWD)
     FiatCurrency.USD -> stringResource(R.string.prefs_display_fiat_USD)
+    else -> this.name
 }

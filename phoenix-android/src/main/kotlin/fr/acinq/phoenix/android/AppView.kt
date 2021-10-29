@@ -63,7 +63,7 @@ fun AppView(appVM: AppViewModel) {
         LocalControllerFactory provides application.business.controllers,
         LocalNavController provides navController,
         LocalKeyState provides appVM.keyState,
-        LocalFiatRates provides fiatRates.value,
+        LocalExchangeRates provides fiatRates.value,
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
