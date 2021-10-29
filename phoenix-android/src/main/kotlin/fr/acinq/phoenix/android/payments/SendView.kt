@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.send
+package fr.acinq.phoenix.android.payments
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.receive
+package fr.acinq.phoenix.android.payments
 
 import androidx.annotation.UiThread
 import androidx.compose.foundation.BorderStroke
