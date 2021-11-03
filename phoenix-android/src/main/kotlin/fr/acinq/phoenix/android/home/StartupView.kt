@@ -19,9 +19,10 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.keyState
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.utils.logger
@@ -30,16 +31,17 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun StartupView(appVM: AppViewModel) {
+fun StartupView(
+    appVM: AppViewModel,
+    onKeyAbsent: () -> Unit,
+    onBusinessStart: () -> Unit,
+) {
     val log = logger()
-    val nc = navController
     val ks = keyState
-    val context = LocalContext.current
-    val _business = business
 
     when (ks) {
         is KeyState.Unknown -> Text(stringResource(id = R.string.startup_wait))
-        is KeyState.Absent -> nc.navigate(Screen.InitWallet)
+        is KeyState.Absent -> onKeyAbsent()
         is KeyState.Error -> Text(stringResource(id = R.string.startup_error_unreadable))
         is KeyState.Present -> {
             when (val encryptedSeed = ks.encryptedSeed) {
@@ -49,7 +51,7 @@ fun StartupView(appVM: AppViewModel) {
                         launch(Dispatchers.Main) {
                             appVM.service?.startBusiness(encryptedSeed.decrypt())
                             log.info { "navigating to home screen..." }
-                            nc.navigate(Screen.Home)
+                            onBusinessStart()
                         }
                     }
                 }

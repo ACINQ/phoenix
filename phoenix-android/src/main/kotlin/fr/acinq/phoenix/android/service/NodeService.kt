@@ -218,7 +218,7 @@ class NodeService : Service() {
         business.loadWallet(seed)
         business.start()
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
-        return WalletState.Started.Kmm
+        return WalletState.Started.Kmm(business)
     }
 
     // =========================================================== //

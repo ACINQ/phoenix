@@ -16,6 +16,9 @@
 
 package fr.acinq.phoenix.android.service
 
+import fr.acinq.phoenix.PhoenixBusiness
+import fr.acinq.phoenix.android.business
+
 /**
  * This class represent the state of the wallet in regard to the underlying LN node.
  * 4 main states:
@@ -48,7 +51,7 @@ sealed class WalletState {
         //         EclairImpl(kit)
         //     }
         // }
-        object Kmm : Started()
+        data class Kmm(val business: PhoenixBusiness) : Started()
     }
 
     /** Startup has failed, the state contains the error details. */

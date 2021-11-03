@@ -125,7 +125,7 @@ private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.
                         context.startActivity(
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://mempool.space/${if (business.chain == Chain.Testnet) "testnet/tx" else "tx"}/${channel.txId}")
+                                Uri.parse("https://mempool.space/${if (business.chain.isTestnet()) "testnet/tx" else "tx"}/${channel.txId}")
                             )
                         )
                     },

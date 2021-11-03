@@ -16,19 +16,24 @@
 
 package fr.acinq.phoenix.android
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.HomeView
 import fr.acinq.phoenix.android.home.ReadDataView
@@ -36,13 +41,16 @@ import fr.acinq.phoenix.android.home.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
+import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.walletPaymentId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -76,49 +84,99 @@ fun AppView(appVM: AppViewModel) {
                 .fillMaxHeight()
         ) {
             NavHost(navController = navController, startDestination = Screen.Startup.route) {
-                composable(Screen.Startup.fullRoute) {
-                    StartupView(appVM)
+                composable(Screen.Startup.route) {
+                    StartupView(
+                        appVM,
+                        onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
+                        onBusinessStart = {navController.navigate(Screen.Home.route)}
+                    )
                 }
-                composable(Screen.InitWallet.fullRoute) {
+                composable(Screen.InitWallet.route) {
                     InitWallet()
                 }
-                composable(Screen.CreateWallet.fullRoute) {
+                composable(Screen.CreateWallet.route) {
                     CreateWalletView(appVM)
                 }
-                composable(Screen.RestoreWallet.fullRoute) {
+                composable(Screen.RestoreWallet.route) {
                     RestoreWalletView(appVM)
                 }
-                composable(Screen.Home.fullRoute) {
-                    HomeView(appVM)
+                composable(Screen.Home.route) {
+                    RequireKey(appVM.keyState) {
+                        HomeView(
+                            onPaymentClick = { payment ->
+                                navController.navigate("${Screen.PaymentDetails.route}/${payment.walletPaymentId().dbType.value}/${payment.walletPaymentId().dbId}")
+                            }
+                        )
+                    }
                 }
-                composable(Screen.Receive.fullRoute) {
+                composable(Screen.Receive.route) {
                     ReceiveView()
                 }
-                composable(Screen.ReadData.fullRoute) {
-                    ReadDataView()
+                composable(Screen.ReadData.route) {
+                    ReadDataView(
+                        onBackClick = { navController.popBackStack() },
+                        onInvoiceRead = {
+                            navController.navigate("${Screen.Send.route}/${it.write()}") {
+                                popUpTo(Screen.Home.route) {
+                                    inclusive = true
+                                    saveState = true
+                                }
+                            }
+                        }
+                    )
                 }
-                composable(Screen.Send.fullRoute) { backStackEntry ->
-                    SendView(backStackEntry.arguments?.getString("request")?.run {
-                        log.info { "redirecting to send view with invoice=$this" }
-                        PaymentRequest.read(cleanUpInvoice(this))
-                    })
+                composable(
+                    route = "${Screen.Send.route}/{request}",
+                    arguments = listOf(
+                        navArgument("request") { type = NavType.StringType },
+                    ),
+                ) {
+                    val request = try {
+                        PaymentRequest.read(it.arguments!!.getString("request")!!)
+                    } catch (e: Exception) {
+                        val context = LocalContext.current
+                        LaunchedEffect(key1 = true) {
+                            Toast.makeText(context, "Invalid payment request", Toast.LENGTH_SHORT).show()
+                        }
+                        null
+                    }
+                    if (request == null) {
+                        // navController.navigate(Screen.Home.route)
+                    } else {
+                        SendView(request)
+                    }
                 }
-                composable(Screen.Settings.fullRoute) {
+                composable(
+                    route = "${Screen.PaymentDetails.route}/{direction}/{id}",
+                    arguments = listOf(
+                        navArgument("direction") { type = NavType.LongType },
+                        navArgument("id") { type = NavType.StringType }
+                    ),
+                ) {
+                    val direction = it.arguments?.getLong("direction")
+                    val id = it.arguments?.getString("id")
+                    if (direction != null && id != null) {
+                        PaymentDetailsView(direction = direction, id = id, onBackClick = {
+                            navController.navigate(Screen.Home.route)
+                        })
+                    }
+                }
+                composable(Screen.Settings.route) {
                     SettingsView()
                 }
-                composable(Screen.DisplaySeed.fullRoute) {
+                composable(Screen.DisplaySeed.route) {
                     SeedView(appVM)
                 }
-                composable(Screen.ElectrumServer.fullRoute) {
+                composable(Screen.ElectrumServer.route) {
                     ElectrumView()
                 }
-                composable(Screen.Channels.fullRoute) {
+                composable(Screen.Channels.route) {
                     ChannelsView()
                 }
-                composable(Screen.MutualClose.fullRoute) {
+                composable(Screen.MutualClose.route) {
                     MutualCloseView()
                 }
-                composable(Screen.Preferences.fullRoute) {
+                composable(Screen.Preferences.route) {
                     PreferencesView()
                 }
             }
@@ -126,13 +184,17 @@ fun AppView(appVM: AppViewModel) {
     }
 }
 
-private fun cleanUpInvoice(input: String): String {
-    val trimmed = input.replace("\\u00A0", "").trim()
-    return when {
-        trimmed.startsWith("lightning://", true) -> trimmed.drop(12)
-        trimmed.startsWith("lightning:", true) -> trimmed.drop(10)
-        trimmed.startsWith("bitcoin://", true) -> trimmed.drop(10)
-        trimmed.startsWith("bitcoin:", true) -> trimmed.drop(8)
-        else -> trimmed
+@Composable
+private fun RequireKey(
+    keyState: KeyState,
+    children: @Composable () -> Unit
+) {
+    if (keyState !is KeyState.Present) {
+        logger().warning { "rejecting access to screen with keyState=$keyState" }
+        navController.navigate(Screen.Startup)
+        Text("redirecting...")
+    } else {
+        logger().debug { "access to screen granted" }
+        children()
     }
 }

@@ -34,11 +34,13 @@ import org.slf4j.LoggerFactory
 
 @SuppressLint("StaticFieldLeak")
 class AppViewModel(private val applicationContext: Context) : ViewModel() {
-    val log = LoggerFactory.getLogger(MainActivity::class.java)
+    val log = LoggerFactory.getLogger(AppViewModel::class.java)
+
+    /** State of the wallet's key: does it exist? what type is it? */
     var keyState: KeyState by mutableStateOf(KeyState.Unknown)
         private set
 
-    /** Watch service - null if the service is disconnected. */
+    /** Monitoring the state of the service - null if the service is disconnected. */
     private val _service = MutableLiveData<NodeService?>(null)
     /** Nullable accessor for the service. */
     val service: NodeService? get() = _service.value

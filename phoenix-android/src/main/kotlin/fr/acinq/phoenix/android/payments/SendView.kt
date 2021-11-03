@@ -33,44 +33,42 @@ import fr.acinq.phoenix.controllers.payments.Scan
 
 @Composable
 fun SendView(request: PaymentRequest?) {
-    requireKeyPresence(inScreen = Screen.Send) {
-        val log = logger()
-        log.info { "init sendview amount=${request?.amount} desc=${request?.description}" }
-        MVIView(CF::scan) { model, postIntent ->
-            val nc = navController
-            Column(
-                modifier = Modifier
-                    .padding(32.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                var amount by remember { mutableStateOf(request?.amount) }
-                Spacer(modifier = Modifier.height(80.dp))
-                AmountInput(
-                    initialAmount = amount,
-                    onAmountChange = { msat, fiat, fiatUnit ->
-                        if (msat == null) {
-                            amount = null
+    val log = logger()
+    log.info { "init sendview amount=${request?.amount} desc=${request?.description}" }
+    MVIView(CF::scan) { model, postIntent ->
+        val nc = navController
+        Column(
+            modifier = Modifier
+                .padding(32.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            var amount by remember { mutableStateOf(request?.amount) }
+            Spacer(modifier = Modifier.height(80.dp))
+            AmountInput(
+                initialAmount = amount,
+                onAmountChange = { msat, fiat, fiatUnit ->
+                    if (msat == null) {
+                        amount = null
 
-                        } else {
-                            amount = msat
-                        }
-                    },
-                    useBasicInput = true,
-                    inputTextSize = 48.sp,
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                FilledButton(
-                    text = R.string.send_pay_button,
-                    icon = R.drawable.ic_send,
-                    enabled = amount != null,
-                    onClick = {
-                        val finalAmount = amount
-                        if (request != null && finalAmount != null) {
-                            postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, finalAmount))
-                            nc.navigate(Screen.Home)
-                        }
-                    })
+                    } else {
+                        amount = msat
+                    }
+                },
+                useBasicInput = true,
+                inputTextSize = 48.sp,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            FilledButton(
+                text = R.string.send_pay_button,
+                icon = R.drawable.ic_send,
+                enabled = amount != null,
+            ) {
+                val finalAmount = amount
+                if (request != null && finalAmount != null) {
+                    postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, finalAmount))
+                    nc.navigate(Screen.Home)
+                }
             }
         }
     }
