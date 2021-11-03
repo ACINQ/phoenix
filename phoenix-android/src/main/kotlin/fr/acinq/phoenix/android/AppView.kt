@@ -36,8 +36,8 @@ import fr.acinq.phoenix.android.home.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
-import fr.acinq.phoenix.android.receive.ReceiveView
-import fr.acinq.phoenix.android.send.SendView
+import fr.acinq.phoenix.android.payments.ReceiveView
+import fr.acinq.phoenix.android.payments.SendView
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
