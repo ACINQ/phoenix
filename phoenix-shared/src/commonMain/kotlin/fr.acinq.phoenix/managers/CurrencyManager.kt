@@ -53,94 +53,177 @@ class CurrencyManager(
 
     private val log = newLogger(loggerFactory)
 
+    private val highLiquidityMarkets = setOf(FiatCurrency.USD, FiatCurrency.EUR)
+
+    interface API {
+        val refreshDelay: Duration
+        val fiatCurrencies: Set<FiatCurrency>
+    }
+    // The blockchain.info API is used to refresh the BitcoinPriceRates.
+    // Since bitcoin prices are volatile, we refresh them often.
+    private val blockchainInfoAPI = object: API {
+        override val refreshDelay = Duration.minutes(20)
+        override val fiatCurrencies = FiatCurrency.values.filter {
+            highLiquidityMarkets.contains(it)
+        }.toSet()
+    }
+
+    // The coindesk API is used to refersh the UsdPriceRates.
+    // Since fiat prices are less volatile, we refresh them less often.
+    // Also, the source only refreshes the values once per hour.
+    private val coindeskAPI = object: API {
+        override val refreshDelay = Duration.minutes(60)
+        override val fiatCurrencies = FiatCurrency.values.filter {
+            !highLiquidityMarkets.contains(it)
+        }.toSet()
+    }
+
     val ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
-    private var priceRatesPollingJob: Job? = null
+    private var refreshJob: Job? = null
+
+    data class RefreshInfo(
+        val lastRefresh: Instant,
+        val nextRefresh: Instant,
+        val failCount: Int
+    ) {
+        constructor(): this(
+            lastRefresh = Instant.fromEpochMilliseconds(0),
+            nextRefresh = Instant.fromEpochMilliseconds(0),
+            failCount = 0
+        )
+        fun fail(now: Instant): RefreshInfo {
+            val newFailCount = failCount + 1
+            val delay = when (newFailCount) {
+                1 -> Duration.seconds(30)
+                2 -> Duration.minutes(1)
+                3 -> Duration.minutes(5)
+                4 -> Duration.minutes(10)
+                5 -> Duration.minutes(30)
+                6 -> Duration.minutes(60)
+                else -> Duration.minutes(120)
+            }
+            return RefreshInfo(
+                lastRefresh = this.lastRefresh,
+                nextRefresh = now + delay,
+                failCount = newFailCount
+            )
+        }
+    }
+    private var refreshList = mutableMapOf<FiatCurrency, RefreshInfo>()
 
     fun start() {
-        priceRatesPollingJob = startRatesPollingJob()
+        refreshJob = startRefreshJob()
     }
 
-    fun stop() {
-        launch { priceRatesPollingJob?.cancelAndJoin() }
+    fun stop() = launch {
+        refreshJob?.cancelAndJoin()
     }
 
-    private fun startRatesPollingJob() = launch {
+    private fun startRefreshJob() = launch {
         launch {
             // This Job refreshes the BitcoinPriceRates from the blockchain.info API.
-            // Since these rates are volatile, we refresh them often.
-            val standardDelay = Duration.minutes(20)
-            val initialDelay = ratesFlow.filterNotNull().first()
-                .filterIsInstance<ExchangeRate.BitcoinPriceRate>()
-                .maxByOrNull { it.timestampMillis }
-                ?.let { initialDelay(it.timestampMillis, standardDelay) }
-            if (initialDelay != null && initialDelay > Duration.ZERO) {
-                // We have fresh data from last app launch
-                log.info { "BitcoinPriceRate's are fresh - initialDelay: $initialDelay" }
-                delay(initialDelay)
-            }
+            val api = blockchainInfoAPI
             while (isActive) {
-                val success = refreshFromBlockchainInfo()
-                if (success) {
-                    delay(standardDelay)
-                } else {
-                    delay(standardDelay / 4)
+                delay(api).let { nextDelay ->
+                    log.debug { "Next BitcoinPriceRate refresh: $nextDelay" }
+                    delay(nextDelay)
                 }
+                refreshFromBlockchainInfo()
             }
         }
         launch {
             // This Job refreshes the UsdPriceRates from the coindesk.com API.
-            // Since these rates are updated at most once per hour (according to coindesk),
-            // it doesn't make sense to update them more often than that.
-            val standardDelay = Duration.minutes(60)
-            val initialDelay = ratesFlow.filterNotNull().first()
-                .filterIsInstance<ExchangeRate.UsdPriceRate>()
-                .maxByOrNull { it.timestampMillis }
-                ?.let { initialDelay(it.timestampMillis, standardDelay) }
-            if (initialDelay != null && initialDelay > Duration.ZERO) {
-                // We have fresh data from last app launch
-                log.info { "UsdPriceRate's are fresh - initialDelay: $initialDelay" }
-                delay(initialDelay)
-            }
+            val api = coindeskAPI
             while (isActive) {
-                val success = refreshFromCoinDesk()
-                if (success) {
-                    delay(standardDelay)
-                } else {
-                    delay(standardDelay / 4)
+                delay(api).let { nextDelay ->
+                    log.debug { "Next UsdPriceRate refresh: $nextDelay" }
+                    delay(nextDelay)
                 }
+                refreshFromCoinDesk()
             }
         }
     }
 
-    /**
-     * Utility function:
-     * After launching the app, we may not need to immediately refresh the exchange rates.
-     * For example, if the user quits & immediately relaunches Phoenix,
-     * then the rates are still fresh.
-     */
-    private fun initialDelay(timestampMillis: Long, standardDelay: Duration): Duration {
-        // The given `timestampMillis` parameter comes from the
-        // latest associated ExchangeRate in the database.
-        val latest = Instant.fromEpochMilliseconds(timestampMillis)
-        // The typical delay would be after the given standardDelay.
-        val afterDelay = latest + standardDelay
+    private fun outdatedCurrencies(api: API): List<FiatCurrency> {
         val now = Clock.System.now()
-        return if (afterDelay <= now) {
-            // No delay - refresh exchange rates immediately
+        val results = mutableListOf<FiatCurrency>()
+        for (fiatCurrency in api.fiatCurrencies) {
+            refreshList[fiatCurrency]?.let {
+                if (it.nextRefresh <= now) {
+                    results.add(fiatCurrency)
+                }
+            } ?: run {
+                results.add(fiatCurrency)
+            }
+        }
+        return results
+    }
+
+    // Updates the `refreshList` with fresh RefreshInfo values.
+    // Only the currencies listed in api.fiatCurrencies are updated.
+    // The `refreshed` parameter marks those currencies that were successfully refreshed.
+    //
+    private fun updateRefreshList(api: API, refreshed: Set<FiatCurrency>) {
+        val now = Clock.System.now()
+        api.fiatCurrencies.forEach { fiatCurrency ->
+            if (refreshed.contains(fiatCurrency)) { // refresh succeeded
+                refreshList[fiatCurrency] = RefreshInfo(
+                    lastRefresh = now,
+                    nextRefresh = now + api.refreshDelay,
+                    failCount = 0
+                )
+            } else { // refresh failed
+                val refreshInfo = refreshList[fiatCurrency] ?: RefreshInfo()
+                refreshList[fiatCurrency] = refreshInfo.fail(now)
+            }
+        }
+    }
+
+    private suspend fun delay(api: API): Duration {
+
+        val initialized = api.fiatCurrencies.all { refreshList.containsKey(it) }
+        if (!initialized) {
+            // Initialize the refreshList with the information from the database.
+            val dbValues = ratesFlow.filterNotNull().first()
+                .filterIsInstance<ExchangeRate.BitcoinPriceRate>()
+            for (fiatCurrency in api.fiatCurrencies) {
+                val lastRefresh = dbValues.firstOrNull { it.fiatCurrency == fiatCurrency  }?.let {
+                    Instant.fromEpochMilliseconds(it.timestampMillis)
+                } ?: run {
+                    Instant.fromEpochMilliseconds(0)
+                }
+                refreshList[fiatCurrency] = RefreshInfo(
+                    lastRefresh = lastRefresh,
+                    nextRefresh = lastRefresh + api.refreshDelay,
+                    failCount = 0
+                )
+            }
+        }
+
+        val nextRefresh = api.fiatCurrencies.mapNotNull { fiatCurrency ->
+            refreshList[fiatCurrency]
+        }.minByOrNull {
+            it.nextRefresh
+        }?.nextRefresh
+
+        val now = Clock.System.now()
+        return if (nextRefresh == null || nextRefresh <= now) {
             Duration.ZERO
         } else {
-            // Existing rates are fresh - add delay (with max for safety)
-            val delay = afterDelay - now
-            if (delay < standardDelay) delay else standardDelay
+            nextRefresh - now
         }
     }
 
-    private suspend fun refreshFromBlockchainInfo(): Boolean = try {
+    private suspend fun refreshFromBlockchainInfo() {
         log.info { "fetching bitcoin prices from blockchain.info" }
-        httpClient.get<Map<String, BlockchainInfoPriceObject>>("https://blockchain.info/ticker")
-            .mapNotNull {
+        val api = blockchainInfoAPI
+
+        val fetchedRates = try {
+            httpClient.get<Map<String, BlockchainInfoPriceObject>>(
+                urlString = "https://blockchain.info/ticker"
+            ).mapNotNull {
                 FiatCurrency.valueOfOrNull(it.key)?.let { fiatCurrency ->
-                    if (fiatCurrency == FiatCurrency.USD || fiatCurrency == FiatCurrency.EUR) {
+                    if (api.fiatCurrencies.contains(fiatCurrency)) {
                         ExchangeRate.BitcoinPriceRate(
                             fiatCurrency = fiatCurrency,
                             price = it.value.last,
@@ -152,26 +235,52 @@ class CurrencyManager(
                     }
                 }
             }
-            .let { fetchedRates ->
-                appDb.saveExchangeRates(fetchedRates)
+        } catch (e: Exception) {
+            log.error { "failed to refresh bitcoin price rates from blockchain.info: $e" }
+            null
+        }
+
+        fetchedRates?.let {
+            if (it.isNotEmpty()) {
+                appDb.saveExchangeRates(it)
+                log.info { "successfully refreshed bitcoin prices from blockchain.info" }
+            } else {
+                log.error { "failed to refresh bitcoin price rates from blockchain.info" }
             }
-        log.info { "successfully refreshed bitcoin prices from blockchain.info" }
-        true
-    } catch (e: Exception) {
-        log.error(e) { "failed to refresh bitcoin price rates from blockchain.info ticker: $e" }
-        false
+        }
+
+        // Update all the corresponding values in `refreshList`
+        updateRefreshList(
+            api = api,
+            refreshed = fetchedRates?.map { it.fiatCurrency }?.toSet() ?: setOf()
+        )
     }
 
-    private suspend fun refreshFromCoinDesk(): Boolean {
+    class WrappedException(
+        val inner: Exception?,
+        val fiatCurrency: FiatCurrency,
+        val reason: String
+    ): Exception("$fiatCurrency: $reason: $inner")
+
+    private suspend fun refreshFromCoinDesk() {
         log.info { "fetching exchange rates from coindesk.com" }
+        val api = coindeskAPI
+
         // Performance notes:
-        // If we use zero concurrency, by fetching each URL one-at-a-time,
-        // and writing to the database after each one,
-        // then the entire process takes around 46 seconds !
-        // That's an average wait time of 23 seconds before a given fiat currency is ready.
-        // We're attempting to maximize concurrency by fetching all,
-        // and hopefully using http pipelining to speed up the process.
-        // The end result is that the process takes around 10 seconds.
+        //
+        // - If we use zero concurrency, by fetching each URL one-at-a-time,
+        //   and writing to the database after each one,
+        //   then the entire process takes around 46 seconds !
+        //   That's an average wait time of 23 seconds
+        //   before a given fiat currency is ready.
+        //
+        // - If we maximize concurrency by fetching all,
+        //   the end result is that the process takes around 10 seconds.
+        //
+        // - Ktor has a bug, and doesn't properly use a shared URLSession:
+        //   https://youtrack.jetbrains.com/issue/KTOR-3362
+        //   If that bug is fixed, the process will take around 800 milliseconds.
+        //
         val http = HttpClient { engine {
             threadsCount = 1
             pipelining = true
@@ -179,10 +288,11 @@ class CurrencyManager(
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val fiatCurrencies = FiatCurrency.values.filter {
-            it != FiatCurrency.USD && it != FiatCurrency.EUR
-        }
-        return fiatCurrencies.map { fiatCurrency ->
+
+        // We're not going to attempt to fetch ALL the fiatCurrencies.
+        // Just those that are outdated.
+        val fiatCurrencies = outdatedCurrencies(api)
+        fiatCurrencies.map { fiatCurrency ->
             val fiat = fiatCurrency.name // e.g.: "AUD"
             async {
                 val response = try {
@@ -190,20 +300,23 @@ class CurrencyManager(
                         urlString = "https://api.coindesk.com/v1/bpi/currentprice/$fiat.json"
                     )
                 } catch (e: Exception) {
-                    log.error { "failed to fetch $fiat price from api.coindesk.com: $e" }
-                    return@async null
+                    throw WrappedException(e, fiatCurrency,
+                        "failed to fetch price from api.coindesk.com"
+                    )
                 }
                 val result = try {
                     json.decodeFromString<CoinDeskResponse>(response.receive())
                 } catch (e: Exception) {
-                    log.error { "failed to parse $fiat price from api.coindesk.com: $e" }
-                    return@async null
+                    throw WrappedException(e, fiatCurrency,
+                        "failed to parse price from api.coindesk.com"
+                    )
                 }
                 val usdRate = result.bpi["USD"]
                 val fiatRate = result.bpi[fiat]
                 if (usdRate == null || fiatRate == null) {
-                    log.error { "failed to extract USD or $fiat price from api.coindesk.com" }
-                    return@async null
+                    throw WrappedException(null, fiatCurrency,
+                        "failed to extract USD or FIAT price from api.coindesk.com"
+                    )
                 }
                 // log.debug { "$fiat = ${fiatRate.rate}" }
                 // Example (fiat = "ILS"):
@@ -212,7 +325,7 @@ class CurrencyManager(
                 // 202,056.4047 / 62,980.0572 = 3.2082
                 // This means that:
                 // - 1 USD = 3.2082 ILS
-                // - 1 ILS = 62,980.0572 * 2.2082 BTC = 202,056.4047 BTC
+                // - 1 ILS = 62,980.0572 * 3.2082 BTC = 202,056.4047 BTC
                 val price = fiatRate.rate / usdRate.rate
                 ExchangeRate.UsdPriceRate(
                     fiatCurrency = fiatCurrency,
@@ -221,22 +334,36 @@ class CurrencyManager(
                     timestampMillis = Clock.System.now().toEpochMilliseconds()
                 )
             }
-        }.mapNotNull { request ->
+        }.map { request -> // Deferred<ExchangeRate.UsdPriceRate>
             try {
-                request.await()
+                Result.success(request.await())
             } catch (e: Exception) {
-                null
+                Result.failure(e)
             }
-        }.let { fetchedRates ->
-            try {
+        }.let { results -> // List<Result<ExchangeRate.UsdPriceRate>>
+
+            val fetchedRates = results.mapNotNull { it.getOrNull() }
+            val failedRates = results.mapNotNull { it.exceptionOrNull() }
+
+            if (failedRates.isNotEmpty()) {
+                log.error {
+                    "Failed to refresh fiat exchange rates for ${failedRates.size} currencies: \n"+
+                    " - 0: ${failedRates.first()}"
+                }
+            }
+
+            if (fetchedRates.isNotEmpty()) {
                 appDb.saveExchangeRates(fetchedRates)
-                log.info { "successfully refreshed exchange rates from coindesk.com" }
-                // We consider the fetch to be successful if we fetched at least 2/3 of the list
-                fetchedRates.size >= (fiatCurrencies.size * 2 / 3)
-            } catch (e: Exception) {
-                log.error(e) { "failed to refresh fiat exchange rates: $e" }
-                false
+                log.info {
+                    "successfully refreshed ${fetchedRates.size} exchange rates from coindesk.com"
+                }
             }
+
+            // Update all the corresponding values in `refreshList`
+            updateRefreshList(
+                api = api,
+                refreshed = fetchedRates.map { it.fiatCurrency }.toSet()
+            )
         }
     }
 }
