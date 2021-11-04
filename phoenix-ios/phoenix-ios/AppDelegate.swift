@@ -68,6 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		let electrumConfig = Prefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		
+		let fiatCurrency = Prefs.shared.fiatCurrency
+		business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
 	}
 	
 	// --------------------------------------------------
@@ -116,8 +119,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Tor configuration observer
-		Prefs.shared.isTorEnabledPublisher.sink {[weak self](isTorEnabled: Bool) in
-			self?.business.updateTorUsage(isEnabled: isTorEnabled)
+		Prefs.shared.isTorEnabledPublisher.sink {(isTorEnabled: Bool) in
+			self.business.updateTorUsage(isEnabled: isTorEnabled)
+		}.store(in: &cancellables)
+		
+		Prefs.shared.fiatCurrencyPublisher.sink {(fiatCurrency: FiatCurrency) in
+			self.business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
 		}.store(in: &cancellables)
 		
 		return true

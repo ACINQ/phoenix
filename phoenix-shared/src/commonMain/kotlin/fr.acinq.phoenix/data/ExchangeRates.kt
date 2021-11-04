@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 sealed class ExchangeRate {
 
     abstract val fiatCurrency: FiatCurrency
+    abstract val timestampMillis: Long
 
     /** An exchange rate may be between a fiat currency and Bitcoin, or between a fiat currency and the US Dollar. */
     enum class Type {
@@ -30,7 +31,7 @@ sealed class ExchangeRate {
         /** The price of 1 BTC in this currency */
         val price: Double,
         val source: String,
-        val timestampMillis: Long
+        override val timestampMillis: Long
     ): ExchangeRate() {
         fun toRow() = Row(
             fiat = fiatCurrency.name,
@@ -49,7 +50,7 @@ sealed class ExchangeRate {
         /** The price of one US Dollar in this currency */
         val price: Double,
         val source: String,
-        val timestampMillis: Long
+        override val timestampMillis: Long
     ): ExchangeRate() {
         fun toRow() = Row(
             fiat = fiatCurrency.name,

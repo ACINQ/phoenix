@@ -41,12 +41,14 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
+    private val configurationManager: AppConfigurationManager,
     private val appDb: SqliteAppDb,
     private val httpClient: HttpClient
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
+        configurationManager = business.appConfigurationManager,
         appDb = business.appDb,
         httpClient = business.httpClient
     )
@@ -139,34 +141,25 @@ class CurrencyManager(
                     log.debug { "Next UsdPriceRate refresh: $nextDelay" }
                     delay(nextDelay)
                 }
-                refreshFromCoinDesk()
+                refreshFromCoinDesk(preferred = true)
+                refreshFromCoinDesk(preferred = false)
             }
         }
-    }
-
-    private fun outdatedCurrencies(api: API): List<FiatCurrency> {
-        val now = Clock.System.now()
-        val results = mutableListOf<FiatCurrency>()
-        for (fiatCurrency in api.fiatCurrencies) {
-            refreshList[fiatCurrency]?.let {
-                if (it.nextRefresh <= now) {
-                    results.add(fiatCurrency)
-                }
-            } ?: run {
-                results.add(fiatCurrency)
-            }
-        }
-        return results
     }
 
     // Updates the `refreshList` with fresh RefreshInfo values.
-    // Only the currencies listed in api.fiatCurrencies are updated.
+    // Only the `attempted` currencies are updated.
     // The `refreshed` parameter marks those currencies that were successfully refreshed.
     //
-    private fun updateRefreshList(api: API, refreshed: Set<FiatCurrency>) {
+    private fun updateRefreshList(
+        api: API,
+        attempted: Collection<FiatCurrency>,
+        refreshed: Collection<FiatCurrency>
+    ) {
+        val refreshedSet = refreshed.toSet()
         val now = Clock.System.now()
-        api.fiatCurrencies.forEach { fiatCurrency ->
-            if (refreshed.contains(fiatCurrency)) { // refresh succeeded
+        attempted.forEach { fiatCurrency ->
+            if (refreshedSet.contains(fiatCurrency)) { // refresh succeeded
                 refreshList[fiatCurrency] = RefreshInfo(
                     lastRefresh = now,
                     nextRefresh = now + api.refreshDelay,
@@ -185,7 +178,7 @@ class CurrencyManager(
         if (!initialized) {
             // Initialize the refreshList with the information from the database.
             val dbValues = ratesFlow.filterNotNull().first()
-                .filterIsInstance<ExchangeRate.BitcoinPriceRate>()
+                .filter { api.fiatCurrencies.contains(it.fiatCurrency) }
             for (fiatCurrency in api.fiatCurrencies) {
                 val lastRefresh = dbValues.firstOrNull { it.fiatCurrency == fiatCurrency  }?.let {
                     Instant.fromEpochMilliseconds(it.timestampMillis)
@@ -252,7 +245,8 @@ class CurrencyManager(
         // Update all the corresponding values in `refreshList`
         updateRefreshList(
             api = api,
-            refreshed = fetchedRates?.map { it.fiatCurrency }?.toSet() ?: setOf()
+            attempted = api.fiatCurrencies,
+            refreshed = fetchedRates?.map { it.fiatCurrency } ?: listOf()
         )
     }
 
@@ -262,20 +256,17 @@ class CurrencyManager(
         val reason: String
     ): Exception("$fiatCurrency: $reason: $inner")
 
-    private suspend fun refreshFromCoinDesk() {
-        log.info { "fetching exchange rates from coindesk.com" }
+    private suspend fun refreshFromCoinDesk(preferred: Boolean) {
         val api = coindeskAPI
 
         // Performance notes:
         //
         // - If we use zero concurrency, by fetching each URL one-at-a-time,
         //   and writing to the database after each one,
-        //   then the entire process takes around 46 seconds !
-        //   That's an average wait time of 23 seconds
-        //   before a given fiat currency is ready.
+        //   then fetching every fiat currency takes around 46 seconds.
         //
         // - If we maximize concurrency by fetching all,
-        //   the end result is that the process takes around 10 seconds.
+        //   then the whole process takes around 10 seconds.
         //
         // - Ktor has a bug, and doesn't properly use a shared URLSession:
         //   https://youtrack.jetbrains.com/issue/KTOR-3362
@@ -289,9 +280,31 @@ class CurrencyManager(
             ignoreUnknownKeys = true
         }
 
-        // We're not going to attempt to fetch ALL the fiatCurrencies.
-        // Just those that are outdated.
-        val fiatCurrencies = outdatedCurrencies(api)
+        val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies().value.toSet()
+        val now = Clock.System.now()
+        val fiatCurrencies = api.fiatCurrencies.filter { fiatCurrency ->
+            if (preferred) {
+                // Only include those marked as "preferred" by the app
+                preferredFiatCurrencies.contains(fiatCurrency)
+            } else {
+                // Only include those NOT marked as "preferred" by the app
+                !preferredFiatCurrencies.contains(fiatCurrency)
+            }
+        }.filter { fiatCurrency ->
+            // Only include those that need to be refreshed,
+            // which might not be all of them.
+            refreshList[fiatCurrency]?.let {
+                val result: Boolean = it.nextRefresh <= now // < Android studio bug
+                result
+            } ?: true
+        }
+
+        if (fiatCurrencies.isEmpty()) {
+            return
+        } else {
+            log.info { "fetching ${fiatCurrencies.size} exchange rate(s) from coindesk.com" }
+        }
+
         fiatCurrencies.map { fiatCurrency ->
             val fiat = fiatCurrency.name // e.g.: "AUD"
             async {
@@ -362,7 +375,8 @@ class CurrencyManager(
             // Update all the corresponding values in `refreshList`
             updateRefreshList(
                 api = api,
-                refreshed = fetchedRates.map { it.fiatCurrency }.toSet()
+                attempted = fiatCurrencies,
+                refreshed = fetchedRates.map { it.fiatCurrency }
             )
         }
     }
