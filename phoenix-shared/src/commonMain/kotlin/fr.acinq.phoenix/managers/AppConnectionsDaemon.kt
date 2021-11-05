@@ -271,30 +271,56 @@ class AppConnectionsDaemon(
         }
     }
 
-    enum class ControlTarget(val flags: Int) {
-        Peer(0b001),
-        Electrum(0b010),
-        Http(0b100),
-        All(0b111);
+    data class ControlTarget(val flags: Int) { // <- bitmask
 
-        val peer get() = (flags and Peer.flags) != 0
-        val electrum get() = (flags and Electrum.flags) != 0
-        val http get() = (flags and Http.flags) != 0
+        companion object {
+            val Peer = ControlTarget(0b001)
+            val Electrum = ControlTarget(0b010)
+            val Http = ControlTarget(0b100)
+            val All = ControlTarget(0b111)
+        }
+
+        /* The `+` operator is implemented, so it can be used like so:
+         * `val options = ControlTarget.Peer + ControlTarget.Electrum`
+         */
+        operator fun plus(other: ControlTarget): ControlTarget {
+            return ControlTarget(this.flags or other.flags)
+        }
+
+        fun contains(options: ControlTarget): Boolean {
+            return (this.flags and options.flags) != 0
+        }
+
+        val containsPeer get() = contains(Peer)
+        val containsElectrum get() = contains(Electrum)
+        val containsHttp get() = contains(Http)
     }
 
     fun incrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
-            if (target.peer) { peerControlChanges.send { incrementDisconnectCount() } }
-            if (target.electrum) { electrumControlChanges.send { incrementDisconnectCount() } }
-            if (target.http) { httpApiControlChanges.send { incrementDisconnectCount() } }
+            if (target.containsPeer) {
+                peerControlChanges.send { incrementDisconnectCount() }
+            }
+            if (target.containsElectrum) {
+                electrumControlChanges.send { incrementDisconnectCount() }
+            }
+            if (target.containsHttp) {
+                httpApiControlChanges.send { incrementDisconnectCount() }
+            }
         }
     }
 
     fun decrementDisconnectCount(target: ControlTarget = ControlTarget.All) {
         launch {
-            if (target.peer) { peerControlChanges.send { decrementDisconnectCount() } }
-            if (target.electrum) { electrumControlChanges.send { decrementDisconnectCount() } }
-            if (target.http) { httpApiControlChanges.send { decrementDisconnectCount() } }
+            if (target.containsPeer) {
+                peerControlChanges.send { decrementDisconnectCount() }
+            }
+            if (target.containsElectrum) {
+                electrumControlChanges.send { decrementDisconnectCount() }
+            }
+            if (target.containsHttp) {
+                httpApiControlChanges.send { decrementDisconnectCount() }
+            }
         }
     }
 

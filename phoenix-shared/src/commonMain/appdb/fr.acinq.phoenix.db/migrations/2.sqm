@@ -1,0 +1,15 @@
+-- Migration: v2 -> v3
+--
+-- Changes:
+-- * Deleted table bitcoin_price_rates
+-- * Added table exchange_rates
+
+DROP TABLE IF EXISTS bitcoin_price_rates;
+
+CREATE TABLE IF NOT EXISTS exchange_rates (
+    fiat TEXT NOT NULL PRIMARY KEY,
+    price REAL NOT NULL,
+    type TEXT NOT NULL,
+    source TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+);

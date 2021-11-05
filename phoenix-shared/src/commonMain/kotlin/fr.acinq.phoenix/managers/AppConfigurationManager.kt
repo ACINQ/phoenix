@@ -203,4 +203,12 @@ class AppConfigurationManager(
     fun updateTorUsage(enabled: Boolean): Unit {
         isTorEnabled.value = enabled
     }
+
+    // Fiat preferences
+    private val _preferredFiatCurrencies by lazy { MutableStateFlow<List<FiatCurrency>>(listOf()) }
+    fun preferredFiatCurrencies(): StateFlow<List<FiatCurrency>> = _preferredFiatCurrencies
+
+    fun updatePreferredFiatCurrencies(list: List<FiatCurrency>) {
+        _preferredFiatCurrencies.value = list
+    }
 }

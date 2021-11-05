@@ -68,6 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		let electrumConfig = Prefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
+		
+		let fiatCurrency = Prefs.shared.fiatCurrency
+		business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
 	}
 	
 	// --------------------------------------------------
@@ -116,8 +119,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		}.store(in: &cancellables)
 		
 		// Tor configuration observer
-		Prefs.shared.isTorEnabledPublisher.sink {[weak self](isTorEnabled: Bool) in
-			self?.business.updateTorUsage(isEnabled: isTorEnabled)
+		Prefs.shared.isTorEnabledPublisher.sink {(isTorEnabled: Bool) in
+			self.business.updateTorUsage(isEnabled: isTorEnabled)
+		}.store(in: &cancellables)
+		
+		Prefs.shared.fiatCurrencyPublisher.sink {(fiatCurrency: FiatCurrency) in
+			self.business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
 		}.store(in: &cancellables)
 		
 		return true
@@ -151,7 +158,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		if !isInBackground {
 			business.appConnectionsDaemon?.incrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.all
+				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
 			isInBackground = true
 		}
@@ -164,7 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		if isInBackground {
 			business.appConnectionsDaemon?.decrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.all
+				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
 			isInBackground = false
 		}
@@ -231,8 +238,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		
 		// allow network connection, even if app in background
 		let appConnectionsDaemon = business.appConnectionsDaemon
-		let all = AppConnectionsDaemon.ControlTarget.all
-		appConnectionsDaemon?.decrementDisconnectCount(target: all)
+		let targets =
+			AppConnectionsDaemon.ControlTarget.companion.Peer.plus(
+				other: AppConnectionsDaemon.ControlTarget.companion.Electrum
+			)
+		appConnectionsDaemon?.decrementDisconnectCount(target: targets)
 		
 		var didReceivePayment = false
 		var totalTimer: Timer? = nil
@@ -249,7 +259,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 				isFinished = true
 				
 				// balance previous decrement call
-				appConnectionsDaemon?.incrementDisconnectCount(target: all)
+				appConnectionsDaemon?.incrementDisconnectCount(target: targets)
 				
 				totalTimer?.invalidate()
 				postPaymentTimer?.invalidate()
@@ -458,7 +468,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			}
 			log.debug("Invoking: business.decrementDisconnectCount()")
 			business.appConnectionsDaemon?.decrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.all
+				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
 		}
 	}
@@ -475,7 +485,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			UIApplication.shared.endBackgroundTask(task)
 			log.debug("Invoking: business.incrementDisconnectCount()")
 			business.appConnectionsDaemon?.incrementDisconnectCount(
-				target: AppConnectionsDaemon.ControlTarget.all
+				target: AppConnectionsDaemon.ControlTarget.companion.All
 			)
 		}
 	}
@@ -538,7 +548,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		assertMainThread()
 		
 		let appConnectionsDaemon = business.appConnectionsDaemon
-		let electrumTarget = AppConnectionsDaemon.ControlTarget.electrum
+		let electrumTarget = AppConnectionsDaemon.ControlTarget.companion.Electrum
 		
 		var didDecrement = false
 		var upToDateListener: AnyCancellable? = nil
