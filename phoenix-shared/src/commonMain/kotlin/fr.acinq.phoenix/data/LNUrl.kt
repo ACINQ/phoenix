@@ -157,9 +157,11 @@ sealed class LNUrl {
         sealed class PayInvoice(override val message: String?) : Error(message) {
             abstract val origin: String
 
-            data class Malformed(override val origin: String): PayInvoice("malformed json")
-            data class MissingPr(override val origin: String): PayInvoice("missing pr value")
-            data class MalformedPr(override val origin: String): PayInvoice("malformed pr value")
+            data class Malformed(
+                override val origin: String,
+                val context: String
+            ): PayInvoice("malformed: $context")
+
             data class InvalidHash(override val origin: String): PayInvoice("paymentRequest.h value doesn't match metadata hash")
             data class InvalidAmount(override val origin: String): PayInvoice("paymentRequest.amount doesn't match user input")
         }
@@ -329,19 +331,19 @@ sealed class LNUrl {
             json: JsonObject
         ): PayInvoice {
             try {
-                val pr =
-                    json["pr"]?.jsonPrimitive?.content ?: throw Error.PayInvoice.MissingPr(origin)
+                val pr = json["pr"]?.jsonPrimitive?.content ?:
+                    throw Error.PayInvoice.Malformed(origin, "missing pr")
                 val paymentRequest = try {
                     PaymentRequest.read(pr) // <- throws
                 } catch (t: Throwable) {
-                    throw Error.PayInvoice.MalformedPr(origin)
+                    throw Error.PayInvoice.Malformed(origin, "unreadable pr")
                 }
                 val successAction = extractSuccessAction(origin, json)
                 return PayInvoice(paymentRequest, successAction)
             } catch (t: Throwable) {
                 when (t) {
                     is Error.PayInvoice -> throw t
-                    else -> throw Error.PayInvoice.Malformed(origin)
+                    else -> throw Error.PayInvoice.Malformed(origin, "unknown error")
                 }
             }
         }
@@ -350,20 +352,22 @@ sealed class LNUrl {
             origin: String,
             json: JsonObject
         ): PayInvoice.SuccessAction? {
-            val obj = json["successAction"]?.jsonObject ?: return null
+            val obj = try {
+                json["successAction"]?.jsonObject // throws on Non-JsonObject (e.g. JsonNull)
+            } catch (t: Throwable) { null } ?: return null
 
             return when (obj["tag"]?.jsonPrimitive?.content) {
                 PayInvoice.SuccessAction.Tag.Message.label -> {
                     val message = obj["message"]?.jsonPrimitive?.content ?: return null
                     if (message.isBlank() || message.length > 144) {
-                        throw Error.PayInvoice.Malformed(origin)
+                        throw Error.PayInvoice.Malformed(origin, "success.message: bad length")
                     }
                     PayInvoice.SuccessAction.Message(message)
                 }
                 PayInvoice.SuccessAction.Tag.Url.label -> {
                     val description = obj["description"]?.jsonPrimitive?.content ?: return null
                     if (description.length > 144) {
-                        throw Error.PayInvoice.Malformed(origin)
+                        throw Error.PayInvoice.Malformed(origin, "success.url.description: bad length")
                     }
                     val urlStr = obj["url"]?.jsonPrimitive?.content ?: return null
                     val url = Url(urlStr)
@@ -372,16 +376,16 @@ sealed class LNUrl {
                 PayInvoice.SuccessAction.Tag.Aes.label -> {
                     val description = obj["description"]?.jsonPrimitive?.content ?: return null
                     if (description.length > 144) {
-                        throw Error.PayInvoice.Malformed(origin)
+                        throw Error.PayInvoice.Malformed(origin, "success.aes.description: bad length")
                     }
                     val ciphertextStr = obj["ciphertext"]?.jsonPrimitive?.content ?: return null
                     val ciphertext = ByteVector(ciphertextStr.b64Decode())
                     if (ciphertext.size() > (4*1024)) {
-                        throw Error.PayInvoice.Malformed(origin)
+                        throw Error.PayInvoice.Malformed(origin, "success.aes.ciphertext: bad length")
                     }
                     val ivStr = obj["iv"]?.jsonPrimitive?.content ?: return null
                     if (ivStr.length != 24) {
-                        throw Error.PayInvoice.Malformed(origin)
+                        throw Error.PayInvoice.Malformed(origin, "success.aes.iv: bad length")
                     }
                     val iv = ByteVector(ivStr.b64Decode())
                     PayInvoice.SuccessAction.Aes(description, ciphertext = ciphertext, iv = iv)

@@ -43,6 +43,7 @@ extension Scan {
 	
 	typealias Intent_LnurlAuthFlow_Login = IntentLnurlAuthFlowLogin
 	
+	typealias LNUrlPay_Error = LNUrlPayError
 	typealias LNUrlPay_Error_RemoteError = LNUrlPayErrorRemoteError
 	typealias LNUrlPay_Error_BadResponseError = LNUrlPayErrorBadResponseError
 	typealias LNUrlPay_Error_ChainMismatch = LNUrlPayErrorChainMismatch
@@ -71,4 +72,10 @@ extension LNUrl {
 	typealias Error_RemoteFailure_Detailed = ErrorRemoteFailureDetailed
 	typealias Error_RemoteFailure_Unreadable = ErrorRemoteFailureUnreadable
 	typealias Error_RemoteFailure_CouldNotConnect = ErrorRemoteFailureCouldNotConnect
+	
+	typealias Error_PayInvoice = ErrorPayInvoice
+	typealias Error_PayInvoice_InvalidAmount = ErrorPayInvoiceInvalidAmount
+	typealias Error_PayInvoice_InvalidHash = ErrorPayInvoiceInvalidHash
+	typealias Error_PayInvoice_Malformed = ErrorPayInvoiceMalformed
+	
 }
