@@ -18,7 +18,7 @@ struct ParsedRow: Equatable {
 
 struct CurrencyConverterView: View {
 	
-	@State var currencies: [Currency] = [.bitcoin(.sat), .fiat(.usd)]
+	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
 	
@@ -38,6 +38,8 @@ struct CurrencyConverterView: View {
 		value: { [$0.size.width] }
 	)
 	@State var flagWidth: CGFloat? = nil
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
 	var body: some View {
@@ -86,6 +88,12 @@ struct CurrencyConverterView: View {
 			content
 			
 		} // </ZStack>
+		.onAppear {
+			onAppear()
+		}
+		.onChange(of: currencies) { _ in
+			currenciesDidChange()
+		}
 	}
 	
 	@ViewBuilder
@@ -102,6 +110,7 @@ struct CurrencyConverterView: View {
 							currencyTextWidth: $currencyTextWidth,
 							flagWidth: $flagWidth
 						)
+						.buttonStyle(PlainButtonStyle())
 						.swipeActions(allowsFullSwipe: false) {
 							Button {
 								editRow(currency)
@@ -116,8 +125,9 @@ struct CurrencyConverterView: View {
 							}
 						}
 					}
-					.onDelete { (indexSet) in
-						deleteRow(indexSet)
+					.onDelete { (_ /* indexSet */) in
+						// implementation not needed
+						// iOS uses button with destructive role instead
 					}
 					.onMove { indexSet, index in
 						moveRow(indexSet, to: index)
@@ -179,21 +189,36 @@ struct CurrencyConverterView: View {
 		.padding(.trailing, 8)
 	}
 	
+	private func onAppear() {
+		log.trace("onAppear()")
+		
+		if currencies.isEmpty {
+			currencies = defaultCurrencies()
+		}
+		parsedRow = ParsedRow(currency: Currency.bitcoin(.btc), parsedAmount: Result.success(1.0))
+	}
+	
+	private func defaultCurrencies() -> [Currency] {
+		return [
+			Currency.bitcoin(currencyPrefs.bitcoinUnit),
+			Currency.fiat(currencyPrefs.fiatCurrency)
+		]
+	}
+	
+	private func currenciesDidChange() {
+		log.trace("currenciesDidChange(): \(Currency.serializeList(currencies))")
+		
+		if currencies == defaultCurrencies() {
+			Prefs.shared.currencyConverterList = []
+		} else {
+			Prefs.shared.currencyConverterList = currencies
+		}
+	}
+	
 	private func moveRow(_ indexSet: IndexSet, to index: Int) {
 		log.trace("moveRow()")
 		
 		currencies.move(fromOffsets: indexSet, toOffset: index)
-	}
-	
-	private func deleteRow(_ indexSet: IndexSet) {
-		log.trace("deleteRow(IndexSet:)")
-		
-		var newCurrencies = currencies
-		newCurrencies.remove(atOffsets: indexSet)
-		
-		if newCurrencies.count >= 2 {
-			currencies = newCurrencies
-		}
 	}
 	
 	private func deleteRow(_ currency: Currency) {
@@ -226,8 +251,6 @@ struct CurrencyConverterView: View {
 			
 			if let idx = currencies.firstIndex(where: { $0 == oldCurrency }) {
 				currencies[idx] = newCurrency
-			} else {
-				log.debug("wtf")
 			}
 			
 		} else {
@@ -235,8 +258,6 @@ struct CurrencyConverterView: View {
 			
 			if !currencies.contains(newCurrency) {
 				currencies.append(newCurrency)
-			} else {
-				log.debug("wtf")
 			}
 		}
 	}
@@ -271,17 +292,29 @@ fileprivate struct Row: View, ViewName {
 		
 		HStack(alignment: VerticalAlignment.center, spacing: 0) {
 			
-			TextField("amount", text: currencyStyler().amountProxy)
-				.keyboardType(.decimalPad)
-				.disableAutocorrection(true)
-				.focused($focusedField, equals: .amountTextfield)
-				.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
-				.padding(.vertical, 8)
-				.padding(.horizontal, 16)
-				.overlay(
-					RoundedRectangle(cornerRadius: 8)
-						.stroke(Color(UIColor.separator), lineWidth: 1)
-				)
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				
+				TextField("amount", text: currencyStyler().amountProxy)
+					.keyboardType(.decimalPad)
+					.disableAutocorrection(true)
+					.focused($focusedField, equals: .amountTextfield)
+					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					clearTextField()
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(Color(UIColor.tertiaryLabel))
+				}
+				.isHidden(amount == "")
+			}
+			.padding(.vertical, 8)
+			.padding(.horizontal, 12)
+			.overlay(
+				RoundedRectangle(cornerRadius: 8)
+					.stroke(Color(UIColor.separator), lineWidth: 1)
+			)
 			
 			Text(currency.abbrev)
 				.frame(width: currencyTextWidth, alignment: .leading)
@@ -304,6 +337,9 @@ fileprivate struct Row: View, ViewName {
 			}
 		}
 		.padding()
+		.onAppear {
+			onAppear()
+		}
 		.onChange(of: amount) { _ in
 			amountDidChange()
 		}
@@ -321,10 +357,29 @@ fileprivate struct Row: View, ViewName {
 		)
 	}
 	
+	func onAppear() {
+		log.trace("[Row:\(currency)] onAppear()")
+		
+		parsedRowDidChange()
+	}
+	
+	func clearTextField() {
+		log.trace("[Row:\(currency)] clearTextField()")
+		
+		focusedField = .amountTextfield
+		parsedAmount = Result.failure(.emptyInput)
+		amount = ""
+		parsedRow = ParsedRow(currency: currency, parsedAmount: Result.failure(.emptyInput))
+	}
+	
 	func amountDidChange() {
 		log.trace("[Row:\(currency)] amountDidChange()")
 		
 		if focusedField == .amountTextfield {
+			switch parsedAmount {
+				case .failure(_): isInvalidAmount = true
+				case .success(_): isInvalidAmount = false
+			}
 			parsedRow = ParsedRow(currency: currency, parsedAmount: parsedAmount)
 		} else {
 			log.trace("[Row:\(currency)] ignoring self-triggered event")

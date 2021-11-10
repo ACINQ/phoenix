@@ -103,6 +103,8 @@
 		DCB493CF269F859E001B0F09 /* SyncManagerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493CE269F859E001B0F09 /* SyncManagerState.swift */; };
 		DCB493D1269F890D001B0F09 /* PendingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493D0269F890D001B0F09 /* PendingSettings.swift */; };
 		DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */; };
+		DCB876302735AA7300657570 /* Prefs+Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB8762F2735AA7300657570 /* Prefs+Serialization.swift */; };
+		DCB876322735AAB500657570 /* Prefs+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB876312735AAB500657570 /* Prefs+Codable.swift */; };
 		DCC46F1625C3521C005D32D9 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = DC72C31825A3CF87008A927A /* FirebaseMessaging */; };
 		DCC9D99A267BD28600EA36DD /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC9D999267BD28600EA36DD /* SyncManager.swift */; };
 		DCC9D99C267BEB3D00EA36DD /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */; };
@@ -268,6 +270,8 @@
 		DCB493CE269F859E001B0F09 /* SyncManagerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagerState.swift; sourceTree = "<group>"; };
 		DCB493D0269F890D001B0F09 /* PendingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingSettings.swift; sourceTree = "<group>"; };
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
+		DCB8762F2735AA7300657570 /* Prefs+Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Serialization.swift"; sourceTree = "<group>"; };
+		DCB876312735AAB500657570 /* Prefs+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Codable.swift"; sourceTree = "<group>"; };
 		DCC9D999267BD28600EA36DD /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		DCC9D99B267BEB3D00EA36DD /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		DCCC7FD426B0A006008ACD9B /* SquareSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareSize.swift; sourceTree = "<group>"; };
@@ -356,6 +360,8 @@
 				53BEF60DF224046E5DE0FDCC /* publishers.swift */,
 				53BEF8EAA43946FC1C7A6E7E /* shapes.swift */,
 				DC18C417256FE22300A2D083 /* Prefs.swift */,
+				DCB876312735AAB500657570 /* Prefs+Codable.swift */,
+				DCB8762F2735AA7300657570 /* Prefs+Serialization.swift */,
 				DC18C41C256FF91100A2D083 /* Utils.swift */,
 				DC1D2B4A2593EB850036AD38 /* CurrencyUnit.swift */,
 				DC1D2B4F2594CE900036AD38 /* FormattedAmount.swift */,
@@ -879,9 +885,11 @@
 				DC1706D926A71D8E00BAFCD0 /* ErrorView.swift in Sources */,
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				DCC9D99A267BD28600EA36DD /* SyncManager.swift in Sources */,
+				DCB876302735AA7300657570 /* Prefs+Serialization.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				DCB876322735AAB500657570 /* Prefs+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
