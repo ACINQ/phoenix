@@ -113,9 +113,9 @@ struct TextFieldCurrencyStyler {
 			isFiatCurrency = false
 			formatter = Utils.bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
 			
-		case .fiat(_):
+		case .fiat(let fiatCurrency):
 			isFiatCurrency = true
-			formatter = Utils.fiatFormatter()
+			formatter = Utils.fiatFormatter(fiatCurrency: fiatCurrency)
 		}
 		
 		if isFiatCurrency {

@@ -625,6 +625,28 @@ extension FiatCurrency {
 		case .zmw  : return "🇿🇲" // Zambian Kwacha
 		default    : return "🏳️"
 	}}
+	
+	fileprivate struct _Key {
+		static var matchingLocales = 0
+	}
+	
+	func matchingLocales() -> [Locale] {
+		executeOnce(storageKey: &_Key.matchingLocales) {
+			
+			var matchingLocales = [Locale]()
+			for identifier in Locale.availableIdentifiers {
+			
+				let locale = Locale(identifier: identifier)
+				if let currencyCode = locale.currencyCode,
+					currencyCode.caseInsensitiveCompare(self.name) == .orderedSame
+				{
+					matchingLocales.append(locale)
+				}
+			}
+			
+			return matchingLocales
+		}
+	}
 }
 
 extension BitcoinUnit {

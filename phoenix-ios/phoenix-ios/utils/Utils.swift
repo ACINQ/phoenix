@@ -248,7 +248,7 @@ class Utils {
 	
 	/// Returns a formatter appropriate for any fiat currency.
 	///
-	static func fiatFormatter() -> NumberFormatter {
+	static func fiatFormatter(fiatCurrency: FiatCurrency) -> NumberFormatter {
 		
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
@@ -288,6 +288,46 @@ class Utils {
 		// So we handle the zero edge case below.
 		//
 		formatter.roundingMode = .halfUp
+		
+		// Some currencies don't display cents.
+		// For example, the Colombian Peso discountinued centavos in 1984.
+		// And today the smallest coin is $5.
+		//
+		// So if we **DON'T** set the Locale appropriately,
+		// then when a Colombian (with currentLocale==es_CO) formats US dollars,
+		// the result will NOT display cents. Which is inappropriate for USD.
+		//
+		// And the opposite problem occurs if an American (with currentLocale=en_US) formats COP,
+		// the result WILL display cents. Which is inappropriate for COP.
+		
+		if let locale = fiatCurrency.matchingLocales().first {
+			
+			// Unfortunately, we can't simply set formatter.locale.
+			// To continue the example from above:
+			//
+			// A Colombian (with currentLocale=es_CO) would expect to see: 12.345,67 USD
+			// An American (with currentLocale=en_US) would expect to see: 12,345 COP
+			//
+			// Changing the locale changes more than just the display of cents.
+			// It could also inappropriately change the grouping separator, decimal separator, etc.
+			//
+			// So we're going to try to just tweak the min/max fractionDigits.
+			
+			let altFormatter = formatter.copy() as! NumberFormatter
+			altFormatter.locale = locale
+			
+			if let str = altFormatter.string(from: NSNumber(value: 1.0)) {
+				
+				let usesCents = str.contains(altFormatter.currencyDecimalSeparator)
+				if usesCents {
+					formatter.minimumFractionDigits = 2
+					formatter.maximumFractionDigits = 2
+				} else {
+					formatter.minimumFractionDigits = 0
+					formatter.maximumFractionDigits = 0
+				}
+			}
+		}
 		
 		return formatter
 	}
@@ -339,7 +379,7 @@ class Utils {
 	) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
-		let formatter = fiatFormatter()
+		let formatter = fiatFormatter(fiatCurrency: exchangeRate.fiatCurrency)
 		
 		var digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
 		
