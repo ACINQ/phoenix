@@ -178,7 +178,6 @@ enum class FiatCurrency : CurrencyUnit {
     SLL, // Sierra Leonean Leone
     SOS, // Somali Shilling
     SRD, // Surinamese Dollar
-    SVC, // Salvadoran Colón
     SYP, // Syrian Pound
     SZL, // Swazi Lilangeni
     THB, // Thai Baht
