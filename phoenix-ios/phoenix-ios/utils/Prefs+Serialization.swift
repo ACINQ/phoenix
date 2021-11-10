@@ -44,6 +44,14 @@ extension FiatCurrency {
 		
 		return nil
 	}
+	
+	static func serializeList(_ list: [FiatCurrency]) -> String {
+		return list.map { $0.serialize() }.joined(separator: ",")
+	}
+	
+	static func deserializeList(_ str: String) -> [FiatCurrency] {
+		return str.components(separatedBy: ",").compactMap { FiatCurrency.deserialize($0) }
+	}
 }
 
 extension BitcoinUnit {

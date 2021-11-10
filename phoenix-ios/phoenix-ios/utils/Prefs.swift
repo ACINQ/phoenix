@@ -156,6 +156,11 @@ class Prefs {
 		}
 	}
 	
+	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
+		var list = self.currencyConverterList
+		return CurrentValueSubject<[Currency], Never>(list)
+	}()
+	
 	var currencyConverterList: [Currency] {
 		get {
 			if let list = UserDefaults.standard.string(forKey: Keys.currencyConverterList.rawValue) {
@@ -170,6 +175,18 @@ class Prefs {
 			} else {
 				UserDefaults.standard.set(Currency.serializeList(newValue), forKey: Keys.currencyConverterList.rawValue)
 			}
+		}
+	}
+	
+	var preferredFiatCurrencies: [FiatCurrency] {
+		get {
+			var result = Set<FiatCurrency>(arrayLiteral: self.fiatCurrency)
+			for currency in self.currencyConverterList {
+				if case .fiat(let fiat) = currency {
+					result.insert(fiat)
+				}
+			}
+			return Array(result)
 		}
 	}
 	
