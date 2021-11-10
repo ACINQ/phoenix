@@ -8,9 +8,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
@@ -81,7 +79,6 @@ class CurrencyManager(
     }
 
     val ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
-    private var refreshJob: Job? = null
 
     data class RefreshInfo(
         val lastRefresh: Instant,
@@ -112,13 +109,75 @@ class CurrencyManager(
         }
     }
     private var refreshList = mutableMapOf<FiatCurrency, RefreshInfo>()
+    private var refreshJob: Job? = null
 
-    fun start() {
-        refreshJob = startRefreshJob()
+    data class Target(val flags: Int) { // <- bitmask
+
+        companion object {
+            val None = Target(0b0)
+            val Bitcoin = Target(0b001)
+            val FiatPreferred = Target(0b010)
+            val FiatOther = Target(0b100)
+            val All = Target(0b111)
+        }
+
+        operator fun plus(other: Target): Target {
+            return Target(this.flags or other.flags)
+        }
+
+        operator fun minus(other: Target): Target {
+            return Target(this.flags and other.flags.inv())
+        }
+
+        fun contains(options: Target): Boolean {
+            return (this.flags and options.flags) != 0
+        }
     }
 
-    fun stop() = launch {
+    private val _refreshFlow = MutableStateFlow<Target>(Target.None)
+    val refreshFlow: StateFlow<Target> = _refreshFlow
+
+    private var networkAccessEnabled = false
+
+    internal fun enableNetworkAccess() {
+        networkAccessEnabled = true
+        start()
+    }
+
+    internal fun disableNetworkAccess() {
+        networkAccessEnabled = false
+        stop()
+    }
+
+    private fun start() {
+        if (networkAccessEnabled && refreshJob == null) {
+            refreshJob = startRefreshJob()
+        }
+    }
+
+    private fun stop() = launch {
         refreshJob?.cancelAndJoin()
+        refreshJob = null
+    }
+
+    fun refresh(targets: Target) = launch {
+        stop().join()
+        val deferred1 = async {
+            if (targets.contains(Target.Bitcoin)) {
+                refreshFromBlockchainInfo()
+            }
+        }
+        val deferred2 = async {
+            if (targets.contains(Target.FiatPreferred)) {
+                refreshFromCoinDesk(preferred = true, forceRefresh = true)
+            }
+            if (targets.contains(Target.FiatOther)) {
+                refreshFromCoinDesk(preferred = false, forceRefresh = true)
+            }
+        }
+        deferred1.await()
+        deferred2.await()
+        start()
     }
 
     private fun startRefreshJob() = launch {
@@ -141,8 +200,8 @@ class CurrencyManager(
                     log.debug { "Next UsdPriceRate refresh: $nextDelay" }
                     delay(nextDelay)
                 }
-                refreshFromCoinDesk(preferred = true)
-                refreshFromCoinDesk(preferred = false)
+                refreshFromCoinDesk(preferred = true, forceRefresh = false)
+                refreshFromCoinDesk(preferred = false, forceRefresh = false)
             }
         }
     }
@@ -207,9 +266,18 @@ class CurrencyManager(
         }
     }
 
+    private fun addRefreshTarget(target: Target) {
+        _refreshFlow.value += target
+    }
+    private fun removeRefreshTarget(target: Target) {
+        _refreshFlow.value -= target
+    }
+
     private suspend fun refreshFromBlockchainInfo() {
         log.info { "fetching bitcoin prices from blockchain.info" }
         val api = blockchainInfoAPI
+        val target = Target.Bitcoin
+        addRefreshTarget(target)
 
         val fetchedRates = try {
             httpClient.get<Map<String, BlockchainInfoPriceObject>>(
@@ -248,6 +316,7 @@ class CurrencyManager(
             attempted = api.fiatCurrencies,
             refreshed = fetchedRates?.map { it.fiatCurrency } ?: listOf()
         )
+        removeRefreshTarget(target)
     }
 
     class WrappedException(
@@ -256,8 +325,9 @@ class CurrencyManager(
         val reason: String
     ): Exception("$fiatCurrency: $reason: $inner")
 
-    private suspend fun refreshFromCoinDesk(preferred: Boolean) {
+    private suspend fun refreshFromCoinDesk(preferred: Boolean, forceRefresh: Boolean) {
         val api = coindeskAPI
+        val target = if (preferred) Target.FiatPreferred else Target.FiatOther
 
         // Performance notes:
         //
@@ -293,16 +363,21 @@ class CurrencyManager(
         }.filter { fiatCurrency ->
             // Only include those that need to be refreshed,
             // which might not be all of them.
-            refreshList[fiatCurrency]?.let {
-                val result: Boolean = it.nextRefresh <= now // < Android studio bug
-                result
-            } ?: true
+            if (forceRefresh) {
+                true
+            } else {
+                refreshList[fiatCurrency]?.let {
+                    val result: Boolean = it.nextRefresh <= now // < Android studio bug
+                    result
+                } ?: true
+            }
         }
 
         if (fiatCurrencies.isEmpty()) {
             return
         } else {
             log.info { "fetching ${fiatCurrencies.size} exchange rate(s) from coindesk.com" }
+            addRefreshTarget(target)
         }
 
         fiatCurrencies.map { fiatCurrency ->
@@ -378,6 +453,7 @@ class CurrencyManager(
                 attempted = fiatCurrencies,
                 refreshed = fetchedRates.map { it.fiatCurrency }
             )
+            removeRefreshTarget(target)
         }
     }
 }

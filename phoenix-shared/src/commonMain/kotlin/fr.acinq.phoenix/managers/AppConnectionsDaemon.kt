@@ -172,14 +172,14 @@ class AppConnectionsDaemon(
                         if (!httpControlFlowEnabled) {
                             httpControlFlowEnabled = true
                             configurationManager.enableNetworkAccess()
-                            currencyManager.start()
+                            currencyManager.enableNetworkAccess()
                         }
                     }
                     else -> {
                         if (httpControlFlowEnabled) {
                             httpControlFlowEnabled = false
                             configurationManager.disableNetworkAccess()
-                            currencyManager.stop()
+                            currencyManager.disableNetworkAccess()
                         }
                     }
                 }

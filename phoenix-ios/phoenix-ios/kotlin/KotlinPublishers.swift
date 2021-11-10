@@ -1,7 +1,16 @@
 import Foundation
 import Combine
 import PhoenixShared
+import os.log
 
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "KotlinPublishers"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 extension PhoenixBusiness {
 	
@@ -20,7 +29,46 @@ extension PhoenixBusiness {
 			KotlinCurrentValueSubject<Lightning_kmpPeer, Lightning_kmpPeer?>(
 				self.peerState()
 			)
-            .compactMap { $0 }
+			.compactMap { $0 }
+			.eraseToAnyPublisher()
+		}
+	}
+}
+
+extension CurrencyManager {
+	
+	fileprivate struct _Key {
+		static var ratesPublisher = 0
+		static var refreshPublisher = 0
+	}
+	
+	func ratesPubliser() -> AnyPublisher<[ExchangeRate], Never> {
+		
+		executeOnce(storageKey: &_Key.ratesPublisher) {
+			
+			// Transforming from Kotlin:
+			// `ratesFlow: Flow<List<ExchangeRate>>`
+			//
+			KotlinPassthroughSubject<NSArray, [ExchangeRate]>(
+				self.ratesFlow
+			)
+			.eraseToAnyPublisher()
+		}
+	}
+	
+	func refreshPublisher() -> AnyPublisher<Bool, Never> {
+		
+		executeOnce(storageKey: &_Key.refreshPublisher) {
+			
+			// Transforming from Kotlin:
+			// `refreshFlow: StateFlow<Target>`
+			//
+			KotlinCurrentValueSubject<Target, Target>(
+				self.refreshFlow
+			)
+			.map { (target: Target) -> Bool in
+				return target != CurrencyManager.Target.companion.None
+			}
 			.eraseToAnyPublisher()
 		}
 	}

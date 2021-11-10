@@ -17,16 +17,28 @@ struct ParsedRow: Equatable {
 	let parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 }
 
+enum LastUpdated {
+	case Now
+	case Date(date: Date)
+	case Never
+}
+
 struct CurrencyConverterView: View {
 	
 	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
-	
 	@State var editingCurrency: Currency? = nil
 	@State var currencySelectorOpen = false
 	
 	@State var didAppear = false
+	@State var isRefreshingExchangeRates = false
+	
+	let refreshingExchangeRatesPublisher =
+		AppDelegate.get().business.currencyManager.refreshPublisher()
+	
+	let timer = Timer.publish(every: 15 /* seconds */, on: .current, in: .common).autoconnect()
+	@State var currentDate = Date()
 	
 	enum CurrencyTextWidth: Preference {}
 	let currencyTextWidthReader = GeometryPreferenceReader(
@@ -42,6 +54,7 @@ struct CurrencyConverterView: View {
 	)
 	@State var flagWidth: CGFloat? = nil
 	
+	@Environment(\.colorScheme) var colorScheme
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	@ViewBuilder
@@ -97,6 +110,12 @@ struct CurrencyConverterView: View {
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
+		.onReceive(refreshingExchangeRatesPublisher) {
+			refreshingExchangeRatesChanged($0)
+		}
+		.onReceive(timer) { _ in
+			self.currentDate = Date()
+		}
 	}
 	
 	@ViewBuilder
@@ -121,6 +140,7 @@ struct CurrencyConverterView: View {
 			}
 			.listStyle(PlainListStyle())
 			
+			footer()
 		}
 		.background(
 			NavigationLink(destination: CurrencySelector(
@@ -220,6 +240,69 @@ struct CurrencyConverterView: View {
 		.padding(.trailing, 8)
 	}
 	
+	@ViewBuilder
+	func footer() -> some View {
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 0) {
+			
+			if isRefreshingExchangeRates {
+				
+				Text("Refreshing rates...")
+				Spacer()
+				ProgressView()
+					.progressViewStyle(CircularProgressViewStyle())
+				
+			} else {
+				
+				Text("Rates last updated: ")
+				lastUpdatedText()
+				Spacer()
+				Button {
+					refreshRates()
+				} label: {
+					HStack(alignment: VerticalAlignment.center, spacing: 4) {
+						Text("refresh")
+						Image(systemName: "arrow.2.squarepath")
+							.imageScale(.medium)
+					}
+				}
+				.padding(.leading, 4)
+			}
+		}
+		.font(.footnote)
+		.padding(.horizontal)
+		.padding([.top, .bottom], 4)
+		.frame(maxWidth: .infinity, minHeight: 40)
+		.background(
+			Color(
+				colorScheme == ColorScheme.light
+				? UIColor.systemGroupedBackground
+				: UIColor.secondarySystemGroupedBackground
+			)
+			.edgesIgnoringSafeArea(.bottom) // background color should extend to bottom of screen
+		)
+	}
+	
+	@ViewBuilder
+	func lastUpdatedText() -> some View {
+		
+		switch currenciesLastUpdated() {
+		case .Now:
+			Text("now")
+		case .Never:
+			Text("never")
+		case .Date(let date):
+			let now = currentDate // Use local @State to allow timer refresh
+			let diff = now.timeIntervalSince1970 - date.timeIntervalSince1970
+			if diff < (60 * 5) { // within last 5 minutes
+				Text("just now")
+			} else {
+				let formatter = RelativeDateTimeFormatter()
+				Text(verbatim: formatter.localizedString(for: date, relativeTo: now))
+			}
+		}
+	}
+	
 	private func onAppear() {
 		log.trace("onAppear()")
 		
@@ -256,6 +339,85 @@ struct CurrencyConverterView: View {
 		}
 	}
 	
+	private func currenciesLastUpdated() -> LastUpdated {
+		
+		var fiatCurrencies: Set<FiatCurrency> = Set(currencies.compactMap { (currency: Currency) in
+			switch currency {
+				case .fiat(let fiatCurrency): return fiatCurrency
+				case .bitcoin(_): return nil
+			}
+		})
+		
+		if fiatCurrencies.isEmpty {
+			// Either the `currencies` array is empty,
+			// or it consists entirely of bitcoin units.
+			// So we can consider our rates to always be fresh.
+			return LastUpdated.Now
+		}
+		
+		// There are 2 types of ExchangeRates:
+		// - BitcoinPriceRate => Direct Fiat<->BTC rate
+		// - UsdPriceRate => Indirect Fiat<->USD rate
+		//
+		// If there are any indirect rates, then we implictly depend upon the USD rate.
+		
+		let hasIndirectRates =
+			currencyPrefs.fiatExchangeRates.contains { (rate: ExchangeRate) -> Bool in
+				return fiatCurrencies.contains(rate.fiatCurrency) && (rate is ExchangeRate.UsdPriceRate)
+			}
+		
+		if hasIndirectRates {
+			fiatCurrencies.insert(FiatCurrency.usd)
+		}
+		
+		let filteredRates = currencyPrefs.fiatExchangeRates.filter { (rate: ExchangeRate) in
+			fiatCurrencies.contains(rate.fiatCurrency)
+		}
+		
+		if filteredRates.count < fiatCurrencies.count {
+			// There is at least one currency that has never been downloaded
+			return LastUpdated.Never
+		}
+		
+		// The BitcoinPriceRates are for currencies with high liquidity (e.g. USD, EUR).
+		// The rates are expect to update frequently (e.g. every 20 minutes).
+		//
+		// The UsdPriceRates for for currencies with "low" liquidity.
+		// (See CurrencyManager.kt for technical discussion on liquidity & conversion implications.)
+		// The rates are only updated on the server once every hour.
+		//
+		// So there are considerations here.
+		// If a UsdPriceRate was updated within the last hour, we can effectively consider it "fresh".
+		
+		let now = currentDate // Use local @State to allow timer refresh
+		
+		let refreshDates: [Date] = filteredRates.map { (rate: ExchangeRate) in
+			
+			if let fiatRate = rate as? ExchangeRate.UsdPriceRate {
+				let diff = now.timeIntervalSince1970 - fiatRate.timestamp.timeIntervalSince1970
+				if diff < (60 * 60) { // within the last hour
+					return now
+				} else {
+					return rate.timestamp
+				}
+				
+			} else {
+				return rate.timestamp
+			}
+		}
+		
+		let lastUpdated = refreshDates.min()!
+		log.debug("currenciesLastUpdated: \(lastUpdated.description(with: Locale.current))")
+		
+		return LastUpdated.Date(date: lastUpdated)
+	}
+	
+	private func refreshingExchangeRatesChanged(_ value: Bool) {
+		log.trace("refreshingExchangeRatesChanged(\(value))")
+		
+		isRefreshingExchangeRates = value
+	}
+	
 	private func moveRow(_ indexSet: IndexSet, to index: Int) {
 		log.trace("moveRow()")
 		
@@ -290,6 +452,15 @@ struct CurrencyConverterView: View {
 		
 		editingCurrency = nil
 		currencySelectorOpen = true
+	}
+	
+	private func refreshRates() {
+		log.trace("refreshRates()")
+		
+		let targets = CurrencyManager.Target.companion.Bitcoin.plus(other:
+			CurrencyManager.Target.companion.FiatPreferred
+		)
+		AppDelegate.get().business.currencyManager.refresh(targets: targets)
 	}
 	
 	private func didSelectCurrency(_ newCurrency: Currency) {
@@ -409,7 +580,7 @@ fileprivate struct Row: View, ViewName {
 	func onAppear() {
 		log.trace("[Row:\(currency)] onAppear()")
 		
-		parsedRowDidChange()
+		parsedRowDidChange(forceRefresh: true)
 	}
 	
 	func clearTextField() {
@@ -435,14 +606,14 @@ fileprivate struct Row: View, ViewName {
 		}
 	}
 	
-	func parsedRowDidChange() {
+	func parsedRowDidChange(forceRefresh: Bool = false) {
 		log.trace("[Row:\(currency)] parsedRowDidChange()")
 		
 		guard let parsedRow = parsedRow else {
 			return
 		}
 		
-		if parsedRow.currency == currency {
+		if !forceRefresh && parsedRow.currency == currency {
 			log.trace("[Row:\(currency)] ignoring self-triggered event")
 			return
 		}
