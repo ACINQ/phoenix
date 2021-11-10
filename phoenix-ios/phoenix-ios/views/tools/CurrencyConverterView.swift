@@ -343,27 +343,52 @@ fileprivate struct Row: View, ViewName {
 			return
 		}
 		
-		var newAmount = ""
+		var srcMsat: Int64? = nil
+		var newParsedAmount: Result<Double, TextFieldCurrencyStylerError>? = nil
+		var newAmount: String? = nil
 		
-		switch parsedRow.parsedAmount {
-			case .failure:
-				isInvalidAmount = true
-				
-			case .success(let amt):
-				isInvalidAmount = false
+		if case .success(let srcAmt) = parsedRow.parsedAmount {
 			
-			if let value = currencyPrefs.convert(
-				srcAmount: amt,
-				srcCurrency: parsedRow.currency,
-				dstCurrency: self.currency
-			) {
-				newAmount = "\(value)"
+			switch parsedRow.currency {
+			case .bitcoin(let srcBitcoinUnit):
+				srcMsat = Utils.toMsat(from: srcAmt, bitcoinUnit: srcBitcoinUnit)
+				
+			case .fiat(let srcFiatCurrency):
+				if let srcExchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: srcFiatCurrency) {
+					srcMsat = Utils.toMsat(fromFiat: srcAmt, exchangeRate: srcExchangeRate)
+				}
 			}
 		}
+		
+		if let srcMsat = srcMsat {
+			
+			switch currency {
+			case .bitcoin(let dstBitcoinUnit):
+					
+				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, hideMsats: true)
+				newParsedAmount = Result.success(dstFormattedAmt.amount)
+				newAmount = dstFormattedAmt.digits
+			
+			case .fiat(let dstFiatCurrency):
 				
-		let result = TextFieldCurrencyStyler.format(input: newAmount, currency: currency, hideMsats: false)
-		parsedAmount = result.1
-		amount = result.0
+				if let dstExchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: dstFiatCurrency) {
+					
+					let dstFormattedAmt = Utils.formatFiat(msat: srcMsat, exchangeRate: dstExchangeRate)
+					newParsedAmount = Result.success(dstFormattedAmt.amount)
+					newAmount = dstFormattedAmt.digits
+				}
+			}
+		}
+		
+		if let newParsedAmount = newParsedAmount, let newAmount = newAmount {
+			isInvalidAmount = false
+			parsedAmount = newParsedAmount
+			amount = newAmount
+		} else {
+			isInvalidAmount = true
+			parsedAmount = Result.failure(.emptyInput)
+			amount = ""
+		}
 	}
 }
 

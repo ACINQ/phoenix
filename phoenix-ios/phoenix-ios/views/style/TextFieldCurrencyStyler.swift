@@ -234,6 +234,7 @@ struct TextFieldCurrencyStyler {
 			// See discussion in: FormattedAmount.withFormattedFractionDigits()
 			//
 			let formattedAmount = FormattedAmount(
+				amount: number.doubleValue,
 				currency: currency,
 				digits: formattedInput,
 				decimalSeparator: formatter.decimalSeparator

@@ -695,7 +695,7 @@ fileprivate struct PaymentCell : View, ViewName {
 		} else {
 			
 			let currency = currencyPrefs.currency
-			let amount = FormattedAmount(currency: currency, digits: "", decimalSeparator: " ")
+			let amount = FormattedAmount(amount: 0.0, currency: currency, digits: "", decimalSeparator: " ")
 
 			let isFailure = false
 			let isOutgoing = true

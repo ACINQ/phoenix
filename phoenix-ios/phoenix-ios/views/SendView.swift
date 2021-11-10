@@ -1015,10 +1015,9 @@ struct ValidateView: View, ViewName {
 		
 		if let amount_msat = amount_msat {
 			
-			let targetAmt = Utils.convertBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit)
 			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
 			
-			parsedAmount = Result.success(targetAmt) // do this first !
+			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
