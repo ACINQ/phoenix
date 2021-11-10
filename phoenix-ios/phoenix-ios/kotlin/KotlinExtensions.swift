@@ -10,28 +10,6 @@ extension PhoenixBusiness {
 	}
 }
 
-extension Lightning_kmpWalletPayment: Identifiable {
-	
-	var identifiable: String {
-		// @see LightningExtensions.kt: `fun WalletPayment.id()`
-		return self.id()
-	}
-}
-
-extension WalletPaymentId: Identifiable {
-	
-	var identifiable: String {
-		return self.identifier
-	}
-}
-
-extension WalletPaymentOrderRow: Identifiable {
-	
-	var identifiable: String {
-		return self.identifier
-	}
-}
-
 extension WalletPaymentInfo {
 	
 	func paymentDescription(includingUserDescription: Bool = true) -> String? {
@@ -214,13 +192,6 @@ extension Lightning_kmpIncomingPayment.Received {
 	}
 }
 
-extension Lightning_kmpIncomingPayment.ReceivedWith: Identifiable {
-	
-	var identifiable: Int {
-		return self.hash
-	}
-}
-
 extension Lightning_kmpOutgoingPayment {
 	
 	var createdAtDate: Date {
@@ -305,6 +276,13 @@ extension ConnectionsManager {
 		}
 
 		return publisher
+	}
+}
+
+extension ExchangeRate {
+	
+	var timestamp: Date {
+		return Date(timeIntervalSince1970: (Double(timestampMillis) / Double(1_000)))
 	}
 }
 
@@ -662,7 +640,7 @@ extension BitcoinUnit {
 			case BitcoinUnit.sat  : return "0.000\(s)000\(s)01 BTC"
 			case BitcoinUnit.bit  : return "0.000\(s)001 BTC"
 			case BitcoinUnit.mbtc : return "0.001 BTC"
-			case BitcoinUnit.btc  : return ""
+			case BitcoinUnit.btc  : return "1 BTC"
 			default               : break
 		}
 		

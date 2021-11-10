@@ -115,6 +115,7 @@ class Utils {
 		
 		let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
 		return FormattedAmount(
+			amount: 0.0,
 			currency: Currency.fiat(fiatCurrency),
 			digits: "?\(decimalSeparator)??",
 			decimalSeparator: decimalSeparator
@@ -231,6 +232,7 @@ class Utils {
 		}
 		
 		let formattedAmount = FormattedAmount(
+			amount: targetAmount,
 			currency: Currency.bitcoin(bitcoinUnit),
 			digits: digits,
 			decimalSeparator: formatter.decimalSeparator
@@ -394,6 +396,7 @@ class Utils {
 		}
 		
 		return FormattedAmount(
+			amount: fiatAmount,
 			currency: Currency.fiat(exchangeRate.fiatCurrency),
 			digits: digits,
 			decimalSeparator: formatter.currencyDecimalSeparator

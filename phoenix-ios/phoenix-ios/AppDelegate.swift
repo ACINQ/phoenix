@@ -64,20 +64,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		AppDelegate._isTestnet = business.chain.isTestnet()
 		super.init()
 		performVersionUpgradeChecks()
-		business.start()
 		
 		let electrumConfig = Prefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
 		
-		let fiatCurrency = Prefs.shared.fiatCurrency
-		business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
+		let fiatCurrencies = Prefs.shared.preferredFiatCurrencies
+		business.appConfigurationManager.updatePreferredFiatCurrencies(list: fiatCurrencies)
+		
+		business.start()
 	}
 	
 	// --------------------------------------------------
 	// MARK: UIApplication Lifecycle
 	// --------------------------------------------------
 
-    func application(
+    internal func application(
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
@@ -123,8 +124,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			self.business.updateTorUsage(isEnabled: isTorEnabled)
 		}.store(in: &cancellables)
 		
-		Prefs.shared.fiatCurrencyPublisher.sink {(fiatCurrency: FiatCurrency) in
-			self.business.appConfigurationManager.updatePreferredFiatCurrencies(list: [fiatCurrency])
+		// PreferredFiatCurrenies observers
+		Publishers.CombineLatest(
+			Prefs.shared.fiatCurrencyPublisher,
+			Prefs.shared.currencyConverterListPublisher
+		).sink { _ in
+			let list = Prefs.shared.preferredFiatCurrencies
+			self.business.appConfigurationManager.updatePreferredFiatCurrencies(list: list)
 		}.store(in: &cancellables)
 		
 		return true

@@ -101,7 +101,7 @@ struct HomeView : MVIView, ViewName {
 			HStack {
 				AppStatusButton()
 				Spacer()
-				FaqButton()
+				ToolsButton()
 			}
 			.padding(.all)
 
@@ -695,7 +695,7 @@ fileprivate struct PaymentCell : View, ViewName {
 		} else {
 			
 			let currency = currencyPrefs.currency
-			let amount = FormattedAmount(currency: currency, digits: "", decimalSeparator: " ")
+			let amount = FormattedAmount(amount: 0.0, currency: currency, digits: "", decimalSeparator: " ")
 
 			let isFailure = false
 			let isOutgoing = true
@@ -865,7 +865,9 @@ fileprivate struct AppStatusButton: View, ViewName {
 	}
 }
 
-fileprivate struct FaqButton: View, ViewName {
+fileprivate struct ToolsButton: View, ViewName {
+	
+	@State var currencyConverterOpen = false
 	
 	@Environment(\.openURL) var openURL
 	
@@ -881,6 +883,11 @@ fileprivate struct FaqButton: View, ViewName {
 				sendFeedbackButtonTapped()
 			} label: {
 				Label("Send feedback", systemImage: "envelope")
+			}
+			Button {
+				currencyConverterTapped()
+			} label: {
+				Label("Currency converter", systemImage: "globe")
 			}
 		} label: {
 			Image(systemName: "questionmark")
@@ -898,9 +905,14 @@ fileprivate struct FaqButton: View, ViewName {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.background(
+			NavigationLink(destination: CurrencyConverterView(), isActive: $currencyConverterOpen) {
+				EmptyView()
+			}
+		)
 	}
 	
-	func faqButtonTapped() -> Void {
+	func faqButtonTapped() {
 		log.trace("[\(viewName)] faqButtonTapped()")
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq") {
@@ -908,7 +920,7 @@ fileprivate struct FaqButton: View, ViewName {
 		}
 	}
 	
-	func sendFeedbackButtonTapped() -> Void {
+	func sendFeedbackButtonTapped() {
 		log.trace("[\(viewName)] sendFeedbackButtonTapped()")
 		
 		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
@@ -928,6 +940,11 @@ fileprivate struct FaqButton: View, ViewName {
 		if let url = comps.url {
 			openURL(url)
 		}
+	}
+	
+	func currencyConverterTapped() {
+		log.trace("[\(viewName)] currencyConverterTapped()")
+		currencyConverterOpen = true
 	}
 }
 

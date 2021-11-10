@@ -10,10 +10,14 @@ import PhoenixShared
 ///
 struct FormattedAmount {
 	
-	// The currency type. E.g.:
-	// - .bitcoin(.sat)
-	// - .fiat(.usd)
-	//
+	/// The raw amount as a Double
+	///
+	let amount: Double
+	
+	/// The currency type. E.g.:
+	/// - .bitcoin(.sat)
+	/// - .fiat(.usd)
+	///
 	let currency: Currency
 	
 	/// Only the digits. E.g. "12,345.6789"
@@ -146,6 +150,7 @@ extension FormattedAmount {
 			self.integerDigits + self.decimalSeparator + betterFractionDigits
 		
 		return FormattedAmount(
+			amount: self.amount,
 			currency: self.currency,
 			digits: betterDigits,
 			decimalSeparator: self.decimalSeparator

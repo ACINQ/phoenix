@@ -1,6 +1,16 @@
 import SwiftUI
 import PhoenixShared
 import Combine
+import os.log
+
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "Prefs"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 
 class Prefs {
@@ -25,6 +35,7 @@ class Prefs {
 		case backupTransactions_useCellularData
 		case backupTransactions_useUploadDelay
 		case showChannelsRemoteBalance
+		case currencyConverterList
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -155,6 +166,45 @@ class Prefs {
 		}
 	}
 	
+	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
+		var list = self.currencyConverterList
+		return CurrentValueSubject<[Currency], Never>(list)
+	}()
+	
+	var currencyConverterList: [Currency] {
+		get {
+			if let list = UserDefaults.standard.string(forKey: Keys.currencyConverterList.rawValue) {
+				log.debug("get: currencyConverterList = \(list)")
+				return Currency.deserializeList(list)
+			} else {
+				log.debug("get: currencyConverterList = nil")
+				return [Currency]()
+			}
+		}
+		set {
+			if newValue.isEmpty {
+				log.debug("set: currencyConverterList = nil")
+				UserDefaults.standard.removeObject(forKey: Keys.currencyConverterList.rawValue)
+			} else {
+				let list = Currency.serializeList(newValue)
+				log.debug("set: currencyConverterList = \(list)")
+				UserDefaults.standard.set(list, forKey: Keys.currencyConverterList.rawValue)
+			}
+		}
+	}
+	
+	var preferredFiatCurrencies: [FiatCurrency] {
+		get {
+			var result = Set<FiatCurrency>(arrayLiteral: self.fiatCurrency)
+			for currency in self.currencyConverterList {
+				if case .fiat(let fiat) = currency {
+					result.insert(fiat)
+				}
+			}
+			return Array(result)
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Push Notifications
 	// --------------------------------------------------
@@ -276,132 +326,5 @@ class Prefs {
 			let key = Keys.backupTransactions_useUploadDelay.rawValue
 			UserDefaults.standard.set(newValue, forKey: key)
 		}
-	}
-}
-
-// MARK:-
-/**
- * We prefer to store Codable types in the UserDefaults system.
- * The Codable system gives us Swift native tools for serialization & deserialization.
- *
- * But the Kotlin bridge is Objective-C. So we're choosing to provide custom
- * serialization & deserialization routines for these.
- */
-
-extension FiatCurrency {
-	
-	func serialize() -> String {
-		return self.name
-	}
-	
-	static func deserialize(_ str: String) -> FiatCurrency? {
-		for value in FiatCurrency.companion.values {
-			if str == value.serialize() {
-				return value
-			}
-		}
-		return nil
-	}
-	
-	static func localeDefault() -> FiatCurrency? {
-		
-		guard let currencyCode = NSLocale.current.currencyCode else {
-			return nil
-		}
-		// currencyCode examples:
-		// - "USD"
-		// - "JPY"
-		
-		for fiat in FiatCurrency.companion.values {
-			
-			let fiatCode = fiat.name // e.g. "AUD", "BRL"
-			
-			if currencyCode.caseInsensitiveCompare(fiatCode) == .orderedSame {
-				return fiat
-			}
-		}
-		
-		return nil
-	}
-}
-
-extension BitcoinUnit {
-	
-	func serialize() -> String {
-		return self.name
-	}
-	
-	static func deserialize(_ str: String) -> BitcoinUnit? {
-		for value in BitcoinUnit.companion.values {
-			if str == value.serialize() {
-				return value
-			}
-		}
-		return nil
-	}
-}
-
-// MARK:-
-
-enum CurrencyType: String, CaseIterable, Codable {
-	case fiat
-	case bitcoin
-}
-
-enum Theme: String, CaseIterable, Codable {
-	case light
-	case dark
-	case system
-	
-	func localized() -> String {
-		switch self {
-		case .light  : return NSLocalizedString("Light", comment: "App theme option")
-		case .dark   : return NSLocalizedString("Dark", comment: "App theme option")
-		case .system : return NSLocalizedString("System", comment: "App theme option")
-		}
-	}
-	
-	func toInterfaceStyle() -> UIUserInterfaceStyle {
-		switch self {
-		case .light  : return .light
-		case .dark   : return .dark
-		case .system : return .unspecified
-		}
-	}
-	
-	func toColorScheme() -> ColorScheme? {
-		switch self {
-		case .light  : return ColorScheme.light
-		case .dark   : return ColorScheme.dark
-		case .system : return nil
-		}
-	}
-}
-
-enum PushPermissionQuery: String, Codable {
-	case neverAskedUser
-	case userDeclined
-	case userAccepted
-}
-
-struct FcmTokenInfo: Equatable, Codable {
-	let nodeID: String
-	let fcmToken: String
-}
-
-struct ElectrumConfigPrefs: Codable {
-	let host: String
-	let port: UInt16
-	
-	private let version: Int // for potential future upgrades
-	
-	init(host: String, port: UInt16) {
-		self.host = host
-		self.port = port
-		self.version = 1
-	}
-	
-	var serverAddress: Lightning_kmpServerAddress {
-		return Lightning_kmpServerAddress(host: host, port: Int32(port), tls: Lightning_kmpTcpSocketTLS.safe)
 	}
 }

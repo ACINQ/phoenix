@@ -15,7 +15,6 @@ class CurrencyPrefs: ObservableObject {
 	@Published var bitcoinUnit: BitcoinUnit
 	
 	@Published var fiatExchangeRates: [ExchangeRate] = []
-	private var fiatExchangeRatesWatcher: Ktor_ioCloseable? = nil
 	
 	var currency: Currency {
 		switch currencyType {
@@ -27,8 +26,6 @@ class CurrencyPrefs: ObservableObject {
 	}
 	
 	private var cancellables = Set<AnyCancellable>()
-	private var unsubscribe: (() -> Void)? = nil
-	
 	private var currencyTypeDelayedSave = DelayedSave()
 
 	init() {
@@ -49,12 +46,9 @@ class CurrencyPrefs: ObservableObject {
 		}.store(in: &cancellables)
 		
 		let business = AppDelegate.get().business
-		let ratesFlow = SwiftFlow<NSArray>(origin: business.currencyManager.ratesFlow)
-		fiatExchangeRatesWatcher = ratesFlow.watch {[weak self](rates: NSArray?) in
-			if let rates = rates as? Array<ExchangeRate> {
-				self?.fiatExchangeRates = rates
-			}
-		}
+		business.currencyManager.ratesPubliser().sink {[weak self](rates: [ExchangeRate]) in
+			self?.fiatExchangeRates = rates
+		}.store(in: &cancellables)
 	}
 	
 	private init(
@@ -74,14 +68,6 @@ class CurrencyPrefs: ObservableObject {
 			timestampMillis: 0
 		)
 		fiatExchangeRates.append(exchangeRate)
-	}
-	
-	deinit {
-		unsubscribe?()
-		let _watcher = fiatExchangeRatesWatcher
-		DispatchQueue.main.async {
-			_watcher?.close()
-		}
 	}
 	
 	func toggleCurrencyType() -> Void {
@@ -142,6 +128,37 @@ class CurrencyPrefs: ObservableObject {
 			source: "\(usdToBtc.source), \(paramToUsd.source)",
 			timestampMillis: min(usdToBtc.timestampMillis, paramToUsd.timestampMillis)
 		)
+	}
+	
+	func convert(srcAmount: Double, srcCurrency: Currency, dstCurrency: Currency) -> Double? {
+	
+		var msat: Int64 = 0
+		
+		switch srcCurrency {
+		case .bitcoin(let bitcoinUnit):
+			msat = Utils.toMsat(from: srcAmount, bitcoinUnit: bitcoinUnit)
+			
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				msat = Utils.toMsat(fromFiat: srcAmount, exchangeRate: exchangeRate)
+				
+			} else {
+				return nil
+			}
+		}
+		
+		switch dstCurrency {
+		case .bitcoin(let bitcoinUnit):
+			return Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+			
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				return Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
+				
+			} else {
+				return nil
+			}
+		}
 	}
 	
 	static func mockUSD() -> CurrencyPrefs {

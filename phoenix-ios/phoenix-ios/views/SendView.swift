@@ -645,7 +645,7 @@ struct ValidateView: View, ViewName {
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
-			unit: $unit,
+			currency: unit,
 			amount: $amount,
 			parsedAmount: $parsedAmount,
 			hideMsats: false
@@ -1015,10 +1015,9 @@ struct ValidateView: View, ViewName {
 		
 		if let amount_msat = amount_msat {
 			
-			let targetAmt = Utils.convertBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit)
 			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
 			
-			parsedAmount = Result.success(targetAmt) // do this first !
+			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
@@ -1060,7 +1059,7 @@ struct ValidateView: View, ViewName {
 		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
-		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amount, currency: unit, hideMsats: false)
 		parsedAmount = result.1
 		amount = result.0
 		
@@ -1312,7 +1311,7 @@ struct ValidateView: View, ViewName {
 		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
 		
 		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
-		let result = TextFieldCurrencyStyler.format(input: amt.digits, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amt.digits, currency: unit, hideMsats: false)
 		
 		parsedAmount = result.1
 		amount = result.0
