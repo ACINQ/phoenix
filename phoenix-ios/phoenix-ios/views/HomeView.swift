@@ -877,17 +877,26 @@ fileprivate struct ToolsButton: View, ViewName {
 			Button {
 				faqButtonTapped()
 			} label: {
-				Label("FAQ", systemImage: "safari")
+				Label(
+					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
+					systemImage: "safari"
+				)
 			}
 			Button {
 				sendFeedbackButtonTapped()
 			} label: {
-				Label("Send feedback", systemImage: "envelope")
+				Label(
+					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
+					systemImage: "envelope"
+				)
 			}
 			Button {
 				currencyConverterTapped()
 			} label: {
-				Label("Currency converter", systemImage: "globe")
+				Label(
+					NSLocalizedString("Currency converter", comment: "HomeView: Tools menu: Label"),
+					systemImage: "globe"
+				)
 			}
 		} label: {
 			Image(systemName: "questionmark")

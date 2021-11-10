@@ -38,22 +38,22 @@
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**No compartas esta semilla con nadie.** Cuidado con el fraude. Los desarrolladores de Phoenix nunca pedirán tu semilla.";
 
 /* No comment provided by engineer. */
-"%@" = "%@";
+"%@ milliseconds" = "%@ milisegundos";
 
 /* No comment provided by engineer. */
-"%@ milliseconds" = "%@ milisegundos";
+"%@ remaining" = "%@ restante";
 
 /* No comment provided by engineer. */
 "%@ sat/byte" = "%@ sat/byte";
 
 /* No comment provided by engineer. */
-"%@.%@ seconds" = "%1$@.%2$@ segundos";
+"%@ seconds" = "%@ segundos";
+
+/* No comment provided by engineer. */
+"%@:%@ minutes" = "%1$@:%2$@ minutos";
 
 /* No comment provided by engineer. */
 "%@% (%@ minimum)" = "%1$@%2$ (%3$@ minimo)";
-
-/* No comment provided by engineer. */
-"%@%@" = "%1$@%2$@";
 
 /* Minimum fee information. E.g.: 1% (3,000 sats minimum) */
 "%@%% (%@ minimum)" = "%1$@%% (%2$@ minimo)";
@@ -63,6 +63,9 @@
 
 /* No comment provided by engineer. */
 "+%@ incoming" = "+%@ entradas";
+
+/* No comment provided by engineer. */
+"<decryption error>" = "<error de descifrado>";
 
 /* No comment provided by engineer. */
 "1 channel" = "1 canal";
@@ -86,6 +89,9 @@
 "Access to Phoenix is protected by biometrics." = "El acceso de Phoenix está protegido por biometría.";
 
 /* No comment provided by engineer. */
+"Add optional comment" = "Agregar comentario opcional";
+
+/* No comment provided by engineer. */
 "Address" = "Dirección";
 
 /* Label in DetailsView_IncomingPayment */
@@ -97,17 +103,53 @@
 /* No comment provided by engineer. */
 "Advanced security" = "Seguridad avanzada";
 
-/* No comment provided by engineer. */
+/* Currency name: AFN */
+"Afghan Afghani" = "Afgani de Afganistán";
+
+/* Currency name: ALL */
+"Albanian Lek" = "Lek albanés";
+
+/* Currency name: DZD */
+"Algerian Dinar" = "Dinar argelino";
+
+/* Error title */
+"Already paid" = "Pagado";
+
+/* TextField placeholder */
 "Amount (optional)" = "Valor (opcional)";
 
 /* error message */
 "Amount exceeds your balance" = "El valor excede tu balance";
+
+/* error message */
+"Amount must be (exactBitcoin.string)" = "La cantidad debe ser (exactBitcoin.string)";
+
+/* error message */
+"Amount must be (exactBitcoin.string) (≈ (approxFiat.string))" = "La cantidad debe ser (exactBitcoin.string) (≈ (approxFiat.string))";
+
+/* error message */
+"Amount must be at least (minBitcoin.string)" = "La cantidad debe ser al menos (minBitcoin.string)";
+
+/* error message */
+"Amount must be at least (minBitcoin.string) (≈ (approxFiat.string))" = "La cantidad debe ser al menos (minBitcoin.string) (≈ (approxFiat.string))";
+
+/* error message */
+"Amount must be at most (maxBitcoin.string)" = "La cantidad debe ser como máximo (maxBitcoin.string)";
+
+/* error message */
+"Amount must be at most (maxBitcoin.string) (≈ (approxFiat.string))" = "La cantidad debe ser como máximo (maxBitcoin.string) (≈ (approxFiat.string))";
 
 /* Label in DetailsView_IncomingPayment */
 "amount received" = "valor recibido";
 
 /* Label in DetailsView_IncomingPayment */
 "amount requested" = "valor requerido";
+
+/* error details */
+"An unknown error occurred." = "Un error desconocido ocurrió.";
+
+/* Currency name: AOA */
+"Angolan Kwanza" = "Kwanza angoleño";
 
 /* placeholder: invoice is amount-less */
 "any amount" = "Cualquier valor";
@@ -133,11 +175,26 @@
 /* No comment provided by engineer. */
 "Are you sure you want to proceed?" = "¿Está seguro que quiere proceder?";
 
+/* Currency name: ARS */
+"Argentine Peso" = "Peso argentino";
+
+/* Currency name: AMD */
+"Armenian Dram" = "Dram armenio";
+
+/* Currency name: AWG */
+"Aruban Florin" = "Florín de Aruba";
+
 /* Currency name: AUD */
 "Australian Dollar" = "Dolar Australiano";
 
+/* lnurl-auth: login button title */
+"Authenticate" = "Autenticar";
+
 /* User prompt */
 "Authenticate to disable biometrics." = "Autentíquese para deshabilitar la biometría.";
+
+/* lnurl-auth: success text */
+"Authenticated" = "Autenticado";
 
 /* No comment provided by engineer. */
 "Automatic Channel Creation" = "Creación automática de canales";
@@ -145,11 +202,35 @@
 /* Explanation for 'Randomize upload delays' toggle */
 "Avoids payment correlation using timestamp metadata." = "Evita la correlación de pagos mediante metadatos de marca de tiempo.";
 
+/* Currency name: AZN */
+"Azerbaijani Manat" = "Manat azerbaiyano";
+
 /* No comment provided by engineer. */
 "Backup seed" = "Semilla de respaldo";
 
 /* No comment provided by engineer. */
 "Backup transactions" = "Transacciones de respaldo";
+
+/* Currency name: BSD */
+"Bahamian Dollar" = "Dólar de las Bahamas";
+
+/* Currency name: BHD */
+"Bahraini Dinar" = "Dinar bahreiní";
+
+/* Currency name: BDT */
+"Bangladeshi Taka" = "Taka bangladesí";
+
+/* Currency name: BBD */
+"Barbadian Dollar" = "Dólar de Barbados";
+
+/* Currency name: BZD */
+"Belize Dollar" = "Dólar beliceño";
+
+/* Currency name: BMD */
+"Bermudan Dollar" = "Dólar de las Bermudas";
+
+/* Currency name: BTN */
+"Bhutanese Ngultrum" = "Ngultrum butanés";
 
 /* No comment provided by engineer. */
 "Biometrics" = "Biometría";
@@ -157,10 +238,13 @@
 /* No comment provided by engineer. */
 "BIP39 seed with standard BIP84 derivation path" = "Semilla BIP39 con ruta de derivación estándar BIP84";
 
-/* Label in DetailsView_IncomingPayment */
-"bitcoin address" = "Dirección de Bitcoin";
-
 /* No comment provided by engineer. */
+"Bitcoin" = "Bitcoin";
+
+/* Label in DetailsView_IncomingPayment */
+"bitcoin address" = "Dirección Bitcoin";
+
+/* TextField placeholder */
 "Bitcoin address" = "Dirección Bitcoin";
 
 /* No comment provided by engineer. */
@@ -184,11 +268,32 @@
 /* No comment provided by engineer. */
 "blockchain tx" = "Transacción de blockchain";
 
+/* Currency name: BOB */
+"Bolivian Boliviano" = "Boliviano de Bolivia";
+
+/* Currency name: BAM */
+"Bosnia-Herzegovina Convertible Mark" = "Marco bosnioherzegovino de Bosnia-Herzegovina";
+
+/* Currency name: BWP */
+"Botswanan Pula" = "Pula de Botsuana";
+
 /* Currency name: BRL */
 "Brazilian Real" = "Real brasileño";
 
+/* Currency name: BND */
+"Brunei Dollar" = "Dólar de Brunei";
+
+/* Currency name: BGN */
+"Bulgarian Lev" = "Lev búlgaro";
+
+/* Currency name: BIF */
+"Burundian Franc" = "Franco burundés";
+
 /* No comment provided by engineer. */
 "By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Por defecto Phoenix se conecta a servidores Electrum aleatorios para acceder a la cadena de bloques de Bitcoin. También puede optar por conectarse a su propio servidor Electrum.";
+
+/* Currency name: KHR */
+"Cambodian Riel" = "Riel camboyano";
 
 /* Currency name: CAD */
 "Canadian Dollar" = "Dólar canadiense";
@@ -196,9 +301,33 @@
 /* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
+/* Currency name: CVE */
+"Cape Verdean Escudo" = "Escudo caboverdiano";
+
+/* Currency name: KYD */
+"Cayman Islands Dollar" = "Dólar de las Islas Caimán";
+
+/* Currency name: XOF */
+"CFA Franc BCEAO" = "Franco CFA de África Occidental";
+
+/* Currency name: XAF */
+"CFA Franc BEAC" = "Franco CFA de África Central";
+
+/* Currency name: XPF */
+"CFP Franc" = "Franco CFP";
+
+/* Error title */
+"Chain mismatch" = "La cadena no coincide";
+
+/* No comment provided by engineer. */
+"Channel Balance Display:" = "Pantalla de balance de canales:";
+
+/* Payment description for channel closing */
+"Channel closing" = "Cierre de canal";
+
 /* Title in DetailsView_IncomingPayment
    Transaction Info: Value */
-"Channel Closing" = "Cierre de canal";
+"Channel Closing" = "Cierre de Canal";
 
 /* No comment provided by engineer. */
 "Channel creation has been temporarily disabled. You may not be able to receive some payments." = "La creación de canales se ha inhabilitado temporalmente. Es posible que no pueda recibir algunos pagos.";
@@ -217,6 +346,12 @@
 
 /* Label in DetailsView_IncomingPayment */
 "claimed amount" = "Cantidad reclamada";
+
+/* No comment provided by engineer. */
+"Clear" = "Limpiar";
+
+/* Button */
+"Close" = "Cerrar";
 
 /* No comment provided by engineer. */
 "Close all channels" = "Cerrar todos los canales";
@@ -248,8 +383,14 @@
 /* No comment provided by engineer. */
 "Cloud sync paused" = "Se pausó la sincronización en la nube";
 
+/* Currency name: COP */
+"Colombian Peso" = "Peso colombiano";
+
 /* No comment provided by engineer. */
 "Coming Soon" = "Próximamente";
+
+/* Currency name: KMF */
+"Comorian Franc" = "Franco comorano";
 
 /* Label in DetailsView_IncomingPayment */
 "completed at" = "Completado en ";
@@ -262,6 +403,9 @@
 
 /* Navigation bar title */
 "Confirm Payment" = "Confirmar pago";
+
+/* Currency name: CDF */
+"Congolese Franc" = "Franco congoleño";
 
 /* Connection state */
 "Connected" = "Conectado";
@@ -281,8 +425,8 @@
 /* Connection state */
 "Connecting..." = "Conectando...";
 
-/* No comment provided by engineer. */
-"Connection status" = "Estado de conexión";
+/* Error title */
+"Connection failure" = "Fallo de conexión";
 
 /* No comment provided by engineer. */
 "Copied QR code image to pasteboard!" = "Se copió la imagen de código QR en Pasteboard!";
@@ -297,7 +441,19 @@
 "Copy Image" = "Copiar imagen";
 
 /* No comment provided by engineer. */
+"Copy link" = "Copiar enlace";
+
+/* No comment provided by engineer. */
 "Copy Text" = "Copiar texto";
+
+/* Currency name: CRC */
+"Costa Rican Colón" = "Colón costarricense";
+
+/* No comment provided by engineer. */
+"Could not connect to host:" = "No se pudo conectar al servidor:";
+
+/* Error message - scanning lightning invoice */
+"Could not connect to service" = "No se pudo conectar al servicio";
 
 /* No comment provided by engineer. */
 "Create new wallet" = "Crear nueva billetera";
@@ -306,7 +462,19 @@
 "Creating record zone..." = "Creando zona de registro…";
 
 /* Currency name: HRK */
-"Croation Kuna" = "Kuna croata";
+"Croatian Kuna" = "Kuna croata";
+
+/* Currency name: CUP */
+"Cuban Peso" = "Peso cubano";
+
+/* HomeView: Tools menu: Label */
+"Currency converter" = "Convertidor de moneda";
+
+/* Navigation bar title */
+"Currency Converter" = "Convertidor de moneda";
+
+/* No comment provided by engineer. */
+"Customize amount" = "Personalizar cantidad";
 
 /* Currency name: CZK */
 "Czech Koruna" = "Corona checa";
@@ -332,8 +500,11 @@
 /* Label in SummaryInfoGrid */
 "Desc" = "Descripción ";
 
-/* No comment provided by engineer. */
+/* TextField placeholder */
 "Description (optional)" = "Descripción (opcional)";
+
+/* No comment provided by engineer. */
+"Description:" = "Descripción:";
 
 /* Navigation bar title */
 "Details" = "Detalles";
@@ -347,6 +518,9 @@
 /* No comment provided by engineer. */
 "Display seed" = "Mostrar semilla";
 
+/* Currency name: DJF */
+"Djiboutian Franc" = "Franco de Yibuti";
+
 /* No comment provided by engineer. */
 "Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don't have another Phoenix wallet running with the same seed." = "No importe una semilla que NO haya sido creada por esta aplicación.\n\nAdemás, asegúrese de no tener otra billetera Phoenix con la misma semilla.";
 
@@ -356,20 +530,42 @@
 /* No comment provided by engineer. */
 "Do not use this feature if you don't fully understand what it does." = "No use esta función si no comprende completamente lo que hace.";
 
+/* Currency name: DOP */
+"Dominican Peso" = "Peso dominicano";
+
+/* Payment description for received KeySend */
+"Donation" = "Donación";
+
 /* No comment provided by engineer. */
 "Downloading payments" = "Descargando pagos";
 
 /* No comment provided by engineer. */
 "Drain my wallet" = "Vaciar mi billetera";
 
+/* Currency name: XCD */
+"East Caribbean Dollar" = "Dólar del Caribe Oriental";
+
+/* No comment provided by engineer. */
+"Edit" = "Editar";
+
+/* Navigation bar title */
+"Edit Info" = "Editar información";
+
 /* No comment provided by engineer. */
 "Edit payment request" = "Editar solicitud de pago";
 
-/* Label in SummaryInfoGrid */
-"Elapsed" = "Tiempo transcurrido";
+/* Currency name: EGP */
+"Egyptian Pound" = "Libra egipcia";
 
-/* Navigation bar title */
+/* Label in DetailsView_IncomingPayment */
+"elapsed" = "tiempo transcurrido";
+
+/* AppStatusPopover: label
+   Navigation bar title */
 "Electrum server" = "Servidor Electrum";
+
+/* No comment provided by engineer. */
+"Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." = "Ingrese una factura Lightning, LNURL o una dirección Lightning a la que desea enviar dinero.";
 
 /* error message */
 "Enter a valid amount" = "Ingrese una cantidad valida";
@@ -377,11 +573,26 @@
 /* error message */
 "Enter an amount" = "Ingrese una cantidad";
 
-/* No comment provided by engineer. */
+/* TextField placeholder */
 "Enter keywords from your seed" = "Ingrese palabras clave de su semilla";
+
+/* Currency name: ERN */
+"Eritrean Nakfa" = "Nafka de Eritrea";
 
 /* Label in SummaryInfoGrid */
 "Error" = "Error";
+
+/* No comment provided by engineer. */
+"Error: %@" = "Error: %@";
+
+/* No comment provided by engineer. */
+"Error: invalid amount" = "Error: monto inválido";
+
+/* No comment provided by engineer. */
+"Error: invalid hash" = "Error: hash no válido";
+
+/* Currency name: ETB */
+"Ethiopian Birr" = "Birr etíope";
 
 /* Currency name: EUR */
 "Euro" = "Euro";
@@ -390,12 +601,18 @@
 "Expect to receive %d separate payments." = "Espere recibir %d pagos separados.";
 
 /* No comment provided by engineer. */
+"Exponential backoff" = "Retroceso exponencial";
+
+/* No comment provided by engineer. */
 "External" = "Externo";
 
 /* No comment provided by engineer. */
 "FAILED" = "HA FALLADO";
 
-/* No comment provided by engineer. */
+/* Currency name: FKP */
+"Falkland Islands Pound" = "Libra de las Islas Malvinas";
+
+/* HomeView: Tools menu: Label */
 "FAQ" = "Preguntas frecuentes";
 
 /* No comment provided by engineer. */
@@ -413,8 +630,20 @@
 /* No comment provided by engineer. */
 "Fetched %@ items" = "Elementos %@ obtenidos";
 
+/* Progress title */
+"Fetching Invoice" = "Obteniendo factura";
+
+/* Progress title */
+"Fetching Lightning URL" = "Obteniendo URL de Lightning";
+
+/* No comment provided by engineer. */
+"Fiat" = "Fíat";
+
 /* Navigation bar title */
 "Fiat currency" = "Moneda fiduciaria";
+
+/* Currency name: FJD */
+"Fijian Dollar" = "Dólar fiyiano";
 
 /* No comment provided by engineer. */
 "For more information, see the FAQ" = "Para más información, consulte las preguntas frecuentes";
@@ -440,35 +669,71 @@
 /* No comment provided by engineer. */
 "Funds will eventually be sent to:" = "Los fondos se enviarán eventualmente a:";
 
+/* Currency name: GMD */
+"Gambian Dalasi" = "Dalasi de Gambia";
+
 /* No comment provided by engineer. */
 "General" = "General";
 
 /* No comment provided by engineer. */
 "Generating QRCode..." = "Generando código QR...";
 
+/* Currency name: GEL */
+"Georgian Lari" = "Lari georgiano";
+
 /* No comment provided by engineer. */
 "Get started" = "Empezar";
+
+/* Currency name: GHS */
+"Ghanaian Cedi" = "Cedi de Ghana";
+
+/* Currency name: GIP */
+"Gibraltar Pound" = "Libra gibraltareña";
 
 /* Currency name: GBP */
 "Great British Pound" = "Libra esterlina";
 
+/* Currency name: GTQ */
+"Guatemalan Quetzal" = "Quetzal guatemalteco";
+
+/* Currency name: GNF */
+"Guinean Franc" = "Franco guineano";
+
+/* Currency name: GYD */
+"Guyanaese Dollar" = "Dólar de Guyana";
+
+/* Currency name: HTG */
+"Haitian Gourde" = "Gourde haitiano";
+
 /* No comment provided by engineer. */
 "Here you can extract and visualize application logs, as well as share them." = "Aquí puede extraer y visualizar registros de la aplicación, así como compartirlos.";
 
+/* Currency name: HNL */
+"Honduran Lempira" = "Lempira hondureña";
+
 /* Currency name: HKD */
 "Hong Kong Dollar" = "Dólar de Hong Kong";
+
+/* No comment provided by engineer. */
+"Host returned error response." = "El servidor devolvio respuesta de error.";
+
+/* No comment provided by engineer. */
+"Host returned status code %@:" = "El servidor devolvio codigo de estado %@:";
+
+/* error details */
+"Host returned unreadable response:" = "El servidor devolvio una respuesta ilegible:";
+
+/* No comment provided by engineer. */
+"Host: %@" = "Servidor: %@";
 
 /* Currency name: HUF */
 "Hungarian Forint" = "Florín húngaro";
 
 /* No comment provided by engineer. */
-"I understand" = "Entiendo";
+"I understand" = "Aceptar";
 
-/* No comment provided by engineer. */
-"I understand." = "Entiendo.";
-
-/* Currency name: ISK */
-"Icelandic Kròna" = "Kròna islandesa";
+/* Currency name: isk */
+"Icelandic Króna" = "Corona islandesa";
 
 /* No comment provided by engineer. */
 "If done correctly, self-backup is the most secure option." = "Si se hace correctamente, la auto-copia es la opción mas segura.";
@@ -480,6 +745,9 @@
 "If you switch to a new device (or reinstall the app) then you'll lose your payment history." = "Si cambia a un nuevo dispositivo (o reinstala la aplicación), perderá su historial de pagos.";
 
 /* No comment provided by engineer. */
+"Image" = "Imagen";
+
+/* No comment provided by engineer. */
 "Import" = "Importar";
 
 /* Fees explanation */
@@ -488,11 +756,20 @@
 /* Currency name: INR */
 "Indian Rupee" = "Rupia india";
 
+/* Currency name: IDR */
+"Indonesian Rupiah" = "Rupia de Indonesia";
+
+/* AppStatusPopover: label */
+"Internet" = "Internet";
+
 /* toast warning */
 "Invalid Lightning Request" = "Solicitud Lightning no válida";
 
 /* No comment provided by engineer. */
 "Invalid port. Valid range: [1 - 65535]" = "Puerto inválido. Intervalo válido: [1 - 65535]";
+
+/* Error title */
+"Invalid response" = "Respuesta invalida";
 
 /* No comment provided by engineer. */
 "Invalid server. Use format: domain.tld" = "Servidor inválido. Utilice el formato: domain.tld";
@@ -503,8 +780,32 @@
 /* error message */
 "Invoice is expired" = "La factura a expirado";
 
+/* Currency name: IRR */
+"Iranian Rial" = "Rial iraní";
+
+/* Currency name: IQD */
+"Iraqi Dinar" = "Dinar iraquí";
+
+/* Currency name: ILS */
+"Israeli New Sheqel" = "Nuevo sheqel israelí";
+
+/* Currency name: JMD */
+"Jamaican Dollar" = "Dólar jamaiquino";
+
 /* Currency name: JPY */
 "Japanese Yen" = "Yen japonés";
+
+/* Currency name: JEP */
+"Jersey Pound" = "Libra de Jersey";
+
+/* Currency name: JOD */
+"Jordanian Dinar" = "Dinar jordano";
+
+/* No comment provided by engineer. */
+"just now" = "En este momento";
+
+/* Currency name: KZT */
+"Kazakhstani Tenge" = "Tenge de Kazajstaán";
 
 /* No comment provided by engineer. */
 "Keep Control" = "Mantener el control";
@@ -515,14 +816,38 @@
 /* No comment provided by engineer. */
 "KEEP THIS SEED SAFE." = "MANTENGA ESTA SEMILLA SEGURA.";
 
-/* Currency name: KRW */
-"Korean Won" = "Won koreano";
+/* Currency name: KES */
+"Kenyan Shilling" = "Chelín keniano";
+
+/* Transaction Info: Value */
+"KeySend" = "KeySend";
+
+/* Currency name: KWD */
+"Kuwaiti Dinar" = "Dinar kuwaití";
+
+/* Currency name: KGS */
+"Kyrgystani Som" = "Som kirguís";
+
+/* Currency name: LAK */
+"Laotian Kip" = "Kip de Laos";
 
 /* Transaction Info: Explanation */
 "layer 1 -> 2" = "Capa 1 -> 2";
 
 /* Transaction Info: Explanation */
 "layer 2 -> 1" = "Capa 2 -> 1";
+
+/* Currency name: LBP */
+"Lebanese Pound" = "Libra libanesa";
+
+/* Currency name: LSL */
+"Lesotho Loti" = "Loti de Lesoto";
+
+/* Currency name: LRD */
+"Liberian Dollar" = "Dólar liberiano";
+
+/* Currency name: LYD */
+"Libyan Dinar" = "Dinar libio";
 
 /* App theme option */
 "Light" = "Claro";
@@ -539,20 +864,122 @@
 /* No comment provided by engineer. */
 "Lightning network" = "Red Lightning";
 
+/* AppStatusPopover: label */
+"Lightning peer" = "Servidor Lightning";
+
+/* lnurl-auth: login button title */
+"Link" = "Enlace";
+
+/* lnurl-auth: success text */
+"Linked" = "Enlazado";
+
+/* No comment provided by engineer. */
+"local / remote" = "local / remoto";
+
+/* No comment provided by engineer. */
+"local / total" = "local / total";
+
+/* lnurl-auth: success text */
+"Logged In" = "Iniciaste sesión";
+
+/* lnurl-auth: login button title */
+"Login" = "Iniciar sesión";
+
 /* Navigation bar title */
 "Logs" = "Registros";
 
 /* No comment provided by engineer. */
+"Long Description" = "descripción larga";
+
+/* No comment provided by engineer. */
 "Look at the logs" = "Ver registros";
+
+/* Currency name: MOP */
+"Macanese Pataca" = "Pataca de Macao";
+
+/* Currency name: MKD */
+"Macedonian Denar" = "Denar macedonio";
+
+/* Currency name: MGA */
+"Malagasy Ariary" = "Ariary malgache";
+
+/* Currency name: MWK */
+"Malawian Kwacha" = "Kwacha malauí";
+
+/* Currency name: MYR */
+"Malaysian Ringgit" = "Ringgit malayo";
+
+/* Currency name: MVR */
+"Maldivian Rufiyaa" = "Rufiyaa de Maldivas";
+
+/* No comment provided by engineer. */
+"Malformed JPG image data" = "Imagen JPG con formato incorrecto";
+
+/* No comment provided by engineer. */
+"Malformed PNG image data" = "Imagen PNG con formato incorrecto";
+
+/* Currency name: MTL */
+"Maltese Lira" = "Lira maltesa";
+
+/* No comment provided by engineer. */
+"Manual input" = "Entrada manual";
+
+/* No comment provided by engineer. */
+"Manual Input" = "Entrada manual";
 
 /* No comment provided by engineer. */
 "Master public key" = "Clave pública maestra";
+
+/* Currency name: MUR */
+"Mauritian Rupee" = "Rupia de Republica de Mauricio";
+
+/* No comment provided by engineer. */
+"Max: " = "Máximo:";
+
+/* Label in SummaryInfoGrid */
+"Message" = "Mensaje";
+
+/* No comment provided by engineer. */
+"Metadata" = "Metadata";
 
 /* Currency name: MXN */
 "Mexican Peso" = "Peso mexicano";
 
 /* No comment provided by engineer. */
+"Min: " = "Mínimo:";
+
+/* No comment provided by engineer. */
 "Modify" = "Modificar";
+
+/* Currency name: MDL */
+"Moldovan Leu" = "Leu moldavo";
+
+/* Currency name: MNT */
+"Mongolian Tugrik" = "Tugrik mongol";
+
+/* Currency name: MAD */
+"Moroccan Dirham" = "Dirham marroqu";
+
+/* Currency name: MZN */
+"Mozambican Metical" = "Metical mozambiqueño";
+
+/* Currency name: MMK */
+"Myanmar Kyat" = "Kyat de Myanmar";
+
+/* Currency name: NAD */
+"Namibian Dollar" = "Dólar de Namibia";
+
+/* Currency name: NPR */
+"Nepalese Rupee" = "Rupia nepalí";
+
+/* Currency name: ANG */
+"Netherlands Antillean Guilder" = "Florín de las Antillas Neerlandesas";
+
+/* error details */
+"Network error. Check your internet connection." = "Error de red. Comprueba tu conexión a Internet.";
+
+/* No comment provided by engineer. */
+"never" = "nunca";
 
 /* No comment provided by engineer. */
 "New Channel (auto-created)" = "Nuevo canal (creado automáticamente)";
@@ -562,6 +989,12 @@
 
 /* No comment provided by engineer. */
 "Next" = "Siguiente";
+
+/* Currency name: NIO */
+"Nicaraguan Córdoba" = "Córdoba nicaragüense";
+
+/* Currency name: NGN */
+"Nigerian Naira" = "Naira nigeriano";
 
 /* No comment provided by engineer. */
 "No" = "No";
@@ -575,14 +1008,32 @@
 /* No comment provided by engineer. */
 "NO FUNDS HAVE BEEN SENT" = "NO SE HAN ENVIADO FONDOS";
 
+/* No comment provided by engineer. */
+"No personal data will be shared with this service." = "No se compartirán datos personales con este servicio.";
+
 /* Transaction Info: Explanation */
 "non-invoice payment" = "Pago sin factura";
 
-/* No comment provided by engineer. */
+/* TextField placeholder */
 "None" = "Ninguno";
+
+/* Currency name: KPW */
+"North Korean Won" = "Won norcoreano";
+
+/* Currency name: NOK */
+"Norwegian Krone" = "Corona noruega";
 
 /* No comment provided by engineer. */
 "Note: Server must have a valid certificate" = "Nota: El servidor debe tener un certificado válido";
+
+/* Label in SummaryInfoGrid */
+"Notes" = "Notas";
+
+/* No comment provided by engineer. */
+"Notes:" = "Notas:";
+
+/* No comment provided by engineer. */
+"now" = "ahora";
 
 /* Connection state */
 "Offline" = "Desconectado";
@@ -590,11 +1041,29 @@
 /* No comment provided by engineer. */
 "OK" = "OK";
 
+/* Currency name: OMR */
+"Omani Rial" = "Rial omaní";
+
 /* No comment provided by engineer. */
 "Only you alone possess this seed. Keep it private." = "Solo tú posees esta semilla. Mantenla en privado.";
 
+/* No comment provided by engineer. */
+"open link" = "abrir enlace";
+
 /* Label in SummaryInfoGrid */
 "Output" = "Salida";
+
+/* Currency name: PKR */
+"Pakistani Rupee" = "Rupia pakistaní";
+
+/* Currency name: PAB */
+"Panamanian Balboa" = "Balboa panameño";
+
+/* Currency name: PGK */
+"Papua New Guinean Kina" = "Kina de Papúa Nueva Guinea";
+
+/* Currency name: PYG */
+"Paraguayan Guarani" = "Guaraní paraguayo";
 
 /* No comment provided by engineer. */
 "Paste from clipboard" = "Pegar desde el portapapeles";
@@ -633,6 +1102,9 @@
 /* Title in DetailsView_IncomingPayment */
 "Payment Request" = "Solicitud de pago";
 
+/* No comment provided by engineer. */
+"Payment requested by" = "Pago solicitado por";
+
 /* Title in DetailsView_IncomingPayment */
 "Payment Sent" = "Pago enviado";
 
@@ -645,6 +1117,12 @@
 /* No comment provided by engineer. */
 "PENDING" = "PENDIENTE";
 
+/* Currency name: PEN */
+"Peruvian Sol" = "Sol peruano";
+
+/* Currency name: PHP */
+"Philippine Peso" = "Peso filipino";
+
 /* No comment provided by engineer. */
 "Phoenix" = "Phoenix";
 
@@ -652,7 +1130,7 @@
 "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "Se puede acceder a Phoenix sin credenciales. Asegúrese de haber habilitado las protecciones adecuadas para iOS.";
 
 /* Error message - scanning lightning invoice */
-"Phoenix does not support the LNURL protocol yet" = "Phoenix aún no es compatible con el protocolo LNURL";
+"Phoenix does not support this type of LNURL yet" = "Phoenix aún no admite este tipo de LNURL";
 
 /* No comment provided by engineer. */
 "Phoenix generated" = "Phoenix generado";
@@ -666,11 +1144,17 @@
 /* No comment provided by engineer. */
 "Please restart Phoenix" = "Reinicia Phoenix";
 
+/* No comment provided by engineer. */
+"Please try again" = "Inténtalo de nuevo";
+
 /* Currency name: PLN */
 "Polish Zloty" = "Zloty polaco";
 
 /* No comment provided by engineer. */
 "Port" = "Puerto";
+
+/* Currency name: QAR */
+"Qatari Rial" = "Rial de Qatar";
 
 /* Connection info */
 "Random server" = "Servidor aleatorio";
@@ -680,6 +1164,12 @@
 
 /* No comment provided by engineer. */
 "Randomized upload delay" = "Usar retrasos aleatorios de carga";
+
+/* Label in DetailsView_IncomingPayment */
+"range" = "rango";
+
+/* No comment provided by engineer. */
+"Rates last updated: %@" = "Última actualización de tarifas: %@";
 
 /* Label in DetailsView_IncomingPayment */
 "reason" = "Razón";
@@ -703,6 +1193,18 @@
 "Recovery Seed" = "Frase de recuperación";
 
 /* No comment provided by engineer. */
+"refresh" = "actualizar";
+
+/* No comment provided by engineer. */
+"Refreshing rates..." = "Actualizando tarifas…";
+
+/* lnurl-auth: login button title */
+"Register" = "Registrarse";
+
+/* lnurl-auth: success text */
+"Registered" = "Registrado";
+
+/* No comment provided by engineer. */
 "Requesting Swap-In Address..." = "Solicitando dirección de intercambio…";
 
 /* No comment provided by engineer. */
@@ -720,8 +1222,23 @@
 /* Currency name: RUB */
 "Russian Ruble" = "Rublo ruso";
 
+/* Currency name: RWF */
+"Rwandan Franc" = "Franco ruandés";
+
+/* Currency name: SHP */
+"Saint Helena Pound" = "Libra de Santa Elena";
+
+/* Currency name: WST */
+"Samoan Tala" = "Tala de Samoa";
+
 /* No comment provided by engineer. */
 "Satoshis are often preferred because it's easier to work with whole numbers rather than fractions." = "A menudo se prefieren los Satoshis porque es más fácil trabajar con números enteros que con fracciones.";
+
+/* Currency name: SAR */
+"Saudi Riyal" = "Riyal saudí";
+
+/* No comment provided by engineer. */
+"Save" = "Guardar";
 
 /* No comment provided by engineer. */
 "Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "Guárdelo en un lugar seguro (no en este teléfono). Si pierde su semilla y su teléfono, ha perdido sus fondos.";
@@ -744,6 +1261,9 @@
 /* Title in DetailsView_IncomingPayment */
 "Send Failed" = "Envío fallido";
 
+/* HomeView: Tools menu: Label */
+"Send feedback" = "Comentarios y sugerencias";
+
 /* No comment provided by engineer. */
 "Send Funds" = "Enviar fondos";
 
@@ -759,11 +1279,41 @@
 /* Label in DetailsView_IncomingPayment */
 "sent at" = "enviado el";
 
+/* Currency name: RSD */
+"Serbian Dinar" = "Dinar serbio";
+
 /* No comment provided by engineer. */
 "Server" = "Servidor";
 
+/* error details */
+"Server returned error: %@" = "El servidor devolvió el error:% @";
+
+/* error details */
+"Server returned HTTP status code %d" = "El servidor devolvió el código de estado HTTP %d";
+
+/* error details */
+"Server returned unreadable response" = "El servidor devolvió una respuesta ilegible";
+
+/* Label in DetailsView_IncomingPayment */
+"service" = "servicio";
+
+/* Label in SummaryInfoGrid */
+"Service" = "Servicio";
+
+/* Error message - scanning lightning invoice */
+"Service appears to be offline, or they have a down server" = "El servicio parece estar desconectado o tienen un servidor inactivo";
+
+/* Error message - scanning lightning invoice */
+"Service doesn't support Lightning addresses, or doesn't know this user" = "El servicio no admite direcciones Lightning o no conoce a este usuario";
+
+/* Error message - scanning lightning invoice */
+"Service returned unreadable response" = "El servicio devolvió una respuesta ilegible";
+
 /* Navigation bar title */
 "Settings" = "Ajustes";
+
+/* Currency name: SCR */
+"Seychellois Rupee" = "Seychellois Rupee";
 
 /* No comment provided by engineer. */
 "Share" = "Compartir";
@@ -778,7 +1328,16 @@
 "Share the logs" = "Compartir registros";
 
 /* No comment provided by engineer. */
+"Short Description" = "Descripción corta";
+
+/* No comment provided by engineer. */
 "Show a Bitcoin address" = "Mostrar una dirección de Bitcoin";
+
+/* No comment provided by engineer. */
+"Show a Lightning invoice" = "Mostrar una factura de Lightning";
+
+/* Currency name: SLL */
+"Sierra Leonean Leone" = "Leone de Sierra Leona";
 
 /* No comment provided by engineer. */
 "Sign into iCloud to backup your payments" = "Inicie sesión en iCloud para hacer una copia de seguridad de sus pagos";
@@ -789,14 +1348,35 @@
 /* No comment provided by engineer. */
 "Skip" = "Saltar";
 
+/* Currency name: SBD */
+"Solomon Islands Dollar" = "Dólar de las Islas Salomón";
+
+/* Currency name: SOS */
+"Somali Shilling" = "Chelín somalí";
+
 /* No comment provided by engineer. */
 "Some Services Disabled" = "Algunos servicios están deshabilitados";
 
 /* No comment provided by engineer. */
 "Something is amiss with this invoice..." = "Algo anda mal con esta factura...";
 
+/* Currency name: ZAR */
+"South African Rand" = "Rand sudafricano";
+
+/* Currency name: KRW */
+"South Korean Won" = "South Korean Won";
+
+/* Currency name: LKR */
+"Sri Lankan Rupee" = "Rupia de Sri Lanka";
+
 /* No comment provided by engineer. */
 "Status" = "Estado";
+
+/* Currency name: SDG */
+"Sudanese Pound" = "Libra sudanesa";
+
+/* Currency name: SRD */
+"Surinamese Dollar" = "Dólar surinamés";
 
 /* Navigation bar title */
 "Swap In" = "Intercambio";
@@ -807,17 +1387,29 @@
 /* Transaction Info: Value */
 "Swap-Out" = "Swap-out";
 
+/* Currency name: SZL */
+"Swazi Lilangeni" = "Lilangeni de Suazilandia";
+
 /* Currency name: SEK */
 "Swedish Krona" = "Corona sueca";
 
 /* Currency name: CHF */
 "Swiss Franc" = "Franco suizo";
 
+/* Currency name: SYP */
+"Syrian Pound" = "Libra siria";
+
 /* App theme option */
 "System" = "Sistema";
 
 /* Currency name: TWD */
-"Taiwan New Dollar" = "Nuevo dólar de Taiwán";
+"Taiwan Dollar" = "Dólar taiwanés";
+
+/* Currency name: TJS */
+"Tajikistani Somoni" = "Somoni de Tayikistán";
+
+/* Currency name: TZS */
+"Tanzanian Shilling" = "Chelín de Tanzania";
 
 /* No comment provided by engineer. */
 "Terminate App" = "Terminar aplicación";
@@ -844,7 +1436,7 @@
 "The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "Los datos almacenados en la nube están encriptados y solo se pueden desencriptar con su semilla.";
 
 /* IntroView */
-"The fee is **%@%%** with a minimum fee of **%@**." = "La tarifa es **%@%%** con una tarifa mínima **%@** ";
+"The fee is **%@%%** with a minimum fee of **%@**." = "La tarifa es de **%@%%** con una tarifa mínima de **%@** ";
 
 /* SendView */
 "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "La factura no incluye el monto. Esto puede ser peligroso: los nodos maliciosos pueden robar su pago. Para estar seguro, **solicite al beneficiario que especifique un monto** en la solicitud de pago.";
@@ -915,6 +1507,9 @@
 /* Informational warning in SendView */
 "To scan a QR code you must give Phoenix permission to access the camera." = "Para escanear un código QR, debe dar permiso a Phoenix para acceder a la cámara.";
 
+/* Currency name: TOP */
+"Tongan Paʻanga" = "Paʻanga de Tonga";
+
 /* No comment provided by engineer. */
 "Tor" = "Tor";
 
@@ -930,8 +1525,20 @@
 /* Label in DetailsView_IncomingPayment */
 "total amount" = "Cantidad total";
 
+/* Currency name: TTD */
+"Trinidad and Tobago Dollar" = "Dólar de Trinidad y Tobago";
+
 /* No comment provided by engineer. */
 "Try again later" = "Inténtalo de nuevo más tarde";
+
+/* Currency name: TND */
+"Tunisian Dinar" = "Dinar tunecino";
+
+/* Currency name: TRY */
+"Turkish Lira" = "Lira turca";
+
+/* Currency name: TMT */
+"Turkmenistani Manat" = "Manat de Turkmenistán";
 
 /* No comment provided by engineer. */
 "Tx" = "Transacción";
@@ -941,6 +1548,15 @@
 
 /* Label in SummaryInfoGrid */
 "Type" = "Tipo";
+
+/* Currency name: UGX */
+"Ugandan Shilling" = "Chelín ugandés";
+
+/* Currency name: UAH */
+"Ukrainian Hryvnia" = "Hryvnia ucraniano";
+
+/* Currency name: AED */
+"United Arab Emirates Dirham" = "Dírham de los Emiratos Árabes Unidos";
 
 /* Currency name: USD */
 "United States Dollar" = "Dólar de los Estados Unidos";
@@ -953,6 +1569,9 @@
 
 /* Error message in LockView */
 "Unknown biometrics" = "Biometría desconocida";
+
+/* Error title */
+"Unknown error" = "Error desconocido";
 
 /* Biometrics prompt */
 "Unlock your seed." = "Desbloquea tu semilla";
@@ -969,6 +1588,9 @@
 /* Explanation for 'Use cellular data' toggle */
 "Uploads will only occur over WiFi." = "Las cargas solo se realizarán a través de WiFi.";
 
+/* Currency name: UYU */
+"Uruguayan Peso" = "Peso uruguayo";
+
 /* No comment provided by engineer. */
 "Use a custom server" = "Utilice un servidor personalizado";
 
@@ -978,11 +1600,20 @@
 /* CloseChannelsView */
 "Use this feature to transfer __all__ your funds to a Bitcoin address." = "Utilice esta función para transferir __todos__ sus fondos a una dirección Bitcoin.";
 
+/* Currency name: UZS */
+"Uzbekistan Som" = "Som uzbeko";
+
+/* Currency name: VUV */
+"Vanuatu Vatu" = "Vatu de Vanuatu";
+
 /* No comment provided by engineer. */
 "Version %@" = "Versión %@";
 
 /* Label in DetailsView_IncomingPayment */
 "via" = "Vía";
+
+/* Currency name: VND */
+"Vietnamese Dong" = "Dong vietnamita";
 
 /* button text */
 "waiting for internet" = "Esperando internet";
@@ -1009,13 +1640,19 @@
 "Will enable cloud syncing" = "Se habilitará la sincronización en la nube";
 
 /* No comment provided by engineer. */
-"With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "Con Phoenix, recibir y enviar Bitcoins es seguro, rápido y fácil.";
+"With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "Con Phoenix, recibir y enviar Bitcoin es seguro, rápido y fácil.";
 
 /* No comment provided by engineer. */
 "Would you like to be notified when somebody sends you a payment?" = "¿Le gustaría recibir una notificación cuando alguien le envié un pago?";
 
+/* Currency name: YER */
+"Yemeni Rial" = "Rial yemení";
+
 /* No comment provided by engineer. */
 "Yes" = "Si";
+
+/* No comment provided by engineer. */
+"You are on bitcoin chain %@, but the invoice is for %@." = "Estás en la cadena de bitcoin %1$@, pero la factura es de %2$@.";
 
 /* No comment provided by engineer. */
 "You are responsible for backing up your seed." = "Eres responsable de hacer una copia de seguridad de tu semilla.";
@@ -1026,6 +1663,9 @@
 
 /* No comment provided by engineer. */
 "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "Puede mejorar su privacidad usando Tor solo cuando se conecta a un servidor Electrum o a la par con Lightning. Esto ralentizará ligeramente sus transacciones.";
+
+/* No comment provided by engineer. */
+"You can use your wallet to anonymously sign and authorize an action on:" = "Puede usar su billetera para firmar de forma anónima y autorizar una acción en:";
 
 /* No comment provided by engineer. */
 "You currenly have 1 Lightning channel with a balance of %@." = "Actualmente tienes 1 canal de Lightning con un saldo de %@.";
@@ -1040,6 +1680,9 @@
 "You don't have any payment channels." = "No tienes ningún canal de pago.";
 
 /* No comment provided by engineer. */
+"You have already paid this invoice." = "Ya pagó esta factura.";
+
+/* No comment provided by engineer. */
 "You have disabled Background App Refresh for this app." = "Ha desactivado la actualización en segundo plano para esta aplicación.";
 
 /* No comment provided by engineer. */
@@ -1050,6 +1693,9 @@
 
 /* Error message - scanning lightning invoice */
 "You've already paid this invoice. Paying it again could result in stolen funds." = "Ya pagó esta factura. Pagarla de nuevo podría resultar en el robo de fondos.";
+
+/* No comment provided by engineer. */
+"Your comment will be sent when you pay." = "Su comentario será enviado cuando pague.";
 
 /* No comment provided by engineer. */
 "Your Node ID:" = "Su ID de Nodo:";
@@ -1065,4 +1711,7 @@
 
 /* No comment provided by engineer. */
 "Your wallet's seed is a list of 12 english words." = "La semilla de su billetera es una lista de 12 palabras en inglés.";
+
+/* Currency name: ZMW */
+"Zambian Kwacha" = "Kwacha zambiano";
 

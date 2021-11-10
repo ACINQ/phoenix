@@ -119,7 +119,7 @@ struct WarningView: View {
 			
 			HStack {
 				Spacer()
-				Text("I understand.")
+				Text("I understand")
 					.font(.headline)
 					.padding(.trailing, 10)
 				Toggle("", isOn: $iUnderstand).labelsHidden()
@@ -225,14 +225,17 @@ struct RestoreView: View {
 			.padding([.leading, .trailing], 16)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField("Enter keywords from your seed", text: $wordInput)
-					.onChange(of: wordInput) { _ in
-						onInput()
-					}
-					.autocapitalization(.none)
-					.disableAutocorrection(true)
-					.disabled(mnemonics.count == 12)
-					.padding(.trailing, 4)
+				TextField(
+					NSLocalizedString("Enter keywords from your seed", comment: "TextField placeholder"),
+					text: $wordInput
+				)
+				.onChange(of: wordInput) { _ in
+					onInput()
+				}
+				.autocapitalization(.none)
+				.disableAutocorrection(true)
+				.disabled(mnemonics.count == 12)
+				.padding(.trailing, 4)
 				
 				// Clear button (appears when TextField's text is non-empty)
 				Button {

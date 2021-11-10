@@ -297,7 +297,7 @@
 "Edit payment request" = "Modifier la requête de paiement";
 
 /* Label in SummaryInfoGrid */
-"Elapsed" = "Temps écoulé";
+"elapsed" = "Temps écoulé";
 
 /* Navigation bar title */
 "Electrum server" = "Serveur Electrum";
@@ -396,10 +396,10 @@
 "I understand" = "Je comprends";
 
 /* No comment provided by engineer. */
-"I understand." = "Je comprends.";
+"I understand" = "Je comprends";
 
 /* Currency name: ISK */
-"Icelandic Kròna" = "Couronne islandaise";
+"Icelandic Króna" = "Couronne islandaise";
 
 /* No comment provided by engineer. */
 "Import" = "Importer";
@@ -715,7 +715,7 @@
 "System" = "Système";
 
 /* Currency name: TWD */
-"Taiwan New Dollar" = "Nouveau Dollar taiwanais";
+"Taiwan Dollar" = "Dollar taiwanais";
 
 /* Currency name: THB */
 "Thai Baht" = "Baht thaïlandais";

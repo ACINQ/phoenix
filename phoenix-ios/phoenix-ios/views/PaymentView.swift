@@ -664,12 +664,12 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						amount.hasFractionDigits
 					{
 						let styledText: Text =
-							Text("\(amount.integerDigits)")
-						+	Text("\(amount.decimalSeparator)\(amount.fractionDigits)")
+							Text(verbatim: "\(amount.integerDigits)")
+						+	Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
 								.foregroundColor(.secondary)
 								.font(.callout)
 								.fontWeight(.light)
-						+	Text(" \(amount.type)")
+						+	Text(verbatim: " \(amount.type)")
 						
 						styledText
 							.onTapGesture { toggleCurrencyType() }
@@ -1057,42 +1057,42 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 					if maxFormatted.hasFractionDigits {
 						
-						Text("\(minFormatted.integerDigits)") +
-						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+						Text(verbatim: "\(minFormatted.integerDigits)") +
+						Text(verbatim: "\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" – ") +
-						Text("\(maxFormatted.integerDigits)") +
-						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+						Text(verbatim: " – ") +
+						Text(verbatim: "\(maxFormatted.integerDigits)") +
+						Text(verbatim: "\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " \(maxFormatted.type)")
 						
 					} else {
 						
-						Text("\(minFormatted.integerDigits)") +
-						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+						Text(verbatim: "\(minFormatted.integerDigits)") +
+						Text(verbatim: "\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" – ") +
-						Text(maxFormatted.digits) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " – ") +
+						Text(verbatim: maxFormatted.digits) +
+						Text(verbatim: " \(maxFormatted.type)")
 					}
 					
 				} else {
 					
 					if maxFormatted.hasFractionDigits {
 						
-						Text(minFormatted.digits) +
-						Text(" – ") +
-						Text("\(maxFormatted.integerDigits)") +
-						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+						Text(verbatim: minFormatted.digits) +
+						Text(verbatim: " – ") +
+						Text(verbatim: "\(maxFormatted.integerDigits)") +
+						Text(verbatim: "\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " \(maxFormatted.type)")
 						
 					} else {
 						
-						Text(minFormatted.digits) +
-						Text(" – ") +
-						Text(maxFormatted.digits) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: minFormatted.digits) +
+						Text(verbatim: " – ") +
+						Text(verbatim: maxFormatted.digits) +
+						Text(verbatim: " \(maxFormatted.type)")
 					}
 				}
 			}
@@ -1592,12 +1592,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
-							Text("\(formatted.integerDigits)") +
-							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)")
+							Text(verbatim: "\(formatted.integerDigits)") +
+							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
 								.foregroundColor(.secondary) +
-							Text(" \(formatted.type)")
+							Text(verbatim: " \(formatted.type)")
 						} else {
-							Text(formatted.string)
+							Text(verbatim: formatted.string)
 						}
 					}
 				}
@@ -1615,11 +1615,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
-							Text("\(formatted.integerDigits)") +
-							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)").foregroundColor(.secondary) +
-							Text(" \(formatted.type)")
+							Text(verbatim: "\(formatted.integerDigits)") +
+							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
+								.foregroundColor(.secondary) +
+							Text(verbatim: " \(formatted.type)")
 						} else {
-							Text(formatted.string)
+							Text(verbatim: formatted.string)
 						}
 					}
 					
@@ -1664,12 +1665,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 			
 			if display_msat.hasFractionDigits { // has visible millisatoshi's
-				Text("\(display_msat.integerDigits)") +
-				Text("\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
+				Text(verbatim: "\(display_msat.integerDigits)") +
+				Text(verbatim: "\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
 					.foregroundColor(.secondary) +
-				Text(" \(display_msat.type)")
+				Text(verbatim: " \(display_msat.type)")
 			} else {
-				Text(display_msat.string)
+				Text(verbatim: display_msat.string)
 			}
 			
 			if let display_fiat = display_fiat {

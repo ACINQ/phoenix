@@ -254,8 +254,7 @@ struct CurrencyConverterView: View {
 				
 			} else {
 				
-				Text("Rates last updated: ")
-				lastUpdatedText()
+				Text("Rates last updated: \(lastUpdatedText())")
 				Spacer()
 				Button {
 					refreshRates()
@@ -283,22 +282,21 @@ struct CurrencyConverterView: View {
 		)
 	}
 	
-	@ViewBuilder
-	func lastUpdatedText() -> some View {
+	func lastUpdatedText() -> String {
 		
 		switch currenciesLastUpdated() {
 		case .Now:
-			Text("now")
+			return NSLocalizedString("now", comment: "")
 		case .Never:
-			Text("never")
+			return NSLocalizedString("never", comment: "")
 		case .Date(let date):
 			let now = currentDate // Use local @State to allow timer refresh
 			let diff = now.timeIntervalSince1970 - date.timeIntervalSince1970
 			if diff < (60 * 5) { // within last 5 minutes
-				Text("just now")
+				return NSLocalizedString("just now", comment: "")
 			} else {
 				let formatter = RelativeDateTimeFormatter()
-				Text(verbatim: formatter.localizedString(for: date, relativeTo: now))
+				return formatter.localizedString(for: date, relativeTo: now)
 			}
 		}
 	}

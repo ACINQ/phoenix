@@ -91,7 +91,6 @@ enum class FiatCurrency : CurrencyUnit {
     DKK, // Danish Krone
     DOP, // Dominican Peso
     DZD, // Algerian Dinar
-    EEK, // Estonian Kroon
     EGP, // Egyptian Pound
     ERN, // Eritrean Nakfa
     ETB, // Ethiopian Birr
@@ -158,7 +157,7 @@ enum class FiatCurrency : CurrencyUnit {
     NZD, // New Zealand Dollar
     OMR, // Omani Rial
     PAB, // Panamanian Balboa
-    PEN, // Peruvian Nuevo Sol
+    PEN, // Peruvian Sol
     PGK, // Papua New Guinean Kina
     PHP, // Philippine Peso
     PKR, // Pakistani Rupee
@@ -189,7 +188,7 @@ enum class FiatCurrency : CurrencyUnit {
     TOP, // Tongan Paʻanga
     TRY, // Turkish Lira
     TTD, // Trinidad and Tobago Dollar
-    TWD, // New Taiwan Dollar
+    TWD, // Taiwan Dollar
     TZS, // Tanzanian Shilling
     UAH, // Ukrainian Hryvnia
     UGX, // Ugandan Shilling

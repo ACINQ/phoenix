@@ -331,7 +331,6 @@ extension FiatCurrency {
 		case .dkk  : return NSLocalizedString("Danish Krone",                        comment: "Currency name: DKK")
 		case .dop  : return NSLocalizedString("Dominican Peso",                      comment: "Currency name: DOP")
 		case .dzd  : return NSLocalizedString("Algerian Dinar",                      comment: "Currency name: DZD")
-		case .eek  : return NSLocalizedString("Estonian Kroon",                      comment: "Currency name: EEK")
 		case .egp  : return NSLocalizedString("Egyptian Pound",                      comment: "Currency name: EGP")
 		case .ern  : return NSLocalizedString("Eritrean Nakfa",                      comment: "Currency name: ERN")
 		case .etb  : return NSLocalizedString("Ethiopian Birr",                      comment: "Currency name: ETB")
@@ -398,7 +397,7 @@ extension FiatCurrency {
 		case .nzd  : return NSLocalizedString("New Zealand Dollar",                  comment: "Currency name: NZD")
 		case .omr  : return NSLocalizedString("Omani Rial",                          comment: "Currency name: OMR")
 		case .pab  : return NSLocalizedString("Panamanian Balboa",                   comment: "Currency name: PAB")
-		case .pen  : return NSLocalizedString("Peruvian Nuevo Sol",                  comment: "Currency name: PEN")
+		case .pen  : return NSLocalizedString("Peruvian Sol",                        comment: "Currency name: PEN")
 		case .pgk  : return NSLocalizedString("Papua New Guinean Kina",              comment: "Currency name: PGK")
 		case .php  : return NSLocalizedString("Philippine Peso",                     comment: "Currency name: PHP")
 		case .pkr  : return NSLocalizedString("Pakistani Rupee",                     comment: "Currency name: PKR")
@@ -428,7 +427,7 @@ extension FiatCurrency {
 		case .top  : return NSLocalizedString("Tongan Paʻanga",                      comment: "Currency name: TOP")
 		case .try_ : return NSLocalizedString("Turkish Lira",                        comment: "Currency name: TRY")
 		case .ttd  : return NSLocalizedString("Trinidad and Tobago Dollar",          comment: "Currency name: TTD")
-		case .twd  : return NSLocalizedString("New Taiwan Dollar",                   comment: "Currency name: TWD")
+		case .twd  : return NSLocalizedString("Taiwan Dollar",                       comment: "Currency name: TWD")
 		case .tzs  : return NSLocalizedString("Tanzanian Shilling",                  comment: "Currency name: TZS")
 		case .uah  : return NSLocalizedString("Ukrainian Hryvnia",                   comment: "Currency name: UAH")
 		case .ugx  : return NSLocalizedString("Ugandan Shilling",                    comment: "Currency name: UGX")
@@ -487,7 +486,6 @@ extension FiatCurrency {
 		case .dkk  : return "🇩🇰" // Danish Krone
 		case .dop  : return "🇩🇴" // Dominican Peso
 		case .dzd  : return "🇩🇿" // Algerian Dinar
-		case .eek  : return "🇪🇪" // Estonian Kroon
 		case .egp  : return "🇪🇬" // Egyptian Pound
 		case .ern  : return "🇪🇷" // Eritrean Nakfa
 		case .etb  : return "🇪🇹" // Ethiopian Birr

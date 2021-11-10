@@ -33,10 +33,13 @@ struct PaymentOptionsView: View {
 						.padding(.bottom, 8)
 					
 					HStack {
-						TextField("None", text: $defaultPaymentDescription)
-							.onChange(of: defaultPaymentDescription) { _ in
-								defaultPaymentDescriptionChanged()
-							}
+						TextField(
+							NSLocalizedString("None", comment: "TextField placeholder"),
+							text: $defaultPaymentDescription
+						)
+						.onChange(of: defaultPaymentDescription) { _ in
+							defaultPaymentDescriptionChanged()
+						}
 						
 						Button {
 							defaultPaymentDescription = ""

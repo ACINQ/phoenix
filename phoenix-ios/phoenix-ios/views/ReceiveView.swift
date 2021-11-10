@@ -1207,14 +1207,17 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding([.top, .bottom])
 
 			HStack {
-				TextField("Amount (optional)", text: currencyStyler().amountProxy)
-					.keyboardType(.decimalPad)
-					.disableAutocorrection(true)
-					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
-					.read(textHeightReader)
-					.padding([.top, .bottom], 8)
-					.padding(.leading, 16)
-					.padding(.trailing, 0)
+				TextField(
+					NSLocalizedString("Amount (optional)", comment: "TextField placeholder"),
+					text: currencyStyler().amountProxy
+				)
+				.keyboardType(.decimalPad)
+				.disableAutocorrection(true)
+				.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+				.read(textHeightReader)
+				.padding([.top, .bottom], 8)
+				.padding(.leading, 16)
+				.padding(.trailing, 0)
 				
 				Picker(
 					selection: $unit,
@@ -1240,7 +1243,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding(.bottom, 4)
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField("Description (optional)", text: $desc)
+				TextField(
+					NSLocalizedString("Description (optional)", comment: "TextField placeholder"),
+					text: $desc
+				)
 				
 				// Clear button (appears when TextField's text is non-empty)
 				Button {
