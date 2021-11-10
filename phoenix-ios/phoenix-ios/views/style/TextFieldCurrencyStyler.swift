@@ -28,13 +28,13 @@ enum TextFieldCurrencyStylerError: Error {
 /// - create TextField using the styler's `amountProxy`
 ///
 /// ```
-/// @State var unit: Currency
+/// var currency: Currency
 /// @State var amount: String
 /// @State var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 ///
 /// var body: some View {
-///   let styler = TextFieldCurrencyStyler(unit: $unit, amount: $amount, parsedAmount: $parsedAmount)
-///   TextField(verbatim: "123", text: styler.amountProxy)
+///   let styler = TextFieldCurrencyStyler(currency: currency, amount: $amount, parsedAmount: $parsedAmount)
+///   TextField("placeholder", text: styler.amountProxy)
 ///       .onChange(of: amount) { _ in
 ///           // new values for amount & parsedAmount available now
 ///       }
@@ -45,21 +45,21 @@ enum TextFieldCurrencyStylerError: Error {
 ///
 struct TextFieldCurrencyStyler {
 	
-	@Binding private var unit: Currency
+	private let currency: Currency
 	@Binding private var amount: String
 	@Binding private var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 	
 	let hideMsats: Bool
 	
 	init(
-		unit: Binding<Currency>,
+		currency: Currency,
 		amount: Binding<String>,
 		parsedAmount: Binding<Result<Double, TextFieldCurrencyStylerError>>,
 		hideMsats: Bool = true
 	) {
-		_unit = unit
-		_amount = amount
-		_parsedAmount = parsedAmount
+		self.currency = currency
+		self._amount = amount
+		self._parsedAmount = parsedAmount
 		
 		self.hideMsats = hideMsats
 	}
@@ -75,7 +75,7 @@ struct TextFieldCurrencyStyler {
 				log.debug("-> set")
 				let (newAmount, result) = TextFieldCurrencyStyler.format(
 					input: input,
-					unit: unit,
+					currency: currency,
 					hideMsats: hideMsats
 				)
 				self.parsedAmount = result
@@ -86,7 +86,7 @@ struct TextFieldCurrencyStyler {
 	
 	static func format(
 		input: String,
-		unit: Currency,
+		currency: Currency,
 		hideMsats: Bool = true
 	) -> (String, Result<Double, TextFieldCurrencyStylerError>)
 	{
@@ -108,7 +108,7 @@ struct TextFieldCurrencyStyler {
 		
 		let isFiatCurrency: Bool
 		let formatter: NumberFormatter
-		switch unit {
+		switch currency {
 		case .bitcoin(let bitcoinUnit):
 			isFiatCurrency = false
 			formatter = Utils.bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
@@ -234,7 +234,7 @@ struct TextFieldCurrencyStyler {
 			// See discussion in: FormattedAmount.withFormattedFractionDigits()
 			//
 			let formattedAmount = FormattedAmount(
-				currency: unit,
+				currency: currency,
 				digits: formattedInput,
 				decimalSeparator: formatter.decimalSeparator
 			)

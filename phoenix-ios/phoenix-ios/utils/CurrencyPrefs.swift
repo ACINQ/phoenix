@@ -144,6 +144,37 @@ class CurrencyPrefs: ObservableObject {
 		)
 	}
 	
+	func convert(srcAmount: Double, srcCurrency: Currency, dstCurrency: Currency) -> Double? {
+	
+		var msat: Int64 = 0
+		
+		switch srcCurrency {
+		case .bitcoin(let bitcoinUnit):
+			msat = Utils.toMsat(from: srcAmount, bitcoinUnit: bitcoinUnit)
+			
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				msat = Utils.toMsat(fromFiat: srcAmount, exchangeRate: exchangeRate)
+				
+			} else {
+				return nil
+			}
+		}
+		
+		switch dstCurrency {
+		case .bitcoin(let bitcoinUnit):
+			return Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+			
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				return Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
+				
+			} else {
+				return nil
+			}
+		}
+	}
+	
 	static func mockUSD() -> CurrencyPrefs {
 		return CurrencyPrefs(currencyType: .bitcoin, fiatCurrency: .usd, bitcoinUnit: .sat, exchangeRate: 20_000.00)
 	}

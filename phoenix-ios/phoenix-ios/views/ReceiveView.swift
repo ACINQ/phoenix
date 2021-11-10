@@ -1191,7 +1191,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
-			unit: $unit,
+			currency: unit,
 			amount: $amount,
 			parsedAmount: $parsedAmount,
 			hideMsats: false
@@ -1329,7 +1329,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
-		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amount, currency: unit, hideMsats: false)
 		parsedAmount = result.1
 		amount = result.0
 		
