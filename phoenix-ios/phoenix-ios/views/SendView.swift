@@ -2318,10 +2318,7 @@ struct LoginView: View, ViewName {
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle(
-			NSLocalizedString("lnurl-auth", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationBarTitle("lnurl-auth", displayMode: .inline)
 		.zIndex(2) // [SendingView, ValidateView, LoginView, ScanView]
 	}
 	

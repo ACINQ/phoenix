@@ -919,7 +919,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let lnurlPay = paymentInfo.metadata.lnurl?.pay {
 			
-			header(NSLocalizedString("lnurl-pay", comment: "Title in DetailsView_IncomingPayment"))
+			header("lnurl-pay")
 			
 			lnurl_service(lnurlPay)
 			lnurl_range(lnurlPay)
