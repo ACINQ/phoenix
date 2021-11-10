@@ -1,6 +1,16 @@
 import SwiftUI
 import PhoenixShared
 import Combine
+import os.log
+
+#if DEBUG && false
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "Prefs"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
 
 
 class Prefs {
@@ -164,16 +174,21 @@ class Prefs {
 	var currencyConverterList: [Currency] {
 		get {
 			if let list = UserDefaults.standard.string(forKey: Keys.currencyConverterList.rawValue) {
+				log.debug("get: currencyConverterList = \(list)")
 				return Currency.deserializeList(list)
 			} else {
+				log.debug("get: currencyConverterList = nil")
 				return [Currency]()
 			}
 		}
 		set {
 			if newValue.isEmpty {
+				log.debug("set: currencyConverterList = nil")
 				UserDefaults.standard.removeObject(forKey: Keys.currencyConverterList.rawValue)
 			} else {
-				UserDefaults.standard.set(Currency.serializeList(newValue), forKey: Keys.currencyConverterList.rawValue)
+				let list = Currency.serializeList(newValue)
+				log.debug("set: currencyConverterList = \(list)")
+				UserDefaults.standard.set(list, forKey: Keys.currencyConverterList.rawValue)
 			}
 		}
 	}
