@@ -1,0 +1,453 @@
+/* United Arab Emirates Dirham */
+"AED" = "Dírham de los Emiratos Árabes Unidos";
+
+/* Afghan Afghani */
+"AFN" = "Afgani de Afganistán";
+
+/* Albanian Lek */
+"ALL" = "Lek albanés";
+
+/* Armenian Dram */
+"AMD" = "Dram armenio";
+
+/* Netherlands Antillean Guilder */
+"ANG" = "Florín de las Antillas Neerlandesas";
+
+/* Angolan Kwanza */
+"AOA" = "Kwanza angoleño";
+
+/* Argentine Peso */
+"ARS" = "Peso argentino";
+
+/* Australian Dollar */
+"AUD" = "Dolar Australiano";
+
+/* Aruban Florin */
+"AWG" = "Florín de Aruba";
+
+/* Azerbaijani Manat */
+"AZN" = "Manat azerbaiyano";
+
+/* Bosnia-Herzegovina Convertible Mark */
+"BAM" = "Marco bosnioherzegovino de Bosnia-Herzegovina";
+
+/* Barbadian Dollar */
+"BBD" = "Dólar de Barbados";
+
+/* Bangladeshi Taka */
+"BDT" = "Taka bangladesí";
+
+/* Bulgarian Lev */
+"BGN" = "Lev búlgaro";
+
+/* Bahraini Dinar */
+"BHD" = "Dinar bahreiní";
+
+/* Burundian Franc */
+"BIF" = "Franco burundés";
+
+/* Bermudan Dollar */
+"BMD" = "Dólar de las Bermudas";
+
+/* Brunei Dollar */
+"BND" = "Dólar de Brunei";
+
+/* Bolivian Boliviano */
+"BOB" = "Boliviano de Bolivia";
+
+/* Brazilian Real */
+"BRL" = "Real brasileño";
+
+/* Bahamian Dollar */
+"BSD" = "Dólar de las Bahamas";
+
+/* Bhutanese Ngultrum */
+"BTN" = "Ngultrum butanés";
+
+/* Botswanan Pula */
+"BWP" = "Pula de Botsuana";
+
+/* Belize Dollar */
+"BZD" = "Dólar beliceño";
+
+/* Canadian Dollar */
+"CAD" = "Dólar canadiense";
+
+/* Congolese Franc */
+"CDF" = "Franco congoleño";
+
+/* Swiss Franc */
+"CHF" = "Franco suizo";
+
+/* Chilean Peso */
+"CLP" = "Peso Chileno";
+
+/* Chinese Yuan */
+"CNY" = "Yuan Chino";
+
+/* Colombian Peso */
+"COP" = "Peso colombiano";
+
+/* Costa Rican Colón */
+"CRC" = "Colón costarricense";
+
+/* Cuban Peso */
+"CUP" = "Peso cubano";
+
+/* Cape Verdean Escudo */
+"CVE" = "Escudo caboverdiano";
+
+/* Czech Koruna */
+"CZK" = "Corona checa";
+
+/* Djiboutian Franc */
+"DJF" = "Franco de Yibuti";
+
+/* Danish Krone */
+"DKK" = "Corona Danesa";
+
+/* Dominican Peso */
+"DOP" = "Peso dominicano";
+
+/* Algerian Dinar */
+"DZD" = "Dinar argelino";
+
+/* Egyptian Pound */
+"EGP" = "Libra egipcia";
+
+/* Eritrean Nakfa */
+"ERN" = "Nafka de Eritrea";
+
+/* Ethiopian Birr */
+"ETB" = "Birr etíope";
+
+/* Euro */
+"EUR" = "Euro";
+
+/* Fijian Dollar */
+"FJD" = "Dólar fiyiano";
+
+/* Falkland Islands Pound */
+"FKP" = "Libra de las Islas Malvinas";
+
+/* Great British Pound */
+"GBP" = "Libra esterlina";
+
+/* Georgian Lari */
+"GEL" = "Lari georgiano";
+
+/* Ghanaian Cedi */
+"GHS" = "Cedi de Ghana";
+
+/* Gibraltar Pound */
+"GIP" = "Libra gibraltareña";
+
+/* Gambian Dalasi */
+"GMD" = "Dalasi de Gambia";
+
+/* Guinean Franc */
+"GNF" = "Franco guineano";
+
+/* Guatemalan Quetzal */
+"GTQ" = "Quetzal guatemalteco";
+
+/* Guyanaese Dollar */
+"GYD" = "Dólar de Guyana";
+
+/* Hong Kong Dollar */
+"HKD" = "Dólar de Hong Kong";
+
+/* Honduran Lempira */
+"HNL" = "Lempira hondureña";
+
+/* Croatian Kuna */
+"HRK" = "Kuna croata";
+
+/* Haitian Gourde */
+"HTG" = "Gourde haitiano";
+
+/* Hungarian Forint */
+"HUF" = "Florín húngaro";
+
+/* Indonesian Rupiah */
+"IDR" = "Rupia de Indonesia";
+
+/* Israeli New Sheqel */
+"ILS" = "Nuevo sheqel israelí";
+
+/* Indian Rupee */
+"INR" = "Rupia india";
+
+/* Iraqi Dinar */
+"IQD" = "Dinar iraquí";
+
+/* Iranian Rial */
+"IRR" = "Rial iraní";
+
+/* Icelandic Króna */
+"ISK" = "Corona islandesa";
+
+/* Jersey Pound */
+"JEP" = "Libra de Jersey";
+
+/* Jamaican Dollar */
+"JMD" = "Dólar jamaiquino";
+
+/* Jordanian Dinar */
+"JOD" = "Dinar jordano";
+
+/* Japanese Yen */
+"JPY" = "Yen japonés";
+
+/* Kenyan Shilling */
+"KES" = "Chelín keniano";
+
+/* Kyrgystani Som */
+"KGS" = "Som kirguís";
+
+/* Cambodian Riel */
+"KHR" = "Riel camboyano";
+
+/* Comorian Franc */
+"KMF" = "Franco comorano";
+
+/* North Korean Won */
+"KPW" = "Won norcoreano";
+
+/* South Korean Won */
+"KRW" = "Won surcoreano";
+
+/* Kuwaiti Dinar */
+"KWD" = "Dinar kuwaití";
+
+/* Cayman Islands Dollar */
+"KYD" = "Dólar de las Islas Caimán";
+
+/* Kazakhstani Tenge */
+"KZT" = "Tenge de Kazajstaán";
+
+/* Laotian Kip */
+"LAK" = "Kip de Laos";
+
+/* Lebanese Pound */
+"LBP" = "Libra libanesa";
+
+/* Sri Lankan Rupee */
+"LKR" = "Rupia de Sri Lanka";
+
+/* Liberian Dollar */
+"LRD" = "Dólar liberiano";
+
+/* Lesotho Loti */
+"LSL" = "Loti de Lesoto";
+
+/* Libyan Dinar */
+"LYD" = "Dinar libio";
+
+/* Moroccan Dirham */
+"MAD" = "Dirham marroqu";
+
+/* Moldovan Leu */
+"MDL" = "Leu moldavo";
+
+/* Malagasy Ariary */
+"MGA" = "Ariary malgache";
+
+/* Macedonian Denar */
+"MKD" = "Denar macedonio";
+
+/* Myanmar Kyat */
+"MMK" = "Kyat de Myanmar";
+
+/* Mongolian Tugrik */
+"MNT" = "Tugrik mongol";
+
+/* Macanese Pataca */
+"MOP" = "Pataca de Macao";
+
+/* Maltese Lira */
+"MTL" = "Lira maltesa";
+
+/* Mauritian Rupee */
+"MUR" = "Rupia de Republica de Mauricio";
+
+/* Maldivian Rufiyaa */
+"MVR" = "Rufiyaa de Maldivas";
+
+/* Malawian Kwacha */
+"MWK" = "Kwacha malauí";
+
+/* Mexican Peso */
+"MXN" = "Peso mexicano";
+
+/* Malaysian Ringgit */
+"MYR" = "Ringgit malayo";
+
+/* Mozambican Metical */
+"MZN" = "Metical mozambiqueño";
+
+/* Namibian Dollar */
+"NAD" = "Dólar de Namibia";
+
+/* Nigerian Naira */
+"NGN" = "Naira nigeriano";
+
+/* Nicaraguan Córdoba */
+"NIO" = "Córdoba nicaragüense";
+
+/* Norwegian Krone */
+"NOK" = "Corona noruega";
+
+/* Nepalese Rupee */
+"NPR" = "Rupia nepalí";
+
+/* New Zealand Dollar */
+"NZD" = "Dólar de Nueva Zelanda";
+
+/* Omani Rial */
+"OMR" = "Rial omaní";
+
+/* Panamanian Balboa */
+"PAB" = "Balboa panameño";
+
+/* Peruvian Sol */
+"PEN" = "Sol peruano";
+
+/* Papua New Guinean Kina */
+"PGK" = "Kina de Papúa Nueva Guinea";
+
+/* Philippine Peso */
+"PHP" = "Peso filipino";
+
+/* Pakistani Rupee */
+"PKR" = "Rupia pakistaní";
+
+/* Polish Zloty */
+"PLN" = "Zloty polaco";
+
+/* Paraguayan Guarani */
+"PYG" = "Guaraní paraguayo";
+
+/* Qatari Rial */
+"QAR" = "Rial de Qatar";
+
+/* Romanian Leu */
+"RON" = "Leu romano";
+
+/* Serbian Dinar */
+"RSD" = "Dinar serbio";
+
+/* Russian Ruble */
+"RUB" = "Rublo ruso";
+
+/* Rwandan Franc */
+"RWF" = "Franco ruandés";
+
+/* Saudi Riyal */
+"SAR" = "Riyal saudí";
+
+/* Solomon Islands Dollar */
+"SBD" = "Dólar de las Islas Salomón";
+
+/* Seychellois Rupee */
+"SCR" = "Seychellois Rupee";
+
+/* Sudanese Pound */
+"SDG" = "Libra sudanesa";
+
+/* Swedish Krona */
+"SEK" = "Corona sueca";
+
+/* Singapore Dollar */
+"SGD" = "Dólar de Singapur";
+
+/* Saint Helena Pound */
+"SHP" = "Libra de Santa Elena";
+
+/* Sierra Leonean Leone */
+"SLL" = "Leone de Sierra Leona";
+
+/* Somali Shilling */
+"SOS" = "Chelín somalí";
+
+/* Surinamese Dollar */
+"SRD" = "Dólar surinamés";
+
+/* Syrian Pound */
+"SYP" = "Libra siria";
+
+/* Swazi Lilangeni */
+"SZL" = "Lilangeni de Suazilandia";
+
+/* Thai Baht */
+"THB" = "Baht tailandés";
+
+/* Tajikistani Somoni */
+"TJS" = "Somoni de Tayikistán";
+
+/* Turkmenistani Manat */
+"TMT" = "Manat de Turkmenistán";
+
+/* Tunisian Dinar */
+"TND" = "Dinar tunecino";
+
+/* Tongan Paʻanga */
+"TOP" = "Paʻanga de Tonga";
+
+/* Turkish Lira */
+"TRY" = "Lira turca";
+
+/* Trinidad and Tobago Dollar */
+"TTD" = "Dólar de Trinidad y Tobago";
+
+/* Taiwan Dollar */
+"TWD" = "Dólar taiwanés";
+
+/* Tanzanian Shilling */
+"TZS" = "Chelín de Tanzania";
+
+/* Ukrainian Hryvnia */
+"UAH" = "Hryvnia ucraniano";
+
+/* Ugandan Shilling */
+"UGX" = "Chelín ugandés";
+
+/* United States Dollar */
+"USD" = "Dólar de los Estados Unidos";
+
+/* Uruguayan Peso */
+"UYU" = "Peso uruguayo";
+
+/* Uzbekistan Som */
+"UZS" = "Som uzbeko";
+
+/* Vietnamese Dong */
+"VND" = "Dong vietnamita";
+
+/* Vanuatu Vatu */
+"VUV" = "Vatu de Vanuatu";
+
+/* Samoan Tala */
+"WST" = "Tala de Samoa";
+
+/* CFA Franc BEAC */
+"XAF" = "Franco CFA de África Central";
+
+/* East Caribbean Dollar */
+"XCD" = "Dólar del Caribe Oriental";
+
+/* CFA Franc BCEAO */
+"XOF" = "Franco CFA de África Occidental";
+
+/* CFP Franc */
+"XPF" = "Franco CFP";
+
+/* Yemeni Rial */
+"YER" = "Rial yemení";
+
+/* South African Rand */
+"ZAR" = "Rand sudafricano";
+
+/* Zambian Kwacha */
+"ZMW" = "Kwacha zambiano";
+

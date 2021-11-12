@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS payments_metadata (
     lnurl_successAction_type TEXT AS LNUrlSuccessAction.TypeVersion,
     lnurl_successAction_blob BLOB,
     user_description TEXT,
+    user_notes TEXT DEFAULT NULL,
+    modified_at INTEGER DEFAULT NULL,
     PRIMARY KEY (type, id)
 );
 
@@ -32,12 +34,15 @@ INSERT INTO payments_metadata (
             lnurl_description,
             lnurl_metadata_type, lnurl_metadata_blob,
             lnurl_successAction_type, lnurl_successAction_blob,
-            user_description)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            user_description, user_notes,
+            modified_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-updateUserDescription:
+updateUserInfo:
 UPDATE payments_metadata
-SET    user_description = ?
+SET    user_description = ?,
+       user_notes = ?,
+       modified_at = ?
 WHERE  type = ? AND id = ?;
 
 fetchDescriptions:
@@ -49,3 +54,7 @@ WHERE  type = ? AND id = ?;
 fetchMetadata:
 SELECT * FROM payments_metadata
 WHERE type = ? AND id = ?;
+
+-- use this in a `transaction` block to know how many rows were changed after an UPDATE
+changes:
+SELECT changes();

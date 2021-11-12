@@ -146,10 +146,13 @@ fileprivate struct StandardWalletView : View {
 			
 				// [Bitcoin Address TextField (X)]
 				HStack {
-					TextField("Bitcoin address", text: $textFieldValue)
-						.onChange(of: textFieldValue) { _ in
-							checkBitcoinAddress()
-						}
+					TextField(
+						NSLocalizedString("Bitcoin address", comment: "TextField placeholder"),
+						text: $textFieldValue
+					)
+					.onChange(of: textFieldValue) { _ in
+						checkBitcoinAddress()
+					}
 					
 					// Clear text field button
 					Button {

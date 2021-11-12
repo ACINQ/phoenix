@@ -159,6 +159,8 @@
     <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
     <string name="send_amount_error">Please enter a valid amount.</string>
     <string name="send_amount_error_balance">Amount exceeds your balance.</string>
+    <string name="send_amount_error_too_large">Amount is too large.</string>
+    <string name="send_amount_error_negative">Amount cannot be negative.</string>
     <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Desc.</string>
@@ -210,6 +212,7 @@
     <string name="utils_pretty_amount"><![CDATA[%1$s%2$s<small>%3$s<small>]]></string>
     <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
+    <string name="utils_no_conversion">BTC exchange rate unavailable</string>
 
     <string name="utils_proceed">Proceed</string>
     <string name="utils_cancel">Cancel</string>

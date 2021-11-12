@@ -17,31 +17,49 @@
 package fr.acinq.phoenix.android
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Context
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.Prefs
-import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.FiatCurrency
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.kodein.log.Logger
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+import fr.acinq.phoenix.android.service.NodeService
+import fr.acinq.phoenix.android.service.WalletState
+import org.slf4j.LoggerFactory
 
 @SuppressLint("StaticFieldLeak")
 class AppViewModel(private val applicationContext: Context) : ViewModel() {
-    val log: Logger = newLogger(LoggerFactory.default)
+    val log = LoggerFactory.getLogger(AppViewModel::class.java)
+
+    /** State of the wallet's key: does it exist? what type is it? */
     var keyState: KeyState by mutableStateOf(KeyState.Unknown)
         private set
+
+    /** Monitoring the state of the service - null if the service is disconnected. */
+    private val _service = MutableLiveData<NodeService?>(null)
+    /** Nullable accessor for the service. */
+    val service: NodeService? get() = _service.value
+
+    /** Connection to the NodeService. */
+    val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(component: ComponentName, bind: IBinder) {
+            log.info("connected to NodeService")
+            _service.value = (bind as NodeService.NodeBinder).getService()
+        }
+
+        override fun onServiceDisconnected(component: ComponentName) {
+            log.info("disconnected from NodeService")
+            _service.postValue(null)
+        }
+    }
+
+    /** Mirrors the node state using a MediatorLiveData. A LiveData object is used because this object can be used outside of compose. */
+    val walletState = StateLiveData(_service)
 
     init {
         refreshSeed()
@@ -64,9 +82,9 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
             val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
             SeedManager.writeSeedToDisk(context, encrypted)
             refreshSeed()
-            log.info { "seed has been written to disk" }
+            log.info("seed has been written to disk")
         } catch (e: Exception) {
-            log.error(e) { "failed to create new wallet: " }
+            log.error("failed to create new wallet: ", e)
         }
     }
 
@@ -77,20 +95,43 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
                 else -> throw RuntimeException("no seed sorry")
             }
         } catch (e: Exception) {
-            log.error(e) { "could not decrypt seed" }
+            log.error("could not decrypt seed", e)
             null
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        log.info { "AppViewModel has been cleared" }
+        service?.shutdown()
+        log.info("AppViewModel has been cleared")
     }
 
     class Factory(private val context: Context) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
             return AppViewModel(context) as T
+        }
+    }
+}
+
+class StateLiveData(service: MutableLiveData<NodeService?>): MediatorLiveData<WalletState>() {
+    private val log = LoggerFactory.getLogger(this::class.java)
+    private var serviceState: LiveData<WalletState>? = null
+
+    init {
+        value = WalletState.Disconnected
+        addSource(service) { s ->
+            if (s == null) {
+                log.info("lost service, force state to Disconnected and remove source")
+                serviceState?.let { removeSource(it) }
+                serviceState = null
+                value = WalletState.Disconnected
+            } else {
+                log.info("service connected, now mirroring service's internal state")
+                addSource(s.state) {
+                    value = it
+                }
+            }
         }
     }
 }

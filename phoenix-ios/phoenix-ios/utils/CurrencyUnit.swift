@@ -4,7 +4,8 @@ import PhoenixShared
 /// Represents a displayable currency,
 /// which can be either a BitcoinUnit or a FiatCurrency.
 ///
-enum Currency: Hashable {
+enum Currency: Hashable, CustomStringConvertible {
+	
 	case bitcoin(BitcoinUnit)
 	case fiat(FiatCurrency)
 	
@@ -14,6 +15,24 @@ enum Currency: Hashable {
 			return unit.shortName
 		case .fiat(let currency):
 			return currency.shortName
+		}
+	}
+	
+	var identifiable: String {
+		switch self {
+		case .bitcoin(let unit):
+			return unit.shortName.lowercased()
+		case .fiat(let currency):
+			return currency.shortName.uppercased()
+		}
+	}
+	
+	var description: String {
+		switch self {
+		case .bitcoin(let unit):
+			return "bitcoin(\(unit.shortName))"
+		case .fiat(let currency):
+			return "fiat(\(currency.shortName))"
 		}
 	}
 }

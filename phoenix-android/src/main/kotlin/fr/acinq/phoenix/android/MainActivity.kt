@@ -17,6 +17,8 @@
 package fr.acinq.phoenix.android
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -28,12 +30,16 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import fr.acinq.phoenix.android.components.mvi.MockView
+import fr.acinq.phoenix.android.service.NodeService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 
 @ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
+    val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel> { AppViewModel.Factory(applicationContext) }
 
     @ExperimentalMaterialApi
@@ -49,12 +55,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // (application as? PhoenixApplication)?.business?.decrementDisconnectCount()
+        Intent(this, NodeService::class.java).let { intent ->
+            applicationContext.bindService(intent, appViewModel.serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_ADJUST_WITH_ACTIVITY)
+        }
     }
 
     override fun onStop() {
         super.onStop()
         // (application as? PhoenixApplication)?.business?.incrementDisconnectCount()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            unbindService(appViewModel.serviceConnection)
+        } catch (e: Exception) {
+            log.error("failed to unbind activity from node service: {}", e.localizedMessage)
+        }
+        log.info("main activity destroyed")
     }
 
 }

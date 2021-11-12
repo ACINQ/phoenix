@@ -32,7 +32,7 @@ struct HomeView : MVIView, ViewName {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	let paymentsPagerPublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
+	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
 	
 	let lastCompletedPaymentPublisher = phoenixBusiness.paymentsManager.lastCompletedPaymentPublisher()
@@ -78,7 +78,7 @@ struct HomeView : MVIView, ViewName {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
-		.onReceive(paymentsPagerPublisher) {
+		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
 		.onReceive(lastCompletedPaymentPublisher) {
@@ -101,7 +101,7 @@ struct HomeView : MVIView, ViewName {
 			HStack {
 				AppStatusButton()
 				Spacer()
-				FaqButton()
+				ToolsButton()
 			}
 			.padding(.all)
 
@@ -695,7 +695,7 @@ fileprivate struct PaymentCell : View, ViewName {
 		} else {
 			
 			let currency = currencyPrefs.currency
-			let amount = FormattedAmount(currency: currency, digits: "", decimalSeparator: " ")
+			let amount = FormattedAmount(amount: 0.0, currency: currency, digits: "", decimalSeparator: " ")
 
 			let isFailure = false
 			let isOutgoing = true
@@ -865,7 +865,9 @@ fileprivate struct AppStatusButton: View, ViewName {
 	}
 }
 
-fileprivate struct FaqButton: View, ViewName {
+fileprivate struct ToolsButton: View, ViewName {
+	
+	@State var currencyConverterOpen = false
 	
 	@Environment(\.openURL) var openURL
 	
@@ -875,12 +877,26 @@ fileprivate struct FaqButton: View, ViewName {
 			Button {
 				faqButtonTapped()
 			} label: {
-				Label("FAQ", systemImage: "safari")
+				Label(
+					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
+					systemImage: "safari"
+				)
 			}
 			Button {
 				sendFeedbackButtonTapped()
 			} label: {
-				Label("Send feedback", systemImage: "envelope")
+				Label(
+					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
+					systemImage: "envelope"
+				)
+			}
+			Button {
+				currencyConverterTapped()
+			} label: {
+				Label(
+					NSLocalizedString("Currency converter", comment: "HomeView: Tools menu: Label"),
+					systemImage: "globe"
+				)
 			}
 		} label: {
 			Image(systemName: "questionmark")
@@ -898,9 +914,14 @@ fileprivate struct FaqButton: View, ViewName {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
+		.background(
+			NavigationLink(destination: CurrencyConverterView(), isActive: $currencyConverterOpen) {
+				EmptyView()
+			}
+		)
 	}
 	
-	func faqButtonTapped() -> Void {
+	func faqButtonTapped() {
 		log.trace("[\(viewName)] faqButtonTapped()")
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq") {
@@ -908,7 +929,7 @@ fileprivate struct FaqButton: View, ViewName {
 		}
 	}
 	
-	func sendFeedbackButtonTapped() -> Void {
+	func sendFeedbackButtonTapped() {
 		log.trace("[\(viewName)] sendFeedbackButtonTapped()")
 		
 		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
@@ -928,6 +949,11 @@ fileprivate struct FaqButton: View, ViewName {
 		if let url = comps.url {
 			openURL(url)
 		}
+	}
+	
+	func currencyConverterTapped() {
+		log.trace("[\(viewName)] currencyConverterTapped()")
+		currencyConverterOpen = true
 	}
 }
 

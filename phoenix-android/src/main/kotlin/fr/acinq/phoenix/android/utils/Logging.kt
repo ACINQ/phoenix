@@ -17,6 +17,9 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.LoggerContext
@@ -29,8 +32,25 @@ import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
 import ch.qos.logback.core.util.FileSize
 import fr.acinq.phoenix.android.BuildConfig
+import fr.acinq.phoenix.android.PhoenixApplication
+import org.kodein.log.frontend.slf4jFrontend
+import org.kodein.log.newLogger
 import org.slf4j.LoggerFactory
 import java.io.File
+
+@Composable
+fun logger(): org.kodein.log.Logger {
+  val context = LocalContext.current
+  val application = context.applicationContext
+
+  if (application !is PhoenixApplication) { // Preview mode
+    return remember { org.kodein.log.LoggerFactory(slf4jFrontend).newLogger(context::class) }
+  }
+
+  return remember {
+    application.business.loggerFactory.newLogger(context::class)
+  }
+}
 
 object Logging {
 

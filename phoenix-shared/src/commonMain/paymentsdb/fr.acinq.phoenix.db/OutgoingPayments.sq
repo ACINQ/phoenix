@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS outgoing_payments (
     status_blob BLOB DEFAULT NULL
 );
 
+-- The created_at column is used by AggregatedQueries.listAllPaymentsOrder for sorting.
+-- And that query is used constantly by the app.
+CREATE INDEX IF NOT EXISTS outgoing_payments_created_at_idx ON outgoing_payments(created_at);
+
 CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
     part_id TEXT NOT NULL PRIMARY KEY,
     part_parent_id TEXT NOT NULL,

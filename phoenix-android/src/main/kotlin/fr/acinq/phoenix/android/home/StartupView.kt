@@ -19,30 +19,29 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.keyState
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.Prefs
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun StartupView() {
+fun StartupView(
+    appVM: AppViewModel,
+    onKeyAbsent: () -> Unit,
+    onBusinessStart: () -> Unit,
+) {
     val log = logger()
-    val nc = navController
     val ks = keyState
-    val context = LocalContext.current
-    val _business = business
 
     when (ks) {
         is KeyState.Unknown -> Text(stringResource(id = R.string.startup_wait))
-        is KeyState.Absent -> nc.navigate(Screen.InitWallet)
+        is KeyState.Absent -> onKeyAbsent()
         is KeyState.Error -> Text(stringResource(id = R.string.startup_error_unreadable))
         is KeyState.Present -> {
             when (val encryptedSeed = ks.encryptedSeed) {
@@ -50,13 +49,9 @@ fun StartupView() {
                     Text(stringResource(id = R.string.startup_starting))
                     LaunchedEffect(key1 = encryptedSeed) {
                         launch(Dispatchers.Main) {
-                            val electrumServer = Prefs.getElectrumServer(context).first()
-                            val seed = _business.prepWallet(EncryptedSeed.toMnemonics(encryptedSeed.decrypt()))
-                            _business.loadWallet(seed)
-                            _business.start()
-                            _business.appConfigurationManager.updateElectrumConfig(electrumServer)
+                            appVM.service?.startBusiness(encryptedSeed.decrypt())
                             log.info { "navigating to home screen..." }
-                            launch(Dispatchers.Main) { nc.navigate(Screen.Home) }
+                            onBusinessStart()
                         }
                     }
                 }

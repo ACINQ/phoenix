@@ -50,7 +50,7 @@ struct AppStatusPopover: View {
 			
 			HStack {
 				Spacer()
-				Button("Close") {
+				Button(NSLocalizedString("Close", comment: "Button")) {
 					withAnimation {
 						popoverState.close()
 					}
@@ -119,11 +119,20 @@ struct AppStatusPopover: View {
 			.font(.title3)
 			.padding(.bottom, 15)
 			
-			ConnectionCell(label: "Internet", connection: monitor.connections.internet)
-				.padding(.bottom, 8)
-			ConnectionCell(label: "Lightning peer", connection: monitor.connections.peer)
-				.padding(.bottom, 8)
-			ConnectionCell(label: "Electrum server", connection: monitor.connections.electrum)
+			ConnectionCell(
+				label: NSLocalizedString("Internet", comment: "AppStatusPopover: label"),
+				connection: monitor.connections.internet
+			)
+			.padding(.bottom, 8)
+			ConnectionCell(
+				label: NSLocalizedString("Lightning peer", comment: "AppStatusPopover: label"),
+				connection: monitor.connections.peer
+			)
+			.padding(.bottom, 8)
+			ConnectionCell(
+				label: NSLocalizedString("Electrum server", comment: "AppStatusPopover: label"),
+				connection: monitor.connections.electrum
+			)
 		
 		} // </VStack>
 	}

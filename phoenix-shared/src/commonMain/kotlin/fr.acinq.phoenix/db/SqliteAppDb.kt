@@ -1,15 +1,20 @@
 package fr.acinq.phoenix.db
 
+import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.phoenix.data.WalletContext
-import fr.acinq.phoenix.data.BitcoinPriceRate
+import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fracinqphoenixdb.Exchange_rates
 import io.ktor.util.date.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -17,31 +22,91 @@ import kotlinx.serialization.json.Json
 
 class SqliteAppDb(driver: SqlDriver) {
 
-    private val database = AppDatabase(driver = driver)
+    private val database = AppDatabase(
+        driver = driver,
+        exchange_ratesAdapter = Exchange_rates.Adapter(
+            typeAdapter = EnumColumnAdapter()
+        )
+    )
+
     private val paramsQueries = database.walletParamsQueries
-    private val priceQueries = database.bitcoinPriceRatesQueries
+    private val priceQueries = database.exchangeRatesQueries
     private val keyValueStoreQueries = database.keyValueStoreQueries
     private val json = Json { ignoreUnknownKeys = true }
 
-    /** Save a [BitcoinPriceRate] to the database (update or insert if does not exist). */
-    suspend fun saveBitcoinRate(rate: BitcoinPriceRate) {
+    /**
+     * Save a list of [ExchangeRate] items to the database.
+     * Inserts new items, and updates existing items.
+     */
+    suspend fun saveExchangeRates(rates: List<ExchangeRate>) {
+        if (rates.isEmpty()) return
         withContext(Dispatchers.Default) {
-            priceQueries.transaction {
-                priceQueries.get(rate.fiatCurrency.name).executeAsOneOrNull()?.run {
-                    priceQueries.update(rate.price, rate.source, rate.timestampMillis, rate.fiatCurrency.name)
-                } ?: run {
-                    priceQueries.insert(rate.fiatCurrency.name, rate.price, rate.source, rate.timestampMillis)
+            database.transaction {
+                for (rate in rates) {
+                    val row = when (rate) {
+                        is ExchangeRate.BitcoinPriceRate -> rate.toRow()
+                        is ExchangeRate.UsdPriceRate -> rate.toRow()
+                    }
+                    priceQueries.get(row.fiat).executeAsOneOrNull()?.run {
+                        priceQueries.update(
+                            price = row.price,
+                            type = row.type,
+                            source = row.source,
+                            updated_at = row.updated_at,
+                            fiat = row.fiat
+                        )
+                    } ?: run {
+                        priceQueries.insert(
+                            fiat = row.fiat,
+                            price = row.price,
+                            type = row.type,
+                            source = row.source,
+                            updated_at = row.updated_at
+                        )
+                    }
                 }
             }
         }
     }
 
-    /** Emits the list of bitcoin price rate as a flow, and emits a new result every time the data changes in db. */
-    fun listBitcoinRates(): Flow<List<BitcoinPriceRate>> {
-        return priceQueries.list(mapper = { fiat_code, price_per_btc, source_url, updated_at ->
-            BitcoinPriceRate(FiatCurrency.valueOf(fiat_code), price_per_btc, source_url, updated_at)
-        }).asFlow().mapToList()
-
+    /**
+     * Emits the list of exchange rates as a flow,
+     * and emits a new result everytime the data changes in the database.
+     */
+    fun listBitcoinRates(): Flow<List<ExchangeRate>> {
+        // Here's what we want:
+        // - we should be able to **REMOVE** fiat currencies from the list in the future
+        //   (e.g. after it collapses due to hyperinflation)
+        // - however, after we do, the corresponding row will remain in the database
+        // - attempting to force-decode it via FiatCurrency.valueOf(code) will cause a crash
+        // - so we use FiatCurrency.valueOfOrNull, and workaround potential null values
+        //
+        return priceQueries.list(mapper = { fiat, price, type, source, updated_at ->
+            ExchangeRate.Row(fiat, price, type, source, updated_at)
+        }).asFlow().mapToList().map {
+            it.mapNotNull { row ->
+                FiatCurrency.valueOfOrNull(row.fiat)?.let { fiatCurrency ->
+                    when (row.type) {
+                        ExchangeRate.Type.BTC -> {
+                            ExchangeRate.BitcoinPriceRate(
+                                fiatCurrency = fiatCurrency,
+                                price = row.price,
+                                source = row.source,
+                                timestampMillis = row.updated_at
+                            )
+                        }
+                        ExchangeRate.Type.USD -> {
+                            ExchangeRate.UsdPriceRate(
+                                fiatCurrency = fiatCurrency,
+                                price = row.price,
+                                source = row.source,
+                                timestampMillis = row.updated_at
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     suspend fun setWalletContext(version: WalletContext.Version, rawData: String): WalletContext.V0? {

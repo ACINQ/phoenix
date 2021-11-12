@@ -1,0 +1,143 @@
+{
+  "project_info": {
+    "project_number": "358118532563",
+    "firebase_url": "https://phoenix-testnet-dc948.firebaseio.com",
+    "project_id": "phoenix-testnet-dc948",
+    "storage_bucket": "phoenix-testnet-dc948.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358118532563:android:1d78424d5ee93df0e4fb26",
+        "android_client_info": {
+          "package_name": "fr.acinq.phoenix.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358118532563-rr117d65nqob7vc9otdkcbd8jldphjot.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.acinq.phoenix.android",
+            "certificate_hash": "d88a3de1710611c6ac303cf2e785dbf39cafc5ea"
+          }
+        },
+        {
+          "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB913iR2Jr_mhnueWLO8TDn5l8XoGoL0V0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "co.acinq.phoenix"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358118532563:android:13afe28140ca8256e4fb26",
+        "android_client_info": {
+          "package_name": "fr.acinq.phoenix.mainnet.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358118532563-m56f2q1d3b6j0q0r8ki1q6f0pcvgc3rt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.acinq.phoenix.mainnet.dev",
+            "certificate_hash": "d88a3de1710611c6ac303cf2e785dbf39cafc5ea"
+          }
+        },
+        {
+          "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB913iR2Jr_mhnueWLO8TDn5l8XoGoL0V0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "co.acinq.phoenix"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:358118532563:android:173d7ff5c4b7430fe4fb26",
+        "android_client_info": {
+          "package_name": "fr.acinq.phoenix.testnet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "358118532563-6mk6vj5juts2ek7on7c8ej3fpd5686mr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fr.acinq.phoenix.testnet",
+            "certificate_hash": "d88a3de1710611c6ac303cf2e785dbf39cafc5ea"
+          }
+        },
+        {
+          "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB913iR2Jr_mhnueWLO8TDn5l8XoGoL0V0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "358118532563-p8cqvdj24qd855gtd2uc1ive4thro924.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "358118532563-kp8r74nv2p7ng3v3bqlrdha12tj8gf7v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "co.acinq.phoenix"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

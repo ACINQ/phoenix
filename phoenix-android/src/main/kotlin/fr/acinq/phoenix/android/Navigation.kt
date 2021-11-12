@@ -27,9 +27,7 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
 
-sealed class Screen(val route: String, val arg: String? = null) {
-    val fullRoute by lazy { if (arg.isNullOrBlank()) route else "${route}/{$arg}" }
-
+sealed class Screen(val route: String) {
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
     object RestoreWallet : Screen("restorewallet")
@@ -43,30 +41,22 @@ sealed class Screen(val route: String, val arg: String? = null) {
     object Preferences : Screen("settings/preferences")
     object Receive : Screen("receive")
     object ReadData : Screen("readdata")
-    object Send : Screen("send", "request")
+    object Send : Screen("send/{request}")
+    object PaymentDetails : Screen("payment")
 }
 
-@Composable
-fun requireWalletPresent(
-    inScreen: Screen,
-    children: @Composable () -> Unit
-) {
-    if (keyState !is KeyState.Present) {
-        logger().warning { "accessing screen=$inScreen with keyState=$keyState" }
-        navController.navigate(Screen.Startup)
-        Text("redirecting...")
-    } else {
-        logger().debug { "access to screen=$inScreen granted" }
-        children()
-    }
-}
-
-fun NavHostController.navigate(screen: Screen, arg: String? = null, builder: NavOptionsBuilder.() -> Unit = {}) {
-    val route = if (arg.isNullOrBlank()) screen.route else "${screen.route}/$arg"
-    newLogger<NavController>(LoggerFactory.default).debug { "navigating to $route" }
+fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
+    val log = newLogger<NavController>(LoggerFactory.default)
+    val path = arg.joinToString{ "/$it" }
+    val route = "${screen.route}$path"
+    log.debug { "navigating from ${currentDestination?.route} to $route" }
     try {
-        navigate(route, builder)
+        if (route == currentDestination?.route) {
+            log.warning { "cannot navigate to same route" }
+        } else {
+            navigate(route, builder)
+        }
     } catch (e: Exception) {
-        newLogger(LoggerFactory.default).error(e) { "failed to navigate to $route" }
+        log.error(e) { "failed to navigate to $route" }
     }
 }

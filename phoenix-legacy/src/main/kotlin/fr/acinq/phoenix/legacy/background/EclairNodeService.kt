@@ -39,7 +39,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.msopentech.thali.toronionproxy.OnionProxyManager
 import com.typesafe.config.ConfigFactory
 import fr.acinq.bitcoin.scala.*
@@ -155,17 +155,13 @@ class EclairNodeService : Service() {
       EventBus.getDefault().register(this)
     }
     Prefs.getFCMToken(applicationContext) ?: run {
-      FirebaseInstanceId.getInstance().instanceId
-        .addOnCompleteListener(OnCompleteListener { task ->
-          if (!task.isSuccessful) {
-            log.warn("failed to retrieve fcm token", task.exception)
-            return@OnCompleteListener
-          }
-          log.debug("retrieved fcm token")
-          task.result?.token?.let { token ->
-            Prefs.saveFCMToken(applicationContext, token)
-          }
-        })
+      FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task.isSuccessful) {
+          log.warn("failed to retrieve fcm token: ", task.exception)
+          return@OnCompleteListener
+        }
+        task.result?.let { serviceScope.launch { Prefs.saveFCMToken(applicationContext, it) } }
+      })
     }
     appContext = AppContext.getInstance(applicationContext)
     appDb = AppDb.getInstance(applicationContext)

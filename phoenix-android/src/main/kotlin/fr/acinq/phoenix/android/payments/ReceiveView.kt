@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android.receive
+package fr.acinq.phoenix.android.payments
 
 import androidx.annotation.UiThread
 import androidx.compose.foundation.BorderStroke
@@ -116,19 +116,17 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 
 @Composable
 fun ReceiveView() {
-    requireWalletPresent(inScreen = Screen.Receive) {
-        val log = logger()
-        val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
-        when (val state = vm.state) {
-            is ReceiveViewState.Default -> DefaultView(vm = vm)
-            is ReceiveViewState.EditInvoice -> EditInvoiceView(
-                description = vm.customDesc,
-                onDescriptionChange = { vm.customDesc = it },
-                onAmountChange = { vm.customAmount = it },
-                onSubmit = { vm.generateInvoice() },
-                onCancel = { vm.state = ReceiveViewState.Default })
-            is ReceiveViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
-        }
+    val log = logger()
+    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
+    when (val state = vm.state) {
+        is ReceiveViewState.Default -> DefaultView(vm = vm)
+        is ReceiveViewState.EditInvoice -> EditInvoiceView(
+            description = vm.customDesc,
+            onDescriptionChange = { vm.customDesc = it },
+            onAmountChange = { vm.customAmount = it },
+            onSubmit = { vm.generateInvoice() },
+            onCancel = { vm.state = ReceiveViewState.Default })
+        is ReceiveViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
     }
 }
 

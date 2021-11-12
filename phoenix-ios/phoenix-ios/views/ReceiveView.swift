@@ -1191,7 +1191,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
-			unit: $unit,
+			currency: unit,
 			amount: $amount,
 			parsedAmount: $parsedAmount,
 			hideMsats: false
@@ -1207,14 +1207,17 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding([.top, .bottom])
 
 			HStack {
-				TextField("Amount (optional)", text: currencyStyler().amountProxy)
-					.keyboardType(.decimalPad)
-					.disableAutocorrection(true)
-					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
-					.read(textHeightReader)
-					.padding([.top, .bottom], 8)
-					.padding(.leading, 16)
-					.padding(.trailing, 0)
+				TextField(
+					NSLocalizedString("Amount (optional)", comment: "TextField placeholder"),
+					text: currencyStyler().amountProxy
+				)
+				.keyboardType(.decimalPad)
+				.disableAutocorrection(true)
+				.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+				.read(textHeightReader)
+				.padding([.top, .bottom], 8)
+				.padding(.leading, 16)
+				.padding(.trailing, 0)
 				
 				Picker(
 					selection: $unit,
@@ -1240,7 +1243,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 				.padding(.bottom, 4)
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				TextField("Description (optional)", text: $desc)
+				TextField(
+					NSLocalizedString("Description (optional)", comment: "TextField placeholder"),
+					text: $desc
+				)
 				
 				// Clear button (appears when TextField's text is non-empty)
 				Button {
@@ -1295,11 +1301,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 			
 			if let msat = msat, let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
 				
-				let targetAmt = Utils.convertToFiat(msat: msat, exchangeRate: exchangeRate)
-				parsedAmount = Result.success(targetAmt)
-				
 				let formattedAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+				parsedAmount = Result.success(formattedAmt.amount)
 				amount = formattedAmt.digits
+				
 			} else {
 				refreshAltAmount()
 			}
@@ -1308,11 +1313,10 @@ struct ModifyInvoiceSheet: View, ViewName {
 			
 			if let msat = msat {
 				
-				let targetAmt = Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-				parsedAmount = Result.success(targetAmt)
-				
 				let formattedAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
+				parsedAmount = Result.success(formattedAmt.amount)
 				amount = formattedAmt.digits
+				
 			} else {
 				refreshAltAmount()
 			}
@@ -1329,7 +1333,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
-		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amount, currency: unit, hideMsats: false)
 		parsedAmount = result.1
 		amount = result.0
 		

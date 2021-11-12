@@ -6,7 +6,7 @@ import os.log
 #if DEBUG && false
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "TransactionView"
+	category: "PaymentView"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
@@ -55,6 +55,20 @@ fileprivate struct SummaryView: View {
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	enum ButtonWidth: Preference {}
+	let buttonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<ButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var buttonWidth: CGFloat? = nil
+	
+	enum ButtonHeight: Preference {}
+	let buttonHeightReader = GeometryPreferenceReader(
+		key: AppendValue<ButtonHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var buttonHeight: CGFloat? = nil
+	
 	init(paymentInfo: WalletPaymentInfo, closeSheet: @escaping () -> Void) {
 	//	self.payment = payment
 		// ^^^ This compiles on Xcode 12.5, but crashes on the device.
@@ -69,7 +83,9 @@ fileprivate struct SummaryView: View {
 		
 		ZStack {
 
-			self.main
+			ScrollView {
+				self.main
+			}
 
 			// Close button in upper right-hand corner
 			VStack {
@@ -120,6 +136,8 @@ fileprivate struct SummaryView: View {
 		let payment = paymentInfo.payment
 		
 		VStack {
+			Spacer(minLength: 90)
+			
 			switch payment.state() {
 			case .success:
 				Image("ic_payment_sent")
@@ -250,13 +268,33 @@ fileprivate struct SummaryView: View {
 				explainFeesPopoverVisible: $explainFeesPopoverVisible
 			)
 			
-			NavigationLink(destination: DetailsView(
-				paymentInfo: $paymentInfo,
-				closeSheet: closeSheet
-			)) {
-				Text("Details")
+			HStack(alignment: VerticalAlignment.center, spacing: 16) {
+			
+				NavigationLink(destination: DetailsView(
+					paymentInfo: $paymentInfo,
+					closeSheet: closeSheet
+				)) {
+					Text("Details")
+						.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+						.read(buttonWidthReader)
+						.read(buttonHeightReader)
+				}
+				
+				Divider()
+					.frame(height: buttonHeight)
+				
+				NavigationLink(destination: EditInfoView(
+					paymentInfo: $paymentInfo
+				)) {
+					Text("Edit")
+						.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+						.read(buttonWidthReader)
+						.read(buttonHeightReader)
+				}
 			}
 			.padding([.top, .bottom])
+			.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
+			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 		}
 	}
 	
@@ -333,6 +371,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			paymentServiceRow
 			paymentDescriptionRow
 			paymentMessaegRow
+			paymentNotesRow
 			paymentTypeRow
 			channelClosingRow
 			paymentFeesRow
@@ -506,6 +545,27 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	var paymentNotesRow: some View {
+		let identifier: String = #function
+		
+		if let notes = paymentInfo.metadata.userNotes, notes.count > 0 {
+			
+			InfoGridRow(
+				identifier: identifier,
+				hSpacing: horizontalSpacingBetweenColumns,
+				keyColumnWidth: keyColumnWidth(identifier: identifier)
+			) {
+				
+				keyColumn(NSLocalizedString("Notes", comment: "Label in SummaryInfoGrid"))
+				
+			} valueColumn: {
+				
+				Text(notes)
+			}
+		}
+	}
+	
+	@ViewBuilder
 	var paymentTypeRow: some View {
 		let identifier: String = #function
 		
@@ -604,12 +664,12 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 						amount.hasFractionDigits
 					{
 						let styledText: Text =
-							Text("\(amount.integerDigits)")
-						+	Text("\(amount.decimalSeparator)\(amount.fractionDigits)")
+							Text(verbatim: "\(amount.integerDigits)")
+						+	Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
 								.foregroundColor(.secondary)
 								.font(.callout)
 								.fontWeight(.light)
-						+	Text(" \(amount.type)")
+						+	Text(verbatim: " \(amount.type)")
 						
 						styledText
 							.onTapGesture { toggleCurrencyType() }
@@ -859,7 +919,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		
 		if let lnurlPay = paymentInfo.metadata.lnurl?.pay {
 			
-			header(NSLocalizedString("lnurl-pay", comment: "Title in DetailsView_IncomingPayment"))
+			header("lnurl-pay")
 			
 			lnurl_service(lnurlPay)
 			lnurl_range(lnurlPay)
@@ -997,42 +1057,42 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 					if maxFormatted.hasFractionDigits {
 						
-						Text("\(minFormatted.integerDigits)") +
-						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+						Text(verbatim: "\(minFormatted.integerDigits)") +
+						Text(verbatim: "\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" – ") +
-						Text("\(maxFormatted.integerDigits)") +
-						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+						Text(verbatim: " – ") +
+						Text(verbatim: "\(maxFormatted.integerDigits)") +
+						Text(verbatim: "\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " \(maxFormatted.type)")
 						
 					} else {
 						
-						Text("\(minFormatted.integerDigits)") +
-						Text("\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
+						Text(verbatim: "\(minFormatted.integerDigits)") +
+						Text(verbatim: "\(minFormatted.decimalSeparator)\(minFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" – ") +
-						Text(maxFormatted.digits) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " – ") +
+						Text(verbatim: maxFormatted.digits) +
+						Text(verbatim: " \(maxFormatted.type)")
 					}
 					
 				} else {
 					
 					if maxFormatted.hasFractionDigits {
 						
-						Text(minFormatted.digits) +
-						Text(" – ") +
-						Text("\(maxFormatted.integerDigits)") +
-						Text("\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
+						Text(verbatim: minFormatted.digits) +
+						Text(verbatim: " – ") +
+						Text(verbatim: "\(maxFormatted.integerDigits)") +
+						Text(verbatim: "\(maxFormatted.decimalSeparator)\(maxFormatted.fractionDigits)")
 							.foregroundColor(.secondary) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: " \(maxFormatted.type)")
 						
 					} else {
 						
-						Text(minFormatted.digits) +
-						Text(" – ") +
-						Text(maxFormatted.digits) +
-						Text(" \(maxFormatted.type)")
+						Text(verbatim: minFormatted.digits) +
+						Text(verbatim: " – ") +
+						Text(verbatim: maxFormatted.digits) +
+						Text(verbatim: " \(maxFormatted.type)")
 					}
 				}
 			}
@@ -1532,12 +1592,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
-							Text("\(formatted.integerDigits)") +
-							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)")
+							Text(verbatim: "\(formatted.integerDigits)") +
+							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
 								.foregroundColor(.secondary) +
-							Text(" \(formatted.type)")
+							Text(verbatim: " \(formatted.type)")
 						} else {
-							Text(formatted.string)
+							Text(verbatim: formatted.string)
 						}
 					}
 				}
@@ -1555,11 +1615,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 						
 						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
-							Text("\(formatted.integerDigits)") +
-							Text("\(formatted.decimalSeparator)\(formatted.fractionDigits)").foregroundColor(.secondary) +
-							Text(" \(formatted.type)")
+							Text(verbatim: "\(formatted.integerDigits)") +
+							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
+								.foregroundColor(.secondary) +
+							Text(verbatim: " \(formatted.type)")
 						} else {
-							Text(formatted.string)
+							Text(verbatim: formatted.string)
 						}
 					}
 					
@@ -1604,12 +1665,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 			
 			if display_msat.hasFractionDigits { // has visible millisatoshi's
-				Text("\(display_msat.integerDigits)") +
-				Text("\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
+				Text(verbatim: "\(display_msat.integerDigits)") +
+				Text(verbatim: "\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
 					.foregroundColor(.secondary) +
-				Text(" \(display_msat.type)")
+				Text(verbatim: " \(display_msat.type)")
 			} else {
-				Text(display_msat.string)
+				Text(verbatim: display_msat.string)
 			}
 			
 			if let display_fiat = display_fiat {
@@ -1966,5 +2027,217 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+}
+
+fileprivate struct EditInfoView: View, ViewName {
+	
+	@Binding var paymentInfo: WalletPaymentInfo
+	
+	let defaultDescText: String
+	let originalDescText: String?
+	@State var descText: String
+	
+	let maxDescCount: Int = 64
+	@State var remainingDescCount: Int
+	
+	let originalNotesText: String?
+	@State var notesText: String
+	
+	let maxNotesCount: Int = 280
+	@State var remainingNotesCount: Int
+	
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+	
+	init(paymentInfo: Binding<WalletPaymentInfo>) {
+		_paymentInfo = paymentInfo
+		
+		let pi = paymentInfo.wrappedValue
+		
+		defaultDescText = pi.paymentDescription(includingUserDescription: false) ?? ""
+		let realizedDesc = pi.paymentDescription(includingUserDescription: true) ?? ""
+		
+		if realizedDesc == defaultDescText {
+			originalDescText = nil
+			_descText = State(initialValue: "")
+			_remainingDescCount = State(initialValue: maxDescCount)
+		} else {
+			originalDescText = realizedDesc
+			_descText = State(initialValue: realizedDesc)
+			_remainingDescCount = State(initialValue: maxDescCount - realizedDesc.count)
+		}
+		
+		originalNotesText = pi.metadata.userNotes
+		let notes = pi.metadata.userNotes ?? ""
+		
+		_notesText = State(initialValue: notes)
+		_remainingNotesCount = State(initialValue: maxNotesCount - notes.count)
+	}
+	
+	@ViewBuilder
+	var body: some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Button {
+					saveButtonTapped()
+				} label: {
+					HStack(alignment: .center, spacing: 4) {
+						Image(systemName: "chevron.left")
+							.imageScale(.medium)
+						Text("Save")
+					}
+				}
+				Spacer()
+				Button {
+					cancelButtonTapped()
+				} label: {
+					Text("Cancel")
+				}
+			}
+			.font(.title3)
+			.padding()
+			
+			ScrollView {
+				content
+			}
+		}
+		.navigationBarTitle(
+			NSLocalizedString("Edit Info", comment: "Navigation bar title"),
+			displayMode: .inline
+		)
+		.navigationBarHidden(true)
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+			
+			Text("Description:")
+				.padding(.leading, 8)
+				.padding(.bottom, 4)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				TextField(defaultDescText, text: $descText)
+				
+				// Clear button (appears when TextField's text is non-empty)
+				Button {
+					descText = ""
+				} label: {
+					Image(systemName: "multiply.circle.fill")
+						.foregroundColor(.secondary)
+				}
+				.isHidden(descText == "")
+			}
+			.padding(.all, 8)
+			.overlay(
+				RoundedRectangle(cornerRadius: 8)
+					.stroke(Color(UIColor.separator), lineWidth: 1)
+			)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				
+				Text("\(remainingDescCount) remaining")
+					.font(.callout)
+					.foregroundColor(remainingDescCount >= 0 ? Color.secondary : Color.appNegative)
+			}
+			.padding([.leading, .trailing], 8)
+			.padding(.top, 4)
+			
+			Text("Notes:")
+				.padding(.top, 20)
+				.padding(.leading, 8)
+				.padding(.bottom, 4)
+				
+			TextEditor(text: $notesText)
+				.frame(minHeight: 80, maxHeight: 320)
+				.padding(.all, 8)
+				.overlay(
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(Color(UIColor.separator), lineWidth: 1)
+				)
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				Spacer()
+				
+				Text("\(remainingNotesCount) remaining")
+					.font(.callout)
+					.foregroundColor(remainingNotesCount >= 0 ? Color.secondary : Color.appNegative)
+			}
+			.padding([.leading, .trailing], 8)
+			.padding(.top, 4)
+		}
+		.padding(.top)
+		.padding([.leading, .trailing])
+		.onChange(of: descText) {
+			descTextDidChange($0)
+		}
+		.onChange(of: notesText) {
+			notesTextDidChange($0)
+		}
+	}
+	
+	func descTextDidChange(_ newText: String) {
+		log.trace("[\(viewName)] descTextDidChange()")
+		
+		remainingDescCount = maxDescCount - newText.count
+	}
+	
+	func notesTextDidChange(_ newText: String) {
+		log.trace("[\(viewName)] notesTextDidChange()")
+		
+		remainingNotesCount = maxNotesCount - newText.count
+	}
+	
+	func cancelButtonTapped() {
+		log.trace("[\(viewName)] cancelButtonTapped()")
+		
+		presentationMode.wrappedValue.dismiss()
+	}
+	
+	func saveButtonTapped() {
+		log.trace("[\(viewName)] saveButtonTapped()")
+		
+		let paymentId = paymentInfo.id()
+		var desc = descText.trimmingCharacters(in: .whitespacesAndNewlines)
+		
+		if desc.count > maxDescCount {
+			let endIdx = desc.index(desc.startIndex, offsetBy: maxDescCount)
+			let substr = desc[desc.startIndex ..< endIdx]
+			desc = String(substr)
+		}
+		
+		let newDesc = (desc == defaultDescText) ? nil : (desc.count == 0 ? nil : desc)
+		
+		var notes = notesText.trimmingCharacters(in: .whitespacesAndNewlines)
+		
+		if notes.count > maxNotesCount {
+			let endIdx = notes.index(notes.startIndex, offsetBy: maxNotesCount)
+			let substr = notes[notes.startIndex ..< endIdx]
+			notes = String(substr)
+		}
+		
+		let newNotes = notes.count == 0 ? nil : notes
+		
+		if (originalDescText != newDesc) || (originalNotesText != newNotes) {
+		
+			let business = AppDelegate.get().business
+			business.databaseManager.paymentsDb { (paymentsDb: SqlitePaymentsDb?, _) in
+				
+				paymentsDb?.updateMetadata(id: paymentId, userDescription: newDesc, userNotes: newNotes) { (_, err) in
+					
+					if let err = err {
+						log.error("paymentsDb.updateMetadata: \(String(describing: err))")
+					}
+				}
+			}
+		} else {
+			log.debug("[\(viewName)] no changes - nothing to save")
+		}
+		
+		presentationMode.wrappedValue.dismiss()
 	}
 }

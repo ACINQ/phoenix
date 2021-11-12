@@ -186,7 +186,7 @@
 
   <!-- //////////////// scan //////////////// -->
 
-  <string name="readinput_manualinput">Inserir manualmente</string>
+  <string name="readinput_manualinput">Inserir dados manualmente</string>
   <string name="readinput_paste">Colar dados da área de transferência</string>
   <string name="readinput_browse">Usar imagem salva de código QR</string>
   <string name="readinput_extracting">Verificando…</string>

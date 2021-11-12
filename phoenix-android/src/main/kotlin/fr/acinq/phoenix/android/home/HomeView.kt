@@ -19,6 +19,7 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -60,102 +61,94 @@ import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.controllers.HomeController
+import fr.acinq.phoenix.controllers.main.Home
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
+import fr.acinq.phoenix.managers.PaymentsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
-private class HomeViewModel(val connectionsFlow: StateFlow<Connections>, controller: HomeController) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
+private class HomeViewModel(
+    val connectionsFlow: StateFlow<Connections>,
+    val paymentsManager: PaymentsManager,
+    controller: HomeController
+) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
+
+    init {
+        paymentsManager.subscribeToPaymentsPage(0, 150)
+    }
+
     class Factory(
         private val connectionsFlow: StateFlow<Connections>,
+        private val paymentsManager: PaymentsManager,
         private val controllerFactory: ControllerFactory,
         private val getController: ControllerFactory.() -> HomeController
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(connectionsFlow, controllerFactory.getController()) as T
+            return HomeViewModel(connectionsFlow, paymentsManager, controllerFactory.getController()) as T
         }
     }
 }
 
 @ExperimentalCoroutinesApi
 @Composable
-fun HomeView(appVM: AppViewModel) {
-    requireWalletPresent(inScreen = Screen.Home) {
-        val log = logger()
+fun HomeView(
+    onPaymentClick: (WalletPayment) -> Unit
+) {
+    val log = logger()
+    val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
 
-        val connectionsFlow = business.connectionsManager.connections
-        val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(connectionsFlow, controllerFactory, CF::home))
-        val connectionsState = vm.connectionsFlow.collectAsState()
-        val showConnectionsDialog = remember { mutableStateOf(false) }
-        if (showConnectionsDialog.value) {
-            ConnectionDialog(connections = connectionsState.value, onClose = { showConnectionsDialog.value = false })
-        }
+    val connectionsState = vm.connectionsFlow.collectAsState()
+    val paymentsPage = business.paymentsManager.paymentsPage.collectAsState()
+    val showConnectionsDialog = remember { mutableStateOf(false) }
+    if (showConnectionsDialog.value) {
+        ConnectionDialog(connections = connectionsState.value, onClose = { showConnectionsDialog.value = false })
+    }
 
-        val paymentsManager = business.paymentsManager
-        val paymentsPage = paymentsManager.paymentsPage.collectAsState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-        DisposableEffect(key1 = "homeview") {
-            log.debug { "subscribing to changes in payments page" }
-            paymentsManager.subscribeToPaymentsPage(0, 50)
-            onDispose {
-                log.debug { "disposing of homeview" }
-            }
-        }
-
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
-
-        ModalDrawer(
-            drawerState = drawerState,
-            drawerShape = RectangleShape,
-            drawerContent = { SideMenu() },
-            content = {
-                MVIView(vm) { model, _ ->
-                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        TopBar(showConnectionsDialog, connectionsState)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        AmountView(
-                            amount = model.balance,
-                            amountTextStyle = MaterialTheme.typography.h3,
-                            unitTextStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(horizontal = 16.dp)
-                        )
-                        model.incomingBalance?.run {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            IncomingAmountNotif(this)
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Surface(
-                            shape = CircleShape, color = MaterialTheme.colors.primary, modifier = Modifier
-                                .width(50.dp)
-                                .height(8.dp)
-                                .align(Alignment.CenterHorizontally)
-                        ) { }
-                        Spacer(modifier = Modifier.height(24.dp))
-                        LazyColumn(modifier = Modifier.weight(1f)) {
-                            items(paymentsPage.value.rows) {
-                                PreparePaymentLine(it)
-                            }
-                        }
-                        BottomBar(scope, drawerState)
+    ModalDrawer(
+        drawerState = drawerState,
+        drawerShape = RectangleShape,
+        drawerContent = { SideMenu() },
+        content = {
+            MVIView(vm) { model, _ ->
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    TopBar(showConnectionsDialog, connectionsState)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AmountView(
+                        amount = model.balance,
+                        amountTextStyle = MaterialTheme.typography.h3,
+                        unitTextStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 16.dp)
+                    )
+                    model.incomingBalance?.run {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        IncomingAmountNotif(this)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    PrimarySeparator()
+                    Spacer(modifier = Modifier.height(24.dp))
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(paymentsPage.value.rows) {
+                            PreparePaymentLine(it, onPaymentClick)
+                        }
+                    }
+                    BottomBar(scope, drawerState)
                 }
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable
@@ -301,22 +294,28 @@ private fun IncomingAmountNotif(amount: MilliSatoshi) {
 }
 
 @Composable
-private fun PreparePaymentLine(row: WalletPaymentOrderRow) {
-    val log = logger()
+private fun PreparePaymentLine(
+    row: WalletPaymentOrderRow,
+    onPaymentClick: (WalletPayment) -> Unit
+) {
     val paymentsManager = business.paymentsManager
     var payment by remember { mutableStateOf<WalletPayment?>(null) }
     LaunchedEffect(key1 = row.id) {
         payment = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.payment
     }
-    payment?.let { PaymentLine(it) } ?: Text("Loading...")
+    payment?.let { PaymentLine(it, onPaymentClick) } ?: Text("Loading...")
 }
 
 @Composable
-private fun PaymentLine(payment: WalletPayment) {
-    val log = logger()
+private fun PaymentLine(
+    payment: WalletPayment,
+    onPaymentClick: (WalletPayment) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        modifier = Modifier
+            .clickable { onPaymentClick(payment) }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIcon(payment)
         Spacer(modifier = Modifier.width(16.dp))

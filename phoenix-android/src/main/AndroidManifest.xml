@@ -18,8 +18,8 @@
         android:theme="@style/Theme.PhoenixAndroid">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/app_name"
             android:theme="@style/Theme.PhoenixAndroid.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +27,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- firebase cloud messaging -->
+        <service
+            android:name="fr.acinq.phoenix.android.service.FCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- node service -->
+        <service
+            android:name="fr.acinq.phoenix.android.service.NodeService"
+            android:exported="false"
+            android:stopWithTask="false" />
+
+        <!-- Set custom default icon for notifications -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:value="@drawable/ic_phoenix_outline" />
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:value="?attr/colorPrimary" />
+
+    </application>
 </manifest>

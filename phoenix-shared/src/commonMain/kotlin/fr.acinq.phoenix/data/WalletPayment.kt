@@ -99,8 +99,10 @@ data class WalletPaymentInfo(
  * Represents information from the `payments_metadata` table.
  */
 data class WalletPaymentMetadata(
-    val userDescription: String? = null,
     val lnurl: LnurlPayMetadata? = null,
+    val userDescription: String? = null,
+    val userNotes: String? = null,
+    val modifiedAt: Long? = null
 )
 
 data class LnurlPayMetadata(

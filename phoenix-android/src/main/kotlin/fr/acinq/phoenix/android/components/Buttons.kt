@@ -74,12 +74,12 @@ fun FilledButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
-    onClick: () -> Unit,
     enabled: Boolean = true,
     space: Dp = 16.dp,
     textStyle: TextStyle = MaterialTheme.typography.button.copy(color = MaterialTheme.colors.onPrimary),
     padding: PaddingValues = PaddingValues(12.dp),
     backgroundColor: Color = MaterialTheme.colors.primary,
+    onClick: () -> Unit,
 ) {
     Button(
         text = text?.run { stringResource(this) },
@@ -155,11 +155,10 @@ fun Button(
     border: BorderStroke? = null, // ButtonDefaults.outlinedBorder,
     elevation: ButtonElevation? = null,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
-    disabledBackgroundColor: Color = MaterialTheme.colors.background,
 ) {
     val colors = ButtonDefaults.buttonColors(
         backgroundColor = backgroundColor,
-        disabledBackgroundColor = disabledBackgroundColor,
+        disabledBackgroundColor = backgroundColor.copy(alpha = 0.5f),
         contentColor = LocalContentColor.current,
         disabledContentColor = mutedTextColor(),
     )

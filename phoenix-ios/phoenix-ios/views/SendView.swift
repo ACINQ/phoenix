@@ -645,7 +645,7 @@ struct ValidateView: View, ViewName {
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
 		return TextFieldCurrencyStyler(
-			unit: $unit,
+			currency: unit,
 			amount: $amount,
 			parsedAmount: $parsedAmount,
 			hideMsats: false
@@ -1015,10 +1015,9 @@ struct ValidateView: View, ViewName {
 		
 		if let amount_msat = amount_msat {
 			
-			let targetAmt = Utils.convertBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit)
 			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
 			
-			parsedAmount = Result.success(targetAmt) // do this first !
+			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
@@ -1060,7 +1059,7 @@ struct ValidateView: View, ViewName {
 		log.trace("[\(viewName)] unitDidChange()")
 		
 		// We might want to apply a different formatter
-		let result = TextFieldCurrencyStyler.format(input: amount, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amount, currency: unit, hideMsats: false)
 		parsedAmount = result.1
 		amount = result.0
 		
@@ -1312,7 +1311,7 @@ struct ValidateView: View, ViewName {
 		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
 		
 		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
-		let result = TextFieldCurrencyStyler.format(input: amt.digits, unit: unit, hideMsats: false)
+		let result = TextFieldCurrencyStyler.format(input: amt.digits, currency: unit, hideMsats: false)
 		
 		parsedAmount = result.1
 		amount = result.0
@@ -2059,7 +2058,7 @@ struct CommentSheet: View, ViewName {
 
 struct LnurlPayErrorNotice: View, ViewName {
 	
-	let error: Scan.LNUrlPayError
+	let error: Scan.LNUrlPay_Error
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
@@ -2115,19 +2114,19 @@ struct LnurlPayErrorNotice: View, ViewName {
 			
 			if let err = error as? Scan.LNUrlPay_Error_RemoteError {
 				
-				if let _ = err.err as? LNUrl.ErrorRemoteFailureCouldNotConnect {
+				if let _ = err.err as? LNUrl.Error_RemoteFailure_CouldNotConnect {
 					
 					Text("Could not connect to host:")
 					Text(err.err.origin)
 						.font(.system(.subheadline, design: .monospaced))
 				
-				} else if let details = err.err as? LNUrl.ErrorRemoteFailureCode {
+				} else if let details = err.err as? LNUrl.Error_RemoteFailure_Code {
 					
 					Text("Host returned status code \(details.code.value):")
 				 	Text(err.err.origin)
 						.font(.system(.subheadline, design: .monospaced))
 				 
-				} else if let details = err.err as? LNUrl.ErrorRemoteFailureDetailed {
+				} else if let details = err.err as? LNUrl.Error_RemoteFailure_Detailed {
 				
 					Text("Host returned error response.")
 					Text("Host: \(details.origin)")
@@ -2135,7 +2134,7 @@ struct LnurlPayErrorNotice: View, ViewName {
 					Text("Error: \(details.reason)")
 						.font(.system(.subheadline, design: .monospaced))
 			 
-				} else if let _ = err.err as? LNUrl.ErrorRemoteFailureUnreadable {
+				} else if let _ = err.err as? LNUrl.Error_RemoteFailure_Unreadable {
 				
 					Text("Host returned unreadable response:", comment: "error details")
 				 	Text(err.err.origin)
@@ -2147,28 +2146,21 @@ struct LnurlPayErrorNotice: View, ViewName {
 				
 			} else if let err = error as? Scan.LNUrlPay_Error_BadResponseError {
 				
-				if let details = err.err as? LNUrl.ErrorPayInvoiceMissingPr {
+				if let details = err.err as? LNUrl.Error_PayInvoice_Malformed {
 					
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
-					Text("Error: missing payment request")
+					Text("Malformed: \(details.context)")
 						.font(.system(.subheadline, design: .monospaced))
 					
-				} else if let details = err.err as? LNUrl.ErrorPayInvoiceMalformedPr {
-					
-					Text("Host: \(details.origin)")
-						.font(.system(.subheadline, design: .monospaced))
-					Text("Error: malformed payment request")
-						.font(.system(.subheadline, design: .monospaced))
-					
-				} else if let details = err.err as? LNUrl.ErrorPayInvoiceInvalidHash {
+				} else if let details = err.err as? LNUrl.Error_PayInvoice_InvalidHash {
 					
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
 					Text("Error: invalid hash")
 						.font(.system(.subheadline, design: .monospaced))
 					
-				} else if let details = err.err as? LNUrl.ErrorPayInvoiceInvalidAmount {
+				} else if let details = err.err as? LNUrl.Error_PayInvoice_InvalidAmount {
 				 
 					Text("Host: \(details.origin)")
 						.font(.system(.subheadline, design: .monospaced))
@@ -2204,20 +2196,20 @@ struct LnurlPayErrorNotice: View, ViewName {
 	
 	func title() -> String {
 		
-		if let err = error as? Scan.LNUrlPayErrorRemoteError {
-			if err.err is LNUrl.ErrorRemoteFailureCouldNotConnect {
+		if let err = error as? Scan.LNUrlPay_Error_RemoteError {
+			if err.err is LNUrl.Error_RemoteFailure_CouldNotConnect {
 				return NSLocalizedString("Connection failure", comment: "Error title")
 			} else {
 				return NSLocalizedString("Invalid response", comment: "Error title")
 			}
 			
-		} else if let _ = error as? Scan.LNUrlPayErrorBadResponseError {
+		} else if let _ = error as? Scan.LNUrlPay_Error_BadResponseError {
 			return NSLocalizedString("Invalid response", comment: "Error title")
 			
-		} else if let _ = error as? Scan.LNUrlPayErrorChainMismatch {
+		} else if let _ = error as? Scan.LNUrlPay_Error_ChainMismatch {
 			return NSLocalizedString("Chain mismatch", comment: "Error title")
 			
-		} else if let _ = error as? Scan.LNUrlPayErrorAlreadyPaidInvoice {
+		} else if let _ = error as? Scan.LNUrlPay_Error_AlreadyPaidInvoice {
 			return NSLocalizedString("Already paid", comment: "Error title")
 			
 		} else {
@@ -2318,10 +2310,7 @@ struct LoginView: View, ViewName {
 		.assignMaxPreference(for: maxImageHeightReader.key, to: $maxImageHeight)
 		.frame(maxHeight: .infinity)
 		.edgesIgnoringSafeArea([.bottom, .leading, .trailing]) // top is nav bar
-		.navigationBarTitle(
-			NSLocalizedString("lnurl-auth", comment: "Navigation bar title"),
-			displayMode: .inline
-		)
+		.navigationBarTitle("lnurl-auth", displayMode: .inline)
 		.zIndex(2) // [SendingView, ValidateView, LoginView, ScanView]
 	}
 	

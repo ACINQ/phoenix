@@ -56,8 +56,10 @@ object Converter {
         else -> BTC_FORMAT
     }
 
-    /** Returns a string representation of this Double. No scientific notation is used. Reuse [BigDecimal.toPlainString]. */
-    fun Double?.toPlainString(): String = this?.takeIf { it > 0 }?.run { BigDecimal.valueOf(this).toPlainString() } ?: ""
+    /** Format the double as a String using [DecimalFormat]. */
+    fun Double?.toPlainString(): String = this?.takeIf { it > 0 }?.run {
+        DecimalFormat("0.########").format(this)
+    } ?: ""
 
     /** Converts [MilliSatoshi] to a fiat amount. */
     fun MilliSatoshi.toFiat(rate: Double): Double = this.toUnit(BitcoinUnit.Btc) * rate
@@ -70,7 +72,7 @@ object Converter {
         if (withUnit) "$this $unit" else this
     }
 
-    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: BitcoinPriceRate? = null, withUnit: Boolean = false): String = when {
+    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false): String = when {
         unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)
         else -> "?!"

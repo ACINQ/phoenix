@@ -17,14 +17,10 @@
 package fr.acinq.phoenix.android.components
 
 
-import android.graphics.Typeface
-import android.text.InputType
-import android.util.TypedValue
-import android.view.View.TEXT_ALIGNMENT_VIEW_END
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -32,20 +28,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.widget.doOnTextChanged
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toFiat
@@ -80,6 +80,18 @@ fun InputText(
     )
 }
 
+@Preview
+@Composable
+fun ComposablePreview() {
+    PhoenixAndroidTheme() {
+        Column {
+            AmountInput(initialAmount = 123456.msat, onAmountChange = { _, _, _ -> Unit })
+            Spacer(modifier = Modifier.height(24.dp))
+            AmountInput(initialAmount = -123456.msat, onAmountChange = { _, _, _ -> Unit }, useBasicInput = true)
+        }
+    }
+}
+
 @Composable
 fun AmountInput(
     initialAmount: MilliSatoshi?,
@@ -94,47 +106,30 @@ fun AmountInput(
     val log = logger()
 
     // get unit ambients
+    val context = LocalContext.current
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
     val rate = fiatRate
-    val units = if (rate != null) {
-        listOf<CurrencyUnit>(
-            BitcoinUnit.Sat,
-            BitcoinUnit.Bit,
-            BitcoinUnit.MBtc,
-            BitcoinUnit.Btc,
-            rate.fiatCurrency
-        )
-    } else {
-        listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc)
-    }
+    val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
     val focusManager = LocalFocusManager.current
-
-    // references for constraint layout
-    val amountRef = "amount_input"
-    val unitRef = "unit_dropdown"
-    val altAmountRef = "alt_amount"
-    val amountLineRef = "amount_line"
 
     // unit selected in the dropdown menu
     var unit: CurrencyUnit by remember { mutableStateOf(prefBitcoinUnit) }
     // stores the raw String input entered by the user.
     var rawAmount: String by remember {
-        mutableStateOf(
-            initialAmount?.toUnit(prefBitcoinUnit).toPlainString()
-        )
+        mutableStateOf(initialAmount?.toUnit(prefBitcoinUnit).toPlainString())
     }
     var convertedAmount: String by remember {
-        mutableStateOf(
-            initialAmount?.toFiat(
-                rate?.price ?: -1.0
-            ).toPlainString()
-        )
+        mutableStateOf(initialAmount?.toFiat(rate?.price ?: -1.0).toPlainString())
     }
-    // stores the numeric value of rawAmount, as a Double. Null if rawAmount is invalid or empty.
-    var amount: Double? by remember { mutableStateOf(initialAmount?.toUnit(prefBitcoinUnit)) }
+    // stores the numeric value of rawAmount as a Double. Null if rawAmount is invalid or empty.
+    var amount: Double? by remember {
+        mutableStateOf(initialAmount?.toUnit(prefBitcoinUnit))
+    }
 
-    log.info { "amount input initial [ amount=${amount.toPlainString()} unit=$unit with rate=$rate ]" }
+    log.debug { "amount input initial [ amount=${amount.toPlainString()} unit=$unit with rate=$rate ]" }
+
+    /** Convert the input [Double] to a (msat -> fiat) pair, if possible. */
     fun convertInputToAmount(): Pair<MilliSatoshi?, Double?> {
         log.info { "amount input update [ amount=$amount unit=$unit with rate=$rate ]" }
         return amount?.let { d ->
@@ -142,22 +137,37 @@ fun AmountInput(
                 is FiatCurrency -> {
                     if (rate == null) {
                         log.warning { "cannot convert fiat amount to bitcoin with a null rate" }
-                        convertedAmount = "No price available"
-                        Pair(null, null)
+                        convertedAmount = context.getString(R.string.utils_no_conversion)
+                        null to null
                     } else {
                         val msat = d.toMilliSatoshi(rate.price)
-                        convertedAmount = msat.toPrettyString(prefBitcoinUnit, withUnit = true)
-                        Pair(msat, amount)
+
+                        if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
+                            convertedAmount = context.getString(R.string.send_amount_error_too_large)
+                            null to null
+                        } else if (msat < 0.msat) {
+                            convertedAmount = context.getString(R.string.send_amount_error_negative)
+                            null to null
+                        } else {
+                            convertedAmount = msat.toPrettyString(prefBitcoinUnit, withUnit = true)
+                            msat to amount
+                        }
                     }
                 }
                 is BitcoinUnit -> d.toMilliSatoshi(u).run {
-                    if (rate == null) {
-                        convertedAmount = "No price available"
-                        Pair(this, null) // conversion is not possible but that does not matter.
+                    if (this.toUnit(BitcoinUnit.Btc) > 21e6) {
+                        convertedAmount = context.getString(R.string.send_amount_error_too_large)
+                        null to null
+                    } else if (this < 0.msat) {
+                        convertedAmount = context.getString(R.string.send_amount_error_negative)
+                        null to null
+                    } else if (rate == null) {
+                        convertedAmount = context.getString(R.string.utils_no_conversion)
+                        this to null // conversion is not possible but that does not stop the payment
                     } else {
                         val fiat = toFiat(rate.price)
                         convertedAmount = fiat.toPrettyString(prefFiat, withUnit = true)
-                        Pair(this, fiat)
+                        this to fiat
                     }
                 }
                 else -> {
@@ -171,131 +181,138 @@ fun AmountInput(
         }
     }
 
-    ConstraintLayout(constraintSet = ConstraintSet {
-        val amountInput = createRefFor(amountRef)
-        val unitDropdown = createRefFor(unitRef)
-        val altAmount = createRefFor(altAmountRef)
-        constrain(amountInput) {
-            if (!useBasicInput) {
-                width = Dimension.fillToConstraints
-                end.linkTo(unitDropdown.start)
-            }
-            top.linkTo(parent.top)
-            start.linkTo(parent.start)
-        }
-        constrain(unitDropdown) {
-            if (useBasicInput) {
-                bottom.linkTo(amountInput.bottom)
-                top.linkTo(amountInput.top)
-            } else {
-                baseline.linkTo(amountInput.baseline)
-            }
-            start.linkTo(amountInput.end)
-            end.linkTo(parent.end)
-        }
-        if (useBasicInput) {
-            val amountLine = createRefFor(amountLineRef)
-            constrain(amountLine) {
-                width = Dimension.fillToConstraints
-                bottom.linkTo(amountInput.bottom)
-                start.linkTo(amountInput.start)
-                end.linkTo(unitDropdown.end)
-            }
-        }
-        constrain(altAmount) {
-            top.linkTo(amountInput.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }
-    }, modifier = modifier) {
-        val onValueChange: (String) -> Unit = {
-            val d = it.toDoubleOrNull()
-            if (d == null) {
-                rawAmount = ""
-                amount = null
-            } else {
-                rawAmount = it
-                amount = d
-            }
-            convertInputToAmount().let { conv ->
-                onAmountChange(conv.first, conv.second, prefFiat)
-            }
-        }
-        if (useBasicInput) {
-            AndroidView(factory = { ctx ->
-                EditText(ctx).apply {
-                    setText(rawAmount)
-                    doOnTextChanged { text, start, before, count ->
-                        onValueChange(text.toString())
-                    }
-                    background = null
-                    inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                    textAlignment = TEXT_ALIGNMENT_VIEW_END
-                    textSize = inputTextSize.value
-                    setTextColor(getColor(ctx, R.attr.colorPrimary))
-                    typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
-                    minWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80.0f, ctx.resources.displayMetrics).toInt()
-                    maxLines = 1
-                }
-            }, modifier = Modifier.layoutId(amountRef))
+    /**
+     * When input changes, refresh the mutable amount field and convert it to a actionable (msat -> fiat) pair.
+     */
+    val onValueChange: (String) -> Unit = {
+        val d = it.toDoubleOrNull()
+        log.info { "double=$d" }
+        if (d == null) {
+            rawAmount = ""
+            amount = null
         } else {
-            TextField(
-                value = rawAmount,
-                onValueChange = onValueChange,
-                modifier = inputModifier.layoutId(amountRef),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.None,
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                colors = textFieldColors(),
-                singleLine = true,
-                maxLines = 1,
-            )
+            rawAmount = it
+            amount = d
         }
+        convertInputToAmount().let { (msat, fiat) -> onAmountChange(msat, fiat, prefFiat) }
+    }
 
-        UnitDropdown(
-            selectedUnit = unit,
-            units = units,
-            onUnitChange = {
-                unit = it
-                convertInputToAmount().let { p -> onAmountChange(p.first, p.second, prefFiat) }
+    // references for constraint layout
+    val amountRef = "amount_input"
+    val unitRef = "unit_dropdown"
+    val altAmountRef = "alt_amount"
+    val amountLineRef = "amount_line"
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ConstraintLayout(
+            constraintSet = ConstraintSet {
+                val amountInput = createRefFor(amountRef)
+                val unitDropdown = createRefFor(unitRef)
+                val altAmount = createRefFor(altAmountRef)
+
+                createHorizontalChain(amountInput, unitDropdown, chainStyle = ChainStyle.Packed)
+                constrain(amountInput) {
+                    width = Dimension.preferredValue(150.dp)
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(unitDropdown.start)
+                }
+                constrain(unitDropdown) {
+                    baseline.linkTo(amountInput.baseline)
+                    start.linkTo(amountInput.end, margin = 2.dp)
+                    end.linkTo(parent.end)
+                }
+                if (useBasicInput) {
+                    val amountLine = createRefFor(amountLineRef)
+                    constrain(amountLine) {
+                        width = Dimension.fillToConstraints
+                        top.linkTo(amountInput.bottom, margin = 2.dp)
+                        start.linkTo(amountInput.start)
+                        end.linkTo(unitDropdown.end)
+                    }
+                }
+                constrain(altAmount) {
+                    top.linkTo(amountInput.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
             },
-            onDismiss = { },
-            modifier = dropdownModifier.layoutId(unitRef)
-        )
+            modifier = modifier.width(IntrinsicSize.Min)
+        ) {
+            if (useBasicInput) {
+                BasicTextField(
+                    value = rawAmount,
+                    onValueChange = onValueChange,
+                    modifier = inputModifier
+                        .layoutId(amountRef)
+                        .defaultMinSize(minWidth = 32.dp)
+                        .sizeIn(maxWidth = 180.dp),
+                    textStyle = MaterialTheme.typography.body1.copy(
+                        fontSize = 32.sp,
+                        color = MaterialTheme.colors.primary
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrect = false,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    singleLine = true,
+                )
+            } else {
+                TextField(
+                    value = rawAmount,
+                    onValueChange = onValueChange,
+                    modifier = inputModifier.layoutId(amountRef),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrect = false,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    colors = textFieldColors(),
+                    singleLine = true,
+                    maxLines = 1,
+                )
+            }
+
+            UnitDropdown(
+                selectedUnit = unit,
+                units = units,
+                onUnitChange = {
+                    unit = it
+                    convertInputToAmount().let { (msat, fiat) -> onAmountChange(msat, fiat, prefFiat) }
+                },
+                onDismiss = { },
+                modifier = dropdownModifier.layoutId(unitRef)
+            )
+
+            if (useBasicInput) {
+                AndroidView(modifier = Modifier
+                    .layoutId(amountLineRef), factory = {
+                    ImageView(it).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        setBackgroundResource(R.drawable.line_dots)
+                    }
+                })
+            }
+        }
 
         Text(
-            text = convertedAmount.takeIf { it.isNotBlank() }
-                ?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
-            style = MaterialTheme.typography.caption,
+            text = convertedAmount.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
+            style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
             modifier = Modifier
                 .layoutId(altAmountRef)
-                .padding(top = 4.dp)
-                .then(
-                    if (useBasicInput) {
-                        Modifier
-                    } else {
-                        Modifier.fillMaxWidth()
-                    }
-                )
+                .fillMaxWidth()
         )
-
-        if (useBasicInput) {
-            AndroidView(modifier = Modifier
-                .height(2.dp)
-                .layoutId(amountLineRef), factory = {
-                ImageView(it).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    setBackgroundResource(R.drawable.line_dots)
-                }
-            })
-        }
     }
 }
 

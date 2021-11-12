@@ -90,6 +90,24 @@
           "revision": "afa9a1ace74e116848d4f743599ab83e584ff8cb",
           "version": "1.2.12"
         }
+      },
+      {
+        "package": "Focuser",
+        "repositoryURL": "git@github.com:art-technologies/swift-focuser.git",
+        "state": {
+          "branch": null,
+          "revision": "f874246f370218994469b74939b88d564be1f810",
+          "version": "0.2.0"
+        }
+      },
+      {
+        "package": "Introspect",
+        "repositoryURL": "https://github.com/siteline/SwiftUI-Introspect.git",
+        "state": {
+          "branch": null,
+          "revision": "2e09be8af614401bc9f87d40093ec19ce56ccaf2",
+          "version": "0.1.3"
+        }
       }
     ]
   },

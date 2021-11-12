@@ -10,9 +10,7 @@ import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
-import fr.acinq.phoenix.data.Chain
-import fr.acinq.phoenix.data.LNUrl
-import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
 import fr.acinq.phoenix.managers.*
 import fr.acinq.phoenix.managers.Utilities.BitcoinAddressInfo
@@ -320,13 +318,19 @@ class AppScanController(
             is Either.Right -> {
                 val paymentRequest = result.value.paymentRequest
                 val paymentId = UUID.randomUUID()
-                databaseManager.paymentsDb().enqueueMetadata(
-                    row = WalletPaymentMetadataRow.serialize(
+                val metadata = WalletPaymentMetadata(
+                    lnurl = LnurlPayMetadata(
                         pay = intent.lnurlPay,
+                        description = intent.lnurlPay.metadata.plainText,
                         successAction = result.value.successAction
-                    ),
-                    id = WalletPaymentId.OutgoingPaymentId(paymentId)
+                    )
                 )
+                WalletPaymentMetadataRow.serialize(metadata)?.let { row ->
+                    databaseManager.paymentsDb().enqueueMetadata(
+                        row = row,
+                        id = WalletPaymentId.OutgoingPaymentId(paymentId)
+                    )
+                }
                 peerManager.getPeer().send(
                     SendPayment(
                         paymentId = paymentId,

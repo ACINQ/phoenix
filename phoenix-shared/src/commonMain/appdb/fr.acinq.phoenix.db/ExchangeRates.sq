@@ -1,0 +1,26 @@
+import fr.acinq.phoenix.data.ExchangeRate;
+
+CREATE TABLE IF NOT EXISTS exchange_rates (
+    fiat TEXT NOT NULL PRIMARY KEY,
+    price REAL NOT NULL,
+    type TEXT AS ExchangeRate.Type NOT NULL,
+    source TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+insert:
+INSERT INTO exchange_rates(
+  fiat, price, type, source, updated_at
+) VALUES (?, ?, ?, ?, ?);
+
+update:
+UPDATE exchange_rates SET price=?, type=?, source=?, updated_at=? WHERE fiat=?;
+
+get:
+SELECT * FROM exchange_rates WHERE fiat=?;
+
+list:
+SELECT * FROM exchange_rates;
+
+delete:
+DELETE FROM exchange_rates WHERE fiat=?;

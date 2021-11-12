@@ -366,7 +366,7 @@
 "Edit payment request" = "Upravit žádost o platbu";
 
 /* Label in SummaryInfoGrid */
-"Elapsed" = "Uplynulý čas";
+"elapsed" = "Uplynulý čas";
 
 /* Navigation bar title */
 "Electrum server" = "Electrum server";
@@ -464,11 +464,8 @@
 /* No comment provided by engineer. */
 "I understand" = "Rozumím";
 
-/* No comment provided by engineer. */
-"I understand." = "Rozumím.";
-
 /* Currency name: ISK */
-"Icelandic Kròna" = "Islandská koruna";
+"Icelandic Króna" = "Islandská koruna";
 
 /* No comment provided by engineer. */
 "If done correctly, self-backup is the most secure option." = "Správně provedená vlastní záloha je nejbezpečnější možností.";
@@ -817,7 +814,7 @@
 "System" = "Systém";
 
 /* Currency name: TWD */
-"Taiwan New Dollar" = "Nový tchajwanský dolar";
+"Taiwan Dollar" = "Tchajwanský dolar";
 
 /* No comment provided by engineer. */
 "Terminate App" = "Ukončit aplikaci";

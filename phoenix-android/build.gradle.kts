@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("com.google.gms.google-services")
 }
 
 val chain: String by project
@@ -101,6 +102,9 @@ dependencies {
     // logging
     implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
     implementation("com.github.tony19:logback-android:${Versions.Android.logback}")
+
+    // firebase cloud messaging
+    implementation("com.google.firebase:firebase-messaging:${Versions.Android.fcm}")
 
     testImplementation("junit:junit:${Versions.junit}")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
