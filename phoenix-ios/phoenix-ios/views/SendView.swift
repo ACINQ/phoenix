@@ -704,7 +704,7 @@ struct ValidateView: View, ViewName {
 				)
 			} else if mvi.model is Scan.Model_LnurlWithdrawFlow_LnurlWithdrawFetch {
 				LnurlFetchNotice(
-					title: NSLocalizedString("Sending Invoice", comment: "Progress title"),
+					title: NSLocalizedString("Forwarding Invoice", comment: "Progress title"),
 					onCancel: { didCancelLnurlWithdrawFetch() }
 				)
 			}
