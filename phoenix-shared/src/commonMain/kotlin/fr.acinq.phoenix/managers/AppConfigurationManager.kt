@@ -29,7 +29,7 @@ class AppConfigurationManager(
     loggerFactory: LoggerFactory
 ) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         chain = business.chain,
         appDb = business.appDb,
@@ -123,18 +123,23 @@ class AppConfigurationManager(
 
     private suspend fun fetchAndStoreWalletContext(): WalletContext.V0? {
         return try {
-            val rawData = httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
-            appDb.setWalletContext(currentWalletContextVersion, rawData)
-        } catch (t: Throwable) {
-            logger.error(t) { "${t.message}" }
-            null
+            httpClient.get<String>("https://acinq.co/phoenix/walletcontext.json")
+        } catch (e1: Exception) {
+            try {
+                httpClient.get<String>("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
+            } catch (e2: Exception) {
+                logger.error(e2) { "failed to fetch wallet context: ${e2.message?.take(200)}" }
+                null
+            }
+        }?.let {
+            appDb.setWalletContext(currentWalletContextVersion, it)
         }
     }
 
     private val publicSuffixListKey = "publicSuffixList"
     private val publicSuffixListDefaultRefresh = Duration.days(30)
 
-    suspend fun fetchPublicSuffixList(
+    private suspend fun fetchPublicSuffixList(
         refreshIfOlderThan: Duration = publicSuffixListDefaultRefresh
     ): Pair<String, Long>? {
         val databaseRow = appDb.getValue(publicSuffixListKey) {
