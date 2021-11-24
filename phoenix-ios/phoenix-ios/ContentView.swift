@@ -102,6 +102,7 @@ struct ContentView: MVIView {
 				loadingView()
 			}
 		}
+		.navigationViewStyle(StackNavigationViewStyle())
 	}
 
 	@ViewBuilder
