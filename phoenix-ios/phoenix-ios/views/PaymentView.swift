@@ -2047,6 +2047,8 @@ fileprivate struct EditInfoView: View, ViewName {
 	let maxNotesCount: Int = 280
 	@State var remainingNotesCount: Int
 	
+	@State var hasChanges = false
+	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
 	init(paymentInfo: Binding<WalletPaymentInfo>) {
@@ -2090,11 +2092,6 @@ fileprivate struct EditInfoView: View, ViewName {
 					}
 				}
 				Spacer()
-				Button {
-					cancelButtonTapped()
-				} label: {
-					Text("Cancel")
-				}
 			}
 			.font(.title3)
 			.padding()
@@ -2169,6 +2166,14 @@ fileprivate struct EditInfoView: View, ViewName {
 			}
 			.padding([.leading, .trailing], 8)
 			.padding(.top, 4)
+			
+			Button {
+				discardButtonTapped()
+			} label: {
+				Text("Discard Changes")
+			}
+			.disabled(!hasChanges)
+			.padding(.top, 8)
 		}
 		.padding(.top)
 		.padding([.leading, .trailing])
@@ -2184,18 +2189,38 @@ fileprivate struct EditInfoView: View, ViewName {
 		log.trace("[\(viewName)] descTextDidChange()")
 		
 		remainingDescCount = maxDescCount - newText.count
+		updateHasChanges()
 	}
 	
 	func notesTextDidChange(_ newText: String) {
 		log.trace("[\(viewName)] notesTextDidChange()")
 		
 		remainingNotesCount = maxNotesCount - newText.count
+		updateHasChanges()
 	}
 	
-	func cancelButtonTapped() {
-		log.trace("[\(viewName)] cancelButtonTapped()")
+	func updateHasChanges() {
 		
-		presentationMode.wrappedValue.dismiss()
+		hasChanges =
+			descText != (originalDescText ?? "") ||
+			notesText != (originalNotesText ?? "")
+	}
+	
+	func discardButtonTapped() {
+		log.trace("[\(viewName)] discardButtonTapped()")
+		
+		let realizedDesc = originalDescText ?? ""
+		if realizedDesc == defaultDescText {
+			descText = ""
+			remainingDescCount = maxDescCount
+		} else {
+			descText = realizedDesc
+			remainingDescCount = maxDescCount - realizedDesc.count
+		}
+		
+		let realizedNotes = originalNotesText ?? ""
+		notesText = realizedNotes
+		remainingNotesCount = maxNotesCount - realizedNotes.count
 	}
 	
 	func saveButtonTapped() {
