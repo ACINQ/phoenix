@@ -59,7 +59,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	private let taskId_watchTower = "co.acinq.phoenix.WatchTower"
 
 	override init() {
+	#if DEBUG
 		setenv("CFNETWORK_DIAGNOSTICS", "3", 1);
+	#endif
 		business = PhoenixBusiness(ctx: PlatformContext())
 		AppDelegate._isTestnet = business.chain.isTestnet()
 		super.init()

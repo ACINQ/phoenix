@@ -13,6 +13,8 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.currentTimestampMillis
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.data.LNUrl
+import io.ktor.http.*
 
 object Mock {
     fun incomingPaymentReceived(): WalletPayment {
@@ -110,6 +112,25 @@ object Mock {
             ),
             parts = listOf(),
             status = OutgoingPayment.Status.Pending
+        )
+    }
+
+    fun lnurlWithdraw(
+        lnurl: String,
+        callback: String,
+        k1: String,
+        defaultDescription: String,
+        minWithdrawable: MilliSatoshi,
+        maxWithdrawable: MilliSatoshi
+    ): LNUrl.Withdraw {
+
+        return LNUrl.Withdraw(
+            lnurl = URLBuilder(lnurl).build(),
+            callback = URLBuilder(callback).build(),
+            k1 = k1,
+            defaultDescription = defaultDescription,
+            minWithdrawable = minWithdrawable,
+            maxWithdrawable = maxWithdrawable
         )
     }
 }

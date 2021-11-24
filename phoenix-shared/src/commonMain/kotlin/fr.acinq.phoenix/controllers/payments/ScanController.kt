@@ -1,13 +1,16 @@
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.io.ReceivePayment
 import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.secure
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.*
@@ -18,13 +21,16 @@ import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.calculateBalance
 import io.ktor.http.*
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
+import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
@@ -44,6 +50,10 @@ class AppScanController(
 ) {
     private var prefetchPublicSuffixListTask: Deferred<Pair<String, Long>?>? = null
     private var lnurlRequestId = 1
+
+    private var continueLnurlTask: Deferred<LNUrl>? = null
+    private var requestPayInvoiceTask: Deferred<LNUrl.PayInvoice>? = null
+    private var sendWithdrawInvoiceTask: Deferred<JsonObject>? = null
 
     constructor(business: PhoenixBusiness, firstModel: Scan.Model?): this(
         loggerFactory = business.loggerFactory,
@@ -67,7 +77,10 @@ class AppScanController(
                     is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
                         this.copy(balanceMsat = balance.msat)
                     }
-                    is Scan.Model.LnurlPayFlow.LnUrlPayFetch -> {
+                    is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest -> {
+                        this.copy(balanceMsat = balance.msat)
+                    }
+                    is Scan.Model.LnurlPayFlow.LnurlPayFetch -> {
                         this.copy(balanceMsat = balance.msat)
                     }
                     else -> this
@@ -98,6 +111,12 @@ class AppScanController(
                 processIntent(intent)
             }
             is Scan.Intent.LnurlPayFlow.CancelLnurlPayment -> launch {
+                processIntent(intent)
+            }
+            is Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw -> launch {
+                processIntent(intent)
+            }
+            is Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw -> launch {
                 processIntent(intent)
             }
             is Scan.Intent.LnurlAuthFlow.Login -> launch {
@@ -163,9 +182,10 @@ class AppScanController(
                 val url = it.value
                 val requestId = lnurlRequestId
                 model(Scan.Model.LnurlServiceFetch)
+                val task = lnurlManager.continueLnurlAsync(url)
+                continueLnurlTask = task
                 val result: Either<Scan.BadRequestReason, LNUrl> = try {
-                    val lnurl = lnurlManager.continueLnUrl(url)
-                    Either.Right(lnurl)
+                    Either.Right(task.await())
                 } catch (e: Exception) {
                     when (e) {
                         is LNUrl.Error.RemoteFailure -> {
@@ -189,6 +209,14 @@ class AppScanController(
                                 val balance = getBalance()
                                 model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
                                     lnurlPay = lnurl,
+                                    balanceMsat = balance.msat,
+                                    error = null
+                                ))
+                            }
+                            is LNUrl.Withdraw -> {
+                                val balance = getBalance()
+                                model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+                                    lnurlWithdraw = lnurl,
                                     balanceMsat = balance.msat,
                                     error = null
                                 ))
@@ -249,31 +277,35 @@ class AppScanController(
         intent: Scan.Intent.CancelLnurlServiceFetch
     ) {
         lnurlRequestId += 1
+        continueLnurlTask?.cancel()
+        continueLnurlTask = null
         model(Scan.Model.Ready)
     }
 
     private suspend fun processIntent(
         intent: Scan.Intent.LnurlPayFlow.SendLnurlPayment
     ) {
+        val requestId = lnurlRequestId
         run { // scoping
             val balance = getBalance()
-            model(Scan.Model.LnurlPayFlow.LnUrlPayFetch(
+            model(Scan.Model.LnurlPayFlow.LnurlPayFetch(
                 lnurlPay = intent.lnurlPay,
                 balanceMsat = balance.msat
             ))
         }
 
-        val requestId = lnurlRequestId
-        val result: Either<Scan.LNUrlPayError, LNUrl.PayInvoice> = try {
-            val invoice = lnurlManager.requestPayInvoice(
-                lnurlPay = intent.lnurlPay,
-                amount = intent.amount,
-                comment = intent.comment
-            )
+        val task = lnurlManager.requestPayInvoiceAsync(
+            lnurlPay = intent.lnurlPay,
+            amount = intent.amount,
+            comment = intent.comment
+        )
+        requestPayInvoiceTask = task
+        val result: Either<Scan.LnurlPayError, LNUrl.PayInvoice> = try {
+            val invoice = task.await()
 
             val requestChain = invoice.paymentRequest.chain()
             if (chain != requestChain) {
-                Either.Left(Scan.LNUrlPayError.ChainMismatch(chain, requestChain))
+                Either.Left(Scan.LnurlPayError.ChainMismatch(chain, requestChain))
             } else {
                 val db = databaseManager.databases.filterNotNull().first()
                 val previousPayment = db.payments.listOutgoingPayments(
@@ -282,20 +314,20 @@ class AppScanController(
                     it.status is OutgoingPayment.Status.Completed.Succeeded
                 }
                 if (previousPayment != null) {
-                    Either.Left(Scan.LNUrlPayError.AlreadyPaidInvoice)
+                    Either.Left(Scan.LnurlPayError.AlreadyPaidInvoice)
                 } else {
                     Either.Right(invoice)
                 }
             }
         } catch (err: Throwable) { when (err) {
             is LNUrl.Error.RemoteFailure -> {
-                Either.Left(Scan.LNUrlPayError.RemoteError(err))
+                Either.Left(Scan.LnurlPayError.RemoteError(err))
             }
             is LNUrl.Error.PayInvoice -> {
-                Either.Left(Scan.LNUrlPayError.BadResponseError(err))
+                Either.Left(Scan.LnurlPayError.BadResponseError(err))
             }
             else -> { // unexpected exception: map to generic error
-                Either.Left(Scan.LNUrlPayError.RemoteError(
+                Either.Left(Scan.LnurlPayError.RemoteError(
                     LNUrl.Error.RemoteFailure.Unreadable(
                         origin = intent.lnurlPay.callback.host
                     )
@@ -348,9 +380,94 @@ class AppScanController(
         intent: Scan.Intent.LnurlPayFlow.CancelLnurlPayment
     ) {
         lnurlRequestId += 1
+        requestPayInvoiceTask?.cancel()
+        requestPayInvoiceTask = null
         val balance = getBalance()
         model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
             lnurlPay = intent.lnurlPay,
+            balanceMsat = balance.msat,
+            error = null
+        ))
+    }
+
+    private suspend fun processIntent(
+        intent: Scan.Intent.LnurlWithdrawFlow.SendLnurlWithdraw
+    ) {
+        val requestId = lnurlRequestId
+        run { // scoping
+            val balance = getBalance()
+            model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch(
+                lnurlWithdraw = intent.lnurlWithdraw,
+                balanceMsat = balance.msat
+            ))
+        }
+
+        val deferred = CompletableDeferred<PaymentRequest>()
+        val preimage = ByteVector32(Random.secure().nextBytes(32))
+        peerManager.getPeer().send(
+            ReceivePayment(
+                paymentPreimage = preimage,
+                amount = intent.amount,
+                description = intent.description ?: intent.lnurlWithdraw.defaultDescription,
+                expirySeconds = (3600 * 24 * 7).toLong(), // one week
+                result = deferred
+            )
+        )
+        val paymentRequest = deferred.await()
+        if (requestId != lnurlRequestId) {
+            // Intent.LnurlWithdrawFlow.CancelLnurlWithdraw has been issued
+            return
+        }
+        val task = lnurlManager.sendWithdrawInvoiceAsync(
+            lnurlWithdraw = intent.lnurlWithdraw,
+            paymentRequest = paymentRequest
+        )
+        sendWithdrawInvoiceTask = task
+        val error: Scan.LnurlWithdrawError? = try {
+            task.await()
+            null
+        } catch (err: Throwable) { when (err) {
+            is LNUrl.Error.RemoteFailure -> {
+                Scan.LnurlWithdrawError.RemoteError(err)
+            }
+            else -> { // unexpected exception: map to generic error
+                Scan.LnurlWithdrawError.RemoteError(
+                    LNUrl.Error.RemoteFailure.Unreadable(
+                        origin = intent.lnurlWithdraw.callback.host
+                    )
+                )
+            }
+        }}
+        if (requestId != lnurlRequestId) {
+            // Intent.LnurlWithdrawFlow.CancelLnurlWithdraw has been issued
+            return
+        }
+        if (error != null) {
+            val balance = getBalance()
+            model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+                lnurlWithdraw = intent.lnurlWithdraw,
+                balanceMsat = balance.msat,
+                error = error
+            ))
+        } else {
+            model(Scan.Model.LnurlWithdrawFlow.Receiving(
+                lnurlWithdraw = intent.lnurlWithdraw,
+                amount = intent.amount,
+                description = intent.description,
+                paymentHash = paymentRequest.paymentHash.toHex()
+            ))
+        }
+    }
+
+    private suspend fun processIntent(
+        intent: Scan.Intent.LnurlWithdrawFlow.CancelLnurlWithdraw
+    ) {
+        lnurlRequestId += 1
+        sendWithdrawInvoiceTask?.cancel()
+        sendWithdrawInvoiceTask = null
+        val balance = getBalance()
+        model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+            lnurlWithdraw = intent.lnurlWithdraw,
             balanceMsat = balance.msat,
             error = null
         ))
@@ -366,7 +483,9 @@ class AppScanController(
         if (psl == null) {
             model(Scan.Model.LnurlAuthFlow.LoginResult(
                 auth = intent.auth,
-                error = Scan.LoginError.OtherError(details = LNUrl.Error.MissingPublicSuffixList)
+                error = Scan.LoginError.OtherError(
+                    details = LNUrl.Error.Auth.MissingPublicSuffixList
+                )
             ))
             return
         }
@@ -449,7 +568,7 @@ class AppScanController(
         ))
 
         return try {
-            lnurlManager.interactiveExtractLNUrl(request)
+            lnurlManager.interactiveExtractLnurl(request)
         } catch (t: Throwable) {
             return null
         }

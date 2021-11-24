@@ -17,16 +17,24 @@ extension Scan {
 	typealias Model_Ready = ModelReady
 	typealias Model_BadRequest = ModelBadRequest
 	
+	typealias Model_InvoiceFlow = ModelInvoiceFlow
 	typealias Model_InvoiceFlow_DangerousRequest = ModelInvoiceFlowDangerousRequest
 	typealias Model_InvoiceFlow_InvoiceRequest = ModelInvoiceFlowInvoiceRequest
 	typealias Model_InvoiceFlow_Sending = ModelInvoiceFlowSending
 	
 	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
 	
+	typealias Model_LnurlPayFlow = ModelLnurlPayFlow
 	typealias Model_LnurlPayFlow_LnurlPayRequest = ModelLnurlPayFlowLnurlPayRequest
-	typealias Model_LnurlPayFlow_LnUrlPayFetch = ModelLnurlPayFlowLnUrlPayFetch
+	typealias Model_LnurlPayFlow_LnurlPayFetch = ModelLnurlPayFlowLnurlPayFetch
 	typealias Model_LnurlPayFlow_Sending = ModelLnurlPayFlowSending
 	
+	typealias Model_LnurlWithdrawFlow = ModelLnurlWithdrawFlow
+	typealias Model_LnurlWithdrawFlow_LnurlWithdrawRequest = ModelLnurlWithdrawFlowLnurlWithdrawRequest
+	typealias Model_LnurlWithdrawFlow_LnurlWithdrawFetch = ModelLnurlWithdrawFlowLnurlWithdrawFetch
+	typealias Model_LnurlWithdrawFlow_Receiving = ModelLnurlWithdrawFlowReceiving
+	
+	typealias Model_LnurlAuthFlow = ModelLnurlAuthFlow
 	typealias Model_LnurlAuthFlow_LoginRequest = ModelLnurlAuthFlowLoginRequest
 	typealias Model_LnurlAuthFlow_LoggingIn = ModelLnurlAuthFlowLoggingIn
 	typealias Model_LnurlAuthFlow_LoginResult = ModelLnurlAuthFlowLoginResult
@@ -41,13 +49,19 @@ extension Scan {
 	typealias Intent_LnurlPayFlow_SendLnurlPayment = IntentLnurlPayFlowSendLnurlPayment
 	typealias Intent_LnurlPayFlow_CancelLnurlPayment = IntentLnurlPayFlowCancelLnurlPayment
 	
+	typealias Intent_LnurlWithdrawFlow_SendLnurlWithdraw = IntentLnurlWithdrawFlowSendLnurlWithdraw
+	typealias Intent_LnurlWithdrawFlow_CancelLnurlWithdraw = IntentLnurlWithdrawFlowCancelLnurlWithdraw
+	
 	typealias Intent_LnurlAuthFlow_Login = IntentLnurlAuthFlowLogin
 	
-	typealias LNUrlPay_Error = LNUrlPayError
-	typealias LNUrlPay_Error_RemoteError = LNUrlPayErrorRemoteError
-	typealias LNUrlPay_Error_BadResponseError = LNUrlPayErrorBadResponseError
-	typealias LNUrlPay_Error_ChainMismatch = LNUrlPayErrorChainMismatch
-	typealias LNUrlPay_Error_AlreadyPaidInvoice = LNUrlPayErrorAlreadyPaidInvoice
+	typealias LnurlPay_Error = LnurlPayError
+	typealias LnurlPay_Error_RemoteError = LnurlPayErrorRemoteError
+	typealias LnurlPay_Error_BadResponseError = LnurlPayErrorBadResponseError
+	typealias LnurlPay_Error_ChainMismatch = LnurlPayErrorChainMismatch
+	typealias LnurlPay_Error_AlreadyPaidInvoice = LnurlPayErrorAlreadyPaidInvoice
+	
+	typealias LnurlWithdraw_Error = LnurlWithdrawError
+	typealias LnurlWithdraw_Error_RemoteError = LnurlWithdrawErrorRemoteError
 	
 	typealias BadRequestReason_AlreadyPaidInvoice = BadRequestReasonAlreadyPaidInvoice
 	typealias BadRequestReason_ChainMismatch = BadRequestReasonChainMismatch
