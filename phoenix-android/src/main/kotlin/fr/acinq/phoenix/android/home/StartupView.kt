@@ -36,12 +36,12 @@ fun StartupView(
     onKeyAbsent: () -> Unit,
     onBusinessStart: () -> Unit,
 ) {
-    val log = logger()
+    val log = logger("StartupView")
     val ks = keyState
 
     when (ks) {
         is KeyState.Unknown -> Text(stringResource(id = R.string.startup_wait))
-        is KeyState.Absent -> onKeyAbsent()
+        is KeyState.Absent -> LaunchedEffect(ks) { onKeyAbsent() }
         is KeyState.Error -> Text(stringResource(id = R.string.startup_error_unreadable))
         is KeyState.Present -> {
             when (val encryptedSeed = ks.encryptedSeed) {

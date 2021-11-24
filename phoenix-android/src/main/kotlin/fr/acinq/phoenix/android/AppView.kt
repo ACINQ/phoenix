@@ -88,17 +88,20 @@ fun AppView(appVM: AppViewModel) {
                     StartupView(
                         appVM,
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStart = {navController.navigate(Screen.Home.route)}
+                        onBusinessStart = { navController.navigate(Screen.Home.route) }
                     )
                 }
                 composable(Screen.InitWallet.route) {
-                    InitWallet()
+                    InitWallet(
+                        onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
+                        onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
+                    )
                 }
                 composable(Screen.CreateWallet.route) {
-                    CreateWalletView(appVM)
+                    CreateWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.RestoreWallet.route) {
-                    RestoreWalletView(appVM)
+                    RestoreWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
                     RequireKey(appVM.keyState) {
