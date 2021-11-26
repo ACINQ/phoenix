@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android.home
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,42 +32,32 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.lightning.utils.msat
-import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.HomeController
 import fr.acinq.phoenix.controllers.main.Home
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -100,9 +89,12 @@ private class HomeViewModel(
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(
-    onPaymentClick: (WalletPayment) -> Unit
+    onPaymentClick: (WalletPayment) -> Unit,
+    onSettingsClick: () -> Unit,
+    onReceiveClick: () -> Unit,
+    onSendClick: () -> Unit,
 ) {
-    val log = logger()
+    val log = logger("HomeView")
     val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
 
     val connectionsState = vm.connectionsFlow.collectAsState()
@@ -113,12 +105,11 @@ fun HomeView(
     }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     ModalDrawer(
         drawerState = drawerState,
         drawerShape = RectangleShape,
-        drawerContent = { SideMenu() },
+        drawerContent = { SideMenu(onSettingsClick) },
         content = {
             MVIView(vm) { model, _ ->
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -144,7 +135,7 @@ fun HomeView(
                             PreparePaymentLine(it, onPaymentClick)
                         }
                     }
-                    BottomBar(scope, drawerState)
+                    BottomBar(drawerState, onReceiveClick, onSendClick)
                 }
             }
         }
@@ -152,10 +143,11 @@ fun HomeView(
 }
 
 @Composable
-private fun SideMenu() {
+private fun SideMenu(
+    onSettingsClick: () -> Unit,
+) {
     val context = LocalContext.current
     val peerState = business.peerState().collectAsState()
-    val nc = navController
     Column {
         Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
             val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
@@ -188,7 +180,7 @@ private fun SideMenu() {
         Button(
             text = stringResource(id = R.string.home__drawer__settings),
             icon = R.drawable.ic_settings,
-            onClick = { nc.navigate(Screen.Settings) },
+            onClick = onSettingsClick,
             padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
@@ -197,7 +189,7 @@ private fun SideMenu() {
             text = stringResource(id = R.string.home__drawer__notifications),
             icon = R.drawable.ic_notification,
             enabled = false,
-            onClick = { nc.navigate(Screen.Settings) },
+            onClick = { },
             padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
@@ -294,149 +286,12 @@ private fun IncomingAmountNotif(amount: MilliSatoshi) {
 }
 
 @Composable
-private fun PreparePaymentLine(
-    row: WalletPaymentOrderRow,
-    onPaymentClick: (WalletPayment) -> Unit
+private fun BottomBar(
+    drawerState: DrawerState,
+    onReceiveClick: () -> Unit,
+    onSendClick: () -> Unit,
 ) {
-    val paymentsManager = business.paymentsManager
-    var payment by remember { mutableStateOf<WalletPayment?>(null) }
-    LaunchedEffect(key1 = row.id) {
-        payment = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.payment
-    }
-    payment?.let { PaymentLine(it, onPaymentClick) } ?: Text("Loading...")
-}
-
-@Composable
-private fun PaymentLine(
-    payment: WalletPayment,
-    onPaymentClick: (WalletPayment) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable { onPaymentClick(payment) }
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        PaymentIcon(payment)
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Row {
-                PaymentDescription(payment = payment, modifier = Modifier.weight(1.0f))
-                Spacer(modifier = Modifier.width(16.dp))
-                if (!isPaymentFailed(payment)) {
-                    val isOutgoing = payment is OutgoingPayment
-                    val amount = when (payment) {
-                        is OutgoingPayment -> if (payment.details is OutgoingPayment.Details.ChannelClosing) {
-                            payment.recipientAmount
-                        } else {
-                            payment.parts.map { it.amount }.sum()
-                        }
-                        is IncomingPayment -> payment.received?.amount ?: 0.msat
-                    }
-                    AmountView(
-                        amount = amount,
-                        amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
-                        unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                        isOutgoing = isOutgoing
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(2.dp))
-            Text(text = payment.completedAt().toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
-        }
-    }
-}
-
-@Composable
-private fun PaymentDescription(payment: WalletPayment, modifier: Modifier = Modifier) {
-    val desc = when (payment) {
-        is OutgoingPayment -> when (val d = payment.details) {
-            is OutgoingPayment.Details.Normal -> d.paymentRequest.description
-            is OutgoingPayment.Details.KeySend -> stringResource(id = R.string.paymentline_keysend_outgoing)
-            is OutgoingPayment.Details.SwapOut -> d.address
-            is OutgoingPayment.Details.ChannelClosing -> stringResource(R.string.paymentline_closing_desc, d.closingAddress)
-        }
-        is IncomingPayment -> when (val o = payment.origin) {
-            is IncomingPayment.Origin.Invoice -> o.paymentRequest.description
-            is IncomingPayment.Origin.KeySend -> stringResource(id = R.string.paymentline_keysend_incoming)
-            is IncomingPayment.Origin.SwapIn -> o.address ?: stringResource(id = R.string.paymentline_swap_in_desc)
-        }
-    }.takeIf { !it.isNullOrBlank() }
-    Text(
-        text = desc ?: stringResource(id = R.string.paymentdetails_no_description),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style = if (desc != null) MaterialTheme.typography.body1 else MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-        modifier = modifier
-    )
-}
-
-private fun isPaymentFailed(payment: WalletPayment) = (payment is OutgoingPayment && payment.status is OutgoingPayment.Status.Completed.Failed)
-
-@Composable
-private fun PaymentIcon(payment: WalletPayment) {
-    when (payment) {
-        is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Completed.Failed -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_failed,
-                description = stringResource(id = R.string.paymentdetails_status_sent_failed)
-            )
-            is OutgoingPayment.Status.Pending -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_pending,
-                description = stringResource(id = R.string.paymentdetails_status_sent_pending)
-            )
-            is OutgoingPayment.Status.Completed.Succeeded.OffChain -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success,
-                description = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                iconSize = 18.dp,
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
-            is OutgoingPayment.Status.Completed.Succeeded.OnChain -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success_onchain,
-                description = stringResource(id = R.string.paymentdetails_status_sent_successful),
-                iconSize = 12.dp,
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
-        }
-        is IncomingPayment -> when (payment.received) {
-            null -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_pending,
-                description = stringResource(id = R.string.paymentdetails_status_received_pending)
-            )
-            else -> PaymentIconComponent(
-                icon = R.drawable.ic_payment_success,
-                description = stringResource(id = R.string.paymentdetails_status_received_successful),
-                iconSize = 18.dp,
-                iconColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary
-            )
-        }
-    }
-}
-
-@Composable
-private fun PaymentIconComponent(icon: Int, description: String, iconSize: Dp = 18.dp, iconColor: Color = MaterialTheme.colors.primary, backgroundColor: Color = Color.Unspecified) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(24.dp)
-            .background(color = backgroundColor)
-            .padding(4.dp)
-    ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = description,
-            modifier = Modifier.size(iconSize),
-            colorFilter = ColorFilter.tint(iconColor)
-        )
-    }
-}
-
-@Composable
-private fun BottomBar(scope: CoroutineScope, drawerState: DrawerState) {
+    val scope = rememberCoroutineScope()
     Row(
         Modifier
             .fillMaxWidth()
@@ -444,7 +299,6 @@ private fun BottomBar(scope: CoroutineScope, drawerState: DrawerState) {
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(MaterialTheme.colors.background)
     ) {
-        val nc = navController
         Button(
             icon = R.drawable.ic_settings,
             onClick = {
@@ -460,7 +314,7 @@ private fun BottomBar(scope: CoroutineScope, drawerState: DrawerState) {
         Button(
             text = stringResource(id = R.string.menu_receive),
             icon = R.drawable.ic_receive,
-            onClick = { nc.navigate(Screen.Receive) },
+            onClick = onReceiveClick,
             iconTint = MaterialTheme.colors.onSurface,
             modifier = Modifier
                 .fillMaxHeight()
@@ -470,7 +324,7 @@ private fun BottomBar(scope: CoroutineScope, drawerState: DrawerState) {
         Button(
             text = stringResource(id = R.string.menu_send),
             icon = R.drawable.ic_send,
-            onClick = { nc.navigate(Screen.ReadData) },
+            onClick = onSendClick,
             iconTint = MaterialTheme.colors.onSurface,
             modifier = Modifier
                 .fillMaxHeight()

@@ -50,8 +50,8 @@ import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.payments.Receive
 import fr.acinq.phoenix.controllers.ReceiveController
+import fr.acinq.phoenix.controllers.payments.Receive
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -145,14 +145,14 @@ private fun DefaultView(vm: ReceiveViewModel) {
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
-                    SideEffect { vm.generateInvoice() }
+                    LaunchedEffect(key1 = true) { vm.generateInvoice() }
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generating -> {
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generated -> {
-                    SideEffect {
+                    LaunchedEffect(model.request) {
                         vm.generateQrCodeBitmap(invoice = model.request)
                     }
                     Spacer(modifier = Modifier.height(24.dp))

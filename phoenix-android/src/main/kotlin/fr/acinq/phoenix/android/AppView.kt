@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,6 +51,7 @@ import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -65,10 +67,11 @@ fun AppView(appVM: AppViewModel) {
     val fiatCurrency = Prefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
     val bitcoinUnit = Prefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
     val electrumServer = Prefs.getElectrumServer(context).collectAsState(initial = null)
+    val business = application.business
 
     CompositionLocalProvider(
-        LocalBusiness provides application.business,
-        LocalControllerFactory provides application.business.controllers,
+        LocalBusiness provides business,
+        LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
         LocalKeyState provides appVM.keyState,
         LocalExchangeRates provides fiatRates.value,
@@ -106,9 +109,10 @@ fun AppView(appVM: AppViewModel) {
                 composable(Screen.Home.route) {
                     RequireKey(appVM.keyState) {
                         HomeView(
-                            onPaymentClick = { payment ->
-                                navController.navigate("${Screen.PaymentDetails.route}/${payment.walletPaymentId().dbType.value}/${payment.walletPaymentId().dbId}")
-                            }
+                            onPaymentClick = { navigateToPaymentDetails(navController, it.walletPaymentId()) },
+                            onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                            onReceiveClick = { navController.navigate(Screen.Receive.route) },
+                            onSendClick = { navController.navigate(Screen.ReadData.route) }
                         )
                     }
                 }
@@ -185,6 +189,19 @@ fun AppView(appVM: AppViewModel) {
             }
         }
     }
+
+    val lastCompletedPayment = business.paymentsManager.lastCompletedPayment.collectAsState().value
+
+    if (lastCompletedPayment != null) {
+        log.debug { "completed payment=${lastCompletedPayment}" }
+        LaunchedEffect(key1 = lastCompletedPayment.walletPaymentId()) {
+            navigateToPaymentDetails(navController, lastCompletedPayment.walletPaymentId())
+        }
+    }
+}
+
+private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId) {
+    navController.navigate("${Screen.PaymentDetails.route}/${id.dbType.value}/${id.dbId}")
 }
 
 @Composable

@@ -53,6 +53,7 @@ import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.utils.WalletPaymentState
 import fr.acinq.phoenix.utils.errorMessage
 import fr.acinq.phoenix.utils.state
+import org.slf4j.LoggerFactory
 
 
 sealed class PaymentDetailsState {
@@ -202,7 +203,10 @@ private class PaymentDetailsViewModel(
     val paymentsManager: PaymentsManager
 ) : ViewModel() {
 
+    val log = LoggerFactory.getLogger(this::class.java)
+
     suspend fun getPayment(id: WalletPaymentId): PaymentDetailsState {
+        log.info("getting payment details for id=$id")
         return paymentsManager.getPayment(id, WalletPaymentFetchOptions.All)?.let {
             PaymentDetailsState.Success(it)
         } ?: PaymentDetailsState.Failure(NoSuchElementException("no payment found for id=$id"))
