@@ -14,6 +14,56 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+struct MsatRange {
+	let min: Lightning_kmpMilliSatoshi
+	let max: Lightning_kmpMilliSatoshi
+}
+
+struct TipNumbers {
+	let baseMsat: Int64
+	let tipMsat: Int64
+	let totalMsat: Int64
+	let percent: Double
+}
+
+struct TipStrings {
+	let bitcoin_base: FormattedAmount
+	let bitcoin_tip: FormattedAmount
+	let bitcoin_total: FormattedAmount
+	let fiat_base: FormattedAmount
+	let fiat_tip: FormattedAmount
+	let fiat_total: FormattedAmount
+	let percent: String
+	let isEmpty: Bool
+	
+	static func empty(_ currencyPrefs: CurrencyPrefs) -> TipStrings {
+		let zeroBitcoin = Utils.formatBitcoin(msat: 0, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let exchangeRate =  ExchangeRate.BitcoinPriceRate(
+			fiatCurrency: currencyPrefs.fiatCurrency,
+			price: 0.0,
+			source: "",
+			timestampMillis: 0
+		)
+		let zeroFiat = Utils.formatFiat(msat: 0, exchangeRate: exchangeRate)
+		return TipStrings(
+			bitcoin_base: zeroBitcoin,
+			bitcoin_tip: zeroBitcoin,
+			bitcoin_total: zeroBitcoin,
+			fiat_base: zeroFiat,
+			fiat_tip: zeroFiat,
+			fiat_total: zeroFiat,
+			percent: "0%",
+			isEmpty: true
+		)
+	}
+}
+
+enum FlowType {
+	case pay(range: MsatRange)
+	case withdraw(range: MsatRange)
+}
+
+
 
 struct SendView: MVIView {
 	
@@ -649,28 +699,29 @@ struct ValidateView: View, ViewName {
 	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
-	func currencyStyler() -> TextFieldCurrencyStyler {
-		return TextFieldCurrencyStyler(
-			currency: unit,
-			amount: $amount,
-			parsedAmount: $parsedAmount,
-			hideMsats: false
-		)
-	}
+	// For the cicular buttons: [metadata, tip, comment]
+	enum MaxButtonWidth: Preference {}
+	let maxButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxButtonWidth: CGFloat? = nil
 	
-	func disconnectedText() -> String {
-		
-		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
-			return NSLocalizedString("waiting for internet", comment: "button text")
-		}
-		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
-			return NSLocalizedString("connecting to peer", comment: "button text")
-		}
-		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
-			return NSLocalizedString("connecting to electrum", comment: "button text")
-		}
-		return ""
-	}
+	// For the tipSummary: the max of: [base, tip, total]
+	enum MaxBitcoinWidth: Preference {}
+	let maxBitcoinWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxBitcoinWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxBitcoinWidth: CGFloat? = nil
+	
+	// For the tipSummary: the max of: [base, tip, total]
+	enum MaxFiatWidth: Preference {}
+	let maxFiatWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxFiatWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxFiatWidth: CGFloat? = nil
 	
 	var body: some View {
 		
@@ -743,7 +794,7 @@ struct ValidateView: View, ViewName {
 		let isDisconnected = connectionsManager.connections.global != .established
 		VStack {
 	
-			if let host = paymentRequestHost() {
+			if let host = paymentHost() {
 				VStack(alignment: HorizontalAlignment.center, spacing: 10) {
 					if mvi.model is Scan.Model_LnurlWithdrawFlow {
 						Text("You are redeeming funds from")
@@ -809,6 +860,7 @@ struct ValidateView: View, ViewName {
 						commentButton()
 					}
 				}
+				.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 				.padding(.horizontal)
 			}
 			
@@ -874,11 +926,72 @@ struct ValidateView: View, ViewName {
 				.padding(.top, 4)
 			}
 			
+			tipSummary
+				.padding(.top)
+				.padding(.top)
 		} // </VStack>
 	}
 	
 	@ViewBuilder
+	var tipSummary: some View {
+		
+		let tipInfo = tipStrings()
+		
+		// 1,000 sat       0.57 usd
+		//    30 sat  +3%  0.01 usd
+		// ---------       --------
+		// 1,030 sat       0.58 usd
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 16) {
+		
+			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
+				Text(verbatim: tipInfo.bitcoin_base.string)
+					.read(maxBitcoinWidthReader)
+				Text(verbatim: tipInfo.bitcoin_tip.string)
+					.read(maxBitcoinWidthReader)
+				Divider()
+					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
+				Text(verbatim: tipInfo.bitcoin_total.string)
+					.read(maxBitcoinWidthReader)
+			}
+			
+			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
+				Text(verbatim: "")
+				Text(verbatim: "+\(tipInfo.percent)")
+				Divider()
+					.frame(width: 0, height: 1)
+				Text(verbatim: "")
+			}
+			
+			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
+				Text(verbatim: tipInfo.fiat_base.string)
+					.read(maxFiatWidthReader)
+				Text(verbatim: tipInfo.fiat_tip.string)
+					.read(maxFiatWidthReader)
+				Divider()
+					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
+				Text(verbatim: tipInfo.fiat_total.string)
+					.read(maxFiatWidthReader)
+			}
+		}
+		.assignMaxPreference(for: maxBitcoinWidthReader.key, to: $maxBitcoinWidth)
+		.assignMaxPreference(for: maxFiatWidthReader.key, to: $maxFiatWidth)
+		.font(.footnote)
+		.foregroundColor(tipInfo.isEmpty ? Color.clear : Color.secondary)
+	}
+	
+	func currencyStyler() -> TextFieldCurrencyStyler {
+		return TextFieldCurrencyStyler(
+			currency: unit,
+			amount: $amount,
+			parsedAmount: $parsedAmount,
+			hideMsats: false
+		)
+	}
+	
+	@ViewBuilder
 	func actionButton(
+		text: String,
 		image: Image,
 		width: CGFloat = 20,
 		height: CGFloat = 20,
@@ -888,29 +1001,39 @@ struct ValidateView: View, ViewName {
 	) -> some View {
 		
 		Button(action: action) {
-			ZStack {
-				Color.buttonFill
-					.frame(width: 30, height: 30)
-					.cornerRadius(50)
-					.overlay(
-						RoundedRectangle(cornerRadius: 50)
-							.stroke(Color(UIColor.separator), lineWidth: 1)
-					)
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				ZStack {
+					Color.buttonFill
+						.frame(width: 30, height: 30)
+						.cornerRadius(50)
+						.overlay(
+							RoundedRectangle(cornerRadius: 50)
+								.stroke(Color(UIColor.separator), lineWidth: 1)
+						)
+					
+					image
+						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
+						.frame(width: width, height: height)
+						.offset(x: xOffset, y: yOffset)
+				}
 				
-				image
-					.renderingMode(.template)
-					.resizable()
-					.scaledToFit()
-					.frame(width: width, height: height)
-					.offset(x: xOffset, y: yOffset)
-			}
-		}
+				Text(text.lowercased())
+					.font(.caption)
+					.foregroundColor(Color.secondary)
+					.padding(.top, 2)
+			} // </VStack>
+		} // </Button>
+		.frame(width: maxButtonWidth)
+		.read(maxButtonWidthReader)
 	}
 	
 	@ViewBuilder
 	func metadataButton() -> some View {
 		
 		actionButton(
+			text: NSLocalizedString("info", comment: "button label - try to make it short"),
 			image: Image(systemName: "info.circle"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
@@ -923,6 +1046,7 @@ struct ValidateView: View, ViewName {
 	func priceTargetButton() -> some View {
 		
 		actionButton(
+			text: priceTargetButtonText(),
 			image: Image(systemName: "target"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
@@ -931,15 +1055,34 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
+	func priceTargetButtonText() -> String {
+		
+		if let _ = lnurlWithdraw() {
+			return NSLocalizedString("range", comment: "button label - try to make it short")
+		} else {
+			return NSLocalizedString("tip", comment: "button label - try to make it short")
+		}
+	}
+	
 	@ViewBuilder
 	func commentButton() -> some View {
 		
 		actionButton(
+			text: NSLocalizedString("comment", comment: "button label - try to make it short"),
 			image: Image(systemName: "pencil.tip"),
 			width: 20, height: 20,
 			xOffset: 0, yOffset: 0
 		) {
 			commentButtonTapped()
+		}
+	}
+	
+	func paymentRequest() -> Lightning_kmpPaymentRequest? {
+		
+		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
+			return model.paymentRequest
+		} else {
+			return nil
 		}
 	}
 	
@@ -965,7 +1108,7 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
-	func paymentRequestHost() -> String? {
+	func paymentHost() -> String? {
 		
 		if let lnurlPay = lnurlPay() {
 			return lnurlPay.lnurl.host
@@ -980,8 +1123,8 @@ struct ValidateView: View, ViewName {
 	
 	func requestDescription() -> String? {
 		
-		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			return model.paymentRequest.desc()
+		if let paymentRequest = paymentRequest() {
+			return paymentRequest.desc()
 			
 		} else if let lnurlPay = lnurlPay() {
 			return lnurlPay.metadata.plainText
@@ -994,21 +1137,29 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
-	func priceRange() -> (min: Lightning_kmpMilliSatoshi, max: Lightning_kmpMilliSatoshi)? {
+	func priceRange() -> MsatRange? {
 		
-		if let lnurlPay = lnurlPay() {
-			return (
+		if let paymentRequest = paymentRequest() {
+			if let min = paymentRequest.amount {
+				return MsatRange(
+					min: min,
+					max: min.times(m: 2.0)
+				)
+			}
+		}
+		else if let lnurlPay = lnurlPay() {
+			return MsatRange(
 				min: lnurlPay.minSendable,
 				max: lnurlPay.maxSendable
 			)
 		} else if let lnurlWithdraw = lnurlWithdraw() {
-			return (
+			return MsatRange(
 				min: lnurlWithdraw.minWithdrawable,
 				max: lnurlWithdraw.maxWithdrawable
 			)
-		} else {
-			return nil
 		}
+		
+		return nil
 	}
 	
 	func hasExtendedMetadata() -> Bool {
@@ -1016,7 +1167,7 @@ struct ValidateView: View, ViewName {
 		guard let lnurlPay = lnurlPay() else {
 			return false
 		}
-		
+
 		if lnurlPay.metadata.longDesc != nil {
 			return true
 		}
@@ -1026,7 +1177,7 @@ struct ValidateView: View, ViewName {
 		if lnurlPay.metadata.imageJpg != nil {
 			return true
 		}
-		
+
 		return false
 	}
 	
@@ -1044,9 +1195,83 @@ struct ValidateView: View, ViewName {
 		guard let lnurlPay = lnurlPay() else {
 			return false
 		}
-		
+
 		let maxCommentLength = lnurlPay.maxCommentLength?.int64Value ?? 0
 		return maxCommentLength > 0
+	}
+	
+	func tipNumbers() -> TipNumbers? {
+		
+		guard let totalAmt = try? parsedAmount.get(), totalAmt > 0 else {
+			return nil
+		}
+		
+		var totalMsat: Int64? = nil
+		switch unit {
+		case .bitcoin(let bitcoinUnit):
+			totalMsat = Utils.toMsat(from: totalAmt, bitcoinUnit: bitcoinUnit)
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				totalMsat = Utils.toMsat(fromFiat: totalAmt, exchangeRate: exchangeRate)
+			}
+		}
+		
+		var baseMsat: Int64? = nil
+		if let paymentRequest = paymentRequest() {
+			baseMsat = paymentRequest.amount?.msat
+		} else if let lnurlPay = lnurlPay() {
+			baseMsat = lnurlPay.minSendable.msat
+		}
+		
+		guard let totalMsat = totalMsat, let baseMsat = baseMsat, totalMsat > baseMsat else {
+			return nil
+		}
+		
+		let tipMsat = totalMsat - baseMsat
+		let percent = Double(tipMsat) / Double(baseMsat)
+		
+		return TipNumbers(baseMsat: baseMsat, tipMsat: tipMsat, totalMsat: totalMsat, percent: percent)
+	}
+	
+	func tipStrings() -> TipStrings {
+		
+		guard let nums = tipNumbers() else {
+			return TipStrings.empty(currencyPrefs)
+		}
+		
+		let bitcoin_base = Utils.formatBitcoin(msat: nums.baseMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let bitcoin_tip = Utils.formatBitcoin(msat: nums.tipMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		let bitcoin_total = Utils.formatBitcoin(msat: nums.totalMsat, bitcoinUnit: currencyPrefs.bitcoinUnit)
+		
+		let fiat_base: FormattedAmount
+		let fiat_tip: FormattedAmount
+		let fiat_total: FormattedAmount
+		if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: currencyPrefs.fiatCurrency) {
+			
+			fiat_base = Utils.formatFiat(msat: nums.baseMsat, exchangeRate: exchangeRate)
+			fiat_tip = Utils.formatFiat(msat: nums.tipMsat, exchangeRate: exchangeRate)
+			fiat_total = Utils.formatFiat(msat: nums.totalMsat, exchangeRate: exchangeRate)
+		} else {
+			fiat_base = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			fiat_tip = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+			fiat_total = Utils.unknownFiatAmount(fiatCurrency: currencyPrefs.fiatCurrency)
+		}
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		
+		let percentStr = formatter.string(from: NSNumber(value: nums.percent)) ?? "?%"
+		
+		return TipStrings(
+			bitcoin_base  : bitcoin_base,
+			bitcoin_tip   : bitcoin_tip,
+			bitcoin_total : bitcoin_total,
+			fiat_base     : fiat_base,
+			fiat_tip      : fiat_tip,
+			fiat_total    : fiat_total,
+			percent       : percentStr,
+			isEmpty       : false
+		)
 	}
 	
 	func balanceMsat() -> Int64? {
@@ -1066,6 +1291,20 @@ struct ValidateView: View, ViewName {
 		}
 	}
 	
+	func disconnectedText() -> String {
+		
+		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
+			return NSLocalizedString("waiting for internet", comment: "button text")
+		}
+		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
+			return NSLocalizedString("connecting to peer", comment: "button text")
+		}
+		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
+			return NSLocalizedString("connecting to electrum", comment: "button text")
+		}
+		return ""
+	}
+	
 	func onAppear() -> Void {
 		log.trace("[\(viewName)] onAppear()")
 		
@@ -1073,8 +1312,8 @@ struct ValidateView: View, ViewName {
 		unit = Currency.bitcoin(bitcoinUnit)
 		
 		var amount_msat: Lightning_kmpMilliSatoshi? = nil
-		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
-			amount_msat = model.paymentRequest.amount
+		if let paymentRequest = paymentRequest() {
+			amount_msat = paymentRequest.amount
 		} else if let lnurlPay = lnurlPay() {
 			amount_msat = lnurlPay.minSendable
 		} else if let lnurlWithdraw = lnurlWithdraw() {
@@ -1205,8 +1444,8 @@ struct ValidateView: View, ViewName {
 				}
 			}
 			
-			if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest,
-			   let expiryTimestampSeconds = model.paymentRequest.expiryTimestampSeconds()?.doubleValue,
+			if let paymentRequest = paymentRequest(),
+			   let expiryTimestampSeconds = paymentRequest.expiryTimestampSeconds()?.doubleValue,
 			   Date(timeIntervalSince1970: expiryTimestampSeconds) <= Date()
 			{
 				isExpiredInvoice = true
@@ -1357,21 +1596,21 @@ struct ValidateView: View, ViewName {
 				msat = maxMsat
 			}
 			
-			var lnurlFlow: LnurlFlow? = nil
-			if let lnurlPay = lnurlPay() {
-				lnurlFlow = LnurlFlow.pay(value: lnurlPay)
+			var flowType: FlowType? = nil
+			if paymentRequest() != nil || lnurlPay() != nil {
+				flowType = FlowType.pay(range: range)
 				
-			} else if let lnurlWithdraw = lnurlWithdraw() {
-				lnurlFlow = LnurlFlow.withdraw(value: lnurlWithdraw)
+			} else if lnurlWithdraw() != nil {
+				flowType = FlowType.withdraw(range: range)
 			}
 			
-			if let lnurlFlow = lnurlFlow {
+			if let flowType = flowType {
 				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
 					
 					PriceSliderSheet(
-						lnurlFlow: lnurlFlow,
+						flowType: flowType,
 						msat: msat,
 						valueChanged: priceSliderChanged
 					)
@@ -1444,9 +1683,17 @@ struct ValidateView: View, ViewName {
 			}
 		}
 		
+		let saveTipPercentInPrefs = {
+			if let tip = tipNumbers() {
+				let percent = Int(tip.percent * 100.0)
+				Prefs.shared.addRecentTipPercent(percent)
+			}
+		}
+		
 		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
 			
 			if let msat = msat {
+				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 					paymentRequest: model.paymentRequest,
 					amount: Lightning_kmpMilliSatoshi(msat: msat)
@@ -1477,16 +1724,19 @@ struct ValidateView: View, ViewName {
 				
 			} else if let msat = msat {
 				
+				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
 					lnurlPay: model.lnurlPay,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
 					comment: comment
 				))
 			}
+			
 		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
 			
 			if let msat = msat {
 				
+				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
 					lnurlWithdraw: model.lnurlWithdraw,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
@@ -1644,20 +1894,15 @@ struct MetadataSheet: View, ViewName {
 	}
 }
 
-enum LnurlFlow {
-	case pay(value: LNUrl.Pay)
-	case withdraw(value: LNUrl.Withdraw)
-}
-
 struct PriceSliderSheet: View, ViewName {
 	
-	let lnurlFlow: LnurlFlow
+	let flowType: FlowType
 	let valueChanged: (Int64) -> Void
 	
-	init(lnurlFlow: LnurlFlow, msat: Int64, valueChanged: @escaping (Int64) -> Void) {
-		self.lnurlFlow = lnurlFlow
-		self.amountSats = Utils.convertBitcoin(msat: msat, bitcoinUnit: .sat)
+	init(flowType: FlowType, msat: Int64, valueChanged: @escaping (Int64) -> Void) {
+		self.flowType = flowType
 		self.valueChanged = valueChanged
+		_amountSats = State(initialValue: Utils.convertBitcoin(msat: msat, bitcoinUnit: .sat))
 	}
 	
 	// The Slider family works with BinaryFloatingPoint.
@@ -1665,13 +1910,13 @@ struct PriceSliderSheet: View, ViewName {
 	
 	@State var amountSats: Double
 	
-	var range: (min: Lightning_kmpMilliSatoshi, max: Lightning_kmpMilliSatoshi) {
+	var range: MsatRange {
 		
-		switch lnurlFlow {
-		case .pay(let lnurlPay):
-			return (min: lnurlPay.minSendable, max: lnurlPay.maxSendable)
-		case .withdraw(let lnurlWithdraw):
-			return (min: lnurlWithdraw.minWithdrawable, max: lnurlWithdraw.maxWithdrawable)
+		switch flowType {
+		case .pay(let range):
+			return range
+		case .withdraw(let range):
+			return range
 		}
 	}
 	
@@ -1704,6 +1949,7 @@ struct PriceSliderSheet: View, ViewName {
 	)
 	@State var contentHeight: CGFloat? = nil
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -1736,7 +1982,8 @@ struct PriceSliderSheet: View, ViewName {
 				)
 				.padding(.bottom, 4)
 				
-				content
+				content.padding()
+				footer
 			}
 		}
 		.assignMaxPreference(for: maxPercentWidthReader.key, to: $maxPercentWidth)
@@ -1850,11 +2097,40 @@ struct PriceSliderSheet: View, ViewName {
 			} // </HStack>
 			
 		} // </VStack>
-		.padding()
 		.assignMaxPreference(for: maxAmountWidthReader.key, to: $maxAmountWidth)
 		.assignMaxPreference(for: contentHeightReader.key, to: $contentHeight)
 		.onChange(of: amountSats) {
 			valueChanged(Utils.toMsat(from: $0, bitcoinUnit: .sat))
+		}
+	}
+	
+	@ViewBuilder
+	var footer: some View {
+		
+		let recentPercents = recentPercents()
+		if case .pay(_) = flowType, !recentPercents.isEmpty {
+			
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				ForEach(0 ..< recentPercents.count) { idx in
+					let percent = recentPercents[idx]
+					Button {
+						recentButtonTapped(percent)
+					} label: {
+						Text(verbatim: "\(percent)%")
+							.padding(.vertical, 6)
+							.padding(.horizontal, 12)
+					}
+					.buttonStyle(ScaleButtonStyle(
+						backgroundFill: Color(UIColor.systemGroupedBackground), // secondarySystemBackground
+						borderStroke: Color.appAccent
+					))
+					if idx+1 < recentPercents.count {
+						Spacer()
+					}
+				} // </ForEach>
+			} // </HStack>
+			.padding(.top, 8)
+			.padding([.leading, .trailing, .bottom])
 		}
 	}
 	
@@ -1908,7 +2184,7 @@ struct PriceSliderSheet: View, ViewName {
 	
 	func percentToMsat(_ percent: Double) -> Int64 {
 		
-		switch lnurlFlow {
+		switch flowType {
 		case .pay(_):
 			
 			// For outgoing payments:
@@ -1929,7 +2205,7 @@ struct PriceSliderSheet: View, ViewName {
 	
 	func maxPercentDouble() -> Double {
 		
-		switch lnurlFlow {
+		switch flowType {
 		case .pay(_):
 			
 			// For outgoing payments:
@@ -1953,7 +2229,7 @@ struct PriceSliderSheet: View, ViewName {
 	
 	func percentDouble() -> Double {
 		
-		switch lnurlFlow {
+		switch flowType {
 		case .pay(_):
 			
 			// For outgoing payments:
@@ -1980,7 +2256,7 @@ struct PriceSliderSheet: View, ViewName {
 	
 	func minPercentDouble() -> Double {
 		
-		switch lnurlFlow {
+		switch flowType {
 		case .pay(_):
 			
 			// For outgoing payments:
@@ -2085,6 +2361,76 @@ struct PriceSliderSheet: View, ViewName {
 		
 		let newMsat = percentToMsat(ceilingPercent / 100.0)
 		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+	}
+	
+	func recentPercents() -> [Int] {
+		
+		// Most recent item is at index 0
+		var recents = Prefs.shared.recentTipPercents
+		
+		// Remove items outside the valid range
+		let minPercent = Int(minPercentDouble() * 100.0)
+		let maxPercent = Int(maxPercentDouble() * 100.0)
+		recents = recents.filter { ($0 >= minPercent) && ($0 <= maxPercent) }
+		
+		// Trim to most recent 3 items
+		let targetCount = 3
+		recents = Array(recents.prefix(targetCount))
+		
+		// Add default values (if needed/possible)
+		let defaults = [10, 15, 20].filter { ($0 >= minPercent) && ($0 <= maxPercent) }
+		
+		if recents.isEmpty {
+			recents.append(contentsOf: defaults)
+		} else if recents.count < targetCount {
+			
+			// The default list is [10, 15, 20]
+			// But what if the user's first tip is 5%, what should the new list be ?
+			//
+			// The most helpful results will be those numbers that are
+			// closest to the user's own picks.
+			//
+			// Thus:
+			// - if the user's first pick is 5  : [5, 10, 15]
+			// - if the user's first pick is 12 : [10, 12, 15]
+			// - if the user's first pick is 18 : [15, 18, 20]
+			// - if the user's first pick is 25 : [15, 20, 25]
+			//
+			// We can use a similar logic if recents.count == 2
+			
+			var extras = defaults
+			repeat {
+				
+				let diffs = extras.map { defaultValue in
+					recents.map { recentValue in
+						return abs(defaultValue - recentValue)
+					}.sum()
+				}
+				
+				if let minDiff = diffs.min(), let minIdx = diffs.firstIndex(of: minDiff) {
+					
+					let defaultValue = extras.remove(at: minIdx)
+					recents.append(defaultValue)
+				}
+				
+			} while recents.count < targetCount && !extras.isEmpty
+		}
+		
+		return recents.sorted()
+	}
+	
+	func recentButtonTapped(_ percent: Int) {
+		log.trace("[\(viewName)] recentButtonTapped()")
+		
+		if case .pay(_) = flowType {
+			
+			// For outgoing payments:
+			// - min => base amount
+			// - anything above min is treated like a tip
+			
+			let newMsat = percentToMsat(Double(percent) / 100.0)
+			amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+		}
 	}
 	
 	func closeButtonTapped() {
