@@ -391,7 +391,7 @@ struct ElectrumAddressPopup: View {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
-					Text("A random electrum server will be selected on each connection attempt.")
+					Text("A random Electrum server will be selected on each connection attempt.")
 						.font(.footnote)
 					
 					Spacer()
