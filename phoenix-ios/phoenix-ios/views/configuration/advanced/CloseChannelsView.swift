@@ -128,7 +128,7 @@ fileprivate struct StandardWalletView : View {
 				Text(
 					"""
 					You currently have \(String(model.channels.count)) Lightning channels \
-					with an aggragate balance of \(formattedSats.string).
+					with an aggregate balance of \(formattedSats.string).
 					"""
 				)
 			}
