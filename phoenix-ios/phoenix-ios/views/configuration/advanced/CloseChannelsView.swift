@@ -120,7 +120,7 @@ fileprivate struct StandardWalletView : View {
 			if model.channels.count == 1 {
 				Text(
 					"""
-					You currenly have 1 Lightning channel \
+					You currently have 1 Lightning channel \
 					with a balance of \(formattedSats.string).
 					"""
 				)
