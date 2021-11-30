@@ -59,7 +59,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
 @Composable
 fun AppView(appVM: AppViewModel) {
-    val log = logger()
+    val log = logger("AppView")
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current

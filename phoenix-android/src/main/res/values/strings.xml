@@ -94,6 +94,7 @@
 
     <!-- //////////////// payment holder //////////////// -->
 
+    <string name="paymentline_loading">Loading…</string>
     <string name="paymentline_sending">Sending…</string>
     <string name="paymentline_processing">Processing…</string>
     <string name="paymentline_waiting">Waiting…</string>

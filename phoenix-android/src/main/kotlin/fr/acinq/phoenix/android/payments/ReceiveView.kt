@@ -82,10 +82,10 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
         val amount = customAmount
         val desc = customDesc
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
-            log.error(e) { "failed to generate invoice with amount=$amount desc=$desc" }
+            log.error("failed to generate invoice with amount=$amount desc=$desc :", e)
             state = ReceiveViewState.Error(e)
         }) {
-            log.info { "generating invoice with amount=$amount desc=$desc" }
+            log.info("generating invoice with amount=$amount desc=$desc")
             state = ReceiveViewState.Default
             controller.intent(Receive.Intent.Ask(amount = amount, desc = desc))
         }
@@ -94,11 +94,11 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
     @UiThread
     fun generateQrCodeBitmap(invoice: String) {
         viewModelScope.launch(Dispatchers.Default) {
-            log.info { "generating qrcode for invoice=$invoice" }
+            log.info("generating qrcode for invoice=$invoice")
             try {
                 qrBitmap = QRCode.generateBitmap(invoice).asImageBitmap()
             } catch (e: Exception) {
-                log.error(e) { "error when generating bitmap QR for invoice=$invoice" }
+                log.error("error when generating bitmap QR for invoice=$invoice:", e)
             }
         }
     }

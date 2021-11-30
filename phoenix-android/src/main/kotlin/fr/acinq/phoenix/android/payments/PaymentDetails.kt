@@ -182,7 +182,7 @@ private fun IconState(
         colorFilter = ColorFilter.tint(color),
         modifier = Modifier.size(50.dp)
     )
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(16.dp))
     Text(text = message)
 }
 

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.WalletPayment
@@ -56,21 +57,53 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.HomeController
 import fr.acinq.phoenix.controllers.main.Home
+import fr.acinq.phoenix.data.WalletPaymentFetchOptions
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
 import fr.acinq.phoenix.managers.PaymentsManager
+import fr.acinq.phoenix.utils.getValue
+import fr.acinq.phoenix.utils.setValue
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+private data class PaymentRowState(
+    val orderRow: WalletPaymentOrderRow,
+    val payment: WalletPayment?
+)
 
+@ExperimentalCoroutinesApi
 private class HomeViewModel(
     val connectionsFlow: StateFlow<Connections>,
     val paymentsManager: PaymentsManager,
     controller: HomeController
 ) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
 
+    private val paymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
+    private var _payments by paymentsFlow
+    val payments: List<PaymentRowState> get() = paymentsFlow.value.values
+        .sortedByDescending { it.orderRow.completedAt ?: it.orderRow.createdAt }
+        .toList()
+
     init {
         paymentsManager.subscribeToPaymentsPage(0, 150)
+        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
+            log.error("failed to collect payments page item", e)
+        }) {
+            paymentsManager.paymentsPage.collect {
+                for (row in it.rows) {
+                    _payments = _payments + (row.id.identifier to PaymentRowState(row, null))
+                    viewModelScope.launch {
+                        paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.let { paymentInfo ->
+                            _payments = _payments + (row.id.identifier to PaymentRowState(row, paymentInfo.payment))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     class Factory(
@@ -86,6 +119,7 @@ private class HomeViewModel(
     }
 }
 
+
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(
@@ -98,7 +132,7 @@ fun HomeView(
     val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
 
     val connectionsState = vm.connectionsFlow.collectAsState()
-    val paymentsPage = business.paymentsManager.paymentsPage.collectAsState()
+
     val showConnectionsDialog = remember { mutableStateOf(false) }
     if (showConnectionsDialog.value) {
         ConnectionDialog(connections = connectionsState.value, onClose = { showConnectionsDialog.value = false })
@@ -130,9 +164,17 @@ fun HomeView(
                     Spacer(modifier = Modifier.height(16.dp))
                     PrimarySeparator()
                     Spacer(modifier = Modifier.height(24.dp))
-                    LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(paymentsPage.value.rows) {
-                            PreparePaymentLine(it, onPaymentClick)
+                    LazyColumn(modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()) {
+                        items(
+                            items = vm.payments,
+                        ) {
+                            if (it.payment == null) {
+                                PaymentLineLoading(it.orderRow.completedAt ?: it.orderRow.createdAt)
+                            } else {
+                                PaymentLine(it.payment, onPaymentClick)
+                            }
                         }
                     }
                     BottomBar(drawerState, onReceiveClick, onSendClick)

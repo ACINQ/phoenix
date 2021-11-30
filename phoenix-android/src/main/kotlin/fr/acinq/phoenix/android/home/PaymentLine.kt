@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,28 +40,43 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
-import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
+import fr.acinq.phoenix.android.mutedTextColor
+import fr.acinq.phoenix.android.negativeColor
+import fr.acinq.phoenix.android.positiveColor
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
+
 
 @Composable
-internal fun PreparePaymentLine(
-    row: WalletPaymentOrderRow,
-    onPaymentClick: (WalletPayment) -> Unit
+fun PaymentLineLoading(
+    timestamp: Long
 ) {
-    val paymentsManager = business.paymentsManager
-    var payment by remember { mutableStateOf<WalletPayment?>(null) }
-    LaunchedEffect(key1 = row.id) {
-        payment = paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.payment
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        PaymentIconComponent(
+            icon = R.drawable.ic_payment_pending,
+            description = stringResource(id = R.string.paymentdetails_status_sent_pending)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(
+                text = stringResource(id = R.string.paymentline_loading),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body1.copy(color = mutedTextColor()),
+                modifier = Modifier.weight(1.0f)
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+        }
     }
-    payment?.let { PaymentLine(it, onPaymentClick) } ?: Text("Loading...")
 }
 
 @Composable
-private fun PaymentLine(
+fun PaymentLine(
     payment: WalletPayment,
     onPaymentClick: (WalletPayment) -> Unit
 ) {
