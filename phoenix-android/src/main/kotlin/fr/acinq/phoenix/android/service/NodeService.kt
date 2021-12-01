@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
@@ -28,6 +29,7 @@ import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.data.Wallet
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -215,9 +217,23 @@ class NodeService : Service() {
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
         val electrumServer = Prefs.getElectrumServer(applicationContext).first()
         val seed = business.prepWallet(EncryptedSeed.toMnemonics(decryptedPayload))
+
         business.loadWallet(seed)
         business.start()
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
+
+        serviceScope.launch {
+            val token = Prefs.getFcmToken(applicationContext).first()
+            log.debug("retrieved from prefs fcm token=$token")
+            var hasRegisteredToken = false
+            business.connectionsManager.connections.collect {
+                if (it.peer == Connection.ESTABLISHED && !hasRegisteredToken) {
+                    business.registerFcmToken(token)
+                    hasRegisteredToken = true
+                }
+            }
+        }
+
         return WalletState.Started.Kmm(business)
     }
 

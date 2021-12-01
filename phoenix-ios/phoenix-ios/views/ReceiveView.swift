@@ -2034,7 +2034,7 @@ struct SwapInView: View, ViewName {
 	}
 }
 
-// MARK:-
+// MARK: -
 
 class ReceiveView_Previews: PreviewProvider {
 

@@ -38,8 +38,10 @@ import fr.acinq.phoenix.controllers.init.RestoreWallet
 
 
 @Composable
-fun InitWallet() {
-    val nc = navController
+fun InitWallet(
+    onCreateWalletClick: () -> Unit,
+    onRestoreWalletClick: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,23 +52,31 @@ fun InitWallet() {
         FilledButton(
             text = R.string.initwallet_create,
             icon = R.drawable.ic_fire,
-            onClick = { nc.navigate(Screen.CreateWallet) })
+            onClick = onCreateWalletClick
+        )
         Spacer(modifier = Modifier.height(16.dp))
         BorderButton(
             text = R.string.initwallet_restore,
             icon = R.drawable.ic_restore,
-            onClick = { nc.navigate(Screen.RestoreWallet) })
+            onClick = onRestoreWalletClick
+        )
     }
 }
 
 @Composable
-fun CreateWalletView(appVM: AppViewModel) {
-    val log = logger()
-    val nc = navController
-    if (appVM.keyState.isReady()) {
-        nc.navigate(Screen.Startup)
-    } else {
+fun CreateWalletView(
+    appVM: AppViewModel,
+    onSeedWritten: () -> Unit
+) {
+    val log = logger("CreateWallet")
+    val context = LocalContext.current
+    if (!keyState.isReady()) {
         MVIView(CF::initialization) { model, postIntent ->
+            val entropy = remember { Lightning.randomBytes(16) }
+            LaunchedEffect(key1 = entropy) {
+                log.info { "generating wallet" }
+                postIntent(Initialization.Intent.GenerateWallet(entropy))
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,17 +84,17 @@ fun CreateWalletView(appVM: AppViewModel) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val entropy = remember { Lightning.randomBytes(16) }
-                log.info { "generating wallet" }
-                postIntent(Initialization.Intent.GenerateWallet(entropy))
                 when (model) {
                     is Initialization.Model.Ready -> {
                         Text("Generating wallet...")
                     }
                     is Initialization.Model.GeneratedWallet -> {
-                        log.info { "a new wallet has been generated, writing to disk..." }
-                        appVM.writeSeed(LocalContext.current.applicationContext, model.mnemonics)
-                        log.info { "seed successfully written to disk" }
+                        LaunchedEffect(keyState) {
+                            log.info { "a new wallet has been generated, writing to disk..." }
+                            appVM.writeSeed(context, model.mnemonics)
+                            log.info { "seed successfully written to disk" }
+                            onSeedWritten()
+                        }
                     }
                 }
             }
@@ -93,11 +103,14 @@ fun CreateWalletView(appVM: AppViewModel) {
 }
 
 @Composable
-fun RestoreWalletView(appVM: AppViewModel) {
-    val log = logger()
+fun RestoreWalletView(
+    appVM: AppViewModel,
+    onSeedWritten: () -> Unit
+) {
+    val log = logger("RestoreWallet")
+    val context = LocalContext.current
     if (appVM.keyState.isReady()) {
-        val nc = navController
-        nc.navigate(Screen.Startup)
+        onSeedWritten()
     } else {
         MVIView(CF::restoreWallet) { model, postIntent ->
             Column(
@@ -146,9 +159,12 @@ fun RestoreWalletView(appVM: AppViewModel) {
                     }
                     is RestoreWallet.Model.ValidMnemonics -> {
                         Text(stringResource(R.string.restore_in_progress))
-                        log.info { "restored wallet seed is valid" }
-                        appVM.writeSeed(LocalContext.current.applicationContext, wordsInput.split(" "))
-                        log.info { "seed successfully written to disk" }
+                        LaunchedEffect(keyState) {
+                            log.info { "restored wallet seed is valid" }
+                            appVM.writeSeed(context, wordsInput.split(" "))
+                            log.info { "seed successfully written to disk" }
+                            onSeedWritten()
+                        }
                     }
                     else -> {
                         Text("Please hold...")

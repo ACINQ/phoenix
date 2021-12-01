@@ -27,11 +27,15 @@ object Scan {
         object IsOwnInvoice : DangerousRequestReason()
     }
 
-    sealed class LNUrlPayError {
-        data class RemoteError(val err: LNUrl.Error.RemoteFailure) : LNUrlPayError()
-        data class BadResponseError(val err: LNUrl.Error.PayInvoice) : LNUrlPayError()
-        data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : LNUrlPayError()
-        object AlreadyPaidInvoice : LNUrlPayError()
+    sealed class LnurlPayError {
+        data class RemoteError(val err: LNUrl.Error.RemoteFailure) : LnurlPayError()
+        data class BadResponseError(val err: LNUrl.Error.PayInvoice) : LnurlPayError()
+        data class ChainMismatch(val myChain: Chain, val requestChain: Chain?) : LnurlPayError()
+        object AlreadyPaidInvoice : LnurlPayError()
+    }
+
+    sealed class LnurlWithdrawError {
+        data class RemoteError(val err: LNUrl.Error.RemoteFailure) : LnurlWithdrawError()
     }
 
     sealed class LoginError {
@@ -52,13 +56,13 @@ object Scan {
                 val request: String,
                 val paymentRequest: PaymentRequest,
                 val reason: DangerousRequestReason
-            ): Model()
+            ): InvoiceFlow()
             data class InvoiceRequest(
                 val request: String,
                 val paymentRequest: PaymentRequest,
                 val balanceMsat: Long
-            ): Model()
-            object Sending: Model()
+            ): InvoiceFlow()
+            object Sending: InvoiceFlow()
         }
 
         object LnurlServiceFetch : Model()
@@ -67,15 +71,35 @@ object Scan {
             data class LnurlPayRequest(
                 val lnurlPay: LNUrl.Pay,
                 val balanceMsat: Long,
-                val error: LNUrlPayError?
+                val error: LnurlPayError?
             ) : LnurlPayFlow()
 
-            data class LnUrlPayFetch(
+            data class LnurlPayFetch(
                 val lnurlPay: LNUrl.Pay,
                 val balanceMsat: Long
             ) : LnurlPayFlow()
 
             object Sending : LnurlPayFlow()
+        }
+
+        sealed class LnurlWithdrawFlow : Model() {
+            data class LnurlWithdrawRequest(
+                val lnurlWithdraw: LNUrl.Withdraw,
+                val balanceMsat: Long,
+                val error: LnurlWithdrawError?
+            ) : LnurlWithdrawFlow()
+
+            data class LnurlWithdrawFetch(
+                val lnurlWithdraw: LNUrl.Withdraw,
+                val balanceMsat: Long
+            ) : LnurlWithdrawFlow()
+
+            data class Receiving(
+                val lnurlWithdraw: LNUrl.Withdraw,
+                val amount: MilliSatoshi,
+                val description: String?,
+                val paymentHash: String
+            ) : LnurlWithdrawFlow()
         }
 
         sealed class LnurlAuthFlow : Model() {
@@ -123,6 +147,18 @@ object Scan {
             data class CancelLnurlPayment(
                 val lnurlPay: LNUrl.Pay
             ) : LnurlPayFlow()
+        }
+
+        sealed class LnurlWithdrawFlow : Intent() {
+            data class SendLnurlWithdraw(
+                val lnurlWithdraw: LNUrl.Withdraw,
+                val amount: MilliSatoshi,
+                val description: String?
+            ) : LnurlWithdrawFlow()
+
+            data class CancelLnurlWithdraw(
+                val lnurlWithdraw: LNUrl.Withdraw
+            ) : LnurlWithdrawFlow()
         }
 
         sealed class LnurlAuthFlow : Intent() {

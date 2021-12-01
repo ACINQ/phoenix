@@ -36,6 +36,7 @@ class Prefs {
 		case backupTransactions_useUploadDelay
 		case showChannelsRemoteBalance
 		case currencyConverterList
+		case recentTipPercents
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -203,6 +204,29 @@ class Prefs {
 			}
 			return Array(result)
 		}
+	}
+	
+	/// Most recent is at index 0
+	var recentTipPercents: [Int] {
+		get {
+			let key = Keys.recentTipPercents.rawValue
+			let saved: [Int]? = UserDefaults.standard.getCodable(forKey: key)
+			return saved ?? []
+		}
+	}
+	
+	func addRecentTipPercent(_ percent: Int) {
+		var recents = recentTipPercents
+		if let idx = recents.firstIndex(of: percent) {
+			recents.remove(at: idx)
+		}
+		recents.insert(percent, at: 0)
+		while recents.count > 6 {
+			recents.removeLast()
+		}
+		
+		let key = Keys.recentTipPercents.rawValue
+		UserDefaults.standard.setCodable(value: recents, forKey: key)
 	}
 	
 	// --------------------------------------------------

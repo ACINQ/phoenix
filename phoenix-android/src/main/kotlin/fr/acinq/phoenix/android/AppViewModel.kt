@@ -42,6 +42,7 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
 
     /** Monitoring the state of the service - null if the service is disconnected. */
     private val _service = MutableLiveData<NodeService?>(null)
+
     /** Nullable accessor for the service. */
     val service: NodeService? get() = _service.value
 
@@ -79,10 +80,15 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
 
     fun writeSeed(context: Context, mnemonics: List<String>) {
         try {
-            val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
-            SeedManager.writeSeedToDisk(context, encrypted)
-            refreshSeed()
-            log.info("seed has been written to disk")
+            val existing = SeedManager.loadSeedFromDisk(context)
+            if (existing == null) {
+                val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
+                SeedManager.writeSeedToDisk(context, encrypted)
+                refreshSeed()
+                log.info("seed has been written to disk")
+            } else {
+                log.warn("cannot overwrite existing seed=${existing.name()}")
+            }
         } catch (e: Exception) {
             log.error("failed to create new wallet: ", e)
         }
@@ -114,7 +120,7 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
     }
 }
 
-class StateLiveData(service: MutableLiveData<NodeService?>): MediatorLiveData<WalletState>() {
+class StateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<WalletState>() {
     private val log = LoggerFactory.getLogger(this::class.java)
     private var serviceState: LiveData<WalletState>? = null
 

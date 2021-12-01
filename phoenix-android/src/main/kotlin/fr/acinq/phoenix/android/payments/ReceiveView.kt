@@ -50,8 +50,8 @@ import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.payments.Receive
 import fr.acinq.phoenix.controllers.ReceiveController
+import fr.acinq.phoenix.controllers.payments.Receive
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,10 +82,10 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
         val amount = customAmount
         val desc = customDesc
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
-            log.error(e) { "failed to generate invoice with amount=$amount desc=$desc" }
+            log.error("failed to generate invoice with amount=$amount desc=$desc :", e)
             state = ReceiveViewState.Error(e)
         }) {
-            log.info { "generating invoice with amount=$amount desc=$desc" }
+            log.info("generating invoice with amount=$amount desc=$desc")
             state = ReceiveViewState.Default
             controller.intent(Receive.Intent.Ask(amount = amount, desc = desc))
         }
@@ -94,11 +94,11 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
     @UiThread
     fun generateQrCodeBitmap(invoice: String) {
         viewModelScope.launch(Dispatchers.Default) {
-            log.info { "generating qrcode for invoice=$invoice" }
+            log.info("generating qrcode for invoice=$invoice")
             try {
                 qrBitmap = QRCode.generateBitmap(invoice).asImageBitmap()
             } catch (e: Exception) {
-                log.error(e) { "error when generating bitmap QR for invoice=$invoice" }
+                log.error("error when generating bitmap QR for invoice=$invoice:", e)
             }
         }
     }
@@ -145,14 +145,14 @@ private fun DefaultView(vm: ReceiveViewModel) {
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
-                    SideEffect { vm.generateInvoice() }
+                    LaunchedEffect(key1 = true) { vm.generateInvoice() }
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generating -> {
                     Text(stringResource(id = R.string.receive__generating))
                 }
                 is Receive.Model.Generated -> {
-                    SideEffect {
+                    LaunchedEffect(model.request) {
                         vm.generateQrCodeBitmap(invoice = model.request)
                     }
                     Spacer(modifier = Modifier.height(24.dp))

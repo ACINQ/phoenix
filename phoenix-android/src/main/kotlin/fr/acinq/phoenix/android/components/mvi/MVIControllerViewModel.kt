@@ -23,12 +23,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.MVI
-import org.kodein.log.Logger
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 open class MVIControllerViewModel<M : MVI.Model, I : MVI.Intent>(val controller: MVI.Controller<M, I>) : ViewModel() {
-    val log: Logger = newLogger(LoggerFactory.default)
+
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     // Model is settable in case the controller is not flexible enough, even though it should be avoided when possible
     var model by mutableStateOf(controller.firstModel)
@@ -36,14 +36,14 @@ open class MVIControllerViewModel<M : MVI.Model, I : MVI.Intent>(val controller:
     private val unsubscribe: () -> Unit
 
     init {
-        log.debug { "initializing view-model for controller=$controller, subscribing to model changes" }
+        log.debug("initializing view-model for controller=$controller, subscribing to model changes")
         unsubscribe = controller.subscribe {
             model = it
         }
     }
 
     override fun onCleared() {
-        log.debug { "clearing view-model for controller=$controller with model=$model" }
+        log.debug("clearing view-model for controller=$controller with model=$model")
         unsubscribe()
         controller.stop()
     }

@@ -15,7 +15,15 @@ fileprivate var log = Logger(OSLog.disabled)
 fileprivate let PAGE_COUNT_START = 25
 fileprivate let PAGE_COUNT_INCREMENT = 25
 
-struct HomeView : MVIView, ViewName {
+
+fileprivate enum NavLinkTag: String {
+	case ConfigurationView
+	case ReceiveView
+	case SendView
+	case CurrencyConverter
+}
+
+struct HomeView : MVIView {
 
 	static let phoenixBusiness = AppDelegate.get().business
 	let phoenixBusiness: PhoenixBusiness = HomeView.phoenixBusiness
@@ -49,15 +57,35 @@ struct HomeView : MVIView, ViewName {
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	@Environment(\.openURL) var openURL
+	@Environment(\.colorScheme) var colorScheme
 	
 	@State var didAppear = false
 	@State var didPreFetch = false
+	
+	@State private var navLinkTag: NavLinkTag? = nil
+	
+	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
+	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
+	@State var temp: [AppScanController] = []
 	
 	@ViewBuilder
 	var view: some View {
 		
 		ZStack {
 
+			// iOS 14 & 15 have bugs when using NavigationLink.
+			// The suggested workarounds include using only a single NavigationLink.
+			//
+			NavigationLink(
+				destination: navLinkView(),
+				isActive: Binding(
+					get: { navLinkTag != nil },
+					set: { if !$0 { navLinkTag = nil }}
+				)
+			) {
+				EmptyView()
+			}
+			
 			Color.primaryBackground
 				.edgesIgnoringSafeArea(.all)
 
@@ -78,6 +106,9 @@ struct HomeView : MVIView, ViewName {
 		.onChange(of: mvi.model) { newModel in
 			onModelChange(model: newModel)
 		}
+		.onChange(of: navLinkTag) { tag in
+			navLinkTagChanged(tag)
+		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
@@ -90,6 +121,9 @@ struct HomeView : MVIView, ViewName {
 		.onReceive(incomingSwapsPublisher) { incomingSwaps in
 			onIncomingSwapsChanged(incomingSwaps)
 		}
+		.onReceive(externalLightningUrlPublisher) { (url: URL) in
+			didReceiveExternalLightningUrl(url)
+		}
 	}
 
 	@ViewBuilder
@@ -101,7 +135,7 @@ struct HomeView : MVIView, ViewName {
 			HStack {
 				AppStatusButton()
 				Spacer()
-				ToolsButton()
+				ToolsButton(navLinkTag: $navLinkTag)
 			}
 			.padding(.all)
 
@@ -249,7 +283,7 @@ struct HomeView : MVIView, ViewName {
 				}
 			}
 
-			BottomBar(toast: toast)
+			BottomBar(navLinkTag: $navLinkTag, toast: toast)
 		
 		} // </VStack>
 		.onAppear {
@@ -268,6 +302,27 @@ struct HomeView : MVIView, ViewName {
 		}
 	}
 
+	@ViewBuilder
+	func navLinkView() -> some View {
+		
+		switch navLinkTag {
+		case .ConfigurationView:
+			ConfigurationView()
+			
+		case .ReceiveView:
+			ReceiveView()
+			
+		case .SendView:
+			SendView(firstModel: externalLightningRequest)
+			
+		case .CurrencyConverter:
+			CurrencyConverterView()
+			
+		default:
+			EmptyView()
+		}
+	}
+	
 	func incomingAmount() -> FormattedAmount? {
 		
 		let msatTotal = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
@@ -281,7 +336,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func didSelectPayment(row: WalletPaymentOrderRow) -> Void {
-		log.trace("[\(viewName)] didSelectPayment()")
+		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
 		let options = WalletPaymentFetchOptions.companion.Descriptions
@@ -294,7 +349,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func onAppear() {
-		log.trace("[\(viewName)] onAppear()")
+		log.trace("onAppear()")
 		
 		// Careful: this function may be called when returning from the Receive/Send view
 		if !didAppear {
@@ -307,20 +362,30 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func onModelChange(model: Home.Model) -> Void {
-		log.trace("[\(viewName)] onModelChange()")
+		log.trace("onModelChange()")
 		
 		// Todo: maybe update paymentsPage subscription ?
 	}
 	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged()")
+		
+		if tag == nil {
+			// If we pushed the SendView with a external lightning url,
+			// we should nil out the url (since the user is finished with it now).
+			self.externalLightningRequest = nil
+		}
+	}
+	
 	func paymentsPageChanged(_ page: PaymentsManager.PaymentsPage) -> Void {
-		log.trace("[\(viewName)] paymentsPageChanged()")
+		log.trace("paymentsPageChanged()")
 		
 		paymentsPage = page
 		maybePreFetchPaymentsFromDatabase()
 	}
 	
 	func lastCompletedPaymentChanged(_ payment: Lightning_kmpWalletPayment) -> Void {
-		log.trace("[\(viewName)] lastCompletedPaymentChanged()")
+		log.trace("lastCompletedPaymentChanged()")
 		
 		let paymentId = payment.walletPaymentId()
 		let options = WalletPaymentFetchOptions.companion.Descriptions
@@ -333,13 +398,13 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
-		log.trace("[\(viewName)] chainContextChanged()")
+		log.trace("chainContextChanged()")
 		
 		isMempoolFull = context.mempool.v1.highUsage
 	}
 	
 	func onIncomingSwapsChanged(_ incomingSwaps: [String: Lightning_kmpMilliSatoshi]) -> Void {
-		log.trace("[\(viewName)] onIncomingSwapsChanged(): \(incomingSwaps)")
+		log.trace("onIncomingSwapsChanged(): \(incomingSwaps)")
 		
 		let oldSum = lastIncomingSwaps.values.reduce(Int64(0)) {(sum, item) -> Int64 in
 			return sum + item.msat
@@ -377,7 +442,7 @@ struct HomeView : MVIView, ViewName {
 		}
 
 		let row = paymentsPage.rows[idx]
-		log.debug("[\(viewName)] Pre-fetching: \(row.identifiable)")
+		log.debug("Pre-fetching: \(row.identifiable)")
 
 		let options = WalletPaymentFetchOptions.companion.Descriptions
 		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { _ in
@@ -386,7 +451,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func startAnimatingIncomingSwapText() -> Void {
-		log.trace("[\(viewName)] startAnimatingIncomingSwapText()")
+		log.trace("startAnimatingIncomingSwapText()")
 		
 		// Here's what we want to happen:
 		// - text starts at normal scale (factor = 1.0)
@@ -436,7 +501,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func animateIncomingSwapText() -> Void {
-		log.trace("[\(viewName)] animateIncomingSwapText()")
+		log.trace("animateIncomingSwapText()")
 		
 		let duration = 0.5 // seconds
 		let nextScaleFactor = incomingSwapScaleFactor == 1.0 ? incomingSwapScaleFactor_BIG : 1.0
@@ -447,10 +512,10 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func incomingSwapAnimationCompleted() -> Void {
-		log.trace("[\(viewName)] incomingSwapAnimationCompleted()")
+		log.trace("incomingSwapAnimationCompleted()")
 		
 		incomingSwapAnimationsRemaining -= 1
-		log.debug("[\(viewName)]: incomingSwapAnimationsRemaining = \(incomingSwapAnimationsRemaining)")
+		log.debug("incomingSwapAnimationsRemaining = \(incomingSwapAnimationsRemaining)")
 		
 		if incomingSwapAnimationsRemaining > 0 {
 			animateIncomingSwapText()
@@ -462,7 +527,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func mempoolFullInfo() -> Void {
-		log.trace("[\(viewName)] mempoolFullInfo()")
+		log.trace("mempoolFullInfo()")
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq#high-mempool-size-impacts") {
 			openURL(url)
@@ -470,7 +535,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func paymentCellDidAppear(_ visibleRow: WalletPaymentOrderRow) -> Void {
-		log.trace("[\(viewName)] paymentCellDidAppear(): \(visibleRow.id)")
+		log.trace("paymentCellDidAppear(): \(visibleRow.id)")
 		
 		// Infinity Scrolling
 		//
@@ -518,7 +583,7 @@ struct HomeView : MVIView, ViewName {
 				let prvOffset = paymentsPage.offset
 				let newCount = paymentsPage.count + Int32(PAGE_COUNT_INCREMENT)
 				
-				log.debug("[\(viewName)] increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
+				log.debug("increasing page.count: Page(offset=\(prvOffset), count=\(newCount)")
 				
 				AppDelegate.get().business.paymentsManager.subscribeToPaymentsPage(
 					offset: prvOffset,
@@ -529,7 +594,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func exploreIncomingSwap(website: BlockchainExplorer.Website) {
-		log.trace("[\(viewName)] exploreIncomingSwap()")
+		log.trace("exploreIncomingSwap()")
 		
 		guard let addr = lastIncomingSwaps.keys.first else {
 			return
@@ -543,7 +608,7 @@ struct HomeView : MVIView, ViewName {
 	}
 	
 	func copyIncomingSwap() {
-		log.trace("[\(viewName)] copyIncomingSwap()")
+		log.trace("copyIncomingSwap()")
 		
 		let addresses = lastIncomingSwaps.keys
 		
@@ -553,6 +618,67 @@ struct HomeView : MVIView, ViewName {
 		} else if addresses.count >= 2 {
 			UIPasteboard.general.string = addresses.joined(separator: ", ")
 		}
+	}
+	
+	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+		log.trace("didReceiveExternalLightningUrl()")
+	
+		if navLinkTag == .SendView {
+			log.debug("Ignoring: handled by SendView")
+			return
+		}
+		
+		// We want to:
+		// - Parse the incoming lightning url
+		// - If it's invalid, we want to display a warning (using the Toast view)
+		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
+		//
+		// In particular, we do **NOT** want the user experience to be:
+		// - switch to SendView
+		// - then again switch to ConfirmView
+		// This feels jittery :(
+		//
+		// So we need to:
+		// - get a Scan.ModelValidate instance
+		// - pass this to SendView as the `firstModel` parameter
+		
+		let controllers = AppDelegate.get().business.controllers
+		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
+			return
+		}
+		temp.append(scanController)
+		
+		var unsubscribe: (() -> Void)? = nil
+		var isFirstFire = true
+		unsubscribe = scanController.subscribe { (model: Scan.Model) in
+			
+			if isFirstFire { // ignore first subscription fire (Scan.ModelReady)
+				isFirstFire = false
+				return
+			}
+			
+			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
+				self.externalLightningRequest = model
+				self.navLinkTag = .SendView
+				
+			} else if let _ = model as? Scan.ModelBadRequest {
+				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
+				toast.pop(
+					Text(msg).anyView,
+					colorScheme: colorScheme.opposite,
+					duration: 4.0,
+					location: .middle
+				)
+			}
+			
+			// Cleanup
+			if let idx = self.temp.firstIndex(where: { $0 === scanController }) {
+				self.temp.remove(at: idx)
+			}
+			unsubscribe?()
+		}
+		
+		scanController.intent(intent: Scan.IntentParse(request: url.absoluteString))
 	}
 }
 
@@ -867,7 +993,7 @@ fileprivate struct AppStatusButton: View, ViewName {
 
 fileprivate struct ToolsButton: View, ViewName {
 	
-	@State var currencyConverterOpen = false
+	@Binding var navLinkTag: NavLinkTag?
 	
 	@Environment(\.openURL) var openURL
 	
@@ -914,11 +1040,6 @@ fileprivate struct ToolsButton: View, ViewName {
 						.stroke(Color.borderColor, lineWidth: 1)
 				)
 		}
-		.background(
-			NavigationLink(destination: CurrencyConverterView(), isActive: $currencyConverterOpen) {
-				EmptyView()
-			}
-		)
 	}
 	
 	func faqButtonTapped() {
@@ -953,7 +1074,7 @@ fileprivate struct ToolsButton: View, ViewName {
 	
 	func currencyConverterTapped() {
 		log.trace("[\(viewName)] currencyConverterTapped()")
-		currencyConverterOpen = true
+		navLinkTag = .CurrencyConverter
 	}
 }
 
@@ -982,30 +1103,17 @@ fileprivate struct DisclaimerBox<Content: View>: View {
 }
 
 fileprivate struct BottomBar: View, ViewName {
-
+	
+	@Binding var navLinkTag: NavLinkTag?
 	@ObservedObject var toast: Toast
-	
-	@State private var selectedTag: String? = nil
-	enum Tag: String {
-		case ConfigurationView
-		case ReceiveView
-		case SendView
-	}
-	
-	@State var temp: [AppScanController] = []
-	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
-	
-	@Environment(\.colorScheme) var colorScheme
 	
 	var body: some View {
 		
 		HStack {
-
-			NavigationLink(
-				destination: ConfigurationView(),
-				tag: Tag.ConfigurationView.rawValue,
-				selection: $selectedTag
-			) {
+			
+			Button {
+				navLinkTag = .ConfigurationView
+			} label: {
 				Image("ic_settings")
 					.resizable()
 					.frame(width: 22, height: 22)
@@ -1017,11 +1125,9 @@ fileprivate struct BottomBar: View, ViewName {
 			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 			
-			NavigationLink(
-				destination: ReceiveView(),
-				tag: Tag.ReceiveView.rawValue,
-				selection: $selectedTag
-			) {
+			Button {
+				navLinkTag = .ReceiveView
+			} label: {
 				HStack {
 					Image("ic_receive")
 						.resizable()
@@ -1037,11 +1143,9 @@ fileprivate struct BottomBar: View, ViewName {
 			Divider().frame(width: 1, height: 40).background(Color.borderColor)
 			Spacer()
 
-			NavigationLink(
-				destination: SendView(firstModel: externalLightningRequest),
-				tag: Tag.SendView.rawValue,
-				selection: $selectedTag
-			) {
+			Button {
+				navLinkTag = .SendView
+			} label: {
 				HStack {
 					Image("ic_scan")
 						.resizable()
@@ -1061,77 +1165,6 @@ fileprivate struct BottomBar: View, ViewName {
 				.cornerRadius(15, corners: [.topLeft, .topRight])
 				.edgesIgnoringSafeArea([.horizontal, .bottom])
 		)
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
-			didReceiveExternalLightningUrl(url)
-		}
-		.onChange(of: selectedTag) { tag in
-			if tag == nil {
-				// If we pushed the SendView with a external lightning url,
-				// we should nil out the url (since the user is finished with it now).
-				self.externalLightningRequest = nil
-			}
-		}
-	}
-	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
-		log.trace("[\(viewName)] didReceiveExternalLightningUrl()")
-		
-		if selectedTag == Tag.SendView.rawValue {
-			log.debug("[\(viewName)] Ignoring: handled by SendView")
-			return
-		}
-		
-		// We want to:
-		// - Parse the incoming lightning url
-		// - If it's invalid, we want to display a warning (using the Toast view)
-		// - Otherwise we want to jump DIRECTLY to the "Confirm Payment" screen.
-		//
-		// In particular, we do **NOT** want the user experience to be:
-		// - switch to SendView
-		// - then again switch to ConfirmView
-		// This feels jittery :(
-		//
-		// So we need to:
-		// - get a Scan.ModelValidate instance
-		// - pass this to SendView as the `firstModel` parameter
-		
-		let controllers = AppDelegate.get().business.controllers
-		guard let scanController = controllers.scan(firstModel: Scan.ModelReady()) as? AppScanController else {
-			return
-		}
-		temp.append(scanController)
-		
-		var unsubscribe: (() -> Void)? = nil
-		var isFirstFire = true
-		unsubscribe = scanController.subscribe { (model: Scan.Model) in
-			
-			if isFirstFire { // ignore first subscription fire (Scan.ModelReady)
-				isFirstFire = false
-				return
-			}
-			
-			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
-				self.externalLightningRequest = model
-				self.selectedTag = Tag.SendView.rawValue
-				
-			} else if let _ = model as? Scan.ModelBadRequest {
-				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
-				toast.pop(
-					Text(msg).anyView,
-					colorScheme: colorScheme.opposite,
-					duration: 4.0,
-					location: .middle
-				)
-			}
-			
-			// Cleanup
-			if let idx = self.temp.firstIndex(where: { $0 === scanController }) {
-				self.temp.remove(at: idx)
-			}
-			unsubscribe?()
-		}
-		
-		scanController.intent(intent: Scan.IntentParse(request: url.absoluteString))
 	}
 }
 

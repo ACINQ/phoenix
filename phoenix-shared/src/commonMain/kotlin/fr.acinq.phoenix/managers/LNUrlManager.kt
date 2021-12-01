@@ -19,6 +19,7 @@ package fr.acinq.phoenix.managers
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.Either
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.data.LNUrl
@@ -31,10 +32,13 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -67,10 +71,10 @@ class LNUrlManager(
      * Get the LNUrl for this source. Throw exception if source is malformed, or invalid.
      * Will execute an HTTP request for some urls and parse the response into an actionable LNUrl object.
      */
-    suspend fun extractLNUrl(source: String): LNUrl {
-        return when (val result = interactiveExtractLNUrl(source)) {
+    suspend fun extractLnurl(source: String): LNUrl {
+        return when (val result = interactiveExtractLnurl(source)) {
             is Either.Left -> result.value
-            is Either.Right -> continueLnUrl(result.value)
+            is Either.Right -> continueLnurlAsync(result.value).await()
         }
     }
 
@@ -78,11 +82,11 @@ class LNUrlManager(
      * Attempts to extract a Bech32 URL from the string.
      * On success:
      * - if the LnUrl is a simple Auth, it's returned immediately
-     * - otherwise the Url is returned (call `continueLnUrl` to fetch & parse the Url)
+     * - otherwise the Url is returned (call `continueLnurlAsync` to fetch & parse the Url)
      *
      * Throws an exception if source is malformed, or invalid.
      */
-    fun interactiveExtractLNUrl(source: String): Either<LNUrl.Auth, Url> {
+    fun interactiveExtractLnurl(source: String): Either<LNUrl.Auth, Url> {
         var url = try {
             LNUrl.parseBech32Url(source)
         } catch (e: Exception) {
@@ -123,7 +127,7 @@ class LNUrlManager(
      * Executes the HTTP request for the LnUrl and parses the response
      * into an actionable LNUrl object.
      */
-    suspend fun continueLnUrl(url: Url): LNUrl {
+    fun continueLnurlAsync(url: Url): Deferred<LNUrl> = async {
         val response: HttpResponse = try {
             httpClient.get(url)
         } catch (err: Throwable) {
@@ -131,7 +135,7 @@ class LNUrlManager(
         }
         try {
             val json = LNUrl.handleLNUrlResponse(response)
-            return LNUrl.parseLNUrlResponse(url, json)
+            return@async LNUrl.parseLNUrlResponse(url, json)
         } catch (e: Exception) {
             when (e) {
                 is LNUrl.Error.RemoteFailure -> throw e
@@ -145,11 +149,12 @@ class LNUrlManager(
      * - LNUrl.Error.RemoteFailure
      * - LNUrl.Error.PayInvoice
      */
-    suspend fun requestPayInvoice(
+    fun requestPayInvoiceAsync(
         lnurlPay: LNUrl.Pay,
         amount: MilliSatoshi,
         comment: String?
-    ): LNUrl.PayInvoice {
+    ): Deferred<LNUrl.PayInvoice> = async {
+
         val builder = URLBuilder(lnurlPay.callback)
         builder.appendParameter(name = "amount", value = amount.msat.toString())
         if (comment != null && comment.isNotEmpty()) {
@@ -190,13 +195,63 @@ class LNUrlManager(
             throw LNUrl.Error.PayInvoice.InvalidAmount(origin)
         }
 
-        return invoice
+        return@async invoice
+    }
+
+    /**
+     * May throw errors of type:
+     * - LNUrl.Error.RemoteFailure
+     */
+    fun sendWithdrawInvoiceAsync(
+        lnurlWithdraw: LNUrl.Withdraw,
+        paymentRequest: PaymentRequest
+    ): Deferred<JsonObject> = async {
+
+        val builder = URLBuilder(lnurlWithdraw.callback)
+        builder.appendParameter(name = "k1", value = lnurlWithdraw.k1)
+        builder.appendParameter(name = "pr", value = paymentRequest.write())
+        val callback = builder.build()
+        val origin = callback.host
+
+        val response: HttpResponse = try {
+            httpClient.get(callback)
+        } catch (err: Throwable) {
+            throw LNUrl.Error.RemoteFailure.CouldNotConnect(origin)
+        }
+
+        // may throw: LNUrl.Error.RemoteFailure
+        //
+        // - LNUrl.Error.RemoteFailure.Code:
+        //     if non-2XX status code is returned
+        // - LNUrl.Error.RemoteFailure.Unreadable:
+        //     if response isn't valid JSON
+        // - LNUrl.Error.RemoteFailure.Detailed:
+        //     if {"status": "ERROR", ...} is returned
+        //
+        LNUrl.handleLNUrlResponse(response)
+
+        // According to the spec:
+        //
+        // > LN SERVICE sends a {"status": "OK"} or
+        // > {"status": "ERROR", "reason": "error details..."} JSON response
+        // > and then attempts to pay the invoices asynchronously.
+        //
+        // At this point:
+        // - the server returned a 2XX response
+        // - the resposne body was valid JSON
+        // - and the JSON did NOT contain {"status": "ERROR", ...}
+        //
+        // We could verify the response contains {"status": "OK"}.
+        // But it doesn't really matter if the server obeyed the spec perfectly.
+        // At this point the server has enough information to send a payment.
+        // And then the user will be told to wait for the incoming payment.
     }
 
     suspend fun requestAuth(auth: LNUrl.Auth, publicSuffixList: PublicSuffixList) {
         val wallet = walletManager.wallet.filterNotNull().first()
         
-        val domain = publicSuffixList.eTldPlusOne(auth.url.host) ?: throw LNUrl.Error.CouldNotDetermineDomain
+        val domain = publicSuffixList.eTldPlusOne(auth.url.host) ?:
+            throw LNUrl.Error.Auth.CouldNotDetermineDomain
         val key = wallet.lnurlAuthLinkingKey(domain)
         val signedK1 = Crypto.compact2der(Crypto.sign(
             data = ByteVector32.fromValidHex(auth.k1),

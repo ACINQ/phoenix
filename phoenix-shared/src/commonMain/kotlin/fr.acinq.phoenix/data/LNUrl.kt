@@ -72,8 +72,8 @@ sealed class LNUrl {
     data class Withdraw(
         val lnurl: Url,
         val callback: Url,
-        val walletIdentifier: String,
-        val description: String,
+        val k1: String,
+        val defaultDescription: String,
         val minWithdrawable: MilliSatoshi,
         val maxWithdrawable: MilliSatoshi
     ) : LNUrl()
@@ -138,13 +138,12 @@ sealed class LNUrl {
 
         sealed class Auth(override val message: String?) : Error(message) {
             object MissingK1 : Auth("missing k1 parameter")
+            object MissingPublicSuffixList : Auth("missing public suffix list")
+            object CouldNotDetermineDomain : Auth("could not determine domain")
         }
 
         sealed class Withdraw(override val message: String?) : Error(message) {
             object MissingK1 : Withdraw("missing k1 parameter in auth metadata")
-            object MissingDescription : Withdraw("missing description parameter in auth metadata")
-            data class AmountAtLeast(val min: MilliSatoshi) : Withdraw("amount must be at least $min")
-            data class AmountAtMost(val min: MilliSatoshi) : Withdraw("amount must be at least $min")
         }
 
         sealed class Pay(override val message: String?) : Error(message) {
@@ -171,9 +170,6 @@ sealed class LNUrl {
         data class UnhandledTag(val tag: String) : Error("unhandled tag=$tag")
         object UnsafeCallback : Error("resource should be https")
         object MissingCallback : Error("missing callback in metadata response")
-
-        object MissingPublicSuffixList : Error("missing public suffix list")
-        object CouldNotDetermineDomain : Error("could not determine domain")
 
         sealed class RemoteFailure(override val message: String) : Error(message) {
             abstract val origin: String
@@ -284,15 +280,15 @@ sealed class LNUrl {
             val tag = json["tag"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() } ?: throw Error.NoTag
             return when (tag) {
                 Tag.Withdraw.label -> {
-                    val walletIdentifier = json["k1"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() } ?: throw Error.Withdraw.MissingK1
+                    val k1 = json["k1"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() } ?: throw Error.Withdraw.MissingK1
                     val minWithdrawable = json["minWithdrawable"]?.jsonPrimitive?.long?.takeIf { it > 0 }?.msat ?: 0.msat
                     val maxWithdrawable = json["maxWithdrawable"]?.jsonPrimitive?.long?.coerceAtLeast(minWithdrawable.msat)?.msat ?: minWithdrawable
-                    val desc = json["defaultDescription"]?.jsonPrimitive?.content ?: throw Error.Withdraw.MissingDescription
+                    val dDesc = json["defaultDescription"]?.jsonPrimitive?.content ?: ""
                     Withdraw(
                         lnurl = lnurl,
                         callback = callback,
-                        walletIdentifier = walletIdentifier,
-                        description = desc,
+                        k1 = k1,
+                        defaultDescription = dDesc,
                         minWithdrawable = minWithdrawable,
                         maxWithdrawable = maxWithdrawable
                     )
