@@ -101,7 +101,7 @@
   <string name="paymentholder_received_prefix">+</string>
   <string name="paymentholder_no_desc">Sem descrição</string>
   <string name="paymentholder_closing_desc">Encerrando #%1$s</string>
-  <string name="paymentholder_swap_in_desc">Pagamento pela rede Bitcoin para %1$s</string>
+  <string name="paymentholder_swap_in_desc">Pagamento pela rede bitcoin para %1$s</string>
 
   <!-- //////////////// receive //////////////// -->
 
@@ -125,13 +125,13 @@
   <string name="receive_address_label">Endereço</string>
   <string name="receive_withdraw_button">Usar link LNURL</string>
 
-  <string name="receive_swap_in_button">Mostrar endereço Bitcoin</string>
+  <string name="receive_swap_in_button">Mostrar endereço bitcoin</string>
   <string name="receive_swap_in_info"><![CDATA[
    Este endereço bitcoin é controlado pela Acinq. Valores recebidos neste endereço serão convertidos para o saldo da sua carteira Phoenix.
     <br /><br />
     O depósito precisa ser de no mínimo <b>%1$s</b>. Taxa <b>%2$s%%</b> (<b>%3$s</b> taxa mínima).
   ]]></string>
-  <string name="receive_swap_in_error_message">Não foi possível obter um endereço Bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
+  <string name="receive_swap_in_error_message">Não foi possível obter um endereço bitcoin do serviço de trocas.\n\nTente novamente mais tarde.</string>
   <string name="receive_swap_in_unknown"><![CDATA[
     <b>Indisponível</b>
     <br /><br />
@@ -140,21 +140,21 @@
   <string name="receive_swap_in_disabled"><![CDATA[
     <b>Serviço desabilitado</b>
     <br /><br />
-    O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    O serviço de depósito via rede bitcoin foi temporariamente desativado.
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
   <string name="receive_swap_in_disabled_mempool"><![CDATA[
     <b>Serviço desabilitado</b>
     <br /><br />
-    O mempool do Bitcoin está cheio e as taxas muito altas. O serviço de depósito via rede Bitcoin foi temporariamente desativado.
+    O mempool do bitcoin está cheio e as taxas muito altas. O serviço de depósito via rede bitcoin foi temporariamente desativado.
     <br /><br />
     Tente novamente mais tarde.
   ]]></string>
-  <string name="receive_swap_in_progress_message">Solicitando um endereço Bitcoin…</string>
-  <string name="receive_swap_in_disclaimer_title">Receber pela rede Bitcoin</string>
+  <string name="receive_swap_in_progress_message">Solicitando um endereço bitcoin…</string>
+  <string name="receive_swap_in_disclaimer_title">Receber pela rede bitcoin</string>
   <string name="receive_swap_in_disclaimer_message"><![CDATA[
-  Um endereço Bitcoin padrão será exibido a seguir.
+  Um endereço bitcoin padrão será exibido a seguir.
   <br /><br />
   Os bitcoins enviados para este endereço aparecerão na sua carteira após a 1ª confirmação da rede.
   <br /><br />
@@ -171,13 +171,13 @@
   <string name="send_invalid_pr_already_paid_button">Abrir comprovante</string>
   <string name="send_amount_error">Insira uma quantia válida.</string>
   <string name="send_amount_error_balance">A quantidade excede o seu saldo.</string>
-  <string name="send_amount_error_swap_out_too_small">Mín. %1$s para pagamentos pela rede Bitcoin.</string>
+  <string name="send_amount_error_swap_out_too_small">Mín. %1$s para pagamentos pela rede bitcoin.</string>
   <string name="send_destination_label">Enviar para</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_error_sending">Ocorreu um erro interno ao tentar enviar este pagamento. Pagamento não realizado.</string>
   <string name="send_pay_button">Pagar</string>
   <string name="send_swap_in_progress">Preparando transação…</string>
-  <string name="send_swap_error">A troca para rede Bitcoin falhou. Tente novamente.</string>
+  <string name="send_swap_error">A troca para rede bitcoin falhou. Tente novamente.</string>
   <string name="send_swap_required_button">Preparar transação</string>
   <string name="send_swap_complete_recap_amount">Quantidade</string>
   <string name="send_swap_complete_recap_fee">Taxa de mineração</string>
@@ -192,17 +192,17 @@
   <string name="readinput_extracting">Verificando…</string>
   
   <string name="send_input_dialog_title">Inserir manualmente</string>
-  <string name="send_input_dialog_message">Insira um endereço Bitcoin, fatura Lightning, LNUrl, ou um endereço Lightning que você deseja enviar dinheiro.</string>
+  <string name="send_input_dialog_message">Insira um endereço bitcoin, solicitação de pagamento, LNUrl, ou um endereço da rede relâmpago que você deseja enviar dinheiro.</string>
   <string name="send_input_dialog_hint">Insira os dados aqui</string>
 
   <string name="scan_request_camera_access">Permitir uso da câmera</string>
-  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma fatura, endereço bitcoin ou LNURL</string>
+  <string name="scan_instructions">Aponte a câmera para o código QR contendo uma solicitação de pagamento, endereço bitcoin ou LNURL</string>
   <string name="scan_state_reading">Lendo dados</string>
 
   <string name="scan_error_expired">O pagamento expirou.</string>
   <string name="scan_error_pay_to_self">Você não pode pagar a si próprio.</string>
   <string name="scan_error_invalid_chain">Este pagamento não usa o mesmo blockchain da sua carteira.</string>
-  <string name="scan_error_lnurl_unsupported">Este tipo de URL Lightning ainda não é suportada!</string>
+  <string name="scan_error_lnurl_unsupported">Este tipo de URL ainda não é suportada!</string>
   <string name="scan_error_lnurl_failure_generic"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um erro.]]></string>
   <string name="scan_error_lnurl_failure_code"><![CDATA[O serviço LNURL <b>%1$s</b> retornou um código de erro HTTP %2$d.]]></string>
   <string name="scan_error_lnurl_failure_detailed"><![CDATA[
@@ -287,14 +287,14 @@
 
   <string name="closechannels_title">Encerrar canais</string>
   <string name="closechannels_checking_channels">Verificando canais, aguarde…</string>
-  <string name="closechannels_channels_recap">Você atualmente possui %1$d canais Lightning que juntos somam o total de %2$s.</string>
+  <string name="closechannels_channels_recap">Você atualmente possui %1$d canais na rede relâmpago que juntos somam o total de %2$s.</string>
   <string name="closechannels_channels_none">No momento, você não possui canais que possam ser esvaziados.\n\nEm \'Lista de canais\' você pode verificar o estado em que se encontram os seus canais.</string>
   <string name="closechannels_mutual_title">Esvaziar carteira</string>
   <string name="closechannels_mutual_instructions"><![CDATA[
-    Use este recurso para esvaziar sua carteira enviando o saldo para um endereço Bitcoin.
+    Use este recurso para esvaziar sua carteira enviando o saldo para um endereço bitcoin.
   ]]></string>
-  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira Bitcoin. Antes de enviar verifique se o endereço está correto.</string>
-  <string name="closechannels_mutual_input_hint">Insira um endereço Bitcoin</string>
+  <string name="closechannels_mutual_input_instructions">Os valores podem ser enviados para uma carteira bitcoin. Antes de enviar verifique se o endereço está correto.</string>
+  <string name="closechannels_mutual_input_hint">Insira um endereço bitcoin</string>
   <string name="closechannels_mutual_button">Esvaziar minha carteira</string>
   <string name="closechannels_force_title">Forçar encerramento</string>
   <string name="closechannels_force_instructions"><![CDATA[
@@ -302,7 +302,7 @@
     <br/><br/>
     Esta função não é &quot;um botão mágico que resolve tudo&quot;; foi inserida como uma medida de segurança e <b>só deve ser usada em casos extremos</b>. Por exemplo, se seu parceiro (ACINQ) desaparecer permanentemente, impedindo que você gaste seus bitcoins. Em todos os outros casos, <b>se você tiver problemas com a Phoenix, entre em contato com o suporte</b>.
     <br/><br/>
-    Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede Bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
+    Forçar o encerramento de canais irá lhe custar dinheiro (para cobrir as taxas da rede bitcoin) além de fazer com que seus fundos fiquem bloqueados por dias. <b>Não desinstale o aplicativo até que seus canais estejam totalmente encerrados ou você perderá bitcoins.</b>
     <br/><br/>
     <b>Não use esse recurso se você não compreender exatamente o que ele faz.</b>
   ]]></string>
@@ -369,7 +369,7 @@
   <string name="inappnotif_background_worker_cannot_run">De tempos em tempos a Phoenix precisa rodar em segundo plano. Verifique se ela não está sendo fechada automaticamente pelo aparelho para economizar energia.</string>
   <string name="inappnotif_upgrade">Uma atualização para este aplicativo está disponível.</string>
   <string name="inappnotif_upgrade_critical">Uma atualização crítica está disponível. A carteira pode apresentar mau funcionamento se não for atualizada.</string>
-  <string name="inappnotif_mempool_high_usage">O mempool da rede Bitcoin está cheio e com taxas altas.</string>
+  <string name="inappnotif_mempool_high_usage">O mempool da rede bitcoin está cheio e com taxas altas.</string>
   <string name="inappnotif_mempool_high_usage_action">Veja como a Phoenix é afetada</string>
 
   <!-- //////////////// display seed //////////////// -->
@@ -585,7 +585,7 @@
   <!-- //////////////// display preferences //////////////// -->
 
   <string name="prefs_display_title">Opções de exibição</string>
-  <string name="prefs_display_coin_label">Unidade de Bitcoin</string>
+  <string name="prefs_display_coin_label">Unidade de bitcoin</string>
   <string name="prefs_display_fiat_label">Moeda estatal</string>
   <string name="prefs_display_theme_label">Tema</string>
   <string name="prefs_display_explorer_label">Blockchain</string>
@@ -595,7 +595,7 @@
   <!-- //////////////// electrum server //////////////// -->
 
   <string name="electrum_title">Servidor Electrum</string>
-  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do Bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
+  <string name="electrum_subtitle">Por padrão, para acessar a blockchain do bitcoin, a Phoenix se conecta a servidores Electrum de forma aleatória. Você pode optar por se conectar ao seu próprio servidor Electrum.</string>
   <string name="electrum_change_button">Definir servidor…</string>
 
   <string name="electrum_block_height_label">Altura do bloco</string>
@@ -625,7 +625,7 @@
   <!-- //////////////// Tor setting //////////////// -->
 
   <string name="tor_settings_title">Configurações do Tor</string>
-  <string name="tor_settings_subtitle">Você pode melhorar sua privacidade ativando o Tor ao se conectar a um servidor Electrum ou ao seu par Lightning. Isso fará com que a Phoenix demore um pouco mais para iniciar.</string>
+  <string name="tor_settings_subtitle">Você pode melhorar sua privacidade ativando o Tor ao se conectar a um servidor Electrum ou ao seu par na rede relâmpago. Isso fará com que a Phoenix demore um pouco mais para iniciar.</string>
   <string name="tor_settings_enabled">Tor está ativado</string>
   <string name="tor_settings_disabled">Tor está desativado</string>
   <string name="tor_settings_confirm_disable_title">Tem certeza de que deseja desativar o Tor?</string>
@@ -638,7 +638,7 @@
   <string name="conndialog_network">Internet</string>
   <string name="conndialog_electrum">Electrum</string>
   <string name="conndialog_tor">Tor</string>
-  <string name="conndialog_lightning">Par Lightning</string>
+  <string name="conndialog_lightning">Par na rede relâmpago</string>
   <string name="conndialog_ok">Conectado</string>
   <string name="conndialog_not_ok">Conectando…</string>
 
@@ -647,7 +647,7 @@
   <string name="about_title">Sobre</string>
   <string name="about_version">Versão: %1$s (%2$d)</string>
   <string name="about_general"><![CDATA[
-  A Phoenix é uma carteira Bitcoin que usa a rede Lightning para enviar e receber pagamentos.
+  A Phoenix é uma carteira bitcoin que usa a rede relâmpago para enviar e receber pagamentos.
   <br/><br/>
   É um software livre de código aberto, desenvolvido pela <a href="https://phoenix.acinq.co">ACINQ</a> sob a <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Licença Apache 2.0</a>.
   <br/><br/>
@@ -656,7 +656,7 @@
   Se você tiver alguma dúvida, consulte o <a href="https://phoenix.acinq.co/faq">FAQ</a>. Você também pode entrar em contato com o <a href="https://phoenix.acinq.co/support">suporte</a> para ajuda.
   ]]></string>
   <string name="about_fiat_rates"><![CDATA[
-    As cotações de Bitcoin/Moeda fiduciária são obtidas de várias APIs de terceiros:
+    As cotações de bitcoin/moeda fiduciária são obtidas de várias APIs de terceiros:
     <br />- Blockchain.info
     <br />- Bitso
     <br />- <a href="https://www.coindesk.com/price/bitcoin">Fornecido por Coindesk</a>
@@ -679,7 +679,7 @@
   <string name="paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
-  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Lightning</string>
+  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede relâmpago</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
   <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Taxa base (satoshi)</string>
@@ -694,7 +694,7 @@
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
   <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
-    Esta taxa se aplica quando você recebe um pagamento pela rede Lightning e um novo canal precisa ser aberto.
+    Esta taxa se aplica quando você recebe um pagamento pela rede relâmpago e um novo canal precisa ser aberto.
     <br /><br />
     Acesse <a href="https://phoenix.acinq.co/faq#what-are-the-fees">o FAQ</a> para mais informações.
   ]]></string>
@@ -739,9 +739,9 @@
     <p>A %% da taxa para novos canais continua a mesma (%1$s%%), mas agora a taxa mínima é de <b>%2$s</b>.</p>
   ]]></string>
 
-  <string name="paymentmode_onchain">Pagar usando a rede Bitcoin</string>
-  <string name="paymentmode_onchain_desc">Transações na rede Bitcoin geralmente são mais lentas e mais caras</string>
-  <string name="paymentmode_lightning">Pagar usando a rede Lightning</string>
+  <string name="paymentmode_onchain">Pagar usando a rede bitcoin</string>
+  <string name="paymentmode_onchain_desc">Transações na rede bitcoin geralmente são mais lentas e mais caras</string>
+  <string name="paymentmode_lightning">Pagar usando a rede relâmpago</string>
   <string name="paymentmode_lightning_desc">Esta é a opção recomendada</string>
 
 </resources>
