@@ -679,7 +679,7 @@
   <string name="paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
 
-  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede relâmpago</string>
+  <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Relâmpago</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
   <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Substituir taxa padrão</string>
   <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Taxa base (satoshi)</string>
