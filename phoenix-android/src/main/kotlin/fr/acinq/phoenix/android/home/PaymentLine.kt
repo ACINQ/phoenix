@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,7 +68,7 @@ fun PaymentLineLoading(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-                modifier = Modifier.weight(1.0f)
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
@@ -111,7 +112,13 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.width(2.dp))
-            Text(text = payment.completedAt().toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            val timestamp: Long = remember {
+                payment.completedAt().takeIf { it > 0 } ?: when (payment) {
+                    is OutgoingPayment -> payment.createdAt
+                    is IncomingPayment -> payment.createdAt
+                }
+            }
+            Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
 }

@@ -33,7 +33,7 @@ import fr.acinq.phoenix.controllers.payments.Scan
 
 @Composable
 fun SendView(request: PaymentRequest?) {
-    val log = logger()
+    val log = logger("SendView")
     log.info { "init sendview amount=${request?.amount} desc=${request?.description}" }
     MVIView(CF::scan) { model, postIntent ->
         val nc = navController

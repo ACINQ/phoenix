@@ -131,7 +131,7 @@ fun AmountInput(
 
     /** Convert the input [Double] to a (msat -> fiat) pair, if possible. */
     fun convertInputToAmount(): Pair<MilliSatoshi?, Double?> {
-        log.info { "amount input update [ amount=$amount unit=$unit with rate=$rate ]" }
+        log.debug { "amount input update [ amount=$amount unit=$unit with rate=$rate ]" }
         return amount?.let { d ->
             when (val u = unit) {
                 is FiatCurrency -> {
@@ -186,7 +186,6 @@ fun AmountInput(
      */
     val onValueChange: (String) -> Unit = {
         val d = it.toDoubleOrNull()
-        log.info { "double=$d" }
         if (d == null) {
             rawAmount = ""
             amount = null

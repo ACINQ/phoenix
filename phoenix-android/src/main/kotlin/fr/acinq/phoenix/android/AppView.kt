@@ -112,7 +112,9 @@ fun AppView(appVM: AppViewModel) {
                             onPaymentClick = { navigateToPaymentDetails(navController, it.walletPaymentId()) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = { navController.navigate(Screen.ReadData.route) }
+                            onSendClick = {
+                                navController.navigate(Screen.ReadData.route) { launchSingleTop = true }
+                            }
                         )
                     }
                 }

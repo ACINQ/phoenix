@@ -48,10 +48,15 @@ fun StartupView(
                 is EncryptedSeed.V2.NoAuth -> {
                     Text(stringResource(id = R.string.startup_starting))
                     LaunchedEffect(key1 = encryptedSeed) {
-                        launch(Dispatchers.Main) {
-                            appVM.service?.startBusiness(encryptedSeed.decrypt())
-                            log.info { "navigating to home screen..." }
-                            onBusinessStart()
+                        launch(Dispatchers.IO) {
+                            log.debug { "decrypting seed..." }
+                            val seed = encryptedSeed.decrypt()
+                            log.debug { "seed has been decrypted" }
+                            launch(Dispatchers.Main) {
+                                appVM.service?.startBusiness(seed)
+                                log.info { "navigating to home screen..." }
+                                onBusinessStart()
+                            }
                         }
                     }
                 }

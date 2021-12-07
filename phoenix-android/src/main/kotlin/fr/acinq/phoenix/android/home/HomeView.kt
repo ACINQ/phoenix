@@ -39,9 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.WalletPayment
@@ -49,76 +46,13 @@ import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.HomeController
-import fr.acinq.phoenix.controllers.main.Home
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.managers.Connections
-import fr.acinq.phoenix.managers.PaymentsManager
-import fr.acinq.phoenix.utils.getValue
-import fr.acinq.phoenix.utils.setValue
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-
-private data class PaymentRowState(
-    val orderRow: WalletPaymentOrderRow,
-    val payment: WalletPayment?
-)
-
-@ExperimentalCoroutinesApi
-private class HomeViewModel(
-    val connectionsFlow: StateFlow<Connections>,
-    val paymentsManager: PaymentsManager,
-    controller: HomeController
-) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
-
-    private val paymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
-    private var _payments by paymentsFlow
-    val payments: List<PaymentRowState> get() = paymentsFlow.value.values
-        .sortedByDescending { it.orderRow.completedAt ?: it.orderRow.createdAt }
-        .toList()
-
-    init {
-        paymentsManager.subscribeToPaymentsPage(0, 150)
-        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            log.error("failed to collect payments page item", e)
-        }) {
-            paymentsManager.paymentsPage.collect {
-                for (row in it.rows) {
-                    _payments = _payments + (row.id.identifier to PaymentRowState(row, null))
-                    viewModelScope.launch {
-                        paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.let { paymentInfo ->
-                            _payments = _payments + (row.id.identifier to PaymentRowState(row, paymentInfo.payment))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    class Factory(
-        private val connectionsFlow: StateFlow<Connections>,
-        private val paymentsManager: PaymentsManager,
-        private val controllerFactory: ControllerFactory,
-        private val getController: ControllerFactory.() -> HomeController
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(connectionsFlow, paymentsManager, controllerFactory.getController()) as T
-        }
-    }
-}
-
 
 @ExperimentalCoroutinesApi
 @Composable
@@ -139,6 +73,7 @@ fun HomeView(
     }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val payments = vm.paymentsFlow.collectAsState().value.values.toList()
 
     ModalDrawer(
         drawerState = drawerState,
@@ -164,14 +99,19 @@ fun HomeView(
                     Spacer(modifier = Modifier.height(16.dp))
                     PrimarySeparator()
                     Spacer(modifier = Modifier.height(24.dp))
-                    LazyColumn(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         items(
-                            items = vm.payments,
+                            items = payments,
                         ) {
                             if (it.payment == null) {
-                                PaymentLineLoading(it.orderRow.completedAt ?: it.orderRow.createdAt)
+                                LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                                    vm.getPaymentDescription(it.orderRow)
+                                }
+                                PaymentLineLoading(it.orderRow.createdAt)
                             } else {
                                 PaymentLine(it.payment, onPaymentClick)
                             }

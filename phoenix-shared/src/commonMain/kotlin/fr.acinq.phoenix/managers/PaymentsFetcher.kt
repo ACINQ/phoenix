@@ -1,12 +1,7 @@
 package fr.acinq.phoenix.managers
 
-import fr.acinq.lightning.db.IncomingPayment
-import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.phoenix.data.Wallet
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentInfo
-import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.db.WalletPaymentOrderRow
 import fr.acinq.phoenix.utils.Cache
 import kotlinx.coroutines.CoroutineScope
