@@ -694,7 +694,7 @@
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s mínimo)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">Abertura de canais</string>
   <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
-    Esta taxa se aplica quando você recebe um pagamento pela rede relâmpago e um novo canal precisa ser aberto.
+    Esta taxa se aplica quando você recebe um pagamento pela rede Relâmpago e um novo canal precisa ser aberto.
     <br /><br />
     Acesse <a href="https://phoenix.acinq.co/faq#what-are-the-fees">o FAQ</a> para mais informações.
   ]]></string>
