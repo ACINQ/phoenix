@@ -48,6 +48,7 @@ import fr.acinq.phoenix.android.negativeColor
 import fr.acinq.phoenix.android.positiveColor
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.walletPaymentId
 
 
 @Composable

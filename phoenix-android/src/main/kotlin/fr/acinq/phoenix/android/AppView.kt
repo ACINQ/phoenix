@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -36,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.HomeView
+import fr.acinq.phoenix.android.home.HomeViewModel
 import fr.acinq.phoenix.android.home.ReadDataView
 import fr.acinq.phoenix.android.home.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
@@ -58,6 +60,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun AppView(appVM: AppViewModel) {
     val log = logger("AppView")
+    log.debug { "init app view composition" }
+
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current
@@ -77,6 +81,10 @@ fun AppView(appVM: AppViewModel) {
         LocalShowInFiat provides isAmountInFiat.value,
         LocalElectrumServer provides electrumServer.value
     ) {
+
+        // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
+        val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
+
         Column(
             Modifier
                 .background(appBackground())
@@ -106,6 +114,7 @@ fun AppView(appVM: AppViewModel) {
                 composable(Screen.Home.route) {
                     RequireKey(appVM.walletState.value) {
                         HomeView(
+                            homeViewModel = homeViewModel,
                             onPaymentClick = { navigateToPaymentDetails(navController, it) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },

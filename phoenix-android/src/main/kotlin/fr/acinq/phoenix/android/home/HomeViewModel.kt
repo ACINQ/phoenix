@@ -83,7 +83,6 @@ class HomeViewModel(
             }
         }
 
-
         viewModelScope.launch(CoroutineExceptionHandler { _, e ->
             log.error("failed to collect payments page items: ", e)
         }) {

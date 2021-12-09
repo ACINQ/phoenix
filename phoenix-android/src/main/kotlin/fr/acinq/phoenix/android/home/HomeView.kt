@@ -58,15 +58,17 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(
+    homeViewModel: HomeViewModel,
     onPaymentClick: (WalletPaymentId) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
 ) {
     val log = logger("HomeView")
+
     val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
 
-    val connectionsState = vm.connectionsFlow.collectAsState()
+    val connectionsState = homeViewModel.connectionsFlow.collectAsState()
 
     val showConnectionsDialog = remember { mutableStateOf(false) }
     if (showConnectionsDialog.value) {
@@ -74,14 +76,14 @@ fun HomeView(
     }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val payments = vm.paymentsFlow.collectAsState().value.values.toList()
+    val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
 
     ModalDrawer(
         drawerState = drawerState,
         drawerShape = RectangleShape,
         drawerContent = { SideMenu(onSettingsClick) },
         content = {
-            MVIView(vm) { model, _ ->
+            MVIView(homeViewModel) { model, _ ->
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     TopBar(showConnectionsDialog, connectionsState)
                     Spacer(modifier = Modifier.height(16.dp))
@@ -110,7 +112,7 @@ fun HomeView(
                         ) {
                             if (it.payment == null) {
                                 LaunchedEffect(key1 = it.orderRow.id.identifier) {
-                                    vm.getPaymentDescription(it.orderRow)
+                                    homeViewModel.getPaymentDescription(it.orderRow)
                                 }
                                 PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
                             } else {
