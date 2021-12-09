@@ -16,29 +16,23 @@
 
 package fr.acinq.phoenix.android
 
-import android.annotation.SuppressLint
+
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.service.WalletState
 import org.slf4j.LoggerFactory
 
-@SuppressLint("StaticFieldLeak")
-class AppViewModel(private val applicationContext: Context) : ViewModel() {
+class AppViewModel() : ViewModel() {
     val log = LoggerFactory.getLogger(AppViewModel::class.java)
-
-    /** State of the wallet's key: does it exist? what type is it? */
-    var keyState: KeyState by mutableStateOf(KeyState.Unknown)
-        private set
 
     /** Monitoring the state of the service - null if the service is disconnected. */
     private val _service = MutableLiveData<NodeService?>(null)
@@ -60,23 +54,7 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
     }
 
     /** Mirrors the node state using a MediatorLiveData. A LiveData object is used because this object can be used outside of compose. */
-    val walletState = StateLiveData(_service)
-
-    init {
-        refreshSeed()
-    }
-
-    private fun refreshSeed() {
-        keyState = try {
-            when (val seed = SeedManager.loadSeedFromDisk(applicationContext)) {
-                null -> KeyState.Absent
-                is EncryptedSeed.V2.NoAuth -> KeyState.Present(seed)
-                else -> KeyState.Error.UnhandledSeedType
-            }
-        } catch (e: Exception) {
-            KeyState.Error.Unreadable
-        }
-    }
+    val walletState = WalletStateLiveData(_service)
 
     fun writeSeed(context: Context, mnemonics: List<String>) {
         try {
@@ -84,7 +62,6 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
             if (existing == null) {
                 val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                 SeedManager.writeSeedToDisk(context, encrypted)
-                refreshSeed()
                 log.info("seed has been written to disk")
             } else {
                 log.warn("cannot overwrite existing seed=${existing.name()}")
@@ -94,9 +71,9 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
         }
     }
 
-    fun decryptSeed(): ByteArray? {
+    fun decryptSeed(context: Context): ByteArray? {
         return try {
-            when (val seed = SeedManager.loadSeedFromDisk(applicationContext)) {
+            when (val seed = SeedManager.loadSeedFromDisk(context)) {
                 is EncryptedSeed.V2.NoAuth -> seed.decrypt()
                 else -> throw RuntimeException("no seed sorry")
             }
@@ -111,21 +88,14 @@ class AppViewModel(private val applicationContext: Context) : ViewModel() {
         service?.shutdown()
         log.info("AppViewModel has been cleared")
     }
-
-    class Factory(private val context: Context) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return AppViewModel(context) as T
-        }
-    }
 }
 
-class StateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<WalletState>() {
+class WalletStateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<WalletState>() {
     private val log = LoggerFactory.getLogger(this::class.java)
     private var serviceState: LiveData<WalletState>? = null
 
     init {
-        value = WalletState.Disconnected
+        value = service.value?.state?.value ?: WalletState.Disconnected
         addSource(service) { s ->
             if (s == null) {
                 log.info("lost service, force state to Disconnected and remove source")
@@ -134,6 +104,7 @@ class StateLiveData(service: MutableLiveData<NodeService?>) : MediatorLiveData<W
                 value = WalletState.Disconnected
             } else {
                 log.info("service connected, now mirroring service's internal state")
+                serviceState = s.state
                 addSource(s.state) {
                     value = it
                 }

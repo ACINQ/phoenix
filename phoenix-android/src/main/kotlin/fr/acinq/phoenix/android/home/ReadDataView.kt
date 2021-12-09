@@ -74,7 +74,6 @@ private class ReadDataViewModel(controller: ScanController) : MVIControllerViewM
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun ReadDataView(
     onBackClick: () -> Unit,

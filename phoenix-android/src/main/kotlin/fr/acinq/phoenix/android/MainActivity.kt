@@ -23,7 +23,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
@@ -40,9 +39,8 @@ import org.slf4j.LoggerFactory
 class MainActivity : AppCompatActivity() {
 
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
-    private val appViewModel by viewModels<AppViewModel> { AppViewModel.Factory(applicationContext) }
+    private val appViewModel by viewModels<AppViewModel>()
 
-    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 1234)
@@ -50,6 +48,9 @@ class MainActivity : AppCompatActivity() {
             PhoenixAndroidTheme {
                 AppView(appViewModel)
             }
+        }
+        appViewModel.walletState.observe(this) {
+            log.debug("wallet state update=${it.name}")
         }
     }
 

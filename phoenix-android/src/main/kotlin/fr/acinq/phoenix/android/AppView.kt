@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -45,7 +44,7 @@ import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
@@ -56,7 +55,6 @@ import fr.acinq.phoenix.data.walletPaymentId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-@ExperimentalMaterialApi
 @Composable
 fun AppView(appVM: AppViewModel) {
     val log = logger("AppView")
@@ -73,7 +71,6 @@ fun AppView(appVM: AppViewModel) {
         LocalBusiness provides business,
         LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
-        LocalKeyState provides appVM.keyState,
         LocalExchangeRates provides fiatRates.value,
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
@@ -91,7 +88,7 @@ fun AppView(appVM: AppViewModel) {
                     StartupView(
                         appVM,
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStart = { navController.navigate(Screen.Home.route) }
+                        onBusinessStarted = { navController.navigate(Screen.Home.route) }
                     )
                 }
                 composable(Screen.InitWallet.route) {
@@ -107,9 +104,9 @@ fun AppView(appVM: AppViewModel) {
                     RestoreWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
-                    RequireKey(appVM.keyState) {
+                    RequireKey(appVM.walletState.value) {
                         HomeView(
-                            onPaymentClick = { navigateToPaymentDetails(navController, it.walletPaymentId()) },
+                            onPaymentClick = { navigateToPaymentDetails(navController, it) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = {
@@ -208,11 +205,11 @@ private fun navigateToPaymentDetails(navController: NavController, id: WalletPay
 
 @Composable
 private fun RequireKey(
-    keyState: KeyState,
+    walletState: WalletState?, // TODO: replace by UI lock state
     children: @Composable () -> Unit
 ) {
-    if (keyState !is KeyState.Present) {
-        logger().warning { "rejecting access to screen with keyState=$keyState" }
+    if (walletState !is WalletState.Started) {
+        logger().warning { "rejecting access to screen with wallet in state=$walletState" }
         navController.navigate(Screen.Startup)
         Text("redirecting...")
     } else {

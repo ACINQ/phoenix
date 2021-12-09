@@ -37,7 +37,6 @@ typealias CF = ControllerFactory
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavHostController?> { null }
-val LocalKeyState = staticCompositionLocalOf<KeyState> { KeyState.Unknown }
 val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
@@ -47,10 +46,6 @@ val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 val navController: NavHostController
     @Composable
     get() = LocalNavController.current ?: error("navigation controller is not available")
-
-val keyState
-    @Composable
-    get() = LocalKeyState.current
 
 val amountUnit: CurrencyUnit
     @Composable

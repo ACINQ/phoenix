@@ -1,9 +1,7 @@
 package fr.acinq.phoenix.android.service
 
 import android.app.Notification
-import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Handler
@@ -12,12 +10,10 @@ import android.os.Looper
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.BuildConfig
@@ -27,14 +23,11 @@ import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.android.utils.Prefs
-import fr.acinq.phoenix.data.Wallet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.lang.Runnable
-import java.net.UnknownHostException
 import java.util.concurrent.locks.ReentrantLock
 
 class NodeService : Service() {
@@ -71,7 +64,7 @@ class NodeService : Service() {
     private fun refreshFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
-                log.warn("fetching FCM registration token failed", task.exception)
+                log.warn("fetching FCM registration token failed: ", task.exception)
                 return@OnCompleteListener
             }
             task.result?.let { serviceScope.launch { Prefs.saveFcmToken(applicationContext, it) } }
@@ -82,7 +75,7 @@ class NodeService : Service() {
     //                      SERVICE LIFECYCLE                      //
     // =========================================================== //
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         log.info("binding node service from intent=$intent")
         // UI is binding to the service. The service is not headless anymore and we can remove the notification.
         isHeadless = false
@@ -167,46 +160,41 @@ class NodeService : Service() {
      * @param decryptedPayload Must be the decrypted payload of an [EncryptedSeed] object.
      */
     fun startBusiness(decryptedPayload: ByteArray) {
-        // Check app state consistency. Use a lock because the [startKit] method can be called concurrently.
-        // If the kit is already starting, started, or in error, the method returns.
-        val canProceed = try {
-            stateLock.lock()
-            val state = _state.value
-            if (state !is WalletState.Off) {
-                log.warn("ignore attempt to start kit with app state=${state?.name}")
+        serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
+            log.error("error when checking node state consistency before startup: ", e)
+        }) {
+            // Check node state consistency. Use a lock because the [doStartNode] method can be called concurrently.
+            // If the node is already starting, started, or in error, the method returns.
+            val canProceed = try {
+                stateLock.lock()
+                val state = _state.value
+                if (state !is WalletState.Off) {
+                    log.warn("ignore attempt to start kit with app state=${state?.name}")
+                    false
+                } else {
+                    updateState(WalletState.Bootstrap.Init, lazy = false)
+                    true
+                }
+            } catch (e: Exception) {
+                log.error("error in state check when starting kit: ", e)
                 false
-            } else {
-                updateState(WalletState.Bootstrap.Init, lazy = false)
-                true
+            } finally {
+                stateLock.unlock()
             }
-        } catch (e: Exception) {
-            log.error("error in state check when starting kit: ", e)
-            false
-        } finally {
-            stateLock.unlock()
-        }
 
-        if (canProceed) {
-            serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
-                log.info("aborted node startup with ${e.javaClass.simpleName}")
-                when (e) {
-                    is IOException, is IllegalAccessException -> {
-                        log.error("seed file not readable: ", e)
-                        updateState(WalletState.Error.UnreadableData)
+            if (canProceed) {
+                serviceScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
+                    log.error("error when starting node: ", e)
+                    updateState(WalletState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
+                    if (isHeadless) {
+                        shutdown()
+                        stopForeground(STOP_FOREGROUND_REMOVE)
                     }
-                    else -> {
-                        log.error("error when starting node: ", e)
-                        updateState(WalletState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
-                    }
+                }) {
+                    log.debug("initiating node startup from state=${_state.value?.name}")
+                    val state = doStartNode(decryptedPayload)
+                    updateState(state)
                 }
-                if (isHeadless) {
-                    shutdown()
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                }
-            }) {
-                log.debug("initiating node startup from state=${_state.value?.name}")
-                val state = doStartNode(decryptedPayload)
-                updateState(state)
             }
         }
     }

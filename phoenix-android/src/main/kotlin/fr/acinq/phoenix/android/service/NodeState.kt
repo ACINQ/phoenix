@@ -57,6 +57,5 @@ sealed class WalletState {
     /** Startup has failed, the state contains the error details. */
     sealed class Error : WalletState() {
         data class Generic(val message: String) : Error()
-        object UnreadableData : Error()
     }
 }

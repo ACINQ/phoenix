@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -46,32 +47,28 @@ import fr.acinq.phoenix.android.utils.logger
 
 @Composable
 fun SeedView(appVM: AppViewModel) {
-    val log = logger()
-    val ks = keyState
+    val log = logger("SeedView")
     val nc = navController
-    if (ks !is KeyState.Present) {
-        nc.navigate(Screen.Startup)
-    } else {
-        val showSeedDialog = remember { mutableStateOf(false) }
-        ScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
-        ScreenBody {
-            AndroidView(factory = {
-                TextView(it).apply {
-                    text = Converter.html(it.getString(R.string.displayseed_instructions))
-                }
-            })
-            if (showSeedDialog.value) {
-                SeedDialog(onClose = { showSeedDialog.value = false }, appVM = appVM)
+    val showSeedDialog = remember { mutableStateOf(false) }
+    ScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+    ScreenBody {
+        AndroidView(factory = {
+            TextView(it).apply {
+                text = Converter.html(it.getString(R.string.displayseed_instructions))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            BorderButton(onClick = { showSeedDialog.value = true }, text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key)
+        })
+        if (showSeedDialog.value) {
+            SeedDialog(onClose = { showSeedDialog.value = false }, appVM = appVM)
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        BorderButton(onClick = { showSeedDialog.value = true }, text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key)
     }
 }
 
 @Composable
 fun SeedDialog(onClose: () -> Unit, appVM: AppViewModel) {
-    val seed = appVM.decryptSeed()
+    val context = LocalContext.current
+    val seed = appVM.decryptSeed(context)
     Dialog(
         onDismiss = onClose
     ) {

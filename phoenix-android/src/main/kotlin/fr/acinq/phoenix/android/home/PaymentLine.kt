@@ -47,15 +47,20 @@ import fr.acinq.phoenix.android.mutedTextColor
 import fr.acinq.phoenix.android.negativeColor
 import fr.acinq.phoenix.android.positiveColor
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.data.WalletPaymentId
 
 
 @Composable
 fun PaymentLineLoading(
-    timestamp: Long
+    paymentId: WalletPaymentId,
+    timestamp: Long,
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        modifier = Modifier
+            .clickable { onPaymentClick(paymentId) }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIconComponent(
             icon = R.drawable.ic_payment_pending,
@@ -79,12 +84,12 @@ fun PaymentLineLoading(
 @Composable
 fun PaymentLine(
     payment: WalletPayment,
-    onPaymentClick: (WalletPayment) -> Unit
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable { onPaymentClick(payment) }
+            .clickable { onPaymentClick(payment.walletPaymentId()) }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIcon(payment)

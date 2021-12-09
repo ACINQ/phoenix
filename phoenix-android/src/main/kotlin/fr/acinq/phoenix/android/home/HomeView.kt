@@ -50,6 +50,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -57,7 +58,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(
-    onPaymentClick: (WalletPayment) -> Unit,
+    onPaymentClick: (WalletPaymentId) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
@@ -111,7 +112,7 @@ fun HomeView(
                                 LaunchedEffect(key1 = it.orderRow.id.identifier) {
                                     vm.getPaymentDescription(it.orderRow)
                                 }
-                                PaymentLineLoading(it.orderRow.createdAt)
+                                PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
                             } else {
                                 PaymentLine(it.payment, onPaymentClick)
                             }
