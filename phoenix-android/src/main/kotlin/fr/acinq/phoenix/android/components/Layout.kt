@@ -112,6 +112,7 @@ fun Dialog(
     onDismiss: () -> Unit,
     title: String? = null,
     properties: DialogProperties = DialogProperties(),
+    isScrollable: Boolean = true,
     buttons: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -121,7 +122,13 @@ fun Dialog(
                 .padding(vertical = 50.dp, horizontal = 32.dp) // min padding for tall/wide dialogs
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)
-                .verticalScroll(rememberScrollState())
+                .then(
+                    if (isScrollable) {
+                        Modifier.verticalScroll(rememberScrollState())
+                    } else {
+                        Modifier
+                    }
+                )
         ) {
             // optional title
             title?.run {

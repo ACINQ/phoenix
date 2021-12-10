@@ -52,7 +52,7 @@ import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-sealed class SeedViewState() {
+private sealed class SeedViewState() {
     object Init : SeedViewState()
     object ReadingSeed : SeedViewState()
     data class ShowSeed(val words: List<String>) : SeedViewState()
@@ -80,9 +80,9 @@ fun SeedView() {
                             val keyState = SeedManager.getSeedState(context)
                             when {
                                 keyState is KeyState.Present && keyState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
-                                    val seed = EncryptedSeed.toMnemonics(keyState.encryptedSeed.decrypt())
+                                    val words = EncryptedSeed.toMnemonics(keyState.encryptedSeed.decrypt())
                                     delay(300)
-                                    state = SeedViewState.ShowSeed(seed)
+                                    state = SeedViewState.ShowSeed(words)
                                 }
                                 keyState is KeyState.Error.Unreadable -> {
                                     state = SeedViewState.Error(context.getString(R.string.displayseed_error_details, keyState.message ?: "n/a"))
@@ -108,7 +108,7 @@ fun SeedView() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SeedDialog(words: List<String>, onClose: () -> Unit) {
+private fun SeedDialog(words: List<String>, onClose: () -> Unit) {
     val log = logger("SeedDialog")
     Dialog(
         onDismiss = onClose,
