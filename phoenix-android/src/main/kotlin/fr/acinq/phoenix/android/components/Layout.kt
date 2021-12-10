@@ -18,7 +18,9 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -117,10 +118,10 @@ fun Dialog(
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
         Column(
             Modifier
-                .padding(vertical = 50.dp) // vertical padding for tall dialogs
-                .fillMaxWidth()
+                .padding(vertical = 50.dp, horizontal = 32.dp) // min padding for tall/wide dialogs
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)
+                .verticalScroll(rememberScrollState())
         ) {
             // optional title
             title?.run {
@@ -130,8 +131,7 @@ fun Dialog(
             content()
             // buttons
             Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.align(Alignment.End)
             ) {
                 if (buttons != null) {
                     buttons()

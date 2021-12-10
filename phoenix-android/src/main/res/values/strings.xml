@@ -361,21 +361,10 @@
     <string name="displayseed_title">Wallet recovery phrase</string>
     <string name="displayseed_authenticate_button">Display seed</string>
     <string name="displayseed_loading">Unlocking seed…</string>
+    <string name="displayseed_error_details">Could not unlock seed: %1$s</string>
     <string name="displayseed_error_generic">Could not unlock seed, please try again.</string>
     <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
-    <string name="displayseed_instructions"><![CDATA[
-    The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed.
-    <br /><br />
-    <strong>Only you alone possess this seed. Keep it private.</strong>
-    <br /><br />
-    <strong>Do not share this seed with anyone</strong>.
-    <br />
-    Beware of phishing. The developers of Phoenix will never ask for your seed.
-    <br /><br />
-    <strong>Do not lose this seed</strong>.
-    <br />
-    Save it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.
-  ]]></string>
+    <string name="displayseed_instructions">The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Do not share this seed with anyone</b>.\nBeware of phishing. The developers of Phoenix will never ask for your seed.\n\n<b>Do not lose this seed</b>.\nSave it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.</string>
     <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
     <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
     <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed, for example on a piece of paper.</string>

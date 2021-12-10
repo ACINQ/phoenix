@@ -83,7 +83,14 @@ fun AppView(appVM: AppViewModel) {
     ) {
 
         // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
-        val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
+        val homeViewModel: HomeViewModel = viewModel(
+            factory = HomeViewModel.Factory(
+                connectionsFlow = business.connectionsManager.connections,
+                paymentsManager = business.paymentsManager,
+                controllerFactory = controllerFactory,
+                getController = CF::home
+            )
+        )
 
         Column(
             Modifier
@@ -180,7 +187,7 @@ fun AppView(appVM: AppViewModel) {
                     SettingsView()
                 }
                 composable(Screen.DisplaySeed.route) {
-                    SeedView(appVM)
+                    SeedView()
                 }
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
