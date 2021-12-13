@@ -18,8 +18,6 @@ package fr.acinq.phoenix.android.settings
 
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -35,8 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import fr.acinq.bitcoin.MnemonicCode
-import fr.acinq.phoenix.android.AppViewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Dialog
@@ -99,7 +95,7 @@ fun SeedView() {
                     Text(stringResource(id = R.string.displayseed_loading), modifier = Modifier.padding(12.dp))
                 }
                 is SeedViewState.ShowSeed -> {
-                    SeedDialog(onClose = { state = SeedViewState.Init }, words = s.words)
+                    SeedDialog(onDismiss = { state = SeedViewState.Init }, words = s.words)
                 }
             }
         }
@@ -108,10 +104,10 @@ fun SeedView() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SeedDialog(words: List<String>, onClose: () -> Unit) {
+private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
     val log = logger("SeedDialog")
     Dialog(
-        onDismiss = onClose,
+        onDismiss = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Column(

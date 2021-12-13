@@ -224,6 +224,7 @@
     <string name="btn_next">Next</string>
     <string name="btn_copy">Copy</string>
     <string name="btn_ok">OK</string>
+    <string name="btn_save">Save</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>

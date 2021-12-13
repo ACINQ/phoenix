@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -122,6 +123,7 @@ fun Dialog(
                 .padding(vertical = 50.dp, horizontal = 32.dp) // min padding for tall/wide dialogs
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)
+                .widthIn(max = 500.dp)
                 .then(
                     if (isScrollable) {
                         Modifier.verticalScroll(rememberScrollState())

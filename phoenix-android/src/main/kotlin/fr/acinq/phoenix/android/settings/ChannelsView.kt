@@ -32,10 +32,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
@@ -51,7 +53,7 @@ import fr.acinq.phoenix.data.Chain
 
 @Composable
 fun ChannelsView() {
-    val log = logger()
+    val log = logger("ChannelsView")
     val nc = navController
 
     val showChannelDialog = remember { mutableStateOf<ChannelsConfiguration.Model.Channel?>(null) }
@@ -61,20 +63,23 @@ fun ChannelsView() {
             channel = this,
         )
     }
-    ScreenHeader(
-        onBackClick = { nc.popBackStack() },
-        title = stringResource(id = R.string.listallchannels_title),
-    )
-    MVIView(CF::channelsConfiguration) { model, _ ->
-        if (model.channels.isEmpty()) {
-            ScreenBody {
-                Text(text = stringResource(id = R.string.listallchannels_no_channels))
-            }
-        } else {
-            ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(model.channels) {
-                        ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+
+    Column {
+        MVIView(CF::channelsConfiguration) { model, _ ->
+            ScreenHeader(
+                onBackClick = { nc.popBackStack() },
+                title = stringResource(id = R.string.listallchannels_title),
+            )
+            if (model.channels.isEmpty()) {
+                ScreenBody {
+                    Text(text = stringResource(id = R.string.listallchannels_no_channels))
+                }
+            } else {
+                ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(model.channels) {
+                            ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
+                        }
                     }
                 }
             }
@@ -110,12 +115,14 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.Model.Channel) {
     val context = LocalContext.current
     val business = business
     Dialog(
         onDismiss = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         buttons = {
             Row(Modifier.fillMaxWidth()) {
                 Button(onClick = { copyToClipboard(context, channel.json, "channel data") }, icon = R.drawable.ic_copy)
