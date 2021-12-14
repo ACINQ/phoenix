@@ -113,17 +113,19 @@ private val DarkColorPalette = darkColors(
 @Composable
 // Set of Material typography styles to start with
 fun typography(palette: Colors) = Typography(
+    // used for highlighting sections
     subtitle1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = palette.primary
     ),
+    // used for values of settings
     subtitle2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        color = palette.onSurface,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        color = settingValueColor(),
     ),
     h3 = TextStyle(
         fontFamily = FontFamily.SansSerif,
@@ -137,15 +139,17 @@ fun typography(palette: Colors) = Typography(
         fontSize = 20.sp,
         color = palette.onSurface,
     ),
+    // default style
     body1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         color = palette.onSurface,
     ),
+    // default but bold
     body2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Light,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = palette.onSurface,
     ),
@@ -156,6 +160,7 @@ fun typography(palette: Colors) = Typography(
         letterSpacing = 1.15.sp,
         color = palette.onSurface,
     ),
+    // basic text but muted
     caption = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
@@ -196,6 +201,9 @@ fun negativeColor(): Color = if (isSystemInDarkTheme()) red500 else red300
 
 @Composable
 fun positiveColor(): Color = if (isSystemInDarkTheme()) green else applegreen
+
+@Composable
+fun settingValueColor(): Color = if (isSystemInDarkTheme()) gray500 else gray400
 
 @Composable
 fun mutedTextColor(): Color = if (isSystemInDarkTheme()) gray700 else gray200

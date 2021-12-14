@@ -19,16 +19,17 @@ package fr.acinq.phoenix.android.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.mutedTypo
+import fr.acinq.phoenix.android.settings.Setting
 
 
 internal data class PreferenceItem<T>(val item: T, val title: String, val description: String? = null)
@@ -43,20 +44,10 @@ internal fun <T> ListPreferenceButton(
     onPreferenceSubmit: (PreferenceItem<T>) -> Unit,
 ) {
     var showPreferenceDialog by remember { mutableStateOf(false) }
-    Clickable(onClick = {
+
+    Setting(modifier = Modifier.alpha(if (enabled) 1f else 0.5f), title = title, description = subtitle) {
         if (enabled) {
             showPreferenceDialog = true
-        }
-    }) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 50.dp, top = 10.dp, bottom = 10.dp, end = 16.dp)
-                .alpha(if (enabled) 1f else 0.5f)
-        ) {
-            Text(text = title)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = subtitle, style = mutedTypo())
         }
     }
 
@@ -113,14 +104,15 @@ private fun <T> PreferenceDialogItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(selected = selected, onClick = { })
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(2.dp))
             Column {
                 Text(text = item.title)
                 item.description?.let {
-                    Text(text = it, style = mutedTypo())
+                    Text(text = it, style = MaterialTheme.typography.subtitle2)
                 }
             }
         }

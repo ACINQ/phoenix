@@ -44,6 +44,7 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 
 @Composable
 fun ElectrumView() {
@@ -62,7 +63,7 @@ fun ElectrumView() {
             subtitle = stringResource(id = R.string.electrum_subtitle)
         )
 
-        ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
+        ScreenBody(Modifier.padding(0.dp)) {
             MVIView(CF::electrumConfiguration) { model, postIntent ->
                 if (showServerDialog) {
                     ElectrumServerDialog(
@@ -80,31 +81,27 @@ fun ElectrumView() {
                             }
                         })
                 }
+
                 // -- connection detail
-                val connection = model.connection
                 val config = model.configuration
-                model.error?.let {
-                    Text("error! cannot connect: ${it.message}")
-                }
-                val title = when {
-                    connection == Connection.CLOSED && config is ElectrumConfig.Random -> stringResource(id = R.string.electrum_not_connected)
-                    connection == Connection.CLOSED && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
-                    connection == Connection.ESTABLISHING && config is ElectrumConfig.Random -> stringResource(id = R.string.electrum_connecting)
-                    connection == Connection.ESTABLISHING && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_connecting_to_custom, config.server.host)
-                    connection == Connection.ESTABLISHED && config is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_connected, config.server.host)
-                    connection == Connection.ESTABLISHED -> stringResource(id = R.string.electrum_connected, "TODO") // FIXME get server's address
-                    else -> stringResource(id = R.string.electrum_not_connected)
-                }
-                val description = when (config) {
-                    is ElectrumConfig.Random -> stringResource(id = R.string.electrum_server_desc_random)
-                    is ElectrumConfig.Custom -> stringResource(id = R.string.electrum_server_desc_custom)
-                    else -> null
-                }
-                Setting(title = title, description = description, onClick = { showServerDialog = true })
+                Setting(title = stringResource(id = R.string.electrum_server_connection), description = when (model.connection) {
+                    Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
+                        stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
+                    } else {
+                        stringResource(id = R.string.electrum_not_connected)
+                    }
+                    Connection.ESTABLISHING -> if (config is ElectrumConfig.Custom) {
+                        stringResource(id = R.string.electrum_connecting_to_custom, config.server.host)
+                    } else {
+                        stringResource(id = R.string.electrum_connecting)
+                    }
+                    Connection.ESTABLISHED -> stringResource(id = R.string.electrum_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
+                }, onClick = { showServerDialog = true })
 
                 // block height
                 if (model.blockHeight > 0) {
-                    Setting(title = stringResource(id = R.string.electrum_block_height_label), description = model.blockHeight.toString())
+                    val height = remember { NumberFormat.getInstance().format(model.blockHeight) }
+                    Setting(title = stringResource(id = R.string.electrum_block_height_label), description = height)
                 }
 
                 // fee rate

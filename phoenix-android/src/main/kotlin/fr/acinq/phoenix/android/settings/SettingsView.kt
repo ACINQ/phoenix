@@ -18,9 +18,7 @@ package fr.acinq.phoenix.android.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -95,9 +93,10 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?, 
                 }
             )
             .then(modifier)
-            .padding(start = 50.dp, top = 10.dp, bottom = 10.dp, end = 16.dp)
+            .padding(start = 50.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
     ) {
-        Text(title, style = MaterialTheme.typography.subtitle2)
-        Text(description ?: "", style = MaterialTheme.typography.caption)
+        Text(title, style = MaterialTheme.typography.body2)
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(description ?: "", style = MaterialTheme.typography.subtitle2)
     }
 }
