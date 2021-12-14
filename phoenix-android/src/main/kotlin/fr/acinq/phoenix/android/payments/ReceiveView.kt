@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
 import fr.acinq.phoenix.controllers.payments.Receive

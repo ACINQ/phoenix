@@ -20,9 +20,9 @@
     <color name="applegreen">#50B338</color>
     <color name="green">#1AC486</color>
     <color name="horizon">#91B4D1</color>
-    <color name="gray900">#2b313e</color>
+    <color name="azur">#0E97FF</color>
+    <color name="gray950">#171B22</color>
     <color name="white">#ffffff</color>
     <color name="mutedbg">#f0f5f7</color>
-    <color name="mutedbg_night">#3e4556</color>
     <color name="black">#000000</color>
 </resources>

@@ -30,14 +30,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.borderColor
-import fr.acinq.phoenix.android.mutedBgColor
-import fr.acinq.phoenix.android.mutedTextColor
+import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.mutedBgColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
 
 
 @Composable
@@ -98,7 +97,7 @@ fun BackButton(onClick: () -> Unit) {
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
-            contentColor = LocalContentColor.current,
+            contentColor = MaterialTheme.colors.onSurface,
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,

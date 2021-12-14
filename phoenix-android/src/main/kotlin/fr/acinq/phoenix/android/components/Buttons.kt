@@ -37,8 +37,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.borderColor
-import fr.acinq.phoenix.android.mutedTextColor
+import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
 
 
 /** A rounded button with a solid background and a muted outline. */

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
+import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

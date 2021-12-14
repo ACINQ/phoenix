@@ -46,12 +46,16 @@ import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.textFieldColors
 import fr.acinq.phoenix.data.*
 
 @Composable

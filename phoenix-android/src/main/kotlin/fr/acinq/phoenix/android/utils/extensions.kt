@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -46,4 +47,16 @@ fun BitcoinUnit.label(): String = when (this) {
 @Composable
 fun FiatCurrency.label(): String = remember(key1 = this.name) {
     Currency.getInstance(this.name).displayName
+}
+
+@Composable
+fun UserTheme.label(): String {
+    val context = LocalContext.current
+    return remember(key1 = this.name) {
+        when (this) {
+            UserTheme.DARK -> context.getString(R.string.prefs_display_theme_dark_label)
+            UserTheme.LIGHT -> context.getString(R.string.prefs_display_theme_light_label)
+            UserTheme.SYSTEM -> context.getString(R.string.prefs_display_theme_system_label)
+        }
+    }
 }

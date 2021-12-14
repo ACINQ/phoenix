@@ -23,6 +23,7 @@ object Versions {
         const val compose = "1.1.0-beta02"
         const val navCompose = "2.4.0-beta02"
         const val constraintLayoutCompose = "1.0.0-beta02"
+        const val accompanist = "0.21.4-beta"
 
         const val zxing = "4.1.0"
         const val fcm = "22.0.0"

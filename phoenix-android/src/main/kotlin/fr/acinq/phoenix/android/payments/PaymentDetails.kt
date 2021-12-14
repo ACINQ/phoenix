@@ -46,6 +46,9 @@ import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.BackButton
 import fr.acinq.phoenix.android.components.PrimarySeparator
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo

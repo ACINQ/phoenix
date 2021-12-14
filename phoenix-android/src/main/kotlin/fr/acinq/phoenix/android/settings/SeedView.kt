@@ -38,13 +38,13 @@ import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.ScreenBody
 import fr.acinq.phoenix.android.components.ScreenHeader
-import fr.acinq.phoenix.android.mutedTextColor
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.mutedTextColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -116,7 +116,7 @@ private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
         ) {
             Text(
                 text = stringResource(id = R.string.displayseed_dialog_header),
-                style = TextStyle(textAlign = TextAlign.Center)
+                style = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center)
             )
 
             Spacer(modifier = Modifier.height(32.dp))

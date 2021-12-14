@@ -14,35 +14,33 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android
+package fr.acinq.phoenix.android.utils
 
 import android.content.Context
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import fr.acinq.phoenix.android.LocalTheme
+import fr.acinq.phoenix.android.isDarkTheme
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
+val azur = Color(0xFF0E97FF)
 
 // primary for mainnet light / success color for light theme
 val applegreen = Color(0xff50b338)
@@ -60,6 +58,7 @@ val red50 = Color(0xfff9e9ec)
 val white = Color.White
 val black = Color.Black
 
+val gray950 = Color(0xFF171B22)
 val gray900 = Color(0xff2b313e)
 val gray800 = Color(0xff3e4556)
 val gray700 = Color(0xff4e586c)
@@ -70,7 +69,8 @@ val gray300 = Color(0xff99a2b6)
 val gray200 = Color(0xffb5bccc)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
-val gray40 = Color(0xfff0f5f7)
+val gray50 = Color(0xFFEBF3F5)
+val gray30 = Color(0xFFF5F9FA)
 
 private val LightColorPalette = lightColors(
     // primary
@@ -93,18 +93,18 @@ private val LightColorPalette = lightColors(
 
 private val DarkColorPalette = darkColors(
     // primary
-    primary = horizon,
-    primaryVariant = horizon,
-    onPrimary = white,
+    primary = azur,
+    primaryVariant = azur,
+    onPrimary = black,
     // secondary = primary
-    secondary = horizon,
+    secondary = azur,
     onSecondary = white,
     // app background
-    background = gray900,
-    onBackground = gray100,
+    background = black,
+    onBackground = gray70,
     // components background
-    surface = gray900,
-    onSurface = gray100,
+    surface = gray950,
+    onSurface = gray70,
     // errors
     error = red500,
     onError = red50,
@@ -176,46 +176,63 @@ val shapes = Shapes(
 )
 
 @Composable
-fun PhoenixAndroidTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val palette = if (darkTheme) DarkColorPalette else LightColorPalette
-    MaterialTheme(
-        colors = palette,
-        typography = typography(palette),
-        shapes = shapes
+fun PhoenixAndroidTheme(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val userTheme by Prefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val systemUiController = rememberSystemUiController()
+
+    CompositionLocalProvider(
+        LocalTheme provides userTheme
     ) {
-        val rippleIndication = rememberRipple(color = if (isSystemInDarkTheme()) gray300 else gray600)
-        CompositionLocalProvider(LocalIndication provides rippleIndication) {
-            content()
+        val statusBarColor = systemStatusBarColor()
+        val navBarColor = systemNavBarColor()
+        val isDarkTheme = isDarkTheme
+        SideEffect {
+            systemUiController.run {
+                setStatusBarColor(statusBarColor, darkIcons = !isDarkTheme)
+                setNavigationBarColor(navBarColor, darkIcons = !isDarkTheme)
+            }
+        }
+        val palette = if (isDarkTheme) DarkColorPalette else LightColorPalette
+        MaterialTheme(
+            colors = palette,
+            typography = typography(palette),
+            shapes = shapes
+        ) {
+            val rippleIndication = rememberRipple(color = if (isDarkTheme) gray300 else gray600)
+            CompositionLocalProvider(LocalIndication provides rippleIndication) {
+                content()
+            }
         }
     }
 }
 
 @Composable
-fun mutedTypo(): TextStyle = MaterialTheme.typography.body1.copy(color = mutedTextColor())
-
-@Composable
 fun monoTypo(): TextStyle = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp)
 
 @Composable
-fun negativeColor(): Color = if (isSystemInDarkTheme()) red500 else red300
+fun negativeColor(): Color = if (isDarkTheme) red500 else red300
 
 @Composable
-fun positiveColor(): Color = if (isSystemInDarkTheme()) green else applegreen
+fun positiveColor(): Color = if (isDarkTheme) green else applegreen
 
 @Composable
-fun settingValueColor(): Color = if (isSystemInDarkTheme()) gray500 else gray400
+fun settingValueColor(): Color = if (isDarkTheme) gray500 else gray400
 
 @Composable
-fun mutedTextColor(): Color = if (isSystemInDarkTheme()) gray700 else gray200
+fun mutedTextColor(): Color = if (isDarkTheme) gray700 else gray200
 
 @Composable
-fun mutedBgColor(): Color = if (isSystemInDarkTheme()) gray800 else gray40
+fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
 
 @Composable
-fun baseBackgroundColor(): Color = if (isSystemInDarkTheme()) gray700 else gray70
+fun borderColor(): Color = if (isDarkTheme) gray900 else gray50
 
 @Composable
-fun borderColor(): Color = if (isSystemInDarkTheme()) gray700 else gray70
+fun systemStatusBarColor() = mutedBgColor() // if (isDarkTheme) gray950 else Color.Unspecified
+
+@Composable
+fun systemNavBarColor() = if (isDarkTheme) gray950 else white
 
 @Composable
 fun whiteLowOp(): Color = Color(0x33ffffff)
@@ -231,9 +248,27 @@ fun getColor(context: Context, @AttrRes attrRes: Int): Int {
 }
 
 @Composable
-fun appBackground(): Brush = Brush.linearGradient(
-    0.2f to MaterialTheme.colors.surface,
-    1.0f to baseBackgroundColor(),
-    start = Offset.Zero, //Offset(80.0f, 80.0f),
-    end = Offset.Infinite, //Offset(100.0f, 100.0f)
-)
+fun appBackground(): Brush {
+    val isDark = isDarkTheme
+    val topGradientColor = if (isDark) gray950 else white
+    val bottomGradientColor = if (isDark) black else gray70
+    return Brush.linearGradient(
+        0.2f to topGradientColor,
+        1.0f to bottomGradientColor,
+        start = Offset.Zero,
+        end = Offset.Infinite,
+    )
+}
+
+enum class UserTheme {
+    LIGHT, DARK, SYSTEM;
+
+    companion object {
+        fun safeValueOf(value: String?): UserTheme = when (value) {
+            LIGHT.name -> LIGHT
+            DARK.name -> DARK
+            SYSTEM.name -> SYSTEM
+            else -> SYSTEM
+        }
+    }
+}

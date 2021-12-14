@@ -17,30 +17,31 @@
 package fr.acinq.phoenix.android.settings
 
 import android.content.Context
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.components.ListPreferenceButton
+import fr.acinq.phoenix.android.components.PreferenceItem
+import fr.acinq.phoenix.android.components.ScreenBody
+import fr.acinq.phoenix.android.components.ScreenHeader
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.label
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun PreferencesView() {
+fun DisplayPrefsView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -49,6 +50,7 @@ fun PreferencesView() {
         ScreenBody(Modifier.padding(0.dp)) {
             BitcoinUnitPreference(context = context, scope = scope)
             FiatCurrencyPreference(context = context, scope = scope)
+            UserThemePreference(context = context, scope = scope)
         }
     }
 }
@@ -96,6 +98,29 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
             prefEnabled = false
             scope.launch {
                 Prefs.saveFiatCurrency(context, it.item)
+                prefEnabled = true
+            }
+        }
+    )
+}
+
+@Composable
+private fun UserThemePreference(context: Context, scope: CoroutineScope) {
+    var prefEnabled by remember { mutableStateOf(true) }
+    val preferences = UserTheme.values().map {
+        PreferenceItem(it, title = it.label())
+    }
+    val currentPref by Prefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    ListPreferenceButton(
+        title = stringResource(id = R.string.prefs_display_theme_label),
+        subtitle = currentPref.label(),
+        enabled = prefEnabled,
+        selectedItem = currentPref,
+        preferences = preferences,
+        onPreferenceSubmit = {
+            prefEnabled = false
+            scope.launch {
+                Prefs.saveUserTheme(context, it.item)
                 prefEnabled = true
             }
         }

@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import kotlinx.coroutines.launch

@@ -49,6 +49,7 @@ import fr.acinq.phoenix.android.payments.SendView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -199,7 +200,7 @@ fun AppView(appVM: AppViewModel) {
                     MutualCloseView()
                 }
                 composable(Screen.Preferences.route) {
-                    PreferencesView()
+                    DisplayPrefsView()
                 }
             }
         }

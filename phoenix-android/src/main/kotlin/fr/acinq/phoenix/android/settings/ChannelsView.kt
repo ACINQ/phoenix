@@ -38,18 +38,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.toMilliSatoshi
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.share
+import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
-import fr.acinq.phoenix.data.Chain
 
 @Composable
 fun ChannelsView() {

@@ -41,18 +41,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.managers.Connections
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -127,13 +126,14 @@ fun HomeView(
     )
 }
 
+@OptIn(ObsoleteCoroutinesApi::class)
 @Composable
 private fun SideMenu(
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val peerState = business.peerState().collectAsState()
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colors.surface).fillMaxWidth().fillMaxHeight()) {
         Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
             val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
             Surface(shape = CircleShape, elevation = 2.dp) {
@@ -282,7 +282,7 @@ private fun BottomBar(
             .fillMaxWidth()
             .height(80.dp)
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(MaterialTheme.colors.background)
+            .background(systemNavBarColor())
     ) {
         Button(
             icon = R.drawable.ic_settings,
