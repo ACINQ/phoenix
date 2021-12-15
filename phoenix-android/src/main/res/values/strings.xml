@@ -125,7 +125,7 @@
     <string name="receive__edit__title">Edit my invoice</string>
     <string name="receive__edit__subtitle">You can change the requested amount and the description of the invoice.</string>
     <string name="receive__edit__amount_label">Amount (optional)</string>
-    <string name="receive__edit__desc_label">Payment description (optional):</string>
+    <string name="receive__edit__desc_label">Description (optional):</string>
     <string name="receive__edit__generate_button">Create invoice</string>
 
     <string name="receive__swapin__error_message">Could not retrieve a Bitcoin address from the swap service.\n\nTry again later.</string>
@@ -214,6 +214,7 @@
     <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
+    <string name="utils_amount_hint">Amount</string>
 
     <string name="utils_proceed">Proceed</string>
     <string name="utils_cancel">Cancel</string>

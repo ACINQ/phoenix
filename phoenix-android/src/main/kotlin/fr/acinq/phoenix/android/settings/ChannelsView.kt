@@ -73,7 +73,7 @@ fun ChannelsView() {
                     Text(text = stringResource(id = R.string.listallchannels_no_channels))
                 }
             } else {
-                ScreenBody(Modifier.padding(horizontal = 0.dp, vertical = 8.dp)) {
+                ScreenBody(Modifier.padding(0.dp)) {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         items(model.channels) {
                             ChannelLine(channel = it, onClick = { showChannelDialog.value = it })
@@ -91,7 +91,7 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
     val capacity = balance + (channel.remoteBalance ?: 0.sat)
     Row(modifier = Modifier
         .clickable { onClick() }
-        .padding(horizontal = 16.dp, vertical = 12.dp),
+        .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
@@ -150,13 +150,11 @@ private fun ChannelDialog(onDismiss: () -> Unit, channel: ChannelsConfiguration.
                 text = channel.json,
                 modifier = Modifier
                     .background(mutedBgColor())
-                    .padding(8.dp)
                     .weight(1.0f)
                     .horizontalScroll(rememberScrollState())
                     .verticalScroll(rememberScrollState()),
                 style = monoTypo(),
             )
-
         }
     }
 }

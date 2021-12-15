@@ -29,7 +29,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.settings.Setting
 
 
 internal data class PreferenceItem<T>(val item: T, val title: String, val description: String? = null)

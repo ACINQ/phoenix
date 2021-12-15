@@ -59,7 +59,7 @@ import fr.acinq.phoenix.android.utils.textFieldColors
 import fr.acinq.phoenix.data.*
 
 @Composable
-fun InputText(
+fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
@@ -107,7 +107,7 @@ fun AmountInput(
     inputTextSize: TextUnit = 16.sp,
     unitTextSize: TextUnit = 16.sp,
 ) {
-    val log = logger()
+    val log = logger("AmountInput")
 
     // get unit ambients
     val context = LocalContext.current
@@ -295,6 +295,7 @@ fun AmountInput(
                 modifier = dropdownModifier.layoutId(unitRef)
             )
 
+            // -- dashed line
             if (useBasicInput) {
                 AndroidView(modifier = Modifier
                     .layoutId(amountLineRef), factory = {
@@ -311,7 +312,7 @@ fun AmountInput(
 
         Text(
             text = convertedAmount.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
-            style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+            style = if (useBasicInput) MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center) else MaterialTheme.typography.caption,
             modifier = Modifier
                 .layoutId(altAmountRef)
                 .fillMaxWidth()

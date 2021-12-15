@@ -47,6 +47,7 @@ fun BorderButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
+    isPrimary: Boolean = true,
     onClick: () -> Unit,
     enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
@@ -61,7 +62,7 @@ fun BorderButton(
         onClick = onClick,
         shape = CircleShape,
         backgroundColor = MaterialTheme.colors.surface,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor()),
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (isPrimary) MaterialTheme.colors.primary else borderColor()),
         textStyle = textStyle,
         padding = padding,
         modifier = modifier

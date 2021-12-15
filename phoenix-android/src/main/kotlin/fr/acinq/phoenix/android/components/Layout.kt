@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -119,10 +120,10 @@ fun Dialog(
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
         Column(
             Modifier
-                .padding(vertical = 50.dp, horizontal = 32.dp) // min padding for tall/wide dialogs
+                .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)
-                .widthIn(max = 500.dp)
+                .widthIn(max = 600.dp)
                 .then(
                     if (isScrollable) {
                         Modifier.verticalScroll(rememberScrollState())
@@ -153,13 +154,11 @@ fun Dialog(
 
 @Composable
 fun HSeparator(
-    padding: PaddingValues = PaddingValues(0.dp)
+    width: Dp? = null,
 ) {
     Box(
-        Modifier
-            .fillMaxWidth()
+        (width?.run { Modifier.width(width) } ?: Modifier.fillMaxWidth())
             .height(1.dp)
-            .padding(padding)
             .background(color = borderColor())
     )
 }

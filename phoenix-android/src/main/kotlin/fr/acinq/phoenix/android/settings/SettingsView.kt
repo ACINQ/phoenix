@@ -32,6 +32,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.ScreenHeader
 import fr.acinq.phoenix.android.components.SettingButton
+import fr.acinq.phoenix.android.components.SettingCategory
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.navigate
 
@@ -66,37 +67,5 @@ fun SettingsView() {
         SettingButton(text = R.string.settings_logs, icon = R.drawable.ic_text, onClick = { })
         SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
         SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { })
-    }
-}
-
-@Composable
-fun SettingCategory(textResId: Int) {
-    Text(
-        text = stringResource(id = textResId),
-        style = MaterialTheme.typography.subtitle1.copy(fontSize = 14.sp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 50.dp, top = 24.dp, end = 0.dp, bottom = 4.dp)
-    )
-}
-
-@Composable
-fun Setting(modifier: Modifier = Modifier, title: String, description: String?, onClick: (() -> Unit)? = null) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
-                } else {
-                    Modifier
-                }
-            )
-            .then(modifier)
-            .padding(start = 50.dp, top = 12.dp, bottom = 12.dp, end = 16.dp)
-    ) {
-        Text(title, style = MaterialTheme.typography.body2)
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(description ?: "", style = MaterialTheme.typography.subtitle2)
     }
 }

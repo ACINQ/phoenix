@@ -280,8 +280,8 @@ private fun BottomBar(
     Row(
         Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .height(70.dp)
+            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(systemNavBarColor())
     ) {
         Button(
@@ -292,10 +292,10 @@ private fun BottomBar(
                 }
             },
             iconTint = MaterialTheme.colors.onSurface,
-            padding = PaddingValues(24.dp),
+            padding = PaddingValues(20.dp),
             modifier = Modifier.fillMaxHeight()
         )
-        VSeparator(PaddingValues(top = 16.dp, bottom = 16.dp))
+        VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
         Button(
             text = stringResource(id = R.string.menu_receive),
             icon = R.drawable.ic_receive,
@@ -305,7 +305,7 @@ private fun BottomBar(
                 .fillMaxHeight()
                 .weight(1f)
         )
-        VSeparator(PaddingValues(top = 16.dp, bottom = 16.dp))
+        VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
         Button(
             text = stringResource(id = R.string.menu_send),
             icon = R.drawable.ic_send,

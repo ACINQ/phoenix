@@ -117,7 +117,7 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 
 @Composable
 fun ReceiveView() {
-    val log = logger()
+    val log = logger("ReceiveView")
     val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
     when (val state = vm.state) {
         is ReceiveViewState.Default -> DefaultView(vm = vm)
@@ -163,16 +163,11 @@ private fun DefaultView(vm: ReceiveViewModel) {
                         onCopy = { copyToClipboard(context, data = model.request) },
                         onShare = { /*TODO*/ },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                     BorderButton(
                         text = R.string.receive__swapin_button,
                         icon = R.drawable.ic_swap,
                         onClick = { postIntent(Receive.Intent.RequestSwapIn) })
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BorderButton(
-                        text = R.string.receive__lnurl_withdraw,
-                        icon = R.drawable.ic_scan,
-                        onClick = { })
                 }
                 is Receive.Model.SwapIn.Requesting -> Text(stringResource(id = R.string.receive__swapin__wait))
                 is Receive.Model.SwapIn.Generated -> {
@@ -263,8 +258,8 @@ private fun EditInvoiceView(
             onBackClick = onCancel
         )
         ScreenBody {
-            Text(stringResource(id = R.string.receive__edit__amount_label), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(stringResource(id = R.string.receive__edit__amount_label), style = MaterialTheme.typography.subtitle1)
+            Spacer(modifier = Modifier.height(4.dp))
             AmountInput(
                 initialAmount = null,
                 onAmountChange = { amount, amountFiat, fiatCode ->
@@ -273,10 +268,10 @@ private fun EditInvoiceView(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(stringResource(id = R.string.receive__edit__desc_label), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            InputText(
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(id = R.string.receive__edit__desc_label), style = MaterialTheme.typography.subtitle1)
+            Spacer(modifier = Modifier.height(4.dp))
+            TextInput(
                 text = description, // TODO use value from prefs
                 onTextChange = onDescriptionChange,
                 modifier = Modifier.fillMaxWidth()

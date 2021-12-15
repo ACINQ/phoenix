@@ -62,9 +62,9 @@ val gray950 = Color(0xFF171B22)
 val gray900 = Color(0xff2b313e)
 val gray800 = Color(0xff3e4556)
 val gray700 = Color(0xff4e586c)
-val gray600 = Color(0xff5f6b83)
-val gray500 = Color(0xff6e7a94)
-val gray400 = Color(0xff838da4)
+val gray600 = Color(0xFF5F6A8A)
+val gray500 = Color(0xFF73899E)
+val gray400 = Color(0xFF8B95AD)
 val gray300 = Color(0xff99a2b6)
 val gray200 = Color(0xffb5bccc)
 val gray100 = Color(0xffd1d7e3)
@@ -125,7 +125,7 @@ fun typography(palette: Colors) = Typography(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        color = settingValueColor(),
+        color = mutedTextColor(),
     ),
     h3 = TextStyle(
         fontFamily = FontFamily.SansSerif,
@@ -217,10 +217,7 @@ fun negativeColor(): Color = if (isDarkTheme) red500 else red300
 fun positiveColor(): Color = if (isDarkTheme) green else applegreen
 
 @Composable
-fun settingValueColor(): Color = if (isDarkTheme) gray500 else gray400
-
-@Composable
-fun mutedTextColor(): Color = if (isDarkTheme) gray700 else gray200
+fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray400
 
 @Composable
 fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
@@ -238,7 +235,12 @@ fun systemNavBarColor() = if (isDarkTheme) gray950 else white
 fun whiteLowOp(): Color = Color(0x33ffffff)
 
 @Composable
-fun textFieldColors() = TextFieldDefaults.textFieldColors(backgroundColor = mutedBgColor())
+fun textFieldColors() = TextFieldDefaults.textFieldColors(
+    focusedLabelColor = MaterialTheme.colors.primary,
+    backgroundColor = if (isDarkTheme) gray900 else gray30,
+    unfocusedLabelColor = red300,
+    placeholderColor = green
+)
 
 /** Get a color using the old way. Use in legacy AndroidView. */
 fun getColor(context: Context, @AttrRes attrRes: Int): Int {

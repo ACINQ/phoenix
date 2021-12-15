@@ -30,9 +30,8 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.InputText
+import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
@@ -162,7 +161,7 @@ fun RestoreWalletView(
                                 )
                             } else {
                                 Text(stringResource(R.string.restore_instructions))
-                                InputText(
+                                TextInput(
                                     text = wordsInput,
                                     onTextChange = { wordsInput = it },
                                     maxLines = 4,

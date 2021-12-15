@@ -174,7 +174,7 @@ private fun ElectrumServerDialog(
             ) {
                 Text(text = stringResource(id = R.string.electrum_dialog_input), style = MaterialTheme.typography.subtitle1)
                 Spacer(Modifier.height(8.dp))
-                InputText(
+                TextInput(
                     modifier = Modifier.fillMaxWidth(),
                     text = address,
                     onTextChange = {
