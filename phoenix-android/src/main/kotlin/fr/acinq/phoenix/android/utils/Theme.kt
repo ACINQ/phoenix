@@ -70,7 +70,7 @@ val gray200 = Color(0xffb5bccc)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFEBF3F5)
-val gray30 = Color(0xFFF5F9FA)
+val gray30 = Color(0xFFF2F6F7)
 
 private val LightColorPalette = lightColors(
     // primary
@@ -81,7 +81,7 @@ private val LightColorPalette = lightColors(
     secondary = horizon,
     onSecondary = white,
     // app background
-    background = white,
+    background = gray30,
     onBackground = gray900,
     // components background
     surface = white,
@@ -127,16 +127,34 @@ fun typography(palette: Colors) = Typography(
         fontSize = 14.sp,
         color = mutedTextColor(),
     ),
-    h3 = TextStyle(
+    h1 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Light,
         fontSize = 48.sp,
         color = palette.onSurface,
     ),
-    h6 = TextStyle(
+    h2 = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Light,
-        fontSize = 20.sp,
+        fontSize = 36.sp,
+        color = palette.onSurface,
+    ),
+    h3 = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Light,
+        fontSize = 24.sp,
+        color = palette.onSurface,
+    ),
+    h4 = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        color = palette.onSurface,
+    ),
+    h5 = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
         color = palette.onSurface,
     ),
     // default style
@@ -226,7 +244,7 @@ fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30
 fun borderColor(): Color = if (isDarkTheme) gray900 else gray50
 
 @Composable
-fun systemStatusBarColor() = mutedBgColor() // if (isDarkTheme) gray950 else Color.Unspecified
+fun systemStatusBarColor() = mutedBgColor()
 
 @Composable
 fun systemNavBarColor() = if (isDarkTheme) gray950 else white
@@ -237,9 +255,7 @@ fun whiteLowOp(): Color = Color(0x33ffffff)
 @Composable
 fun textFieldColors() = TextFieldDefaults.textFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
-    backgroundColor = if (isDarkTheme) gray900 else gray30,
-    unfocusedLabelColor = red300,
-    placeholderColor = green
+    backgroundColor = MaterialTheme.colors.surface,
 )
 
 /** Get a color using the old way. Use in legacy AndroidView. */

@@ -20,14 +20,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -36,16 +41,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
-import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
-
 @Composable
-fun ScreenHeader(
+fun Header(
     title: String? = null,
-    subtitle: String? = null,
     onBackClick: () -> Unit,
-    backgroundColor: Color = mutedBgColor(),
+    backgroundColor: Color = MaterialTheme.colors.background,
 ) {
     Row(
         modifier = Modifier
@@ -60,31 +62,7 @@ fun ScreenHeader(
             verticalArrangement = Arrangement.Center
         ) {
             title?.run { Text(text = this) }
-            subtitle?.run {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
-            }
         }
-    }
-}
-
-@Composable
-fun ScreenBody(
-    modifier: Modifier = Modifier.padding(PaddingValues(start = 50.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)),
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.surface)
-    ) {
-        HSeparator()
-        Column(
-            modifier = modifier.fillMaxWidth()
-        ) {
-            content()
-        }
-        HSeparator()
     }
 }
 
@@ -93,8 +71,8 @@ fun ScreenBody(
 fun BackButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        shape = CircleShape,
-        contentPadding = PaddingValues(16.dp),
+        shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
+        contentPadding = PaddingValues(start = 28.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
@@ -102,7 +80,7 @@ fun BackButton(onClick: () -> Unit) {
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(50.dp)
+        modifier = Modifier.size(width = 62.dp, height = 48.dp)
     ) {
         PhoenixIcon(resourceId = R.drawable.ic_arrow_back)
     }
@@ -174,6 +152,23 @@ fun VSeparator(
             .padding(padding)
             .background(color = borderColor())
     )
+}
+
+@Composable
+fun Card(
+    modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    internalPadding: PaddingValues = PaddingValues(0.dp),
+    shape: Shape = RoundedCornerShape(16.dp),
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .clip(shape)
+            .background(MaterialTheme.colors.surface)
+            .padding(internalPadding)
+    ) {
+        content()
+    }
 }
 
 fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.3f))

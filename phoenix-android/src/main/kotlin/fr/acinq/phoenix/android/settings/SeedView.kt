@@ -34,10 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Dialog
-import fr.acinq.phoenix.android.components.ScreenBody
-import fr.acinq.phoenix.android.components.ScreenHeader
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
@@ -63,14 +60,16 @@ fun SeedView() {
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<SeedViewState>(SeedViewState.Init) }
 
-    Column {
-        ScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
-        ScreenBody {
+    SettingScreen {
+        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+        Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
-            Spacer(modifier = Modifier.height(24.dp))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Card {
             when (val s = state) {
                 is SeedViewState.Init -> {
-                    BorderButton(onClick = {
+                    SettingButton(text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key) {
                         state = SeedViewState.ReadingSeed
                         scope.launch {
                             val keyState = SeedManager.getSeedState(context)
@@ -89,10 +88,12 @@ fun SeedView() {
                                 }
                             }
                         }
-                    }, text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key)
+                    }
                 }
                 is SeedViewState.ReadingSeed -> {
-                    Text(stringResource(id = R.string.displayseed_loading), modifier = Modifier.padding(12.dp))
+                    Row (modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        IconWithText(icon = R.drawable.ic_key, text = stringResource(id = R.string.displayseed_loading))
+                    }
                 }
                 is SeedViewState.ShowSeed -> {
                     SeedDialog(onDismiss = { state = SeedViewState.Init }, words = s.words)

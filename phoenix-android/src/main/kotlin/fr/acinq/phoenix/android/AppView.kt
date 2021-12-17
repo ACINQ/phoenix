@@ -202,6 +202,9 @@ fun AppView(appVM: AppViewModel) {
                 composable(Screen.Preferences.route) {
                     DisplayPrefsView()
                 }
+                composable(Screen.About.route) {
+                    AboutView()
+                }
             }
         }
     }

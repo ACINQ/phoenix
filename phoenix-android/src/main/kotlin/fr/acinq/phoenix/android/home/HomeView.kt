@@ -88,8 +88,8 @@ fun HomeView(
                     Spacer(modifier = Modifier.height(16.dp))
                     AmountView(
                         amount = model.balance,
-                        amountTextStyle = MaterialTheme.typography.h3,
-                        unitTextStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
+                        amountTextStyle = MaterialTheme.typography.h1,
+                        unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(horizontal = 16.dp)

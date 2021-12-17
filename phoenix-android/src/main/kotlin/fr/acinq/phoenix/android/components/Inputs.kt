@@ -27,6 +27,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -80,6 +81,7 @@ fun TextInput(
         enabled = enabled,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         colors = textFieldColors(),
+        shape = RectangleShape,
         modifier = modifier
     )
 }
@@ -238,12 +240,18 @@ fun AmountInput(
                     }
                 }
                 constrain(altAmount) {
-                    top.linkTo(amountInput.bottom, margin = 8.dp)
+                    if (useBasicInput) {
+                        top.linkTo(amountInput.bottom, margin = 8.dp)
+                    } else {
+                        top.linkTo(amountInput.bottom, margin = 2.dp)
+                    }
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
             },
-            modifier = modifier.width(IntrinsicSize.Min)
+            modifier = modifier
+                .width(IntrinsicSize.Min)
+                .then(if (!useBasicInput) Modifier.fillMaxWidth() else Modifier)
         ) {
             if (useBasicInput) {
                 BasicTextField(
@@ -270,7 +278,9 @@ fun AmountInput(
                 TextField(
                     value = rawAmount,
                     onValueChange = onValueChange,
-                    modifier = inputModifier.layoutId(amountRef),
+                    modifier = inputModifier
+                        .layoutId(amountRef)
+                        .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.None,
                         autoCorrect = false,
@@ -281,6 +291,7 @@ fun AmountInput(
                     colors = textFieldColors(),
                     singleLine = true,
                     maxLines = 1,
+                    shape = RectangleShape,
                 )
             }
 

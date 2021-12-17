@@ -57,14 +57,14 @@ fun ElectrumView() {
     val prefElectrumServer = LocalElectrumServer.current
     var showServerDialog by rememberSaveable { mutableStateOf(false) }
 
-    Column {
-        ScreenHeader(
+    SettingScreen {
+        SettingHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.electrum_title),
             subtitle = stringResource(id = R.string.electrum_subtitle)
         )
 
-        ScreenBody(Modifier.padding(0.dp)) {
+        Card {
             MVIView(CF::electrumConfiguration) { model, postIntent ->
                 if (showServerDialog) {
                     ElectrumServerDialog(

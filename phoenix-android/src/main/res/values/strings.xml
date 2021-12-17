@@ -276,10 +276,10 @@
     <string name="closechannels_mutual_title">Close my channels</string>
     <string name="closechannels_mutual_subtitle">Use this screen to close your payments channels and drain your funds to a Bitcoin address.</string>
     <string name="closechannels_checking_channels">Checking your channels, please hold…</string>
-    <string name="closechannels_channels_recap">%1$d channel(s) holding an aggregated balance of %2$s can be closed. Funds will be sent to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
+    <string name="closechannels_channels_recap">You have %1$d active Lightning channel(s) holding an aggregated balance of %2$s. Closing those channels will send funds to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
     <string name="closechannels_channels_none">You currently don\'t have any channels that could be closed.</string>
     <string name="closechannels_mutual_input_hint">Bitcoin address</string>
-    <string name="closechannels_mutual_button">Empty my wallet</string>
+    <string name="closechannels_mutual_button">Drain my wallet</string>
     <string name="closechannels_force_title">Force close</string>
     <string name="closechannels_force_instructions"><![CDATA[
     Force close allows you to unilaterally close your channels.
@@ -582,23 +582,18 @@
 
     <!-- //////////////// about screen //////////////// -->
 
-    <string name="about_title">About</string>
-    <string name="about_version">Version: %1$s (%2$d)</string>
-    <string name="about_general"><![CDATA[
-  Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.
-  <br/><br/>
-  It is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.
-  <br/><br/>
-  Note that this wallet is non-custodial: <strong>you have sole custody of the wallet\'s 12-words seed</strong>. Do not give this seed to anyone, and beware of phishing.
-  <br/><br/>
-  If you have questions, consult the <a href="https://phoenix.acinq.co/faq">FAQ</a>. You can also contact <a href="https://phoenix.acinq.co/support">support</a> for help.
-  ]]></string>
-    <string name="about_fiat_rates"><![CDATA[
-    Bitcoin/fiat exchange rates are retrieved from various third-party APIs:
-    <br />- Blockchain.info
-    <br />- Bitso
-    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
-  ]]></string>
+    <string name="about_title">About Phoenix</string>
+    <string name="about_general_title">About</string>
+    <string name="about_general_content">Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.\n\nIt is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.</string>
+    <string name="about_seed_title">Safeguarding your key</string>
+    <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
+    <string name="about_rates_title">Exchange rates</string>
+    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n- Blockchain.info\n- powered by Coindesk.com\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+    <string name="about_version">Version</string>
+    <string name="about_faq_link">Any questions? Check the FAQ</string>
+    <string name="about_support_link">Support</string>
+    <string name="about_privacy_link">Privacy</string>
+    <string name="about_terms_link">Terms</string>
 
     <!-- //////////////// background node service //////////////// -->
 

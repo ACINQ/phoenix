@@ -17,20 +17,13 @@
 package fr.acinq.phoenix.android.settings
 
 import android.content.Context
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.ListPreferenceButton
-import fr.acinq.phoenix.android.components.PreferenceItem
-import fr.acinq.phoenix.android.components.ScreenBody
-import fr.acinq.phoenix.android.components.ScreenHeader
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.UserTheme
@@ -45,9 +38,9 @@ fun DisplayPrefsView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    Column {
-        ScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
-        ScreenBody(Modifier.padding(0.dp)) {
+    SettingScreen {
+        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
+        Card {
             BitcoinUnitPreference(context = context, scope = scope)
             FiatCurrencyPreference(context = context, scope = scope)
             UserThemePreference(context = context, scope = scope)

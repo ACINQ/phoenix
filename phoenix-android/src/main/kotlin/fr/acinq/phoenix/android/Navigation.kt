@@ -16,13 +16,9 @@
 
 package fr.acinq.phoenix.android
 
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import fr.acinq.phoenix.android.security.KeyState
-import fr.acinq.phoenix.android.utils.logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 
@@ -33,16 +29,19 @@ sealed class Screen(val route: String) {
     object RestoreWallet : Screen("restorewallet")
     object Startup : Screen("startup")
     object Home : Screen("home")
+    object Receive : Screen("receive")
+    object ReadData : Screen("readdata")
+    object Send : Screen("send/{request}")
+    object PaymentDetails : Screen("payment")
+
+    // -- settings
     object Settings : Screen("settings")
     object DisplaySeed : Screen("settings/seed")
     object ElectrumServer : Screen("settings/electrum")
     object Channels : Screen("settings/channels")
     object MutualClose : Screen("settings/mutualclose")
     object Preferences : Screen("settings/preferences")
-    object Receive : Screen("receive")
-    object ReadData : Screen("readdata")
-    object Send : Screen("send/{request}")
-    object PaymentDetails : Screen("payment")
+    object About : Screen("settings/about")
 }
 
 fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {
