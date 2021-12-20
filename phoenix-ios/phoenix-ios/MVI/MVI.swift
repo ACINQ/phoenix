@@ -21,15 +21,23 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 		return _model!
 	}
 	
-	private let getController: (ControllerFactory) -> MVIController<Model, Intent>
-	private var controller: MVIController<Model, Intent>? = nil
+	private let getController: ((ControllerFactory) -> MVIController<Model, Intent>)?
+	private var controller: MVIController<Model, Intent>?
 	
 	private var unsub: (() -> Void)? = nil
 	private var subCount: Int = 0
 
 	init(_ getController: @escaping (ControllerFactory) -> MVIController<Model, Intent>) {
 		self.getController = getController
+		self.controller = nil
 	}
+	
+	init(_ controller: MVIController<Model, Intent>) {
+		self.getController = nil
+		self.controller = controller
+		_model = controller.firstModel
+	}
+	
 
 	deinit {
 		let _unsub = unsub
@@ -44,8 +52,10 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	/// 
 	fileprivate func initializeControllerIfNeeded(_ factory: ControllerFactory) -> Void {
 		if controller == nil {
-			controller = getController(factory)
-			_model = controller!.firstModel
+			if let getController = getController {
+				controller = getController(factory)
+				_model = controller!.firstModel
+			}
 		}
 	}
 
