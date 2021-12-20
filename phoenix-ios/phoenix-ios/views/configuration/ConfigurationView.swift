@@ -180,8 +180,8 @@ struct ConfigurationView: MVIView {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
-			onExternalLightningUrl(url)
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: String) in
+			didReceiveExternalLightningUrl(url)
 		}
 		.navigationBarTitle(
 			NSLocalizedString("Settings", comment: "Navigation bar title"),
@@ -227,8 +227,8 @@ struct ConfigurationView: MVIView {
 		}
 	}
 	
-	func onExternalLightningUrl(_ url: URL) {
-		log.debug("onExternalLightningUrl()")
+	func didReceiveExternalLightningUrl(_ urlStr: String) {
+		log.debug("didReceiveExternalLightningUrl()")
 		
 		// We previoulsy had a crash under the following conditions:
 		// - navigate to ConfigurationView
@@ -238,6 +238,7 @@ struct ConfigurationView: MVIView {
 		//
 		// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
 		//
+		// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
 		selectedTag = nil
 	}
 }

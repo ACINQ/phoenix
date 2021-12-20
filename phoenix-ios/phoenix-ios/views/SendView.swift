@@ -97,7 +97,7 @@ struct SendView: MVIView {
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: String) in
 			didReceiveExternalLightningUrl(url)
 		}
 	}
@@ -248,10 +248,10 @@ struct SendView: MVIView {
 		)
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		mvi.intent(Scan.Intent_Parse(request: url.absoluteString))
+		mvi.intent(Scan.Intent_Parse(request: urlStr))
 	}
 }
 

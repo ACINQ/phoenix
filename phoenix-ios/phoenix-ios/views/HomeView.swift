@@ -121,7 +121,7 @@ struct HomeView : MVIView {
 		.onReceive(incomingSwapsPublisher) { incomingSwaps in
 			onIncomingSwapsChanged(incomingSwaps)
 		}
-		.onReceive(externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(externalLightningUrlPublisher) { (url: String) in
 			didReceiveExternalLightningUrl(url)
 		}
 	}
@@ -620,7 +620,7 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 	
 		if navLinkTag == .SendView {
@@ -678,7 +678,7 @@ struct HomeView : MVIView {
 			unsubscribe?()
 		}
 		
-		scanController.intent(intent: Scan.IntentParse(request: url.absoluteString))
+		scanController.intent(intent: Scan.IntentParse(request: urlStr))
 	}
 }
 
