@@ -848,14 +848,14 @@ fileprivate struct AppStatusButton: View, ViewName {
 	
 	@State var dimStatus = false
 	
-	@State var syncState: SyncManagerState = .initializing
-	@State var pendingSettings: PendingSettings? = nil
+	@State var syncState: SyncTxManager_State = .initializing
+	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
 	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
-	let syncManager = AppDelegate.get().syncManager!
+	let syncTxManager = AppDelegate.get().syncManager!.syncTxManager
 	
 	@ViewBuilder
 	var body: some View {
@@ -873,11 +873,11 @@ fileprivate struct AppStatusButton: View, ViewName {
 			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
 				.stroke(Color.borderColor, lineWidth: 1)
 		)
-		.onReceive(syncManager.statePublisher) {
-			syncManagerStateChanged($0)
+		.onReceive(syncTxManager.statePublisher) {
+			syncTxManagerStateChanged($0)
 		}
-		.onReceive(syncManager.pendingSettingsPublisher) {
-			syncManagerPendingSettingsChanged($0)
+		.onReceive(syncTxManager.pendingSettingsPublisher) {
+			syncTxManagerPendingSettingsChanged($0)
 		}
 	}
 	
@@ -970,14 +970,14 @@ fileprivate struct AppStatusButton: View, ViewName {
 		return (isSyncing, isWaiting, isError)
 	}
 	
-	func syncManagerStateChanged(_ newState: SyncManagerState) -> Void {
-		log.trace("[\(viewName)] syncManagerStateChanged()")
+	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) -> Void {
+		log.trace("[\(viewName)] syncTxManagerStateChanged()")
 		
 		syncState = newState
 	}
 	
-	func syncManagerPendingSettingsChanged(_ newPendingSettings: PendingSettings?) -> Void {
-		log.trace("[\(viewName)] syncManagerPendingSettingsChanged()")
+	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) -> Void {
+		log.trace("[\(viewName)] syncTxManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
 	}

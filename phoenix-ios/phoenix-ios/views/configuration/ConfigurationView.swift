@@ -1,8 +1,9 @@
 import SwiftUI
 import PhoenixShared
+import Combine
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "ConfigurationView"
@@ -28,7 +29,7 @@ struct ConfigurationView: MVIView {
 		case ElectrumConfigurationView
 		case TorView
 		case PaymentOptionsView
-		case CloudOptionsView
+		case BackupView
 		case AppAccessView
 		case RecoverySeedView
 		case LogsConfigurationView
@@ -39,6 +40,21 @@ struct ConfigurationView: MVIView {
 	@State private var selectedTag: Tag? = nil
 	
 	@State private var listViewId = UUID()
+	
+	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
+	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
+	
+	let externalLightningUrlPublisher: PassthroughSubject<URL, Never>
+	
+	init() {
+		if let encryptedNodeId = AppDelegate.get().encryptedNodeId {
+			backupSeedStatePublisher = Prefs.shared.backupSeedStatePublisher(encryptedNodeId)
+		} else {
+			backupSeedStatePublisher = PassthroughSubject<BackupSeedState, Never>().eraseToAnyPublisher()
+		}
+		
+		externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
+	}
 	
 	@ViewBuilder
 	var view: some View {
@@ -78,13 +94,34 @@ struct ConfigurationView: MVIView {
 					}
 				}
 				
-				NavigationLink(
-					destination: CloudOptionsView(),
-					tag: Tag.CloudOptionsView,
-					selection: $selectedTag
-				) {
-					Label { Text("Cloud backup") } icon: {
-						Image(systemName: "icloud")
+				if fullMode {
+					NavigationLink(
+						destination: BackupView(),
+						tag: Tag.BackupView,
+						selection: $selectedTag
+					) {
+						Label {
+							switch backupSeedState {
+							case .notBackedUp:
+								HStack(alignment: VerticalAlignment.center, spacing: 0) {
+									Text("Backup")
+									Spacer()
+									Image(systemName: "exclamationmark.triangle")
+										.renderingMode(.template)
+										.foregroundColor(Color.appWarn)
+								}
+							case .backupInProgress:
+								HStack(alignment: VerticalAlignment.center, spacing: 0) {
+									Text("Backup")
+									Spacer()
+									Image(systemName: "icloud.and.arrow.up")
+								}
+							case .safelyBackedUp:
+								Text("Backup")
+							}
+						} icon: {
+							Image(systemName: "icloud.and.arrow.up")
+						}
 					}
 				}
 			}
@@ -99,15 +136,6 @@ struct ConfigurationView: MVIView {
 					) {
 						Label { Text("App access") } icon: {
 							Image(systemName: isTouchID ? "touchid" : "faceid")
-						}
-					}
-					NavigationLink(
-						destination: RecoverySeedView(),
-						tag: Tag.RecoverySeedView,
-						selection: $selectedTag
-					) {
-						Label { Text("Recovery phrase") } icon: {
-							Image(systemName: "key")
 						}
 					}
 				}
@@ -180,7 +208,10 @@ struct ConfigurationView: MVIView {
 		.onAppear() {
 			onAppear()
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
+			onBackupSeedState(state)
+		}
+		.onReceive(externalLightningUrlPublisher) {(url: URL) in
 			onExternalLightningUrl(url)
 		}
 		.navigationBarTitle(
@@ -227,8 +258,14 @@ struct ConfigurationView: MVIView {
 		}
 	}
 	
+	func onBackupSeedState(_ newState: BackupSeedState) {
+		log.trace("onBackupSeedState()")
+		
+		backupSeedState = newState
+	}
+	
 	func onExternalLightningUrl(_ url: URL) {
-		log.debug("onExternalLightningUrl()")
+		log.trace("onExternalLightningUrl()")
 		
 		// We previoulsy had a crash under the following conditions:
 		// - navigate to ConfigurationView

@@ -4,28 +4,28 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "PendingSettings"
+	category: "SyncTxManager_PendingSettings"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-class PendingSettings: Equatable, CustomStringConvertible {
+class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
 	
 	enum EnableDisable{
 	  case willEnable
 	  case willDisable
 	}
 	
-	private weak var parent: SyncManager?
+	private weak var parent: SyncTxManager?
 	
 	let paymentSyncing: EnableDisable
 	let delay: TimeInterval
 	let startDate: Date
 	let fireDate: Date
 	
-	init(_ parent: SyncManager, enableSyncing delay: TimeInterval) {
+	init(_ parent: SyncTxManager, enableSyncing delay: TimeInterval) {
 		let now = Date()
 		self.parent = parent
 		self.paymentSyncing = .willEnable
@@ -36,7 +36,7 @@ class PendingSettings: Equatable, CustomStringConvertible {
 		startTimer()
 	}
 	
-	init(_ parent: SyncManager, disableSyncing delay: TimeInterval) {
+	init(_ parent: SyncTxManager, disableSyncing delay: TimeInterval) {
 		let now = Date()
 		self.parent = parent
 		self.paymentSyncing = .willDisable
@@ -84,13 +84,13 @@ class PendingSettings: Equatable, CustomStringConvertible {
 		let dateStr = fireDate.description(with: Locale.current)
 		switch paymentSyncing {
 		case .willEnable:
-			return "<PendingSettings: willEnable @ \(dateStr)>"
+			return "<SyncTxManager_PendingSettings: willEnable @ \(dateStr)>"
 		case .willDisable:
-			return "<PendingSettings: willDisable @ \(dateStr)>"
+			return "<SyncTxManager_PendingSettings: willDisable @ \(dateStr)>"
 		}
 	}
 	
-	static func == (lhs: PendingSettings, rhs: PendingSettings) -> Bool {
+	static func == (lhs: SyncTxManager_PendingSettings, rhs: SyncTxManager_PendingSettings) -> Bool {
 		
 		return (lhs.paymentSyncing == rhs.paymentSyncing) && (lhs.fireDate == rhs.fireDate)
 	}

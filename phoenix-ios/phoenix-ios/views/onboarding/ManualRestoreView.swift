@@ -12,7 +12,7 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 
-struct RestoreWalletView: MVIView {
+struct ManualRestoreView: MVIView {
 
 	@StateObject var mvi = MVIState({ $0.restoreWallet() })
 	
@@ -55,7 +55,7 @@ struct RestoreWalletView: MVIView {
 			main
 		}
 		.navigationBarTitle(
-			NSLocalizedString("Restore my wallet", comment: "Navigation bar title"),
+			NSLocalizedString("Manual restore", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
 		.onChange(of: mvi.model, perform: { model in
@@ -71,7 +71,7 @@ struct RestoreWalletView: MVIView {
 				.zIndex(1)
 				.transition(.move(edge: .bottom))
 		} else {
-			RestoreView(
+			EnterSeedView(
 				mvi: mvi,
 				mnemonics: $mnemonics,
 				autocomplete: $autocomplete
@@ -93,7 +93,11 @@ struct RestoreWalletView: MVIView {
 		
 		AppSecurity.shared.addKeychainEntry(mnemonics: mnemonics) { (error: Error?) in
 			if error == nil {
-				AppDelegate.get().loadWallet(seed: model.seed)
+				AppDelegate.get().loadWallet(
+					mnemonics: mnemonics,
+					seed: model.seed,
+					walletRestoreType: .fromManualEntry
+				)
 			}
 		}
 	}
@@ -156,7 +160,7 @@ struct WarningView: View {
 	}
 }
 
-struct RestoreView: View {
+struct EnterSeedView: View {
 	
 	@ObservedObject var mvi: MVIState<RestoreWallet.Model, RestoreWallet.Intent>
 
@@ -667,7 +671,7 @@ struct RestoreView: View {
 	}
 }
 
-class RestoreWalletView_Previews: PreviewProvider {
+class ManualRestoreView_Previews: PreviewProvider {
 	
 	static let filteredWordList1 = [
 		"abc", "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access"
@@ -683,27 +687,27 @@ class RestoreWalletView_Previews: PreviewProvider {
 
 	static var previews: some View {
 		
-		RestoreWalletView().mock(
+		ManualRestoreView().mock(
 			RestoreWallet.ModelReady()
 		)
 		.previewDevice("iPhone 11")
 		
-		RestoreWalletView().mock(
+		ManualRestoreView().mock(
 			RestoreWallet.ModelInvalidMnemonics()
 		)
 		.previewDevice("iPhone 11")
 		
-		RestoreWalletView().mock(
+		ManualRestoreView().mock(
 			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList1)
 		)
 		.previewDevice("iPhone 11")
 		
-		RestoreWalletView().mock(
+		ManualRestoreView().mock(
 			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList2)
 		)
 		.previewDevice("iPhone 11")
 		
-		RestoreWalletView().mock(
+		ManualRestoreView().mock(
 			RestoreWallet.ModelFilteredWordlist(uuid: "", predicate: "ab", words: filteredWordList3)
 		)
 		.previewDevice("iPhone 11")
