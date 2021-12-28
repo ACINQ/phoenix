@@ -79,11 +79,15 @@ struct SendView: MVIView {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	init(firstModel: Scan.Model? = nil) {
+	init(controller: AppScanController? = nil) {
 		
-		self._mvi = StateObject.init(wrappedValue: MVIState.init {
-			$0.scan(firstModel: firstModel ?? Scan.Model_Ready())
-		})
+		if let controller = controller {
+			self._mvi = StateObject(wrappedValue: MVIState(controller))
+		} else {
+			self._mvi = StateObject(wrappedValue: MVIState {
+				$0.scan(firstModel: Scan.Model_Ready())
+			})
+		}
 	}
 	
 	@ViewBuilder
@@ -97,7 +101,7 @@ struct SendView: MVIView {
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: String) in
 			didReceiveExternalLightningUrl(url)
 		}
 	}
@@ -144,7 +148,7 @@ struct SendView: MVIView {
 		}
 	}
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
 		if let newModel = newModel as? Scan.Model_BadRequest {
@@ -248,10 +252,10 @@ struct SendView: MVIView {
 		)
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		mvi.intent(Scan.Intent_Parse(request: url.absoluteString))
+		mvi.intent(Scan.Intent_Parse(request: urlStr))
 	}
 }
 
@@ -366,7 +370,7 @@ struct ScanView: View, ViewName {
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
 	}
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("[\(viewName)] modelDidChange()")
 		
 		if ignoreScanner {

@@ -36,8 +36,6 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
-	@StateObject var toast = Toast()
-	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
@@ -65,7 +63,7 @@ struct HomeView : MVIView {
 	@State private var navLinkTag: NavLinkTag? = nil
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
+	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
 	
 	@ViewBuilder
@@ -97,8 +95,6 @@ struct HomeView : MVIView {
 
 			main
 
-			toast.view()
-
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
@@ -121,7 +117,7 @@ struct HomeView : MVIView {
 		.onReceive(incomingSwapsPublisher) { incomingSwaps in
 			onIncomingSwapsChanged(incomingSwaps)
 		}
-		.onReceive(externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(externalLightningUrlPublisher) { (url: String) in
 			didReceiveExternalLightningUrl(url)
 		}
 	}
@@ -283,7 +279,7 @@ struct HomeView : MVIView {
 				}
 			}
 
-			BottomBar(navLinkTag: $navLinkTag, toast: toast)
+			BottomBar(navLinkTag: $navLinkTag)
 		
 		} // </VStack>
 		.onAppear {
@@ -313,7 +309,7 @@ struct HomeView : MVIView {
 			ReceiveView()
 			
 		case .SendView:
-			SendView(firstModel: externalLightningRequest)
+			SendView(controller: externalLightningRequest)
 			
 		case .CurrencyConverter:
 			CurrencyConverterView()
@@ -371,8 +367,8 @@ struct HomeView : MVIView {
 		log.trace("navLinkTagChanged()")
 		
 		if tag == nil {
-			// If we pushed the SendView with a external lightning url,
-			// we should nil out the url (since the user is finished with it now).
+			// If we pushed the SendView, triggered by an external lightning url,
+			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
 		}
 	}
@@ -620,7 +616,7 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 	
 		if navLinkTag == .SendView {
@@ -649,26 +645,14 @@ struct HomeView : MVIView {
 		temp.append(scanController)
 		
 		var unsubscribe: (() -> Void)? = nil
-		var isFirstFire = true
 		unsubscribe = scanController.subscribe { (model: Scan.Model) in
 			
-			if isFirstFire { // ignore first subscription fire (Scan.ModelReady)
-				isFirstFire = false
+			// Ignore first subscription fire (Scan.ModelReady)
+			if let _ = model as? Scan.ModelReady {
 				return
-			}
-			
-			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
-				self.externalLightningRequest = model
+			} else {
+				self.externalLightningRequest = scanController
 				self.navLinkTag = .SendView
-				
-			} else if let _ = model as? Scan.ModelBadRequest {
-				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
-				toast.pop(
-					Text(msg).anyView,
-					colorScheme: colorScheme.opposite,
-					duration: 4.0,
-					location: .middle
-				)
 			}
 			
 			// Cleanup
@@ -678,7 +662,7 @@ struct HomeView : MVIView {
 			unsubscribe?()
 		}
 		
-		scanController.intent(intent: Scan.IntentParse(request: url.absoluteString))
+		scanController.intent(intent: Scan.IntentParse(request: urlStr))
 	}
 }
 
@@ -1105,7 +1089,6 @@ fileprivate struct DisclaimerBox<Content: View>: View {
 fileprivate struct BottomBar: View, ViewName {
 	
 	@Binding var navLinkTag: NavLinkTag?
-	@ObservedObject var toast: Toast
 	
 	var body: some View {
 		

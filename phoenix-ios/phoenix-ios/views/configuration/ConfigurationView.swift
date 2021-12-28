@@ -44,7 +44,7 @@ struct ConfigurationView: MVIView {
 	@State private var backupSeedState: BackupSeedState = .safelyBackedUp
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
-	let externalLightningUrlPublisher: PassthroughSubject<URL, Never>
+	let externalLightningUrlPublisher: PassthroughSubject<String, Never>
 	
 	init() {
 		if let encryptedNodeId = AppDelegate.get().encryptedNodeId {
@@ -211,7 +211,7 @@ struct ConfigurationView: MVIView {
 		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
 			onBackupSeedState(state)
 		}
-		.onReceive(externalLightningUrlPublisher) {(url: URL) in
+		.onReceive(externalLightningUrlPublisher) {(url: String) in
 			onExternalLightningUrl(url)
 		}
 		.navigationBarTitle(
@@ -264,7 +264,7 @@ struct ConfigurationView: MVIView {
 		backupSeedState = newState
 	}
 	
-	func onExternalLightningUrl(_ url: URL) {
+	func onExternalLightningUrl(_ urlStr: String) {
 		log.trace("onExternalLightningUrl()")
 		
 		// We previoulsy had a crash under the following conditions:
@@ -275,6 +275,7 @@ struct ConfigurationView: MVIView {
 		//
 		// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
 		//
+		// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
 		selectedTag = nil
 	}
 }

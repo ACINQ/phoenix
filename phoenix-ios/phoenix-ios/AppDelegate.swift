@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	private var longLivedTask: UIBackgroundTaskIdentifier = .invalid
 	
-	public var externalLightningUrlPublisher = PassthroughSubject<URL, Never>()
+	public var externalLightningUrlPublisher = PassthroughSubject<String, Never>()
 	
 	// The taskID must match the value in Info.plist
 	private let taskId_watchTower = "co.acinq.phoenix.WatchTower"
