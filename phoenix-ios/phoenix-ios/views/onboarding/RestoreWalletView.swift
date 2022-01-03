@@ -218,7 +218,7 @@ struct RestoreView: View {
 
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
 				Spacer()
-				Text("Your wallet's seed is a list of 12 english words.")
+				Text("Your wallet's seed is a list of 12 English words.")
 					.id(topID)
 				Spacer()
 			}

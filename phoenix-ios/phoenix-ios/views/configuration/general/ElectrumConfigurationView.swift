@@ -186,7 +186,7 @@ struct ElectrumConfigurationView: MVIView {
 			
 			Text(
 				"""
-				By default Phoenix connects to random Electrum servers in order to access the \
+				By default, Phoenix connects to random Electrum servers in order to access the \
 				Bitcoin blockchain. You can also choose to connect to your own Electrum server.
 				"""
 			)
@@ -391,7 +391,7 @@ struct ElectrumAddressPopup: View {
 				
 				HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
-					Text("A random electrum server will be selected on each connection attempt.")
+					Text("A random Electrum server will be selected on each connection attempt.")
 						.font(.footnote)
 					
 					Spacer()
