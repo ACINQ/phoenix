@@ -100,7 +100,7 @@ struct ManualBackupView : View {
 			VStack(alignment: .leading, spacing: 35) {
 				Text(
 					"""
-					The recovery phrase (sometimes called a seed), is a list of 12 english words. \
+					The recovery phrase (sometimes called a seed), is a list of 12 English words. \
 					It allows you to recover full access to your funds if needed.
 					"""
 				)
