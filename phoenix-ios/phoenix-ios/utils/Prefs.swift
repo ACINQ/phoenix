@@ -22,7 +22,11 @@ class Prefs {
 	
 	public static let shared = Prefs()
 	
-	private init() {/* must use shared instance */}
+	private init() {
+		UserDefaults.standard.register(defaults: [
+			Keys.isNewWallet.rawValue: true
+		])
+	}
 	
 	private enum Keys: String {
 		case currencyType
@@ -46,6 +50,7 @@ class Prefs {
 		case currencyConverterList
 		case recentTipPercents
 		case manualBackup_taskDone
+		case isNewWallet
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -176,6 +181,25 @@ class Prefs {
 		}
 	}
 	
+	/**
+	 * Set to true, until the user has funded their wallet at least once.
+	 * A false value does NOT indicate that the wallet has funds.
+	 * Just that the wallet had a non-zero balance at least once.
+	 */
+	var isNewWallet: Bool {
+		get {
+			 UserDefaults.standard.bool(forKey: Keys.isNewWallet.rawValue)
+		}
+		set {
+			UserDefaults.standard.set(newValue, forKey: Keys.isNewWallet.rawValue)
+			isTorEnabledPublisher.send(newValue)
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Currency Conversion
+	// --------------------------------------------------
+	
 	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
 		var list = self.currencyConverterList
 		return CurrentValueSubject<[Currency], Never>(list)
@@ -214,6 +238,15 @@ class Prefs {
 			return Array(result)
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Recent Tips
+	// --------------------------------------------------
+	
+	/**
+	 * The SendView includes a Quick Tips feature,
+	 * where we remember recent tip-percentages used by the user.
+	 */
 	
 	/// Most recent is at index 0
 	var recentTipPercents: [Int] {

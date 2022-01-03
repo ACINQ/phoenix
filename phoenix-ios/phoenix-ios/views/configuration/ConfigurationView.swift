@@ -12,32 +12,29 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+fileprivate enum NavLinkTag: String {
+	// General
+	case AboutView
+	case DisplayConfigurationView
+	case PaymentOptionsView
+	case BackupView
+	// Security
+	case AppAccessView
+	// Advanced
+	case ElectrumConfigurationView
+	case TorView
+	case LogsConfigurationView
+	case ChannelsConfigurationView
+	case CloseChannelsView
+	case ForceCloseChannelsView
+}
 
-struct ConfigurationView: MVIView {
-
-	@StateObject var mvi = MVIState({ $0.configuration() })
-	
-	@Environment(\.controllerFactory) var factoryEnv
-	var factory: ControllerFactory { return factoryEnv }
+struct ConfigurationView: View {
 	
 	@State var isFaceID = true
 	@State var isTouchID = false
 	
-	enum Tag: String {
-		case AboutView
-		case DisplayConfigurationView
-		case ElectrumConfigurationView
-		case TorView
-		case PaymentOptionsView
-		case BackupView
-		case AppAccessView
-		case RecoverySeedView
-		case LogsConfigurationView
-		case ChannelsConfigurationView
-		case CloseChannelsView
-		case ForceCloseChannelsView
-	}
-	@State private var selectedTag: Tag? = nil
+	@State private var navLinkTag: NavLinkTag? = nil
 	
 	@State private var listViewId = UUID()
 	
@@ -45,6 +42,13 @@ struct ConfigurationView: MVIView {
 	let backupSeedStatePublisher: AnyPublisher<BackupSeedState, Never>
 	
 	let externalLightningUrlPublisher: PassthroughSubject<String, Never>
+	
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
+	
+	@State private var swiftUiBugWorkaround: NavLinkTag? = nil
+	@State private var swiftUiBugWorkaroundIdx = 0
+	
+	@State var didAppear = false
 	
 	init() {
 		if let encryptedNodeId = AppDelegate.get().encryptedNodeId {
@@ -57,48 +61,49 @@ struct ConfigurationView: MVIView {
 	}
 	
 	@ViewBuilder
-	var view: some View {
+	var body: some View {
 		
 		List {
-			let fullMode = mvi.model is Configuration.ModelFullMode
+			let hasWallet = hasWallet()
 
 			Section(header: Text("General")) {
-				
+					
 				NavigationLink(
 					destination: AboutView(),
-					tag: Tag.AboutView,
-					selection: $selectedTag
+					tag: NavLinkTag.AboutView,
+					selection: $navLinkTag
 				) {
 					Label { Text("About") } icon: {
 						Image(systemName: "info.circle")
 					}
 				}
-				
+			
 				NavigationLink(
 					destination: DisplayConfigurationView(),
-					tag: Tag.DisplayConfigurationView,
-					selection: $selectedTag
+					tag: NavLinkTag.DisplayConfigurationView,
+					selection: $navLinkTag
 				) {
 					Label { Text("Display") } icon: {
 						Image(systemName: "paintbrush.pointed")
 					}
 				}
-				
+		
 				NavigationLink(
 					destination: PaymentOptionsView(),
-					tag: Tag.PaymentOptionsView,
-					selection: $selectedTag
+					tag: NavLinkTag.PaymentOptionsView,
+					selection: $navLinkTag
 				) {
 					Label { Text("Payment options & fees") } icon: {
 						Image(systemName: "wrench")
 					}
 				}
-				
-				if fullMode {
+			
+				if hasWallet {
+					
 					NavigationLink(
 						destination: BackupView(),
-						tag: Tag.BackupView,
-						selection: $selectedTag
+						tag: NavLinkTag.BackupView,
+						selection: $navLinkTag
 					) {
 						Label {
 							switch backupSeedState {
@@ -123,90 +128,105 @@ struct ConfigurationView: MVIView {
 							Image(systemName: "icloud.and.arrow.up")
 						}
 					}
-				}
-			}
+				
+				} // </if: hasWallet>
+				
+			} // </Section: General>
 
-			if fullMode {
+			if hasWallet {
 				Section(header: Text("Security")) {
-					
+
 					NavigationLink(
 						destination: AppAccessView(),
-						tag: Tag.AppAccessView,
-						selection: $selectedTag
+						tag: NavLinkTag.AppAccessView,
+						selection: $navLinkTag
 					) {
 						Label { Text("App access") } icon: {
 							Image(systemName: isTouchID ? "touchid" : "faceid")
 						}
 					}
-				}
-			}
+
+				} // </Section: Security>
+
+			} // <if: hasWallet>
 
 			Section(header: Text("Advanced")) {
-				
+
 				NavigationLink(
 					destination: ElectrumConfigurationView(),
-					tag: Tag.ElectrumConfigurationView,
-					selection: $selectedTag
+					tag: NavLinkTag.ElectrumConfigurationView,
+					selection: $navLinkTag
 				) {
 					Label { Text("Electrum server") } icon: {
 						Image(systemName: "link")
 					}
 				}
-				
+
 				NavigationLink(
 					destination: ComingSoonView(title: "Tor"),
-					tag: Tag.TorView,
-					selection: $selectedTag
+					tag: NavLinkTag.TorView,
+					selection: $navLinkTag
 				) {
 					Label { Text("Tor") } icon: {
 						Image(systemName: "shield.lefthalf.fill")
 					}
 				}
-				
+
 				NavigationLink(
 					destination: LogsConfigurationView(),
-					tag: Tag.LogsConfigurationView,
-					selection: $selectedTag
+					tag: NavLinkTag.LogsConfigurationView,
+					selection: $navLinkTag
 				) {
 					Label { Text("Logs") } icon: {
 						Image(systemName: "doc.text")
 					}
 				}
-				if fullMode {
+
+				if hasWallet {
+
 					NavigationLink(
 						destination: ChannelsConfigurationView(),
-						tag: Tag.ChannelsConfigurationView,
-						selection: $selectedTag
+						tag: NavLinkTag.ChannelsConfigurationView,
+						selection: $navLinkTag
 					) {
 						Label { Text("Payment channels") } icon: {
 							Image(systemName: "bolt")
 						}
 					}
+
 					NavigationLink(
 						destination: CloseChannelsView(),
-						tag: Tag.CloseChannelsView,
-						selection: $selectedTag
+						tag: NavLinkTag.CloseChannelsView,
+						selection: $navLinkTag
 					) {
 						Label { Text("Close all channels") } icon: {
 							Image(systemName: "xmark.circle")
 						}
 					}
+
 					NavigationLink(
 						destination: ForceCloseChannelsView(),
-						tag: Tag.ForceCloseChannelsView,
-						selection: $selectedTag
+						tag: NavLinkTag.ForceCloseChannelsView,
+						selection: $navLinkTag
 					) {
 						Label { Text("Danger zone") } icon: {
 							Image(systemName: "exclamationmark.triangle")
 						}
 					}.foregroundColor(.appNegative)
-				}
-			}
+
+				} // </if: hasWallet>
+			} // </Section: Advanced>
 		}
 		.listStyle(GroupedListStyle())
 		.id(listViewId)
 		.onAppear() {
 			onAppear()
+		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
+		.onChange(of: navLinkTag) {
+			navLinkTagChanged($0)
 		}
 		.onReceive(backupSeedStatePublisher) {(state: BackupSeedState) in
 			onBackupSeedState(state)
@@ -219,7 +239,19 @@ struct ConfigurationView: MVIView {
 			displayMode: .inline
 		)
 			
-	} // end: view
+	} // end: body
+	
+	func hasWallet() -> Bool {
+		
+		let walletManager = AppDelegate.get().business.walletManager
+		let hasWalletFlow = SwiftStateFlow<NSNumber>(origin: walletManager.hasWallet)
+		
+		if let value = hasWalletFlow.value_ {
+			return value.boolValue
+		} else {
+			return false
+		}
+	}
 	
 	func onAppear() {
 		log.trace("onAppear()")
@@ -238,23 +270,83 @@ struct ConfigurationView: MVIView {
 			default                   : isFaceID = false
 		}
 		
-		// SwiftUI BUG, and workaround.
-		//
-		// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
-		// For example:
-		// - Tap on "About", to push the AboutView onto the NavigationView
-		// - Tap "<" to pop the AboutView
-		// - Notice that the "About" row is still selected (e.g. has gray background)
-		//
-		// There are several workaround for this issue:
-		// https://developer.apple.com/forums/thread/660468
-		//
-		// We are implementing the least risky solution.
-		// Which requires us to change the `List.id` property.
+		if !didAppear {
+			didAppear = true
+			if let deepLink = deepLinkManager.deepLink {
+				deepLinkChanged(deepLink)
+			}
+			
+		} else {
 		
-		if selectedTag != nil {
-			selectedTag = nil
-			listViewId = UUID()
+			// SwiftUI BUG, and workaround.
+			//
+			// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
+			// For example:
+			// - Tap on "About", to push the AboutView onto the NavigationView
+			// - Tap "<" to pop the AboutView
+			// - Notice that the "About" row is still selected (e.g. has gray background)
+			//
+			// There are several workaround for this issue:
+			// https://developer.apple.com/forums/thread/660468
+			//
+			// We are implementing the least risky solution.
+			// Which requires us to change the `List.id` property.
+			
+			if navLinkTag != nil {
+				navLinkTag = nil
+				listViewId = UUID()
+			}
+		}
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged()")
+		
+		// This is a hack, courtesy of bugs in Apple's NavigationLink:
+		// https://developer.apple.com/forums/thread/677333
+		//
+		// Summary:
+		// There's some quirky code in SwiftUI that is resetting our navLinkTag.
+		// Several bizarre workarounds have been proposed.
+		// I've tried every one of them, and none of them work (at least, without bad side-effects).
+		//
+		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
+		// and forcibly undo it.
+		
+		DispatchQueue.main.async {
+			var newNavLinkTag: NavLinkTag? = nil
+			switch value {
+			case .backup:
+				newNavLinkTag = .BackupView
+			default:
+				break
+			}
+			
+			if let newNavLinkTag = newNavLinkTag {
+				
+				self.swiftUiBugWorkaround = newNavLinkTag
+				self.swiftUiBugWorkaroundIdx += 1
+				
+				let idx = self.swiftUiBugWorkaroundIdx
+				self.navLinkTag = newNavLinkTag // Trigger/push the view
+				
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+					
+					if self.swiftUiBugWorkaroundIdx == idx {
+						self.swiftUiBugWorkaround = nil
+					}
+				}
+			}
+		}
+	}
+	
+	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
+		log.trace("navLinkTagChanged()")
+		
+		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
+				
+			log.trace("Blocking SwiftUI's attempt to reset our navLinkTag")
+			self.navLinkTag = forcedNavLinkTag
 		}
 	}
 	
@@ -276,7 +368,7 @@ struct ConfigurationView: MVIView {
 		// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
 		//
 		// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
-		selectedTag = nil
+		navLinkTag = nil
 	}
 }
 

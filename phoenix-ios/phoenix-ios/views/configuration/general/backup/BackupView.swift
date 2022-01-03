@@ -140,24 +140,27 @@ fileprivate struct Section_BackupSeed: View {
 	func backupWarning() -> some View {
 		
 		Label {
-			VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
-				Text(
-					"""
-					You have not backed up your recovery phrase!
-					"""
-				)
-				.font(.callout)
-				.bold()
-				
-				Text(styled: NSLocalizedString(
-					"""
-					If you do not back it up and you lose access to Phoenix \
-					you will **lose your funds**!
-					""",
-					comment: "BackupView"
-				))
-				.font(.subheadline)
-			}
+			HStack(alignment: VerticalAlignment.center, spacing: 0) {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 10) {
+					Text(
+						"""
+						You have not backed up your recovery phrase!
+						"""
+					)
+					.font(.callout)
+					.bold()
+					
+					Text(styled: NSLocalizedString(
+						"""
+						If you do not back it up and you lose access to Phoenix \
+						you will **lose your funds**!
+						""",
+						comment: "BackupView"
+					))
+					.font(.subheadline)
+				} // </VStack>
+				Spacer() // ensure label takes up full width
+			}// </HStack>
 		} icon: {
 			Image(systemName: "exclamationmark.circle")
 				.renderingMode(.template)
@@ -167,7 +170,7 @@ fileprivate struct Section_BackupSeed: View {
 		.padding()
 		.overlay(
 			RoundedRectangle(cornerRadius: 10)
-				.stroke(Color.appWarn, lineWidth: 1)
+				.strokeBorder(Color.appWarn, lineWidth: 1)
 		)
 	}
 	

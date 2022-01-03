@@ -88,6 +88,7 @@
 		DC99E95825BA2BA800FB20F7 /* about.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95625BA2BA800FB20F7 /* about.css */; };
 		DC99E95925BA2BA800FB20F7 /* advancedSecurity.css in Resources */ = {isa = PBXBuildFile; fileRef = DC99E95725BA2BA800FB20F7 /* advancedSecurity.css */; };
 		DC9B8EE225D72CC200E13818 /* ForceCloseChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */; };
+		DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCAC5B6F27726FC80077BB98 /* DeepLink.swift */; };
 		DCACF6F02566D0A60009B01E /* Data+Hexadecimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */; };
 		DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */; };
 		DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */; };
@@ -263,6 +264,7 @@
 		DC99E95625BA2BA800FB20F7 /* about.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = about.css; sourceTree = "<group>"; };
 		DC99E95725BA2BA800FB20F7 /* advancedSecurity.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = advancedSecurity.css; sourceTree = "<group>"; };
 		DC9B8EE125D72CC200E13818 /* ForceCloseChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceCloseChannelsView.swift; sourceTree = "<group>"; };
+		DCAC5B6F27726FC80077BB98 /* DeepLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLink.swift; sourceTree = "<group>"; };
 		DCACF6EF2566D0A60009B01E /* Data+Hexadecimal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Hexadecimal.swift"; sourceTree = "<group>"; };
 		DCACF6F52566D0BA0009B01E /* KeyStoreError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyStoreError.swift; sourceTree = "<group>"; };
 		DCACF6F62566D0BA0009B01E /* GenericPasswordStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericPasswordStore.swift; sourceTree = "<group>"; };
@@ -544,6 +546,7 @@
 			children = (
 				DC1706D826A71D8E00BAFCD0 /* ErrorView.swift */,
 				DC71E7322728645B0063613D /* CurrencyConverterView.swift */,
+				DCAC5B6F27726FC80077BB98 /* DeepLink.swift */,
 			);
 			path = tools;
 			sourceTree = "<group>";
@@ -978,6 +981,7 @@
 				C8D7ABB189B14D3104ABB50D /* AboutView.swift in Sources */,
 				C8D7AA4B09B32AD99C88BB5E /* DisplayConfigurationView.swift in Sources */,
 				DC384D81265C12B700131772 /* Cache.swift in Sources */,
+				DCAC5B7027726FC80077BB98 /* DeepLink.swift in Sources */,
 				DC9473FA261270B4008D7242 /* MVI+Mock.swift in Sources */,
 				C8D7AFF5BC5754DBBEEB2688 /* ElectrumConfigurationView.swift in Sources */,
 				53BEFBECABE13063AB28A4D6 /* publishers.swift in Sources */,

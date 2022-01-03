@@ -25,8 +25,12 @@ fileprivate enum NavLinkTag: String {
 
 struct HomeView : MVIView {
 
-	static let phoenixBusiness = AppDelegate.get().business
-	let phoenixBusiness: PhoenixBusiness = HomeView.phoenixBusiness
+	static let appDelegate = AppDelegate.get()
+	static let phoenixBusiness = appDelegate.business
+	static let encryptedNodeId = appDelegate.encryptedNodeId!
+	
+	let phoenixBusiness = HomeView.phoenixBusiness
+	let encryptedNodeId = HomeView.encryptedNodeId
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -37,6 +41,7 @@ struct HomeView : MVIView {
 	@State var isMempoolFull = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
@@ -45,12 +50,12 @@ struct HomeView : MVIView {
 	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
 	
 	let incomingSwapsPublisher = phoenixBusiness.paymentsManager.incomingSwapsPublisher()
+	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
-	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
-	
+	// Toggles confirmation dialog (used to select preferred explorer)
 	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -65,6 +70,11 @@ struct HomeView : MVIView {
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
 	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
+	
+	let backupSeed_enabled_publisher = Prefs.shared.backupSeed_isEnabled_publisher
+	let manualBackup_taskDone_publisher = Prefs.shared.manualBackup_taskDone_publisher
+	@State var backupSeed_enabled = Prefs.shared.backupSeed_isEnabled
+	@State var manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 	
 	@ViewBuilder
 	var view: some View {
@@ -105,6 +115,9 @@ struct HomeView : MVIView {
 		.onChange(of: navLinkTag) { tag in
 			navLinkTagChanged(tag)
 		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
@@ -114,11 +127,17 @@ struct HomeView : MVIView {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
-		.onReceive(incomingSwapsPublisher) { incomingSwaps in
-			onIncomingSwapsChanged(incomingSwaps)
+		.onReceive(incomingSwapsPublisher) {
+			onIncomingSwapsChanged($0)
 		}
-		.onReceive(externalLightningUrlPublisher) { (url: String) in
-			didReceiveExternalLightningUrl(url)
+		.onReceive(externalLightningUrlPublisher) {
+			didReceiveExternalLightningUrl($0)
+		}
+		.onReceive(backupSeed_enabled_publisher) {
+			self.backupSeed_enabled = $0
+		}
+		.onReceive(manualBackup_taskDone_publisher) {
+			self.manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
 	}
 
@@ -221,19 +240,11 @@ struct HomeView : MVIView {
 			.padding(.bottom, 25)
 
 			// === Beta Version Disclaimer ===
-			DisclaimerBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "umbrella")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-					Text("This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co.")
-				}
-				.font(.caption)
-			}
+			generalNotice
 			
 			// === Mempool Full Warning ====
 			if isMempoolFull {
-				DisclaimerBox {
+				NoticeBox {
 					HStack(alignment: VerticalAlignment.top, spacing: 0) {
 						Image(systemName: "exclamationmark.triangle")
 							.imageScale(.large)
@@ -297,6 +308,52 @@ struct HomeView : MVIView {
 			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 		}
 	}
+	
+	@ViewBuilder
+	var generalNotice: some View {
+		
+		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
+
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Spacer()
+					Text("Welcome to Phoenix.\nTap 'Receive' to fund your wallet.")
+						.multilineTextAlignment(.center)
+						.allowsTightening(true)
+					Spacer()
+				} // </HStack>
+				.font(.footnote)
+			} // </NoticeBox>
+
+		} else if !backupSeed_enabled && !manualBackup_taskDone {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+					Button {
+						navigateToBackup()
+					} label: {
+						Group {
+							Text("Backup your recovery phrase to prevent losing your funds. ")
+								.foregroundColor(.primary)
+							+
+							Text("Let's go ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					}
+				} // </HStack>
+				.font(.caption)
+			} // </NoticeBox>
+			
+		}
+	}
 
 	@ViewBuilder
 	func navLinkView() -> some View {
@@ -304,16 +361,12 @@ struct HomeView : MVIView {
 		switch navLinkTag {
 		case .ConfigurationView:
 			ConfigurationView()
-			
 		case .ReceiveView:
 			ReceiveView()
-			
 		case .SendView:
 			SendView(controller: externalLightningRequest)
-			
 		case .CurrencyConverter:
 			CurrencyConverterView()
-			
 		default:
 			EmptyView()
 		}
@@ -336,7 +389,7 @@ struct HomeView : MVIView {
 		
 		// pretty much guaranteed to be in the cache
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
+		HomeView.phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 			
 			if let result = result {
 				selectedItem = result
@@ -360,7 +413,11 @@ struct HomeView : MVIView {
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		// Todo: maybe update paymentsPage subscription ?
+		if model.balance.msat > 0 || model.incomingBalance?.msat ?? 0 > 0 || model.paymentsCount > 0 {
+			if Prefs.shared.isNewWallet {
+				Prefs.shared.isNewWallet = false
+			}
+		}
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
@@ -663,6 +720,23 @@ struct HomeView : MVIView {
 		}
 		
 		scanController.intent(intent: Scan.IntentParse(request: urlStr))
+	}
+	
+	func navigateToBackup() {
+		log.trace("navigateToBackup()")
+		
+		deepLinkManager.broadcast(DeepLink.backup)
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged()")
+		
+		switch value {
+		case .backup:
+			self.navLinkTag = .ConfigurationView
+		default:
+			break
+		}
 	}
 }
 
@@ -985,22 +1059,6 @@ fileprivate struct ToolsButton: View, ViewName {
 		
 		Menu {
 			Button {
-				faqButtonTapped()
-			} label: {
-				Label(
-					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
-					systemImage: "safari"
-				)
-			}
-			Button {
-				sendFeedbackButtonTapped()
-			} label: {
-				Label(
-					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
-					systemImage: "envelope"
-				)
-			}
-			Button {
 				currencyConverterTapped()
 			} label: {
 				Label(
@@ -1008,8 +1066,42 @@ fileprivate struct ToolsButton: View, ViewName {
 					systemImage: "globe"
 				)
 			}
+			Button {
+				sendFeedbackButtonTapped()
+			} label: {
+				Label(
+					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
+					image: "email"
+				)
+			}
+			Button {
+				telegramButtonTapped()
+			} label: {
+				Label {
+					Text(verbatim: "Telegram")
+				} icon: {
+					Image("telegram")
+				}
+			}
+			Button {
+				twitterButtonTapped()
+			} label: {
+				Label {
+					Text(verbatim: "Twitter")
+				} icon: {
+					Image("twitter")
+				}
+			}
+			Button {
+				faqButtonTapped()
+			} label: {
+				Label(
+					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
+					systemImage: "safari"
+				)
+			}
 		} label: {
-			Image(systemName: "questionmark")
+			Image(systemName: "wrench.fill")
 				.renderingMode(.template)
 				.imageScale(.large)
 				.font(.caption2)
@@ -1026,12 +1118,9 @@ fileprivate struct ToolsButton: View, ViewName {
 		}
 	}
 	
-	func faqButtonTapped() {
-		log.trace("[\(viewName)] faqButtonTapped()")
-		
-		if let url = URL(string: "https://phoenix.acinq.co/faq") {
-			openURL(url)
-		}
+	func currencyConverterTapped() {
+		log.trace("[\(viewName)] currencyConverterTapped()")
+		navLinkTag = .CurrencyConverter
 	}
 	
 	func sendFeedbackButtonTapped() {
@@ -1056,13 +1145,32 @@ fileprivate struct ToolsButton: View, ViewName {
 		}
 	}
 	
-	func currencyConverterTapped() {
-		log.trace("[\(viewName)] currencyConverterTapped()")
-		navLinkTag = .CurrencyConverter
+	func telegramButtonTapped() {
+		log.trace("[\(viewName)] telegramButtonTapped()")
+		
+		if let url = URL(string: "https://t.me/phoenix_wallet") {
+			openURL(url)
+		}
+	}
+	
+	func twitterButtonTapped() {
+		log.trace("[\(viewName)] twitterButtonTapped()")
+		
+		if let url = URL(string: "https://twitter.com/PhoenixWallet") {
+			openURL(url)
+		}
+	}
+	
+	func faqButtonTapped() {
+		log.trace("[\(viewName)] faqButtonTapped()")
+		
+		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+			openURL(url)
+		}
 	}
 }
 
-fileprivate struct DisclaimerBox<Content: View>: View {
+fileprivate struct NoticeBox<Content: View>: View {
 	
 	let content: Content
 	
@@ -1075,7 +1183,7 @@ fileprivate struct DisclaimerBox<Content: View>: View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 0) {
 			content
-			Spacer() // ensure content takes up full width of screen
+			Spacer(minLength: 0) // ensure content takes up full width of screen
 		}
 		.padding(12)
 		.background(

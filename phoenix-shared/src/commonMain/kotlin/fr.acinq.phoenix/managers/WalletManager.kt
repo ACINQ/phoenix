@@ -8,6 +8,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WalletManager(
@@ -15,7 +17,18 @@ class WalletManager(
 ) : CoroutineScope by MainScope() {
 
     private val _wallet = MutableStateFlow<Wallet?>(null)
-    val wallet: StateFlow<Wallet?> = _wallet
+    internal val wallet: StateFlow<Wallet?> = _wallet
+
+    private val _hasWallet = MutableStateFlow<Boolean>(false)
+    val hasWallet: StateFlow<Boolean> = _hasWallet
+
+    init {
+        launch {
+            _wallet.collect {
+                _hasWallet.value = it != null
+            }
+        }
+    }
 
     fun loadWallet(seed: ByteArray) {
         val newWallet = Wallet(seed, chain)

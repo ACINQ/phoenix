@@ -68,9 +68,9 @@ class PhoenixBusiness(
 
     var appConnectionsDaemon: AppConnectionsDaemon? = null
 
-    internal val walletManager by lazy { WalletManager(chain) }
     internal val appDb by lazy { SqliteAppDb(createAppDbDriver(ctx)) }
 
+    val walletManager by lazy { WalletManager(chain) }
     val nodeParamsManager by lazy { NodeParamsManager(this) }
     val databaseManager by lazy { DatabaseManager(this) }
     val peerManager by lazy { PeerManager(this) }
