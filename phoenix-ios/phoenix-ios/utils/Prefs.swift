@@ -3,7 +3,7 @@ import PhoenixShared
 import Combine
 import os.log
 
-#if DEBUG && false
+#if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "Prefs"
@@ -12,6 +12,11 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+enum BackupSeedState {
+	case notBackedUp
+	case backupInProgress
+	case safelyBackedUp
+}
 
 class Prefs {
 	
@@ -34,9 +39,13 @@ class Prefs {
 		case backupTransactions_enabled
 		case backupTransactions_useCellularData
 		case backupTransactions_useUploadDelay
+		case backupSeed_enabled
+		case backupSeed_hasUploadedSeed
+		case backupSeed_name
 		case showChannelsRemoteBalance
 		case currencyConverterList
 		case recentTipPercents
+		case manualBackup_taskDone
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -258,7 +267,7 @@ class Prefs {
 	}
 	
 	// --------------------------------------------------
-	// MARK: Cloud Backup
+	// MARK: Cloud Tx Backup
 	// --------------------------------------------------
 	
 	private func recordZoneCreatedKey(_ encryptedNodeId: String) -> String {
@@ -276,7 +285,6 @@ class Prefs {
 		if value == true {
 			UserDefaults.standard.setValue(value, forKey: key)
 		} else {
-			// Remove trace of account on disk
 			UserDefaults.standard.removeObject(forKey: key)
 		}
 	}
@@ -350,5 +358,162 @@ class Prefs {
 			let key = Keys.backupTransactions_useUploadDelay.rawValue
 			UserDefaults.standard.set(newValue, forKey: key)
 		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Cloud Seed Backup
+	// --------------------------------------------------
+	
+	lazy private(set) var backupSeed_isEnabled_publisher: CurrentValueSubject<Bool, Never> = {
+		var value = self.backupSeed_isEnabled
+		return CurrentValueSubject<Bool, Never>(value)
+	}()
+	
+	var backupSeed_isEnabled: Bool {
+		get {
+			let key = Keys.backupSeed_enabled.rawValue
+			if UserDefaults.standard.object(forKey: key) != nil {
+				return UserDefaults.standard.bool(forKey: key)
+			} else {
+				return false // default value
+			}
+		}
+		set {
+			let key = Keys.backupSeed_enabled.rawValue
+			UserDefaults.standard.set(newValue, forKey: key)
+			backupSeed_isEnabled_publisher.send(newValue)
+		}
+	}
+	
+	lazy private(set) var backupSeed_hasUploadedSeed_publisher: PassthroughSubject<Void, Never> = {
+		return PassthroughSubject<Void, Never>()
+	}()
+	
+	private func backupSeed_hasUploadedSeed_key(_ encryptedNodeId: String) -> String {
+		return "\(Keys.backupSeed_hasUploadedSeed.rawValue)-\(encryptedNodeId)"
+	}
+	
+	func backupSeed_hasUploadedSeed(encryptedNodeId: String) -> Bool {
+		
+		return UserDefaults.standard.bool(forKey: backupSeed_hasUploadedSeed_key(encryptedNodeId))
+	}
+	
+	func backupSeed_setHasUploadedSeed(_ value: Bool, encryptedNodeId: String) {
+		
+		let key = backupSeed_hasUploadedSeed_key(encryptedNodeId)
+		if value == true {
+			UserDefaults.standard.setValue(value, forKey: key)
+		} else {
+			UserDefaults.standard.removeObject(forKey: key)
+		}
+		backupSeed_hasUploadedSeed_publisher.send()
+	}
+	
+	lazy private(set) var backupSeed_name_publisher: PassthroughSubject<Void, Never> = {
+		return PassthroughSubject<Void, Never>()
+	}()
+	
+	private func backupSeed_name_key(_ encryptedNodeId: String) -> String {
+		return "\(Keys.backupSeed_name)-\(encryptedNodeId)"
+	}
+	
+	func backupSeed_name(encryptedNodeId: String) -> String? {
+		
+		return UserDefaults.standard.string(forKey: backupSeed_name_key(encryptedNodeId))
+	}
+	
+	func backupSeed_setName(_ value: String?, encryptedNodeId: String) {
+		
+		let key = backupSeed_name_key(encryptedNodeId)
+		let oldValue = backupSeed_name(encryptedNodeId: encryptedNodeId) ?? ""
+		let newValue = value ?? ""
+		
+		if oldValue != newValue {
+			if newValue.isEmpty {
+				UserDefaults.standard.removeObject(forKey: key)
+			} else {
+				UserDefaults.standard.setValue(newValue, forKey: key)
+			}
+			backupSeed_setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+			backupSeed_name_publisher.send()
+		}
+	}
+	
+	// --------------------------------------------------
+	// MARK: Manual Seed Backup
+	// --------------------------------------------------
+	
+	lazy private(set) var manualBackup_taskDone_publisher: PassthroughSubject<Void, Never> = {
+		return PassthroughSubject<Void, Never>()
+	}()
+	
+	private func manualBackup_taskDone_key(_ encryptedNodeId: String) -> String {
+		return "\(Keys.manualBackup_taskDone)-\(encryptedNodeId)"
+	}
+	
+	func manualBackup_taskDone(encryptedNodeId: String) -> Bool {
+		
+		return UserDefaults.standard.bool(forKey: manualBackup_taskDone_key(encryptedNodeId))
+	}
+	
+	func manualBackup_setTaskDone(_ newValue: Bool, encryptedNodeId: String) {
+		
+		let key = manualBackup_taskDone_key(encryptedNodeId)
+		if newValue {
+			UserDefaults.standard.setValue(newValue, forKey: key)
+		} else {
+			UserDefaults.standard.removeObject(forKey: key)
+		}
+		manualBackup_taskDone_publisher.send()
+	}
+	
+	// --------------------------------------------------
+	// MARK: Seed Backup State
+	// --------------------------------------------------
+	
+	func backupSeedStatePublisher(_ encryptedNodeId: String) -> AnyPublisher<BackupSeedState, Never> {
+		
+		let publisher = Publishers.CombineLatest3(
+			backupSeed_isEnabled_publisher,       // CurrentValueSubject<Bool, Never>
+			backupSeed_hasUploadedSeed_publisher, // PassthroughSubject<Void, Never>
+			manualBackup_taskDone_publisher       // PassthroughSubject<Void, Never>
+		).map { (backupSeed_isEnabled: Bool, _, _) -> BackupSeedState in
+			
+			let prefs = Prefs.shared
+			
+			let backupSeed_hasUploadedSeed = prefs.backupSeed_hasUploadedSeed(encryptedNodeId: encryptedNodeId)
+			let manualBackup_taskDone = prefs.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
+			
+			if backupSeed_isEnabled {
+				if backupSeed_hasUploadedSeed {
+					return .safelyBackedUp
+				} else {
+					return .backupInProgress
+				}
+			} else {
+				if manualBackup_taskDone {
+					return .safelyBackedUp
+				} else {
+					return .notBackedUp
+				}
+			}
+		}
+		.handleEvents(receiveRequest: { _ in
+			
+			// Publishers.CombineLatest doesn't fire until all publishers have emitted a value.
+			// We don't have have to worry about that with the CurrentValueSubject, because it always has a value.
+			// But for the PassthroughSubject publishers, this poses a problem.
+			//
+			// The other related publishers (Merge & Zip) don't do exactly what we want either.
+			// So we're taking the simplest approach, and force-firing the associated PassthroughSubject publishers.
+			
+			let prefs = Prefs.shared
+			
+			prefs.backupSeed_hasUploadedSeed_publisher.send()
+			prefs.manualBackup_taskDone_publisher.send()
+		})
+		.eraseToAnyPublisher()
+		
+		return publisher
 	}
 }

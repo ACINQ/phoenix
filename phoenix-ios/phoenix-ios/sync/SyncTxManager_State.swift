@@ -1,7 +1,7 @@
 import Foundation
 import CloudKit
 
-/* SyncManager State Machine:
+/* SyncTxManager State Machine:
  *
  * The state is always one of the following:
  *
@@ -19,13 +19,12 @@ import CloudKit
  * - synced
  * - disabled
  *
- * The state is modified via the `updateState` function:
+ * The state is modified via the `updateState` functions:
  *
  * Note that `(defer)` in the state diagram below signifies a transition to the "simplified state flow",
  * as implemented by the `updateState` function.
  *
- * [initializing] --*--> [waiting_forCloudCredentials]
- *                  |--> (defer)
+ * [initializing] --> (defer)
  *
  * [waiting_any] --> (defer)
  *
@@ -56,13 +55,13 @@ import CloudKit
  * [disabled] --> (defer)
  */
 
-enum SyncManagerState: Equatable, CustomStringConvertible {
+enum SyncTxManager_State: Equatable, CustomStringConvertible {
 	
 	case initializing
-	case updatingCloud(details: SyncManagerState_UpdatingCloud)
-	case downloading(details: SyncManagerState_Progress)
-	case uploading(details: SyncManagerState_Progress)
-	case waiting(details: SyncManagerState_Waiting)
+	case updatingCloud(details: SyncTxManager_State_UpdatingCloud)
+	case downloading(details: SyncTxManager_State_Progress)
+	case uploading(details: SyncTxManager_State_Progress)
+	case waiting(details: SyncTxManager_State_Waiting)
 	case synced
 	case disabled
 	
@@ -101,28 +100,28 @@ enum SyncManagerState: Equatable, CustomStringConvertible {
 	
 	// Simplified initializers:
 	
-	static func updatingCloud_creatingRecordZone() -> SyncManagerState {
-		return .updatingCloud(details: SyncManagerState_UpdatingCloud(kind: .creatingRecordZone))
+	static func updatingCloud_creatingRecordZone() -> SyncTxManager_State {
+		return .updatingCloud(details: SyncTxManager_State_UpdatingCloud(kind: .creatingRecordZone))
 	}
 	
-	static func updatingCloud_deletingRecordZone() -> SyncManagerState {
-		return .updatingCloud(details: SyncManagerState_UpdatingCloud(kind: .deletingRecordZone))
+	static func updatingCloud_deletingRecordZone() -> SyncTxManager_State {
+		return .updatingCloud(details: SyncTxManager_State_UpdatingCloud(kind: .deletingRecordZone))
 	}
 	
-	static func waiting_forInternet() -> SyncManagerState {
-		return .waiting(details: SyncManagerState_Waiting(kind: .forInternet))
+	static func waiting_forInternet() -> SyncTxManager_State {
+		return .waiting(details: SyncTxManager_State_Waiting(kind: .forInternet))
 	}
 	
-	static func waiting_forCloudCredentials() -> SyncManagerState {
-		return .waiting(details: SyncManagerState_Waiting(kind: .forCloudCredentials))
+	static func waiting_forCloudCredentials() -> SyncTxManager_State {
+		return .waiting(details: SyncTxManager_State_Waiting(kind: .forCloudCredentials))
 	}
 	
 	static func waiting_exponentialBackoff(
-		_ parent: SyncManager,
+		_ parent: SyncTxManager,
 		delay: TimeInterval,
 		error: Error
-	) -> SyncManagerState {
-		return .waiting(details: SyncManagerState_Waiting(
+	) -> SyncTxManager_State {
+		return .waiting(details: SyncTxManager_State_Waiting(
 			kind: .exponentialBackoff(error),
 			parent: parent,
 			delay: delay
@@ -130,10 +129,10 @@ enum SyncManagerState: Equatable, CustomStringConvertible {
 	}
 	
 	static func waiting_randomizedUploadDelay(
-		_ parent: SyncManager,
+		_ parent: SyncTxManager,
 		delay: TimeInterval
-	) -> SyncManagerState {
-		return .waiting(details: SyncManagerState_Waiting(
+	) -> SyncTxManager_State {
+		return .waiting(details: SyncTxManager_State_Waiting(
 			kind: .randomizedUploadDelay,
 			parent: parent,
 			delay: delay
@@ -143,7 +142,7 @@ enum SyncManagerState: Equatable, CustomStringConvertible {
 
 /// Details concerning the type of changes being made to the CloudKit container(s).
 ///
-class SyncManagerState_UpdatingCloud: Equatable {
+class SyncTxManager_State_UpdatingCloud: Equatable {
 	
 	enum Kind {
 		case creatingRecordZone
@@ -173,7 +172,7 @@ class SyncManagerState_UpdatingCloud: Equatable {
 		}
 	}
 	
-	static func == (lhs: SyncManagerState_UpdatingCloud, rhs: SyncManagerState_UpdatingCloud) -> Bool {
+	static func == (lhs: SyncTxManager_State_UpdatingCloud, rhs: SyncTxManager_State_UpdatingCloud) -> Bool {
 		return lhs.kind == rhs.kind
 	}
 }
@@ -181,7 +180,7 @@ class SyncManagerState_UpdatingCloud: Equatable {
 /// Exposes an ObservableObject that can be used by the UI to display progress information.
 /// All changes to `@Published` properties will be made on the UI thread.
 ///
-class SyncManagerState_Progress: ObservableObject, Equatable {
+class SyncTxManager_State_Progress: ObservableObject, Equatable {
 	
 	@Published var totalCount: Int
 	@Published var completedCount: Int = 0
@@ -238,16 +237,16 @@ class SyncManagerState_Progress: ObservableObject, Equatable {
 		}
 	}
 	
-	static func == (lhs: SyncManagerState_Progress, rhs: SyncManagerState_Progress) -> Bool {
+	static func == (lhs: SyncTxManager_State_Progress, rhs: SyncTxManager_State_Progress) -> Bool {
 		// Equality for this class is is based on pointers
 		return lhs === rhs
 	}
 }
 
-/// Details concerning what/why the SyncManager is temporarily paused.
+/// Details concerning what/why the SyncTxManager is temporarily paused.
 /// Sometimes these delays can be manually cancelled by the user.
 ///
-class SyncManagerState_Waiting: Equatable {
+class SyncTxManager_State_Waiting: Equatable {
 	
 	enum Kind: Equatable {
 		case forInternet
@@ -255,7 +254,7 @@ class SyncManagerState_Waiting: Equatable {
 		case exponentialBackoff(Error)
 		case randomizedUploadDelay
 		
-		static func == (lhs: SyncManagerState_Waiting.Kind, rhs: SyncManagerState_Waiting.Kind) -> Bool {
+		static func == (lhs: SyncTxManager_State_Waiting.Kind, rhs: SyncTxManager_State_Waiting.Kind) -> Bool {
 			switch (lhs, rhs) {
 				case (.forInternet, .forInternet): return true
 				case (.forCloudCredentials, .forCloudCredentials): return true
@@ -271,13 +270,13 @@ class SyncManagerState_Waiting: Equatable {
 	let kind: Kind
 	
 	struct WaitingUntil: Equatable {
-		weak var parent: SyncManager?
+		weak var parent: SyncTxManager?
 		let delay: TimeInterval
 		let startDate: Date
 		let fireDate: Date
 		
-		static func == (lhs: SyncManagerState_Waiting.WaitingUntil,
-		                rhs: SyncManagerState_Waiting.WaitingUntil
+		static func == (lhs: SyncTxManager_State_Waiting.WaitingUntil,
+		                rhs: SyncTxManager_State_Waiting.WaitingUntil
 		) -> Bool {
 			return (lhs.parent === rhs.parent) &&
 			       (lhs.delay == rhs.delay) &&
@@ -293,7 +292,7 @@ class SyncManagerState_Waiting: Equatable {
 		self.until = nil
 	}
 	
-	init(kind: Kind, parent: SyncManager, delay: TimeInterval) {
+	init(kind: Kind, parent: SyncTxManager, delay: TimeInterval) {
 		self.kind = kind
 		
 		let now = Date()
@@ -320,7 +319,7 @@ class SyncManagerState_Waiting: Equatable {
 		timerFire()
 	}
 	
-	static func == (lhs: SyncManagerState_Waiting, rhs: SyncManagerState_Waiting) -> Bool {
+	static func == (lhs: SyncTxManager_State_Waiting, rhs: SyncTxManager_State_Waiting) -> Bool {
 		
 		return (lhs.kind == rhs.kind) && (lhs.until == rhs.until)
 	}

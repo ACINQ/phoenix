@@ -14,6 +14,11 @@ fileprivate var log = Logger(
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
+enum WalletRestoreType {
+	case fromManualEntry
+	case fromCloudBackup(name: String?)
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
@@ -38,13 +43,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	let business: PhoenixBusiness
 	
 	private var _syncManager: SyncManager? = nil
-	var syncManager: SyncManager? {
+	var syncManager: SyncManager? { // read-only getter
 		_syncManager
+	}
+	
+	private var _encryptedNodeId: String? = nil
+	var encryptedNodeId: String? { // read-only getter
+		return _encryptedNodeId
 	}
 	
 	private var walletLoaded = false
 	private var fcmToken: String? = nil
-	private var peerConnection: Lightning_kmpConnection? = nil
+	private var peerConnectionState: Lightning_kmpConnection? = nil
 	
 	private var badgeCount = 0
 	private var cancellables = Set<AnyCancellable>()
@@ -85,7 +95,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
 	) -> Bool {
 
-		UIKitAppearance()
+		let navBarAppearance = UINavigationBarAppearance()
+		navBarAppearance.backgroundColor = .primaryBackground
+		navBarAppearance.shadowColor = .clear // no separator line between navBar & content
+		UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+		UINavigationBar.appearance().compactAppearance = navBarAppearance
+		UINavigationBar.appearance().standardAppearance = navBarAppearance
+		
+		UITableView.appearance().backgroundColor = .primaryBackground
 		
 		#if !targetEnvironment(simulator) // push notifications don't work on iOS simulator
 			UIApplication.shared.registerForRemoteNotifications()
@@ -657,40 +674,90 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	// MARK: PhoenixBusiness
 	// --------------------------------------------------
 	
-	func loadWallet(mnemonics: [String]) -> Void {
-		log.trace("loadWallet(mnemonics:)")
+	/// Loads the given wallet, and starts the Lightning node.
+	///
+	/// - Parameters:
+	///   - mnemonics: The 12-word recovery phrase
+	///   - seed: The seed is extracted from the mnemonics. If you've already performed this
+	///           step (i.e. during verification), then pass it here to avoid the duplicate effort.
+	///   - walletRestoreType: If restoring a wallet from a backup, pass the type here.
+	///
+	@discardableResult
+	func loadWallet(
+		mnemonics: [String],
+		seed knownSeed: KotlinByteArray? = nil,
+		walletRestoreType: WalletRestoreType? = nil
+	) -> Bool {
+		
+		log.trace("loadWallet()")
 		assertMainThread()
 		
-		let seed = business.prepWallet(mnemonics: mnemonics, passphrase: "")
-		loadWallet(seed: seed)
-	}
-	
-	func loadWallet(seed: KotlinByteArray) -> Void {
-		log.trace("loadWallet(seed:)")
-		assertMainThread()
-		
-		if !walletLoaded {
-			let cloudInfo = business.loadWallet(seed: seed)
-			walletLoaded = true
-			maybeRegisterFcmToken()
-			setupActivePaymentsListener()
-			
-			if let cloudKey = cloudInfo?.first,
-				let encryptedNodeId = cloudInfo?.second
-			{
-				_syncManager = SyncManager(cloudKey: cloudKey, encryptedNodeId: encryptedNodeId as String)
-			}
+		guard walletLoaded == false else {
+			return false
 		}
+		
+		let seed = knownSeed ?? business.prepWallet(mnemonics: mnemonics, passphrase: "")
+		let cloudInfo = business.loadWallet(seed: seed)
+		walletLoaded = true
+		
+		maybeRegisterFcmToken()
+		setupActivePaymentsListener()
+		
+		if let cloudInfo = cloudInfo {
+			
+			let cloudKey = cloudInfo.first!
+			let encryptedNodeId = cloudInfo.second! as String
+			
+			if let walletRestoreType = walletRestoreType {
+				switch walletRestoreType {
+				case .fromManualEntry:
+					//
+					// User is restoring wallet after manually typing in the recovery phrase.
+					// So we can mark the manual_backup task as completed.
+					//
+					Prefs.shared.manualBackup_setTaskDone(true, encryptedNodeId: encryptedNodeId)
+					//
+					// And ensure cloud backup is disabled for the wallet.
+					//
+					Prefs.shared.backupSeed_isEnabled = false
+					Prefs.shared.backupSeed_setName(nil, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed_setHasUploadedSeed(false, encryptedNodeId: encryptedNodeId)
+					
+				case .fromCloudBackup(let name):
+					//
+					// User is restoring wallet from an existing iCloud backup.
+					// So we can mark the iCloud backpu as completed.
+					//
+					Prefs.shared.backupSeed_isEnabled = true
+					Prefs.shared.backupSeed_setName(name, encryptedNodeId: encryptedNodeId)
+					Prefs.shared.backupSeed_setHasUploadedSeed(true, encryptedNodeId: encryptedNodeId)
+					//
+					// And ensure manual backup is diabled for the wallet.
+					//
+					Prefs.shared.manualBackup_setTaskDone(false, encryptedNodeId: encryptedNodeId)
+				}
+			}
+			
+			_encryptedNodeId = encryptedNodeId
+			_syncManager = SyncManager(
+				chain: business.chain,
+				mnemonics: mnemonics,
+				cloudKey: cloudKey,
+				encryptedNodeId: encryptedNodeId
+			)
+		}
+		
+		return true
 	}
 	
 	private func connectionsChanged(_ connections: Connections) -> Void {
 		log.trace("connectionsChanged()")
 		
-		let prvPeerConnection = peerConnection
-		peerConnection = connections.peer
+		let prvPeerConnectionState = peerConnectionState
+		peerConnectionState = connections.peer
 		
-		if prvPeerConnection != Lightning_kmpConnection.established &&
-		   peerConnection == Lightning_kmpConnection.established
+		if prvPeerConnectionState != Lightning_kmpConnection.established &&
+		   peerConnectionState == Lightning_kmpConnection.established
 		{
 			maybeRegisterFcmToken()
 		}
@@ -708,7 +775,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			log.debug("maybeRegisterFcmToken: no: !fcmToken")
 			return
 		}
-		if peerConnection != Lightning_kmpConnection.established {
+		if peerConnectionState != Lightning_kmpConnection.established {
 			log.debug("maybeRegisterFcmToken: no: !peerConnection")
 			return
 		}
