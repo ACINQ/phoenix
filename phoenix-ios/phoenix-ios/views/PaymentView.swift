@@ -951,6 +951,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			offChain_completedAt(offChain)
 			offChain_elapsed(outgoingPayment)
+			offChain_amountReceived(outgoingPayment)
+			offChain_fees(outgoingPayment)
 			offChain_totalAmount(outgoingPayment)
 			offChain_recipientPubkey(outgoingPayment)
 		
@@ -1384,6 +1386,61 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	func offChain_amountReceived(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(NSLocalizedString("amount received", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			commonValue_amount(msat: outgoingPayment.recipientAmount)
+		}
+	}
+	
+	@ViewBuilder
+	func offChain_fees(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(NSLocalizedString("fees paid", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let (display_msat, display_fiat) = displayAmounts(msat: outgoingPayment.fees)
+			let display_percent = displayFeePercent(fees: outgoingPayment.fees, total: outgoingPayment.amount)
+			
+			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
+				
+				if display_msat.hasFractionDigits { // has visible millisatoshi's
+					Text(verbatim: "\(display_msat.integerDigits)") +
+					Text(verbatim: "\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
+						.foregroundColor(.secondary) +
+					Text(verbatim: " \(display_msat.type)")
+				} else {
+					Text(verbatim: display_msat.string)
+				}
+				
+				if let display_fiat = display_fiat {
+					Text(verbatim: "≈ \(display_fiat.string)")
+				}
+				
+				Text(verbatim: display_percent)
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func offChain_totalAmount(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
@@ -1757,6 +1814,23 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		}
 		
 		return (display_sat, display_fiat)
+	}
+	
+	func displayFeePercent(fees: Lightning_kmpMilliSatoshi, total: Lightning_kmpMilliSatoshi) -> String {
+		
+		let percent: Double
+		if total.msat == 0 {
+			percent = 0.0
+		} else {
+			percent = Double(fees.msat) / Double(total.msat)
+		}
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 3
+		
+		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
 	}
 	
 	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
