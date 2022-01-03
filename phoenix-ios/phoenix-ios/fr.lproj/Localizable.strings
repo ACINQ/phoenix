@@ -56,7 +56,7 @@
 "A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "Une clé de sauvegarde a été générée, contenant toutes les informations nécessaires pour restaurer vos fonds Bitcoin si nécessaire.";
 
 /* No comment provided by engineer. */
-"A random electrum server will be selected on each connection attempt." = "Un serveur Electrum aléatoire sera sélectionné à chaque tentative de connexion.";
+"A random Electrum server will be selected on each connection attempt." = "Un serveur Electrum aléatoire sera sélectionné à chaque tentative de connexion.";
 
 /* Navigation bar title */
 "About" = "À propos";
@@ -158,7 +158,7 @@
 "Brazilian Real" = "Real brésilien";
 
 /* No comment provided by engineer. */
-"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Par défaut Phoenix se connecte à des serveurs Electrum aléatoires pour accéder à la blockchain Bitcoin. Vous pouvez également choisir de ne vous connecter qu’à un serveur en particulier.";
+"By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Par défaut Phoenix se connecte à des serveurs Electrum aléatoires pour accéder à la blockchain Bitcoin. Vous pouvez également choisir de ne vous connecter qu’à un serveur en particulier.";
 
 /* Currency name: CAD */
 "Canadian Dollar" = "Dollar canadien";
@@ -724,7 +724,7 @@
 "The address is for %@, but you're on %@" = "L’adresse est pour %1$@, mais vous êtes sur %2$@";
 
 /* No comment provided by engineer. */
-"The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "La clé de sauvegarde, aussi appelée “seed”, est une liste de 12 mots anglais. Elle vous permet de récupérer l’accès à vos fonds si nécessaire.";
+"The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." = "La clé de sauvegarde, aussi appelée “seed”, est une liste de 12 mots anglais. Elle vous permet de récupérer l’accès à vos fonds si nécessaire.";
 
 /* No comment provided by engineer. */
 "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Le réseau Bitcoin est saturé et les frais sont très élevés. Le service de swap on-chain a été désactivé temporairement.";
@@ -890,13 +890,13 @@
 "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "Tor vous permet de protéger votre vie privée quand vous vous connectez à Electrum et à votre pair Lightning. Cette fonctionnalité va légèrement ralentir l’application.";
 
 /* No comment provided by engineer. */
-"You currenly have 1 Lightning channel with a balance of %@." = "Vous avez en ce moment 1 canal Lightning avec une balance de %@.";
+"You currently have 1 Lightning channel with a balance of %@." = "Vous avez en ce moment 1 canal Lightning avec une balance de %@.";
 
 /* No comment provided by engineer. */
 "You currently don't have any channels that can be closed." = "Vous n’avez en ce moment aucun canal de paiement qui puisse être fermé.";
 
 /* No comment provided by engineer. */
-"You currently have %@ Lightning channels with an aggragate balance of %@." = "Vous avez en ce moment %1$@ canaux Lightning d’une balance aggrégée de %2$@.";
+"You currently have %@ Lightning channels with an aggregate balance of %@." = "Vous avez en ce moment %1$@ canaux Lightning d’une balance aggrégée de %2$@.";
 
 /* No comment provided by engineer. */
 "You don't have any payment channels." = "Vous n’avez aucun canal de paiement.";
@@ -917,5 +917,5 @@
 "Your Node ID:" = "Votre identifiant de noeud :";
 
 /* No comment provided by engineer. */
-"Your wallet's seed is a list of 12 english words." = "La clé de votre portefeuille est une liste de 12 mots anglais.";
+"Your wallet's seed is a list of 12 English words." = "La clé de votre portefeuille est une liste de 12 mots anglais.";
 
