@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
+import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
+import fr.acinq.phoenix.android.navController
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
@@ -79,6 +81,7 @@ private val LightColorPalette = lightColors(
     onPrimary = white,
     // secondary = primary
     secondary = horizon,
+    secondaryVariant = horizon,
     onSecondary = white,
     // app background
     background = gray30,
@@ -98,6 +101,7 @@ private val DarkColorPalette = darkColors(
     onPrimary = black,
     // secondary = primary
     secondary = azur,
+    secondaryVariant = azur,
     onSecondary = white,
     // app background
     background = black,
@@ -247,7 +251,7 @@ fun borderColor(): Color = if (isDarkTheme) gray900 else gray50
 fun systemStatusBarColor() = mutedBgColor()
 
 @Composable
-fun systemNavBarColor() = if (isDarkTheme) gray950 else white
+fun systemNavBarColor() = if (isDarkTheme) black else white
 
 @Composable
 fun whiteLowOp(): Color = Color(0x33ffffff)

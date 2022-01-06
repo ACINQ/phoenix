@@ -45,15 +45,7 @@
     <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
     <string name="authprompt_title">Unlock to continue</string>
-    <string name="authprompt_hard_negative">Cancel</string>
     <string name="authprompt_error_unsecure">Device is not secure (code: %1$d)</string>
-
-    <!-- //////////////// Pin dialog //////////////////// -->
-
-    <string name="pindialog_title_default">Please enter your PIN</string>
-    <string name="pindialog_pwd_placeholder" translatable="false">●●●●●●</string>
-    <string name="pindialog_error">PIN code must be a 6 digits number.</string>
-    <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
 
     <!-- //////////////// Biometric dialog //////////////////// -->
 
@@ -75,6 +67,7 @@
 
     <string name="startup_unlock_required">Phoenix is locked.\nPlease authenticate to continue.</string>
     <string name="startup_unlock_button">Unlock</string>
+    <string name="startup_check_lock">Checking lock…</string>
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_starting">Starting…</string>
@@ -451,7 +444,7 @@
 
     <!-- //////////////// access control //////////////// -->
 
-    <string name="accessctrl_title">Security</string>
+    <string name="accessctrl_title">Application access</string>
     <string name="accessctrl_subtitle">We recommend enabling the screen lock to prevent unintended use of your wallet.</string>
 
     <string name="accessctrl_auth_no_hw">Your device does not support hardware backed user authentication.</string>

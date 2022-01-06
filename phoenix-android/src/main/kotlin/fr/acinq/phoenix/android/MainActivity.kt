@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         }
         setContent {
             PhoenixAndroidTheme {
-                AppView(appViewModel)
+                AppView(this@MainActivity, appViewModel)
             }
         }
     }

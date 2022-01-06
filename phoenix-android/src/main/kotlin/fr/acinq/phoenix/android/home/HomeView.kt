@@ -64,9 +64,6 @@ fun HomeView(
     onSendClick: () -> Unit,
 ) {
     val log = logger("HomeView")
-
-    val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
-
     val connectionsState = homeViewModel.connectionsFlow.collectAsState()
 
     val showConnectionsDialog = remember { mutableStateOf(false) }
@@ -133,7 +130,12 @@ private fun SideMenu(
 ) {
     val context = LocalContext.current
     val peerState = business.peerState().collectAsState()
-    Column(modifier = Modifier.background(MaterialTheme.colors.surface).fillMaxWidth().fillMaxHeight()) {
+    Column(
+        modifier = Modifier
+            .background(systemNavBarColor())
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
         Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
             val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
             Surface(shape = CircleShape, elevation = 2.dp) {
@@ -277,43 +279,54 @@ private fun BottomBar(
     onSendClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    Row(
+    Box(
         Modifier
             .fillMaxWidth()
-            .height(70.dp)
+            .height(78.dp)
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(systemNavBarColor())
     ) {
-        Button(
-            icon = R.drawable.ic_settings,
-            onClick = {
-                scope.launch {
-                    drawerState.open()
-                }
-            },
-            iconTint = MaterialTheme.colors.onSurface,
-            padding = PaddingValues(20.dp),
-            modifier = Modifier.fillMaxHeight()
-        )
-        VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
-        Button(
-            text = stringResource(id = R.string.menu_receive),
-            icon = R.drawable.ic_receive,
-            onClick = onReceiveClick,
-            iconTint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
-        VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
-        Button(
-            text = stringResource(id = R.string.menu_send),
-            icon = R.drawable.ic_send,
-            onClick = onSendClick,
-            iconTint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
+        Row {
+            Button(
+                icon = R.drawable.ic_settings,
+                onClick = {
+                    scope.launch {
+                        drawerState.open()
+                    }
+                },
+                iconTint = MaterialTheme.colors.onSurface,
+                padding = PaddingValues(20.dp),
+                modifier = Modifier.fillMaxHeight()
+            )
+            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+            Button(
+                text = stringResource(id = R.string.menu_receive),
+                icon = R.drawable.ic_receive,
+                onClick = onReceiveClick,
+                iconTint = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
+            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+            Button(
+                text = stringResource(id = R.string.menu_send),
+                icon = R.drawable.ic_send,
+                onClick = onSendClick,
+                iconTint = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
+        }
+        Row(Modifier.padding(horizontal = 32.dp).align(Alignment.BottomCenter)) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+            ) { }
+        }
     }
 }

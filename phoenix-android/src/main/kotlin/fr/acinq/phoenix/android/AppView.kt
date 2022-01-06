@@ -22,10 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -59,7 +56,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @Composable
-fun AppView(appVM: AppViewModel) {
+fun AppView(
+    mainActivity: MainActivity,
+    appVM: AppViewModel,
+) {
     val log = logger("AppView")
     log.debug { "init app view composition" }
 
@@ -102,6 +102,7 @@ fun AppView(appVM: AppViewModel) {
             NavHost(navController = navController, startDestination = Screen.Startup.route) {
                 composable(Screen.Startup.route) {
                     StartupView(
+                        mainActivity,
                         appVM,
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
                         onBusinessStarted = { navController.navigate(Screen.Home.route) }
@@ -205,6 +206,12 @@ fun AppView(appVM: AppViewModel) {
                 composable(Screen.About.route) {
                     AboutView()
                 }
+                composable(Screen.AppLock.route) {
+                    AppLockView(
+                        mainActivity = mainActivity,
+                        appVM = appVM
+                    )
+                }
             }
         }
     }
@@ -236,4 +243,13 @@ private fun RequireKey(
         logger().debug { "access to screen granted" }
         children()
     }
+}
+
+sealed class LockState {
+    sealed class Locked : LockState() {
+        object Default : Locked()
+        data class WithError(val code: Int?) : Locked()
+    }
+
+    object Unlocked : LockState()
 }

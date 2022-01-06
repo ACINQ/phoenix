@@ -102,7 +102,7 @@ dependencies {
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.AndroidLegacy.lifecycle}")
   implementation("androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidLegacy.lifecycle}")
   // ANDROIDX - biometric
-  implementation("androidx.biometric:biometric:${Versions.AndroidLegacy.biometrics}")
+  implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
   // ANDROIDX - preferences
   implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
   // ANDROIDX - work manager

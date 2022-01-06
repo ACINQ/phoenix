@@ -16,8 +16,12 @@
 
 package fr.acinq.phoenix.android.settings
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.components.*
@@ -43,7 +47,7 @@ fun SettingsView() {
         // -- security
         SettingCategory(R.string.settings_security_title)
         Card {
-            SettingButton(text = R.string.settings_access_control, icon = R.drawable.ic_unlock, onClick = { })
+            SettingButton(text = R.string.settings_access_control, icon = R.drawable.ic_unlock, onClick = { nc.navigate(Screen.AppLock) })
             SettingButton(text = R.string.settings_display_seed, icon = R.drawable.ic_key, onClick = { nc.navigate(Screen.DisplaySeed) })
         }
 
@@ -55,5 +59,6 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_mutual_close, icon = R.drawable.ic_cross_circle, onClick = { nc.navigate(Screen.MutualClose) })
             SettingButton(text = R.string.settings_force_close, icon = R.drawable.ic_alert_triangle, onClick = { })
         }
+        Spacer(Modifier.height(32.dp))
     }
 }

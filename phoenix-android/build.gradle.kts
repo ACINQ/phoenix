@@ -98,6 +98,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:${Versions.Android.navCompose}")
     // -- jetpack compose: accompanist (utility library for compose)
     implementation("com.google.accompanist:accompanist-systemuicontroller:${Versions.Android.accompanist}")
+    // -- AndroidX: biometric
+    implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
 
     // -- scanner zxing
     implementation("com.journeyapps:zxing-android-embedded:${Versions.Android.zxing}")

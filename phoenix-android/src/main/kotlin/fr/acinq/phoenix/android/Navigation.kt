@@ -42,6 +42,7 @@ sealed class Screen(val route: String) {
     object MutualClose : Screen("settings/mutualclose")
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
+    object AppLock : Screen("settings/applock")
 }
 
 fun NavHostController.navigate(screen: Screen, arg: List<Any> = emptyList(), builder: NavOptionsBuilder.() -> Unit = {}) {

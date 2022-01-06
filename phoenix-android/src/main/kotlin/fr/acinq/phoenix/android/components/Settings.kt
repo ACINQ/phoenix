@@ -21,7 +21,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
 @Composable
@@ -106,6 +109,35 @@ fun Setting(modifier: Modifier = Modifier, title: String, description: String?, 
     }
 }
 
+@Composable
+fun SettingSwitch(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: String?,
+    icon: Int = R.drawable.ic_blank,
+    enabled: Boolean,
+    isChecked: Boolean,
+    onCheckChangeAttempt: ((Boolean) -> Unit)
+) {
+    Row(
+        modifier = modifier
+            .clickable(onClick = {
+                onCheckChangeAttempt(!isChecked)
+            })
+            .enableOrFade(enabled)
+            .padding(16.dp)
+    ) {
+        PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize), MaterialTheme.colors.primary)
+        Spacer(Modifier.width(16.dp))
+        Column(Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.body2)
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2)
+        }
+        Spacer(Modifier.width(16.dp))
+        Switch(checked = isChecked, onCheckedChange = null)
+    }
+}
 
 @Composable
 fun SettingButton(

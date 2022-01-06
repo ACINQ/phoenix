@@ -16,27 +16,34 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.content.Context
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import fr.acinq.phoenix.android.AppViewModel
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.WalletState
+import fr.acinq.phoenix.android.utils.BiometricsHelper
+import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.kodein.log.Logger
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun StartupView(
+    mainActivity: MainActivity,
     appVM: AppViewModel,
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
@@ -45,8 +52,62 @@ fun StartupView(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val walletState = appVM.walletState.observeAsState()
+    val isLockActive by Prefs.getIsScreenLockActive(context).collectAsState(initial = null)
 
-    when (val state = walletState.value) {
+    when (isLockActive) {
+        null -> Text(stringResource(id = R.string.startup_check_lock))
+        true -> when (appVM.lockState) {
+            is LockState.Locked -> {
+                LaunchedEffect(key1 = true) {
+                    val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
+                        setTitle(context.getString(R.string.authprompt_title))
+                        setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                    }.build()
+                    BiometricsHelper.getPrompt(
+                        activity = mainActivity,
+                        onSuccess = { appVM.lockState = LockState.Unlocked },
+                        onFailure = { appVM.lockState = LockState.Locked.WithError(it) },
+                        onCancel = { log.debug { "cancelled auth prompt" } }
+                    ).authenticate(promptInfo)
+                }
+            }
+            is LockState.Unlocked -> {
+                AttemptStart(
+                    context = context,
+                    scope = scope,
+                    log = log,
+                    appVM = appVM,
+                    walletState = walletState.value,
+                    onKeyAbsent = onKeyAbsent,
+                    onBusinessStarted = onBusinessStarted
+                )
+            }
+        }
+        false -> {
+            AttemptStart(
+                context = context,
+                scope = scope,
+                log = log,
+                appVM = appVM,
+                walletState = walletState.value,
+                onKeyAbsent = onKeyAbsent,
+                onBusinessStarted = onBusinessStarted
+            )
+        }
+    }
+}
+
+@Composable
+private fun AttemptStart(
+    context: Context,
+    scope: CoroutineScope,
+    log: Logger,
+    appVM: AppViewModel,
+    walletState: WalletState?,
+    onKeyAbsent: () -> Unit,
+    onBusinessStarted: () -> Unit,
+) {
+    when (walletState) {
         is WalletState.Off -> {
             val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
                 value = SeedManager.getSeedState(context)
@@ -80,7 +141,7 @@ fun StartupView(
 
         is WalletState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
         is WalletState.Bootstrap -> Text(stringResource(id = R.string.startup_starting))
-        is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, state.message))
+        is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, walletState.message))
         is WalletState.Started -> LaunchedEffect(true) { onBusinessStarted() }
     }
 }

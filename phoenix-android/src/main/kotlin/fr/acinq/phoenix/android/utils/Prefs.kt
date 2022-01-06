@@ -76,12 +76,21 @@ object Prefs {
             } else ServerAddress(address, 50002)
         }
     }
+
     suspend fun saveElectrumServer(context: Context, address: String) = context.datastore.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
     suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
 
     // -- FCM
+
     val PREFS_FCM_TOKEN = stringPreferencesKey("PREFS_FCM_TOKEN")
 
     fun getFcmToken(context: Context): Flow<String?> = prefs(context).map { it[PREFS_FCM_TOKEN] }
     suspend fun saveFcmToken(context: Context, token: String) = context.datastore.edit { it[PREFS_FCM_TOKEN] = token }
+
+    // -- App access, screen lock...
+
+    val PREFS_SCREEN_LOCK = booleanPreferencesKey("PREFS_SCREEN_LOCK")
+
+    fun getIsScreenLockActive(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SCREEN_LOCK] ?: false }
+    suspend fun saveIsScreenLockActive(context: Context, isScreenLockActive: Boolean) = context.datastore.edit { it[PREFS_SCREEN_LOCK] = isScreenLockActive }
 }

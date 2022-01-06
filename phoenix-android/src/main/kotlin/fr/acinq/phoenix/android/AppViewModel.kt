@@ -21,6 +21,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -55,6 +58,9 @@ class AppViewModel() : ViewModel() {
 
     /** Mirrors the node state using a MediatorLiveData. A LiveData object is used because this object can be used outside of compose. */
     val walletState = WalletStateLiveData(_service)
+
+    /** Tells if the UI is locked with biometrics. */
+    var lockState by mutableStateOf<LockState>(LockState.Locked.Default)
 
     fun writeSeed(context: Context, mnemonics: List<String>) {
         try {
