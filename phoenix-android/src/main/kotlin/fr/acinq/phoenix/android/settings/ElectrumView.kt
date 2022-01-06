@@ -85,19 +85,22 @@ fun ElectrumView() {
 
                 // -- connection detail
                 val config = model.configuration
-                Setting(title = stringResource(id = R.string.electrum_server_connection), description = when (model.connection) {
-                    Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
-                        stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
-                    } else {
-                        stringResource(id = R.string.electrum_not_connected)
+                SettingInteractive(
+                    title = stringResource(id = R.string.electrum_server_connection),
+                    description = when (model.connection) {
+                        Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
+                            stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
+                        } else {
+                            stringResource(id = R.string.electrum_not_connected)
+                        }
+                        Connection.ESTABLISHING -> if (config is ElectrumConfig.Custom) {
+                            stringResource(id = R.string.electrum_connecting_to_custom, config.server.host)
+                        } else {
+                            stringResource(id = R.string.electrum_connecting)
+                        }
+                        Connection.ESTABLISHED -> stringResource(id = R.string.electrum_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
                     }
-                    Connection.ESTABLISHING -> if (config is ElectrumConfig.Custom) {
-                        stringResource(id = R.string.electrum_connecting_to_custom, config.server.host)
-                    } else {
-                        stringResource(id = R.string.electrum_connecting)
-                    }
-                    Connection.ESTABLISHED -> stringResource(id = R.string.electrum_connected, "${model.currentServer?.host}:${model.currentServer?.port}")
-                }, onClick = { showServerDialog = true })
+                ) { showServerDialog = true }
 
                 // block height
                 if (model.blockHeight > 0) {

@@ -44,10 +44,8 @@ internal fun <T> ListPreferenceButton(
 ) {
     var showPreferenceDialog by remember { mutableStateOf(false) }
 
-    Setting(modifier = Modifier.alpha(if (enabled) 1f else 0.5f), title = title, description = subtitle) {
-        if (enabled) {
-            showPreferenceDialog = true
-        }
+    SettingInteractive(title = title, description = subtitle, enabled = enabled) {
+        showPreferenceDialog = true
     }
 
     if (showPreferenceDialog) {

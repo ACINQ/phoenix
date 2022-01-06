@@ -89,23 +89,51 @@ fun SettingCategory(textResId: Int) {
 }
 
 @Composable
-fun Setting(modifier: Modifier = Modifier, title: String, description: String?, onClick: (() -> Unit)? = null) {
+fun Setting(modifier: Modifier = Modifier, title: String, description: String?) {
     Column(
-        Modifier
+        modifier
             .fillMaxWidth()
-            .then(
-                if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
-                } else {
-                    Modifier
-                }
-            )
-            .then(modifier)
             .padding(16.dp)
     ) {
         Text(title, style = MaterialTheme.typography.body2)
         Spacer(modifier = Modifier.height(2.dp))
         Text(description ?: "", style = MaterialTheme.typography.subtitle2)
+    }
+}
+
+@Composable
+fun SettingInteractive(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: String?,
+    icon: Int? = null,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)
+) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clickable(onClick = { if (enabled) onClick() })
+            .enableOrFade(enabled)
+            .padding(16.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
+                Spacer(Modifier.width(16.dp))
+            }
+            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            if (icon != null) {
+                Spacer(modifier = Modifier.width(34.dp))
+            }
+            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+        }
     }
 }
 
@@ -119,23 +147,26 @@ fun SettingSwitch(
     isChecked: Boolean,
     onCheckChangeAttempt: ((Boolean) -> Unit)
 ) {
-    Row(
-        modifier = modifier
-            .clickable(onClick = {
-                onCheckChangeAttempt(!isChecked)
-            })
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clickable(onClick = { if (enabled) onCheckChangeAttempt(!isChecked) })
             .enableOrFade(enabled)
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
-        PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize), MaterialTheme.colors.primary)
-        Spacer(Modifier.width(16.dp))
-        Column(Modifier.weight(1f)) {
-            Text(text = title, style = MaterialTheme.typography.body2)
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            PhoenixIcon(icon, Modifier.size(ButtonDefaults.IconSize))
+            Spacer(Modifier.width(16.dp))
+            Text(text = title, style = MaterialTheme.typography.body2, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(16.dp))
+            Switch(checked = isChecked, onCheckedChange = null)
         }
-        Spacer(Modifier.width(16.dp))
-        Switch(checked = isChecked, onCheckedChange = null)
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.width(34.dp))
+            Text(text = description ?: "", style = MaterialTheme.typography.subtitle2, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(48.dp))
+        }
     }
 }
 
