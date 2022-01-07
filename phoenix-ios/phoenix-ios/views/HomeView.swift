@@ -314,16 +314,8 @@ struct HomeView : MVIView {
 		
 		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
 
-			NoticeBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Spacer()
-					Text("Welcome to Phoenix.\nTap 'Receive' to fund your wallet.")
-						.multilineTextAlignment(.center)
-						.allowsTightening(true)
-					Spacer()
-				} // </HStack>
-				.font(.footnote)
-			} // </NoticeBox>
+			// Reserved for potential "welcome" message.
+			EmptyView()
 
 		} else if !backupSeed_enabled && !manualBackup_taskDone {
 			
