@@ -90,8 +90,8 @@ sealed class LNUrl {
             val raw: String,
             val plainText: String,
             val longDesc: String?,
-            val imagePng: ByteVector?,
-            val imageJpg: ByteVector?,
+            val imagePng: String?, // base64 encoded png
+            val imageJpg: String?, // base64 encoded jpg
             val unknown: JsonArray?
         )
     }
@@ -436,8 +436,8 @@ sealed class LNUrl {
                 raw = raw,
                 plainText = plainText!!,
                 longDesc = longDesc,
-                imagePng = imagePng?.let { ByteVector(it.encodeToByteArray()) },
-                imageJpg = imageJpg?.let { ByteVector(it.encodeToByteArray()) },
+                imagePng = imagePng,
+                imageJpg = imageJpg,
                 unknown = unknown.takeIf { it.isNotEmpty() }?.let {
                     JsonArray(it.toList())
                 }

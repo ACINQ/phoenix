@@ -1856,7 +1856,7 @@ struct MetadataSheet: View, ViewName {
 							.font(Font.system(.body, design: .serif))
 							.bold()
 						
-						if let image = UIImage(data: imagePng.toSwiftData()) {
+						if let data = Data(base64Encoded: imagePng), let image = UIImage(data: data) {
 							Image(uiImage: image)
 								.padding(.leading)
 						} else {
@@ -1873,7 +1873,7 @@ struct MetadataSheet: View, ViewName {
 							.font(Font.system(.body, design: .serif))
 							.bold()
 						
-						if let image = UIImage(data: imageJpg.toSwiftData()) {
+						if let data = Data(base64Encoded: imageJpg), let image = UIImage(data: data) {
 							Image(uiImage: image)
 								.padding(.leading)
 						} else {
