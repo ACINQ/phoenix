@@ -1067,13 +1067,12 @@ fileprivate struct ToolsButton: View, ViewName {
 				)
 			}
 			Button {
-				telegramButtonTapped()
+				faqButtonTapped()
 			} label: {
-				Label {
-					Text(verbatim: "Telegram")
-				} icon: {
-					Image("telegram")
-				}
+				Label(
+					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
+					systemImage: "safari"
+				)
 			}
 			Button {
 				twitterButtonTapped()
@@ -1085,13 +1084,24 @@ fileprivate struct ToolsButton: View, ViewName {
 				}
 			}
 			Button {
-				faqButtonTapped()
+				telegramButtonTapped()
 			} label: {
-				Label(
-					NSLocalizedString("FAQ", comment: "HomeView: Tools menu: Label"),
-					systemImage: "safari"
-				)
+				Label {
+					Text(verbatim: "Telegram")
+				} icon: {
+					Image("telegram")
+				}
 			}
+			Button {
+				githubButtonTapped()
+			} label: {
+				Label {
+					Text("View source")
+				} icon: {
+					Image("github")
+				}
+			}
+			
 		} label: {
 			Image(systemName: "wrench.fill")
 				.renderingMode(.template)
@@ -1157,6 +1167,14 @@ fileprivate struct ToolsButton: View, ViewName {
 		log.trace("[\(viewName)] faqButtonTapped()")
 		
 		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+			openURL(url)
+		}
+	}
+	
+	func githubButtonTapped() {
+		log.trace("[\(viewName)] githubButtonTapped()")
+		
+		if let url = URL(string: "https://github.com/ACINQ/phoenix") {
 			openURL(url)
 		}
 	}
