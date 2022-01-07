@@ -61,7 +61,6 @@ fun SettingHeader(
             .fillMaxWidth()
             .background(backgroundColor)
             .padding(horizontal = 0.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.Top,
     ) {
         BackButton(onClick = onBackClick)
         Column(

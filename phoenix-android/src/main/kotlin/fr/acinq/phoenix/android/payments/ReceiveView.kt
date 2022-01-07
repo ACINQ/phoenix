@@ -144,7 +144,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
         verticalArrangement = Arrangement.Top,
     ) {
         val nc = navController
-        Header(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
+        SettingHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {

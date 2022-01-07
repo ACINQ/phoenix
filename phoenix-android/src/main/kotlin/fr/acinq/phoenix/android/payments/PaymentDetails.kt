@@ -45,6 +45,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
 import fr.acinq.phoenix.android.components.BackButton
 import fr.acinq.phoenix.android.components.PrimarySeparator
+import fr.acinq.phoenix.android.components.SettingHeader
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -96,7 +97,7 @@ private fun PaymentDetailsInfo(
             .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {
-        BackButton(onBackClick)
+        SettingHeader(onBackClick = onBackClick, backgroundColor = Color.Unspecified)
         Column(
             modifier = Modifier
                 .fillMaxWidth()

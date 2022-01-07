@@ -43,28 +43,6 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
-@Composable
-fun Header(
-    title: String? = null,
-    onBackClick: () -> Unit,
-    backgroundColor: Color = MaterialTheme.colors.background,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(horizontal = 0.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        BackButton(onClick = onBackClick)
-        Column(
-            modifier = Modifier.padding(horizontal = 0.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            title?.run { Text(text = this) }
-        }
-    }
-}
 
 /** Button for navigation purpose, with the back arrow. */
 @Composable
@@ -72,7 +50,7 @@ fun BackButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
-        contentPadding = PaddingValues(start = 28.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
@@ -80,9 +58,9 @@ fun BackButton(onClick: () -> Unit) {
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(width = 62.dp, height = 48.dp)
+        modifier = Modifier.size(width = 62.dp, height = 52.dp)
     ) {
-        PhoenixIcon(resourceId = R.drawable.ic_arrow_back)
+        PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
     }
 }
 
