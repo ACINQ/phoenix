@@ -951,7 +951,7 @@ struct ValidateView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
 				Text(verbatim: tipInfo.bitcoin_base.string)
 					.read(maxBitcoinWidthReader)
-				Text(verbatim: tipInfo.bitcoin_tip.string)
+				Text(verbatim: "+ \(tipInfo.bitcoin_tip.string)")
 					.read(maxBitcoinWidthReader)
 				Divider()
 					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
@@ -961,7 +961,7 @@ struct ValidateView: View, ViewName {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
 				Text(verbatim: "")
-				Text(verbatim: "+\(tipInfo.percent)")
+				Text(verbatim: tipInfo.percent)
 				Divider()
 					.frame(width: 0, height: 1)
 				Text(verbatim: "")
@@ -970,7 +970,7 @@ struct ValidateView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
 				Text(verbatim: tipInfo.fiat_base.string)
 					.read(maxFiatWidthReader)
-				Text(verbatim: tipInfo.fiat_tip.string)
+				Text(verbatim: "+ \(tipInfo.fiat_tip.string)")
 					.read(maxFiatWidthReader)
 				Divider()
 					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
