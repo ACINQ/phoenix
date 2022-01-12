@@ -618,10 +618,16 @@
   <string name="paymentsettings_title">Options et frais de paiements</string>
   <string name="paymentsettings_subtitle">Définissez ici vos préférences pour les paiements que vous envoyez ou recevez.</string>
 
-  <string name="paymentsettings_defaultdesc_title">Description des paiements reçus</string>
+  <string name="paymentsettings_defaultdesc_title">Description des paiements entrants</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Description de vos requêtes de paiement</string>
   <string name="paymentsettings_defaultdesc_dialog_description">Les requêtes de paiement que vous créez utiliseront cette description. Celle-ci peut toujours être changée au cas par cas.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Entrez une description</string>
+
+  <string name="paymentsettings_expiry_title">Expiration des paiements entrants</string>
+  <string name="paymentsettings_expiry_dialog_title">Expiration des paiements</string>
+  <string name="paymentsettings_expiry_dialog_description">Les requêtes de paiement que vous créez utiliseront cette durée d\'expiration (exprimée en secondes). Par défaut cette expiration est d\'une semaine.</string>
+  <string name="paymentsettings_expiry_dialog_hint">Saisissez une valeur en secondes</string>
+  <string name="paymentsettings_expiry_value">%1$s seconde(s)</string>
 
   <string name="paymentsettings_trampoline_fees_title">Frais max pour les paiements Lightning sortants</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>

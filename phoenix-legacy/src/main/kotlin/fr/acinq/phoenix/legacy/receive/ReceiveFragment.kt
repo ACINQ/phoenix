@@ -275,7 +275,7 @@ class ReceiveFragment : BaseFragment() {
     }) {
       Wallet.hideKeyboard(context, mBinding.amountValue)
       model.state.value = PaymentGenerationState.IN_PROGRESS
-      val invoice = app.requireService.generatePaymentRequest(mBinding.descValue.text.toString(), extractAmount())
+      val invoice = app.requireService.generatePaymentRequest(mBinding.descValue.text.toString(), extractAmount(), Prefs.getPaymentsExpirySeconds(requireContext()))
       model.invoice.value = Pair(invoice, null)
     }
   }

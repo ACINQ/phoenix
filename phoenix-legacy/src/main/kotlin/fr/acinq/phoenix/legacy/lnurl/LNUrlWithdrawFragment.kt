@@ -179,7 +179,10 @@ class LNUrlWithdrawFragment : BaseFragment() {
         if (!amount.isEmpty) {
           model.state.value = LNUrlWithdrawState.InProgress
           val domain = model.callback.value!!.host()
-          val pr = app.requireService.generatePaymentRequest(if (description.isBlank()) getString(R.string.receive_default_desc) else description, amount)
+          val pr = app.requireService.generatePaymentRequest(
+            description = if (description.isBlank()) getString(R.string.receive_default_desc) else description,
+            amount_opt = amount,
+            expirySeconds = Prefs.getPaymentsExpirySeconds(requireContext()))
           val url = urlBuilder.addEncodedQueryParameter("pr", PaymentRequest.write(pr)).build()
           log.info("sending LNURL-withdraw request {}", url.toString())
           Wallet.httpClient.newCall(Request.Builder().url(url).build()).enqueue(object : Callback {
