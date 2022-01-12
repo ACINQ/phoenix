@@ -114,10 +114,6 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
         }
       }
     }
-
-    mBinding.backupRequiredButton.setOnClickListener {
-      findNavController().navigate(R.id.action_access_control_to_display_seed)
-    }
   }
 
   override fun onResume() {
@@ -215,8 +211,8 @@ class AccessControlFragment : BaseFragment(), SharedPreferences.OnSharedPreferen
 
   private fun refreshUI(state: AccessLockState) {
     log.debug("refresh ui with state=$state")
-    context?.let { model.isBackupDone.value = Prefs.isBackupDone(it) }
     mBinding.screenLockSwitch.setChecked(state is AccessLockState.Done.ScreenLock || state is AccessLockState.Done.FullLock)
+    mBinding.fullLockSwitch.visibility = if (state is AccessLockState.Done.FullLock) View.VISIBLE else View.GONE
     mBinding.fullLockSwitch.setChecked(state is AccessLockState.Done.FullLock)
   }
 
@@ -236,7 +232,6 @@ class AccessControlViewModel : ViewModel() {
 
   val state = MutableLiveData<AccessLockState>(AccessLockState.Init)
 
-  val isBackupDone = MutableLiveData(false)
   val canUseSoftAuth = MutableLiveData(false)
   val canUseHardAuth = MutableLiveData(false)
   val isUpdatingState = MutableLiveData(false)
