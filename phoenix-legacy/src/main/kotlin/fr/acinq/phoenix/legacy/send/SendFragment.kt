@@ -133,6 +133,15 @@ class SendFragment : BaseFragment() {
             AmountError.NotEnoughBalance -> getString(R.string.send_amount_error_balance)
             AmountError.SwapOutBelowMin -> getString(R.string.send_amount_error_swap_out_too_small, Converter.printAmountPretty(swapOutSettings.minAmount, requireContext(), withUnit = true))
             AmountError.SwapOutAboveMax -> getString(R.string.send_amount_error_swap_out_above_max, Converter.printAmountPretty(swapOutSettings.maxAmount, requireContext(), withUnit = true))
+            AmountError.AboveRequestedAmount -> {
+              val state = model.state.value
+              val prAmount = if (state is SendState.Lightning && state.pr.amount().isDefined) state.pr.amount().get() else null
+              if (prAmount != null) {
+                getString(R.string.send_amount_error_above_request, Converter.printAmountPretty(prAmount.`$times`(2), requireContext(), withUnit = true))
+              } else {
+                getString(R.string.send_amount_error_above_request_generic)
+              }
+            }
             else -> getString(R.string.send_amount_error)
           }
           mBinding.amountError.visibility = View.VISIBLE
@@ -333,13 +342,26 @@ class SendFragment : BaseFragment() {
         } else {
           mBinding.amountConverted.text = getString(R.string.utils_converted_amount, Converter.printFiatPretty(ctx, amount.get(), withUnit = true))
         }
+
+        // validate amount
         if (balance != null && amount.get().`$greater`(balance.sendable)) {
           throw AmountError.NotEnoughBalance
         }
-        if (model.state.value is SendState.Onchain && amount.get().`$less`(swapOutSettings.minAmount)) {
-          throw AmountError.SwapOutBelowMin
-        } else if (model.state.value is SendState.Onchain && amount.get().`$greater`(swapOutSettings.maxAmount)) {
-          throw AmountError.SwapOutAboveMax
+        when (val state = model.state.value) {
+          is SendState.Onchain -> {
+            if (amount.get().`$less`(swapOutSettings.minAmount)) {
+              throw AmountError.SwapOutBelowMin
+            }
+            if (amount.get().`$greater`(swapOutSettings.maxAmount)) {
+              throw AmountError.SwapOutAboveMax
+            }
+          }
+          is SendState.Lightning -> {
+            val prAmount = if (state.pr.amount().isDefined) state.pr.amount().get() else null
+            if (prAmount != null && amount.get().`$greater`(prAmount.`$times`(2))) {
+              throw AmountError.AboveRequestedAmount
+            }
+          }
         }
       } else {
         throw RuntimeException("amount is undefined")

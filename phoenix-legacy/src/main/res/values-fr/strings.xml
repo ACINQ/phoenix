@@ -140,6 +140,8 @@
   <string name="send_amount_error_balance">Le montant dépasse votre solde.</string>
   <string name="send_amount_error_swap_out_too_small">%1$s minimum pour un paiement on-chain.</string>
   <string name="send_amount_error_swap_out_above_max">%1$s maximum pour un paiement on-chain.</string>
+  <string name="send_amount_error_above_request_generic">Ne doit pas dépasser le double du montant requis</string>
+  <string name="send_amount_error_above_request">Le montant ne doit pas excéder %1$s</string>
   <string name="send_destination_label">Destinataire</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_mining_fee_info_title">À quoi correspondent ces frais ?</string>

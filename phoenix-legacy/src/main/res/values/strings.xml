@@ -172,6 +172,8 @@
   <string name="send_amount_error_balance">Amount exceeds your balance.</string>
   <string name="send_amount_error_swap_out_too_small">Min. %1$s for on-chain payment.</string>
   <string name="send_amount_error_swap_out_above_max">Max. %1$s for on-chain payment.</string>
+  <string name="send_amount_error_above_request_generic">Must not exceed twice the requested amount</string>
+  <string name="send_amount_error_above_request">Amount must be at most %1$s</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_mining_fee_info_title">What are those fees?</string>
