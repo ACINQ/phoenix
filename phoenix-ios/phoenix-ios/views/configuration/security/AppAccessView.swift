@@ -43,7 +43,7 @@ struct AppAccessView : View {
 	@ViewBuilder
 	func form() -> some View {
 		
-		Form {
+		List {
 			Section {
 				Toggle(isOn: $biometricsEnabled) {
 				
@@ -77,7 +77,7 @@ struct AppAccessView : View {
 				.disabled(!biometricStatus.isAvailable())
 				
 				securityStatus()
-			}
+			} // </Section>
 			
 			Section {
 				
@@ -127,8 +127,9 @@ struct AppAccessView : View {
 				.buttonStyle(PlainButtonStyle()) // disable row highlight when tapping help button
 				
 				receiveStatus()
-			}
-		}
+			} // </Section>
+		} // </List>
+		.listStyle(.insetGrouped)
 		.sheet(isPresented: $showHelpSheet) {
 			
 			AdvancedSecurityHelp(isShowing: $showHelpSheet)

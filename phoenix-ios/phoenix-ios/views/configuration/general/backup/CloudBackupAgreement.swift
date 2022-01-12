@@ -64,6 +64,7 @@ struct CloudBackupAgreement: View {
 			section_legal()
 			section_name()
 		}
+		.listStyle(.insetGrouped)
 		.navigationTitle("iCloud Backup")
 		.navigationBarBackButtonHidden(true)
 		.navigationBarItems(leading: backButton())

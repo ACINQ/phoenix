@@ -216,8 +216,8 @@ struct ConfigurationView: View {
 
 				} // </if: hasWallet>
 			} // </Section: Advanced>
-		}
-		.listStyle(GroupedListStyle())
+		} // </List>
+		.listStyle(.insetGrouped)
 		.id(listViewId)
 		.onAppear() {
 			onAppear()

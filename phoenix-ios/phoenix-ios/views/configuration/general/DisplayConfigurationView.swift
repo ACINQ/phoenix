@@ -22,7 +22,7 @@ struct DisplayConfigurationView: View {
 	
 	@ViewBuilder
 	var body: some View {
-		Form {
+		List {
 			Section {
 				NavigationLink(
 					destination: FiatCurrencySelector(selectedFiatCurrency: fiatCurrency)
@@ -60,7 +60,7 @@ struct DisplayConfigurationView: View {
 			}
 			.id(sectionId)
 			
-			Section {
+			Section(header: Text("Theme")) {
 				Picker(
 					selection: Binding(
 						get: { theme },
@@ -73,8 +73,11 @@ struct DisplayConfigurationView: View {
 					}
 				}
 				.pickerStyle(SegmentedPickerStyle())
-			}
-		}
+				
+			} // </Section>
+			
+		} // </List>
+		.listStyle(.insetGrouped)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle(
 			NSLocalizedString("Display options", comment: "Navigation bar title"),

@@ -56,6 +56,7 @@ struct ManualBackupView : View {
 			section_button()
 			section_legal()
 		}
+		.listStyle(.insetGrouped)
 		.sheet(isPresented: $revealSeed) {
 			
 			RecoverySeedReveal(

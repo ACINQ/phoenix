@@ -25,7 +25,7 @@ struct PaymentOptionsView: View {
 	
 	var body: some View {
 		
-		Form {
+		List {
 			Section {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -56,7 +56,7 @@ struct PaymentOptionsView: View {
 					)
 				}
 				.padding([.top, .bottom], 8)
-			}
+			} // </Section>
 			
 			Section {
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
@@ -98,8 +98,10 @@ struct PaymentOptionsView: View {
 				.font(.callout)
 				.foregroundColor(Color.secondary)
 				.padding([.top, .bottom], 8)
-			}
-		}
+			
+			} // </Section>
+		} // </List>
+		.listStyle(.insetGrouped)
 		.navigationBarTitle(NSLocalizedString("Payment Options", comment: "Navigation Bar Title"))
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
