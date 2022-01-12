@@ -84,7 +84,7 @@
           android:propertyName="strokeWidth"
           android:duration="1000"
           android:valueFrom="0.5"
-          android:valueTo="1.5"
+          android:valueTo="1"
           android:valueType="floatType"
           android:interpolator="@android:anim/bounce_interpolator"/>
         <objectAnimator

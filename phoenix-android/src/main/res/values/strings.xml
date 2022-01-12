@@ -377,15 +377,15 @@
 
     <!-- //////////////// payment details //////////////// -->
 
-    <string name="paymentdetails_loading">Retrieving payment details…</string>
-    <string name="paymentdetails_error">There was an error when retrieving the details for this payment.\n\nPlease try again.</string>
+    <string name="paymentdetails_loading">Loading payment details…</string>
+    <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
-    <string name="paymentdetails_status_sent_successful">Payment sent</string>
-    <string name="paymentdetails_status_sent_pending">Payment pending…</string>
-    <string name="paymentdetails_status_sent_failed">Payment failed, no money has been sent.</string>
+    <string name="paymentdetails_status_sent_successful">Sent</string>
+    <string name="paymentdetails_status_sent_pending">Pending…</string>
+    <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
     <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
-    <string name="paymentdetails_status_received_successful">Payment has been received</string>
+    <string name="paymentdetails_status_received_successful">Received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
