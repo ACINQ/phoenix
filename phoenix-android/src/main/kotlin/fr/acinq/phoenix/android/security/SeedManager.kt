@@ -17,16 +17,9 @@
 package fr.acinq.phoenix.android.security
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import org.kodein.log.Logger
 import org.kodein.log.LoggerFactory
 import org.kodein.log.newLogger
 import java.io.File
-import java.lang.RuntimeException
 
 sealed class KeyState {
     fun isReady() = this is Present
@@ -35,7 +28,7 @@ sealed class KeyState {
     object Absent : KeyState()
     data class Present(internal val encryptedSeed: EncryptedSeed.V2) : KeyState()
     sealed class Error : KeyState() {
-        object Unreadable : Error()
+        data class Unreadable(val message: String?) : Error()
         object UnhandledSeedType : Error()
     }
 }
@@ -51,6 +44,17 @@ object SeedManager {
 
     /** Extract the encrypted seed from app private dir. */
     fun loadSeedFromDisk(context: Context): EncryptedSeed? = loadSeedFromDir(getDatadir(context), SEED_FILE)
+
+    fun getSeedState(context: Context): KeyState = try {
+        when (val seed = loadSeedFromDisk(context)) {
+            null -> KeyState.Absent
+            is EncryptedSeed.V2.NoAuth -> KeyState.Present(seed)
+            else -> KeyState.Error.UnhandledSeedType
+        }
+    } catch (e: Exception) {
+        log.error(e) { "failed to read seed: " }
+        KeyState.Error.Unreadable(e.localizedMessage)
+    }
 
     /** Extract an encrypted seed contained in a given file/folder. */
     private fun loadSeedFromDir(dir: File, seedFileName: String): EncryptedSeed? {

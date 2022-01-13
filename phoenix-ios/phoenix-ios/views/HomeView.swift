@@ -25,8 +25,12 @@ fileprivate enum NavLinkTag: String {
 
 struct HomeView : MVIView {
 
-	static let phoenixBusiness = AppDelegate.get().business
-	let phoenixBusiness: PhoenixBusiness = HomeView.phoenixBusiness
+	static let appDelegate = AppDelegate.get()
+	static let phoenixBusiness = appDelegate.business
+	static let encryptedNodeId = appDelegate.encryptedNodeId!
+	
+	let phoenixBusiness = HomeView.phoenixBusiness
+	let encryptedNodeId = HomeView.encryptedNodeId
 	
 	@StateObject var mvi = MVIState({ $0.home() })
 
@@ -36,9 +40,8 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
-	@StateObject var toast = Toast()
-	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	let paymentsPagePublisher = phoenixBusiness.paymentsManager.paymentsPagePublisher()
 	@State var paymentsPage = PaymentsManager.PaymentsPage(offset: 0, count: 0, rows: [])
@@ -47,12 +50,12 @@ struct HomeView : MVIView {
 	let chainContextPublisher = phoenixBusiness.appConfigurationManager.chainContextPublisher()
 	
 	let incomingSwapsPublisher = phoenixBusiness.paymentsManager.incomingSwapsPublisher()
+	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
 	@State var lastIncomingSwaps = [String: Lightning_kmpMilliSatoshi]()
 	@State var incomingSwapScaleFactor: CGFloat = 1.0
 	@State var incomingSwapAnimationsRemaining = 0
 	
-	let incomingSwapScaleFactor_BIG: CGFloat = 1.2
-	
+	// Toggles confirmation dialog (used to select preferred explorer)
 	@State var showBlockchainExplorerOptions = false
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
@@ -65,8 +68,13 @@ struct HomeView : MVIView {
 	@State private var navLinkTag: NavLinkTag? = nil
 	
 	let externalLightningUrlPublisher = AppDelegate.get().externalLightningUrlPublisher
-	@State var externalLightningRequest: Scan.ModelInvoiceFlowInvoiceRequest? = nil
+	@State var externalLightningRequest: AppScanController? = nil
 	@State var temp: [AppScanController] = []
+	
+	let backupSeed_enabled_publisher = Prefs.shared.backupSeed_isEnabled_publisher
+	let manualBackup_taskDone_publisher = Prefs.shared.manualBackup_taskDone_publisher
+	@State var backupSeed_enabled = Prefs.shared.backupSeed_isEnabled
+	@State var manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 	
 	@ViewBuilder
 	var view: some View {
@@ -97,8 +105,6 @@ struct HomeView : MVIView {
 
 			main
 
-			toast.view()
-
 		} // </ZStack>
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
@@ -109,6 +115,9 @@ struct HomeView : MVIView {
 		.onChange(of: navLinkTag) { tag in
 			navLinkTagChanged(tag)
 		}
+		.onChange(of: deepLinkManager.deepLink) {
+			deepLinkChanged($0)
+		}
 		.onReceive(paymentsPagePublisher) {
 			paymentsPageChanged($0)
 		}
@@ -118,11 +127,17 @@ struct HomeView : MVIView {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
-		.onReceive(incomingSwapsPublisher) { incomingSwaps in
-			onIncomingSwapsChanged(incomingSwaps)
+		.onReceive(incomingSwapsPublisher) {
+			onIncomingSwapsChanged($0)
 		}
-		.onReceive(externalLightningUrlPublisher) { (url: URL) in
-			didReceiveExternalLightningUrl(url)
+		.onReceive(externalLightningUrlPublisher) {
+			didReceiveExternalLightningUrl($0)
+		}
+		.onReceive(backupSeed_enabled_publisher) {
+			self.backupSeed_enabled = $0
+		}
+		.onReceive(manualBackup_taskDone_publisher) {
+			self.manualBackup_taskDone = Prefs.shared.manualBackup_taskDone(encryptedNodeId: encryptedNodeId)
 		}
 	}
 
@@ -225,19 +240,11 @@ struct HomeView : MVIView {
 			.padding(.bottom, 25)
 
 			// === Beta Version Disclaimer ===
-			DisclaimerBox {
-				HStack(alignment: VerticalAlignment.top, spacing: 0) {
-					Image(systemName: "umbrella")
-						.imageScale(.large)
-						.padding(.trailing, 10)
-					Text("This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co.")
-				}
-				.font(.caption)
-			}
+			generalNotice
 			
 			// === Mempool Full Warning ====
 			if isMempoolFull {
-				DisclaimerBox {
+				NoticeBox {
 					HStack(alignment: VerticalAlignment.top, spacing: 0) {
 						Image(systemName: "exclamationmark.triangle")
 							.imageScale(.large)
@@ -283,7 +290,7 @@ struct HomeView : MVIView {
 				}
 			}
 
-			BottomBar(navLinkTag: $navLinkTag, toast: toast)
+			BottomBar(navLinkTag: $navLinkTag)
 		
 		} // </VStack>
 		.onAppear {
@@ -301,6 +308,44 @@ struct HomeView : MVIView {
 			.modifier(GlobalEnvironment()) // SwiftUI bug (prevent crash)
 		}
 	}
+	
+	@ViewBuilder
+	var generalNotice: some View {
+		
+		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
+
+			// Reserved for potential "welcome" message.
+			EmptyView()
+
+		} else if !backupSeed_enabled && !manualBackup_taskDone {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.triangle")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+					Button {
+						navigateToBackup()
+					} label: {
+						Group {
+							Text("Backup your recovery phrase to prevent losing your funds. ")
+								.foregroundColor(.primary)
+							+
+							Text("Let's go ")
+								.foregroundColor(.appAccent)
+							+
+							Text(Image(systemName: "arrowtriangle.forward"))
+								.foregroundColor(.appAccent)
+						}
+						.multilineTextAlignment(.leading)
+						.allowsTightening(true)
+					}
+				} // </HStack>
+				.font(.caption)
+			} // </NoticeBox>
+			
+		}
+	}
 
 	@ViewBuilder
 	func navLinkView() -> some View {
@@ -308,16 +353,12 @@ struct HomeView : MVIView {
 		switch navLinkTag {
 		case .ConfigurationView:
 			ConfigurationView()
-			
 		case .ReceiveView:
 			ReceiveView()
-			
 		case .SendView:
-			SendView(firstModel: externalLightningRequest)
-			
+			SendView(controller: externalLightningRequest)
 		case .CurrencyConverter:
 			CurrencyConverterView()
-			
 		default:
 			EmptyView()
 		}
@@ -340,7 +381,7 @@ struct HomeView : MVIView {
 		
 		// pretty much guaranteed to be in the cache
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
+		HomeView.phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
 			
 			if let result = result {
 				selectedItem = result
@@ -364,15 +405,19 @@ struct HomeView : MVIView {
 	func onModelChange(model: Home.Model) -> Void {
 		log.trace("onModelChange()")
 		
-		// Todo: maybe update paymentsPage subscription ?
+		if model.balance.msat > 0 || model.incomingBalance?.msat ?? 0 > 0 || model.paymentsCount > 0 {
+			if Prefs.shared.isNewWallet {
+				Prefs.shared.isNewWallet = false
+			}
+		}
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
 		log.trace("navLinkTagChanged()")
 		
 		if tag == nil {
-			// If we pushed the SendView with a external lightning url,
-			// we should nil out the url (since the user is finished with it now).
+			// If we pushed the SendView, triggered by an external lightning url,
+			// then we can nil out the associated controller now (since we handed off to SendView).
 			self.externalLightningRequest = nil
 		}
 	}
@@ -620,7 +665,7 @@ struct HomeView : MVIView {
 		}
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 	
 		if navLinkTag == .SendView {
@@ -649,26 +694,14 @@ struct HomeView : MVIView {
 		temp.append(scanController)
 		
 		var unsubscribe: (() -> Void)? = nil
-		var isFirstFire = true
 		unsubscribe = scanController.subscribe { (model: Scan.Model) in
 			
-			if isFirstFire { // ignore first subscription fire (Scan.ModelReady)
-				isFirstFire = false
+			// Ignore first subscription fire (Scan.ModelReady)
+			if let _ = model as? Scan.ModelReady {
 				return
-			}
-			
-			if let model = model as? Scan.ModelInvoiceFlowInvoiceRequest {
-				self.externalLightningRequest = model
+			} else {
+				self.externalLightningRequest = scanController
 				self.navLinkTag = .SendView
-				
-			} else if let _ = model as? Scan.ModelBadRequest {
-				let msg = NSLocalizedString("Invalid Lightning Request", comment: "toast warning")
-				toast.pop(
-					Text(msg).anyView,
-					colorScheme: colorScheme.opposite,
-					duration: 4.0,
-					location: .middle
-				)
 			}
 			
 			// Cleanup
@@ -678,7 +711,24 @@ struct HomeView : MVIView {
 			unsubscribe?()
 		}
 		
-		scanController.intent(intent: Scan.IntentParse(request: url.absoluteString))
+		scanController.intent(intent: Scan.IntentParse(request: urlStr))
+	}
+	
+	func navigateToBackup() {
+		log.trace("navigateToBackup()")
+		
+		deepLinkManager.broadcast(DeepLink.backup)
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged()")
+		
+		switch value {
+		case .backup:
+			self.navLinkTag = .ConfigurationView
+		default:
+			break
+		}
 	}
 }
 
@@ -848,14 +898,14 @@ fileprivate struct AppStatusButton: View, ViewName {
 	
 	@State var dimStatus = false
 	
-	@State var syncState: SyncManagerState = .initializing
-	@State var pendingSettings: PendingSettings? = nil
+	@State var syncState: SyncTxManager_State = .initializing
+	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
 	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 
-	let syncManager = AppDelegate.get().syncManager!
+	let syncTxManager = AppDelegate.get().syncManager!.syncTxManager
 	
 	@ViewBuilder
 	var body: some View {
@@ -873,11 +923,11 @@ fileprivate struct AppStatusButton: View, ViewName {
 			RoundedRectangle(cornerRadius: 30) // Test this with larger dynamicFontSize
 				.stroke(Color.borderColor, lineWidth: 1)
 		)
-		.onReceive(syncManager.statePublisher) {
-			syncManagerStateChanged($0)
+		.onReceive(syncTxManager.statePublisher) {
+			syncTxManagerStateChanged($0)
 		}
-		.onReceive(syncManager.pendingSettingsPublisher) {
-			syncManagerPendingSettingsChanged($0)
+		.onReceive(syncTxManager.pendingSettingsPublisher) {
+			syncTxManagerPendingSettingsChanged($0)
 		}
 	}
 	
@@ -970,14 +1020,14 @@ fileprivate struct AppStatusButton: View, ViewName {
 		return (isSyncing, isWaiting, isError)
 	}
 	
-	func syncManagerStateChanged(_ newState: SyncManagerState) -> Void {
-		log.trace("[\(viewName)] syncManagerStateChanged()")
+	func syncTxManagerStateChanged(_ newState: SyncTxManager_State) -> Void {
+		log.trace("[\(viewName)] syncTxManagerStateChanged()")
 		
 		syncState = newState
 	}
 	
-	func syncManagerPendingSettingsChanged(_ newPendingSettings: PendingSettings?) -> Void {
-		log.trace("[\(viewName)] syncManagerPendingSettingsChanged()")
+	func syncTxManagerPendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) -> Void {
+		log.trace("[\(viewName)] syncTxManagerPendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
 	}
@@ -1001,6 +1051,22 @@ fileprivate struct ToolsButton: View, ViewName {
 		
 		Menu {
 			Button {
+				currencyConverterTapped()
+			} label: {
+				Label(
+					NSLocalizedString("Currency converter", comment: "HomeView: Tools menu: Label"),
+					systemImage: "globe"
+				)
+			}
+			Button {
+				sendFeedbackButtonTapped()
+			} label: {
+				Label(
+					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
+					image: "email"
+				)
+			}
+			Button {
 				faqButtonTapped()
 			} label: {
 				Label(
@@ -1009,23 +1075,35 @@ fileprivate struct ToolsButton: View, ViewName {
 				)
 			}
 			Button {
-				sendFeedbackButtonTapped()
+				twitterButtonTapped()
 			} label: {
-				Label(
-					NSLocalizedString("Send feedback", comment: "HomeView: Tools menu: Label"),
-					systemImage: "envelope"
-				)
+				Label {
+					Text(verbatim: "Twitter")
+				} icon: {
+					Image("twitter")
+				}
 			}
 			Button {
-				currencyConverterTapped()
+				telegramButtonTapped()
 			} label: {
-				Label(
-					NSLocalizedString("Currency converter", comment: "HomeView: Tools menu: Label"),
-					systemImage: "globe"
-				)
+				Label {
+					Text(verbatim: "Telegram")
+				} icon: {
+					Image("telegram")
+				}
 			}
+			Button {
+				githubButtonTapped()
+			} label: {
+				Label {
+					Text("View source")
+				} icon: {
+					Image("github")
+				}
+			}
+			
 		} label: {
-			Image(systemName: "questionmark")
+			Image(systemName: "wrench.fill")
 				.renderingMode(.template)
 				.imageScale(.large)
 				.font(.caption2)
@@ -1042,12 +1120,9 @@ fileprivate struct ToolsButton: View, ViewName {
 		}
 	}
 	
-	func faqButtonTapped() {
-		log.trace("[\(viewName)] faqButtonTapped()")
-		
-		if let url = URL(string: "https://phoenix.acinq.co/faq") {
-			openURL(url)
-		}
+	func currencyConverterTapped() {
+		log.trace("[\(viewName)] currencyConverterTapped()")
+		navLinkTag = .CurrencyConverter
 	}
 	
 	func sendFeedbackButtonTapped() {
@@ -1072,13 +1147,40 @@ fileprivate struct ToolsButton: View, ViewName {
 		}
 	}
 	
-	func currencyConverterTapped() {
-		log.trace("[\(viewName)] currencyConverterTapped()")
-		navLinkTag = .CurrencyConverter
+	func telegramButtonTapped() {
+		log.trace("[\(viewName)] telegramButtonTapped()")
+		
+		if let url = URL(string: "https://t.me/phoenix_wallet") {
+			openURL(url)
+		}
+	}
+	
+	func twitterButtonTapped() {
+		log.trace("[\(viewName)] twitterButtonTapped()")
+		
+		if let url = URL(string: "https://twitter.com/PhoenixWallet") {
+			openURL(url)
+		}
+	}
+	
+	func faqButtonTapped() {
+		log.trace("[\(viewName)] faqButtonTapped()")
+		
+		if let url = URL(string: "https://phoenix.acinq.co/faq") {
+			openURL(url)
+		}
+	}
+	
+	func githubButtonTapped() {
+		log.trace("[\(viewName)] githubButtonTapped()")
+		
+		if let url = URL(string: "https://github.com/ACINQ/phoenix") {
+			openURL(url)
+		}
 	}
 }
 
-fileprivate struct DisclaimerBox<Content: View>: View {
+fileprivate struct NoticeBox<Content: View>: View {
 	
 	let content: Content
 	
@@ -1091,7 +1193,7 @@ fileprivate struct DisclaimerBox<Content: View>: View {
 		
 		HStack(alignment: VerticalAlignment.top, spacing: 0) {
 			content
-			Spacer() // ensure content takes up full width of screen
+			Spacer(minLength: 0) // ensure content takes up full width of screen
 		}
 		.padding(12)
 		.background(
@@ -1105,7 +1207,6 @@ fileprivate struct DisclaimerBox<Content: View>: View {
 fileprivate struct BottomBar: View, ViewName {
 	
 	@Binding var navLinkTag: NavLinkTag?
-	@ObservedObject var toast: Toast
 	
 	var body: some View {
 		

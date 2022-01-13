@@ -74,7 +74,7 @@
 "A bitcoin can be divided into smaller units. The smallest unit is called a Satoshi, and there are 100 million satoshis in a single bitcoin." = "Bitcoin je rozdělitelný na menší jednotky. Nejmenší jednotka se nazývá satoshi a v jednom bitcoinu je 100 milionů satoshi.";
 
 /* No comment provided by engineer. */
-"A random electrum server will be selected on each connection attempt." = "Při každém pokusu o připojení bude vybrán náhodný Electrum server.";
+"A random Electrum server will be selected on each connection attempt." = "Při každém pokusu o připojení bude vybrán náhodný Electrum server.";
 
 /* No comment provided by engineer. */
 "A temporary error occurred, and Phoenix is unable to continue loading." = "Došlo k dočasné chybě a Phoenix nemůže pokračovat v načítání.";
@@ -188,7 +188,7 @@
 "Brazilian Real" = "Brazilský real";
 
 /* No comment provided by engineer. */
-"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Ve výchozím nastavení se Phoenix připojuje k náhodným Electrum serverům, aby získal přístup k bitcoinovému blockchainu. Můžete si také zvolit připojit se k vlastnímu serveru Electrum.";
+"By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "Ve výchozím nastavení se Phoenix připojuje k náhodným Electrum serverům, aby získal přístup k bitcoinovému blockchainu. Můžete si také zvolit připojit se k vlastnímu serveru Electrum.";
 
 /* Currency name: CAD */
 "Canadian Dollar" = "Kanadský dolar";
@@ -826,7 +826,7 @@
 "The address is for %@, but you're on %@" = "Adresa je pro %@, ale jste na %@";
 
 /* No comment provided by engineer. */
-"The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "Záložní fráze, známá jako seed, je seznam 12 anglických slov. V případě potřeby vám umožní obnovit plný přístup k vašim finančním prostředkům.";
+"The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." = "Záložní fráze, známá jako seed, je seznam 12 anglických slov. V případě potřeby vám umožní obnovit plný přístup k vašim finančním prostředkům.";
 
 /* No comment provided by engineer. */
 "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Bitcoinový mempool je přetížený a poplatky jsou velmi vysoké. Služba swapu na on-chainu byla dočasně deaktivována.";
@@ -1025,13 +1025,13 @@
 "You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "Své soukromí můžete zlepšit pouze tím, že použijete Tor při připojení k serveru Electrum nebo k vašemu Lightning peeru.";
 
 /* No comment provided by engineer. */
-"You currenly have 1 Lightning channel with a balance of %@." = "Aktuálně máte 1 Lightning kanál se zůstatkem %@.";
+"You currently have 1 Lightning channel with a balance of %@." = "Aktuálně máte 1 Lightning kanál se zůstatkem %@.";
 
 /* No comment provided by engineer. */
 "You currently don't have any channels that can be closed." = "Aktuálně nemáte žádné kanály, které můžou být uzavřeny.";
 
 /* No comment provided by engineer. */
-"You currently have %@ Lightning channels with an aggragate balance of %@." = "Aktuálně máte %1$@ Lightning kanálů s celkovým zůstatkem %2$@.";
+"You currently have %@ Lightning channels with an aggregate balance of %@." = "Aktuálně máte %1$@ Lightning kanálů s celkovým zůstatkem %2$@.";
 
 /* No comment provided by engineer. */
 "You don't have any payment channels." = "Nemáte žádné platební kanály.";
@@ -1061,4 +1061,4 @@
 "Your wallet is empty. The first payment you receive must be at least **%@**." = "Vaše peněženka je prázdná. První platba kterou dostanete musí být nejméně **% @ **.";
 
 /* No comment provided by engineer. */
-"Your wallet's seed is a list of 12 english words." = "Seed vaší peněženky je seznam 12 anglických slov.";
+"Your wallet's seed is a list of 12 English words." = "Seed vaší peněženky je seznam 12 anglických slov.";

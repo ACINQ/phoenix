@@ -79,11 +79,15 @@ struct SendView: MVIView {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
-	init(firstModel: Scan.Model? = nil) {
+	init(controller: AppScanController? = nil) {
 		
-		self._mvi = StateObject.init(wrappedValue: MVIState.init {
-			$0.scan(firstModel: firstModel ?? Scan.Model_Ready())
-		})
+		if let controller = controller {
+			self._mvi = StateObject(wrappedValue: MVIState(controller))
+		} else {
+			self._mvi = StateObject(wrappedValue: MVIState {
+				$0.scan(firstModel: Scan.Model_Ready())
+			})
+		}
 	}
 	
 	@ViewBuilder
@@ -97,7 +101,7 @@ struct SendView: MVIView {
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
-		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: URL) in
+		.onReceive(AppDelegate.get().externalLightningUrlPublisher) { (url: String) in
 			didReceiveExternalLightningUrl(url)
 		}
 	}
@@ -144,7 +148,7 @@ struct SendView: MVIView {
 		}
 	}
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("modelDidChange()")
 		
 		if let newModel = newModel as? Scan.Model_BadRequest {
@@ -248,10 +252,10 @@ struct SendView: MVIView {
 		)
 	}
 	
-	func didReceiveExternalLightningUrl(_ url: URL) -> Void {
+	func didReceiveExternalLightningUrl(_ urlStr: String) -> Void {
 		log.trace("didReceiveExternalLightningUrl()")
 		
-		mvi.intent(Scan.Intent_Parse(request: url.absoluteString))
+		mvi.intent(Scan.Intent_Parse(request: urlStr))
 	}
 }
 
@@ -366,7 +370,7 @@ struct ScanView: View, ViewName {
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
 	}
 	
-	func modelDidChange(_ newModel: Scan.Model) -> Void {
+	func modelDidChange(_ newModel: Scan.Model) {
 		log.trace("[\(viewName)] modelDidChange()")
 		
 		if ignoreScanner {
@@ -947,7 +951,7 @@ struct ValidateView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
 				Text(verbatim: tipInfo.bitcoin_base.string)
 					.read(maxBitcoinWidthReader)
-				Text(verbatim: tipInfo.bitcoin_tip.string)
+				Text(verbatim: "+ \(tipInfo.bitcoin_tip.string)")
 					.read(maxBitcoinWidthReader)
 				Divider()
 					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
@@ -957,7 +961,7 @@ struct ValidateView: View, ViewName {
 			
 			VStack(alignment: HorizontalAlignment.center, spacing: 8) {
 				Text(verbatim: "")
-				Text(verbatim: "+\(tipInfo.percent)")
+				Text(verbatim: tipInfo.percent)
 				Divider()
 					.frame(width: 0, height: 1)
 				Text(verbatim: "")
@@ -966,7 +970,7 @@ struct ValidateView: View, ViewName {
 			VStack(alignment: HorizontalAlignment.trailing, spacing: 8) {
 				Text(verbatim: tipInfo.fiat_base.string)
 					.read(maxFiatWidthReader)
-				Text(verbatim: tipInfo.fiat_tip.string)
+				Text(verbatim: "+ \(tipInfo.fiat_tip.string)")
 					.read(maxFiatWidthReader)
 				Divider()
 					.frame(width: tipInfo.isEmpty ? 0 : maxBitcoinWidth ?? 0, height: 1)
@@ -1852,7 +1856,7 @@ struct MetadataSheet: View, ViewName {
 							.font(Font.system(.body, design: .serif))
 							.bold()
 						
-						if let image = UIImage(data: imagePng.toSwiftData()) {
+						if let data = Data(base64Encoded: imagePng), let image = UIImage(data: data) {
 							Image(uiImage: image)
 								.padding(.leading)
 						} else {
@@ -1869,7 +1873,7 @@ struct MetadataSheet: View, ViewName {
 							.font(Font.system(.body, design: .serif))
 							.bold()
 						
-						if let image = UIImage(data: imageJpg.toSwiftData()) {
+						if let data = Data(base64Encoded: imageJpg), let image = UIImage(data: data) {
 							Image(uiImage: image)
 								.padding(.leading)
 						} else {

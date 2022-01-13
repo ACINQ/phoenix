@@ -128,7 +128,7 @@ class AppConfigurationManager(
             try {
                 httpClient.get<String>("https://s3.eu-west-1.amazonaws.com/acinq.co/phoenix/walletcontext.json")
             } catch (e2: Exception) {
-                logger.error(e2) { "failed to fetch wallet context: ${e2.message?.take(200)}" }
+                logger.error { "failed to fetch wallet context: ${e2.message?.take(200)}" }
                 null
             }
         }?.let {

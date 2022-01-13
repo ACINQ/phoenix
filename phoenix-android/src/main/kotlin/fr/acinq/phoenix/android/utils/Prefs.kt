@@ -51,6 +51,7 @@ object Prefs {
     val PREFS_SHOW_AMOUNT_IN_FIAT = booleanPreferencesKey("PREFS_SHOW_AMOUNT_IN_FIAT")
     val PREFS_BITCOIN_UNIT = stringPreferencesKey("PREFS_BITCOIN_UNIT")
     val PREFS_FIAT_CURRENCY = stringPreferencesKey("PREFS_FIAT_CURRENCY")
+    val PREFS_THEME = stringPreferencesKey("PREFS_THEME")
 
     fun getBitcoinUnit(context: Context): Flow<BitcoinUnit> = prefs(context).map { BitcoinUnit.valueOf(it[PREFS_BITCOIN_UNIT] ?: BitcoinUnit.Sat.name) }
     suspend fun saveBitcoinUnit(context: Context, coinUnit: BitcoinUnit) = context.datastore.edit { it[PREFS_BITCOIN_UNIT] = coinUnit.name }
@@ -58,6 +59,8 @@ object Prefs {
     suspend fun saveFiatCurrency(context: Context, currency: FiatCurrency) = context.datastore.edit { it[PREFS_FIAT_CURRENCY] = currency.name }
     fun getIsAmountInFiat(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SHOW_AMOUNT_IN_FIAT] ?: false }
     suspend fun saveIsAmountInFiat(context: Context, inFiat: Boolean) = context.datastore.edit { it[PREFS_SHOW_AMOUNT_IN_FIAT] = inFiat }
+    fun getUserTheme(context: Context): Flow<UserTheme> = prefs(context).map { UserTheme.safeValueOf(it[PREFS_THEME]) }
+    suspend fun saveUserTheme(context: Context, theme: UserTheme) = context.datastore.edit { it[PREFS_THEME] = theme.name }
 
     // -- electrum
 
@@ -73,12 +76,21 @@ object Prefs {
             } else ServerAddress(address, 50002)
         }
     }
+
     suspend fun saveElectrumServer(context: Context, address: String) = context.datastore.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
     suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
 
     // -- FCM
+
     val PREFS_FCM_TOKEN = stringPreferencesKey("PREFS_FCM_TOKEN")
 
     fun getFcmToken(context: Context): Flow<String?> = prefs(context).map { it[PREFS_FCM_TOKEN] }
     suspend fun saveFcmToken(context: Context, token: String) = context.datastore.edit { it[PREFS_FCM_TOKEN] = token }
+
+    // -- App access, screen lock...
+
+    val PREFS_SCREEN_LOCK = booleanPreferencesKey("PREFS_SCREEN_LOCK")
+
+    fun getIsScreenLockActive(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SCREEN_LOCK] ?: false }
+    suspend fun saveIsScreenLockActive(context: Context, isScreenLockActive: Boolean) = context.datastore.edit { it[PREFS_SCREEN_LOCK] = isScreenLockActive }
 }

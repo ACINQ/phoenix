@@ -23,6 +23,8 @@ object Versions {
         const val compose = "1.1.0-beta02"
         const val navCompose = "2.4.0-beta02"
         const val constraintLayoutCompose = "1.0.0-beta02"
+        const val accompanist = "0.21.4-beta"
+        const val biometrics = "1.1.0"
 
         const val zxing = "4.1.0"
         const val fcm = "22.0.0"
@@ -42,7 +44,6 @@ object Versions {
         const val constraint = "2.0.4"
         const val lifecycleExtensions = "2.2.0"
         const val lifecycle = "2.3.1"
-        const val biometrics = "1.1.0"
         const val work = "2.5.0"
         const val viewpager = "1.0.0"
         const val eventbus = "3.1.1"

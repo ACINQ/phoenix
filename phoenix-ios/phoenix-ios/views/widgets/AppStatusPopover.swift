@@ -18,12 +18,12 @@ struct AppStatusPopover: View {
 
 	@StateObject var monitor = ObservableConnectionsManager()
 	
-	@State var syncState: SyncManagerState = .initializing
-	@State var pendingSettings: PendingSettings? = nil
+	@State var syncState: SyncTxManager_State = .initializing
+	@State var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
 	@Environment(\.popoverState) var popoverState: PopoverState
 	
-	let syncManager = AppDelegate.get().syncManager!
+	let syncManager = AppDelegate.get().syncManager!.syncTxManager
 	
 	enum TitleIconWidth: Preference {}
 	let titleIconWidthReader = GeometryPreferenceReader(
@@ -148,7 +148,7 @@ struct AppStatusPopover: View {
 	}
 	
 	@ViewBuilder
-	func syncStatusSection_pending(_ value: PendingSettings) -> some View {
+	func syncStatusSection_pending(_ value: SyncTxManager_PendingSettings) -> some View {
 		
 		VStack(alignment: .leading) {
 			
@@ -336,13 +336,13 @@ struct AppStatusPopover: View {
 		} // </VStack>
 	}
 	
-	func syncStateChanged(_ newSyncState: SyncManagerState) {
+	func syncStateChanged(_ newSyncState: SyncTxManager_State) {
 		log.trace("syncStateChanged()")
 		
 		syncState = newSyncState
 	}
 	
-	func pendingSettingsChanged(_ newPendingSettings: PendingSettings?) {
+	func pendingSettingsChanged(_ newPendingSettings: SyncTxManager_PendingSettings?) {
 		log.trace("pendingSettingsChanged()")
 		
 		pendingSettings = newPendingSettings
@@ -381,8 +381,8 @@ fileprivate struct ConnectionCell: View {
 
 fileprivate struct SyncProgressDetails: View {
 	
-	@Binding var syncState: SyncManagerState
-	@StateObject var syncProgress: SyncManagerState_Progress
+	@Binding var syncState: SyncTxManager_State
+	@StateObject var syncProgress: SyncTxManager_State_Progress
 	
 	@ViewBuilder
 	var body: some View {
@@ -452,7 +452,7 @@ fileprivate struct SyncProgressDetails: View {
 
 fileprivate struct SyncWaitingDetails: View, ViewName {
 	
-	let waiting: SyncManagerState_Waiting
+	let waiting: SyncTxManager_State_Waiting
 	
 	let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
 	@State var currentDate = Date()
@@ -471,7 +471,6 @@ fileprivate struct SyncWaitingDetails: View, ViewName {
 					
 				default:
 					Text("Waiting...")
-			
 			} // </switch>
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 8) {
@@ -579,7 +578,7 @@ fileprivate struct SyncWaitingDetails: View, ViewName {
 
 fileprivate struct PendingSettingsDetails: View, ViewName {
 	
-	let pendingSettings: PendingSettings
+	let pendingSettings: SyncTxManager_PendingSettings
 	
 	@ViewBuilder
 	var body: some View {

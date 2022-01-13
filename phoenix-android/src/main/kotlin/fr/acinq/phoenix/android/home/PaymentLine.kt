@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,19 +43,25 @@ import fr.acinq.lightning.utils.msat
 import fr.acinq.lightning.utils.sum
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.mutedTextColor
-import fr.acinq.phoenix.android.negativeColor
-import fr.acinq.phoenix.android.positiveColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import fr.acinq.phoenix.android.utils.negativeColor
+import fr.acinq.phoenix.android.utils.positiveColor
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.data.WalletPaymentId
+import fr.acinq.phoenix.data.walletPaymentId
 
 
 @Composable
 fun PaymentLineLoading(
-    timestamp: Long
+    paymentId: WalletPaymentId,
+    timestamp: Long,
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        modifier = Modifier
+            .clickable { onPaymentClick(paymentId) }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIconComponent(
             icon = R.drawable.ic_payment_pending,
@@ -67,7 +74,7 @@ fun PaymentLineLoading(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.body1.copy(color = mutedTextColor()),
-                modifier = Modifier.weight(1.0f)
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
@@ -78,12 +85,12 @@ fun PaymentLineLoading(
 @Composable
 fun PaymentLine(
     payment: WalletPayment,
-    onPaymentClick: (WalletPayment) -> Unit
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable { onPaymentClick(payment) }
+            .clickable { onPaymentClick(payment.walletPaymentId()) }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         PaymentIcon(payment)
@@ -111,7 +118,13 @@ fun PaymentLine(
                 }
             }
             Spacer(modifier = Modifier.width(2.dp))
-            Text(text = payment.completedAt().toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
+            val timestamp: Long = remember {
+                payment.completedAt().takeIf { it > 0 } ?: when (payment) {
+                    is OutgoingPayment -> payment.createdAt
+                    is IncomingPayment -> payment.createdAt
+                }
+            }
+            Text(text = timestamp.toRelativeDateString(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp))
         }
     }
 }

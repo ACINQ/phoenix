@@ -18,14 +18,21 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -33,76 +40,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.borderColor
-import fr.acinq.phoenix.android.mutedBgColor
-import fr.acinq.phoenix.android.mutedTextColor
+import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
 
-
-@Composable
-fun ScreenHeader(
-    title: String? = null,
-    subtitle: String? = null,
-    onBackClick: () -> Unit,
-    backgroundColor: Color = mutedBgColor(),
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(horizontal = 0.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        BackButton(onClick = onBackClick)
-        Column(
-            modifier = Modifier.padding(horizontal = 0.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            title?.run { Text(text = this) }
-            subtitle?.run {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
-            }
-        }
-    }
-}
-
-@Composable
-fun ScreenBody(
-    modifier: Modifier = Modifier.padding(PaddingValues(start = 50.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)),
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.surface)
-    ) {
-        HSeparator()
-        Column(
-            modifier = modifier.fillMaxWidth()
-        ) {
-            content()
-        }
-        HSeparator()
-    }
-}
 
 /** Button for navigation purpose, with the back arrow. */
 @Composable
 fun BackButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        shape = CircleShape,
-        contentPadding = PaddingValues(16.dp),
+        shape = RoundedCornerShape(topStart = 0.dp, topEnd = 50.dp, bottomEnd = 50.dp, bottomStart = 0.dp),
+        contentPadding = PaddingValues(start = 20.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Unspecified,
             disabledBackgroundColor = Color.Unspecified,
-            contentColor = LocalContentColor.current,
+            contentColor = MaterialTheme.colors.onSurface,
             disabledContentColor = mutedTextColor(),
         ),
         elevation = null,
-        modifier = Modifier.size(50.dp)
+        modifier = Modifier.size(width = 62.dp, height = 52.dp)
     ) {
-        PhoenixIcon(resourceId = R.drawable.ic_arrow_back)
+        PhoenixIcon(resourceId = R.drawable.ic_arrow_back, Modifier.width(24.dp))
     }
 }
 
@@ -111,16 +69,24 @@ fun Dialog(
     onDismiss: () -> Unit,
     title: String? = null,
     properties: DialogProperties = DialogProperties(),
+    isScrollable: Boolean = true,
     buttons: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
         Column(
             Modifier
-                .padding(vertical = 50.dp) // vertical padding for tall dialogs
-                .fillMaxWidth()
+                .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
                 .clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colors.surface)
+                .widthIn(max = 600.dp)
+                .then(
+                    if (isScrollable) {
+                        Modifier.verticalScroll(rememberScrollState())
+                    } else {
+                        Modifier
+                    }
+                )
         ) {
             // optional title
             title?.run {
@@ -130,8 +96,7 @@ fun Dialog(
             content()
             // buttons
             Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.align(Alignment.End)
             ) {
                 if (buttons != null) {
                     buttons()
@@ -145,13 +110,11 @@ fun Dialog(
 
 @Composable
 fun HSeparator(
-    padding: PaddingValues = PaddingValues(0.dp)
+    width: Dp? = null,
 ) {
     Box(
-        Modifier
-            .fillMaxWidth()
+        (width?.run { Modifier.width(width) } ?: Modifier.fillMaxWidth())
             .height(1.dp)
-            .padding(padding)
             .background(color = borderColor())
     )
 }
@@ -167,6 +130,23 @@ fun VSeparator(
             .padding(padding)
             .background(color = borderColor())
     )
+}
+
+@Composable
+fun Card(
+    modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    internalPadding: PaddingValues = PaddingValues(0.dp),
+    shape: Shape = RoundedCornerShape(16.dp),
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .clip(shape)
+            .background(MaterialTheme.colors.surface)
+            .padding(internalPadding)
+    ) {
+        content()
+    }
 }
 
 fun Modifier.enableOrFade(enabled: Boolean): Modifier = this.then(Modifier.alpha(if (enabled) 1f else 0.3f))

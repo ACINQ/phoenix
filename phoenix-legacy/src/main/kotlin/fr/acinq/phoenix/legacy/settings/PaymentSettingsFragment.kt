@@ -20,6 +20,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ import fr.acinq.phoenix.legacy.utils.Converter
 import fr.acinq.phoenix.legacy.utils.Prefs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.NumberFormat
 
 class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
@@ -48,6 +50,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
 
   private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _: SharedPreferences, key: String ->
     if (key == Prefs.PREFS_PAYMENT_DEFAULT_DESCRIPTION
+      || key == Prefs.PREFS_PAYMENTS_EXPIRY_SEC
       || key == Prefs.PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE || key == Prefs.PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE
       || key == Prefs.PREFS_AUTO_PAY_TO_OPEN
     ) {
@@ -79,6 +82,22 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
           .show()
       }
     }
+    mBinding.paymentExpiryButton.setOnClickListener {
+      context?.let { ctx ->
+        AlertHelper.buildWithInput(
+          layoutInflater,
+          title = ctx.getString(R.string.paymentsettings_expiry_dialog_title),
+          message = ctx.getString(R.string.paymentsettings_expiry_dialog_description),
+          callback = { Prefs.setPaymentsExpirySeconds(ctx, it.toLongOrNull()?.coerceAtLeast(1)) },
+          defaultValue = Prefs.getPaymentsExpirySeconds(ctx).toString(),
+          inputType = InputType.TYPE_CLASS_NUMBER,
+          maxLength = 7,
+          hint = ctx.getString(R.string.paymentsettings_expiry_dialog_hint)
+        )
+          .setNegativeButton(getString(R.string.utils_cancel), null)
+          .show()
+      }
+    }
     mBinding.trampolineFeesButton.setOnClickListener { context?.let { getMaxTrampolineFeeDialog(it)?.show() } }
     mBinding.payToOpenFeesButton.setOnClickListener {
       AlertHelper.build(layoutInflater, title = getString(R.string.paymentsettings_paytoopen_fees_dialog_title),
@@ -100,6 +119,7 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
   private fun refreshUI() {
     context?.let { ctx ->
       mBinding.defaultDescriptionButton.setSubtitle(Prefs.getDefaultPaymentDescription(ctx).takeIf { it.isNotBlank() } ?: getString(R.string.paymentsettings_defaultdesc_none))
+      mBinding.paymentExpiryButton.setSubtitle(ctx.getString(R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(Prefs.getPaymentsExpirySeconds(ctx))))
 
       val isAutoPayToOpenEnabled = Prefs.isAutoPayToOpenEnabled(ctx)
       val trampolineFeeSetting = Prefs.getMaxTrampolineCustomFee(ctx) ?: appContext(ctx).trampolineFeeSettings.value?.last()

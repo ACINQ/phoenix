@@ -16,15 +16,15 @@
 
 package fr.acinq.phoenix.android
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
@@ -34,23 +34,23 @@ import fr.acinq.phoenix.data.FiatCurrency
 
 typealias CF = ControllerFactory
 
+val LocalTheme = staticCompositionLocalOf { UserTheme.SYSTEM }
 val LocalBusiness = staticCompositionLocalOf<PhoenixBusiness?> { null }
 val LocalControllerFactory = staticCompositionLocalOf<ControllerFactory?> { null }
 val LocalNavController = staticCompositionLocalOf<NavHostController?> { null }
-val LocalKeyState = staticCompositionLocalOf<KeyState> { KeyState.Unknown }
 val LocalBitcoinUnit = compositionLocalOf { BitcoinUnit.Sat }
 val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
 val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
 
+val isDarkTheme: Boolean
+    @Composable
+    get() = LocalTheme.current.let { it == UserTheme.DARK || (it == UserTheme.SYSTEM && isSystemInDarkTheme()) }
+
 val navController: NavHostController
     @Composable
     get() = LocalNavController.current ?: error("navigation controller is not available")
-
-val keyState
-    @Composable
-    get() = LocalKeyState.current
 
 val amountUnit: CurrencyUnit
     @Composable

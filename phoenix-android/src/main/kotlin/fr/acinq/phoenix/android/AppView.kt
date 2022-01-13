@@ -21,14 +21,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.HomeView
+import fr.acinq.phoenix.android.home.HomeViewModel
 import fr.acinq.phoenix.android.home.ReadDataView
 import fr.acinq.phoenix.android.home.StartupView
 import fr.acinq.phoenix.android.init.CreateWalletView
@@ -45,9 +43,10 @@ import fr.acinq.phoenix.android.init.RestoreWalletView
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
-import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -56,10 +55,14 @@ import fr.acinq.phoenix.data.walletPaymentId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-@ExperimentalMaterialApi
 @Composable
-fun AppView(appVM: AppViewModel) {
+fun AppView(
+    mainActivity: MainActivity,
+    appVM: AppViewModel,
+) {
     val log = logger("AppView")
+    log.debug { "init app view composition" }
+
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current
@@ -73,13 +76,23 @@ fun AppView(appVM: AppViewModel) {
         LocalBusiness provides business,
         LocalControllerFactory provides business.controllers,
         LocalNavController provides navController,
-        LocalKeyState provides appVM.keyState,
         LocalExchangeRates provides fiatRates.value,
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
         LocalElectrumServer provides electrumServer.value
     ) {
+
+        // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
+        val homeViewModel: HomeViewModel = viewModel(
+            factory = HomeViewModel.Factory(
+                connectionsFlow = business.connectionsManager.connections,
+                paymentsManager = business.paymentsManager,
+                controllerFactory = controllerFactory,
+                getController = CF::home
+            )
+        )
+
         Column(
             Modifier
                 .background(appBackground())
@@ -89,9 +102,10 @@ fun AppView(appVM: AppViewModel) {
             NavHost(navController = navController, startDestination = Screen.Startup.route) {
                 composable(Screen.Startup.route) {
                     StartupView(
+                        mainActivity,
                         appVM,
                         onKeyAbsent = { navController.navigate(Screen.InitWallet.route) },
-                        onBusinessStart = { navController.navigate(Screen.Home.route) }
+                        onBusinessStarted = { navController.navigate(Screen.Home.route) }
                     )
                 }
                 composable(Screen.InitWallet.route) {
@@ -107,12 +121,15 @@ fun AppView(appVM: AppViewModel) {
                     RestoreWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
-                    RequireKey(appVM.keyState) {
+                    RequireKey(appVM.walletState.value) {
                         HomeView(
-                            onPaymentClick = { navigateToPaymentDetails(navController, it.walletPaymentId()) },
+                            homeViewModel = homeViewModel,
+                            onPaymentClick = { navigateToPaymentDetails(navController, it) },
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
-                            onSendClick = { navController.navigate(Screen.ReadData.route) }
+                            onSendClick = {
+                                navController.navigate(Screen.ReadData.route) { launchSingleTop = true }
+                            }
                         )
                     }
                 }
@@ -172,7 +189,7 @@ fun AppView(appVM: AppViewModel) {
                     SettingsView()
                 }
                 composable(Screen.DisplaySeed.route) {
-                    SeedView(appVM)
+                    SeedView()
                 }
                 composable(Screen.ElectrumServer.route) {
                     ElectrumView()
@@ -184,7 +201,16 @@ fun AppView(appVM: AppViewModel) {
                     MutualCloseView()
                 }
                 composable(Screen.Preferences.route) {
-                    PreferencesView()
+                    DisplayPrefsView()
+                }
+                composable(Screen.About.route) {
+                    AboutView()
+                }
+                composable(Screen.AppLock.route) {
+                    AppLockView(
+                        mainActivity = mainActivity,
+                        appVM = appVM
+                    )
                 }
             }
         }
@@ -206,15 +232,24 @@ private fun navigateToPaymentDetails(navController: NavController, id: WalletPay
 
 @Composable
 private fun RequireKey(
-    keyState: KeyState,
+    walletState: WalletState?, // TODO: replace by UI lock state
     children: @Composable () -> Unit
 ) {
-    if (keyState !is KeyState.Present) {
-        logger().warning { "rejecting access to screen with keyState=$keyState" }
+    if (walletState !is WalletState.Started) {
+        logger().warning { "rejecting access to screen with wallet in state=$walletState" }
         navController.navigate(Screen.Startup)
         Text("redirecting...")
     } else {
         logger().debug { "access to screen granted" }
         children()
     }
+}
+
+sealed class LockState {
+    sealed class Locked : LockState() {
+        object Default : Locked()
+        data class WithError(val code: Int?) : Locked()
+    }
+
+    object Unlocked : LockState()
 }

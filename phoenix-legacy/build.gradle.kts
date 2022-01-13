@@ -29,8 +29,8 @@ android {
     applicationId = "fr.acinq.phoenix.mainnet"
     minSdk = 24
     targetSdk = 30
-    versionCode = 34
-    versionName = "1.4.19"
+    versionCode = 35
+    versionName = gitCommitHash()
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
@@ -102,7 +102,7 @@ dependencies {
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.AndroidLegacy.lifecycle}")
   implementation("androidx.lifecycle:lifecycle-common-java8:${Versions.AndroidLegacy.lifecycle}")
   // ANDROIDX - biometric
-  implementation("androidx.biometric:biometric:${Versions.AndroidLegacy.biometrics}")
+  implementation("androidx.biometric:biometric:${Versions.Android.biometrics}")
   // ANDROIDX - preferences
   implementation("androidx.preference:preference-ktx:${Versions.Android.prefs}")
   // ANDROIDX - work manager

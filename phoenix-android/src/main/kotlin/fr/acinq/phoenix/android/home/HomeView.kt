@@ -39,99 +39,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
-import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.controllers.ControllerFactory
-import fr.acinq.phoenix.controllers.HomeController
-import fr.acinq.phoenix.controllers.main.Home
-import fr.acinq.phoenix.data.WalletPaymentFetchOptions
-import fr.acinq.phoenix.db.WalletPaymentOrderRow
+import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.managers.Connections
-import fr.acinq.phoenix.managers.PaymentsManager
-import fr.acinq.phoenix.utils.getValue
-import fr.acinq.phoenix.utils.setValue
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.launch
-
-private data class PaymentRowState(
-    val orderRow: WalletPaymentOrderRow,
-    val payment: WalletPayment?
-)
-
-@ExperimentalCoroutinesApi
-private class HomeViewModel(
-    val connectionsFlow: StateFlow<Connections>,
-    val paymentsManager: PaymentsManager,
-    controller: HomeController
-) : MVIControllerViewModel<Home.Model, Home.Intent>(controller) {
-
-    private val paymentsFlow = MutableStateFlow<Map<String, PaymentRowState>>(HashMap())
-    private var _payments by paymentsFlow
-    val payments: List<PaymentRowState> get() = paymentsFlow.value.values
-        .sortedByDescending { it.orderRow.completedAt ?: it.orderRow.createdAt }
-        .toList()
-
-    init {
-        paymentsManager.subscribeToPaymentsPage(0, 150)
-        viewModelScope.launch(CoroutineExceptionHandler { _, e ->
-            log.error("failed to collect payments page item", e)
-        }) {
-            paymentsManager.paymentsPage.collect {
-                for (row in it.rows) {
-                    _payments = _payments + (row.id.identifier to PaymentRowState(row, null))
-                    viewModelScope.launch {
-                        paymentsManager.fetcher.getPayment(row, WalletPaymentFetchOptions.Descriptions)?.let { paymentInfo ->
-                            _payments = _payments + (row.id.identifier to PaymentRowState(row, paymentInfo.payment))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    class Factory(
-        private val connectionsFlow: StateFlow<Connections>,
-        private val paymentsManager: PaymentsManager,
-        private val controllerFactory: ControllerFactory,
-        private val getController: ControllerFactory.() -> HomeController
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(connectionsFlow, paymentsManager, controllerFactory.getController()) as T
-        }
-    }
-}
-
 
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeView(
-    onPaymentClick: (WalletPayment) -> Unit,
+    homeViewModel: HomeViewModel,
+    onPaymentClick: (WalletPaymentId) -> Unit,
     onSettingsClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onSendClick: () -> Unit,
 ) {
     val log = logger("HomeView")
-    val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(business.connectionsManager.connections, business.paymentsManager, controllerFactory, CF::home))
-
-    val connectionsState = vm.connectionsFlow.collectAsState()
+    val connectionsState = homeViewModel.connectionsFlow.collectAsState()
 
     val showConnectionsDialog = remember { mutableStateOf(false) }
     if (showConnectionsDialog.value) {
@@ -139,20 +72,21 @@ fun HomeView(
     }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
 
     ModalDrawer(
         drawerState = drawerState,
         drawerShape = RectangleShape,
         drawerContent = { SideMenu(onSettingsClick) },
         content = {
-            MVIView(vm) { model, _ ->
+            MVIView(homeViewModel) { model, _ ->
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     TopBar(showConnectionsDialog, connectionsState)
                     Spacer(modifier = Modifier.height(16.dp))
                     AmountView(
                         amount = model.balance,
-                        amountTextStyle = MaterialTheme.typography.h3,
-                        unitTextStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
+                        amountTextStyle = MaterialTheme.typography.h1,
+                        unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .padding(horizontal = 16.dp)
@@ -164,14 +98,19 @@ fun HomeView(
                     Spacer(modifier = Modifier.height(16.dp))
                     PrimarySeparator()
                     Spacer(modifier = Modifier.height(24.dp))
-                    LazyColumn(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         items(
-                            items = vm.payments,
+                            items = payments,
                         ) {
                             if (it.payment == null) {
-                                PaymentLineLoading(it.orderRow.completedAt ?: it.orderRow.createdAt)
+                                LaunchedEffect(key1 = it.orderRow.id.identifier) {
+                                    homeViewModel.getPaymentDescription(it.orderRow)
+                                }
+                                PaymentLineLoading(it.orderRow.id, it.orderRow.createdAt, onPaymentClick)
                             } else {
                                 PaymentLine(it.payment, onPaymentClick)
                             }
@@ -184,13 +123,19 @@ fun HomeView(
     )
 }
 
+@OptIn(ObsoleteCoroutinesApi::class)
 @Composable
 private fun SideMenu(
     onSettingsClick: () -> Unit,
 ) {
     val context = LocalContext.current
     val peerState = business.peerState().collectAsState()
-    Column {
+    Column(
+        modifier = Modifier
+            .background(systemNavBarColor())
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
         Column(Modifier.padding(start = 24.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)) {
             val nodeId = peerState.value?.nodeParams?.nodeId?.toString() ?: stringResource(id = R.string.utils_unknown)
             Surface(shape = CircleShape, elevation = 2.dp) {
@@ -334,43 +279,54 @@ private fun BottomBar(
     onSendClick: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    Row(
+    Box(
         Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(MaterialTheme.colors.background)
+            .height(78.dp)
+            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .background(systemNavBarColor())
     ) {
-        Button(
-            icon = R.drawable.ic_settings,
-            onClick = {
-                scope.launch {
-                    drawerState.open()
-                }
-            },
-            iconTint = MaterialTheme.colors.onSurface,
-            padding = PaddingValues(24.dp),
-            modifier = Modifier.fillMaxHeight()
-        )
-        VSeparator(PaddingValues(top = 16.dp, bottom = 16.dp))
-        Button(
-            text = stringResource(id = R.string.menu_receive),
-            icon = R.drawable.ic_receive,
-            onClick = onReceiveClick,
-            iconTint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
-        VSeparator(PaddingValues(top = 16.dp, bottom = 16.dp))
-        Button(
-            text = stringResource(id = R.string.menu_send),
-            icon = R.drawable.ic_send,
-            onClick = onSendClick,
-            iconTint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-        )
+        Row {
+            Button(
+                icon = R.drawable.ic_settings,
+                onClick = {
+                    scope.launch {
+                        drawerState.open()
+                    }
+                },
+                iconTint = MaterialTheme.colors.onSurface,
+                padding = PaddingValues(20.dp),
+                modifier = Modifier.fillMaxHeight()
+            )
+            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+            Button(
+                text = stringResource(id = R.string.menu_receive),
+                icon = R.drawable.ic_receive,
+                onClick = onReceiveClick,
+                iconTint = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
+            VSeparator(PaddingValues(top = 20.dp, bottom = 20.dp))
+            Button(
+                text = stringResource(id = R.string.menu_send),
+                icon = R.drawable.ic_send,
+                onClick = onSendClick,
+                iconTint = MaterialTheme.colors.onSurface,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+            )
+        }
+        Row(Modifier.padding(horizontal = 32.dp).align(Alignment.BottomCenter)) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+            ) { }
+        }
     }
 }

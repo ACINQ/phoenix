@@ -17,97 +17,163 @@
 package fr.acinq.phoenix.android.settings
 
 
-import android.content.Context
-import android.view.Gravity
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import fr.acinq.phoenix.android.*
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Dialog
-import fr.acinq.phoenix.android.components.ScreenBody
-import fr.acinq.phoenix.android.components.ScreenHeader
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.components.*
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
-import fr.acinq.phoenix.android.utils.Converter
+import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.mutedTextColor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@Composable
-fun SeedView(appVM: AppViewModel) {
-    val log = logger()
-    val ks = keyState
-    val nc = navController
-    if (ks !is KeyState.Present) {
-        nc.navigate(Screen.Startup)
-    } else {
-        val showSeedDialog = remember { mutableStateOf(false) }
-        ScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
-        ScreenBody {
-            AndroidView(factory = {
-                TextView(it).apply {
-                    text = Converter.html(it.getString(R.string.displayseed_instructions))
-                }
-            })
-            if (showSeedDialog.value) {
-                SeedDialog(onClose = { showSeedDialog.value = false }, appVM = appVM)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            BorderButton(onClick = { showSeedDialog.value = true }, text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key)
-        }
-    }
+private sealed class SeedViewState() {
+    object Init : SeedViewState()
+    object ReadingSeed : SeedViewState()
+    data class ShowSeed(val words: List<String>) : SeedViewState()
+    data class Error(val message: String) : SeedViewState()
 }
 
 @Composable
-fun SeedDialog(onClose: () -> Unit, appVM: AppViewModel) {
-    val seed = appVM.decryptSeed()
-    Dialog(
-        onDismiss = onClose
-    ) {
-        if (seed != null) {
-            // TODO: suspend method with state
-            val words = EncryptedSeed.toMnemonics(seed)
-            Column(Modifier.padding(24.dp)) {
-                Text(text = stringResource(id = R.string.displayseed_dialog_header))
-                Spacer(modifier = Modifier.height(16.dp))
-                AndroidView(factory = { ctx ->
-                    TableLayout(ctx).apply {
-                        var i = 0
-                        while (i < words.size / 2) {
-                            addView(TableRow(context).apply {
-                                this.gravity = Gravity.CENTER
-                                this.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT)
-                                this.addView(buildWordView(ctx, i, words[i], true))
-                                this.addView(buildWordView(ctx, i + words.size / 2, words[i + (words.size / 2)], false))
-                            })
-                            i += 1
+fun SeedView() {
+    val log = logger("SeedView")
+    val nc = navController
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var state by remember { mutableStateOf<SeedViewState>(SeedViewState.Init) }
+
+    SettingScreen {
+        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+        Card(internalPadding = PaddingValues(16.dp)) {
+            Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Card {
+            when (val s = state) {
+                is SeedViewState.Init -> {
+                    SettingButton(text = R.string.displayseed_authenticate_button, icon = R.drawable.ic_key) {
+                        state = SeedViewState.ReadingSeed
+                        scope.launch {
+                            val keyState = SeedManager.getSeedState(context)
+                            when {
+                                keyState is KeyState.Present && keyState.encryptedSeed is EncryptedSeed.V2.NoAuth -> {
+                                    val words = EncryptedSeed.toMnemonics(keyState.encryptedSeed.decrypt())
+                                    delay(300)
+                                    state = SeedViewState.ShowSeed(words)
+                                }
+                                keyState is KeyState.Error.Unreadable -> {
+                                    state = SeedViewState.Error(context.getString(R.string.displayseed_error_details, keyState.message ?: "n/a"))
+                                }
+                                else -> {
+                                    log.info { "unable to read seed in state=$keyState" }
+                                    // TODO: handle errors
+                                }
+                            }
                         }
                     }
-                })
+                }
+                is SeedViewState.ReadingSeed -> {
+                    Row (modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        IconWithText(icon = R.drawable.ic_key, text = stringResource(id = R.string.displayseed_loading))
+                    }
+                }
+                is SeedViewState.ShowSeed -> {
+                    SeedDialog(onDismiss = { state = SeedViewState.Init }, words = s.words)
+                }
             }
-        } else {
-            Text(stringResource(id = R.string.displayseed_error_generic))
         }
     }
 }
 
-private fun buildWordView(context: Context, i: Int, word: String, hasRightPadding: Boolean): TextView {
-    val bottomPadding = context.resources.getDimensionPixelSize(R.dimen.space_xxs)
-    val rightPadding = if (hasRightPadding) context.resources.getDimensionPixelSize(R.dimen.space_lg) else 0
-    val textView = TextView(context)
-    textView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
-    textView.text = Converter.html(context.getString(R.string.displayseed_words_td, i + 1, word))
-    textView.setPadding(0, 0, rightPadding, bottomPadding)
-    return textView
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun SeedDialog(words: List<String>, onDismiss: () -> Unit) {
+    val log = logger("SeedDialog")
+    Dialog(
+        onDismiss = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Column(
+            modifier = Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.displayseed_dialog_header),
+                style = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            if (words.isEmpty()) {
+                Text("reading seed...")
+            } else {
+                val groupedWords: List<Pair<String, String>> = remember(words) {
+                    words.mapIndexed { i, w ->
+                        if (i + (words.size / 2) < words.size) {
+                            words[i] to words[i + (words.size / 2)]
+                        } else {
+                            null
+                        }
+                    }.filterNotNull()
+                }
+                val typo = MaterialTheme.typography.body1
+                val indexColor = mutedTextColor()
+                val indexStyle = remember(typo) { typo.copy(fontSize = 12.sp, textAlign = TextAlign.End, color = indexColor) }
+                val wordStyle = remember(typo) { typo.copy(fontWeight = FontWeight.Bold) }
+
+                groupedWords.forEachIndexed { index, wordPair ->
+                    Row(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .widthIn(max = 300.dp)
+                    ) {
+                        Cell(text = "#${index + 1}", modifier = Modifier.width(24.dp), textStyle = indexStyle)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Cell(text = wordPair.first, modifier = Modifier.width(100.dp), textStyle = wordStyle)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Cell(text = "#${index + words.size / 2 + 1}", modifier = Modifier.width(24.dp), textStyle = indexStyle)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Cell(text = wordPair.second, modifier = Modifier.width(100.dp), textStyle = wordStyle)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = stringResource(id = R.string.displayseed_derivation_path),
+                style = TextStyle(textAlign = TextAlign.Center, color = mutedTextColor())
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.Cell(
+    text: String,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.body1
+) {
+    Text(
+        text = text,
+        modifier = modifier.alignBy(FirstBaseline),
+        style = textStyle
+    )
 }

@@ -310,6 +310,8 @@ struct CurrencyConverterView: View {
 		}
 		didAppear = true
 		
+		UIScrollView.appearance().keyboardDismissMode = .interactive
+		
 		if #available(iOS 15.0, *) { } else {
 			// iOS 14 bug workaround
 			currencies = Prefs.shared.currencyConverterList

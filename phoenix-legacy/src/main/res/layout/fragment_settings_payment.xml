@@ -56,7 +56,7 @@
           app:text="@string/paymentsettings_defaultdesc_title" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
-          android:id="@+id/trampoline_fees_button"
+          android:id="@+id/payment_expiry_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="@dimen/space_md"
@@ -64,6 +64,18 @@
           app:hz_bias="0"
           app:icon="@color/transparent"
           app:layout_constraintTop_toBottomOf="@id/default_description_button"
+          app:spacer_size="@dimen/space_md"
+          app:text="@string/paymentsettings_expiry_title" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/trampoline_fees_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="@dimen/space_md"
+          android:background="@drawable/button_bg_square"
+          app:hz_bias="0"
+          app:icon="@color/transparent"
+          app:layout_constraintTop_toBottomOf="@id/payment_expiry_button"
           app:spacer_size="@dimen/space_md"
           app:text="@string/paymentsettings_trampoline_fees_title" />
 

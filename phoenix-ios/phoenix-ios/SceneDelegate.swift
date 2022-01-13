@@ -94,7 +94,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			// Because it hasn't been displayed yet.
 			let url = context.url
 			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-				AppDelegate.get().externalLightningUrlPublisher.send(url)
+				self.handleExternalURL(url)
 			}
 		}
 		
@@ -160,6 +160,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: URL Handling
+	// --------------------------------------------------
+	
 	/// From Apple docs:
 	///
 	/// > If your app has opted into Scenes, and your app is not running, the system delivers the
@@ -170,9 +174,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		log.trace("scene(_:openURLContexts:)")
 		
 		if let context = URLContexts.first {
-			log.debug("openURL: \(context.url)")
-			AppDelegate.get().externalLightningUrlPublisher.send(context.url)
+			handleExternalURL(context.url)
 		}
+	}
+	
+	func handleExternalURL(_ url: URL) {
+		log.trace("handleExternalURL")
+		
+		var urlStr = url.absoluteString
+		
+		// We support phoenix-specific URLs:
+		// phoenix:lightning:lnbc10u1pwjqwkkp...
+		//
+		// As per issue #186:
+		// > Anyone with more than one lightning wallet on iOS has a hard time
+		// > having the URI open the correct wallet...
+		//
+		let trimMatchingPrefix = {(prefix: String) -> Void in
+			
+			if urlStr.lowercased().starts(with: prefix.lowercased()) {
+				
+				let startIdx = urlStr.index(urlStr.startIndex, offsetBy: prefix.count)
+				let substr = urlStr[startIdx ..< urlStr.endIndex]
+				urlStr = String(substr)
+			}
+		}
+		
+		trimMatchingPrefix("phoenix://")
+		trimMatchingPrefix("phoenix:")
+		
+		AppDelegate.get().externalLightningUrlPublisher.send(urlStr)
 	}
 	
 	// --------------------------------------------------

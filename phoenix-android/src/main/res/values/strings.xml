@@ -45,15 +45,7 @@
     <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
     <string name="authprompt_title">Unlock to continue</string>
-    <string name="authprompt_hard_negative">Cancel</string>
     <string name="authprompt_error_unsecure">Device is not secure (code: %1$d)</string>
-
-    <!-- //////////////// Pin dialog //////////////////// -->
-
-    <string name="pindialog_title_default">Please enter your PIN</string>
-    <string name="pindialog_pwd_placeholder" translatable="false">●●●●●●</string>
-    <string name="pindialog_error">PIN code must be a 6 digits number.</string>
-    <string name="pindialog_error_donotmatch">PIN codes do not match.</string>
 
     <!-- //////////////// Biometric dialog //////////////////// -->
 
@@ -75,8 +67,9 @@
 
     <string name="startup_unlock_required">Phoenix is locked.\nPlease authenticate to continue.</string>
     <string name="startup_unlock_button">Unlock</string>
+    <string name="startup_check_lock">Checking lock…</string>
     <string name="startup_binding_service">Binding service…</string>
-    <string name="startup_wait">Loading…</string>
+    <string name="startup_wait">Preparing wallet…</string>
     <string name="startup_starting">Starting…</string>
     <string name="startup_wait_tor">Starting Tor…</string>
     <string name="startup_start_button">Restart</string>
@@ -125,7 +118,7 @@
     <string name="receive__edit__title">Edit my invoice</string>
     <string name="receive__edit__subtitle">You can change the requested amount and the description of the invoice.</string>
     <string name="receive__edit__amount_label">Amount (optional)</string>
-    <string name="receive__edit__desc_label">Payment description (optional):</string>
+    <string name="receive__edit__desc_label">Description (optional):</string>
     <string name="receive__edit__generate_button">Create invoice</string>
 
     <string name="receive__swapin__error_message">Could not retrieve a Bitcoin address from the swap service.\n\nTry again later.</string>
@@ -214,6 +207,7 @@
     <string name="utils_pretty_amount_with_unit"><![CDATA[%1$s%2$s<small>%3$s<small> %4$s]]></string>
     <string name="utils_unknown_amount" translatable="false">!?</string>
     <string name="utils_no_conversion">BTC exchange rate unavailable</string>
+    <string name="utils_amount_hint">Amount</string>
 
     <string name="utils_proceed">Proceed</string>
     <string name="utils_cancel">Cancel</string>
@@ -224,6 +218,7 @@
     <string name="btn_next">Next</string>
     <string name="btn_copy">Copy</string>
     <string name="btn_ok">OK</string>
+    <string name="btn_save">Save</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_close">Close</string>
@@ -274,10 +269,10 @@
     <string name="closechannels_mutual_title">Close my channels</string>
     <string name="closechannels_mutual_subtitle">Use this screen to close your payments channels and drain your funds to a Bitcoin address.</string>
     <string name="closechannels_checking_channels">Checking your channels, please hold…</string>
-    <string name="closechannels_channels_recap">%1$d channel(s) holding an aggregated balance of %2$s can be closed. Funds will be sent to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
+    <string name="closechannels_channels_recap">You have %1$d active Lightning channel(s) holding an aggregated balance of %2$s. Closing those channels will send funds to the provided Bitcoin address.\n\nMake sure that this address is correct.</string>
     <string name="closechannels_channels_none">You currently don\'t have any channels that could be closed.</string>
     <string name="closechannels_mutual_input_hint">Bitcoin address</string>
-    <string name="closechannels_mutual_button">Empty my wallet</string>
+    <string name="closechannels_mutual_button">Drain my wallet</string>
     <string name="closechannels_force_title">Force close</string>
     <string name="closechannels_force_instructions"><![CDATA[
     Force close allows you to unilaterally close your channels.
@@ -361,21 +356,10 @@
     <string name="displayseed_title">Wallet recovery phrase</string>
     <string name="displayseed_authenticate_button">Display seed</string>
     <string name="displayseed_loading">Unlocking seed…</string>
+    <string name="displayseed_error_details">Could not unlock seed: %1$s</string>
     <string name="displayseed_error_generic">Could not unlock seed, please try again.</string>
     <string name="displayseed_error_wrong_password">PIN is incorrect.</string>
-    <string name="displayseed_instructions"><![CDATA[
-    The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed.
-    <br /><br />
-    <strong>Only you alone possess this seed. Keep it private.</strong>
-    <br /><br />
-    <strong>Do not share this seed with anyone</strong>.
-    <br />
-    Beware of phishing. The developers of Phoenix will never ask for your seed.
-    <br /><br />
-    <strong>Do not lose this seed</strong>.
-    <br />
-    Save it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.
-  ]]></string>
+    <string name="displayseed_instructions">The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed.\n\n<b>Only you alone possess this seed. Keep it private.</b>\n\n<b>Do not share this seed with anyone</b>.\nBeware of phishing. The developers of Phoenix will never ask for your seed.\n\n<b>Do not lose this seed</b>.\nSave it somewhere safe (not on this phone). If you lose your seed and your phone, you\'ve lost your funds.</string>
     <string name="displayseed_derivation_path">BIP39 seed with standard BIP84 derivation path</string>
     <string name="displayseed_words_td"><![CDATA[<td><font color="rgba(100,100,100,.3)"><small>#%1$d</small></font> <b>%2$s</b></td>]]></string>
     <string name="displayseed_has_saved_seed_checkbox">I have made a backup of my seed, for example on a piece of paper.</string>
@@ -393,15 +377,15 @@
 
     <!-- //////////////// payment details //////////////// -->
 
-    <string name="paymentdetails_loading">Retrieving payment details…</string>
-    <string name="paymentdetails_error">There was an error when retrieving the details for this payment.\n\nPlease try again.</string>
+    <string name="paymentdetails_loading">Loading payment details…</string>
+    <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
-    <string name="paymentdetails_status_sent_successful">Payment sent</string>
-    <string name="paymentdetails_status_sent_pending">Payment pending…</string>
-    <string name="paymentdetails_status_sent_failed">Payment failed, no money has been sent.</string>
+    <string name="paymentdetails_status_sent_successful">Sent</string>
+    <string name="paymentdetails_status_sent_pending">Pending…</string>
+    <string name="paymentdetails_status_sent_failed">Failed. No money has been sent.</string>
 
     <string name="paymentdetails_status_received_pending">Payment has not been received yet.</string>
-    <string name="paymentdetails_status_received_successful">Payment has been received</string>
+    <string name="paymentdetails_status_received_successful">Received</string>
 
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
@@ -460,7 +444,7 @@
 
     <!-- //////////////// access control //////////////// -->
 
-    <string name="accessctrl_title">Security</string>
+    <string name="accessctrl_title">Application access</string>
     <string name="accessctrl_subtitle">We recommend enabling the screen lock to prevent unintended use of your wallet.</string>
 
     <string name="accessctrl_auth_no_hw">Your device does not support hardware backed user authentication.</string>
@@ -527,37 +511,11 @@
     <string name="prefs_display_coin_mbtc_label">Milli-Bitcoin (mbtc)</string>
     <string name="prefs_display_coin_mbtc_desc">1 mbtc is 0.001 btc</string>
     <string name="prefs_display_coin_btc_label">Bitcoin (btc)</string>
-
-    <string name="prefs_display_fiat_AUD">Australian Dollar (AUD)</string>
-    <string name="prefs_display_fiat_BRL">Brazilian Real (BRL)</string>
-    <string name="prefs_display_fiat_CAD">Canadian Dollar (CAD)</string>
-    <string name="prefs_display_fiat_CHF">Swiss Franc (CHF)</string>
-    <string name="prefs_display_fiat_CLP">Chilean Peso (CLP)</string>
-    <string name="prefs_display_fiat_CNY">Chinese Yuan (CNY)</string>
-    <string name="prefs_display_fiat_CZK">Czech Koruna (CZK)</string>
-    <string name="prefs_display_fiat_DKK">Danish Krone (DKK)</string>
-    <string name="prefs_display_fiat_EUR">Euro (EUR)</string>
-    <string name="prefs_display_fiat_GBP">Great British Pound (GBP)</string>
-    <string name="prefs_display_fiat_HKD">Hong Kong Dollar (HKD)</string>
-    <string name="prefs_display_fiat_HRK">Croatian Kuna (HRK)</string>
-    <string name="prefs_display_fiat_HUF">Hungarian Forint (HUF)</string>
-    <string name="prefs_display_fiat_INR">Indian Rupee (HRK)</string>
-    <string name="prefs_display_fiat_ISK">Icelandic Kròna (ISK)</string>
-    <string name="prefs_display_fiat_JPY">Japanese Yen (INR) (JPY)</string>
-    <string name="prefs_display_fiat_KRW">Korean Won (KRW)</string>
-    <string name="prefs_display_fiat_MXN">Mexican Peso (MXN)</string>
-    <string name="prefs_display_fiat_NZD">New Zealand Dollar (NZD)</string>
-    <string name="prefs_display_fiat_PLN">Polish Zloty (PLN)</string>
-    <string name="prefs_display_fiat_RON">Romanian New Leu (RON)</string>
-    <string name="prefs_display_fiat_RUB">Russian Ruble (RUB)</string>
-    <string name="prefs_display_fiat_SEK">Swedish Krona (SEK)</string>
-    <string name="prefs_display_fiat_SGD">Singapore Dollar (SGD)</string>
-    <string name="prefs_display_fiat_THB">Thai Baht (THB)</string>
-    <string name="prefs_display_fiat_TWD">Taiwan New Dollar (TWD)</string>
-    <string name="prefs_display_fiat_USD">United States Dollar (USD)</string>
-
     <string name="prefs_display_fiat_label">Fiat currency</string>
     <string name="prefs_display_theme_label">Application theme</string>
+    <string name="prefs_display_theme_dark_label">Dark theme</string>
+    <string name="prefs_display_theme_light_label">Light theme</string>
+    <string name="prefs_display_theme_system_label">Follow system</string>
     <string name="prefs_display_explorer_label">Onchain explorer</string>
     <string name="prefs_display_balance_display">Show balance in home</string>
     <string name="prefs_display_balance_display_desc">Hiding balance helps against prying eyes</string>
@@ -566,8 +524,8 @@
 
     <string name="electrum_title">Electrum server</string>
     <string name="electrum_subtitle">Phoenix needs to access the Bitcoin blockchain to monitor and secure your channels.</string>
-    <string name="electrum_server_desc_random">The Electrum server is picked at random.</string>
-    <string name="electrum_server_desc_custom">You will only connect to this server. Make sure the address is correct.</string>
+    <string name="electrum_server_desc_random">Server is picked at random.</string>
+    <string name="electrum_server_desc_custom">Server is custom.</string>
 
     <string name="electrum_block_height_label">Block height</string>
     <string name="electrum_tip_label">Tip timestamp</string>
@@ -577,11 +535,12 @@
     <string name="electrum_fee_rate">%1$s sat/byte</string>
     <string name="electrum_connection_label">Server</string>
 
-    <string name="electrum_not_connected">Not connected</string>
-    <string name="electrum_not_connected_to_custom">Connecting to %1$s</string>
-    <string name="electrum_connecting">Establishing connection…</string>
-    <string name="electrum_connecting_to_custom">Connecting to: %1$s…</string>
-    <string name="electrum_connected">Connected to: %1$s</string>
+    <string name="electrum_server_connection">Server</string>
+    <string name="electrum_not_connected">Disconnected</string>
+    <string name="electrum_not_connected_to_custom">Disconnected from %1$s</string>
+    <string name="electrum_connecting">Connecting to random server…</string>
+    <string name="electrum_connecting_to_custom">Connecting to %1$s…</string>
+    <string name="electrum_connected">Connected to %1$s</string>
 
     <string name="electrum_dialog_checkbox">Use a custom server</string>
     <string name="electrum_dialog_ssl">Server must have a valid certificate</string>
@@ -616,23 +575,18 @@
 
     <!-- //////////////// about screen //////////////// -->
 
-    <string name="about_title">About</string>
-    <string name="about_version">Version: %1$s (%2$d)</string>
-    <string name="about_general"><![CDATA[
-  Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.
-  <br/><br/>
-  It is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.
-  <br/><br/>
-  Note that this wallet is non-custodial: <strong>you have sole custody of the wallet\'s 12-words seed</strong>. Do not give this seed to anyone, and beware of phishing.
-  <br/><br/>
-  If you have questions, consult the <a href="https://phoenix.acinq.co/faq">FAQ</a>. You can also contact <a href="https://phoenix.acinq.co/support">support</a> for help.
-  ]]></string>
-    <string name="about_fiat_rates"><![CDATA[
-    Bitcoin/fiat exchange rates are retrieved from various third-party APIs:
-    <br />- Blockchain.info
-    <br />- Bitso
-    <br />- <a href="https://www.coindesk.com/price/bitcoin">Powered by Coindesk</a>
-  ]]></string>
+    <string name="about_title">About Phoenix</string>
+    <string name="about_general_title">About</string>
+    <string name="about_general_content">Phoenix is a Bitcoin wallet using the Lightning network for sending and receiving payments.\n\nIt is a free open source software, developed by <a href="https://phoenix.acinq.co">ACINQ</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0 License</a>.</string>
+    <string name="about_seed_title">Safeguarding your key</string>
+    <string name="about_seed_content">This wallet is self-custodial: <b>you have sole custody of the wallet\'s 12-words seed key</b>.\n\nThis key gives access to your money. Do not reveal it to anyone, and beware of phishing.</string>
+    <string name="about_rates_title">Exchange rates</string>
+    <string name="about_rates_content">Bitcoin/fiat exchange rates are retrieved from various third-party APIs:\n- Blockchain.info\n- powered by Coindesk.com\n\nThose rates may not be accurate. Always check the actual Bitcoin amount before sending a payment.</string>
+    <string name="about_version">Version</string>
+    <string name="about_faq_link">Any questions? Check the FAQ</string>
+    <string name="about_support_link">Support</string>
+    <string name="about_privacy_link">Privacy</string>
+    <string name="about_terms_link">Terms</string>
 
     <!-- //////////////// background node service //////////////// -->
 

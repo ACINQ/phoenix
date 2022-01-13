@@ -172,6 +172,8 @@
   <string name="send_amount_error_balance">Amount exceeds your balance.</string>
   <string name="send_amount_error_swap_out_too_small">Min. %1$s for on-chain payment.</string>
   <string name="send_amount_error_swap_out_above_max">Max. %1$s for on-chain payment.</string>
+  <string name="send_amount_error_above_request_generic">Must not exceed twice the requested amount</string>
+  <string name="send_amount_error_above_request">Amount must be at most %1$s</string>
   <string name="send_destination_label">Send to</string>
   <string name="send_description_label">Desc.</string>
   <string name="send_mining_fee_info_title">What are those fees?</string>
@@ -684,11 +686,17 @@
   <string name="paymentsettings_title">Payment options and fees</string>
   <string name="paymentsettings_subtitle">Set various options and fees for payments you send or receive.</string>
 
-  <string name="paymentsettings_defaultdesc_title">Default payment description</string>
+  <string name="paymentsettings_defaultdesc_title">Incoming payment description</string>
   <string name="paymentsettings_defaultdesc_none">No description set…</string>
   <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
   <string name="paymentsettings_defaultdesc_dialog_description">Payment requests that you create will use this description. You can override it on a case-by-case basis.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
+
+  <string name="paymentsettings_expiry_title">Incoming payment expiry</string>
+  <string name="paymentsettings_expiry_dialog_title">Payment expiry</string>
+  <string name="paymentsettings_expiry_dialog_description">Payment requests that you create will use this expiry time (in seconds). Default value is 1 week.</string>
+  <string name="paymentsettings_expiry_dialog_hint">Enter an expiry, in seconds</string>
+  <string name="paymentsettings_expiry_value">%1$s seconds</string>
 
   <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>

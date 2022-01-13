@@ -27,6 +27,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -46,16 +47,20 @@ import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.msat
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.LocalBitcoinUnit
+import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
+import fr.acinq.phoenix.android.fiatRate
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.textFieldColors
 import fr.acinq.phoenix.data.*
 
 @Composable
-fun InputText(
+fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
@@ -76,6 +81,7 @@ fun InputText(
         enabled = enabled,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         colors = textFieldColors(),
+        shape = RectangleShape,
         modifier = modifier
     )
 }
@@ -103,7 +109,7 @@ fun AmountInput(
     inputTextSize: TextUnit = 16.sp,
     unitTextSize: TextUnit = 16.sp,
 ) {
-    val log = logger()
+    val log = logger("AmountInput")
 
     // get unit ambients
     val context = LocalContext.current
@@ -131,7 +137,7 @@ fun AmountInput(
 
     /** Convert the input [Double] to a (msat -> fiat) pair, if possible. */
     fun convertInputToAmount(): Pair<MilliSatoshi?, Double?> {
-        log.info { "amount input update [ amount=$amount unit=$unit with rate=$rate ]" }
+        log.debug { "amount input update [ amount=$amount unit=$unit with rate=$rate ]" }
         return amount?.let { d ->
             when (val u = unit) {
                 is FiatCurrency -> {
@@ -186,7 +192,6 @@ fun AmountInput(
      */
     val onValueChange: (String) -> Unit = {
         val d = it.toDoubleOrNull()
-        log.info { "double=$d" }
         if (d == null) {
             rawAmount = ""
             amount = null
@@ -235,12 +240,18 @@ fun AmountInput(
                     }
                 }
                 constrain(altAmount) {
-                    top.linkTo(amountInput.bottom, margin = 8.dp)
+                    if (useBasicInput) {
+                        top.linkTo(amountInput.bottom, margin = 8.dp)
+                    } else {
+                        top.linkTo(amountInput.bottom, margin = 2.dp)
+                    }
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
             },
-            modifier = modifier.width(IntrinsicSize.Min)
+            modifier = modifier
+                .width(IntrinsicSize.Min)
+                .then(if (!useBasicInput) Modifier.fillMaxWidth() else Modifier)
         ) {
             if (useBasicInput) {
                 BasicTextField(
@@ -267,7 +278,9 @@ fun AmountInput(
                 TextField(
                     value = rawAmount,
                     onValueChange = onValueChange,
-                    modifier = inputModifier.layoutId(amountRef),
+                    modifier = inputModifier
+                        .layoutId(amountRef)
+                        .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.None,
                         autoCorrect = false,
@@ -278,6 +291,7 @@ fun AmountInput(
                     colors = textFieldColors(),
                     singleLine = true,
                     maxLines = 1,
+                    shape = RectangleShape,
                 )
             }
 
@@ -292,6 +306,7 @@ fun AmountInput(
                 modifier = dropdownModifier.layoutId(unitRef)
             )
 
+            // -- dashed line
             if (useBasicInput) {
                 AndroidView(modifier = Modifier
                     .layoutId(amountLineRef), factory = {
@@ -308,7 +323,7 @@ fun AmountInput(
 
         Text(
             text = convertedAmount.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
-            style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center),
+            style = if (useBasicInput) MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center) else MaterialTheme.typography.caption,
             modifier = Modifier
                 .layoutId(altAmountRef)
                 .fillMaxWidth()

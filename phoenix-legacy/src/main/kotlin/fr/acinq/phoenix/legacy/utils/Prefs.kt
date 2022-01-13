@@ -68,6 +68,7 @@ object Prefs {
 
   // -- payment configuration
   const val PREFS_PAYMENT_DEFAULT_DESCRIPTION = "PREFS_PAYMENT_DEFAULT_DESCRIPTION"
+  const val PREFS_PAYMENTS_EXPIRY_SEC = "PREFS_PAYMENTS_EXPIRY_SEC"
   const val PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_BASE_TRAMPOLINE_FEE"
   const val PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE = "PREFS_CUSTOM_MAX_PROPORTIONAL_TRAMPOLINE_FEE"
   const val PREFS_AUTO_PAY_TO_OPEN = "PREFS_AUTO_PAY_TO_OPEN"
@@ -301,6 +302,17 @@ object Prefs {
 
   fun setDefaultPaymentDescription(context: Context, value: String) {
     return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREFS_PAYMENT_DEFAULT_DESCRIPTION, value).apply()
+  }
+
+  // default expiry = 1 week
+  private val DEFAULT_EXPIRY: Long = 60L * 60 * 24 * 7
+
+  fun getPaymentsExpirySeconds(context: Context): Long {
+    return PreferenceManager.getDefaultSharedPreferences(context).getLong(PREFS_PAYMENTS_EXPIRY_SEC, DEFAULT_EXPIRY)
+  }
+
+  fun setPaymentsExpirySeconds(context: Context, expirySeconds: Long?) {
+    return PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(PREFS_PAYMENTS_EXPIRY_SEC, expirySeconds ?: DEFAULT_EXPIRY).apply()
   }
 
   fun getMaxTrampolineCustomFee(context: Context): TrampolineFeeSetting? {

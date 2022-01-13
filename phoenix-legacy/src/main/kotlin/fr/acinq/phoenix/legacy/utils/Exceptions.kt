@@ -33,6 +33,7 @@ class ChannelsNotClosed(channelsNotClosedCount: Int) : RuntimeException()
 sealed class AmountError: RuntimeException() {
   object Default : AmountError()
   object NotEnoughBalance : AmountError()
+  object AboveRequestedAmount : AmountError()
   object SwapOutBelowMin : AmountError()
   object SwapOutAboveMax : AmountError()
 }

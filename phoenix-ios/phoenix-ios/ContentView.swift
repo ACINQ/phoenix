@@ -13,10 +13,12 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct GlobalEnvironment: ViewModifier {
 	static var currencyPrefs = CurrencyPrefs()
+	static var deepLinkManager = DeepLinkManager()
 
 	func body(content: Self.Content) -> some View {
 		content
 			.environmentObject(Self.currencyPrefs)
+			.environmentObject(Self.deepLinkManager)
 	}
 }
 

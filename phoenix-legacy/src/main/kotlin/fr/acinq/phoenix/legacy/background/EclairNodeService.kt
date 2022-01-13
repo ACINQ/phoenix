@@ -650,26 +650,29 @@ class EclairNodeService : Service() {
 
   /** Generate a BOLT 11 payment request. */
   @UiThread
-  suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>): PaymentRequest = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, expirySeconds: Long): PaymentRequest = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     kit?.run {
       val hop = PaymentRequest.ExtraHop(Wallet.ACINQ.nodeId(), ShortChannelId.peerId(nodeParams().nodeId()), MilliSatoshi(1000), 100, CltvExpiryDelta(144))
       val routes = ScalaList.empty<List<PaymentRequest.ExtraHop>>().`$colon$colon`(ScalaList.empty<PaymentRequest.ExtraHop>().`$colon$colon`(hop))
-      doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard())
+      doGeneratePaymentRequest(description, amount_opt, routes, paymentType = PaymentType.Standard(), expirySeconds = expirySeconds)
     } ?: throw KitNotInitialized
   }
 
   @WorkerThread
-  private fun doGeneratePaymentRequest(description: String,
+  private fun doGeneratePaymentRequest(
+    description: String,
     amount_opt: Option<MilliSatoshi>,
     routes: ScalaList<ScalaList<PaymentRequest.ExtraHop>>,
     timeout: Timeout = shortTimeout,
-    paymentType: String): PaymentRequest {
+    paymentType: String,
+    expirySeconds: Long
+  ): PaymentRequest {
     return kit?.run {
       val f = Patterns.ask(paymentHandler(),
         MultiPartHandler.ReceivePayment(
           /* amount */ amount_opt,
           /* description */ description,
-          /* expiry in seconds */ Option.apply(7 * DateUtils.DAY_IN_MILLIS / 1000),
+          /* expiry in seconds */ Option.apply(expirySeconds),
           /* extra routing info */ routes,
           /* fallback onchain address */ Option.empty(),
           /* payment preimage */ Option.empty(),
@@ -852,7 +855,9 @@ class EclairNodeService : Service() {
           amount_opt = Option.apply(event.amount()),
           routes = ScalaList.empty<ScalaList<PaymentRequest.ExtraHop>>(),
           timeout = Timeout(Duration.create(10, TimeUnit.MINUTES)),
-          paymentType = PaymentType.SwapIn())
+          paymentType = PaymentType.SwapIn(),
+          expirySeconds = 3600
+        )
 
         // 2 - save payment in eclair db, and save additional metadata such as the address
         paymentMetaRepository.insertSwapIn(pr.paymentHash().toString(), event.bitcoinAddress())

@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
@@ -37,8 +38,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import fr.acinq.phoenix.android.borderColor
-import fr.acinq.phoenix.android.mutedTextColor
+import fr.acinq.phoenix.android.utils.borderColor
+import fr.acinq.phoenix.android.utils.mutedTextColor
 
 
 /** A rounded button with a solid background and a muted outline. */
@@ -47,6 +48,7 @@ fun BorderButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
+    isPrimary: Boolean = true,
     onClick: () -> Unit,
     enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
@@ -61,7 +63,7 @@ fun BorderButton(
         onClick = onClick,
         shape = CircleShape,
         backgroundColor = MaterialTheme.colors.surface,
-        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, borderColor()),
+        border = BorderStroke(ButtonDefaults.OutlinedBorderSize, if (isPrimary) MaterialTheme.colors.primary else borderColor()),
         textStyle = textStyle,
         padding = padding,
         modifier = modifier
@@ -117,22 +119,6 @@ fun PhoenixIcon(
     )
 }
 
-@Composable
-fun SettingButton(
-    text: Int,
-    icon: Int,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        text = stringResource(id = text),
-        icon = icon,
-        iconTint = MaterialTheme.colors.onSurface,
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
-    )
-}
-
 /**
  * A very customisable button, by default using a square shape with a transparent bg.
  *
@@ -162,11 +148,11 @@ fun Button(
         contentColor = LocalContentColor.current,
         disabledContentColor = mutedTextColor(),
     )
-    val contentColor by colors.contentColor(enabled)
+    val contentColor by colors.contentColor(true)
     Surface(
         shape = shape,
-        color = colors.backgroundColor(enabled).value,
-        contentColor = contentColor.copy(1f),
+        color = colors.backgroundColor(true).value,
+        contentColor = colors.contentColor(true).value, //contentColor.copy(1f),
         border = border,
         elevation = elevation?.elevation(enabled, interactionSource)?.value ?: 0.dp,
         modifier = modifier
@@ -194,7 +180,8 @@ fun Button(
                             minHeight = 0.dp
                         )
                         .indication(interactionSource, LocalIndication.current)
-                        .padding(padding),
+                        .padding(padding)
+                        .alpha(if (enabled) 1f else 0.5f),
                     horizontalArrangement = horizontalArrangement,
                     verticalAlignment = Alignment.CenterVertically,
                     content = {

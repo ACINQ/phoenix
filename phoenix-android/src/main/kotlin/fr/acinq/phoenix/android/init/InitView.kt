@@ -30,8 +30,10 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.InputText
+import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.security.KeyState
+import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.Initialization
 import fr.acinq.phoenix.controllers.init.RestoreWallet
@@ -70,33 +72,50 @@ fun CreateWalletView(
 ) {
     val log = logger("CreateWallet")
     val context = LocalContext.current
-    if (!keyState.isReady()) {
-        MVIView(CF::initialization) { model, postIntent ->
-            val entropy = remember { Lightning.randomBytes(16) }
-            LaunchedEffect(key1 = entropy) {
-                log.info { "generating wallet" }
-                postIntent(Initialization.Intent.GenerateWallet(entropy))
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                when (model) {
-                    is Initialization.Model.Ready -> {
-                        Text("Generating wallet...")
-                    }
-                    is Initialization.Model.GeneratedWallet -> {
-                        LaunchedEffect(keyState) {
-                            log.info { "a new wallet has been generated, writing to disk..." }
-                            appVM.writeSeed(context, model.mnemonics)
-                            log.info { "seed successfully written to disk" }
-                            onSeedWritten()
+
+    val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
+        value = SeedManager.getSeedState(context)
+    }
+
+    when (keyState.value) {
+        is KeyState.Absent -> {
+            MVIView(CF::initialization) { model, postIntent ->
+                val entropy = remember { Lightning.randomBytes(16) }
+                LaunchedEffect(key1 = entropy) {
+                    log.info { "generating wallet..." }
+                    postIntent(Initialization.Intent.GenerateWallet(entropy))
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    when (model) {
+                        is Initialization.Model.Ready -> {
+                            Text("Generating wallet...")
+                        }
+                        is Initialization.Model.GeneratedWallet -> {
+                            LaunchedEffect(true) {
+                                log.info { "a new wallet has been generated, writing to disk..." }
+                                appVM.writeSeed(context, model.mnemonics)
+                                log.info { "seed successfully written to disk" }
+                                onSeedWritten()
+                            }
                         }
                     }
                 }
+            }
+        }
+        KeyState.Unknown -> {
+            Text(stringResource(id = R.string.startup_wait))
+        }
+        else -> {
+            // we should not be here
+            Text(stringResource(id = R.string.startup_wait))
+            LaunchedEffect(true) {
+                onSeedWritten()
             }
         }
     }
@@ -109,67 +128,82 @@ fun RestoreWalletView(
 ) {
     val log = logger("RestoreWallet")
     val context = LocalContext.current
-    if (appVM.keyState.isReady()) {
-        onSeedWritten()
-    } else {
-        MVIView(CF::restoreWallet) { model, postIntent ->
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth()
-            ) {
-                var wordsInput by remember { mutableStateOf("") }
-                when (model) {
-                    is RestoreWallet.Model.Ready -> {
-                        var showDisclaimer by remember { mutableStateOf(true) }
-                        var hasCheckedWarning by remember { mutableStateOf(false) }
-                        if (showDisclaimer) {
-                            Text(stringResource(R.string.restore_disclaimer_message))
-                            Row(Modifier.padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(hasCheckedWarning, onCheckedChange = { hasCheckedWarning = it })
-                                Spacer(Modifier.width(16.dp))
-                                Text(stringResource(R.string.restore_disclaimer_checkbox))
+
+    val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
+        value = SeedManager.getSeedState(context)
+    }
+
+    when (keyState.value) {
+        is KeyState.Absent -> {
+            MVIView(CF::restoreWallet) { model, postIntent ->
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth()
+                ) {
+                    var wordsInput by remember { mutableStateOf("") }
+                    when (model) {
+                        is RestoreWallet.Model.Ready -> {
+                            var showDisclaimer by remember { mutableStateOf(true) }
+                            var hasCheckedWarning by remember { mutableStateOf(false) }
+                            if (showDisclaimer) {
+                                Text(stringResource(R.string.restore_disclaimer_message))
+                                Row(Modifier.padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(hasCheckedWarning, onCheckedChange = { hasCheckedWarning = it })
+                                    Spacer(Modifier.width(16.dp))
+                                    Text(stringResource(R.string.restore_disclaimer_checkbox))
+                                }
+                                BorderButton(
+                                    text = R.string.restore_disclaimer_next,
+                                    icon = R.drawable.ic_arrow_next,
+                                    onClick = { showDisclaimer = false },
+                                    enabled = hasCheckedWarning
+                                )
+                            } else {
+                                Text(stringResource(R.string.restore_instructions))
+                                TextInput(
+                                    text = wordsInput,
+                                    onTextChange = { wordsInput = it },
+                                    maxLines = 4,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 32.dp)
+                                )
+                                BorderButton(
+                                    text = R.string.restore_import_button,
+                                    icon = R.drawable.ic_check_circle,
+                                    onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
+                                    enabled = wordsInput.isNotBlank()
+                                )
                             }
-                            BorderButton(
-                                text = R.string.restore_disclaimer_next,
-                                icon = R.drawable.ic_arrow_next,
-                                onClick = { showDisclaimer = false },
-                                enabled = hasCheckedWarning
-                            )
-                        } else {
-                            Text(stringResource(R.string.restore_instructions))
-                            InputText(
-                                text = wordsInput,
-                                onTextChange = { wordsInput = it },
-                                maxLines = 4,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 32.dp)
-                            )
-                            BorderButton(
-                                text = R.string.restore_import_button,
-                                icon = R.drawable.ic_check_circle,
-                                onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
-                                enabled = wordsInput.isNotBlank()
-                            )
                         }
-                    }
-                    is RestoreWallet.Model.InvalidMnemonics -> {
-                        Text(stringResource(R.string.restore_error))
-                    }
-                    is RestoreWallet.Model.ValidMnemonics -> {
-                        Text(stringResource(R.string.restore_in_progress))
-                        LaunchedEffect(keyState) {
-                            log.info { "restored wallet seed is valid" }
-                            appVM.writeSeed(context, wordsInput.split(" "))
-                            log.info { "seed successfully written to disk" }
-                            onSeedWritten()
+                        is RestoreWallet.Model.InvalidMnemonics -> {
+                            Text(stringResource(R.string.restore_error))
                         }
-                    }
-                    else -> {
-                        Text("Please hold...")
+                        is RestoreWallet.Model.ValidMnemonics -> {
+                            Text(stringResource(R.string.restore_in_progress))
+                            LaunchedEffect(keyState) {
+                                log.info { "restored wallet seed is valid" }
+                                appVM.writeSeed(context, wordsInput.split(" "))
+                                log.info { "seed successfully written to disk" }
+                                onSeedWritten()
+                            }
+                        }
+                        else -> {
+                            Text(stringResource(id = R.string.restore_in_progress))
+                        }
                     }
                 }
+            }
+        }
+        KeyState.Unknown -> {
+            Text(stringResource(id = R.string.startup_wait))
+        }
+        else -> {
+            // we should not be here
+            Text(stringResource(id = R.string.startup_wait))
+            LaunchedEffect(true) {
+                onSeedWritten()
             }
         }
     }

@@ -20,11 +20,9 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
@@ -47,19 +44,17 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Button
-import fr.acinq.phoenix.android.components.Dialog
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.databinding.ScanViewBinding
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.readClipboard
-import fr.acinq.phoenix.android.whiteLowOp
+import fr.acinq.phoenix.android.utils.whiteLowOp
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ScanController
 import fr.acinq.phoenix.controllers.payments.Scan
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 private class ReadDataViewModel(controller: ScanController) : MVIControllerViewModel<Scan.Model, Scan.Intent>(controller) {
@@ -74,7 +69,6 @@ private class ReadDataViewModel(controller: ScanController) : MVIControllerViewM
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun ReadDataView(
     onBackClick: () -> Unit,

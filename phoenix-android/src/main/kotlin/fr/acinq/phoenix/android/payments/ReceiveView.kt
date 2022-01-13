@@ -41,14 +41,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
 import fr.acinq.phoenix.controllers.payments.Receive
@@ -116,7 +119,7 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 
 @Composable
 fun ReceiveView() {
-    val log = logger()
+    val log = logger("ReceiveView")
     val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
     when (val state = vm.state) {
         is ReceiveViewState.Default -> DefaultView(vm = vm)
@@ -141,7 +144,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
         verticalArrangement = Arrangement.Top,
     ) {
         val nc = navController
-        ScreenHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
+        SettingHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
@@ -162,16 +165,11 @@ private fun DefaultView(vm: ReceiveViewModel) {
                         onCopy = { copyToClipboard(context, data = model.request) },
                         onShare = { /*TODO*/ },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                     BorderButton(
                         text = R.string.receive__swapin_button,
                         icon = R.drawable.ic_swap,
                         onClick = { postIntent(Receive.Intent.RequestSwapIn) })
-                    Spacer(modifier = Modifier.height(8.dp))
-                    BorderButton(
-                        text = R.string.receive__lnurl_withdraw,
-                        icon = R.drawable.ic_scan,
-                        onClick = { })
                 }
                 is Receive.Model.SwapIn.Requesting -> Text(stringResource(id = R.string.receive__swapin__wait))
                 is Receive.Model.SwapIn.Generated -> {
@@ -254,34 +252,42 @@ private fun EditInvoiceView(
     onSubmit: () -> Unit,
     onCancel: () -> Unit
 ) {
-    val log = logger()
-    Column {
-        ScreenHeader(
+    val log = logger("EditInvoiceView")
+    SettingScreen {
+        SettingHeader(
             title = stringResource(id = R.string.receive__edit__title),
             subtitle = stringResource(id = R.string.receive__edit__subtitle),
             onBackClick = onCancel
         )
-        ScreenBody {
-            Text(stringResource(id = R.string.receive__edit__amount_label), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
+        Card(internalPadding = PaddingValues(16.dp)) {
+            Text(
+                text = stringResource(id = R.string.receive__edit__amount_label),
+                style = MaterialTheme.typography.subtitle1,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             AmountInput(
                 initialAmount = null,
                 onAmountChange = { amount, amountFiat, fiatCode ->
-                    log.info { "invoice amount update amount=$amount msat fiat=$amountFiat $fiatCode" }
+                    log.debug { "invoice amount update amount=$amount msat fiat=$amountFiat $fiatCode" }
                     onAmountChange(amount)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(stringResource(id = R.string.receive__edit__desc_label), modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            InputText(
+        }
+        Card(internalPadding = PaddingValues(16.dp)) {
+            Text(
+                text = stringResource(id = R.string.receive__edit__desc_label),
+                style = MaterialTheme.typography.subtitle1,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            TextInput(
                 text = description, // TODO use value from prefs
                 onTextChange = onDescriptionChange,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(32.dp))
-            BorderButton(
+        }
+        Card {
+            SettingButton(
                 text = R.string.receive__edit__generate_button,
                 icon = R.drawable.ic_qrcode,
                 onClick = onSubmit
