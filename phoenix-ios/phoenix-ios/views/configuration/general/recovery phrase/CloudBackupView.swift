@@ -4,13 +4,13 @@ import os.log
 #if DEBUG && true
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
-	category: "CloudBackupAgreement"
+	category: "CloudBackupView"
 )
 #else
 fileprivate var log = Logger(OSLog.disabled)
 #endif
 
-struct CloudBackupAgreement: View {
+struct CloudBackupView: View {
 	
 	@Binding var backupSeed_enabled: Bool
 	

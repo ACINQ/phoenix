@@ -17,12 +17,11 @@ fileprivate enum NavLinkTag: String {
 	case AboutView
 	case DisplayConfigurationView
 	case PaymentOptionsView
-	case BackupView
+	case RecoveryPhraseView
 	// Security
 	case AppAccessView
 	// Advanced
-	case ElectrumConfigurationView
-	case TorView
+	case PrivacyView
 	case LogsConfigurationView
 	case ChannelsConfigurationView
 	case CloseChannelsView
@@ -101,15 +100,15 @@ struct ConfigurationView: View {
 				if hasWallet {
 					
 					NavigationLink(
-						destination: BackupView(),
-						tag: NavLinkTag.BackupView,
+						destination: RecoveryPhraseView(),
+						tag: NavLinkTag.RecoveryPhraseView,
 						selection: $navLinkTag
 					) {
 						Label {
 							switch backupSeedState {
 							case .notBackedUp:
 								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Backup")
+									Text("Recovery phrase")
 									Spacer()
 									Image(systemName: "exclamationmark.triangle")
 										.renderingMode(.template)
@@ -117,15 +116,15 @@ struct ConfigurationView: View {
 								}
 							case .backupInProgress:
 								HStack(alignment: VerticalAlignment.center, spacing: 0) {
-									Text("Backup")
+									Text("Recovery phrase")
 									Spacer()
 									Image(systemName: "icloud.and.arrow.up")
 								}
 							case .safelyBackedUp:
-								Text("Backup")
+								Text("Recovery phrase")
 							}
 						} icon: {
-							Image(systemName: "icloud.and.arrow.up")
+							Image(systemName: "squareshape.split.3x3")
 						}
 					}
 				
@@ -153,22 +152,12 @@ struct ConfigurationView: View {
 			Section(header: Text("Advanced")) {
 
 				NavigationLink(
-					destination: ElectrumConfigurationView(),
-					tag: NavLinkTag.ElectrumConfigurationView,
+					destination: PrivacyView(),
+					tag: NavLinkTag.PrivacyView,
 					selection: $navLinkTag
 				) {
-					Label { Text("Electrum server") } icon: {
-						Image(systemName: "link")
-					}
-				}
-
-				NavigationLink(
-					destination: ComingSoonView(title: "Tor"),
-					tag: NavLinkTag.TorView,
-					selection: $navLinkTag
-				) {
-					Label { Text("Tor") } icon: {
-						Image(systemName: "shield.lefthalf.fill")
+					Label { Text("Privacy") } icon: {
+						Image(systemName: "eye")
 					}
 				}
 
@@ -278,23 +267,27 @@ struct ConfigurationView: View {
 			
 		} else {
 		
-			// SwiftUI BUG, and workaround.
-			//
-			// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
-			// For example:
-			// - Tap on "About", to push the AboutView onto the NavigationView
-			// - Tap "<" to pop the AboutView
-			// - Notice that the "About" row is still selected (e.g. has gray background)
-			//
-			// There are several workaround for this issue:
-			// https://developer.apple.com/forums/thread/660468
-			//
-			// We are implementing the least risky solution.
-			// Which requires us to change the `List.id` property.
-			
-			if navLinkTag != nil {
-				navLinkTag = nil
-				listViewId = UUID()
+			if #available(iOS 15.0, *) {
+				// No workaround needed
+			} else {
+				// SwiftUI BUG, and workaround.
+				//
+				// In iOS 14, the NavigationLink remains selected after we return to the ConfigurationView.
+				// For example:
+				// - Tap on "About", to push the AboutView onto the NavigationView
+				// - Tap "<" to pop the AboutView
+				// - Notice that the "About" row is still selected (e.g. has gray background)
+				//
+				// There are several workaround for this issue:
+				// https://developer.apple.com/forums/thread/660468
+				//
+				// We are implementing the least risky solution.
+				// Which requires us to change the `List.id` property.
+				
+				if navLinkTag != nil {
+					navLinkTag = nil
+					listViewId = UUID()
+				}
 			}
 		}
 	}
@@ -317,7 +310,7 @@ struct ConfigurationView: View {
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
 			case .backup:
-				newNavLinkTag = .BackupView
+				newNavLinkTag = NavLinkTag.RecoveryPhraseView
 			default:
 				break
 			}
@@ -359,16 +352,20 @@ struct ConfigurationView: View {
 	func onExternalLightningUrl(_ urlStr: String) {
 		log.trace("onExternalLightningUrl()")
 		
-		// We previoulsy had a crash under the following conditions:
-		// - navigate to ConfigurationView
-		// - navigate to a subview (such as AboutView)
-		// - switch to another app, and open a lightning URL with Phoenix
-		// - crash !
-		//
-		// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
-		//
-		// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
-		navLinkTag = nil
+		if #available(iOS 15.0, *) {
+			// No workaround needed
+		} else {
+			// We previoulsy had a crash under the following conditions:
+			// - navigate to ConfigurationView
+			// - navigate to a subview (such as AboutView)
+			// - switch to another app, and open a lightning URL with Phoenix
+			// - crash !
+			//
+			// It works fine as long as the NavigationStack is popped to at least the ConfigurationView.
+			//
+			// This is only needed for iOS 14. Apple has fixed the issue in iOS 15.
+			navLinkTag = nil
+		}
 	}
 }
 
