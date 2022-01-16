@@ -10,7 +10,7 @@
 "(Phoenix can be running in the background.)" = "(يمكن تشغيل Phoenix في الخلفية.)";
 "(QR code)" = "(رمز QR)";
 "(This is your address - derived from your seed. You alone possess your seed.)" = "(هذا هو عنوانك - مشتق من عبارة الاسترداد خاصتك. أنت وحدك تمتلك هذه العبارة.)";
-"(you provided this address)" = "(لقد قدمت هذا العنوان)";
+"(you provided this address)" = "(لقد قدمت انت هذا العنوان)";
 /* RecoverySeedView */
 "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**لا تفقد هذه العبارة** احفظها في مكان آمن (ليس على هذا الهاتف). إذا فقدت عبارتك وهاتفك، فقد فقدت جميع أموالك.";
 /* RecoverySeedView */
@@ -388,7 +388,7 @@
 "Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "يمكن الوصول إلى Phoenix بدون وسائل امان. تأكد من أنك قمت بتمكين الحماية الكافية لنظام iOS.";
 /* Error message - scanning lightning invoice */
 "Phoenix does not support this type of LNURL yet" = "لا تدعم Phoenix هذا النوع من LNURL حتى الآن";
-"Phoenix generated" = "تم توليد Phoenix";
+"Phoenix generated" = "تم توليده بواسطة Phoenix";
 /* Error message in LockView */
 "Please enable Touch ID" = "يرجى تمكين Touch ID";
 /* Error message in LockView */
