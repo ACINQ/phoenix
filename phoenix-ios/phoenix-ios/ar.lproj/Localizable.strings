@@ -1,0 +1,674 @@
+" (not available)" = " (غير متوفر)";
+" (not enrolled)" = " (غير مفعل)";
+"(coming soon)" = "(قريبًا)";
+/* Upload progress information */
+"(completed) of (total)" = "(completed) من (total)";
+/* Upload progress information */
+"(completed) of (total), pushing batch of (inFlight)" = "(completed) من (total)، يتم دفع مجموعة (inFlight)";
+"(derived from your seed)" = "(مشتق من بذرتك)";
+"(Lightning invoice)" = "(فاتورة البرق)";
+"(Phoenix can be running in the background.)" = "(يمكن تشغيل Phoenix في الخلفية.)";
+"(QR code)" = "(رمز QR)";
+"(This is your address - derived from your seed. You alone possess your seed.)" = "(هذا هو عنوانك - مشتق من بذرتك. أنت وحدك تمتلك بذرك.)";
+"(you provided this address)" = "(لقد قدمت هذا العنوان)";
+/* RecoverySeedView */
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**لا تفقد هذه العبارة** احفظها في مكان آمن (ليس على هذا الهاتف). إذا فقدت عبارتك وهاتفك، فقد فقدت جميع أموالك.";
+/* RecoverySeedView */
+"**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**لا تشارك هذه العبارة مع أي شخص.** احذر من التصيد الاحتيالي والصفحات المزورة. لن يطلب مطورو Phoenix مطلقًا عبارتك.";
+"%@ milliseconds" = "%@ أجزاء من الثانية";
+"%@ remaining" = "%@ المتبقي";
+"%@ sat/byte" = "%@ ساتوشي/بايت";
+"%@ seconds" = "%@ ثواني";
+"%@:%@ minutes" = "%@ : %@ دقيقة";
+"%@% (%@ minimum)" = "الرسوم %@٪ (بحد ادنى %@)";
+/* Minimum fee information */
+"%@%% (%@ minimum)" = "الرسوم %@٪ (بحد ادنى %@)";
+/* Count != 1 */
+"%d channels" = "%d قنوات";
+"+%@ incoming" = "+ %@ وارد";
+"<decryption error>" = "";
+"1 channel" = "قناة واحدة";
+"A backup phrase is generated, storing all the information needed to restore your Bitcoin funds." = "يتم إنشاء عبارة احتياطية، حيث يتم تخزين جميع المعلومات اللازمة لاسترداد مبالغ البيتكوين الخاصة بك";
+"A bitcoin can be divided into smaller units. The smallest unit is called a Satoshi, and there are 100 million satoshis in a single bitcoin." = "يمكن تقسيم البيتكوين إلى وحدات أصغر. أصغر وحدة تسمى ساتوشي (Satoshi)،وهناك 100 مليون ساتوشي في عملة البيتكوين الواحدة.";
+"A random electrum server will be selected on each connection attempt." = "سيتم تحديد خادم Electrum عشوائي في كل محاولة اتصال.";
+"A temporary error occurred, and Phoenix is unable to continue loading." = "حدث خطأ مؤقت ، ولم يتمكن Phoenix من متابعة التحميل.";
+/* Navigation bar title */
+"About" = "حول";
+"Access to Phoenix is protected by biometrics." = "الوصول إلى Phoenix محمي بواسطة القياسات الحيوية.";
+"Add optional comment" = "أضف تعليقًا اختياريًا";
+"Address" = "العنوان";
+/* Label in DetailsView_IncomingPayment */
+"address type" = "نوع العنوان";
+"Advanced" = "متقدم";
+"Advanced security" = "الأمان المتقدم";
+/* Error title */
+"Already paid" = "مدفوع بالفعل";
+/* TextField placeholder */
+"Amount (optional)" = "المبلغ (اختياري)";
+/* error message */
+"Amount exceeds your balance" = "المبلغ يتجاوز رصيدك";
+/* error message */
+"Amount must be (exactBitcoin.string)" = "يجب أن يكون المبلغ (exactBitcoin.string)";
+/* error message */
+"Amount must be (exactBitcoin.string) (≈ (approxFiat.string))" = "يجب أن يكون المبلغ (precBitcoin.string) (≈ (almostFiat.string))";
+/* error message */
+"Amount must be at least (minBitcoin.string)" = "يجب أن يكون المبلغ على الأقل (minBitcoin.string)";
+/* error message */
+"Amount must be at least (minBitcoin.string) (≈ (approxFiat.string))" = "يجب أن يكون المبلغ على الأقل (minBitcoin.string) (≈ (almostFiat.string))";
+/* error message */
+"Amount must be at most (maxBitcoin.string)" = "يجب ألا يتجاوز المبلغ (maxBitcoin.string)";
+/* error message */
+"Amount must be at most (maxBitcoin.string) (≈ (approxFiat.string))" = "يجب ألا يتجاوز المبلغ (maxBitcoin.string) (≈ (almostFiat.string))";
+/* Label in DetailsView_IncomingPayment */
+"amount received" = "تم استلام المبلغ";
+/* Label in DetailsView_IncomingPayment */
+"amount requested" = "المبلغ المطلوب";
+/* error details */
+"An unknown error occurred." = "حدث خطأ غير معروف.";
+/* placeholder: invoice is amount-less */
+"any amount" = "أي مبلغ";
+/* error message */
+"Any amount" = "أي مبلغ";
+"App access" = "الوصول إلى التطبيق";
+/* Navigation bar title */
+"App Access" = "الوصول إلى التطبيق";
+/* Biometrics prompt to unlock the Phoenix app */
+"App is locked" = "التطبيق مقفل";
+"App theme" = "مظهر التطبيق";
+"Are you sure you want to pay this invoice?" = "هل أنت متأكد أنك تريد دفع هذه الفاتورة؟";
+"Are you sure you want to proceed?" = "هل انت متأكد انك تريد المتابعة؟";
+/* lnurl-auth: login button title */
+"Authenticate" = "التوثيق";
+/* User prompt */
+"Authenticate to disable biometrics." = "قم بالتوثيق لإيقاف القياسات الحيوية.";
+/* lnurl-auth: success text */
+"Authenticated" = "تم التوثيق";
+"Automatic Channel Creation" = "إنشاء قناة بشكل تلقائي";
+/* Explanation for 'Randomize upload delays' toggle */
+"Avoids payment correlation using timestamp metadata." = "يتم تجنب ربط عمليات الدفع بأوقات حدوثها.";
+"Backup seed" = "النسخ الاحتياطي لعبارة الاسترداد";
+"Backup transactions" = "النسخ الاحتياطي للمعاملات";
+"Biometrics" = "القياسات الحيوية (البصمة)";
+"BIP39 seed with standard BIP84 derivation path" = "BIP39 seed with standard BIP84 derivation path";
+"Bitcoin" = "بيتكوين";
+/* Label in DetailsView_IncomingPayment */
+"bitcoin address" = "عنوان بيتكوين";
+/* TextField placeholder */
+"Bitcoin address" = "عنوان بيتكوين";
+"Bitcoin mempool is full and fees are high." = "الـ mempool (المعاملات المعلقة) الخاص بالبيتكوين ممتلئ والرسوم مرتفعة.";
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transaction. Payment required 1 transaction." = "رسوم شبكة بيتكوين المدفوعة للمعاملات عبر الشبكة الرئيسية. الدفعة تطلبت معاملة واحدة.";
+/* Fees explanation */
+"Bitcoin network fees paid for on-chain transactions. Payment required (txCount) transactions." = "رسوم شبكة بيتكوين المدفوعة للمعاملات عبر الشبكة الرئيسية. الدفعة تطلبت (txCount) معاملات.";
+/* Label in DetailsView_IncomingPayment */
+"bitcoin txids" = "معرّفات تحويلات البيتكوين";
+/* Navigation bar title */
+"Bitcoin unit" = "وحدة البيتكوين";
+"Block height" = "ارتفاع الكتلة";
+"blockchain tx" = "blockchain TX";
+"By default Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "بشكل افتراضي، يتصل Phoenix بخوادم Electrum عشوائية لأجل الوصول إلى سلسلة كتل البيتكوين. يمكنك أيضًا اختيار الاتصال بخادم Electrum الخاص بك.";
+"Cancel" = "إلغاء";
+/* Error title */
+"Chain mismatch" = "السلسلة غير متطابقة";
+"Channel Balance Display:" = "طريقة عرض موازنة القناة:";
+/* Payment description for channel closing */
+"Channel closing" = "يتم إغلاق القناة";
+/* Title in DetailsView_IncomingPayment
+   Transaction Info: Value */
+"Channel Closing" = "إغلاق القناة";
+"Channel creation has been temporarily disabled. You may not be able to receive some payments." = "تم تعطيل إنشاء القناة مؤقتًا. قد لا تتمكن من تلقي بعض المدفوعات.";
+/* Label in DetailsView_IncomingPayment */
+"channel id" = "معرف القناة";
+"Checking channel state..." = "جارِ التحقق من حالة القناة...";
+/* Label in DetailsView_IncomingPayment */
+"claimed amount" = "المبلغ المطالب به";
+"Clear" = "مسح";
+/* Button */
+"Close" = "إغلاق";
+"Close all channels" = "أغلق كل القنوات";
+/* Navigation bar title */
+"Close channels" = "إغلاق القنوات";
+/* Title in DetailsView_IncomingPayment */
+"Closing Status" = "حالة الإغلاق";
+"Cloud backup" = "النسخ الاحتياطي للسحابة";
+/* Navigation bar title */
+"Cloud Backup" = "النسخ الاحتياطي للسحابة";
+"Cloud sync complete" = "اكتملت مزامنة السحابة";
+"Cloud sync disabled" = "تم تعطيل المزامنة السحابية";
+"Cloud sync error" = "خطأ في المزامنة السحابية";
+"Cloud sync initializing" = "جارِ تهيئة المزامنة السحابية";
+"Cloud sync paused" = "تم إيقاف مزامنة السحابة مؤقتًا";
+"Coming Soon" = "قريبًا";
+/* Label in DetailsView_IncomingPayment */
+"completed at" = "اكتمل في";
+"Configuration" = "الضبط";
+"Confirm" = "تأكيد";
+/* Navigation bar title */
+"Confirm Payment" = "تأكيد الدفع";
+/* Connection state */
+"Connected" = "متصل";
+/* Connection status */
+"Connected to:" = "متصل بـ:";
+/* button text */
+"connecting to electrum" = "الاتصال بالالكتروم";
+/* button text */
+"connecting to peer" = "الاتصال بنظير";
+/* Connection status */
+"Connecting to:" = "الاتصال بـ:";
+/* Connection state */
+"Connecting..." = "توصيل...";
+/* Error title */
+"Connection failure" = "فشل الاتصال";
+"Copied QR code image to pasteboard!" = "تم نسخ صورة رمز QR إلى الحافظة!";
+"Copied to pasteboard!" = "تم النسخ إلى الحافظة!";
+"Copy" = "نسخ";
+"Copy Image" = "نسخ الصورة";
+"Copy link" = "نسخ الرابط";
+"Copy Text" = "نسخ النص";
+"Could not connect to host:" = "تعذر الاتصال بالمستضيف:";
+/* Error message - scanning lightning invoice */
+"Could not connect to service" = "تعذر الاتصال بالخدمة";
+"Create new wallet" = "إنشاء محفظة جديدة";
+"Creating record zone..." = "جاري إنشاء منطقة التسجيل...";
+/* HomeView: Tools menu: Label */
+"Currency converter" = "تحويل العملات";
+/* Navigation bar title */
+"Currency Converter" = "تحويل العملات";
+"Customize amount" = "تخصيص المبلغ";
+"Danger zone" = "منطقة الخطر";
+/* App theme option */
+"Dark" = "داكن";
+"Default payment description" = "وصف المدفوعات الافتراضي";
+"Deleting record zone..." = "جارٍ حذف منطقة التسجيل...";
+/* Minimum amount description. */
+"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "يجب أن تكون الودائع على الأقل **%@**. الرسوم **%@٪** (بحد ادنى %@).";
+/* Label in SummaryInfoGrid */
+"Desc" = "الوصف";
+/* TextField placeholder */
+"Description (optional)" = "وصف (اختياري)";
+"Description:" = "الوصف:";
+/* Navigation bar title */
+"Details" = "التفاصيل";
+"Display" = "العرض";
+/* Navigation bar title */
+"Display options" = "خيارات العرض";
+"Display seed" = "عرض عبارة الاسترداد";
+"Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don't have another Phoenix wallet running with the same seed." = "لا تقم باستيراد عبارة استرداد لم يتم إنشاؤها بواسطة هذا التطبيق.\
+\
+تأكد ايضًا من عدم وجود محفظة Phoenix أخرى تعمل بنفس عبارة الاسترداد.";
+"DO NOT SHARE." = "لا تشاركها.";
+"Do not use this feature if you don't fully understand what it does." = "لا تستخدم هذه الميزة إذا كنت لا تفهم تمامًا ما تفعله.";
+/* Payment description for received KeySend */
+"Donation" = "التبرع";
+"Downloading payments" = "تحميل المدفوعات";
+"Drain my wallet" = "تسييل محفظتي";
+"Edit" = "تعديل";
+/* Navigation bar title */
+"Edit Info" = "تعديل المعلومات";
+"Edit payment request" = "تعديل طلب الدفع";
+/* Label in SummaryInfoGrid */
+"elapsed" = "تمت في غضون";
+/* Navigation bar title */
+"Electrum server" = "خادم Electrum";
+"Enter a Lightning invoice, LNURL, or Lightning address you want to send money to." = "أدخل فاتورة برق أو LNURL أو عنوان برق تريد إرسال الأموال إليه.";
+/* error message */
+"Enter a valid amount" = "أدخل مبلغًا صالحًا";
+/* error message */
+"Enter an amount" = "أدخل مبلغًا";
+/* TextField placeholder */
+"Enter keywords from your seed" = "أدخل الكلمات الرئيسية من عبارة الاسترداد الخاصة بك";
+/* Label in SummaryInfoGrid */
+"Error" = "خطأ";
+"Error: %@" = "خطأ: %@";
+"Error: invalid amount" = "خطأ: مبلغ غير صالح";
+"Error: invalid hash" = "خطأ: هاش غير صالح";
+/* label text */
+"Expect to receive %d separate payments." = "توقع الحصول على %d مدفوعات منفصلة.";
+"Exponential backoff" = "تراجع أسي";
+"External" = "خارجي";
+"FAILED" = "فشل الارسال";
+/* HomeView: Tools menu: Label */
+"FAQ" = "الاسئلة الشائعة";
+"Fee for on-the-fly channel creation:" = "رسوم إنشاء قناة سريعة:";
+"Fee rate" = "معدل الرسوم";
+/* Label in SummaryInfoGrid */
+"Fees" = "الرسوم";
+"Fetched %@ item" = "تم جلب %@ عنصر";
+"Fetched %@ items" = "تم جلب %@ عناصر";
+/* Progress title */
+"Fetching Invoice" = "جارِ إحضار الفاتورة";
+/* Progress title */
+"Fetching Lightning URL" = "جارِ احضار رابط البرق";
+"Fiat" = "العملة الورقية";
+/* Navigation bar title */
+"Fiat currency" = "العملة الورقية";
+"For more information, see the FAQ" = "لمزيد من المعلومات ، راجع التعليمات";
+"Force close allows you to unilaterally close your channels." = "يسمح لك فرض الاغلاق بإغلاق قنواتك من جانب واحد.";
+/* Navigation bar title */
+"Force close channels" = "فرض إغلاق القنوات";
+/* ForceCloseChannelsView */
+"Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "سيكلفك فرض الاغلاق أموالًا (لتغطية رسوم الارسال عبر السلسلة الرئيسية) وسيؤدي ذلك إلى حجز أموالك لعدة أيام. **لا تقم بإلغاء تثبيت التطبيق حتى يتم إغلاق قنواتك بالكامل وإلا ستخسر الأموال.**";
+"Full Screen" = "ملء الشاشة";
+"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "يمكن إرسال الأموال إلى محفظة Bitcoin. تأكد من صحة العنوان قبل الإرسال.";
+"Funds sent" = "تم إرسال الأموال";
+"Funds will eventually be sent to:" = "في النهاية سيتم إرسال الأموال إلى:";
+"General" = "عام";
+"Generating QRCode..." = "جارِ إنشاء رمز QR...";
+"Get started" = "البدء";
+"Here you can extract and visualize application logs, as well as share them." = "هنا يمكنك استخراج ومشاهدة سجلات التطبيق، وكذلك مشاركتها.";
+"Host returned error response." = "قام المضيف بالرد بخطأ.";
+"Host returned status code %@:" = "قام المضيف الرد برمز الحالة %@:";
+/* error details */
+"Host returned unreadable response:" = "ردّ المضيف برد غير قابل للقراءة.";
+"Host: %@" = "المضيف: %@";
+"I understand" = "أفهم";
+"If done correctly, self-backup is the most secure option." = "إذا تم القيام به بشكل صحيح، فإن النسخ الاحتياطي الذاتي هو الخيار الأكثر أمانًا.";
+/* ErrorView */
+"If the problem persists, please contact support at **phoenix@acinq.co**." = "إذا استمرت المشكلة ، يرجى الاتصال بالدعم على **phoenix@acinq.co**.";
+"If you switch to a new device (or reinstall the app) then you'll lose your payment history." = "إذا قمت بالانتقال إلى جهاز جديد (أو أعدت تثبيت التطبيق)، فستفقد سجل المدفوعات الخاص بك.";
+"Image" = "صورة";
+"Import" = "استيراد";
+/* Fees explanation */
+"In order to receive this payment, a new payment channel was opened. This is not always required." = "لتلقي هذه الدفعة، تم فتح قناة دفع جديدة. هذا ليس مطلوبًا دائما.";
+/* AppStatusPopover: label */
+"Internet" = "إنترنت";
+/* toast warning */
+"Invalid Lightning Request" = "طلب خاطئ لشبكة البرق";
+"Invalid port. Valid range: [1 - 65535]" = "منفذ خاطئ. النطاق المقبول: [1 - 65535]";
+/* Error title */
+"Invalid response" = "استجابة غير صالحة";
+"Invalid server. Use format: domain.tld" = "خادم غير صالح. استخدم التنسيق: domain.tld";
+/* Label in DetailsView_IncomingPayment */
+"invoice created" = "تم إنشاء الفاتورة";
+/* error message */
+"Invoice is expired" = "الفاتورة منتهية الصلاحية";
+"just now" = "الآن";
+"Keep Control" = "ابقَ متحكمًا";
+"Keep it safe and secret!" = "احتفظ بها في مكان آمن وسري!";
+"KEEP THIS SEED SAFE." = "ابقِ عبارة الاسترداد هذه في مكان آمان.";
+/* Transaction Info: Value */
+"KeySend" = "الدفع عبر KeySend";
+/* Transaction Info: Explanation */
+"layer 1 -> 2" = "الطبقة 1 - > 2";
+/* Transaction Info: Explanation */
+"layer 2 -> 1" = "الطبقة 2 - > 1";
+/* App theme option */
+"Light" = "فاتح";
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required %d hops." = "رسوم شبكة البرق لتمرير المبلغ. تطلبت الدفعة المرور بـ%d خطوات.";
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment required 1 hop." = "رسوم شبكة البرق لتمرير المبلغ. تطلبت الدفعة خطوة واحدة فقط.";
+/* Fees explanation */
+"Lightning fees for routing the payment. Payment was divided into %d parts, using %d hops." = "رسوم شبكة البرق لتمرير المبلغ. تم تقسيم الدفعة إلى %d أجزاء، عن طريق المرور بـ%d خطوات.";
+"Lightning network" = "شبكة البرق";
+/* AppStatusPopover: label */
+"Lightning peer" = "نظير البرق";
+/* lnurl-auth: login button title */
+"Link" = "ربط";
+/* lnurl-auth: success text */
+"Linked" = "تم الربط";
+"local / remote" = "رصيدي / رصيد النظير";
+"local / total" = "رصيدي / الإجمالي";
+/* lnurl-auth: success text */
+"Logged In" = "تم تسجيل الدخول";
+/* lnurl-auth: login button title */
+"Login" = "تسجيل الدخول";
+/* Navigation bar title */
+"Logs" = "السجلات";
+"Long Description" = "وصف طويل";
+"Look at the logs" = "مشاهدة السجلات";
+"Malformed JPG image data" = "بيانات صورة JPG غير صحيحة";
+"Malformed PNG image data" = "بيانات صورة PNG غير صحيحة";
+"Manual input" = "إدخال يدوي";
+"Manual Input" = "إدخال يدوي";
+"Master public key" = "اصل المفتاح العام";
+"Max: " = "الحد الأعلى:";
+/* Label in SummaryInfoGrid */
+"Message" = "رسالة";
+"Metadata" = "البيانات الوصفية";
+"Min: " = "الحد الأدنى:";
+"Modify" = "تعديل";
+/* error details */
+"Network error. Check your internet connection." = "خطأ في الشبكة. تحقق من اتصالك بالإنترنت.";
+"never" = "أبدا";
+"New Channel (auto-created)" = "قناة جديدة (تم إنشاؤها تلقائيًا)";
+"Next" = "التالي";
+"No" = "لا";
+/* placeholder: invoice is description-less */
+"no description" = "بدون وصف";
+/* placeholder text */
+"No description" = "بدون وصف";
+"NO FUNDS HAVE BEEN SENT" = "لم يتم إرسال أي أموال";
+"No personal data will be shared with this service." = "لن يتم مشاركة أي بيانات شخصية مع هذه الخدمة.";
+/* Transaction Info: Explanation */
+"non-invoice payment" = "دفع بدون فاتورة";
+/* TextField placeholder */
+"None" = "لاشيء";
+"Note: Server must have a valid certificate" = "ملاحظة: يجب أن يكون لدى الخادم شهادة صالحة";
+/* Label in SummaryInfoGrid */
+"Notes" = "ملاحظات";
+"Notes:" = "ملاحظات:";
+"now" = "حاليا";
+/* Connection state */
+"Offline" = "غير متصل على الانترنت";
+"OK" = "موافق";
+"Only you alone possess this seed. Keep it private." = "أنت وحدك تمتلك عبارة الاسترداد هذه. ابقها خاصة.";
+"open link" = "افتح الرابط";
+/* Label in SummaryInfoGrid */
+"Output" = "المخرجات";
+"Paste from clipboard" = "لصق من الحافظة";
+"Path" = "المسار";
+"Pay" = "دفع";
+/* Navigation bar title */
+"Payment channels" = "قنوات الدفع";
+"Payment channels are automatically created when needed." = "يتم إنشاء قنوات الدفع تلقائيًا عند الحاجة.";
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "يتم إنشاء قنوات الدفع تلقائيًا عندما تتلقى مدفوعات. استخدم شاشة **استلام** للاستلام عبر شبكة البرق.";
+/* Label in DetailsView_IncomingPayment */
+"payment hash" = "هاش الدفعة";
+/* Navigation Bar Title */
+"Payment Options" = "خيارات الدفع";
+"Payment options & fees" = "خيارات الدفع والرسوم";
+/* Title in DetailsView_IncomingPayment */
+"Payment Parts" = "أجزاء الدفعة";
+/* Title in DetailsView_IncomingPayment */
+"Payment Received" = "تم استلام المبلغ";
+/* Title in DetailsView_IncomingPayment */
+"Payment Request" = "طلب الدفع";
+"Payment requested by" = "تم طلب الدفع من";
+/* Title in DetailsView_IncomingPayment */
+"Payment Sent" = "تم الدفع";
+/* Explanation for 'Randomize upload delays' toggle */
+"Payments are uploaded to the cloud immediately upon completion." = "يتم رفع المدفوعات إلى السحابة فور اتمامها.";
+/* timestamp string for pending transaction */
+"pending" = "قيد الانتظار";
+"PENDING" = "قيد الانتظار";
+"Phoenix" = "Phoenix";
+"Phoenix can be accessed without credentials. Make sure that you have enabled adequate protections for iOS." = "يمكن الوصول إلى Phoenix بدون وسائل امان. تأكد من أنك قمت بتمكين الحماية الكافية لنظام iOS.";
+/* Error message - scanning lightning invoice */
+"Phoenix does not support this type of LNURL yet" = "لا تدعم Phoenix هذا النوع من LNURL حتى الآن";
+"Phoenix generated" = "تم توليد Phoenix";
+/* Error message in LockView */
+"Please enable Touch ID" = "يرجى تمكين Touch ID";
+/* Error message in LockView */
+"Please enabled Face ID" = "يرجى تمكين Face ID";
+"Please restart Phoenix" = "الرجاء إعادة تشغيل Phoenix";
+"Please try again" = "حاول مرة اخرى";
+"Port" = "المنفذ";
+/* Connection info */
+"Random server" = "خادم عشوائي";
+"Randomize upload delays" = "تأخير الرفع لأوقات عشوائية";
+"Randomized upload delay" = "تأخير الرفع لأوقات عشوائية";
+/* Label in DetailsView_IncomingPayment */
+"range" = "النطاق";
+"Rates last updated: %@" = "آخر تحديث للأسعار: %@";
+/* Label in DetailsView_IncomingPayment */
+"reason" = "السبب";
+/* Navigation bar title */
+"Receive" = "استلام";
+"RECEIVED" = "تم الاستلام";
+/* Label in DetailsView_IncomingPayment */
+"received at" = "تم الاستلام في";
+/* Label in DetailsView_IncomingPayment */
+"recipient pubkey" = "المفتاح العام للمتلقي";
+"Recovery phrase" = "عبارة الإسترداد";
+/* Navigation bar title */
+"Recovery Seed" = "عبارة الإسترداد";
+"refresh" = "تحديث";
+"Refreshing rates..." = "جارِ تحديث الأسعار...";
+/* lnurl-auth: login button title */
+"Register" = "يسجل";
+/* lnurl-auth: success text */
+"Registered" = "مسجل";
+"Requesting Swap-In Address..." = "طلب عنوان المبادلة...";
+"Require Face ID" = "تمكين Face ID";
+"Require Touch ID" = "تمكين بصمة الاصبع";
+/* Navigation bar title */
+"Restore my wallet" = "استعادة محفظتي";
+"Satoshis are often preferred because it's easier to work with whole numbers rather than fractions." = "غالبًا يُفضل استخدام وحدة الساتوشي لأنه يسهل استخدام الأعداد الصحيحة بدلاً من الكسور.";
+"Save" = "حفظ";
+"Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "احفظه في مكان آمن (ليس على هذا الهاتف). إذا فقدت عبارتك وهاتفك، فقد فقدت جميع أموالك.";
+/* Navigation bar title */
+"Scan a QR code" = "امسح رمز QR";
+"Scan Bitcoin Address" = "امسح عنوان بيتكوين";
+"Security" = "الأمان";
+"See how Phoenix is affected" = "انظر كيف تتأثر محفظة Phoenix";
+"Send" = "إرسال";
+/* Title in DetailsView_IncomingPayment */
+"Send Failed" = "فشل الإرسال";
+/* HomeView: Tools menu: Label */
+"Send feedback" = "شاركنا ملاحظاتك";
+"Send Funds" = "ارسال الاموال";
+/* Navigation bar title */
+"Sending payment" = "ارسال المبلغ";
+"Sending Payment..." = "جارِ إرسال المبلغ...";
+"SENT" = "تم الإرسال";
+/* Label in DetailsView_IncomingPayment */
+"sent at" = "تم الارسال في";
+"Server" = "الخادم";
+/* error details */
+"Server returned error: %@" = "ردّ الخادم بالخطأ: %@";
+/* error details */
+"Server returned HTTP status code %d" = "ردّ الخادم بخطأ HTTP رقم %d";
+/* error details */
+"Server returned unreadable response" = "ردّ الخادم برد غير قابل للقراءة";
+/* Label in DetailsView_IncomingPayment */
+"service" = "الخدمة";
+/* Label in SummaryInfoGrid */
+"Service" = "الخدمة";
+/* Error message - scanning lightning invoice */
+"Service appears to be offline, or they have a down server" = "يبدو أن الخدمة غير متصلة بالإنترنت، أو ان خادمهم متعطل";
+/* Error message - scanning lightning invoice */
+"Service doesn't support Lightning addresses, or doesn't know this user" = "لا تدعم هذه الخدمة عناوين البرق، أو انها لا تتعرف هذا المستخدم";
+/* Error message - scanning lightning invoice */
+"Service returned unreadable response" = "ردّت الخدمة برد غير قابل للقراءة";
+/* Navigation bar title */
+"Settings" = "الإعدادات";
+"Share" = "مشاركة";
+"Share Image" = "مشاركة الصورة";
+"Share Text" = "مشاركة النص";
+"Share the logs" = "مشاركة السجلات";
+"Short Description" = "وصف قصير";
+"Show a Bitcoin address" = "أظهر عنوان بيتكوين";
+"Show a Lightning invoice" = "إظهار فاتورة برق";
+"Sign into iCloud to backup your payments" = "قم بتسجيل الدخول إلى iCloud لعمل نسخة احتياطية من مدفوعاتك";
+"Skip" = "تخطي";
+"Some Services Disabled" = "بعض الخدمات معطلة";
+"Something is amiss with this invoice..." = "هناك شيء خاطئ في هذه الفاتورة ...";
+"Status" = "الحالة";
+/* Navigation bar title */
+"Swap In" = "التبديل";
+/* Transaction Info: Value */
+"Swap-In" = "مبادلة دخول";
+/* Transaction Info: Value */
+"Swap-Out" = "مبادلة خروج";
+/* App theme option */
+"System" = "النظام";
+"Terminate App" = "إنهاء التطبيق";
+/* Error message - parsing bitcoin address */
+"The address is for %@, but you're on %@" = "العنوان لـ %@ ، لكنك على %@";
+"The backup phrase, known as a seed, is a list of 12 english words. It allows you to recover full access to your funds if needed." = "العبارة الاحتياطية، المعروفة باسم seed او عبارة الاسترداد، هي قائمة من 12 كلمة إنجليزية. تسمح لك باستعادة الوصول الكامل إلى أموالك إذا لزم الأمر.";
+"The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "الـ mempool (المعاملات المعلقة) الخاصة بالبيتكوين مزدحمة حالياً والرسوم مرتفعة للغاية. تم تعطيل خدمة مبادلة الايداعات على السلسلة الرئيسية مؤقتًا.";
+/* label text */
+"The closing transaction is in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "معاملة إغلاق القناة موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
+/* label text */
+"The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "معاملات إغلاق القنوات موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
+"The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "يتم تشفير البيانات المخزنة في السحابة، ولا يمكن فك تشفيرها إلا بعبارة الاسترداد الخاصة بك.";
+/* IntroView */
+"The fee is **%@%%** with a minimum fee of **%@**." = "الرسوم **%@٪** مع حد أدنى للرسوم **%@**.";
+/* SendView */
+"The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الضارة من سرقة مبلغك. لكي تبقى بأمان، ***اطلب من المستفيد تحديد مبلغ*** في طلب الدفع.";
+/* Error message - scanning lightning invoice */
+"The invoice is for (requestChain), but you're on (reason.myChain.name)" = "الفاتورة لـ (requestChain) ، لكنك على (reason.myChain.name)";
+"The invoice is for you. You are about to pay yourself." = "الفاتورة تابعة لك. انك تحاول أن تدفع لنفسك.";
+/* Error message - parsing bitcoin address */
+"The scanned QR code is not a bitcoin address" = "رمز الـ QR الممسوح ضوئيًا ليس عنوان بيتكوين";
+/* Warning for iOS Simulator (only for devs) */
+"The simulator cannot access the camera. Please use the clipboard." = "نظام المحاكاة لا يمكنه الوصول إلى الكاميرا. الرجاء استخدام الحافظة.";
+"This address is derived from your seed and belongs to you." = "هذا العنوان مشتق من عبارة الاسترداد الخاصة بك وهو ملك لك.";
+"This app is experimental. Please backup your seed. You can report issues to phoenix@acinq.co." = "هذا التطبيق تجريبي. يرجى الاحتفاظ بنسخة احتياطية من عبارة الاسترداد. يمكنك الإبلاغ عن المشاكل إلى phoenix@acinq.co.";
+/* Error message - scanning lightning invoice */
+"This doesn't appear to be a Lightning invoice" = "لا يبدو أن هذه فاتورة برق";
+/* ForceCloseChannelsView */
+"This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "هذه الميزة ليست \"الزر السحري لإصلاح كل شيء\". إنها هنا كإجراء أمان و** يجب استخدامها فقط في السيناريوهات القصوى **. على سبيل المثال، إذا اختفى نظيرك (ACINQ) بشكل دائم، مما يمنعك من إنفاق أموالك. في جميع الحالات الأخرى، ** إذا كنت تواجه مشكلات مع Phoenix، فيجب عليك الاتصال بالدعم **.";
+"This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "يتم تطبيق هذه الرسوم عندما تتلقى دفعة عبر شبكة البرق ويلزم لإستلامها إنشاء قناة جديدة.";
+"This fee is dynamic, and may change depending on the conditions of the bitcoin network." = "هذه الرسوم ديناميكية، وقد تتغير حسب ظروف شبكة البيتكوين.";
+"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "تطبّق هذه الرسوم فقط عندما يلزم إنشاء قناة جديدة. المدفوعات التي تستخدم القنوات الحالية الموجودة لايلزمها دفع رسوم. الرسوم ديناميكية وقد تتغير حسب ظروف شبكة البيتكوين.";
+"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "هذا عنوان استبدال. لا يتم التحكم به من قبل محفظتك. سيتم تحويل الايداعات المرسلة إلى هذا العنوان عبر السلسلة الرئيسية إلى قنوات برق.";
+"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "هذا يعني أنك لن تكون قادرًا على تلقي المدفوعات عندما يكون Phoenix في الخلفية. لتلقي المدفوعات، يجب أن تكون محفظة Phoenix مفتوحة وتعمل في الواجهة.";
+"This means you will not be notified if you receive a payment while Phoenix is in the background." = "هذا يعني أنه لن يتم إشعارك إذا تلقيت مبلغ أثناء عمل Phoenix في الخلفية.";
+"This seed is invalid and cannot be imported.\n\nPlease try again" = "هذه عبارة استرداد غير صالحة ولا يمكن استيرادها. \
+\
+ حاول مرة اخرى";
+"Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." = "في اي مكان في التطبيق، يمكنك النقر على المبلغ لتحويل قيمته بين البيتكوين والقيمة بالعملة الورقية.";
+/* Label in DetailsView_IncomingPayment */
+"timestamp" = "الزمن";
+"Tip timestamp" = "الزمن";
+"To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" = "لإصلاح ذلك، أعد تمكين تحديث تطبيق الخلفية عبر: الإعدادات -> عام -> تحديث التطبيقات في الخلفية";
+"To receive incoming payments, Phoenix must be running, and you must have unlocked the app once." = "لتتمكن من استقبال المدفوعات، يجب أن يكون Phoenix قيد التشغيل، ويجب أن تكون قد فتحت قفل التطبيق مرة واحدة.";
+"To receive incoming payments, Phoenix must be running." = "لتتمكن من استقبال المدفوعات، يجب ان يكون Phoenix قيد التشغيل.";
+/* Informational warning in SendView */
+"To scan a QR code you must give Phoenix permission to access the camera." = "لمسح رمز QR، يجب أن تمنح Phoenix إذنًا للوصول إلى الكاميرا.";
+"Tor" = "Tor";
+"Tor is disabled" = "تم تعطيل Tor";
+"Tor is enabled" = "تم تمكين Tor";
+/* Navigation bar title */
+"Tor Settings" = "Tor";
+/* Label in DetailsView_IncomingPayment */
+"total amount" = "المبلغ الإجمالي";
+"Try again later" = "حاول مرة أخرى في وقت لاحق";
+"Tx" = "TX";
+/* Label in DetailsView_IncomingPayment */
+"type" = "نوع";
+/* Label in SummaryInfoGrid */
+"Type" = "نوع";
+/* Connection state */
+"Unknown" = "مجهول";
+/* Error message - parsing bitcoin address */
+"Unknown Bech32 version" = "إصدار Bech32 غير معروف";
+/* Error message in LockView */
+"Unknown biometrics" = "القياسات الحيوية (البصمة) غير معروفة";
+/* Error title */
+"Unknown error" = "خطأ غير معروف";
+/* Biometrics prompt */
+"Unlock your seed." = "افتح عبارة الاسترداد الخاصة بك.";
+"Updating cloud" = "يتم تحديث السحابة";
+"Uploading payments" = "رفع المدفوعات";
+/* Explanation for 'Use cellular data' toggle */
+"Uploads can occur over cellular connections." = "عمليات الرفع من الممكن ان تحدث عبر شبكة البيانات الخلوية.";
+/* Explanation for 'Use cellular data' toggle */
+"Uploads will only occur over WiFi." = "عمليات الرفع ستحدث عبر الـ WiFi فقط.";
+"Use a custom server" = "استخدم خادم مخصص";
+"Use cellular data" = "استعمل البيانات الخلوية";
+/* CloseChannelsView */
+"Use this feature to transfer __all__ your funds to a Bitcoin address." = "استخدم هذه الميزة لتحويل __جميع _ أموالك إلى عنوان بيتكوين.";
+"Version %@" = "الإصدار %@";
+/* Label in DetailsView_IncomingPayment */
+"via" = "عبر";
+/* button text */
+"waiting for internet" = "في انتظار الإنترنت";
+"Waiting for internet" = "في انتظار الإنترنت";
+"Waiting..." = "انتظار...";
+"Warning" = "تحذير";
+"Welcome!" = "أهلا بك!";
+/* Connection status */
+"Will connect to:" = "سوف يتصل بـ:";
+"Will disable cloud syncing" = "سيعطل المزامنة السحابية";
+"Will enable cloud syncing" = "سيمكن المزامنة السحابية";
+"With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "مع Phoenix، يكون استلام عملات البيتكوين وإرسالها آمنًا وسهلاً وسريعًا.";
+"Would you like to be notified when somebody sends you a payment?" = "هل ترغب في أن يتم إعلامك عندما يرسل لك شخص ما مبلغًا؟";
+"Yes" = "نعم";
+"You are on bitcoin chain %@, but the invoice is for %@." = "أنت في شبكة بتكوين %@، لكن الفاتورة هي في %@.";
+"You are responsible for backing up your seed." = "أنت مسؤول عن نسخ عبارة الاسترداد الخاصة بك احتياطيًا.";
+/* CloseChannelsView
+   ForceCloseChannelsView */
+"You can also use the **Payment Channels** screen to inspect the state of your channels." = "يمكنك أيضًا استخدام شاشة **قنوات الدفع** للتحقق من حالة قنواتك.";
+"You can improve your privacy by only using Tor when connecting to an Electrum server or to your Lightning peer. This will slightly slow down your transactions." = "يمكنك تحسين خصوصيتك فقط باستخدام Tor عند الاتصال بخادم Electrum أو بنظير شبكة البرق الخاص بك. سيؤدي هذا إلى إبطاء عمل حوالاتك بشكل طفيف.";
+"You can use your wallet to anonymously sign and authorize an action on:" = "يمكنك استخدام محفظتك للتوقيع بشكل مجهول وتفويض إجراء على:";
+"You currenly have 1 Lightning channel with a balance of %@." = "لديك حاليًا قناة برق واحدة برصيد %@.";
+"You currently don't have any channels that can be closed." = "ليس لديك حاليًا أي قنوات يمكن إغلاقها.";
+"You currently have %@ Lightning channels with an aggragate balance of %@." = "لديك حاليًا %@ قنوات على شبكة البرق برصيد اجمالي يبلغ %@.";
+"You don't have any payment channels." = "ليس لديك أي قنوات دفع.";
+"You have already paid this invoice." = "لقد دفعت هذه الفاتورة بالفعل.";
+"You have disabled Background App Refresh for this app." = "لقد قمت بتعطيل تحديث التطبيق في الخلفية.";
+"You have disabled notifications for this app." = "لقد قمت بتعطيل الإشعارات لهذا التطبيق.";
+/* Error message - scanning lightning invoice */
+"You scanned a bitcoin address. Phoenix currently only supports sending Lightning payments. You can use a third-party service to make the offchain->onchain swap." = "لقد قمت بمسح عنوان بيتكوين. تدعم Phoenix حاليًا فقط إرسال مدفوعات عبر شبكة البرق (Lightning). يمكنك استخدام خدمات من جهات خارجية لعمل تحويل من شبكة البرق إلى الشبكة الرئيسية للبيتكوين.";
+/* Error message - scanning lightning invoice */
+"You've already paid this invoice. Paying it again could result in stolen funds." = "لقد دفعت هذه الفاتورة بالفعل. قد يؤدي دفعها مرة أخرى إلى سرقة الأموال.";
+"Your comment will be sent when you pay." = "سيتم إرسال تعليقك عندما تدفع.";
+"Your Node ID:" = "معرف العقدة الخاص بك:";
+"Your payment history is only stored on this device." = "يتم تخزين سجل مدفوعاتك على هذا الجهاز فقط.";
+"Your payment history will be stored in iCloud." = "سيتم تخزين سجل مدفوعاتك على iCloud.";
+/* Minimum amount description. */
+"Your wallet is empty. The first payment you receive must be at least **%@**." = "محفظتك فارغة. يجب أن يكون أول مبلغ تتلقاه **%@**.";
+"Your wallet's seed is a list of 12 english words." = "عبارة الاسترداد هي قائمة من 12 كلمة إنجليزية.";
+"-" = "-";
+"…" = "…";
+"%@.%@ seconds" = "%1$@.%2$@ ثواني";
+"A random Electrum server will be selected on each connection attempt." = "سيتم تحديد خادم Electrum عشوائي في كل محاولة اتصال.";
+/* Currency name: AUD */
+"Australian Dollar" = "";
+/* Currency name: BRL */
+"Brazilian Real" = "";
+"By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "بشكل افتراضي، يتصل Phoenix بخوادم Electrum عشوائية لأجل الوصول إلى سلسلة كتل البيتكوين. يمكنك أيضًا اختيار الاتصال بخادم Electrum الخاص بك.";
+/* Currency name: CAD */
+"Canadian Dollar" = "";
+/* Currency name: CLP */
+"Chilean Peso" = "";
+/* Currency name: CNY */
+"Chinese Yuan" = "";
+"Connection status" = "";
+/* Currency name: CZK */
+"Czech Koruna" = "";
+/* Currency name: DKK */
+"Danish Krone" = "";
+/* Currency name: EUR */
+"Euro" = "";
+"example.com" = "example.com";
+/* Currency name: GBP */
+"Great British Pound" = "";
+/* Currency name: HKD */
+"Hong Kong Dollar" = "";
+/* Currency name: HRK */
+"Croation Kuna" = "";
+/* Currency name: HUD */
+"Hungarian Forint" = "";
+/* Currency name: ISK */
+"Icelandic Króna" = "";
+/* Currency name: INR */
+"Indian Rupee" = "";
+/* Currency name: JPY */
+"Japanese Yen" = "";
+/* Currency name: KRW */
+"Korean Won" = "";
+/* Currency name: MXN */
+"Mexican Peso" = "";
+/* Currency name: NZD */
+"New Zealand Dollar" = "";
+/* Error message - scanning lightning invoice */
+"Phoenix does not support the LNURL protocol yet" = "لا تدعم Phoenix بروتوكول LNURL حتى الآن";
+/* Currency name: PLN */
+"Polish Zloty" = "";
+/* Currency name: RON */
+"Romanian Leu" = "";
+/* Currency name: RUB */
+"Russian Ruble" = "";
+"Share channel list" = "";
+/* Currency name: SGD */
+"Singapore Dollar" = "";
+/* Currency name: SEK */
+"Swedish Krona" = "";
+/* Currency name: CHF */
+"Swiss Franc" = "";
+/* Currency name: TWD */
+"Taiwan Dollar" = "";
+/* Currency name: THB */
+"Thai Baht" = "";
+"The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." = "العبارة الاحتياطية، المعروفة باسم seed او عبارة الاسترداد، هي قائمة من 12 كلمة إنجليزية. تسمح لك باستعادة الوصول الكامل إلى أموالك إذا لزم الأمر.";
+/* Currency name: USD */
+"United States Dollar" = "";
+"You currently have 1 Lightning channel with a balance of %@." = "لديك حاليًا قناة برق واحدة برصيد %@.";
+"You currently have %@ Lightning channels with an aggregate balance of %@." = "لديك حاليًا %1$@ قنوات على شبكة البرق برصيد اجمالي يبلغ %2$@.";
+"Your wallet's seed is a list of 12 English words." = "عبارة الاسترداد الخاصة بمحفظتك هي قائمة من 12 كلمة إنجليزية.";
