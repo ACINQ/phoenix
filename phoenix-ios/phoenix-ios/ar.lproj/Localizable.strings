@@ -261,7 +261,7 @@
 /* error details */
 "Host returned unreadable response:" = "ردّ المضيف برد غير قابل للقراءة.";
 "Host: %@" = "المضيف: %@";
-"I understand" = "أفهم";
+"I understand" = "فهمت";
 "If done correctly, self-backup is the most secure option." = "إذا تم القيام به بشكل صحيح، فإن النسخ الاحتياطي الذاتي هو الخيار الأكثر أمانًا.";
 /* ErrorView */
 "If the problem persists, please contact support at **phoenix@acinq.co**." = "إذا استمرت المشكلة ، يرجى الاتصال بالدعم على **phoenix@acinq.co**.";
