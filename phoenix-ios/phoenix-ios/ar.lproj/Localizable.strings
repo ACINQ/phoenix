@@ -5,11 +5,11 @@
 "(completed) of (total)" = "(completed) من (total)";
 /* Upload progress information */
 "(completed) of (total), pushing batch of (inFlight)" = "(completed) من (total)، يتم دفع مجموعة (inFlight)";
-"(derived from your seed)" = "(مشتق من بذرتك)";
+"(derived from your seed)" = "(مشتق من عبارة الاسترداد الخاصة بك)";
 "(Lightning invoice)" = "(فاتورة البرق)";
 "(Phoenix can be running in the background.)" = "(يمكن تشغيل Phoenix في الخلفية.)";
 "(QR code)" = "(رمز QR)";
-"(This is your address - derived from your seed. You alone possess your seed.)" = "(هذا هو عنوانك - مشتق من بذرتك. أنت وحدك تمتلك بذرك.)";
+"(This is your address - derived from your seed. You alone possess your seed.)" = "(هذا هو عنوانك - مشتق من عبارة الاسترداد خاصتك. أنت وحدك تمتلك هذه العبارة.)";
 "(you provided this address)" = "(لقد قدمت هذا العنوان)";
 /* RecoverySeedView */
 "**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**لا تفقد هذه العبارة** احفظها في مكان آمن (ليس على هذا الهاتف). إذا فقدت عبارتك وهاتفك، فقد فقدت جميع أموالك.";
