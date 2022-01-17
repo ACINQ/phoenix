@@ -42,7 +42,13 @@ struct RecoveryPhraseList: View {
 	@State var legal_lossRisk: Bool
 	@State var animatingLegalToggleColor = false
 	
-	@Namespace var cloudBackupSectionID
+	@State var didAppear = false
+	
+	@Namespace var sectionID_warning
+	@Namespace var sectionID_info
+	@Namespace var sectionID_button
+	@Namespace var sectionID_legal
+	@Namespace var sectionID_cloudBackup
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -69,18 +75,22 @@ struct RecoveryPhraseList: View {
 		List {
 			if !backupSeed_enabled && !(legal_taskDone && legal_lossRisk) {
 				section_warning()
+					.id(sectionID_warning)
 			}
 			section_info()
+				.id(sectionID_info)
 			section_button()
+				.id(sectionID_button)
 			if !backupSeed_enabled {
 				section_legal()
+					.id(sectionID_legal)
 			}
 			CloudBackupSection(
 				backupSeed_enabled: $backupSeed_enabled,
 				syncState: $syncState,
 				syncStateWasEnabled: $syncStateWasEnabled
 			)
-			.id(cloudBackupSectionID)
+			.id(sectionID_cloudBackup)
 		}
 		.listStyle(.insetGrouped)
 		.sheet(isPresented: $revealSeed) {
@@ -223,7 +233,7 @@ struct RecoveryPhraseList: View {
 	@ViewBuilder
 	func section_legal() -> some View {
 		
-		Section {
+		Section(header: Text("Legal")) {
 			
 			Toggle(isOn: $legal_taskDone) {
 				Text(
@@ -266,9 +276,6 @@ struct RecoveryPhraseList: View {
 				legalToggleChanged()
 			}
 			
-		} header: {
-			Text("Legal")
-			
 		} // </Section>
 	}
 	
@@ -289,9 +296,12 @@ struct RecoveryPhraseList: View {
 	func onAppear(){
 		log.trace("onAppear()")
 		
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-			withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
-				animatingLegalToggleColor = true
+		if !didAppear {
+			didAppear = true
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+					animatingLegalToggleColor = true
+				}
 			}
 		}
 	}
@@ -306,7 +316,7 @@ struct RecoveryPhraseList: View {
 		if newSyncState == .deleting {
 			log.debug("newSyncState == .deleting")
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-				scrollViewProxy.scrollTo(cloudBackupSectionID, anchor: .top)
+				scrollViewProxy.scrollTo(sectionID_cloudBackup, anchor: .top)
 			}
 		}
 	}

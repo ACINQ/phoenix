@@ -118,7 +118,7 @@ struct CloudBackupView: View {
 	@ViewBuilder
 	func section_legal() -> some View {
 		
-		Section {
+		Section(header: Text("Legal")) {
 			
 			Toggle(isOn: $legal_appleRisk) {
 				Text(
@@ -155,9 +155,6 @@ struct CloudBackupView: View {
 				offImage: offImage()
 			))
 			.padding(.vertical, 5)
-			
-		} header: {
-			Text("Legal")
 			
 		} // </Section>
 		.onChange(of: toggle_enabled) { newValue in
@@ -241,7 +238,16 @@ struct CloudBackupView: View {
 		log.trace("didTapBackButton()")
 		
 		if canSave {
-			backupSeed_enabled = toggle_enabled
+			if #available(iOS 15.0, *) {
+				// No workaround needed
+				backupSeed_enabled = toggle_enabled
+			} else {
+				// This causes a crash in iOS 14. Appears to be a SwiftUI bug.
+				// Workaround is to delay the state change until after the animation has completed.
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
+					backupSeed_enabled = toggle_enabled
+				}
+			}
 			
 			// Subtle optimizations:
 			// - changing backupSeed_isEnabled causes upload/delete
