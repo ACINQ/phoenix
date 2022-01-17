@@ -23,7 +23,13 @@ enum WalletRestoreType {
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 	
 	static func get() -> AppDelegate {
-		UIApplication.shared.delegate as! AppDelegate
+		// In Swift5, we get a runtime warning:
+		// > UIApplication.delegate must be used from main thread only
+		// 
+	//	if !Thread.isMainThread {
+	//		log.debug("Accessing UIApplication.shared on non-main thread")
+	//	}
+		return UIApplication.shared.delegate as! AppDelegate
 	}
 	
 	// There are some places in the code where we need to access the testnet state from a background thread.

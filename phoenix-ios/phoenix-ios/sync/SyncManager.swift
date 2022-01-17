@@ -39,6 +39,9 @@ class SyncManager {
 			encryptedNodeId: encryptedNodeId
 		)
 		
+		syncSeedManager.parent = self
+		syncTxManager.parent = self
+		
 		startNetworkMonitor()
 		startCloudStatusMonitor()
 		checkForCloudCredentials()
