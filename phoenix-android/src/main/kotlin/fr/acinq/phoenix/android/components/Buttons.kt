@@ -42,7 +42,7 @@ import fr.acinq.phoenix.android.utils.borderColor
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
 
-/** A rounded button with a solid background and a muted outline. */
+/** A rounded button with a solid surface background and a muted outline. */
 @Composable
 fun BorderButton(
     modifier: Modifier = Modifier,
@@ -70,7 +70,7 @@ fun BorderButton(
     )
 }
 
-/** A rounded button with a solid background. */
+/** A rounded button with a solid background using app theme's primary color. */
 @Composable
 fun FilledButton(
     modifier: Modifier = Modifier,
@@ -176,7 +176,7 @@ fun Button(
                 Row(
                     Modifier
                         .defaultMinSize(
-                            minWidth = ButtonDefaults.MinWidth,
+                            minWidth = 42.dp,
                             minHeight = 0.dp
                         )
                         .indication(interactionSource, LocalIndication.current)

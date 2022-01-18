@@ -18,7 +18,8 @@ package fr.acinq.phoenix.android.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
@@ -41,6 +43,7 @@ fun AmountView(
     isOutgoing: Boolean? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
+    separatorSpace: Dp = 8.dp
 ) {
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
@@ -60,11 +63,11 @@ fun AmountView(
             modifier = Modifier.alignBy(FirstBaseline)
         )
         if (showUnit) {
+            Spacer(modifier = Modifier.width(separatorSpace))
             Text(
                 text = unit.toString(),
                 style = unitTextStyle,
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .alignBy(FirstBaseline)
             )
         }

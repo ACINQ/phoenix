@@ -22,10 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -130,6 +127,19 @@ fun VSeparator(
             .padding(padding)
             .background(color = borderColor())
     )
+}
+
+@Composable
+fun PrimarySeparator(
+    modifier: Modifier = Modifier, width: Dp = 50.dp, height: Dp = 8.dp
+) {
+    Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colors.primary,
+        modifier = modifier
+            .width(width)
+            .height(height)
+    ) { }
 }
 
 @Composable

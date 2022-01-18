@@ -390,7 +390,7 @@
     <string name="paymentdetails_desc_label">Desc.</string>
     <string name="paymentdetails_desc_custom_title">Add note</string>
     <string name="paymentdetails_desc_custom_info">You can attach a note to this payment.</string>
-    <string name="paymentdetails_destination_label">Sent to</string>
+    <string name="paymentdetails_destination_label">To</string>
     <string name="paymentdetails_relayer_label">Relayed by</string>
     <string name="paymentdetails_fees_label">Fees</string>
     <string name="paymentdetails_pay_to_open_label">Fees</string>
@@ -407,7 +407,9 @@
     To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
   ]]></string>
 
-    <string name="paymentdetails_technicals_button">Show details</string>
+    <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
+    <string name="paymentdetails_edit_button">Edit</string>
+    <string name="paymentdetails_details_button">Details</string>
 
     <string name="paymentdetails_failure_recipient_unknown_or_liquidity">Recipient is not reachable, or does not have enough inbound liquidity.</string>
     <string name="paymentdetails_failure_invalid_details">Payment rejected by the recipient.\nThis usually occurs when the invoice has already been paid or when it contains an expiration date, and you attempted to send a payment after the expiration.</string>

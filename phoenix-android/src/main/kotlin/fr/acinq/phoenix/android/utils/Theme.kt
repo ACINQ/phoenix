@@ -66,13 +66,13 @@ val gray800 = Color(0xff3e4556)
 val gray700 = Color(0xff4e586c)
 val gray600 = Color(0xFF5F6A8A)
 val gray500 = Color(0xFF73899E)
-val gray400 = Color(0xFF8B95AD)
+val gray400 = Color(0xFF8B99AD)
 val gray300 = Color(0xff99a2b6)
 val gray200 = Color(0xffb5bccc)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
-val gray50 = Color(0xFFEBF3F5)
-val gray30 = Color(0xFFF2F6F7)
+val gray50 = Color(0xFFE9F1F3)
+val gray30 = Color(0xFFEFF4F5)
 
 private val LightColorPalette = lightColors(
     // primary
