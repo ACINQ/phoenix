@@ -62,6 +62,16 @@ struct CurrencyConverterView: View {
 		
 		ZStack {
 			
+			NavigationLink(destination: CurrencySelector(
+					selectedCurrencies: $currencies,
+					editingCurrency: $editingCurrency,
+					didSelectCurrency: didSelectCurrency
+				),
+				isActive: $currencySelectorOpen
+			) {
+				EmptyView()
+			}
+			
 			// We want to measure various items within the List.
 			// But we need to measure ALL of them.
 			// And we can't do that with a List because it's lazy.
@@ -107,6 +117,9 @@ struct CurrencyConverterView: View {
 		.onAppear {
 			onAppear()
 		}
+		.onDisappear {
+			onDisappear()
+		}
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
@@ -141,18 +154,8 @@ struct CurrencyConverterView: View {
 			.listStyle(PlainListStyle())
 			
 			footer()
-		}
-		.background(
-			NavigationLink(destination: CurrencySelector(
-					selectedCurrencies: $currencies,
-					editingCurrency: $editingCurrency,
-					didSelectCurrency: didSelectCurrency
-				),
-				isActive: $currencySelectorOpen
-			) {
-				EmptyView()
-			}
-		)
+			
+		} // </VStack>
 		.navigationBarTitle(
 			NSLocalizedString("Currency Converter", comment: "Navigation bar title"),
 			displayMode: .inline
@@ -304,22 +307,39 @@ struct CurrencyConverterView: View {
 	private func onAppear() {
 		log.trace("onAppear()")
 		
+		if #available(iOS 15.0, *) { } else {
+			// iOS 14 workaround
+			log.debug("Setting UITableView.background = .systemBackground")
+			UITableView.appearance().backgroundColor = .systemBackground
+		}
+		
 		// Careful: this function may be called when returning from the Receive/Send view
 		if didAppear {
-			return
+			didAppear = true
+			
+			UIScrollView.appearance().keyboardDismissMode = .interactive
+			
+			if #available(iOS 15.0, *) { } else {
+				// iOS 14 bug workaround
+				currencies = Prefs.shared.currencyConverterList
+			}
+			if currencies.isEmpty {
+				currencies = defaultCurrencies()
+			}
+			parsedRow = ParsedRow(currency: Currency.bitcoin(.btc), parsedAmount: Result.success(1.0))
 		}
-		didAppear = true
-		
-		UIScrollView.appearance().keyboardDismissMode = .interactive
+	}
+	
+	private func onDisappear() {
+		log.trace("onDisappear()")
 		
 		if #available(iOS 15.0, *) { } else {
-			// iOS 14 bug workaround
-			currencies = Prefs.shared.currencyConverterList
+			// iOS 14 workaround
+			if !currencySelectorOpen {
+				log.debug("Setting UITableView.background = .primaryBackground")
+				UITableView.appearance().backgroundColor = .primaryBackground
+			}
 		}
-		if currencies.isEmpty {
-			currencies = defaultCurrencies()
-		}
-		parsedRow = ParsedRow(currency: Currency.bitcoin(.btc), parsedAmount: Result.success(1.0))
 	}
 	
 	private func defaultCurrencies() -> [Currency] {

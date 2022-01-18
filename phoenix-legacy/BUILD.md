@@ -78,10 +78,10 @@ docker build -t phoenix_build .
 
 ```shell
 # If you're on linux:
-docker run --rm -v $(pwd):/home/ubuntu/phoenix/app/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew assemble
+docker run --rm -v $(pwd):/home/ubuntu/phoenix/phoenix-legacy/build/outputs -w /home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-legacy:assemble
 
 # If you're on Windows:
-docker run --rm -v ${pwd}:/home/ubuntu/phoenix/app/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew assemble
+docker run --rm -v ${pwd}:/home/ubuntu/phoenix/phoenix-legacy/build/outputs -w //home/ubuntu/phoenix phoenix_build ./gradlew :phoenix-legacy:assemble
 ```
 
 6. Built artifacts are in `.apk/release`.

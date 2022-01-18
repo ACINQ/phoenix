@@ -69,6 +69,10 @@ fileprivate struct AtomicState {
 ///
 class SyncSeedManager: SyncManagerProtcol {
 	
+	/// Access to parent for shared logic.
+	///
+	weak var parent: SyncManager? = nil
+	
 	/// The chain in use by PhoenixBusiness (e.g. Testnet)
 	///
 	private let chain: Chain
@@ -859,9 +863,8 @@ class SyncSeedManager: SyncManagerProtcol {
 		} // </updateState>
 		
 		if isNotAuthenticated {
-			let syncManager = AppDelegate.get().syncManager
 			DispatchQueue.main.async {
-				syncManager?.checkForCloudCredentials()
+				self.parent?.checkForCloudCredentials()
 			}
 		}
 	}

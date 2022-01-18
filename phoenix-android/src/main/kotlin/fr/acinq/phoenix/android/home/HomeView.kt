@@ -95,7 +95,7 @@ fun HomeView(
                         Spacer(modifier = Modifier.height(8.dp))
                         IncomingAmountNotif(this)
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     PrimarySeparator()
                     Spacer(modifier = Modifier.height(24.dp))
                     LazyColumn(

@@ -100,6 +100,10 @@ fileprivate struct ConsecutivePartialFailure {
 ///
 class SyncTxManager {
 	
+	/// Access to parent for shared logic.
+	///
+	weak var parent: SyncManager? = nil
+	
 	/// The cloudKey is derived from the user's seed.
 	/// It's used to encrypt data before uploading to the cloud.
 	/// The data stored in the cloud is an encrypted blob, and requires the cloudKey for decryption.
@@ -2054,9 +2058,8 @@ class SyncTxManager {
 		} // </updateState>
 		
 		if isNotAuthenticated {
-			let syncManager = AppDelegate.get().syncManager
 			DispatchQueue.main.async {
-				syncManager?.checkForCloudCredentials()
+				self.parent?.checkForCloudCredentials()
 			}
 		}
 	}

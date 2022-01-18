@@ -24,19 +24,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,10 +50,7 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.AmountView
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.PrimarySeparator
-import fr.acinq.phoenix.android.components.SettingHeader
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
@@ -82,71 +84,61 @@ fun PaymentDetailsView(
 
     Column(
         modifier = Modifier
+            .background(MaterialTheme.colors.background)
             .fillMaxWidth()
-            .verticalScroll(scrollState)
+            .fillMaxHeight()
+            .verticalScroll(scrollState),
     ) {
         SettingHeader(onBackClick = onBackClick, backgroundColor = Color.Unspecified)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (val state = paymentState.value) {
-                is PaymentDetailsState.Loading -> {
-                    Card {
-                        Text(stringResource(id = R.string.paymentdetails_loading))
-                    }
-                }
-                is PaymentDetailsState.Success -> PaymentDetailsInfo(state.payment)
-                is PaymentDetailsState.Failure -> {
-                    Card {
-                        Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
-                    }
-                }
+        when (val state = paymentState.value) {
+            is PaymentDetailsState.Loading -> Card {
+                Text(stringResource(id = R.string.paymentdetails_loading))
+            }
+            is PaymentDetailsState.Failure -> Card {
+                Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
+            }
+            is PaymentDetailsState.Success -> Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 44.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PaymentDetailsSuccess(state.payment)
             }
         }
     }
 }
 
 @Composable
-private fun PaymentDetailsInfo(
+private fun PaymentDetailsSuccess(
     data: WalletPaymentInfo
 ) {
     val payment = data.payment
+    var showEditDescriptionDialog by remember { mutableStateOf(false) }
 
     // status
-    Spacer(modifier = Modifier.height(48.dp))
-    DetailsInfoHeader(payment)
-    Spacer(modifier = Modifier.height(48.dp))
+    PaymentStatus(payment)
+    Spacer(modifier = Modifier.height(72.dp))
 
     // details
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(24.dp))
+            .widthIn(500.dp)
+            .clip(RoundedCornerShape(32.dp))
             .background(MaterialTheme.colors.surface)
-            .padding(24.dp),
+            .padding(top = 36.dp, bottom = 8.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AmountView(
             amount = payment.amount,
-            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 24.sp)
+            amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 32.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
+            unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
+            separatorSpace = 4.dp,
+            isOutgoing = payment is OutgoingPayment
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         PrimarySeparator(height = 6.dp)
-        Spacer(modifier = Modifier.height(48.dp))
-
-        if (payment is OutgoingPayment) {
-            DetailsRow(
-                label = stringResource(id = R.string.paymentdetails_destination_label),
-                value = when (val details = payment.details) {
-                    is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
-                    is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
-                    is OutgoingPayment.Details.KeySend -> null
-                    is OutgoingPayment.Details.SwapOut -> details.address
-                }
-            )
-        }
+        Spacer(modifier = Modifier.height(28.dp))
 
         DetailsRow(
             label = stringResource(id = R.string.paymentdetails_desc_label),
@@ -163,36 +155,84 @@ private fun PaymentDetailsInfo(
                     is IncomingPayment.Origin.SwapIn -> "On-chain swap deposit"
                 }
                 else -> null
-            },
+            }?.takeIf { it.isNotBlank() },
             fallbackValue = stringResource(id = R.string.paymentdetails_no_description)
         )
 
+        if (payment is OutgoingPayment) {
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailsRow(
+                label = stringResource(id = R.string.paymentdetails_destination_label),
+                value = when (val details = payment.details) {
+                    is OutgoingPayment.Details.Normal -> details.paymentRequest.nodeId.toString()
+                    is OutgoingPayment.Details.ChannelClosing -> details.closingAddress
+                    is OutgoingPayment.Details.KeySend -> null
+                    is OutgoingPayment.Details.SwapOut -> details.address
+                },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
         payment.errorMessage()?.let { errorMessage ->
+            Spacer(modifier = Modifier.height(8.dp))
             DetailsRow(
                 label = stringResource(id = R.string.paymentdetails_error_label),
                 value = errorMessage
             )
         }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        Row(
+            modifier = Modifier.height(44.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                text = stringResource(id = R.string.paymentdetails_details_button),
+                textStyle = MaterialTheme.typography.caption,
+                space = 4.dp,
+                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                onClick = { /*TODO*/ })
+            VSeparator(padding = PaddingValues(vertical = 8.dp))
+            Button(
+                text = stringResource(id = R.string.paymentdetails_edit_button),
+                space = 4.dp,
+                textStyle = MaterialTheme.typography.caption,
+                padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
+                onClick = { showEditDescriptionDialog = true })
+        }
+    }
+
+    if (showEditDescriptionDialog) {
+        EditPaymentDetails(
+            initialDescription = data.metadata.userDescription,
+            onConfirm = {
+                // TODO: save user desc
+                showEditDescriptionDialog = false
+            },
+            onDismiss = { showEditDescriptionDialog = false }
+        )
     }
 }
 
 @Composable
-private fun DetailsInfoHeader(
+private fun PaymentStatus(
     payment: WalletPayment
 ) {
     when (payment) {
         is OutgoingPayment -> when (payment.status) {
-            is OutgoingPayment.Status.Pending -> PaymentStateIcon(
+            is OutgoingPayment.Status.Pending -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 color = mutedTextColor()
             )
-            is OutgoingPayment.Status.Completed.Failed -> PaymentStateIcon(
+            is OutgoingPayment.Status.Completed.Failed -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_failed),
                 imageResId = R.drawable.ic_payment_details_failure_static,
                 color = negativeColor()
             )
-            is OutgoingPayment.Status.Completed.Succeeded -> PaymentStateIcon(
+            is OutgoingPayment.Status.Completed.Succeeded -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_sent_successful),
                 imageResId = R.drawable.ic_payment_details_success_static,
                 color = positiveColor(),
@@ -200,12 +240,12 @@ private fun DetailsInfoHeader(
             )
         }
         is IncomingPayment -> when (payment.received) {
-            null -> PaymentStateIcon(
+            null -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_pending),
                 imageResId = R.drawable.ic_payment_details_pending_static,
                 color = mutedTextColor()
             )
-            else -> PaymentStateIcon(
+            else -> PaymentStatusIcon(
                 message = stringResource(id = R.string.paymentdetails_status_received_successful),
                 imageResId = R.drawable.ic_payment_details_success_static,
                 color = positiveColor(),
@@ -216,7 +256,7 @@ private fun DetailsInfoHeader(
 }
 
 @Composable
-private fun PaymentStateIcon(
+private fun PaymentStatusIcon(
     message: String,
     timestamp: Long? = null,
     imageResId: Int,
@@ -236,14 +276,22 @@ private fun PaymentStateIcon(
 }
 
 @Composable
-private fun DetailsRow(label: String, value: String?, fallbackValue: String = stringResource(id = R.string.utils_unknown)) {
+private fun DetailsRow(
+    label: String,
+    value: String?,
+    fallbackValue: String = stringResource(id = R.string.utils_unknown),
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip
+) {
     Row {
-        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.width(100.dp))
+        Text(text = label, style = MaterialTheme.typography.caption.copy(textAlign = TextAlign.End), modifier = Modifier.width(96.dp))
         Spacer(Modifier.width(8.dp))
         Text(
             text = value ?: fallbackValue,
             style = MaterialTheme.typography.body1.copy(fontStyle = if (value == null) FontStyle.Italic else FontStyle.Normal),
-            modifier = Modifier.width(300.dp)
+            modifier = Modifier.width(300.dp),
+            maxLines = maxLines,
+            overflow = overflow,
         )
     }
 }
@@ -267,6 +315,43 @@ private class PaymentDetailsViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
             return PaymentDetailsViewModel(paymentsManager) as T
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun EditPaymentDetails(
+    initialDescription: String?,
+    onConfirm: (String?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var description by rememberSaveable { mutableStateOf(initialDescription) }
+    Dialog(
+        onDismiss = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        buttons = {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
+            Button(
+                onClick = {
+                    onConfirm(description)
+                },
+                text = stringResource(id = R.string.btn_save)
+            )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.paymentdetails_edit_dialog_title))
+            Spacer(modifier = Modifier.height(16.dp))
+            TextInput(
+                modifier = Modifier.fillMaxWidth(),
+                text = description ?: "",
+                onTextChange = { description = it.takeIf { it.isNotBlank() } },
+            )
         }
     }
 }
