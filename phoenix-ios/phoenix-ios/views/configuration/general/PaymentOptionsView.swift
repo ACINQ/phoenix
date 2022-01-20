@@ -16,6 +16,9 @@ struct PaymentOptionsView: View {
 
 	@State var defaultPaymentDescription: String = Prefs.shared.defaultPaymentDescription ?? ""
 	
+	@State var invoiceExpirationDays: Int = Prefs.shared.invoiceExpirationDays
+	let invoiceExpirationDaysOptions = [7, 30, 60]
+	
 	@State var payToOpen_feePercent: Double = 0.0
 	@State var payToOpen_minFeeSat: Int64 = 0
 	
@@ -26,8 +29,8 @@ struct PaymentOptionsView: View {
 	var body: some View {
 		
 		List {
+			
 			Section {
-				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 					Text("Default payment description")
 						.padding(.bottom, 8)
@@ -54,8 +57,34 @@ struct PaymentOptionsView: View {
 						RoundedRectangle(cornerRadius: 4)
 							.stroke(Color(UIColor.separator), lineWidth: 1)
 					)
-				}
+				} // </VStack>
 				.padding([.top, .bottom], 8)
+			} // </Section>
+			
+			Section {
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					Text("Incoming payment expiry")
+						.padding(.bottom, 8)
+					
+					Picker(
+						selection: Binding(
+							get: { invoiceExpirationDays },
+							set: { invoiceExpirationDays = $0 }
+						), label: Text("Invoice expiration")
+					) {
+						ForEach(0 ..< invoiceExpirationDaysOptions.count) {
+							let days = invoiceExpirationDaysOptions[$0]
+							Text("\(days) days").tag(days)
+						}
+					}
+					.pickerStyle(SegmentedPickerStyle())
+					.onChange(of: invoiceExpirationDays) { _ in
+						invoiceExpirationDaysChanged()
+					}
+					
+				} // </VStack>
+				.padding([.top, .bottom], 8)
+				
 			} // </Section>
 			
 			Section {
@@ -117,10 +146,16 @@ struct PaymentOptionsView: View {
 		return formatter.string(from: NSNumber(value: payToOpen_feePercent))!
 	}
 	
-	func defaultPaymentDescriptionChanged() -> Void {
+	func defaultPaymentDescriptionChanged() {
 		log.trace("defaultPaymentDescriptionChanged(): \(defaultPaymentDescription)")
 		
 		Prefs.shared.defaultPaymentDescription = self.defaultPaymentDescription
+	}
+	
+	func invoiceExpirationDaysChanged() {
+		log.trace("invoiceExpirationDaysChanged(): \(invoiceExpirationDays)")
+		
+		Prefs.shared.invoiceExpirationDays = self.invoiceExpirationDays
 	}
 	
 	func openFaqButtonTapped() -> Void {

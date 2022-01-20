@@ -17,7 +17,11 @@ object Receive {
     }
 
     sealed class Intent : MVI.Intent() {
-        data class Ask(val amount: MilliSatoshi?, val desc: String?) : Intent()
+        data class Ask(
+            val amount: MilliSatoshi?,
+            val desc: String?,
+            val expiryDays: Long = 7
+        ) : Intent()
         object RequestSwapIn : Intent()
     }
 
