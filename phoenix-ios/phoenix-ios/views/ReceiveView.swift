@@ -703,7 +703,7 @@ struct ReceiveLightningView: View, ViewName {
 		mvi.intent(Receive.IntentAsk(
 			amount: nil,
 			desc: defaultDesc,
-			expiryDays: Int64(Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
 		))
 		
 		let query = Prefs.shared.pushPermissionQuery
@@ -1426,7 +1426,7 @@ struct ModifyInvoiceSheet: View, ViewName {
 			mvi.intent(Receive.IntentAsk(
 				amount: msat,
 				desc: trimmedDesc,
-				expiryDays: Int64(Prefs.shared.invoiceExpirationDays)
+				expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
 			))
 		}
 	}
@@ -2035,7 +2035,7 @@ struct SwapInView: View, ViewName {
 		mvi.intent(Receive.IntentAsk(
 			amount: lastAmount,
 			desc: lastDescription,
-			expiryDays: Int64(Prefs.shared.invoiceExpirationDays)
+			expirySeconds: Int64(60 * 60 * 24 * Prefs.shared.invoiceExpirationDays)
 		))
 	}
 }
