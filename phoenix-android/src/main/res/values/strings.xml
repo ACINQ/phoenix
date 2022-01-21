@@ -70,6 +70,7 @@
     <string name="startup_check_lock">Checking lock…</string>
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
+    <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_starting">Starting…</string>
     <string name="startup_wait_tor">Starting Tor…</string>
     <string name="startup_start_button">Restart</string>

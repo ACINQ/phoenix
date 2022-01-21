@@ -1,7 +1,7 @@
 import java.io.ByteArrayOutputStream
 
 plugins {
-  id("com.android.application")
+  id("com.android.library")
   kotlin("android")
   id("kotlin-kapt")
   id("kotlin-android-extensions")
@@ -26,32 +26,25 @@ android {
   compileSdk = 30
   ndkVersion = "21.3.6528147"
   defaultConfig {
-    applicationId = "fr.acinq.phoenix.testnet"
     minSdk = 24
-    targetSdk = 30
-    versionCode = 35
-    versionName = gitCommitHash()
+    targetSdk = 31
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
+    val libCode = 36
     getByName("debug") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
-      isDebuggable = true
+      buildConfigField("int", "LIB_CODE", libCode.toString()) // lib version code
+      buildConfigField("String", "LIB_COMMIT", "\"${gitCommitHash()}\"") // lib version name
     }
     getByName("release") {
       resValue("string", "CHAIN", chain)
       buildConfigField("String", "CHAIN", chain)
+      buildConfigField("int", "LIB_CODE", libCode.toString()) // lib version code
+      buildConfigField("String", "LIB_COMMIT", "\"${gitCommitHash()}\"") // lib version name
       isMinifyEnabled = false
-      isDebuggable = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-    }
-    applicationVariants.all {
-      outputs.forEach {
-        val chain = buildType.resValues.get("CHAIN")?.value ?: throw RuntimeException("a valid chain name is required")
-        val apkName = "phoenix-${defaultConfig.versionCode}-${defaultConfig.versionName}-${chain.drop(1).dropLast(1)}-${buildType.name}.apk"
-        (it as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName = apkName
-      }
     }
   }
   compileOptions {
@@ -111,6 +104,9 @@ dependencies {
   }
   // ANDROIDX - view pager 2
   implementation("androidx.viewpager2:viewpager2:${Versions.AndroidLegacy.viewpager}")
+
+  // -- AndroidX: preferences datastore
+  implementation("androidx.datastore:datastore-preferences:1.0.0")
 
   // SQLDelight
   implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")

@@ -17,12 +17,11 @@
 package fr.acinq.phoenix.android.utils
 
 import android.content.Context
-import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.legacy.datastore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -30,11 +29,8 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 
 
-val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = Prefs.DATASTORE_FILE)
-
 object Prefs {
     private val log = LoggerFactory.getLogger(this::class.java)
-    const val DATASTORE_FILE = "settings"
 
     private fun prefs(context: Context): Flow<Preferences> {
         return context.datastore.data.catch { exception ->

@@ -109,7 +109,7 @@ import scala.collection.immutable.List as ScalaList
 class EclairNodeService : Service() {
 
   companion object {
-    const val EXTRA_REASON = "${BuildConfig.APPLICATION_ID}.SERVICE_SPAWN_REASON"
+    const val EXTRA_REASON = "${BuildConfig.LIBRARY_PACKAGE_NAME}.SERVICE_SPAWN_REASON"
   }
 
   private val log = LoggerFactory.getLogger(this::class.java)
@@ -172,7 +172,7 @@ class EclairNodeService : Service() {
     notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
       .setOnlyAlertOnce(true)
       .setContentTitle(getString(R.string.notif__headless_title__default))
-      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_ONE_SHOT))
+      .setContentIntent(PendingIntent.getActivity(this, Constants.NOTIF_ID__HEADLESS, intent, PendingIntent.FLAG_IMMUTABLE))
     log.info("service created")
   }
 
@@ -324,6 +324,10 @@ class EclairNodeService : Service() {
             log.error("error when bootstrapping Tor: ", e)
             updateState(KitState.Error.Tor(e.localizedMessage ?: e.javaClass.simpleName))
           }
+          is `NoActiveChannelsException$` -> {
+            log.info("legacy node does not have active channels anymore, restarting to modern app")
+            updateState(KitState.MoveToModernApp)
+          }
           else -> {
             log.error("error when starting node: ", e)
             updateState(KitState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
@@ -402,7 +406,7 @@ class EclairNodeService : Service() {
 
     Class.forName("org.sqlite.JDBC")
     val setup = Setup(Wallet.getDatadir(context), Option.apply(seed), Option.empty(), Option.apply(address), system)
-    log.info("node setup ready, running version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+    log.info("node setup ready, running library version ${BuildConfig.LIB_COMMIT} (${BuildConfig.LIB_CODE})")
 
     // we could do this only once, but we want to make sure that previous installs, that were using DNS resolution
     // (which caused issues related to IPv6) do overwrite the previous value
@@ -1003,6 +1007,8 @@ sealed class KitState {
       EclairImpl(kit)
     }
   }
+
+  object MoveToModernApp : KitState()
 
   /** Startup has failed, the state contains the error details. */
   sealed class Error : KitState() {

@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.home
 
 import android.content.Context
+import android.content.Intent
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.material.Text
@@ -31,8 +32,10 @@ import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
+import fr.acinq.phoenix.android.utils.LegacyHelper
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -107,6 +110,7 @@ private fun AttemptStart(
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
+    val skipLegacyCheck by PrefsDatastore.getSkipLegacyCheck(context).collectAsState(false)
     when (walletState) {
         is WalletState.Off -> {
             val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
@@ -121,13 +125,19 @@ private fun AttemptStart(
                 is KeyState.Present -> {
                     when (val encryptedSeed = keyState.encryptedSeed) {
                         is EncryptedSeed.V2.NoAuth -> {
-                            Text(stringResource(id = R.string.startup_starting))
-                            LaunchedEffect(key1 = encryptedSeed) {
-                                scope.launch(Dispatchers.IO) {
-                                    log.debug { "decrypting seed..." }
-                                    val seed = encryptedSeed.decrypt()
-                                    log.debug { "seed has been decrypted" }
-                                    appVM.service?.startBusiness(seed)
+                            Text(stringResource(id = R.string.startup_checking_seed))
+                            LaunchedEffect(encryptedSeed, skipLegacyCheck) {
+                                if (!skipLegacyCheck && LegacyHelper.hasLegacyChannels(context)) {
+                                    log.info { "found legacy channels database file" }
+                                    context.startActivity(Intent(context, fr.acinq.phoenix.legacy.MainActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) })
+                                } else {
+                                    log.info { "no legacy database, proceed to modern engine launch" }
+                                    scope.launch(Dispatchers.IO) {
+                                        log.debug { "decrypting seed..." }
+                                        val seed = encryptedSeed.decrypt()
+                                        log.debug { "seed has been decrypted" }
+                                        appVM.service?.startBusiness(seed)
+                                    }
                                 }
                             }
                         }
@@ -138,7 +148,6 @@ private fun AttemptStart(
                 }
             }
         }
-
         is WalletState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
         is WalletState.Bootstrap -> Text(stringResource(id = R.string.startup_starting))
         is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, walletState.message))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ACINQ SAS
+ * Copyright 2022 ACINQ SAS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package fr.acinq.phoenix.android
+package fr.acinq.phoenix.android.utils
 
-import android.app.Application
-import fr.acinq.phoenix.PhoenixBusiness
-import fr.acinq.phoenix.android.utils.Logging
-import fr.acinq.phoenix.legacy.AppContext
-import fr.acinq.phoenix.utils.PlatformContext
+import android.content.Context
+import fr.acinq.phoenix.android.BuildConfig
+import java.io.File
 
-class PhoenixApplication : AppContext() {
+object LegacyHelper {
 
-    val business by lazy { PhoenixBusiness(PlatformContext(this)) }
-
-    override fun onCreate() {
-        super.onCreate()
-        Logging.setupLogger(applicationContext)
+    fun hasLegacyChannels(context: Context): Boolean {
+        val datadir = File(File(context.filesDir, "node-data"), BuildConfig.CHAIN) // e.g. /data/.../node-data/mainnet
+        val legacyDbFile = File(datadir, "eclair.sqlite")
+        return legacyDbFile.exists() && legacyDbFile.isFile && legacyDbFile.canRead()
     }
 
 }

@@ -21,6 +21,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -49,13 +52,12 @@ import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 
-class AppContext : Application(), DefaultLifecycleObserver {
+
+val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+open class AppContext : Application() {
 
   val log = LoggerFactory.getLogger(this::class.java)
-
-  @Volatile
-  var isAppVisible = false
-    private set
 
   override fun onCreate() {
     super<Application>.onCreate()
@@ -66,23 +68,9 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
   }
 
-  override fun onStart(owner: LifecycleOwner) {
-    isAppVisible = true
-  }
-
-  override fun onStop(owner: LifecycleOwner) {
-    isAppVisible = false
-  }
-
-  override fun onDestroy(owner: LifecycleOwner) {
-    super.onDestroy(owner)
-    EventBus.getDefault().unregister(this)
-  }
-
   private fun init() {
     ThemeHelper.applyTheme(Prefs.getTheme(applicationContext))
     Logging.setupLogger(applicationContext)
-    ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     Converter.refreshCoinPattern(applicationContext)
     Prefs.getLastKnownWalletContext(applicationContext)?.run {
       try {
@@ -225,7 +213,7 @@ class AppContext : Application(), DefaultLifecycleObserver {
     }
 
     // -- version context
-    val installedVersion = BuildConfig.VERSION_CODE
+    val installedVersion = BuildConfig.LIB_CODE
     val latestVersion = json.getInt("version")
     val latestCriticalVersion = json.getInt("latest_critical_version")
     if (installedVersion < latestCriticalVersion) {
