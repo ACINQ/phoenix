@@ -20,6 +20,7 @@ import fr.acinq.phoenix.managers.Utilities.BitcoinAddressInfo
 import fr.acinq.phoenix.utils.PublicSuffixList
 import fr.acinq.phoenix.utils.chain
 import fr.acinq.phoenix.utils.calculateBalance
+import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -261,12 +262,20 @@ class AppScanController(
     ) {
         val paymentRequest = intent.paymentRequest
         val paymentId = UUID.randomUUID()
-        peerManager.getPeer().send(
+        val peer = peerManager.getPeer()
+        val trampolineFees = intent.maxFees?.let { maxFees ->
+            createTrampolineFees(
+                defaultFees = peer.walletParams.trampolineFees,
+                maxFees = maxFees
+            )
+        }
+        peer.send(
             SendPayment(
                 paymentId = paymentId,
                 amount = intent.amount,
                 recipient = paymentRequest.nodeId,
-                details = OutgoingPayment.Details.Normal(paymentRequest)
+                details = OutgoingPayment.Details.Normal(paymentRequest),
+                trampolineFeesOverride = trampolineFees
             )
         )
         model(Scan.Model.InvoiceFlow.Sending)
@@ -363,12 +372,20 @@ class AppScanController(
                         id = WalletPaymentId.OutgoingPaymentId(paymentId)
                     )
                 }
-                peerManager.getPeer().send(
+                val peer = peerManager.getPeer()
+                val trampolineFees = intent.maxFees?.let { maxFees ->
+                    createTrampolineFees(
+                        defaultFees = peer.walletParams.trampolineFees,
+                        maxFees = maxFees
+                    )
+                }
+                peer.send(
                     SendPayment(
                         paymentId = paymentId,
                         amount = intent.amount,
                         recipient = paymentRequest.nodeId,
-                        details = OutgoingPayment.Details.Normal(paymentRequest)
+                        details = OutgoingPayment.Details.Normal(paymentRequest),
+                        trampolineFeesOverride = trampolineFees
                     )
                 )
                 model(Scan.Model.LnurlPayFlow.Sending)

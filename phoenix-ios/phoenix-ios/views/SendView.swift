@@ -1700,7 +1700,8 @@ struct ValidateView: View, ViewName {
 				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 					paymentRequest: model.paymentRequest,
-					amount: Lightning_kmpMilliSatoshi(msat: msat)
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					maxFees: Prefs.shared.maxFees?.toKotlin()
 				))
 			}
 			
@@ -1732,6 +1733,7 @@ struct ValidateView: View, ViewName {
 				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
 					lnurlPay: model.lnurlPay,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					maxFees: Prefs.shared.maxFees?.toKotlin(),
 					comment: comment
 				))
 			}

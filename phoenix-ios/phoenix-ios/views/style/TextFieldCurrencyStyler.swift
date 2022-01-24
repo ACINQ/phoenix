@@ -41,8 +41,6 @@ enum TextFieldCurrencyStylerError: Error {
 /// }
 /// ```
 ///
-/// For changed, you can list
-///
 struct TextFieldCurrencyStyler {
 	
 	private let currency: Currency
@@ -84,6 +82,17 @@ struct TextFieldCurrencyStyler {
 		)
 	}
 	
+	/**
+	 * Attempts to format the given input, and returns a tuple containing the results.
+	 * On success, the tuple is:
+	 *   (formattedString, Result.success(parsedNumber))
+	 * On failure, the tuple is:
+	 *   (originalInput, Result.failure(reason))
+	 *
+	 * Note:
+	 * - The `Utils` class can be used to convert from number to formattedString.
+	 * - This class can be used to convert from string to (formattedString, parsedNumber)
+	 */
 	static func format(
 		input: String,
 		currency: Currency,

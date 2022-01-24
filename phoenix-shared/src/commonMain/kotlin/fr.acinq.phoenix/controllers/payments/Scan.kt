@@ -1,13 +1,18 @@
 package fr.acinq.phoenix.controllers.payments
 
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.controllers.MVI
 import fr.acinq.phoenix.data.LNUrl
 import io.ktor.http.*
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
+
+data class MaxFees(
+    val feeBase: Satoshi,
+    val feeProportionalMillionths: Long
+)
 
 @OptIn(ExperimentalTime::class)
 object Scan {
@@ -131,7 +136,8 @@ object Scan {
 
             data class SendInvoicePayment(
                 val paymentRequest: PaymentRequest,
-                val amount: MilliSatoshi
+                val amount: MilliSatoshi,
+                val maxFees: MaxFees?
             ) : InvoiceFlow()
         }
 
@@ -141,6 +147,7 @@ object Scan {
             data class SendLnurlPayment(
                 val lnurlPay: LNUrl.Pay,
                 val amount: MilliSatoshi,
+                val maxFees: MaxFees?,
                 val comment: String?
             ) : LnurlPayFlow()
 

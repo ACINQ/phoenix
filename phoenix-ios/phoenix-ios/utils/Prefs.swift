@@ -44,6 +44,7 @@ class Prefs {
 		case manualBackup_taskDone
 		case isNewWallet
 		case invoiceExpirationDays
+		case maxFees
 	}
 	
 	public static let shared = Prefs()
@@ -203,6 +204,25 @@ class Prefs {
 		}
 		set {
 			UserDefaults.standard.set(newValue, forKey: Keys.invoiceExpirationDays.rawValue)
+		}
+	}
+	
+	lazy private(set) var maxFeesPublisher: CurrentValueSubject<MaxFees?, Never> = {
+		let currentValue = self.maxFees
+		return CurrentValueSubject<MaxFees?, Never>(currentValue)
+	}()
+	
+	var maxFees: MaxFees? {
+		get {
+			let key = Keys.maxFees.rawValue
+			let result: MaxFees? = UserDefaults.standard.getCodable(forKey: key)
+			return result
+		}
+		set {
+			let key = Keys.maxFees.rawValue
+			UserDefaults.standard.setCodable(value: newValue, forKey: key)
+			log.debug("Prefs.maxFees: \(String(describing: newValue))")
+			maxFeesPublisher.send(newValue)
 		}
 	}
 	
