@@ -20,14 +20,6 @@ enum BackupSeedState {
 
 class Prefs {
 	
-	public static let shared = Prefs()
-	
-	private init() {
-		UserDefaults.standard.register(defaults: [
-			Keys.isNewWallet.rawValue: true
-		])
-	}
-	
 	private enum Keys: String {
 		case currencyType
 		case fiatCurrency
@@ -51,6 +43,16 @@ class Prefs {
 		case recentTipPercents
 		case manualBackup_taskDone
 		case isNewWallet
+		case invoiceExpirationDays
+	}
+	
+	public static let shared = Prefs()
+	
+	private init() {
+		UserDefaults.standard.register(defaults: [
+			Keys.isNewWallet.rawValue: true,
+			Keys.invoiceExpirationDays.rawValue: 7
+		])
 	}
 	
 	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
@@ -184,7 +186,7 @@ class Prefs {
 	/**
 	 * Set to true, until the user has funded their wallet at least once.
 	 * A false value does NOT indicate that the wallet has funds.
-	 * Just that the wallet had a non-zero balance at least once.
+	 * Just that the wallet had either a non-zero balance, or a transaction, at least once.
 	 */
 	var isNewWallet: Bool {
 		get {
@@ -192,7 +194,15 @@ class Prefs {
 		}
 		set {
 			UserDefaults.standard.set(newValue, forKey: Keys.isNewWallet.rawValue)
-			isTorEnabledPublisher.send(newValue)
+		}
+	}
+	
+	var invoiceExpirationDays: Int {
+		get {
+			UserDefaults.standard.integer(forKey: Keys.invoiceExpirationDays.rawValue)
+		}
+		set {
+			UserDefaults.standard.set(newValue, forKey: Keys.invoiceExpirationDays.rawValue)
 		}
 	}
 	
