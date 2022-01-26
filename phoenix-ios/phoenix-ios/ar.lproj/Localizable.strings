@@ -608,67 +608,13 @@
 "…" = "…";
 "%@.%@ seconds" = "%1$@.%2$@ ثواني";
 "A random Electrum server will be selected on each connection attempt." = "سيتم تحديد خادم Electrum عشوائي في كل محاولة اتصال.";
-/* Currency name: AUD */
-"Australian Dollar" = "";
-/* Currency name: BRL */
-"Brazilian Real" = "";
 "By default, Phoenix connects to random Electrum servers in order to access the Bitcoin blockchain. You can also choose to connect to your own Electrum server." = "بشكل افتراضي، يتصل Phoenix بخوادم Electrum عشوائية لأجل الوصول إلى سلسلة كتل البيتكوين. يمكنك أيضًا اختيار الاتصال بخادم Electrum الخاص بك.";
-/* Currency name: CAD */
-"Canadian Dollar" = "";
-/* Currency name: CLP */
-"Chilean Peso" = "";
-/* Currency name: CNY */
-"Chinese Yuan" = "";
 "Connection status" = "";
-/* Currency name: CZK */
-"Czech Koruna" = "";
-/* Currency name: DKK */
-"Danish Krone" = "";
-/* Currency name: EUR */
-"Euro" = "";
 "example.com" = "example.com";
-/* Currency name: GBP */
-"Great British Pound" = "";
-/* Currency name: HKD */
-"Hong Kong Dollar" = "";
-/* Currency name: HRK */
-"Croation Kuna" = "";
-/* Currency name: HUD */
-"Hungarian Forint" = "";
-/* Currency name: ISK */
-"Icelandic Króna" = "";
-/* Currency name: INR */
-"Indian Rupee" = "";
-/* Currency name: JPY */
-"Japanese Yen" = "";
-/* Currency name: KRW */
-"Korean Won" = "";
-/* Currency name: MXN */
-"Mexican Peso" = "";
-/* Currency name: NZD */
-"New Zealand Dollar" = "";
 /* Error message - scanning lightning invoice */
 "Phoenix does not support the LNURL protocol yet" = "لا تدعم Phoenix بروتوكول LNURL حتى الآن";
-/* Currency name: PLN */
-"Polish Zloty" = "";
-/* Currency name: RON */
-"Romanian Leu" = "";
-/* Currency name: RUB */
-"Russian Ruble" = "";
 "Share channel list" = "";
-/* Currency name: SGD */
-"Singapore Dollar" = "";
-/* Currency name: SEK */
-"Swedish Krona" = "";
-/* Currency name: CHF */
-"Swiss Franc" = "";
-/* Currency name: TWD */
-"Taiwan Dollar" = "";
-/* Currency name: THB */
-"Thai Baht" = "";
 "The backup phrase, known as a seed, is a list of 12 English words. It allows you to recover full access to your funds if needed." = "العبارة الاحتياطية، المعروفة باسم seed او عبارة الاسترداد، هي قائمة من 12 كلمة إنجليزية. تسمح لك باستعادة الوصول الكامل إلى أموالك إذا لزم الأمر.";
-/* Currency name: USD */
-"United States Dollar" = "";
 "You currently have 1 Lightning channel with a balance of %@." = "لديك حاليًا قناة برق واحدة برصيد %@.";
 "You currently have %@ Lightning channels with an aggregate balance of %@." = "لديك حاليًا %1$@ قنوات على شبكة البرق برصيد اجمالي يبلغ %2$@.";
 "Your wallet's seed is a list of 12 English words." = "عبارة الاسترداد الخاصة بمحفظتك هي قائمة من 12 كلمة إنجليزية.";

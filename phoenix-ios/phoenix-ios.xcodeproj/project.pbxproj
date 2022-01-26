@@ -303,6 +303,10 @@
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		DCF360CF2591018300E92031 /* CloseChannelsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloseChannelsView.swift; sourceTree = "<group>"; };
+		DCF9312C279F1A4D00FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		DCF9312D279F1A6200FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DCF9312F279F1BD900FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/about.html; sourceTree = "<group>"; };
+		DCF93130279F1BE900FD7776 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = ar; path = ar.lproj/advancedSecurity.html; sourceTree = "<group>"; };
 		DCFA8758260E6F2E00AE8953 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroView.swift; sourceTree = "<group>"; };
 		DCFA876C260E91E600AE8953 /* IntroContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroContainer.swift; sourceTree = "<group>"; };
 		DCFD079026D84A380020DD8E /* HorizontalActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalActivity.swift; sourceTree = "<group>"; };
@@ -820,6 +824,7 @@
 				fr,
 				es,
 				cs,
+				ar,
 			);
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
@@ -1097,6 +1102,7 @@
 				DC5AF4532677BBF7003C911B /* es */,
 				967728A5267D16B00072C5F0 /* fr */,
 				DC0E31B726EF85B4002071C6 /* cs */,
+				DCF9312C279F1A4D00FD7776 /* ar */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1107,6 +1113,7 @@
 				DC5AF4562677BBF7003C911B /* es */,
 				967728A6267D16B00072C5F0 /* fr */,
 				DC0E31B626EF85B4002071C6 /* cs */,
+				DCF9312D279F1A6200FD7776 /* ar */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1118,6 +1125,7 @@
 				DC384D7C265BE41900131772 /* fr */,
 				DCAE99C12671928500D76E64 /* es */,
 				DC0E31B826EF85B4002071C6 /* cs */,
+				DCF9312F279F1BD900FD7776 /* ar */,
 			);
 			name = about.html;
 			sourceTree = "<group>";
@@ -1129,6 +1137,7 @@
 				DC384D7D265BE41900131772 /* fr */,
 				DCAE99C22671928500D76E64 /* es */,
 				DC0E31B926EF85B4002071C6 /* cs */,
+				DCF93130279F1BE900FD7776 /* ar */,
 			);
 			name = advancedSecurity.html;
 			sourceTree = "<group>";
