@@ -744,6 +744,7 @@ fileprivate struct RecoveryPhraseReveal: View {
 				
 				Spacer()
 			}
+			.environment(\.layoutDirection, .leftToRight) // issue #237
 			.padding(.top, 20)
 			.padding(.bottom, 10)
 			

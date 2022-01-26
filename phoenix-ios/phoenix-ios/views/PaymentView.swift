@@ -818,14 +818,14 @@ fileprivate struct DetailsView: View {
 				Button {
 					presentationMode.wrappedValue.dismiss()
 				} label: {
-					Image(systemName: "chevron.left")
+					Image(systemName: "chevron.backward")
 						.imageScale(.medium)
 				}
 				Spacer()
 				Button {
 					closeSheet()
 				} label: {
-					Image(systemName: "xmark") // must match size of chevron.left above
+					Image(systemName: "xmark") // must match size of chevron.backward above
 						.imageScale(.medium)
 				}
 			}
@@ -2160,7 +2160,7 @@ fileprivate struct EditInfoView: View, ViewName {
 					saveButtonTapped()
 				} label: {
 					HStack(alignment: .center, spacing: 4) {
-						Image(systemName: "chevron.left")
+						Image(systemName: "chevron.backward")
 							.imageScale(.medium)
 						Text("Save")
 					}
