@@ -500,7 +500,7 @@
 "This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "هذا يعني أنك لن تكون قادرًا على تلقي المدفوعات عندما يكون Phoenix في الخلفية. لتلقي المدفوعات، يجب أن تكون محفظة Phoenix مفتوحة وتعمل في الواجهة.";
 "This means you will not be notified if you receive a payment while Phoenix is in the background." = "هذا يعني أنه لن يتم إشعارك إذا تلقيت مبلغ أثناء عمل Phoenix في الخلفية.";
 "This seed is invalid and cannot be imported.\n\nPlease try again" = "هذه عبارة استرداد غير صالحة ولا يمكن استيرادها. \n\n حاول مرة اخرى";
-"Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." = "في اي مكان في التطبيق، يمكنك النقر على المبلغ لتحويل قيمته بين البيتكوين والقيمة بالعملة الورقية.";
+"Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat." = "في اي مكان في التطبيق، يمكنك النقر على المبلغ لتحويل قيمته بين البيتكوين والعملة الورقية.";
 /* Label in DetailsView_IncomingPayment */
 "timestamp" = "الزمن";
 "Tip timestamp" = "الزمن";
