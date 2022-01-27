@@ -294,8 +294,8 @@
 "Link" = "ربط";
 /* lnurl-auth: success text */
 "Linked" = "تم الربط";
-"local / remote" = "رصيدي / رصيد النظير";
-"local / total" = "رصيدي / الإجمالي";
+"local / remote" = "رصيد النظير / رصيدي";
+"local / total" = "الإجمالي / رصيدي";
 /* lnurl-auth: success text */
 "Logged In" = "تم تسجيل الدخول";
 /* lnurl-auth: login button title */
