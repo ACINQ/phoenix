@@ -621,7 +621,7 @@
 /* reason for iCloud failure */
 "iCloud service unavailable" = "خدمة iCloud غير متوفرة";
 /* BackupView */
-"If you do not back it up and you lose access to Phoenix you will **lose your funds**!" = "إذا لم تقم بعمل نسخة احتياطية وفقدت الوصول إلى Phoenix، **فستفقد أموالك **!";
+"If you do not back it up and you lose access to Phoenix you will **lose your funds**!" = "إذا لم تقم بعمل نسخة احتياطية وفقدت الوصول إلى Phoenix، **فستفقد أموالك**!";
 /* button label - try to make it short */
 "info" = "معلومات";
 /* Navigation bar title */
@@ -657,12 +657,12 @@
 "I understand that certain Apple employees may be able to access my iCloud data." = "أتفهم أن بعض موظفي Apple قد يتمكنون من الوصول إلى بيانات iCloud الخاصة بي.";
 "I understand that if I lose my phone & my recovery phrase, then I will lose the funds in my wallet." = "أتفهم أنني إذا فقدت هاتفي وعبارة الاسترداد الخاصة بي، فسأخسر الأموال الموجودة في محفظتي.";
 "Legal" = "قانوني";
-"Let's go " = "لنبدأ";
+"Let's go " = " لنبدأ";
 "Malformed: %@" = "تالف: %@";
 /* Navigation bar title */
 "Manual Backup" = "نسخ احتياطي يدوي";
 "Name" = "الإسم";
-"Naming your wallet makes it easier to manage multiple wallets." = "تسمية محفظتك سيجعل إدارة محافظ متعددة امرًا سهلًا.";
+"Naming your wallet makes it easier to manage multiple wallets." = "تسمية محفظتك سيجعل إدارة عدة محافظ امرًا سهلًا.";
 "Payment requested from %@" = "طلب الدفع من %@";
 "Phoenix can restore your funds automatically." = "تستطيع Phoenix استعادة أموالك بشكل تلقائي.";
 "Redeem" = "استرداد";
@@ -681,6 +681,8 @@
 "Your recovery phrase will be stored in iCloud, and Phoenix can automatically restore your wallet balance." = "سيتم تخزين عبارة الاسترداد الخاصة بك في iCloud، ويمكن لـ Phoenix استعادة رصيد محفظتك تلقائيًا.";
 "Enable iCloud backup" ="تمكين النسخ الاحتياطي على iCloud";
 "Wallet name (optional)"="اسم المحفظة (اختياري)";
+"Recovery phrase" = "عبارة الاسترداد";
 "iCloud backup" = "النسخ الاحتياطي على iCloud";
 "iCloud Backup" = "النسخ الاحتياطي على iCloud";
-"Recovery phrase" = "عبارة الاسترداد";
+"Payments backup" = "النسخ الاحتياطي للمدفوعات";
+"Payments Backup" = "النسخ الاحتياطي للمدفوعات";
