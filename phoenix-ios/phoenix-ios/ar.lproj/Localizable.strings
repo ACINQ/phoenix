@@ -238,7 +238,7 @@
 /* ForceCloseChannelsView */
 "Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "سيكلفك فرض الاغلاق أموالًا (لتغطية رسوم الارسال عبر السلسلة الرئيسية) وسيؤدي ذلك إلى حجز أموالك لعدة أيام. **لا تقم بإلغاء تثبيت التطبيق حتى يتم إغلاق قنواتك بالكامل وإلا ستخسر الأموال.**";
 "Full Screen" = "ملء الشاشة";
-"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "يمكن إرسال الأموال إلى محفظة Bitcoin. تأكد من صحة العنوان قبل الإرسال.";
+"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "يمكن إرسال الأموال إلى محفظة بيتكوين. تأكد من صحة العنوان قبل الإرسال.";
 "Funds sent" = "تم إرسال الأموال";
 "Funds will eventually be sent to:" = "في النهاية سيتم إرسال الأموال إلى:";
 "General" = "عام";
@@ -558,7 +558,7 @@
 "With Phoenix, receiving and sending bitcoin is safe, easy, and fast." = "مع Phoenix، يكون استلام عملات البيتكوين وإرسالها آمنًا وسهلاً وسريعًا.";
 "Would you like to be notified when somebody sends you a payment?" = "هل ترغب في أن يتم إعلامك عندما يرسل لك شخص ما مبلغًا؟";
 "Yes" = "نعم";
-"You are on bitcoin chain %@, but the invoice is for %@." = "أنت في شبكة بتكوين %@، لكن الفاتورة هي في %@.";
+"You are on bitcoin chain %@, but the invoice is for %@." = "أنت في شبكة بيتكوين %@، لكن الفاتورة هي في %@.";
 /* CloseChannelsView
    ForceCloseChannelsView */
 "You can also use the **Payment Channels** screen to inspect the state of your channels." = "يمكنك أيضًا استخدام شاشة **قنوات الدفع** للتحقق من حالة قنواتك.";
