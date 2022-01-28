@@ -105,6 +105,13 @@ struct PaymentOptionsView: View {
 				} // </VStack>
 				.padding([.top, .bottom], 8)
 				
+				VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
+					Text("Phoenix will try to make the payment using the minimum fee possible.")
+				}
+				.font(.callout)
+				.foregroundColor(Color.secondary)
+				.padding([.top, .bottom], 8)
+				
 			} // </Section>
 			
 			Section {
@@ -223,22 +230,100 @@ struct PaymentOptionsView: View {
 
 struct MaxFeeConfiguration: View, ViewName {
 	
-	@State var baseFee: String = ""
-	@State var parsedBaseFee: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
-	@State var isInvalidBaseFee: Bool = false
+	let minimumBaseFee = Double(0)       // sat
+	let maximumBaseFee = Double(100_000) // sat
 	
-	@State var proportionalFee: String = ""
-	@State var parsedProportionalFee: Result<NSNumber, TextFieldNumberParserError> = Result.failure(.emptyInput)
-	@State var isInvalidProportionalFee: Bool = false
+	let minimumProportionalFee = Double(0)  // %
+	let maximumProportionalFee = Double(50) // %
+	
+	enum FeeProblem {
+		enum InvalidReason {
+			case notANumber
+			case belowMinimum
+			case aboveMaximum
+		}
+		enum WarningReason {
+			case belowRecommended
+		}
+		case invalid(InvalidReason)
+		case warning(WarningReason)
+	}
+	
+	@State var baseFee: String
+	@State var parsedBaseFee: Result<Double, TextFieldCurrencyStylerError>
+	@State var baseFeeProblem: FeeProblem?
+	
+	@State var proportionalFee: String
+	@State var parsedProportionalFee: Result<NSNumber, TextFieldNumberParserError>
+	@State var proportionalFeeProblem: FeeProblem?
+	
+	let examplePayments: [Int64] = [1_000, 10_000, 100_000, 1_000_000]
+	@State var examplePaymentsIdx = 1
 	
 	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
+	
+	var invalidBaseFee: FeeProblem.InvalidReason? {
+		if case .invalid(let reason) = baseFeeProblem {
+			return reason
+		} else {
+			return nil
+		}
+	}
+	
+	var invalidProportionalFee: FeeProblem.InvalidReason? {
+		if case .invalid(let reason) = proportionalFeeProblem {
+			return reason
+		} else {
+			return nil
+		}
+	}
+	
+	var baseFeeWarning: FeeProblem.WarningReason? {
+		if case .warning(let reason) = baseFeeProblem {
+			return reason
+		} else {
+			return nil
+		}
+	}
+	
+	var proportionalFeeWarning: FeeProblem.WarningReason? {
+		if case .warning(let reason) = proportionalFeeProblem {
+			return reason
+		} else {
+			return nil
+		}
+	}
+	
+	init() {
+		if let maxFees = Prefs.shared.maxFees {
+			
+			let feeBaseFormatted = Utils.formatBitcoin(sat: maxFees.feeBaseSat, bitcoinUnit: .sat)
+			self.parsedBaseFee = Result.success(Double(maxFees.feeBaseSat))
+			self.baseFee = feeBaseFormatted.digits
+			self.baseFeeProblem = nil
+			
+			let percent = Double(maxFees.feeProportionalMillionths) / Double(10_000)
+			self.parsedProportionalFee = Result.success(NSNumber(value: percent))
+			self.proportionalFee = formatProportionalFee(maxFees.feeProportionalMillionths)
+			self.proportionalFeeProblem = nil
+			
+		} else {
+			self.baseFee = ""
+			self.parsedBaseFee = Result.failure(.emptyInput)
+			self.baseFeeProblem = .invalid(.notANumber)
+			
+			self.proportionalFee = ""
+			self.parsedProportionalFee = Result.failure(.emptyInput)
+			self.proportionalFeeProblem = .invalid(.notANumber)
+		}
+	}
 	
 	@ViewBuilder
 	var body: some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 0) {
 			
-			Text("Base fee (satoshis)")
+			Text("Max base fee (satoshis)")
 				.padding(.leading, 8)
 				.padding(.bottom, 6)
 			
@@ -249,7 +334,7 @@ struct MaxFeeConfiguration: View, ViewName {
 				)
 				.keyboardType(.decimalPad)
 				.disableAutocorrection(true)
-				.foregroundColor(isInvalidBaseFee ? Color.appNegative : Color.primaryForeground)
+				.foregroundColor(invalidBaseFee != nil ? Color.appNegative : Color.primaryForeground)
 				.padding([.top, .bottom], 8)
 				.padding([.leading, .trailing], 16)
 				
@@ -258,7 +343,7 @@ struct MaxFeeConfiguration: View, ViewName {
 					clearBaseFee()
 				} label: {
 					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(.secondary)
+						.foregroundColor(Color(UIColor.tertiaryLabel))
 				}
 				.isHidden(baseFee == "")
 				.padding(.trailing, 8)
@@ -269,7 +354,7 @@ struct MaxFeeConfiguration: View, ViewName {
 			)
 			.padding(.bottom)
 			
-			Text("Proportional fee (%)")
+			Text("Max proportional fee (%)")
 				.padding(.leading, 8)
 				.padding(.bottom, 6)
 			
@@ -280,7 +365,7 @@ struct MaxFeeConfiguration: View, ViewName {
 				)
 				.keyboardType(.decimalPad)
 				.disableAutocorrection(true)
-				.foregroundColor(isInvalidProportionalFee ? Color.appNegative : Color.primaryForeground)
+				.foregroundColor(invalidProportionalFee != nil ? Color.appNegative : Color.primaryForeground)
 				.padding([.top, .bottom], 8)
 				.padding([.leading, .trailing], 16)
 				
@@ -289,7 +374,7 @@ struct MaxFeeConfiguration: View, ViewName {
 					clearProportionalFee()
 				} label: {
 					Image(systemName: "multiply.circle.fill")
-						.foregroundColor(.secondary)
+						.foregroundColor(Color(UIColor.tertiaryLabel))
 				}
 				.isHidden(proportionalFee == "")
 				.padding(.trailing, 8)
@@ -299,6 +384,10 @@ struct MaxFeeConfiguration: View, ViewName {
 					.stroke(Color(UIColor.separator), lineWidth: 1)
 			)
 			.padding(.bottom)
+			
+			footer
+				.padding(.top, 8)
+				.padding(.bottom, 24)
 			
 			HStack {
 				Spacer()
@@ -311,20 +400,198 @@ struct MaxFeeConfiguration: View, ViewName {
 				Button("Save") {
 					didTapSaveButton()
 				}
-				.disabled(isInvalidBaseFee || isInvalidProportionalFee)
+				.disabled(invalidBaseFee != nil || invalidProportionalFee != nil)
 			}
 			.font(.title2)
 		}
 		.padding()
-		.onAppear {
-			onAppear()
-		}
 		.onChange(of: baseFee) { _ in
 			baseFeeDidChange()
 		}
 		.onChange(of: proportionalFee) { _ in
 			proportionalFeeDidChange()
 		}
+	}
+
+	@ViewBuilder
+	var footer: some View {
+		
+		ZStack(alignment: Alignment.topLeading) {
+			if let invalidBaseFee = invalidBaseFee, invalidBaseFee != .notANumber {
+				example(pseudoHide: true)
+				errorMessage(invalidBaseFee, isBaseFee: true)
+			} else if let invalidProportionalFee = invalidProportionalFee, invalidProportionalFee != .notANumber {
+				example(pseudoHide: true)
+				errorMessage(invalidProportionalFee, isBaseFee: false)
+			} else if let baseFeeWarning = baseFeeWarning {
+				example(pseudoHide: true)
+				warningMessage(baseFeeWarning, isBaseFee: true)
+			} else if let proportionalFeeWarning = proportionalFeeWarning {
+				example(pseudoHide: true)
+				warningMessage(proportionalFeeWarning, isBaseFee: false)
+			} else {
+				example(pseudoHide: false)
+			}
+		}
+	}
+
+	@ViewBuilder
+	func errorMessage(_ reason: FeeProblem.InvalidReason, isBaseFee: Bool) -> some View {
+		
+		Group {
+			if isBaseFee {
+				switch reason {
+					case .belowMinimum:
+						let minSats = Utils.formatBitcoin(sat: Int64(minimumBaseFee), bitcoinUnit: .sat).string
+						Text("Base fee must be at least \(minSats).")
+					case .aboveMaximum:
+						let maxSats = Utils.formatBitcoin(sat: Int64(maximumBaseFee), bitcoinUnit: .sat).string
+						Text("Maximum base fee is \(maxSats).")
+					default:
+						EmptyView()
+				}
+			} else {
+				switch reason {
+					case .belowMinimum:
+						let minPercent = formatPercent_noFractionDigits(minimumProportionalFee / 100.0)
+						Text("Proportianal fee must be at least \(minPercent).")
+					case .aboveMaximum:
+						let maxPercent = formatPercent_noFractionDigits(maximumProportionalFee / 100.0)
+						Text("Maximum proportional fee is \(maxPercent).")
+					default:
+						EmptyView()
+				}
+			}
+		}
+		.font(.subheadline)
+		.foregroundColor(.appNegative)
+	}
+	
+	@ViewBuilder
+	func warningMessage(_ reason: FeeProblem.WarningReason, isBaseFee: Bool) -> some View {
+		
+		Group {
+			if isBaseFee {
+				let recommended = defaultMaxFees().feeBaseSat
+				let minSats = Utils.formatBitcoin(sat: recommended, bitcoinUnit: .sat).string
+				Text("With configured proportional fee, we recommend a base fee of at least \(minSats).")
+			} else {
+				let recommended = defaultMaxFees().feeProportionalMillionths
+				let minPercent = formatProportionalFee(recommended)
+				Text("With configured base fee, we recommend a proportional fee of at least \(minPercent)%.")
+			}
+		}
+		.font(.subheadline)
+		.foregroundColor(.primary)
+	}
+	
+	@ViewBuilder
+	func example(pseudoHide: Bool) -> some View {
+
+		// |      example payment :   10,000 sat     - + |
+		// |             base fee :      100 sat         |
+		// |     proportional fee :       30 sat         |
+		// | ------------------------------------------- |
+		// |              max fee :      130 sat (1.3%)  |
+		
+		let pseudoClear = Color(UIColor.systemBackground)
+		
+		ZStack(alignment: Alignment.topTrailing) {
+			
+			HStack(alignment: VerticalAlignment.top, /*horizontal-*/spacing: 0) {
+			
+				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
+					Text("example payment :")
+					Text("max base fee :")
+					Text("max proportional fee :")
+					if pseudoHide {
+						Rectangle()
+							 .fill(Color(UIColor.systemBackground))
+							 .frame(width: 1, height: 2)
+					} else {
+						Divider()
+							.frame(height: 2)
+					}
+					Text("max fee :")
+		
+				} // </VStack>
+				.padding(.top, 4)
+				.font(.footnote)
+				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
+				.fixedSize(horizontal: true, vertical: false)
+		
+				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
+					Text(examplePaymentAmountString()).padding(.horizontal, 8)
+					Text(exampleBaseFeeString()).padding(.horizontal, 8)
+					Text(exampleProportionalFeeString()).padding(.horizontal, 8)
+					if pseudoHide {
+						Rectangle()
+							 .fill(Color(UIColor.systemBackground))
+							 .frame(width: 1, height: 2)
+					} else {
+						Divider()
+							.frame(height: 2)
+					}
+					Text(exampleMaxFeeString()).padding(.horizontal, 8)
+			
+				} // </VStack>
+				.padding(.top, 4)
+				.font(.footnote)
+				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
+			
+				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
+					Text(verbatim: " ")
+					Text(verbatim: " ")
+					Text(verbatim: " ")
+					if pseudoHide {
+						Rectangle()
+							 .fill(Color(UIColor.systemBackground))
+							 .frame(width: 1, height: 2)
+					} else {
+						Divider()
+							.frame(height: 2)
+					}
+					Text(verbatim: "(\(exampleMaxPercentString()))")
+			
+				} // </VStack>
+				.padding(.top, 4)
+				.padding(.trailing, 32)
+				.font(.footnote)
+				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
+				.fixedSize(horizontal: true, vertical: false)
+			
+			} // </HStack>
+			
+			HStack(alignment: VerticalAlignment.top, /*horizontal-*/spacing: 32) {
+				Button {
+					decrementExamplePaymentsIdx()
+				} label: {
+					Text("-")
+				}
+				.disabled(examplePaymentsIdx == 0)
+				
+				Button {
+					incrementExamplePaymentsIdx()
+				} label: {
+					Text("+")
+				}
+				.disabled(examplePaymentsIdx+1 == examplePayments.count)
+				
+			} // </HStack>
+			.font(.headline)
+			.isHidden(pseudoHide)
+			
+		} // </ZStack>
+	}
+	
+	func formatPercent_noFractionDigits(_ value: Double) -> String {
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.minimumFractionDigits = 0
+		formatter.maximumFractionDigits = 0
+		
+		return formatter.string(from: NSNumber(value: value))!
 	}
 	
 	func defaultBaseFee() -> String {
@@ -338,6 +605,102 @@ struct MaxFeeConfiguration: View, ViewName {
 		
 		let fees = defaultMaxFees()
 		return formatProportionalFee(fees.feeProportionalMillionths)
+	}
+	
+	func examplePaymentAmount() -> Lightning_kmpMilliSatoshi {
+		
+		let sat = examplePayments[examplePaymentsIdx]
+		return Lightning_kmpMilliSatoshi(sat: Bitcoin_kmpSatoshi(sat: sat))
+	}
+	
+	func examplePaymentAmountString() -> String {
+		return Utils.formatBitcoin(msat: examplePaymentAmount(), bitcoinUnit: .sat, hideMsats: true).string
+	}
+	
+	func exampleBaseFee() -> Lightning_kmpMilliSatoshi {
+		
+		if invalidBaseFee == nil, case .success(let amount) = parsedBaseFee {
+			let msat = Int64(amount * 1_000.0)
+			return Lightning_kmpMilliSatoshi(msat: msat)
+		} else {
+			let defaultFees = defaultMaxFees()
+			return Lightning_kmpMilliSatoshi(sat: Bitcoin_kmpSatoshi(sat: defaultFees.feeBaseSat))
+		}
+	}
+	
+	func exampleBaseFeeString() -> String {
+		return Utils.formatBitcoin(msat: exampleBaseFee(), bitcoinUnit: .sat, hideMsats: true).string
+	}
+	
+	func exampleProportionalFee() -> Lightning_kmpMilliSatoshi {
+		
+		let paymentAmount = Double(examplePaymentAmount().msat)
+		
+		if invalidProportionalFee == nil, case .success(let number) = parsedProportionalFee {
+			// Example:
+			// number: 0.5 <- is a a percent, i.e. 0.5%
+			// toPercent: 0.5 / 100 = 0.005
+			let percent = number.doubleValue / Double(100)
+			let msat = Int64(paymentAmount * percent)
+			return Lightning_kmpMilliSatoshi(msat: msat)
+		} else {
+			let defaultFees = defaultMaxFees()
+			let percent = Double(defaultFees.feeProportionalMillionths) / Double(1_000_000)
+			let msat = Int64(paymentAmount * percent)
+			return Lightning_kmpMilliSatoshi(msat: msat)
+		}
+	}
+	
+	func exampleProportionalFeeString() -> String {
+		return Utils.formatBitcoin(msat: exampleProportionalFee(), bitcoinUnit: .sat, hideMsats: true).string
+	}
+	
+	func exampleMaxFee() -> Lightning_kmpMilliSatoshi {
+		
+		let msat = exampleBaseFee().msat + exampleProportionalFee().msat
+		return Lightning_kmpMilliSatoshi(msat: msat)
+	}
+	
+	func exampleMaxFeeString() -> String {
+		return Utils.formatBitcoin(msat: exampleMaxFee(), bitcoinUnit: .sat, hideMsats: true).string
+	}
+	
+	func exampleMaxPercent() -> Double {
+		
+		let numerator = exampleMaxFee()
+		let denominator = examplePaymentAmount()
+		
+		return Double(numerator.msat) / Double(denominator.msat)
+	}
+	
+	func exampleMaxPercentString() -> String {
+		
+		let raw = exampleMaxPercent()
+		let percent = raw * Double(100)
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		
+		// This doesn't work.
+	//	formatter.usesSignificantDigits = true
+	//	formatter.minimumSignificantDigits = 3
+	//	formatter.maximumSignificantDigits = 3
+	
+		if percent < 0 { // 0.XY
+			formatter.minimumFractionDigits = 2
+			formatter.maximumFractionDigits = 2
+		} else if percent < 10 { // A.XY
+			formatter.minimumFractionDigits = 2
+			formatter.maximumFractionDigits = 2
+		} else if percent < 100 { // AB.X
+			formatter.minimumFractionDigits = 1
+			formatter.maximumFractionDigits = 1
+		} else { // ABC
+			formatter.minimumFractionDigits = 0
+			formatter.maximumFractionDigits = 0
+		}
+	
+		return formatter.string(from: NSNumber(value: exampleMaxPercent())) ?? ""
 	}
 	
 	func currencyStyler() -> TextFieldCurrencyStyler {
@@ -357,33 +720,25 @@ struct MaxFeeConfiguration: View, ViewName {
 		)
 	}
 	
-	func onAppear() {
-		log.trace("[\(viewName)] onAppear()")
-		
-		if let maxFees = Prefs.shared.maxFees {
-			
-			let feeBaseFormatted = Utils.formatBitcoin(sat: maxFees.feeBaseSat, bitcoinUnit: .sat)
-			parsedBaseFee = Result.success(Double(maxFees.feeBaseSat))
-			baseFee = feeBaseFormatted.digits
-			
-			let percent = Double(maxFees.feeProportionalMillionths) / Double(1_000_000)
-			parsedProportionalFee = Result.success(NSNumber(value: percent))
-			proportionalFee = formatProportionalFee(maxFees.feeProportionalMillionths)
-		}
-	}
-	
 	func baseFeeDidChange() {
 		log.trace("[\(viewName)] baseFeeDidChange()")
 		
 		switch parsedBaseFee {
 		case .failure:
 			if baseFee.isEmpty {
-				isInvalidBaseFee = false // user choosing default value
+				baseFeeProblem = nil // user choosing default value
 			} else {
-				isInvalidBaseFee = true
+				baseFeeProblem = .invalid(.notANumber)
 			}
-		case .success:
-			isInvalidBaseFee = false
+		case .success(let configuredBaseFee):
+			if configuredBaseFee < minimumBaseFee {
+				baseFeeProblem = .invalid(.belowMinimum)
+			} else if configuredBaseFee > maximumBaseFee {
+				baseFeeProblem = .invalid(.aboveMaximum)
+			} else {
+				baseFeeProblem = nil
+				checkForWarnings()
+			}
 		}
 	}
 	
@@ -393,12 +748,70 @@ struct MaxFeeConfiguration: View, ViewName {
 		switch parsedProportionalFee {
 		case .failure:
 			if proportionalFee.isEmpty {
-				isInvalidProportionalFee = false // user choosing default value
+				proportionalFeeProblem = nil // user choosing default value
 			} else {
-				isInvalidProportionalFee = true
+				proportionalFeeProblem = .invalid(.notANumber)
 			}
-		case .success:
-			isInvalidProportionalFee = false
+		case .success(let number):
+			let percent = number.doubleValue
+			if percent < 0 {
+				proportionalFeeProblem = .invalid(.belowMinimum)
+			}
+			else if percent > maximumProportionalFee {
+				proportionalFeeProblem = .invalid(.aboveMaximum)
+			} else {
+				proportionalFeeProblem = nil
+				checkForWarnings()
+			}
+		}
+	}
+	
+	func checkForWarnings() {
+		
+		log.trace("[\(viewName)] clearBaseFee()")
+		
+		guard
+			invalidBaseFee == nil,
+			let configuredBaseFee = try? parsedBaseFee.get(),
+			invalidProportionalFee == nil,
+			let configuredPercent = try? parsedProportionalFee.get()
+		else {
+			return
+		}
+		
+		let defaultMaxFees = defaultMaxFees()
+		let defaultMaxBaseFee = Double(defaultMaxFees.feeBaseSat)
+		let defaultMaxProportionalPercent = Double(defaultMaxFees.feeProportionalMillionths) / 10_000.0
+		
+		do {
+			// IF configuredBaseFee is "significantly" above the default max value,
+			// AND the configuredPercent is below the default max value,
+			// THEN we display a warning.
+			
+			let baseFeeThreshold = defaultMaxBaseFee + 300
+			
+			var warn = false
+			if configuredBaseFee >= baseFeeThreshold {
+				if configuredPercent.doubleValue < defaultMaxProportionalPercent {
+					warn = true
+				}
+			}
+			proportionalFeeProblem = warn ? .warning(.belowRecommended) : nil
+		}
+		do {
+			// IF configuredProportionalPercent is "significantly" above the default max value,
+			// AND the configuredBaseFee is below the default max value,
+			// THEN we display a warning.
+		
+			let proportionalPercentThreshold = defaultMaxProportionalPercent + 0.2 // 0.2% == 0.002
+			
+			var warn = false
+			if configuredPercent.doubleValue >= proportionalPercentThreshold {
+				if configuredBaseFee < defaultMaxBaseFee {
+					warn = true
+				}
+			}
+			baseFeeProblem = warn ? .warning(.belowRecommended) :  nil
 		}
 	}
 	
@@ -406,14 +819,32 @@ struct MaxFeeConfiguration: View, ViewName {
 		log.trace("[\(viewName)] clearBaseFee()")
 		
 		parsedBaseFee = .failure(.emptyInput)
-		baseFee = ""
+		baseFee = "" // triggers `baseFeeDidChange()`
 	}
 	
 	func clearProportionalFee() {
 		log.trace("[\(viewName)] clearProportionalFee()")
 		
 		parsedProportionalFee = .failure(.emptyInput)
-		proportionalFee = ""
+		proportionalFee = "" // triggers `proportionalFeeDidChange()`
+	}
+	
+	func decrementExamplePaymentsIdx() {
+		log.trace("[\(viewName)] decrementExamplePaymentsIdx")
+		
+		guard examplePaymentsIdx > 0 else {
+			return
+		}
+		examplePaymentsIdx -= 1
+	}
+	
+	func incrementExamplePaymentsIdx() {
+		log.trace("[\(viewName)] incrementExamplePaymentsIdx")
+		
+		guard examplePaymentsIdx + 1 < examplePayments.count else {
+			return
+		}
+		examplePaymentsIdx += 1
 	}
 	
 	func didTapCancelButton() {
@@ -435,15 +866,19 @@ struct MaxFeeConfiguration: View, ViewName {
 		var newBaseFee_sat: Int64? = nil
 		var newProportionalFee_millionths: Int64? = nil
 		
-		if let newBaseFee_double = try? parsedBaseFee.get(), newBaseFee_double > 0 {
-			
+		if invalidBaseFee == nil,
+			let newBaseFee_double = try? parsedBaseFee.get(),
+			newBaseFee_double > 0
+		{
 			newBaseFee_sat = Int64(newBaseFee_double)
 			shouldSave = true
 		}
-		if let newProportionalFee_number = try? parsedProportionalFee.get() {
+		if invalidProportionalFee == nil,
+			let newProportionalFee_number = try? parsedProportionalFee.get()
+		{
 			let newProportionalFee_double = newProportionalFee_number.doubleValue
 			if newProportionalFee_double > 0 {
-				
+			
 				// Example:
 				// newProportionalFee_double: 0.5 <- is a a percent, i.e. 0.5%
 				// toNumber: 0.5 / 100 = 0.005
