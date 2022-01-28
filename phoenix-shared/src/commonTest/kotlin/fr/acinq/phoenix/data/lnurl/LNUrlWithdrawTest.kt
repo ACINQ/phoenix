@@ -22,8 +22,8 @@ class LNUrlWithdrawTest {
     private val defaultWithdraw = LNUrl.Withdraw(
         lnurl = defaultLnurl,
         callback = defaultCallback,
-        walletIdentifier = defaultK1,
-        description = defaultDesc,
+        k1 = defaultK1,
+        defaultDescription = defaultDesc,
         minWithdrawable = defaultMin,
         maxWithdrawable = defaultMax,
     )
