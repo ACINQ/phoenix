@@ -19,9 +19,9 @@
 "%@ sat/byte" = "%@ ساتوشي/بايت";
 "%@ seconds" = "%@ ثواني";
 "%@:%@ minutes" = "%@ : %@ دقيقة";
-"%@% (%@ minimum)" = "الرسوم %@٪ (بحد ادنى %@)";
+"%@% (%@ minimum)" = "الرسوم %@% (بحد ادنى %@)";
 /* Minimum fee information */
-"%@%% (%@ minimum)" = "الرسوم %@٪ (بحد ادنى %@)";
+"%@%% (%@ minimum)" = "الرسوم %@% (بحد ادنى %@)";
 /* Count != 1 */
 "%d channels" = "%d قنوات";
 "+%@ incoming" = "+ %@ وارد";
@@ -172,7 +172,7 @@
 "Default payment description" = "وصف المدفوعات الافتراضي";
 "Deleting record zone..." = "جارٍ حذف منطقة التسجيل...";
 /* Minimum amount description. */
-"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "يجب أن تكون الودائع على الأقل **%@**. الرسوم **%@٪** (بحد ادنى %@).";
+"Deposits must be at least **%@**. The fee is **%@%%** (%@ minimum)." = "يجب أن تكون الودائع على الأقل **%@**. الرسوم **%@%** (بحد ادنى %@).";
 /* Label in SummaryInfoGrid */
 "Desc" = "الوصف";
 /* TextField placeholder */
@@ -478,7 +478,7 @@
 "The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "معاملات إغلاق القنوات موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
 "The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "يتم تشفير البيانات المخزنة في السحابة، ولا يمكن فك تشفيرها إلا بعبارة الاسترداد الخاصة بك.";
 /* IntroView */
-"The fee is **%@%%** with a minimum fee of **%@**." = "الرسوم **%@٪** مع حد أدنى للرسوم **%@**.";
+"The fee is **%@%%** with a minimum fee of **%@**." = "الرسوم **%@%** مع حد أدنى للرسوم **%@**.";
 /* SendView */
 "The invoice doesn't include an amount. This can be dangerous: malicious nodes may be able to steal your payment. To be safe, **ask the payee to specify an amount**  in the payment request." = "لا تتضمن هذه الفاتورة مبلغًا. قد يكون هذا أمرًا خطيرًا: فقد تتمكن العقد الضارة من سرقة مبلغك. لكي تبقى بأمان، ***اطلب من المستفيد تحديد مبلغ*** في طلب الدفع.";
 /* Error message - scanning lightning invoice */
@@ -689,3 +689,16 @@
 "Incoming payment expiry" = "مدة انتهاء فواتير المدفوعات الواردة";
 "Theme" = "النمط";
 "View source" = "الاطلاع على المصدر";
+"Maximum fee for outgoing Lightning payments" = "الحد الأقصى لرسوم مدفوعات البرق الصادرة";
+"Phoenix will try to make the payment using the minimum fee possible." = "ستحاول Phoenix الدفع باستخدام ادنى حد ممكن من الرسوم";
+"Max base fee (satoshis)" = "الحد الأقصى للرسوم الأساسية (بالساتوشي)";
+"Max proportional fee (%)" = "الحد الأقصى للرسوم النسبيّة (%)";
+"example payment :" = "مثال لدفع :";
+"max base fee :" = "الحد الأقصى للرسوم الأساسية";
+"max proportional fee :" = "الحد الأقصى للرسوم النسبيّة";
+"max fee :" = "أقصى حد للرسوم :";
+"Base fee must be at least %@." = "يجب ان تكون الرسوم الأساسية كحد ادنى %@.";
+"Maximum base fee is %@." = "اعلى حد للرسوم الاساسية هو %@.";
+"Maximum proportional fee is %@." = "اعلى حد للرسوم النسبيّة هو %@.";
+"With configured proportional fee, we recommend a base fee of at least %@." = "مع الرسوم النسبيّة التي تم اختيارها، نوصي برسوم أساسية كحد أدنى %@.";
+"With configured base fee, we recommend a proportional fee of at least %@%%." = "مع الرسوم الأساسية التي تم اختيارها، نوصي برسوم نسبيّة كحد أدنى %@%%.";
