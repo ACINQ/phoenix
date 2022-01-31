@@ -267,6 +267,8 @@ struct ScanView: View, ViewName {
 	
 	@Binding var paymentRequest: String?
 	
+	@State var clipboardHasString = UIPasteboard.general.hasStrings
+	
 	@State var showingImagePicker = false
 	@State var imagePickerSelection: UIImage? = nil
 	
@@ -276,6 +278,10 @@ struct ScanView: View, ViewName {
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
 	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
+		UIApplication.willEnterForegroundNotification
+	)
 	
 	// Subtle timing bug:
 	//
@@ -332,6 +338,9 @@ struct ScanView: View, ViewName {
 				removal: .move(edge: .bottom)
 			)
 		)
+		.onReceive(willEnterForegroundPublisher) { _ in
+			willEnterForeground()
+		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
@@ -376,7 +385,7 @@ struct ScanView: View, ViewName {
 				}
 			}
 			.font(.title3)
-			.disabled(!UIPasteboard.general.hasStrings)
+			.disabled(!clipboardHasString)
 			
 			Divider()
 				.padding([.top, .bottom], 10)
@@ -400,6 +409,12 @@ struct ScanView: View, ViewName {
 		.sheet(isPresented: $showingImagePicker) {
 			 ImagePicker(image: $imagePickerSelection)
 		}
+	}
+	
+	func willEnterForeground() {
+		log.trace("[\(viewName)] willEnterForeground()")
+		
+		clipboardHasString = UIPasteboard.general.hasStrings
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) {
