@@ -314,7 +314,7 @@ struct CurrencyConverterView: View {
 		}
 		
 		// Careful: this function may be called when returning from the Receive/Send view
-		if didAppear {
+		if !didAppear {
 			didAppear = true
 			
 			UIScrollView.appearance().keyboardDismissMode = .interactive
