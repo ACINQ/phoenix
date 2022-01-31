@@ -79,6 +79,8 @@ struct PaymentsBackupView: View {
 						and can only be decrypted with your seed.
 						"""
 					)
+					.lineLimit(nil)          // SwiftUI bugs
+					.minimumScaleFactor(0.5) // Truncating text
 					.foregroundColor(Color.gray)
 				}
 			} icon: {
