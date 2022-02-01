@@ -54,9 +54,11 @@ struct DisplayConfigurationView: View {
 				
 				Text("Throughout the app, you can tap on most amounts to toggle between bitcoin and fiat.")
 					.font(.callout)
+					.lineLimit(nil)          // SwiftUI bugs
+					.minimumScaleFactor(0.5) // Truncating text
 					.foregroundColor(Color.secondary)
 					.padding(.top, 8)
-					.padding(.bottom, 4) // visible in dark mode
+					.padding(.bottom, 4)
 			}
 			.id(sectionId)
 			
@@ -126,19 +128,22 @@ struct FiatCurrencySelector: View, ViewName {
 	
 	@State var selectedFiatCurrency: FiatCurrency
 	
+	@State var visibleFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
+	@State var searchText: String = ""
+	
 	enum TextWidth: Preference {}
 	let textWidthReader = GeometryPreferenceReader(
 		key: AppendValue<TextWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var textWidth: CGFloat? = nil
+	@State private var textWidth: CGFloat? = nil
 	
 	enum FlagWidth: Preference {}
 	let flagWidthReader = GeometryPreferenceReader(
 		key: AppendValue<FlagWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var flagWidth: CGFloat? = nil
+	@State private var flagWidth: CGFloat? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -146,8 +151,6 @@ struct FiatCurrencySelector: View, ViewName {
 	var body: some View {
 		
 		ZStack {
-			
-			let fiatCurrencies = FiatCurrency.companion.values
 			
 			// We want to vertically align the text:
 			//
@@ -165,8 +168,7 @@ struct FiatCurrencySelector: View, ViewName {
 			//
 			ScrollView {
 				VStack {
-					ForEach(0 ..< fiatCurrencies.count) {
-						let fiatCurrency = fiatCurrencies[$0]
+					ForEach(FiatCurrency.companion.values) { fiatCurrency in
 
 						Text(fiatCurrency.shortName)
 							.foregroundColor(Color.clear)
@@ -183,23 +185,36 @@ struct FiatCurrencySelector: View, ViewName {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			}
 			
-			List {
-				ForEach(0 ..< fiatCurrencies.count) {
-					let fiatCurrency = fiatCurrencies[$0]
-					
-					Button {
-						didSelect(fiatCurrency)
-					} label: {
-						row(fiatCurrency)
+			if #available(iOS 15.0, *) {
+				content
+					.searchable(text: $searchText)
+					.onChange(of: searchText) { _ in
+						searchTextDidChange()
 					}
-				}
+			} else {
+				content
 			}
-			.listStyle(PlainListStyle())
 		}
 		.navigationBarTitle(
 			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		List {
+			ForEach(visibleFiatCurrencies) { fiatCurrency in
+				
+				Button {
+					didSelect(fiatCurrency)
+				} label: {
+					row(fiatCurrency)
+				}
+			}
+		}
+		.listStyle(PlainListStyle())
 	}
 	
 	@ViewBuilder
@@ -235,6 +250,28 @@ struct FiatCurrencySelector: View, ViewName {
 		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
 			presentationMode.wrappedValue.dismiss()
+		}
+	}
+	
+	func searchTextDidChange() {
+		log.trace("[\(viewName)] searchTextDidChange(): \(searchText)")
+		
+		let allFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
+		
+		let components = searchText
+			.components(separatedBy: .whitespacesAndNewlines)
+			.filter { !$0.isEmpty }
+		
+		if components.isEmpty {
+			visibleFiatCurrencies = allFiatCurrencies
+			
+		} else {
+			visibleFiatCurrencies = allFiatCurrencies.filter { fiatCurrency in
+				components.allSatisfy { component in
+					fiatCurrency.shortName.localizedCaseInsensitiveContains(component) ||
+					fiatCurrency.longName.localizedCaseInsensitiveContains(component)
+				}
+			}
 		}
 	}
 }
