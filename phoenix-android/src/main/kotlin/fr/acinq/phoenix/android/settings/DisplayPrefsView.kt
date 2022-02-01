@@ -25,7 +25,7 @@ import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.android.utils.label
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -67,7 +67,7 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefsEnabled = false
             scope.launch {
-                Prefs.saveBitcoinUnit(context, it.item)
+                UserPrefs.saveBitcoinUnit(context, it.item)
                 prefsEnabled = true
             }
         }
@@ -90,7 +90,7 @@ private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefEnabled = false
             scope.launch {
-                Prefs.saveFiatCurrency(context, it.item)
+                UserPrefs.saveFiatCurrency(context, it.item)
                 prefEnabled = true
             }
         }
@@ -103,7 +103,7 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
     val preferences = UserTheme.values().map {
         PreferenceItem(it, title = it.label())
     }
-    val currentPref by Prefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val currentPref by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_theme_label),
         subtitle = currentPref.label(),
@@ -113,7 +113,7 @@ private fun UserThemePreference(context: Context, scope: CoroutineScope) {
         onPreferenceSubmit = {
             prefEnabled = false
             scope.launch {
-                Prefs.saveUserTheme(context, it.item)
+                UserPrefs.saveUserTheme(context, it.item)
                 prefEnabled = true
             }
         }

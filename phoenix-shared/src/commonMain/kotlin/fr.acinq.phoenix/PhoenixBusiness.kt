@@ -86,7 +86,7 @@ class PhoenixBusiness(
         setLightningLoggerFactory(loggerFactory)
     }
 
-    fun start() {
+    fun start(startupOptions: StartupOptions) {
         if (appConnectionsDaemon == null) {
             logger.debug { "start business" }
             appConnectionsDaemon = AppConnectionsDaemon(this)
@@ -160,3 +160,8 @@ class PhoenixBusiness(
             AppCloseChannelsConfigurationController(_this, isForceClose = true)
     }
 }
+
+data class StartupOptions(
+    /** When true, we ask our peer whether there are legacy channels to reestablish for the legacy node id. */
+    val requestCheckLegacyChannels: Boolean,
+)

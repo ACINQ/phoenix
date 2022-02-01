@@ -19,7 +19,6 @@ package fr.acinq.phoenix.android.settings
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +29,7 @@ import fr.acinq.phoenix.android.components.SettingHeader
 import fr.acinq.phoenix.android.components.SettingScreen
 import fr.acinq.phoenix.android.components.SettingSwitch
 import fr.acinq.phoenix.android.utils.BiometricsHelper
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -44,7 +43,7 @@ fun AppLockView(
     val log = logger("AppLockView")
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val isScreenLockActive = Prefs.getIsScreenLockActive(context).collectAsState(initial = false)
+    val isScreenLockActive = UserPrefs.getIsScreenLockActive(context).collectAsState(initial = false)
     val nc = navController
 
     SettingScreen {
@@ -60,7 +59,7 @@ fun AppLockView(
                     scope.launch {
                         if (it) {
                             // if user wants to enable screen lock, we don't need to check authentication
-                            Prefs.saveIsScreenLockActive(context, true)
+                            UserPrefs.saveIsScreenLockActive(context, true)
                         } else {
                             // if user wants to disable screen lock, we must first check his credentials
                             val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
@@ -70,7 +69,7 @@ fun AppLockView(
                             BiometricsHelper.getPrompt(
                                 activity = mainActivity,
                                 onSuccess = {
-                                    scope.launch { Prefs.saveIsScreenLockActive(context, false) }
+                                    scope.launch { UserPrefs.saveIsScreenLockActive(context, false) }
                                 },
                                 onFailure = {
                                     // TODO display some message

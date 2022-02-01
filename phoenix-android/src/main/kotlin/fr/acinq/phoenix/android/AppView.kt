@@ -33,10 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.home.HomeViewModel
-import fr.acinq.phoenix.android.home.ReadDataView
-import fr.acinq.phoenix.android.home.StartupView
+import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
@@ -45,13 +42,14 @@ import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -66,10 +64,11 @@ fun AppView(
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
     val context = LocalContext.current
-    val isAmountInFiat = Prefs.getIsAmountInFiat(context).collectAsState(false)
-    val fiatCurrency = Prefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
-    val bitcoinUnit = Prefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
-    val electrumServer = Prefs.getElectrumServer(context).collectAsState(initial = null)
+    val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
+    val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
+    val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
+    val electrumServer = UserPrefs.getElectrumServer(context).collectAsState(initial = null)
+    val startLegacyApp = PrefsDatastore.getStartLegacyApp(context).collectAsState(initial = null)
     val business = application.business
 
     CompositionLocalProvider(
@@ -80,7 +79,8 @@ fun AppView(
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
-        LocalElectrumServer provides electrumServer.value
+        LocalElectrumServer provides electrumServer.value,
+        LocalStartLegacyApp provides startLegacyApp.value
     ) {
 
         // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
@@ -115,10 +115,10 @@ fun AppView(
                     )
                 }
                 composable(Screen.CreateWallet.route) {
-                    CreateWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.RestoreWallet.route) {
-                    RestoreWalletView(appVM = appVM, onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                    RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
                 }
                 composable(Screen.Home.route) {
                     RequireKey(appVM.walletState.value) {
@@ -211,6 +211,9 @@ fun AppView(
                         mainActivity = mainActivity,
                         appVM = appVM
                     )
+                }
+                composable(Screen.SwitchToLegacy.route) {
+                    LegacySwitcherView { navController.navigate(Screen.Startup.route) }
                 }
             }
         }

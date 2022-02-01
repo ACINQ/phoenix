@@ -30,6 +30,7 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.CurrencyUnit
 import fr.acinq.phoenix.data.ExchangeRate
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.legacy.utils.StartLegacyAppEnum
 
 
 typealias CF = ControllerFactory
@@ -43,6 +44,7 @@ val LocalFiatCurrency = compositionLocalOf { FiatCurrency.USD }
 val LocalExchangeRates = compositionLocalOf<List<ExchangeRate>> { listOf() }
 val LocalShowInFiat = compositionLocalOf { false }
 val LocalElectrumServer = compositionLocalOf<ServerAddress?> { null }
+val LocalStartLegacyApp = compositionLocalOf<StartLegacyAppEnum?> { null }
 
 val isDarkTheme: Boolean
     @Composable

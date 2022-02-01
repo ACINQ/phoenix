@@ -29,7 +29,7 @@
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
     <string name="autocreate_generating">Creating your wallet…</string>
-    <string name="autocreate_error">We could not create your wallet.\nReason: %1$s</string>
+    <string name="autocreate_error">Failed to write wallet keys.\nReason: %1$s</string>
 
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
@@ -70,6 +70,7 @@
     <string name="startup_check_lock">Checking lock…</string>
     <string name="startup_binding_service">Binding service…</string>
     <string name="startup_wait">Preparing wallet…</string>
+    <string name="startup_wait_legacy_check">Checking legacy wallet…</string>
     <string name="startup_checking_seed">Unlocking…</string>
     <string name="startup_starting">Starting…</string>
     <string name="startup_wait_tor">Starting Tor…</string>
@@ -85,6 +86,10 @@
     <string name="startup_error_no_biometrics_or_key_invalidated">Enroll a fingerprint in Android first to unlock the wallet.\n\nOtherwise, restore your wallet using your 12-words seed backup.</string>
     <string name="startup_error_auth_failed">Authentication failed.</string>
     <string name="startup_error_auth_failed_with_details">Authentication failed.\n—\n%1$s</string>
+
+    <!-- -->
+    <string name="legacyswitch_title">Legacy app running…</string>
+    <string name="legacyswitch_restart">Restart legacy app</string>
 
     <!-- //////////////// payment holder //////////////// -->
 

@@ -33,10 +33,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.phoenix.legacy.AppLock
-import fr.acinq.phoenix.legacy.BaseFragment
-import fr.acinq.phoenix.legacy.MainActivity
-import fr.acinq.phoenix.legacy.R
+import fr.acinq.phoenix.legacy.*
 import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.legacy.security.PinDialog
@@ -159,7 +156,8 @@ class StartupFragment : BaseFragment() {
           log.error("failed to handle modern app switch: ", e)
         }) {
           log.info("moving to modern application...")
-          PrefsDatastore.saveSkipLegacyCheck(requireContext(), true)
+          PrefsDatastore.saveStartLegacyApp(requireContext(), StartLegacyAppEnum.NOT_REQUIRED)
+          appContext(context).legacyAppStatus.value = LegacyAppStatus.FINISHED
           requireActivity().finish()
         }
       }

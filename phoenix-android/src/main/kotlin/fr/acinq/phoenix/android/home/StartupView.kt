@@ -17,12 +17,16 @@
 package fr.acinq.phoenix.android.home
 
 import android.content.Context
-import android.content.Intent
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.*
@@ -30,12 +34,14 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
-import fr.acinq.phoenix.android.utils.LegacyHelper
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.legacy.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.StartLegacyAppEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,26 +61,43 @@ fun StartupView(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val walletState = appVM.walletState.observeAsState()
-    val isLockActive by Prefs.getIsScreenLockActive(context).collectAsState(initial = null)
+    val isLockActive by UserPrefs.getIsScreenLockActive(context).collectAsState(initial = null)
 
-    when (isLockActive) {
-        null -> Text(stringResource(id = R.string.startup_check_lock))
-        true -> when (appVM.lockState) {
-            is LockState.Locked -> {
-                LaunchedEffect(key1 = true) {
-                    val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
-                        setTitle(context.getString(R.string.authprompt_title))
-                        setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
-                    }.build()
-                    BiometricsHelper.getPrompt(
-                        activity = mainActivity,
-                        onSuccess = { appVM.lockState = LockState.Unlocked },
-                        onFailure = { appVM.lockState = LockState.Locked.WithError(it) },
-                        onCancel = { log.debug { "cancelled auth prompt" } }
-                    ).authenticate(promptInfo)
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        when (isLockActive) {
+            null -> Text(stringResource(id = R.string.startup_check_lock))
+            true -> when (appVM.lockState) {
+                is LockState.Locked -> {
+                    LaunchedEffect(key1 = true) {
+                        val promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
+                            setTitle(context.getString(R.string.authprompt_title))
+                            setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                        }.build()
+                        BiometricsHelper.getPrompt(
+                            activity = mainActivity,
+                            onSuccess = { appVM.lockState = LockState.Unlocked },
+                            onFailure = { appVM.lockState = LockState.Locked.WithError(it) },
+                            onCancel = { log.debug { "cancelled auth prompt" } }
+                        ).authenticate(promptInfo)
+                    }
+                }
+                is LockState.Unlocked -> {
+                    AttemptStart(
+                        context = context,
+                        scope = scope,
+                        log = log,
+                        appVM = appVM,
+                        walletState = walletState.value,
+                        onKeyAbsent = onKeyAbsent,
+                        onBusinessStarted = onBusinessStarted
+                    )
                 }
             }
-            is LockState.Unlocked -> {
+            false -> {
                 AttemptStart(
                     context = context,
                     scope = scope,
@@ -85,17 +108,6 @@ fun StartupView(
                     onBusinessStarted = onBusinessStarted
                 )
             }
-        }
-        false -> {
-            AttemptStart(
-                context = context,
-                scope = scope,
-                log = log,
-                appVM = appVM,
-                walletState = walletState.value,
-                onKeyAbsent = onKeyAbsent,
-                onBusinessStarted = onBusinessStarted
-            )
         }
     }
 }
@@ -110,7 +122,7 @@ private fun AttemptStart(
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
-    val skipLegacyCheck by PrefsDatastore.getSkipLegacyCheck(context).collectAsState(false)
+    val startLegacyApp = PrefsDatastore.getStartLegacyApp(context).collectAsState(null).value
     when (walletState) {
         is WalletState.Off -> {
             val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
@@ -123,26 +135,20 @@ private fun AttemptStart(
                 is KeyState.Error.Unreadable -> Text(stringResource(id = R.string.startup_error_generic, keyState.message ?: ""))
                 is KeyState.Error.UnhandledSeedType -> Text(stringResource(id = R.string.startup_error_generic, "Unhandled seed type"))
                 is KeyState.Present -> {
-                    when (val encryptedSeed = keyState.encryptedSeed) {
-                        is EncryptedSeed.V2.NoAuth -> {
-                            Text(stringResource(id = R.string.startup_checking_seed))
-                            LaunchedEffect(encryptedSeed, skipLegacyCheck) {
-                                if (!skipLegacyCheck && LegacyHelper.hasLegacyChannels(context)) {
-                                    log.info { "found legacy channels database file" }
-                                    context.startActivity(Intent(context, fr.acinq.phoenix.legacy.MainActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) })
-                                } else {
-                                    log.info { "no legacy database, proceed to modern engine launch" }
-                                    scope.launch(Dispatchers.IO) {
-                                        log.debug { "decrypting seed..." }
-                                        val seed = encryptedSeed.decrypt()
-                                        log.debug { "seed has been decrypted" }
-                                        appVM.service?.startBusiness(seed)
-                                    }
-                                }
-                            }
+                    log.info { "wallet ready with startLegacyApp=$startLegacyApp" }
+                    when (startLegacyApp) {
+                        null -> Text(stringResource(id = R.string.startup_wait))
+                        StartLegacyAppEnum.UNKNOWN -> {
+                            Text(stringResource(id = R.string.startup_wait_legacy_check))
+                            SwitchToLegacy(context, appVM)
                         }
-                        is EncryptedSeed.V2.WithAuth -> {
-                            Text("seed=${keyState.encryptedSeed} version is not handled yet")
+                        StartLegacyAppEnum.REQUIRED -> {
+                            log.info { "starting legacy app with startLegacyApp=$startLegacyApp" }
+                            SwitchToLegacy(context, appVM)
+                        }
+                        StartLegacyAppEnum.NOT_REQUIRED -> {
+                            log.info { "start KMP backend with checkLegacyChannel=$startLegacyApp and checkLegacyChannel=false" }
+                            StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = false)
                         }
                     }
                 }
@@ -153,4 +159,31 @@ private fun AttemptStart(
         is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, walletState.message))
         is WalletState.Started -> LaunchedEffect(true) { onBusinessStarted() }
     }
+}
+
+@Composable
+private fun StartKMP(scope: CoroutineScope, service: NodeService?, encryptedSeed: EncryptedSeed.V2, checkLegacyChannel: Boolean) {
+    val log = logger("StartupView")
+    when (encryptedSeed) {
+        is EncryptedSeed.V2.NoAuth -> {
+            Text(stringResource(id = R.string.startup_checking_seed))
+            LaunchedEffect(encryptedSeed) {
+                scope.launch(Dispatchers.IO) {
+                    log.debug { "decrypting seed..." }
+                    val seed = encryptedSeed.decrypt()
+                    log.debug { "seed has been decrypted" }
+                    service?.startBusiness(seed, checkLegacyChannel)
+                }
+            }
+        }
+        is EncryptedSeed.V2.WithAuth -> {
+            Text("seed=$encryptedSeed version is not handled yet")
+        }
+    }
+}
+
+@Composable
+private fun SwitchToLegacy(context: Context, appVM: AppViewModel) {
+    application.legacyAppStatus.value = LegacyAppStatus.INIT
+    LocalNavController.current?.navigate(Screen.SwitchToLegacy.route)
 }

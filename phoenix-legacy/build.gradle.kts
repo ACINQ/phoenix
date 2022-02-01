@@ -117,7 +117,7 @@ dependencies {
 
   // eclair core
   implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:${Versions.secp256k1}")
-  implementation("fr.acinq.eclair:eclair-core_2.11:${Versions.AndroidLegacy.eclair}")
+  api("fr.acinq.eclair:eclair-core_2.11:${Versions.AndroidLegacy.eclair}")
 
   // eventbus
   implementation("org.greenrobot:eventbus:${Versions.AndroidLegacy.eventbus}")

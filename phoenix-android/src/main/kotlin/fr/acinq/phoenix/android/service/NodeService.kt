@@ -16,13 +16,15 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
+import fr.acinq.phoenix.StartupOptions
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Notifications
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -67,7 +69,7 @@ class NodeService : Service() {
                 log.warn("fetching FCM registration token failed: ", task.exception)
                 return@OnCompleteListener
             }
-            task.result?.let { serviceScope.launch { Prefs.saveFcmToken(applicationContext, it) } }
+            task.result?.let { serviceScope.launch { InternalData.saveFcmToken(applicationContext, it) } }
         })
     }
 
@@ -131,7 +133,7 @@ class NodeService : Service() {
                 encryptedSeed.decrypt().let {
                     log.info("successfully decrypted seed in the background, starting wallet...")
                     notifyForegroundService(getString(R.string.notif__headless_title__default), null)
-                    startBusiness(it)
+                    startBusiness(it, requestCheckLegacyChannels = false)
                 }
             }
             else -> {
@@ -159,7 +161,7 @@ class NodeService : Service() {
      * Start the node business logic.
      * @param decryptedPayload Must be the decrypted payload of an [EncryptedSeed] object.
      */
-    fun startBusiness(decryptedPayload: ByteArray) {
+    fun startBusiness(decryptedPayload: ByteArray, requestCheckLegacyChannels: Boolean) {
         serviceScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
             log.error("error when checking node state consistency before startup: ", e)
         }) {
@@ -191,8 +193,8 @@ class NodeService : Service() {
                         stopForeground(STOP_FOREGROUND_REMOVE)
                     }
                 }) {
-                    log.debug("initiating node startup from state=${_state.value?.name}")
-                    val state = doStartNode(decryptedPayload)
+                    log.debug("initiating node startup from state=${_state.value?.name} with requestCLC=$requestCheckLegacyChannels")
+                    val state = doStartNode(decryptedPayload, requestCheckLegacyChannels)
                     updateState(state)
                 }
             }
@@ -200,18 +202,18 @@ class NodeService : Service() {
     }
 
     @WorkerThread
-    private suspend fun doStartNode(decryptedPayload: ByteArray): WalletState.Started {
+    private suspend fun doStartNode(decryptedPayload: ByteArray, requestCheckLegacyChannels: Boolean): WalletState.Started {
         log.info("starting up node...")
         val business = (applicationContext as? PhoenixApplication)?.business ?: throw RuntimeException("invalid context type, should be PhoenixApplication")
-        val electrumServer = Prefs.getElectrumServer(applicationContext).first()
+        val electrumServer = UserPrefs.getElectrumServer(applicationContext).first()
         val seed = business.prepWallet(EncryptedSeed.toMnemonics(decryptedPayload))
 
         business.loadWallet(seed)
-        business.start()
+        business.start(StartupOptions(requestCheckLegacyChannels = requestCheckLegacyChannels))
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 
         serviceScope.launch {
-            val token = Prefs.getFcmToken(applicationContext).first()
+            val token = InternalData.getFcmToken(applicationContext).first()
             log.debug("retrieved from prefs fcm token=$token")
             var hasRegisteredToken = false
             business.connectionsManager.connections.collect {

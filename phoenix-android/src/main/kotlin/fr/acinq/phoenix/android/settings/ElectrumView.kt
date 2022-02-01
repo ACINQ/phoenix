@@ -39,7 +39,7 @@ import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.utils.Prefs
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
@@ -71,7 +71,7 @@ fun ElectrumView() {
                         initialAddress = prefElectrumServer,
                         onConfirm = { address ->
                             scope.launch {
-                                Prefs.saveElectrumServer(context, address)
+                                UserPrefs.saveElectrumServer(context, address)
                                 postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address = address))
                                 showServerDialog = false
                             }

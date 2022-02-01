@@ -36,9 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import fr.acinq.phoenix.android.LocalTheme
-import fr.acinq.phoenix.android.Screen
 import fr.acinq.phoenix.android.isDarkTheme
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 
 // primary for testnet
 val horizon = Color(0xff91b4d1)
@@ -200,7 +199,7 @@ val shapes = Shapes(
 @Composable
 fun PhoenixAndroidTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current
-    val userTheme by Prefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
+    val userTheme by UserPrefs.getUserTheme(context).collectAsState(initial = UserTheme.SYSTEM)
     val systemUiController = rememberSystemUiController()
 
     CompositionLocalProvider(

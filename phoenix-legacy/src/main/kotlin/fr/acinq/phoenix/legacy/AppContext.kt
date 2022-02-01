@@ -24,19 +24,12 @@ import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ProcessLifecycleOwner
 import fr.acinq.bitcoin.scala.Satoshi
 import fr.acinq.eclair.CltvExpiryDelta
 import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.background.BalanceEvent
 import fr.acinq.phoenix.legacy.main.InAppNotifications
-import fr.acinq.phoenix.legacy.utils.Constants
-import fr.acinq.phoenix.legacy.utils.Logging
-import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.ThemeHelper
 import fr.acinq.phoenix.legacy.utils.*
 import okhttp3.Call
 import okhttp3.Callback
@@ -48,12 +41,26 @@ import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-val Context.datastore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+/** This datastore persists user's preferences (theme, currencies, ...). */
+val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "userprefs")
+/** This datastore persists miscellaneous internal data representing various states of the app. */
+val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
+
+/**
+ * Describes how the legacy and modern apps interact:
+ * - [INIT], the modern app is in control and will decide what to do ;
+ * - [EXPECTED], the modern app should start the legacy app ;
+ * - [RUNNING], the modern app should pause and wait ;
+ * - [FINISHED], the modern app should take over ;
+ * - [INTERRUPTED], the legacy app did not complete its job properly and should be started again ;
+ */
+enum class LegacyAppStatus {
+  INIT, EXPECTED, RUNNING, FINISHED, INTERRUPTED
+}
 
 open class AppContext : Application() {
 
@@ -109,6 +116,9 @@ open class AppContext : Application() {
       return context.applicationContext as AppContext
     }
   }
+
+  /** Signals the status of the legacy app in regard to the migration process launched by the modern app. This is how the modern and the legacy apps communicate. */
+  val legacyAppStatus = MutableLiveData<LegacyAppStatus>()
 
   /** Settings for pay-to-open. */
   val payToOpenSettings = MutableLiveData<PayToOpenSettings?>()

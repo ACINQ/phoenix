@@ -73,7 +73,7 @@ kotlin {
 
 dependencies {
     implementation(project(":phoenix-shared"))
-    implementation(project(":phoenix-legacy"))
+    api(project(":phoenix-legacy"))
 
     implementation("com.google.android.material:material:1.4.0")
 

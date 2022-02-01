@@ -17,11 +17,8 @@
 package fr.acinq.phoenix.legacy.utils
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import fr.acinq.phoenix.legacy.datastore
+import androidx.datastore.preferences.core.*
+import fr.acinq.phoenix.legacy.internalData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -32,9 +29,8 @@ import java.io.IOException
 object PrefsDatastore {
   private val log = LoggerFactory.getLogger(this::class.java)
 
-
   private fun prefs(context: Context): Flow<Preferences> {
-    return context.datastore.data.catch { exception ->
+    return context.internalData.data.catch { exception ->
       if (exception is IOException) {
         emit(emptyPreferences())
       } else {
@@ -43,8 +39,26 @@ object PrefsDatastore {
     }
   }
 
-  val PREFS_SKIP_LEGACY_CHECK = booleanPreferencesKey("PREFS_SKIP_LEGACY_CHECK")
+  /**
+   * If [StartLegacyAppEnum.REQUIRED] we run the legacy app.
+   * If [StartLegacyAppEnum.NOT_REQUIRED] we run the modern KMP app.
+   * If [StartLegacyAppEnum.UNKNOWN] we run the modern KMP app and query the peer for information.
+   */
+  private val START_LEGACY_APP = stringPreferencesKey("START_LEGACY_APP")
+  fun getStartLegacyApp(context: Context): Flow<StartLegacyAppEnum> = prefs(context).map {
+    StartLegacyAppEnum.safeValueOf(it[START_LEGACY_APP])
+  }
+  suspend fun saveStartLegacyApp(context: Context, value: StartLegacyAppEnum) = context.internalData.edit { it[START_LEGACY_APP] = value.name }
+}
 
-  fun getSkipLegacyCheck(context: Context): Flow<Boolean> = prefs(context).map { it[PREFS_SKIP_LEGACY_CHECK] ?: false }
-  suspend fun saveSkipLegacyCheck(context: Context, value: Boolean) = context.datastore.edit { it[PREFS_SKIP_LEGACY_CHECK] = value }
+enum class StartLegacyAppEnum {
+  UNKNOWN, REQUIRED, NOT_REQUIRED;
+
+  companion object {
+    fun safeValueOf(value: String?) = when (value) {
+      REQUIRED.name -> REQUIRED
+      NOT_REQUIRED.name -> NOT_REQUIRED
+      else -> UNKNOWN
+    }
+  }
 }
