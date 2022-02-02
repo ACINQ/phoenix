@@ -750,8 +750,8 @@
 /* No comment provided by engineer. */
 "Sending Payment..." = "Odesílání platby...";
 
-/* No comment provided by engineer. */
-"SENT" = "ODESLAT";
+/* Confirm dialog that payment has been sent. */
+"SENT" = "ODESLÁNO";
 
 /* Label in DetailsView_IncomingPayment */
 "sent at" = "odeslat na";
