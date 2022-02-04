@@ -201,6 +201,7 @@
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		967728A5267D16B00072C5F0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		967728A6267D16B00072C5F0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		96F5FBE627AD7A6A00EF5DFC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Currencies.strings; sourceTree = "<group>"; };
 		C8D7A1F8A123C59199C182C2 /* ElectrumConfigurationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ElectrumConfigurationView.swift; sourceTree = "<group>"; };
 		C8D7A209301A31C14A982ECD /* InitializationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitializationView.swift; sourceTree = "<group>"; };
 		C8D7A2327BC90150A3E1493D /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -1100,6 +1101,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DC2CFA92273C7874007AACB9 /* es */,
+				96F5FBE627AD7A6A00EF5DFC /* fr */,
 			);
 			name = Currencies.strings;
 			sourceTree = "<group>";
