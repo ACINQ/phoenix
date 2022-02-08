@@ -493,7 +493,7 @@
 "Error: invalid hash" = "Erreur : hachage invalide";
 
 /* No comment provided by engineer. */
-"example payment :" = "exemple de paiement :";
+"example payment" = "exemple de paiement";
 
 /* label text */
 "Expect to receive %d separate payments." = "Attendez-vous à recevoir %d paiements séparés.";
@@ -775,16 +775,16 @@
 "Master public key" = "Clé publique maître";
 
 /* No comment provided by engineer. */
-"max base fee :" = "Frais de base maximum :";
+"max base fee" = "frais de base maximum";
 
 /* No comment provided by engineer. */
 "Max base fee (satoshis)" = "Frais de base maximum (satoshis)";
 
 /* No comment provided by engineer. */
-"max fee :" = "Frais maximum";
+"max fee" = "frais maximum";
 
 /* No comment provided by engineer. */
-"max proportional fee :" = "Frais proportionnels maximum";
+"max proportional fee" = "frais proportionnels maximum";
 
 /* No comment provided by engineer. */
 "Max proportional fee (%)" = "Frais proportionnels maximum (%)";

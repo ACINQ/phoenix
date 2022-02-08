@@ -262,6 +262,13 @@ struct MaxFeeConfiguration: View, ViewName {
 	
 	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	
+	enum ExampleHeight: Preference {}
+	let exampleHeightReader = GeometryPreferenceReader(
+		key: AppendValue<ExampleHeight>.self,
+		value: { [$0.size.height] }
+	)
+	@State var exampleHeight: CGFloat? = nil
+	
 	var invalidBaseFee: FeeProblem.InvalidReason? {
 		if case .invalid(let reason) = baseFeeProblem {
 			return reason
@@ -487,7 +494,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	
 	@ViewBuilder
 	func example(pseudoHide: Bool) -> some View {
-
+		
 		// |      example payment :   10,000 sat     - + |
 		// |             base fee :      100 sat         |
 		// |     proportional fee :       30 sat         |
@@ -495,15 +502,52 @@ struct MaxFeeConfiguration: View, ViewName {
 		// |              max fee :      130 sat (1.3%)  |
 		
 		let pseudoClear = Color(UIColor.systemBackground)
-		
 		ZStack(alignment: Alignment.topTrailing) {
 			
-			HStack(alignment: VerticalAlignment.top, /*horizontal-*/spacing: 0) {
-			
-				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
-					Text("example payment :")
-					Text("max base fee :")
-					Text("max proportional fee :")
+			GeometryReader { geometry in
+				
+				let column0Width: CGFloat = geometry.size.width / 4.0 * 2.0
+				let column1Width: CGFloat = geometry.size.width / 4.0 * 1.25
+				let column2Width: CGFloat = geometry.size.width / 4.0 * 0.75
+				
+				let columns: [GridItem] = [
+					GridItem(.fixed(column0Width), spacing: 0, alignment: .trailing),
+					GridItem(.fixed(column1Width), spacing: 0, alignment: .trailing),
+					GridItem(.fixed(column2Width), spacing: 0, alignment: .leading)
+				]
+				
+				VStack(alignment: HorizontalAlignment.center, spacing: 8) {
+					
+					LazyVGrid(columns: columns, spacing: 8) {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("example payment")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(examplePaymentAmountString())
+						Text(verbatim: " ")
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max base fee")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleBaseFeeString())
+						Text(verbatim: " ")
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max proportional fee")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleProportionalFeeString())
+						Text(verbatim: " ")
+					
+					} // </LazyVGrid>
+					.font(.footnote)
+					.foregroundColor(pseudoHide ? pseudoClear : .secondary)
+					
 					if pseudoHide {
 						Rectangle()
 							 .fill(Color(UIColor.systemBackground))
@@ -512,55 +556,27 @@ struct MaxFeeConfiguration: View, ViewName {
 						Divider()
 							.frame(height: 2)
 					}
-					Text("max fee :")
-		
+					
+					LazyVGrid(columns: columns, spacing: 8) {
+						
+						HStack(alignment: VerticalAlignment.center, spacing: 0) {
+							Text("max fee")
+								.multilineTextAlignment(.trailing)
+							Text(verbatim: " : ")
+						}
+						Text(exampleMaxFeeString())
+						Text(verbatim: " (\(exampleMaxPercentString()))")
+						
+					} // </LazyVGrid>
+					.font(.footnote)
+					.foregroundColor(pseudoHide ? pseudoClear : .secondary)
+					
 				} // </VStack>
-				.padding(.top, 4)
-				.font(.footnote)
-				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
-				.fixedSize(horizontal: true, vertical: false)
-		
-				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
-					Text(examplePaymentAmountString()).padding(.horizontal, 8)
-					Text(exampleBaseFeeString()).padding(.horizontal, 8)
-					Text(exampleProportionalFeeString()).padding(.horizontal, 8)
-					if pseudoHide {
-						Rectangle()
-							 .fill(Color(UIColor.systemBackground))
-							 .frame(width: 1, height: 2)
-					} else {
-						Divider()
-							.frame(height: 2)
-					}
-					Text(exampleMaxFeeString()).padding(.horizontal, 8)
-			
-				} // </VStack>
-				.padding(.top, 4)
-				.font(.footnote)
-				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
-			
-				VStack(alignment: HorizontalAlignment.trailing, /*vertical-*/spacing: 8) {
-					Text(verbatim: " ")
-					Text(verbatim: " ")
-					Text(verbatim: " ")
-					if pseudoHide {
-						Rectangle()
-							 .fill(Color(UIColor.systemBackground))
-							 .frame(width: 1, height: 2)
-					} else {
-						Divider()
-							.frame(height: 2)
-					}
-					Text(verbatim: "(\(exampleMaxPercentString()))")
-			
-				} // </VStack>
-				.padding(.top, 4)
-				.padding(.trailing, 32)
-				.font(.footnote)
-				.foregroundColor(pseudoHide ? pseudoClear : .secondary)
-				.fixedSize(horizontal: true, vertical: false)
-			
-			} // </HStack>
+				.read(exampleHeightReader)
+				
+			} // </GeometryReader>
+			.assignMaxPreference(for: exampleHeightReader.key, to: $exampleHeight)
+			.frame(height: exampleHeight)
 			
 			HStack(alignment: VerticalAlignment.top, /*horizontal-*/spacing: 32) {
 				Button {
