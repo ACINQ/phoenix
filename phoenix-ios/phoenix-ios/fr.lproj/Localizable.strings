@@ -35,7 +35,7 @@
 "(you provided this address)" = "(vous avez fourni cette adresse)";
 
 /* ManualBackupView */
-"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**Ne perdez pas cette clé.** Sauvegardez la dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous ne pourrez plus accéder à vos fonds.";
+"**Do not lose this seed.** Save it somewhere safe (not on this phone). If you lose your seed and your phone, you've lost your funds." = "**Ne perdez pas cette clé.** Sauvegardez-la dans un endroit sûr (pas sur ce téléphone). Si vous perdez votre clé et votre téléphone, vous ne pourrez plus accéder à vos fonds.";
 
 /* ManualBackupView */
 "**Do not share this seed with anyone.** Beware of phishing. The developers of Phoenix will never ask for your seed." = "**Ne la donnez à personne.** Faites attention au hameçonnage. Les développeurs de Phoenix ne vous demanderont jamais votre clé.";
@@ -565,7 +565,7 @@
 "Full Screen" = "Plein écran";
 
 /* No comment provided by engineer. */
-"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "Les fonds peuvent être envoyés vers une adresse Bitcoin de votre choix. Assurez-vous que l’adresse soit correcte avant d’envoyer.";
+"Funds can be sent to a Bitcoin wallet. Make sure the address is correct before sending." = "Les fonds peuvent être envoyés vers une adresse Bitcoin de votre choix. Assurez-vous que l’adresse soit correcte avant d’effectuer l'envoi.";
 
 /* No comment provided by engineer. */
 "Funds sent" = "Fonds envoyés";
@@ -583,16 +583,16 @@
 "Get started" = "Commencer";
 
 /* No comment provided by engineer. */
-"Here you can extract and visualize application logs, as well as share them." = "Dans cet écran vous pouvez extraire et visualiser les logs de l’application, ainsi que les partager avec un tiers.";
+"Here you can extract and visualize application logs, as well as share them." = "Dans cet écran vous pouvez extraire et visualiser les logs de l’application, et les partager avec un tiers.";
 
 /* No comment provided by engineer. */
-"Host returned error response." = "L’hôte a répondu avec une erreur.";
+"Host returned error response." = "Le service a renvoyé une erreur.";
 
 /* No comment provided by engineer. */
-"Host returned status code %@:" = "L’hôte a répondu avec le statut %@ :";
+"Host returned status code %@:" = "Le service a renvoyé un statut %@ :";
 
 /* error details */
-"Host returned unreadable response:" = "L’hôte a répondu un message invalide";
+"Host returned unreadable response:" = "Le service a renvoyé un message invalide";
 
 /* No comment provided by engineer. */
 "Host: %@" = "Hôte :";
@@ -646,7 +646,7 @@
 "In order to receive this payment, a new payment channel was opened. This is not always required." = "Afin de recevoir ce paiement, un nouveau canal de paiement a été ouvert. Cela n’est pas toujours nécessaire.";
 
 /* No comment provided by engineer. */
-"Incoming payment expiry" = "Expiration des paiements entrant";
+"Incoming payment expiry" = "Expiration des requêtes de paiement";
 
 /* button label - try to make it short */
 "info" = "info";
@@ -793,13 +793,13 @@
 "Max: " = "Max :";
 
 /* No comment provided by engineer. */
-"Maximum base fee is %@." = "Les frais de base maximum sont %@.";
+"Maximum base fee is %@." = "Les frais de base sont au max %@.";
 
 /* No comment provided by engineer. */
 "Maximum fee for outgoing Lightning payments" = "Frais maximum pour les paiements Lightning sortants";
 
 /* No comment provided by engineer. */
-"Maximum proportional fee is %@." = "Les frais proportionnels maximum sont %@.";
+"Maximum proportional fee is %@." = "Les frais proportionnels sont au max %@.";
 
 /* Label in SummaryInfoGrid */
 "Message" = "Message";
@@ -899,7 +899,7 @@
 
 /* CloseChannelsView
    ForceCloseChannelsView */
-"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Des canaux de paiements sont automatiquement créés quand vous recevez des paiements. Utilisez l’écran **Recevoir** pour créér des requêtes de paiement Lightning.";
+"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Des canaux de paiements sont automatiquement créés lorsque vous recevez des paiements. Utilisez l’écran **Recevoir** pour créer des requêtes de paiement Lightning.";
 
 /* Label in DetailsView_IncomingPayment */
 "payment hash" = "hash du paiement";
@@ -908,7 +908,7 @@
 "Payment Options" = "Options des paiements";
 
 /* No comment provided by engineer. */
-"Payment options & fees" = "Options et frais des paiements";
+"Payment options & fees" = "Options et frais de paiements";
 
 /* Title in DetailsView_IncomingPayment */
 "Payment Parts" = "Parties de paiement";
@@ -932,7 +932,7 @@
 "Payment Sent" = "Paiement envoyé";
 
 /* Explanation for 'Randomize upload delays' toggle */
-"Payments are uploaded to the cloud immediately upon completion." = "Les paiements sont versés sur le cloud immédiatement après complétion.";
+"Payments are uploaded to the cloud immediately upon completion." = "Les paiements sont sauvés dans le cloud immédiatement.";
 
 /* No comment provided by engineer. */
 "Payments backup" = "Sauvegarde des paiements";
@@ -959,7 +959,7 @@
 "Phoenix generated" = "Généré par Phoenix";
 
 /* No comment provided by engineer. */
-"Phoenix will try to make the payment using the minimum fee possible." = "Les paiements seront toujours essayés en visant des frais minimaux possibles.";
+"Phoenix will try to make the payment using the minimum fee possible." = "Les paiements utilisent d'abord des frais minimaux avant d'augmenter graduellement jusqu'à ce maximum.";
 
 /* Error message in LockView */
 "Please enable Touch ID" = "Veuillez activer Touch ID";
@@ -989,10 +989,10 @@
 "Random server" = "Serveur aléatoire";
 
 /* No comment provided by engineer. */
-"Randomize upload delays" = "Décalage aléatoire du téléversement";
+"Randomize upload delays" = "Délai aléatoire dans le transfert";
 
 /* No comment provided by engineer. */
-"Randomized upload delay" = "Décalage aléatoire du téléversement";
+"Randomized upload delay" = "Délai aléatoire dans le transfert";
 
 /* button label - try to make it short
    Label in DetailsView_IncomingPayment */
@@ -1155,7 +1155,7 @@
 "Some Services Disabled" = "Certains services sont désactivés";
 
 /* No comment provided by engineer. */
-"Something is amiss with this invoice..." = "Quelque chose ne va pas dans cette requête…";
+"Something is amiss with this invoice..." = "Cette requête ne semble pas correcte…";
 
 /* No comment provided by engineer. */
 "Status" = "Statut";
@@ -1221,7 +1221,7 @@
 "This doesn't appear to be a Lightning invoice" = "Cela ne semble pas être une requête Lightning";
 
 /* ForceCloseChannelsView */
-"This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sûreté, **à n’utiliser qu’en dernier recours.** Par exemple, si votre pair (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**";
+"This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "Cette fonctionnalité n’est pas une solution miracle. Elle n’est disponible qu’en tant que mesure de sécurité, **à n’utiliser qu’en dernier recours.** Par exemple, si votre pair (ACINQ) venait à disparaître de façon permanente, vous empêchant ainsi d’accéder au réseau et de dépenser vos fonds. Dans tous les autres cas, **si vous rencontrez des difficultés à utiliser Phoenix, vous devriez plutôt contacter le support.**";
 
 /* No comment provided by engineer. */
 "This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "Ces frais s’appliquent quand vous recevez un paiement Lightning et qu’un nouveau canal doit être créé.";
@@ -1233,10 +1233,10 @@
 "This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Ces frais s’appliquent quand un nouveau canal doit être créé. Les paiements qui passent par des canaux existants ne paient pas ces frais. Ces frais sont dynamiques et peuvent changer selon les conditions du réseau Bitcoin.";
 
 /* No comment provided by engineer. */
-"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en des canaux de paiement Lightning.";
+"This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Ceci est une adresse de swap. Elle n’est pas contrôlée par votre portefeuille. Les dépôts on-chain seront convertis en canaux de paiement Lightning.";
 
 /* No comment provided by engineer. */
-"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en arrière-plan. Pour recevoir des paiements, Phoenix devra être allumé et au premier plan.";
+"This means you will not be able to receive payments when Phoenix is in the background. To receive payments, Phoenix must be open and in the foreground." = "Cela signifie que vous ne pourrez pas recevoir des paiements quand Phoenix est en arrière-plan. Pour recevoir des paiements, Phoenix devra être allumé et en premier plan.";
 
 /* No comment provided by engineer. */
 "This means you will not be notified if you receive a payment while Phoenix is in the background." = "Cela signifie que vous ne serez pas notifié si vous recevez un paiement alors que Phoenix est en arrière-plan.";
@@ -1260,7 +1260,7 @@
 "To fix this re-enable Background App Refresh via: Settings -> General -> Background App Refresh" = "Pour corriger cela, veuillez réactiver l’actualisation en arrière plan dans Réglages > Phoenix > Actualiser (arrière-plan)";
 
 /* No comment provided by engineer. */
-"To receive incoming payments, Phoenix must be running, and you must have unlocked the app once." = "Pour recevoir des paiements, Phoenix doit être démarré et vous devez avoir déjà déverrouillé l’application.";
+"To receive incoming payments, Phoenix must be running, and you must have unlocked the app once." = "Pour recevoir des paiements, Phoenix doit être démarré et déverrouillé.";
 
 /* No comment provided by engineer. */
 "To receive incoming payments, Phoenix must be running." = "Pour recevoir des paiements, Phoenix doit être démarré.";
@@ -1320,13 +1320,13 @@
 "Uploading payments" = "Téléversement des paiements";
 
 /* No comment provided by engineer. */
-"Uploading your recovery phrase to iCloud…" = "Téléversement de votre clé de sauvegarde sur iCloud…";
+"Uploading your recovery phrase to iCloud…" = "Sauvegarde de votre clé sur iCloud…";
 
 /* Explanation for 'Use cellular data' toggle */
-"Uploads can occur over cellular connections." = "Les téléversements peuvent se faire sur le réseau cellulaire";
+"Uploads can occur over cellular connections." = "Les transferts de données peuvent se faire via le réseau cellulaire";
 
 /* Explanation for 'Use cellular data' toggle */
-"Uploads will only occur over WiFi." = "Les téléversements se feront uniquement par WiFi";
+"Uploads will only occur over WiFi." = "Les transferts de données sont faits uniquement par WiFi";
 
 /* No comment provided by engineer. */
 "Use a custom server" = "Utiliser un serveur personnalisé";
@@ -1450,7 +1450,7 @@
 "Your payment history is only stored on this device." = "Votre historique de paiements ne sera stocké que sur cet appareil.";
 
 /* No comment provided by engineer. */
-"Your payment history will be stored in iCloud." = "Votre historique de paiements sera stockés dans iCloud.";
+"Your payment history will be stored in iCloud." = "Votre historique de paiements sera stocké dans iCloud.";
 
 /* No comment provided by engineer. */
 "Your recovery phrase is stored in iCloud." = "Votre clé de sauvegarde est stockée dans iCloud.";
