@@ -66,7 +66,7 @@ fun SendView(request: PaymentRequest?) {
             ) {
                 val finalAmount = amount
                 if (request != null && finalAmount != null) {
-                    postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(request, finalAmount))
+                    postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = request, amount = finalAmount, maxFees = null))
                     nc.navigate(Screen.Home)
                 }
             }

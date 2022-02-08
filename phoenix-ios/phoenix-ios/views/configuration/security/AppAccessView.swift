@@ -187,12 +187,18 @@ struct AppAccessView : View {
 						and you must have unlocked the app once.
 						"""
 					)
+					.lineLimit(nil)          // SwiftUI bugs
+					.minimumScaleFactor(0.5) // Truncating text
 					
 				} else {
 					Text("To receive incoming payments, Phoenix must be running.")
+						.lineLimit(nil)          // SwiftUI bugs
+						.minimumScaleFactor(0.5) // Truncating text
 				}
 				
 				Text("(Phoenix can be running in the background.)")
+					.lineLimit(nil)          // SwiftUI bugs
+					.minimumScaleFactor(0.5) // Truncating text
 					.foregroundColor(Color.gray)
 					.padding(.top, 2)
 			}

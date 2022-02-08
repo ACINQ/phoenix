@@ -816,15 +816,21 @@ fileprivate struct PaymentCell : View, ViewName {
 				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 
 				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
-
-				Text(verbatim: isOutgoing ? "-" : "+")
-					.foregroundColor(color)
-					.padding(.trailing, 1)
-
-				Text(amount.digits)
-					.foregroundColor(color)
+				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+				
+					Text(verbatim: isOutgoing ? "-" : "+")
+						.foregroundColor(color)
+						.padding(.trailing, 1)
 					
-				Text(verbatim: " \(amount.type)")
+					Text(verbatim: amount.digits)
+						.foregroundColor(color)
+				}
+				.environment(\.layoutDirection, .leftToRight) // issue #237
+				
+				Text(verbatim: " ") // separate for RTL languages
+					.font(.caption)
+					.foregroundColor(.gray)
+				Text(verbatim: amount.type)
 					.font(.caption)
 					.foregroundColor(.gray)
 			}

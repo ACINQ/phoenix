@@ -213,21 +213,23 @@ fileprivate struct SummaryView: View {
 					// component representing the millisatoshis.
 					// This can be a little confusing for those new to Lightning.
 					// So we're going to downplay the millisatoshis visually.
-					
-					Text(verbatim: isOutgoing ? "-" : "+")
-						.font(.largeTitle)
-						.foregroundColor(Color.secondary)
-						.onTapGesture { toggleCurrencyType() }
-					Text(verbatim: amount.integerDigits)
-						.font(.largeTitle)
-						.onTapGesture { toggleCurrencyType() }
-					Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
-						.lineLimit(1)            // SwiftUI bugs
-						.minimumScaleFactor(0.5) // Truncating text
-						.font(.title)
-						.foregroundColor(Color.secondary)
-						.onTapGesture { toggleCurrencyType() }
-						.padding(.trailing, 6)
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+						Text(verbatim: isOutgoing ? "-" : "+")
+							.font(.largeTitle)
+							.foregroundColor(Color.secondary)
+							.onTapGesture { toggleCurrencyType() }
+						Text(verbatim: amount.integerDigits)
+							.font(.largeTitle)
+							.onTapGesture { toggleCurrencyType() }
+						Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
+							.lineLimit(1)            // SwiftUI bugs
+							.minimumScaleFactor(0.5) // Truncating text
+							.font(.title)
+							.foregroundColor(Color.secondary)
+							.onTapGesture { toggleCurrencyType() }
+					}
+					.environment(\.layoutDirection, .leftToRight) // issue #237
+					.padding(.trailing, 6)
 					Text(verbatim: amount.type)
 						.font(.title3)
 						.foregroundColor(Color.appAccent)
@@ -236,14 +238,17 @@ fileprivate struct SummaryView: View {
 					
 				} else {
 					
-					Text(verbatim: isOutgoing ? "-" : "+")
-						.font(.largeTitle)
-						.foregroundColor(Color.secondary)
-						.onTapGesture { toggleCurrencyType() }
-					Text(amount.digits)
-						.font(.largeTitle)
-						.onTapGesture { toggleCurrencyType() }
-						.padding(.trailing, 6)
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+						Text(verbatim: isOutgoing ? "-" : "+")
+							.font(.largeTitle)
+							.foregroundColor(Color.secondary)
+							.onTapGesture { toggleCurrencyType() }
+						Text(amount.digits)
+							.font(.largeTitle)
+							.onTapGesture { toggleCurrencyType() }
+					}
+					.environment(\.layoutDirection, .leftToRight) // issue #237
+					.padding(.trailing, 6)
 					Text(amount.type)
 						.font(.title3)
 						.foregroundColor(Color.appAccent)
@@ -818,14 +823,14 @@ fileprivate struct DetailsView: View {
 				Button {
 					presentationMode.wrappedValue.dismiss()
 				} label: {
-					Image(systemName: "chevron.left")
+					Image(systemName: "chevron.backward")
 						.imageScale(.medium)
 				}
 				Spacer()
 				Button {
 					closeSheet()
 				} label: {
-					Image(systemName: "xmark") // must match size of chevron.left above
+					Image(systemName: "xmark") // must match size of chevron.backward above
 						.imageScale(.medium)
 				}
 			}
@@ -2160,7 +2165,7 @@ fileprivate struct EditInfoView: View, ViewName {
 					saveButtonTapped()
 				} label: {
 					HStack(alignment: .center, spacing: 4) {
-						Image(systemName: "chevron.left")
+						Image(systemName: "chevron.backward")
 							.imageScale(.medium)
 						Text("Save")
 					}

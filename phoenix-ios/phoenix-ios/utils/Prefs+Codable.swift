@@ -64,3 +64,22 @@ struct ElectrumConfigPrefs: Codable {
 		return Lightning_kmpServerAddress(host: host, port: Int32(port), tls: Lightning_kmpTcpSocketTLS.safe)
 	}
 }
+
+struct MaxFees: Codable {
+	let feeBaseSat: Int64
+	let feeProportionalMillionths: Int64
+	
+	static func fromTrampolineFees(_ fees: Lightning_kmpTrampolineFees) -> MaxFees {
+		return MaxFees(
+			feeBaseSat: fees.feeBase.sat,
+			feeProportionalMillionths: fees.feeProportional
+		)
+	}
+	
+	func toKotlin() -> PhoenixShared.MaxFees {
+		return PhoenixShared.MaxFees(
+			feeBase: Bitcoin_kmpSatoshi(sat: self.feeBaseSat),
+			feeProportionalMillionths: self.feeProportionalMillionths
+		)
+	}
+}

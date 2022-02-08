@@ -117,6 +117,7 @@ struct SendView: MVIView {
 
 			ScanView(
 				mvi: mvi,
+				toast: toast,
 				paymentRequest: $paymentRequest
 			)
 
@@ -262,14 +263,25 @@ struct SendView: MVIView {
 struct ScanView: View, ViewName {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
+	@ObservedObject var toast: Toast
 	
 	@Binding var paymentRequest: String?
+	
+	@State var clipboardHasString = UIPasteboard.general.hasStrings
+	
+	@State var showingImagePicker = false
+	@State var imagePickerSelection: UIImage? = nil
 	
 	@State var displayWarning: Bool = false
 	@State var ignoreScanner: Bool = false
 	
+	@Environment(\.colorScheme) var colorScheme: ColorScheme
 	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
 	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
+		UIApplication.willEnterForegroundNotification
+	)
 	
 	// Subtle timing bug:
 	//
@@ -326,6 +338,9 @@ struct ScanView: View, ViewName {
 				removal: .move(edge: .bottom)
 			)
 		)
+		.onReceive(willEnterForegroundPublisher) { _ in
+			willEnterForeground()
+		}
 		.onChange(of: mvi.model) { newModel in
 			modelDidChange(newModel)
 		}
@@ -348,8 +363,11 @@ struct ScanView: View, ViewName {
 			Button {
 				manualInput()
 			} label: {
-				Image(systemName: "square.and.pencil")
-				Text("Manual input")
+				Label {
+					Text("Manual input")
+				} icon: {
+					Image(systemName: "square.and.pencil")
+				}
 			}
 			.font(.title3)
 			.padding(.top, 10)
@@ -360,14 +378,43 @@ struct ScanView: View, ViewName {
 			Button {
 				pasteFromClipboard()
 			} label: {
-				Image(systemName: "arrow.right.doc.on.clipboard")
-				Text("Paste from clipboard")
+				Label {
+					Text("Paste from clipboard")
+				} icon: {
+					Image(systemName: "arrow.right.doc.on.clipboard")
+				}
 			}
 			.font(.title3)
-			.disabled(!UIPasteboard.general.hasStrings)
+			.disabled(!clipboardHasString)
+			
+			Divider()
+				.padding([.top, .bottom], 10)
+			
+			Button {
+				showingImagePicker = true
+			} label: {
+				Label {
+					Text("Choose image")
+				} icon: {
+					Image(systemName: "photo")
+				}
+			}
+			.font(.title3)
 			.padding(.bottom, 10)
+			.onChange(of: imagePickerSelection) { _ in
+				imagePickerDidChooseImage()
+			}
 		}
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
+		.sheet(isPresented: $showingImagePicker) {
+			 ImagePicker(image: $imagePickerSelection)
+		}
+	}
+	
+	func willEnterForeground() {
+		log.trace("[\(viewName)] willEnterForeground()")
+		
+		clipboardHasString = UIPasteboard.general.hasStrings
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) {
@@ -440,6 +487,49 @@ struct ScanView: View, ViewName {
 				intent: mvi.intent,
 				ignoreScanner: $ignoreScanner
 			)
+		}
+	}
+	
+	func imagePickerDidChooseImage() {
+		log.trace("[\(viewName)] imagePickerDidChooseImage()")
+		
+		guard let uiImage = imagePickerSelection else { return }
+		imagePickerSelection = nil
+		
+		if let ciImage = CIImage(image: uiImage) {
+			var options: [String: Any]
+			let context = CIContext()
+			options = [CIDetectorAccuracy: CIDetectorAccuracyHigh]
+			let qrDetector = CIDetector(ofType: CIDetectorTypeQRCode, context: context, options: options)
+			
+			if let orientation = ciImage.properties[(kCGImagePropertyOrientation as String)] {
+				options = [CIDetectorImageOrientation: orientation]
+			} else {
+				options = [CIDetectorImageOrientation: 1]
+			}
+			let features = qrDetector?.features(in: ciImage, options: options)
+			
+			var qrCodeString: String? = nil
+			if let features = features {
+				for case let row as CIQRCodeFeature in features {
+					if qrCodeString == nil {
+						qrCodeString = row.messageString
+					}
+				}
+			}
+			
+			if let qrCodeString = qrCodeString {
+				mvi.intent(Scan.Intent_Parse(request: qrCodeString))
+			} else {
+				toast.pop(
+					Text("Image doesn't contain a readable QR code.").multilineTextAlignment(.center).anyView,
+					colorScheme: colorScheme.opposite,
+					style: .chrome,
+					duration: 10.0,
+					location: .middle,
+					showCloseButton: true
+				)
+			}
 		}
 	}
 }
@@ -1700,7 +1790,8 @@ struct ValidateView: View, ViewName {
 				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
 					paymentRequest: model.paymentRequest,
-					amount: Lightning_kmpMilliSatoshi(msat: msat)
+					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					maxFees: Prefs.shared.maxFees?.toKotlin()
 				))
 			}
 			
@@ -1732,6 +1823,7 @@ struct ValidateView: View, ViewName {
 				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
 					lnurlPay: model.lnurlPay,
 					amount: Lightning_kmpMilliSatoshi(msat: msat),
+					maxFees: Prefs.shared.maxFees?.toKotlin(),
 					comment: comment
 				))
 			}

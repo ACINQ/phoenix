@@ -497,6 +497,7 @@ struct EnterSeedView: View {
 				}
 			}
 		}
+		.environment(\.layoutDirection, .leftToRight) // issue #237
 	}
 	
 	func mnemonic(_ idx: Int) -> String {

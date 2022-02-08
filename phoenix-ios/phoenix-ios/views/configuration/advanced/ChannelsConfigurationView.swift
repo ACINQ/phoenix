@@ -394,6 +394,7 @@ fileprivate struct ChannelInfoPopup: View, ViewName {
 					.font(.caption)
 					.padding()
 			}
+			.environment(\.layoutDirection, .leftToRight) // issue #237
 			.frame(height: 300)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			

@@ -34,3 +34,19 @@ extension WalletPaymentOrderRow {
 		return self.identifier
 	}
 }
+
+extension BitcoinUnit: Identifiable {
+	// BitcoinUnit is an enum in Kotlin.
+	// So `.name` is guaranteed to be unique.
+	public var id: String {
+		return self.name
+	}
+}
+
+extension FiatCurrency: Identifiable {
+	// FiatCurrency is an enum in Kotlin.
+	// So `.name` is guaranteed to be unique.
+	public var id: String {
+		return self.name
+	}
+}

@@ -88,7 +88,7 @@ struct IntroView1: View {
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Text("Next")
-					Image(systemName: "arrow.right")
+					Image(systemName: "arrow.forward")
 						.imageScale(.medium)
 				}
 				.padding([.top, .bottom], 8)
@@ -157,7 +157,7 @@ struct IntroView2: View {
 			} label: {
 				HStack(alignment: VerticalAlignment.center, spacing: 4) {
 					Text("I understand")
-					Image(systemName: "arrow.right")
+					Image(systemName: "arrow.forward")
 						.imageScale(.medium)
 				}
 				.padding([.top, .bottom], 8)

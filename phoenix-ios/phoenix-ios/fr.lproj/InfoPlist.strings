@@ -8,5 +8,5 @@
 "NSFaceIDUsageDescription" = "Authentification avec Face ID";
 
 /* Privacy - Photo Library Additions Usage Description */
-"NSPhotoLibraryAddUsageDescription" = "Phoenix souhaiterait sauvegarder l’image du QR code dans votre bibliothèque de photos.";
+"NSPhotoLibraryAddUsageDescription" = "Phoenix souhaiterait sauver l’image du QR code dans votre bibliothèque de photos.";
 

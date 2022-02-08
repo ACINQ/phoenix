@@ -314,7 +314,7 @@ struct CurrencyConverterView: View {
 		}
 		
 		// Careful: this function may be called when returning from the Receive/Send view
-		if didAppear {
+		if !didAppear {
 			didAppear = true
 			
 			UIScrollView.appearance().keyboardDismissMode = .interactive
@@ -889,28 +889,32 @@ fileprivate struct CurrencySelector: View, ViewName {
 	
 	let didSelectCurrency: (Currency) -> Void
 	
+	@State var visibleBitcoinUnits: [BitcoinUnit] = BitcoinUnit.companion.values
+	@State var visibleFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
+	
 	@State var selectedCurrency: Currency? = nil
+	@State var searchText: String = ""
 	
 	enum BitcoinTextWidth: Preference {}
 	let bitcoinTextWidthReader = GeometryPreferenceReader(
 		key: AppendValue<BitcoinTextWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var bitcoinTextWidth: CGFloat? = nil
+	@State private var bitcoinTextWidth: CGFloat? = nil
 	
 	enum FiatTextWidth: Preference {}
 	let fiatTextWidthReader = GeometryPreferenceReader(
 		key: AppendValue<FiatTextWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var fiatTextWidth: CGFloat? = nil
+	@State private var fiatTextWidth: CGFloat? = nil
 	
 	enum FlagWidth: Preference {}
 	let flagWidthReader = GeometryPreferenceReader(
 		key: AppendValue<FlagWidth>.self,
 		value: { [$0.size.width] }
 	)
-	@State var flagWidth: CGFloat? = nil
+	@State private var flagWidth: CGFloat? = nil
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -918,9 +922,6 @@ fileprivate struct CurrencySelector: View, ViewName {
 	var body: some View {
 		
 		ZStack {
-			
-			let bitcoinUnits = BitcoinUnit.companion.values
-			let fiatCurrencies = FiatCurrency.companion.values
 			
 			// We want to measure various items within the List.
 			// But we need to measure ALL of them.
@@ -931,16 +932,15 @@ fileprivate struct CurrencySelector: View, ViewName {
 			//
 			ScrollView {
 				VStack {
-					ForEach(0 ..< bitcoinUnits.count) {
-						let bitcoinUnit = bitcoinUnits[$0]
+					ForEach(BitcoinUnit.companion.values) { bitcoinUnit in
 						
 						Text(bitcoinUnit.shortName)
 							.foregroundColor(Color.clear)
 							.read(bitcoinTextWidthReader)
 							.frame(width: bitcoinTextWidth, alignment: .leading) // required, or refreshes after display
 					}
-					ForEach(0 ..< fiatCurrencies.count) {
-						let fiatCurrency = fiatCurrencies[$0]
+					
+					ForEach(FiatCurrency.companion.values) { fiatCurrency in
 
 						Text(fiatCurrency.shortName)
 							.foregroundColor(Color.clear)
@@ -958,40 +958,54 @@ fileprivate struct CurrencySelector: View, ViewName {
 				.assignMaxPreference(for: flagWidthReader.key, to: $flagWidth)
 			}
 			
-			List {
-				
-				Section(header: Text("Bitcoin")) {
-					ForEach(0 ..< bitcoinUnits.count) {
-						let bitcoinUnit = bitcoinUnits[$0]
-						Button {
-							didSelect(bitcoinUnit)
-						} label: {
-							bitcoinRow(bitcoinUnit)
-						}
-						.buttonStyle(.plain)
-						.disabled(isSelected(bitcoinUnit))
+			if #available(iOS 15.0, *) {
+				content
+					.searchable(text: $searchText)
+					.onChange(of: searchText) { _ in
+						searchTextDidChange()
 					}
-				}
-				
-				Section(header: Text("Fiat")) {
-					ForEach(0 ..< fiatCurrencies.count) {
-						let fiatCurrency = fiatCurrencies[$0]
-						Button {
-							didSelect(fiatCurrency)
-						} label: {
-							fiatRow(fiatCurrency)
-						}
-						.buttonStyle(.plain)
-						.disabled(isSelected(fiatCurrency))
-					}
-				}
+			} else {
+				content
 			}
-			.listStyle(GroupedListStyle())
 		}
 		.navigationBarTitle(
 			NSLocalizedString("Fiat currency", comment: "Navigation bar title"),
 			displayMode: .inline
 		)
+	}
+	
+	@ViewBuilder
+	var content: some View {
+		
+		List {
+			
+			Section(header: Text("Bitcoin")) {
+				ForEach(visibleBitcoinUnits) { bitcoinUnit in
+					
+					Button {
+						didSelect(bitcoinUnit)
+					} label: {
+						bitcoinRow(bitcoinUnit)
+					}
+					.buttonStyle(.plain)
+					.disabled(isSelected(bitcoinUnit))
+				}
+			}
+			
+			Section(header: Text("Fiat")) {
+				ForEach(visibleFiatCurrencies) { fiatCurrency in
+					
+					Button {
+						didSelect(fiatCurrency)
+					} label: {
+						fiatRow(fiatCurrency)
+					}
+					.buttonStyle(.plain)
+					.disabled(isSelected(fiatCurrency))
+				}
+			}
+		}
+		.listStyle(GroupedListStyle())
 	}
 	
 	@ViewBuilder
@@ -1079,6 +1093,38 @@ fileprivate struct CurrencySelector: View, ViewName {
 		selectedCurrency = currency
 		didSelectCurrency(currency)
 		popView()
+	}
+	
+	func searchTextDidChange() {
+		log.trace("[\(viewName)] searchTextDidChange(): \(searchText)")
+		
+		let allBitcoinUnits: [BitcoinUnit] = BitcoinUnit.companion.values
+		let allFiatCurrencies: [FiatCurrency] = FiatCurrency.companion.values
+		
+		let components = searchText
+			.components(separatedBy: .whitespacesAndNewlines)
+			.filter { !$0.isEmpty }
+		
+		if components.isEmpty {
+			
+			visibleBitcoinUnits = allBitcoinUnits
+			visibleFiatCurrencies = allFiatCurrencies
+			
+		} else {
+			
+			visibleBitcoinUnits = allBitcoinUnits.filter { bitcoinUnit in
+				components.allSatisfy { component in
+					bitcoinUnit.shortName.localizedCaseInsensitiveContains(component)
+				}
+			}
+			
+			visibleFiatCurrencies = allFiatCurrencies.filter { fiatCurrency in
+				components.allSatisfy { component in
+					fiatCurrency.shortName.localizedCaseInsensitiveContains(component) ||
+					fiatCurrency.longName.localizedCaseInsensitiveContains(component)
+				}
+			}
+		}
 	}
 	
 	func popView() {

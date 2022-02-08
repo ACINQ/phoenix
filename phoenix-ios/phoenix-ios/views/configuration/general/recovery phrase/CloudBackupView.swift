@@ -77,7 +77,7 @@ struct CloudBackupView: View {
 			didTapBackButton()
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Image(systemName: "chevron.left")
+				Image(systemName: "chevron.backward")
 					 .font(.title2)
 				if canSave {
 					Text("Save")
