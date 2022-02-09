@@ -30,6 +30,10 @@ actor SyncTxManager_Actor {
 	private var state: SyncTxManager_State
 	private var pendingSettings: SyncTxManager_PendingSettings? = nil
 	
+	var activeState: SyncTxManager_State {
+		return state
+	}
+	
 	init(isEnabled: Bool, recordZoneCreated: Bool, hasDownloadedRecords: Bool) {
 		self.isEnabled = isEnabled
 		if isEnabled {
@@ -43,10 +47,6 @@ actor SyncTxManager_Actor {
 		}
 		
 		state = .initializing
-	}
-	
-	var activeState: SyncTxManager_State {
-		return state
 	}
 	
 	func markDatabasesReady() -> SyncTxManager_State? {

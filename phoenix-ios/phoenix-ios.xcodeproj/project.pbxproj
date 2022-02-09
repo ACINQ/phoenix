@@ -125,6 +125,7 @@
 		DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD777D126DE9FE800979A12 /* DelayedSave.swift */; };
 		DCE1E5FA26418183005465B8 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1E5F926418183005465B8 /* Toast.swift */; };
 		DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232D27AD68CD0017CF56 /* SyncTxManager_Actor.swift */; };
+		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
 		DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEC6A1727A82A98002C20BA /* ImagePicker.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
@@ -306,6 +307,7 @@
 		DCD777D126DE9FE800979A12 /* DelayedSave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedSave.swift; sourceTree = "<group>"; };
 		DCE1E5F926418183005465B8 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		DCE7232D27AD68CD0017CF56 /* SyncTxManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager_Actor.swift; sourceTree = "<group>"; };
+		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
@@ -681,6 +683,7 @@
 			children = (
 				DCEFD921276A796800001767 /* SyncManager.swift */,
 				DCBA371A2758076F00610EC8 /* SyncSeedManager.swift */,
+				DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */,
 				DCAEF8D8275E69B000015993 /* SyncSeedManager_State.swift */,
 				DCC9D999267BD28600EA36DD /* SyncTxManager.swift */,
 				DCE7232D27AD68CD0017CF56 /* SyncTxManager_Actor.swift */,
@@ -964,6 +967,7 @@
 				DC27E4CB2791D17A00C777CC /* RecoveryPhraseView.swift in Sources */,
 				DCACF6FC2566D0BA0009B01E /* AppSecurity.swift in Sources */,
 				DC1D2B4B2593EB860036AD38 /* CurrencyUnit.swift in Sources */,
+				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				DC46BAF326CACCF700E760A6 /* KotlinExtensions.swift in Sources */,
