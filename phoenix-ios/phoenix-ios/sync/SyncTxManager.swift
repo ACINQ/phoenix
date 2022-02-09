@@ -31,41 +31,6 @@ fileprivate let record_table_name = "payments"
 fileprivate let record_column_data = "encryptedData"
 fileprivate let record_column_meta = "encryptedMeta"
 
-/// See `SyncTxManager_State.swift` for state machine diagrams
-/// 
-fileprivate struct AtomicState {
-	var needsDatabases = true
-	
-	var waitingForInternet = false
-	var waitingForCloudCredentials = false
-	
-	var isEnabled: Bool
-	var needsCreateRecordZone: Bool
-	var needsDeleteRecordZone: Bool
-	
-	var needsDownloadExisting = false
-	
-	var paymentsQueueCount: Int = 0
-	
-	var active: SyncTxManager_State
-	var pendingSettings: SyncTxManager_PendingSettings? = nil
-	
-	init(isEnabled: Bool, recordZoneCreated: Bool, hasDownloadedRecords: Bool) {
-		self.isEnabled = isEnabled
-		if isEnabled {
-			needsCreateRecordZone = !recordZoneCreated
-			needsDownloadExisting = !hasDownloadedRecords
-			needsDeleteRecordZone = false
-		} else {
-			needsCreateRecordZone = false
-			needsDownloadExisting = false
-			needsDeleteRecordZone = recordZoneCreated
-		}
-		
-		active = .initializing
-	}
-}
-
 fileprivate struct DownloadedItem {
 	let record: CKRecord
 	let unpaddedSize: Int
@@ -129,8 +94,9 @@ class SyncTxManager {
 	/// 
 	public let pendingSettingsPublisher = CurrentValueSubject<SyncTxManager_PendingSettings?, Never>(nil)
 	
-	private let queue = DispatchQueue(label: "SyncTxManager")
-	private var state: AtomicState // must be read/modified within queue
+	/// Implements the state machine in a thread-safe actor.
+	/// 
+	private let actor: SyncTxManager_Actor
 	
 	private var consecutiveErrorCount = 0
 	private var consecutivePartialFailures: [WalletPaymentId: ConsecutivePartialFailure] = [:]
@@ -146,12 +112,12 @@ class SyncTxManager {
 		self.cloudKey = SymmetricKey(data: cloudKey.toByteArray().toSwiftData())
 		self.encryptedNodeId = encryptedNodeId
 		
-		self.state = AtomicState(
+		self.actor = SyncTxManager_Actor(
 			isEnabled: Prefs.shared.backupTransactions_isEnabled,
 			recordZoneCreated: Prefs.shared.recordZoneCreated(encryptedNodeId: encryptedNodeId),
 			hasDownloadedRecords: Prefs.shared.hasDownloadedRecords(encryptedNodeId: encryptedNodeId)
 		)
-		statePublisher = CurrentValueSubject<SyncTxManager_State, Never>(state.active)
+		statePublisher = CurrentValueSubject<SyncTxManager_State, Never>(.initializing)
 		
 		waitForDatabases()
 	}
@@ -173,29 +139,23 @@ class SyncTxManager {
 		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
 			log.debug("fetchQueueCountPublisher().sink(): count = \(queueCount)")
 			
+			guard let self = self else {
+				return
+			}
+			
 			let count = Int(clamping: queueCount)
 			
-			var delay: TimeInterval? = nil
+			let wait: SyncTxManager_State_Waiting?
 			if Prefs.shared.backupTransactions_useUploadDelay {
-				delay = TimeInterval.random(in: 10 ..< 900)
+				let delay = TimeInterval.random(in: 10 ..< 900)
+				wait = SyncTxManager_State_Waiting(kind: .randomizedUploadDelay, parent: self, delay: delay)
+			} else {
+				wait = nil
 			}
-				
-			self?.updateState { state, deferToSimplifiedStateFlow in
-				state.paymentsQueueCount = count
-				if count > 0 {
-					switch state.active {
-						case .uploading(let details):
-							details.setTotalCount(count)
-						case .synced:
-							if let delay = delay {
-								log.debug("state.active = waiting(randomizedUploadDelay)")
-								state.active = .waiting_randomizedUploadDelay(self!, delay: delay)
-							} else {
-								deferToSimplifiedStateFlow = true
-							}
-				
-						default: break
-					}
+			
+			Task {
+				if let newState = await self.actor.queueCountChanged(count, wait: wait) {
+					self.handleNewState(newState)
 				}
 			}
 
@@ -208,11 +168,11 @@ class SyncTxManager {
 		var isFirstFire = true
 		Prefs.shared.backupTransactions_isEnabledPublisher.sink {[weak self](shouldEnable: Bool) in
 			
-			guard let self = self else {
-				return
-			}
 			if isFirstFire {
 				isFirstFire = false
+				return
+			}
+			guard let self = self else {
 				return
 			}
 			
@@ -223,32 +183,11 @@ class SyncTxManager {
 				SyncTxManager_PendingSettings(self, enableSyncing: delay)
 			:	SyncTxManager_PendingSettings(self, disableSyncing: delay)
 			
-			var publishMe: SyncTxManager_PendingSettings? = pendingSettings
-			self.updateState { state, _ in
-				
-				if shouldEnable {
-					if !state.isEnabled {
-						log.debug("state.pendingSettings = \(pendingSettings))")
-						state.pendingSettings = pendingSettings
-					} else {
-						log.debug("state.pendingSettings = nil (already enabled)")
-						state.pendingSettings = nil
-						publishMe = nil
-					}
-					
-				} else /* if !shouldEnable */ {
-					if state.isEnabled {
-						log.debug("state.pendingSettings = \(pendingSettings))")
-						state.pendingSettings = pendingSettings
-					} else {
-						log.debug("state.pendingSettings = nil (already disabled)")
-						state.pendingSettings = nil
-						publishMe = nil
-					}
+			Task {
+				if await self.actor.enqueuePendingSettings(pendingSettings) {
+					self.publishPendingSettings(pendingSettings)
 				}
 			}
-			
-			self.publishPendingSettings(publishMe)
 			
 		}.store(in: &cancellables)
 	}
@@ -289,202 +228,63 @@ class SyncTxManager {
 	// MARK: State Machine
 	// ----------------------------------------
 	
-	func updateState(pending: SyncTxManager_PendingSettings, approved: Bool) {
-		log.trace("updateState(pending: approved: \(approved ? "true" : "false"))")
-	
-		var shouldPublish = false
+	func dequeuePendingSettings(_ pending: SyncTxManager_PendingSettings, approved: Bool) {
+		log.trace("dequeuePendingSettings(_, approved: \(approved ? "true" : "false"))")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			if state.pendingSettings != pending {
-				// Current state doesn't match parameter.
-				// So we ignore the function call.
-				return
+		Task {
+			let (accepted, newState) = await self.actor.dequeuePendingSettings(pending, approved: approved)
+			if accepted {
+				self.publishPendingSettings(nil)
+				if !approved {
+					if pending.paymentSyncing == .willEnable {
+						// We were going to enable cloud syncing.
+						// But the user just changed their mind, and cancelled it.
+						// So now we need to disable it again.
+						Prefs.shared.backupTransactions_isEnabled = false
+					} else {
+						// We were going to disable cloud syncing.
+						// But the user just changed their mind, and cancelled it.
+						// So now we need to enable it again.
+						Prefs.shared.backupTransactions_isEnabled = true
+					}
+				}
 			}
-			
-			state.pendingSettings = nil
-			shouldPublish = true
-			
-			if approved {
-				if pending.paymentSyncing == .willEnable {
-					
-					if !state.isEnabled {
-					
-						log.debug("Transitioning to enabled state")
-						
-						state.isEnabled = true
-						state.needsCreateRecordZone = true
-						state.needsDownloadExisting = true
-						state.needsDeleteRecordZone = false
-						
-						switch state.active {
-							case .updatingCloud(let details):
-								switch details.kind {
-									case .deletingRecordZone:
-										details.cancel()
-									default: break
-								}
-							case .disabled:
-								deferToSimplifiedStateFlow = true // defer to updateState()
-							default: break
-						}
-						
-					} else {
-						
-						log.debug("Reqeust to transition to enabled state, but already enabled")
-					}
-					
-					// Transitioning to enabled state
-					
-					
-				} else /* if pending.paymentSyncing == .willDisable */ {
-					
-					if state.isEnabled {
-					
-						log.debug("Transitioning to disabled state")
-						
-						state.isEnabled = false
-						state.needsCreateRecordZone = false
-						state.needsDownloadExisting = false
-						state.needsDeleteRecordZone = true
-						
-						switch state.active {
-							case .updatingCloud(let details):
-								switch details.kind {
-									case .creatingRecordZone:
-										details.cancel()
-									default: break
-								}
-							case .downloading(let progress):
-								progress.cancel()
-							case .uploading(let progress):
-								progress.cancel()
-							case .waiting(let details):
-								// Careful: calling `details.skip` within `queue.sync` will cause deadlock.
-								DispatchQueue.global(qos: .default).async {
-									details.skip()
-								}
-							case .synced:
-								deferToSimplifiedStateFlow = true // defer to updateState()
-							default: break
-						}
-						
-					} else {
-						
-						log.debug("Request to transition to disabled state, but already disabled")
-					}
-				}
-			} // </if approved>
-			
-		} // </updateState>
-		
-		if shouldPublish {
-			publishPendingSettings(nil)
-			if !approved {
-				if pending.paymentSyncing == .willEnable {
-					// We were going to enable cloud syncing.
-					// But the user just changed their mind, and cancelled it.
-					// So now we need to disable it again.
-					Prefs.shared.backupTransactions_isEnabled = false
-				} else {
-					// We were going to disable cloud syncing.
-					// But the user just changed their mind, and cancelled it.
-					// So now we need to enable it again.
-					Prefs.shared.backupTransactions_isEnabled = true
-				}
+			if let newState = newState {
+				self.handleNewState(newState)
 			}
 		}
 	}
 	
-	func updateState(finishing waiting: SyncTxManager_State_Waiting) {
-		log.trace("updateState(finishing waiting)")
+	func finishWaiting(_ waiting: SyncTxManager_State_Waiting) {
+		log.trace("finishWaiting()")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			guard case .waiting(let details) = state.active, details == waiting else {
-				// Current state doesn't match parameter.
-				// So we ignore the function call.
-				return
-			}
-			
-			switch details.kind {
-				case .exponentialBackoff:
-					deferToSimplifiedStateFlow = true // defer to updateState()
-				case .randomizedUploadDelay:
-					deferToSimplifiedStateFlow = true // defer to updateState()
-				default:
-					break
+		Task {
+			if let newState = await self.actor.finishWaiting(waiting) {
+				self.handleNewState(newState)
 			}
 		}
 	}
 	
-	private func updateState(_ modifyStateBlock: (inout AtomicState, inout Bool) -> Void) {
+	private func handleNewState(_ newState: SyncTxManager_State) {
 		
-		var changedState: SyncTxManager_State? = nil
-		queue.sync {
-			let prvActive = state.active
-			var deferToSimplifiedStateFlow = false
-			modifyStateBlock(&state, &deferToSimplifiedStateFlow)
-			
-			if deferToSimplifiedStateFlow {
-				// State management deferred to this function.
-				// Executing simplified state flow.
-				
-				if state.waitingForInternet {
-					state.active = .waiting_forInternet()
-				} else if state.waitingForCloudCredentials {
-					state.active = .waiting_forCloudCredentials()
-				} else if state.isEnabled {
-					if state.needsCreateRecordZone {
-						state.active = .updatingCloud_creatingRecordZone()
-					} else if state.needsDownloadExisting {
-						state.active = .downloading(details: SyncTxManager_State_Progress(
-							totalCount: 0
-						))
-					} else if state.paymentsQueueCount > 0 {
-						state.active = .uploading(details: SyncTxManager_State_Progress(
-							totalCount: state.paymentsQueueCount
-						))
-					} else {
-						state.active = .synced
-					}
-				} else {
-					if state.needsDeleteRecordZone {
-						state.active = .updatingCloud_deletingRecordZone()
-					} else {
-						state.active = .disabled
-					}
+		log.debug("state = \(newState)")
+		switch newState {
+			case .updatingCloud(let details):
+				switch details.kind {
+					case .creatingRecordZone:
+						createRecordZone(details)
+					case .deletingRecordZone:
+						deleteRecordZone(details)
 				}
-			
-			} // </simplified_state_flow>
-			
-			if prvActive != state.active {
-				changedState = state.active
-			}
-		
-		} // </queue.sync>
-		
-		if let newState = changedState {
-			log.debug("state.active = \(newState)")
-			switch newState {
-				case .updatingCloud(let details):
-					switch details.kind {
-						case .creatingRecordZone:
-							createRecordZone(details)
-						case .deletingRecordZone:
-							deleteRecordZone(details)
-					}
-				case .downloading(let progress):
-					downloadPayments(progress)
-					break
-				case .uploading(let progress):
-					uploadPayments(progress)
-				default:
-					break
-			}
-			
-			publishNewState(newState)
+			case .downloading(let progress):
+				downloadPayments(progress)
+			case .uploading(let progress):
+				uploadPayments(progress)
+			default:
+				break
 		}
+		
+		publishNewState(newState)
 	}
 	
 	// ----------------------------------------
@@ -502,17 +302,14 @@ class SyncTxManager {
 			log.trace("waitForDatabases(): finish()")
 			
 			cancellables.removeAll()
-			self.updateState { state, deferToSimplifiedStateFlow in
-				state.needsDatabases = false
-				
-				switch state.active {
-					case .initializing:
-						deferToSimplifiedStateFlow = true
-					default: break
+			Task {
+				if let newState = await self.actor.markDatabasesReady() {
+					self.handleNewState(newState)
 				}
+				
+				self.startQueueCountMonitor()
+				self.startPreferencesMonitor()
 			}
-			self.startQueueCountMonitor()
-			self.startPreferencesMonitor()
 		}
 		
 		// Kotlin will crash if we try to use multiple threads (like a real app)
@@ -542,29 +339,9 @@ class SyncTxManager {
 	func networkStatusChanged(hasInternet: Bool) {
 		log.trace("networkStatusChanged(hasInternet: \(hasInternet)")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			if hasInternet {
-				state.waitingForInternet = false
-				
-				switch state.active {
-					case .waiting(let details):
-						switch details.kind {
-							case .forInternet:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-					default: break
-				}
-				
-			} else {
-				state.waitingForInternet = true
-				
-				switch state.active {
-					case .synced:
-						deferToSimplifiedStateFlow = true
-					default: break
-				}
+		Task {
+			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
+				self.handleNewState(newState)
 			}
 		}
 	}
@@ -574,29 +351,9 @@ class SyncTxManager {
 	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
 		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			if hasCloudCredentials {
-				state.waitingForCloudCredentials = false
-				
-				switch state.active {
-					case .waiting(let details):
-						switch details.kind {
-							case .forCloudCredentials:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-					default: break
-				}
-				
-			} else {
-				state.waitingForCloudCredentials = true
-				
-				switch state.active {
-					case .synced:
-						deferToSimplifiedStateFlow = true
-					default: break
-				}
+		Task {
+			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
+				self.handleNewState(newState)
 			}
 		}
 	}
@@ -616,16 +373,9 @@ class SyncTxManager {
 				
 				Prefs.shared.setRecordZoneCreated(true, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					state.needsCreateRecordZone = false
-					switch state.active {
-					case .updatingCloud(let details):
-						switch details.kind {
-							case .creatingRecordZone:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-						default: break
+				Task {
+					if let newState = await self.actor.didCreateRecordZone() {
+						self.handleNewState(newState)
 					}
 				}
 				
@@ -680,16 +430,9 @@ class SyncTxManager {
 				
 				Prefs.shared.setRecordZoneCreated(false, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					state.needsDeleteRecordZone = false
-					switch state.active {
-						case .updatingCloud(let details):
-							switch details.kind {
-								case .deletingRecordZone:
-									deferToSimplifiedStateFlow = true
-								default: break
-							}
-						default: break
+				Task {
+					if let newState = await self.actor.didDeleteRecordZone() {
+						self.handleNewState(newState)
 					}
 				}
 				
@@ -776,14 +519,9 @@ class SyncTxManager {
 				
 				Prefs.shared.setHasDownloadedRecords(true, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					state.needsDownloadExisting = false
-					
-					switch state.active {
-						case .downloading:
-							deferToSimplifiedStateFlow = true
-						default:
-							break
+				Task {
+					if let newState = await self.actor.didDownloadPayments() {
+						self.handleNewState(newState)
 					}
 				}
 				
@@ -1125,16 +863,9 @@ class SyncTxManager {
 				log.trace("uploadPayments(): finish(): success")
 				
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					switch state.active {
-						case .uploading:
-							if state.paymentsQueueCount == 0 {
-								state.active = .synced
-							} else {
-								deferToSimplifiedStateFlow = true
-							}
-						default:
-							break
+				Task {
+					if let newState = await self.actor.didUploadPayments() {
+						self.handleNewState(newState)
 					}
 				}
 				
@@ -2020,42 +1751,27 @@ class SyncTxManager {
 			useExponentialBackoff = true
 		}
 		
-		var delay = 0.0
+		let wait: SyncTxManager_State_Waiting?
 		if useExponentialBackoff {
 			self.consecutiveErrorCount += 1
-			delay = self.exponentialBackoff()
-		
-			if let minDelay = minDelay {
-				if delay < minDelay {
-					delay = minDelay
-				}
+			var delay = self.exponentialBackoff()
+			if let minDelay = minDelay, delay < minDelay {
+				delay = minDelay
 			}
+			wait = SyncTxManager_State_Waiting(kind: .exponentialBackoff(error), parent: self, delay: delay)
+		} else {
+			wait = nil
 		}
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			if isNotAuthenticated {
-				state.waitingForCloudCredentials = true
+		Task { [isNotAuthenticated, isZoneNotFound] in
+			if let newState = await self.actor.handleError(
+				isNotAuthenticated: isNotAuthenticated,
+				isZoneNotFound: isZoneNotFound,
+				wait: wait
+			) {
+				self.handleNewState(newState)
 			}
-			if isZoneNotFound {
-				state.needsCreateRecordZone = true
-			}
-			
-			switch state.active {
-				case .updatingCloud: fallthrough
-				case .downloading: fallthrough
-				case .uploading:
-					
-					if useExponentialBackoff {
-						state.active = .waiting_exponentialBackoff(self, delay: delay, error: error)
-					} else {
-						deferToSimplifiedStateFlow = true
-					}
-					
-				default:
-					break
-			}
-		} // </updateState>
+		}
 		
 		if isNotAuthenticated {
 			DispatchQueue.main.async {

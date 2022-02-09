@@ -67,7 +67,7 @@ class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
 		log.trace("approve()")
 		
 		if let parent = parent {
-			parent.updateState(pending: self, approved: true)
+			parent.dequeuePendingSettings(self, approved: true)
 		}
 	}
 	
@@ -75,7 +75,7 @@ class SyncTxManager_PendingSettings: Equatable, CustomStringConvertible {
 		log.trace("cancel()")
 		
 		if let parent = parent {
-			parent.updateState(pending: self, approved: false)
+			parent.dequeuePendingSettings(self, approved: false)
 		}
 	}
 	
