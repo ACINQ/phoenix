@@ -53,6 +53,8 @@ fileprivate struct SummaryView: View {
 	@State var explainFeesPopoverVisible = false
 	@State var explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: 200, height:500)
 	
+	@State var showDeletePaymentConfirmationDialog = false
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	enum ButtonWidth: Preference {}
@@ -273,34 +275,108 @@ fileprivate struct SummaryView: View {
 				explainFeesPopoverVisible: $explainFeesPopoverVisible
 			)
 			
-			HStack(alignment: VerticalAlignment.center, spacing: 16) {
-			
-				NavigationLink(destination: DetailsView(
-					paymentInfo: $paymentInfo,
-					closeSheet: closeSheet
-				)) {
-					Text("Details")
-						.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
-						.read(buttonWidthReader)
-						.read(buttonHeightReader)
+			if #available(iOS 15.0, *) {
+				if payment.state() == WalletPaymentState.failure {
+					buttonList_withDeleteOption
+				} else {
+					buttonList
 				}
-				
-				Divider()
-					.frame(height: buttonHeight)
-				
-				NavigationLink(destination: EditInfoView(
-					paymentInfo: $paymentInfo
-				)) {
-					Text("Edit")
-						.frame(minWidth: buttonWidth, alignment: Alignment.leading)
-						.read(buttonWidthReader)
-						.read(buttonHeightReader)
+			} else {
+				buttonList
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var buttonList: some View {
+		
+		// Details | Edit
+		//         ^
+		//         And we want this line to be perfectly centered in the view.
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 16) {
+		
+			NavigationLink(destination: DetailsView(
+				paymentInfo: $paymentInfo,
+				closeSheet: closeSheet
+			)) {
+				Text("Details")
+					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+					.read(buttonWidthReader)
+					.read(buttonHeightReader)
+			}
+			
+			Divider()
+				.frame(height: buttonHeight)
+			
+			NavigationLink(destination: EditInfoView(
+				paymentInfo: $paymentInfo
+			)) {
+				Text("Edit")
+					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+					.read(buttonWidthReader)
+					.read(buttonHeightReader)
+			}
+		}
+		.padding([.top, .bottom])
+		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
+		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
+	}
+	
+	@ViewBuilder
+	@available(iOS 15.0, *)
+	var buttonList_withDeleteOption: some View {
+		
+		// Details | Edit | Delete
+		
+		HStack(alignment: VerticalAlignment.center, spacing: 16) {
+			
+			NavigationLink(destination: DetailsView(
+				paymentInfo: $paymentInfo,
+				closeSheet: closeSheet
+			)) {
+				Text("Details")
+					.frame(minWidth: buttonWidth, alignment: Alignment.trailing)
+					.read(buttonWidthReader)
+					.read(buttonHeightReader)
+			}
+			
+			Divider()
+				.frame(height: buttonHeight)
+			
+			NavigationLink(destination: EditInfoView(
+				paymentInfo: $paymentInfo
+			)) {
+				Text("Edit")
+					.frame(minWidth: buttonWidth, alignment: Alignment.center)
+					.read(buttonWidthReader)
+					.read(buttonHeightReader)
+			}
+			
+			Divider()
+				.frame(height: buttonHeight)
+			
+			Button {
+				showDeletePaymentConfirmationDialog = true
+			} label: {
+				Text("Delete")
+					.foregroundColor(.appNegative)
+					.frame(minWidth: buttonWidth, alignment: Alignment.leading)
+					.read(buttonWidthReader)
+					.read(buttonHeightReader)
+			}
+			.confirmationDialog("Delete payment?",
+				isPresented: $showDeletePaymentConfirmationDialog,
+				titleVisibility: Visibility.hidden
+			) {
+				Button("Delete payment", role: ButtonRole.destructive) {
+					deletePayment()
 				}
 			}
-			.padding([.top, .bottom])
-			.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
-			.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 		}
+		.padding([.top, .bottom])
+		.assignMaxPreference(for: buttonWidthReader.key, to: $buttonWidth)
+		.assignMaxPreference(for: buttonHeightReader.key, to: $buttonHeight)
 	}
 	
 	func toggleCurrencyType() -> Void {
@@ -313,7 +389,7 @@ fileprivate struct SummaryView: View {
 		return feesInfo?.1 ?? ""
 	}
 	
-	func onAppear() -> Void {
+	func onAppear() {
 		log.trace("onAppear()")
 		
 		// Update text in explainFeesPopover
@@ -333,6 +409,23 @@ fileprivate struct SummaryView: View {
 				explainFeesText = explainFeesPopoverText()
 			}
 		}
+	}
+	
+	func deletePayment() {
+		log.trace("deletePayment()")
+		
+		let business = AppDelegate.get().business
+		business.databaseManager.paymentsDb { paymentsDb, _ in
+			
+			paymentsDb?.deletePayment(paymentId: paymentInfo.id(), completionHandler: { _, error in
+				
+				if let error = error {
+					log.error("Error deleting payment: \(String(describing: error))")
+				}
+			})
+		}
+		
+		closeSheet()
 	}
 }
 
