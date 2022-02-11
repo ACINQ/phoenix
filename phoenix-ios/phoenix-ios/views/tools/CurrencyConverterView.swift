@@ -25,11 +25,15 @@ enum LastUpdated {
 
 struct CurrencyConverterView: View {
 	
+	let initialAmount: CurrencyAmount?
+	let amountDidChange: ((CurrencyAmount?) -> Void)?
+	
 	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
-	@State var editingCurrency: Currency? = nil
+	
 	@State var currencySelectorOpen = false
+	@State var replacingCurrency: Currency? = nil
 	
 	@State var didAppear = false
 	@State var isRefreshingExchangeRates = false
@@ -57,6 +61,20 @@ struct CurrencyConverterView: View {
 	@Environment(\.colorScheme) var colorScheme
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	init() {
+		self.initialAmount = nil
+		self.amountDidChange = nil
+	}
+	
+	init(initialAmount: CurrencyAmount?, amountDidChange: @escaping (CurrencyAmount?) -> Void) {
+		self.initialAmount = initialAmount
+		self.amountDidChange = amountDidChange
+	}
+	
+	// --------------------------------------------------
+	// MARK: ViewBuilders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -64,7 +82,7 @@ struct CurrencyConverterView: View {
 			
 			NavigationLink(destination: CurrencySelector(
 					selectedCurrencies: $currencies,
-					editingCurrency: $editingCurrency,
+					replacingCurrency: $replacingCurrency,
 					didSelectCurrency: didSelectCurrency
 				),
 				isActive: $currencySelectorOpen
@@ -123,6 +141,9 @@ struct CurrencyConverterView: View {
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
+		.onChange(of: parsedRow) { _ in
+			parsedRowDidChange()
+		}
 		.onReceive(refreshingExchangeRatesPublisher) {
 			refreshingExchangeRatesChanged($0)
 		}
@@ -166,7 +187,7 @@ struct CurrencyConverterView: View {
 	@available(iOS 15.0, *)
 	func currencyRows() -> some View {
 		
-		ForEach(currencies, id: \.identifiable) { currency in
+		ForEach(currencies) { currency in
 			Row(
 				currency: currency,
 				parsedRow: $parsedRow,
@@ -202,7 +223,7 @@ struct CurrencyConverterView: View {
 	@ViewBuilder
 	func currencyRows_iOS14() -> some View {
 		
-		ForEach(currencies, id: \.identifiable) { currency in
+		ForEach(currencies) { currency in
 			
 			Row_iOS14(
 				currency: currency,
@@ -285,6 +306,10 @@ struct CurrencyConverterView: View {
 		)
 	}
 	
+	// --------------------------------------------------
+	// MARK: UI Content Helpers
+	// --------------------------------------------------
+	
 	func lastUpdatedText() -> String {
 		
 		switch currenciesLastUpdated() {
@@ -303,6 +328,10 @@ struct CurrencyConverterView: View {
 			}
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	private func onAppear() {
 		log.trace("onAppear()")
@@ -326,7 +355,18 @@ struct CurrencyConverterView: View {
 			if currencies.isEmpty {
 				currencies = defaultCurrencies()
 			}
-			parsedRow = ParsedRow(currency: Currency.bitcoin(.btc), parsedAmount: Result.success(1.0))
+			
+			if let initialAmount = initialAmount {
+				parsedRow = ParsedRow(
+					currency: initialAmount.currency,
+					parsedAmount: Result.success(initialAmount.amount)
+				)
+			} else {
+				parsedRow = ParsedRow(
+					currency: Currency.bitcoin(.btc),
+					parsedAmount: Result.success(1.0)
+				)
+			}
 		}
 	}
 	
@@ -356,6 +396,24 @@ struct CurrencyConverterView: View {
 			Prefs.shared.currencyConverterList = []
 		} else {
 			Prefs.shared.currencyConverterList = currencies
+		}
+	}
+	
+	private func parsedRowDidChange() {
+		log.trace("parsedRowDidChange()")
+		
+		guard
+			let parsedRow = parsedRow,
+			let amountDidChange = amountDidChange
+		else {
+			return
+		}
+
+		switch parsedRow.parsedAmount {
+		case .success(let amount):
+			amountDidChange(CurrencyAmount(currency: parsedRow.currency, amount: amount))
+		case .failure(_):
+			amountDidChange(initialAmount)
 		}
 	}
 	
@@ -463,14 +521,14 @@ struct CurrencyConverterView: View {
 	private func editRow(_ currency: Currency) {
 		log.trace("editRow()")
 		
-		editingCurrency = currency
+		replacingCurrency = currency
 		currencySelectorOpen = true
 	}
 	
 	private func addRow() {
 		log.trace("addRow()")
 		
-		editingCurrency = nil
+		replacingCurrency = nil
 		currencySelectorOpen = true
 	}
 	
@@ -486,10 +544,10 @@ struct CurrencyConverterView: View {
 	private func didSelectCurrency(_ newCurrency: Currency) {
 		log.trace("didSelectCurrency(\(newCurrency))")
 		
-		if let oldCurrency = editingCurrency {
+		if let replaceMe = replacingCurrency {
 			log.debug("replacing currency...")
 			
-			if let idx = currencies.firstIndex(where: { $0 == oldCurrency }) {
+			if let idx = currencies.firstIndex(where: { $0 == replaceMe }) {
 				currencies[idx] = newCurrency
 			}
 			
@@ -885,7 +943,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 fileprivate struct CurrencySelector: View, ViewName {
 	
 	@Binding var selectedCurrencies: [Currency]
-	@Binding var editingCurrency: Currency?
+	@Binding var replacingCurrency: Currency?
 	
 	let didSelectCurrency: (Currency) -> Void
 	
@@ -1072,7 +1130,7 @@ fileprivate struct CurrencySelector: View, ViewName {
 		
 		if currency == selectedCurrency {
 			return true
-		} else if currency == editingCurrency {
+		} else if currency == replacingCurrency {
 			return false
 		} else {
 			return selectedCurrencies.contains(currency)
