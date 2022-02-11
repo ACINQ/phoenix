@@ -63,6 +63,15 @@
 		DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */; };
 		DC27E4D1279753EC00C777CC /* TextFieldNumberParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27E4D0279753EC00C777CC /* TextFieldNumberParser.swift */; };
 		DC2CFA93273C7874007AACB9 /* Currencies.strings in Resources */ = {isa = PBXBuildFile; fileRef = DC2CFA91273C7874007AACB9 /* Currencies.strings */; };
+		DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431327B6972C0006FCC4 /* SwapInView.swift */; };
+		DC2F431627B6983B0006FCC4 /* CopyOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431527B6983B0006FCC4 /* CopyOptionsSheet.swift */; };
+		DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431727B698E20006FCC4 /* ShareOptionsSheet.swift */; };
+		DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */; };
+		DC2F431C27B69BB20006FCC4 /* ReceiveLightningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431B27B69BB20006FCC4 /* ReceiveLightningView.swift */; };
+		DC2F431E27B69DD30006FCC4 /* NotificationsDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431D27B69DD30006FCC4 /* NotificationsDisabledPopover.swift */; };
+		DC2F432027B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F431F27B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift */; };
+		DC2F432227B69FAA0006FCC4 /* SwapInDisabledPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */; };
+		DC2F432427B6A0240006FCC4 /* RequestPushPermissionPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */; };
 		DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC33369726BAF721000E3F49 /* ShortSheet.swift */; };
 		DC34399F276CEFB600CAA73A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF84242A565B00829871 /* Assets.xcassets */; };
 		DC384D7F265BF36600131772 /* StyledString.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC384D7E265BF36600131772 /* StyledString.swift */; };
@@ -256,6 +265,15 @@
 		DC27E4CE2792079500C777CC /* CenterTopLineAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterTopLineAlignment.swift; sourceTree = "<group>"; };
 		DC27E4D0279753EC00C777CC /* TextFieldNumberParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldNumberParser.swift; sourceTree = "<group>"; };
 		DC2CFA92273C7874007AACB9 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Currencies.strings; sourceTree = "<group>"; };
+		DC2F431327B6972C0006FCC4 /* SwapInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInView.swift; sourceTree = "<group>"; };
+		DC2F431527B6983B0006FCC4 /* CopyOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyOptionsSheet.swift; sourceTree = "<group>"; };
+		DC2F431727B698E20006FCC4 /* ShareOptionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareOptionsSheet.swift; sourceTree = "<group>"; };
+		DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifyInvoiceSheet.swift; sourceTree = "<group>"; };
+		DC2F431B27B69BB20006FCC4 /* ReceiveLightningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveLightningView.swift; sourceTree = "<group>"; };
+		DC2F431D27B69DD30006FCC4 /* NotificationsDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsDisabledPopover.swift; sourceTree = "<group>"; };
+		DC2F431F27B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAppRefreshDisabledPopover.swift; sourceTree = "<group>"; };
+		DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwapInDisabledPopover.swift; sourceTree = "<group>"; };
+		DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestPushPermissionPopover.swift; sourceTree = "<group>"; };
 		DC33369726BAF721000E3F49 /* ShortSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortSheet.swift; sourceTree = "<group>"; };
 		DC384D7C265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/about.html; sourceTree = "<group>"; };
 		DC384D7D265BE41900131772 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = fr; path = fr.lproj/advancedSecurity.html; sourceTree = "<group>"; };
@@ -439,8 +457,8 @@
 			children = (
 				DCACF70D256701870009B01E /* LockView.swift */,
 				53BEFE171C182513A5762686 /* HomeView.swift */,
-				53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */,
 				53BEF4DAE061532668494988 /* PaymentView.swift */,
+				DC2F431227B696A40006FCC4 /* receive */,
 				DC118BF627B44E4C0080BBAC /* send */,
 				DC71E7312728643C0063613D /* tools */,
 				DCFA8757260E6DFF00AE8953 /* onboarding */,
@@ -586,6 +604,23 @@
 				DC27E4CA2791D17A00C777CC /* CloudBackupView.swift */,
 			);
 			path = "recovery phrase";
+			sourceTree = "<group>";
+		};
+		DC2F431227B696A40006FCC4 /* receive */ = {
+			isa = PBXGroup;
+			children = (
+				53BEFBC93C11EF306B9EB33A /* ReceiveView.swift */,
+				DC2F431327B6972C0006FCC4 /* SwapInView.swift */,
+				DC2F431B27B69BB20006FCC4 /* ReceiveLightningView.swift */,
+				DC2F431527B6983B0006FCC4 /* CopyOptionsSheet.swift */,
+				DC2F431727B698E20006FCC4 /* ShareOptionsSheet.swift */,
+				DC2F431927B699800006FCC4 /* ModifyInvoiceSheet.swift */,
+				DC2F432327B6A0240006FCC4 /* RequestPushPermissionPopover.swift */,
+				DC2F431D27B69DD30006FCC4 /* NotificationsDisabledPopover.swift */,
+				DC2F431F27B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift */,
+				DC2F432127B69FAA0006FCC4 /* SwapInDisabledPopover.swift */,
+			);
+			path = receive;
 			sourceTree = "<group>";
 		};
 		DC46BAEC26CACCF700E760A6 /* kotlin */ = {
@@ -982,6 +1017,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC09085825B5E43900A46136 /* String+VersionComparison.swift in Sources */,
+				DC2F431627B6983B0006FCC4 /* CopyOptionsSheet.swift in Sources */,
 				DCACF6FE2566D0BA0009B01E /* GenericPasswordConvertible.swift in Sources */,
 				DC33369826BAF721000E3F49 /* ShortSheet.swift in Sources */,
 				DC99E90925B78FA800FB20F7 /* EnabledSecurity.swift in Sources */,
@@ -1000,6 +1036,7 @@
 				DCB876322735AAB500657570 /* Prefs+Codable.swift in Sources */,
 				DCD777D226DE9FE800979A12 /* DelayedSave.swift in Sources */,
 				DCACF70E256701870009B01E /* LockView.swift in Sources */,
+				DC2F432427B6A0240006FCC4 /* RequestPushPermissionPopover.swift in Sources */,
 				DC682FE8258175CE00CA1114 /* Popover.swift in Sources */,
 				DCACF6FA2566D0BA0009B01E /* KeyStoreError.swift in Sources */,
 				DC0E31BB26EFDED4002071C6 /* VSlider.swift in Sources */,
@@ -1013,6 +1050,7 @@
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,
 				DC118BFC27B4504B0080BBAC /* ScanView.swift in Sources */,
 				DC46BAF326CACCF700E760A6 /* KotlinExtensions.swift in Sources */,
+				DC2F432227B69FAA0006FCC4 /* SwapInDisabledPopover.swift in Sources */,
 				53BEF90975122B844248569C /* ReceiveView.swift in Sources */,
 				DC118C0427B454720080BBAC /* PaymentInFlightView.swift in Sources */,
 				DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */,
@@ -1035,9 +1073,11 @@
 				53BEF96EC93BBB4B6C9E0845 /* lang.swift in Sources */,
 				DCAEF8F5276131A600015993 /* CheckboxToggleStyle.swift in Sources */,
 				DC118BFA27B44F840080BBAC /* PriceSliderSheet.swift in Sources */,
+				DC2F431827B698E20006FCC4 /* ShareOptionsSheet.swift in Sources */,
 				DC72C33425A51AAC008A927A /* CurrencyPrefs.swift in Sources */,
 				DCE7232E27AD68CD0017CF56 /* SyncTxManager_Actor.swift in Sources */,
 				DCEFD922276A796800001767 /* SyncManager.swift in Sources */,
+				DC2F431C27B69BB20006FCC4 /* ReceiveLightningView.swift in Sources */,
 				53BEF4D5663CD782DC63DF63 /* colors.swift in Sources */,
 				DC27E4CC2791D17A00C777CC /* CloudBackupView.swift in Sources */,
 				DC118BFE27B451890080BBAC /* MetadataSheet.swift in Sources */,
@@ -1047,6 +1087,7 @@
 				DC89857F25914747007B253F /* UIApplicationState+Phoenix.swift in Sources */,
 				DC46BAF426CACCF700E760A6 /* KotlinFlow.swift in Sources */,
 				DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */,
+				DC2F431E27B69DD30006FCC4 /* NotificationsDisabledPopover.swift in Sources */,
 				DC118C0227B453110080BBAC /* PaymentRequestedView.swift in Sources */,
 				DC384D83265C32F100131772 /* TextField+Verbatim.swift in Sources */,
 				DCFA8759260E6F2E00AE8953 /* IntroView.swift in Sources */,
@@ -1068,6 +1109,7 @@
 				DC99E94025BA141000FB20F7 /* LocalWebView.swift in Sources */,
 				53BEFA633D95514CA5C0422A /* ChannelsConfigurationView.swift in Sources */,
 				DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */,
+				DC2F432027B69F320006FCC4 /* BgAppRefreshDisabledPopover.swift in Sources */,
 				DCCC7FD526B0A006008ACD9B /* SquareSize.swift in Sources */,
 				DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */,
 				DCAEF8F727628BEB00015993 /* Either.swift in Sources */,
@@ -1089,6 +1131,7 @@
 				DCACF7092566D0F00009B01E /* AppAccessView.swift in Sources */,
 				DC27E4D1279753EC00C777CC /* TextFieldNumberParser.swift in Sources */,
 				F4AED297257A50CD009485C1 /* LogsConfigurationViewerView.swift in Sources */,
+				DC2F431A27B699800006FCC4 /* ModifyInvoiceSheet.swift in Sources */,
 				DCD5FF4326A0D34B009CC666 /* EqualSizes.swift in Sources */,
 				F4AED298257A50CD009485C1 /* LogsConfigurationView.swift in Sources */,
 				DC27E4CF2792079600C777CC /* CenterTopLineAlignment.swift in Sources */,
@@ -1097,6 +1140,7 @@
 				C8D7AB09E80CE2B6AE270A97 /* TorConfigurationView.swift in Sources */,
 				DC27E4C42791C58C00C777CC /* PaymentsBackupView.swift in Sources */,
 				DC59377127516297003B4B53 /* Sequence+Sum.swift in Sources */,
+				DC2F431427B6972C0006FCC4 /* SwapInView.swift in Sources */,
 				DC71E7352728A5720063613D /* KotlinIdentifiable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
