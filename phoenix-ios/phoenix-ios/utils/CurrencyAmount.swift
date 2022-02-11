@@ -1,6 +1,6 @@
 import Foundation
 
-struct CurrencyAmount {
+struct CurrencyAmount: Equatable {
 	let currency: Currency
 	let amount: Double
 }

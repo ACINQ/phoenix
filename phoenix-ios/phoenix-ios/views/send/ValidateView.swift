@@ -59,6 +59,7 @@ struct ValidateView: View {
 	
 	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).abbrev
 	@State var currencyConverterOpen = false
+	@State var currencyConverterAmount: CurrencyAmount? = nil
 	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
@@ -114,8 +115,8 @@ struct ValidateView: View {
 		
 			NavigationLink(
 				destination: CurrencyConverterView(
-					initialAmount: currentAmount(),
-					amountDidChange: currencyConverterAmountChanged
+					currencyAmount: $currencyConverterAmount,
+					didClose: {}
 				),
 				isActive: $currencyConverterOpen
 			) {
@@ -179,6 +180,9 @@ struct ValidateView: View {
 		}
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
+		}
+		.onChange(of: currencyConverterAmount) { _ in
+			currencyConverterAmountChanged()
 		}
 	}
 	
@@ -723,26 +727,6 @@ struct ValidateView: View {
 		return options
 	}
 	
-	func currencyFromChoice() -> Currency? {
-		
-		for currency in currencyList {
-			if currency.abbrev == currencyPickerChoice {
-				return currency
-			}
-		}
-		
-		return nil
-	}
-	
-	func currentAmount() -> CurrencyAmount? {
-		
-		guard let amt = try? parsedAmount.get(), amt > 0 else {
-			return nil
-		}
-		
-		return CurrencyAmount(currency: currency, amount: amt)
-	}
-	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -824,7 +808,7 @@ struct ValidateView: View {
 	func currencyPickerDidChange() -> Void {
 		log.trace("currencyPickerDidChange()")
 		
-		if let newCurrency = currencyFromChoice() {
+		if let newCurrency = currencyList.first(where: { $0.abbrev == currencyPickerChoice }) {
 			if currency != newCurrency {
 				currency = newCurrency
 				
@@ -836,7 +820,15 @@ struct ValidateView: View {
 				// This seems to be needed, because `amountDidChange` isn't automatically called
 				refreshAltAmount()
 			}
-		} else {
+			
+		} else { // user selected "other"
+			
+			if let amt = try? parsedAmount.get(), amt > 0 {
+				currencyConverterAmount = CurrencyAmount(currency: currency, amount: amt)
+			} else {
+				currencyConverterAmount = nil
+			}
+			
 			currencyConverterOpen = true
 			currencyPickerChoice = currency.abbrev
 		}
@@ -1247,20 +1239,20 @@ struct ValidateView: View {
 		))
 	}
 	
-	func currencyConverterAmountChanged(_ newAmt: CurrencyAmount?) {
+	func currencyConverterAmountChanged() {
 		log.trace("currencyConverterAmountChanged()")
 		
-		if let newAmt = newAmt {
-			
+		if let newAmt = currencyConverterAmount {
+
 			let newCurrencyList = Currency.displayable2(currencyPrefs: currencyPrefs, plus: newAmt.currency)
-			
+
 			if currencyList != newCurrencyList {
 				currencyList = newCurrencyList
 			}
-			
+
 			currency = newAmt.currency
 			currencyPickerChoice = newAmt.currency.abbrev
-			
+
 			let formattedAmt: FormattedAmount
 			switch newAmt.currency {
 			case .bitcoin(let bitcoinUnit):
@@ -1268,12 +1260,12 @@ struct ValidateView: View {
 			case .fiat(let fiatCurrency):
 				formattedAmt = Utils.formatFiat(amount: newAmt.amount, fiatCurrency: fiatCurrency)
 			}
-		
+
 			parsedAmount = Result.success(newAmt.amount)
 			amount = formattedAmt.digits
-			
+
 		} else {
-			
+
 			parsedAmount = Result.failure(.emptyInput)
 			amount = ""
 		}

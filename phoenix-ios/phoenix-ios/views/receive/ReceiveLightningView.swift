@@ -14,16 +14,6 @@ fileprivate var log = Logger(OSLog.disabled)
 
 struct ReceiveLightningView: View {
 	
-	enum ReceiveViewSheet {
-		case sharingUrl(url: String)
-		case sharingImg(img: UIImage)
-	}
-	
-	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
-	// In particular, animating the border around the qrcode doesn't work well.
-	@Namespace private var qrCodeAnimation_inner
-	@Namespace private var qrCodeAnimation_outer
-	
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 	@ObservedObject var toast: Toast
 	
@@ -33,6 +23,15 @@ struct ReceiveLightningView: View {
 
 	@State var isFullScreenQrcode = false
 	
+	// To workaround a bug in SwiftUI, we're using multiple namespaces for our animation.
+	// In particular, animating the border around the qrcode doesn't work well.
+	@Namespace private var qrCodeAnimation_inner
+	@Namespace private var qrCodeAnimation_outer
+	
+	enum ReceiveViewSheet {
+		case sharingUrl(url: String)
+		case sharingImg(img: UIImage)
+	}
 	@State var sheet: ReceiveViewSheet? = nil
 	
 	@State var swapIn_enabled = true
@@ -48,7 +47,8 @@ struct ReceiveLightningView: View {
 	@State var badgesDisabled = false
 	@State var showRequestPushPermissionPopoverTimer: Timer? = nil
 	
-	@State var modificationUnit = Currency.bitcoin(.sat)
+	@State var modificationAmount: CurrencyAmount? = nil
+	@State var currencyConverterOpen = false
 	
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
 	@Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
@@ -69,10 +69,26 @@ struct ReceiveLightningView: View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	// --------------------------------------------------
+	// MARK: ViewBuilders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
-		content()
+		ZStack {
+			NavigationLink(
+				destination: CurrencyConverterView(
+					currencyAmount: $modificationAmount,
+					didClose: currencyConvertDidClose
+				),
+				isActive: $currencyConverterOpen
+			) {
+				EmptyView()
+			}
+			
+			content()
+		}
 		.onAppear {
 			onAppear()
 		}
@@ -518,6 +534,10 @@ struct ReceiveLightningView: View {
 		.padding([.leading, .trailing], 10)
 	}
 	
+	// --------------------------------------------------
+	// MARK: UI Content Helpers
+	// --------------------------------------------------
+	
 	func invoiceAmount() -> String {
 		
 		if let m = mvi.model as? Receive.Model_Generated {
@@ -556,6 +576,10 @@ struct ReceiveLightningView: View {
 		}
 	}
 	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
@@ -589,17 +613,6 @@ struct ReceiveLightningView: View {
 		} else {
 			
 			checkPushPermissions()
-		}
-		
-		if currencyPrefs.currencyType == .fiat, currencyPrefs.fiatExchangeRate() != nil {
-			
-			let fiatCurrency = currencyPrefs.fiatCurrency
-			modificationUnit = Currency.fiat(fiatCurrency)
-			
-		} else {
-			
-			let bitcoinUnit = currencyPrefs.bitcoinUnit
-			modificationUnit = Currency.bitcoin(bitcoinUnit)
 		}
 	}
 	
@@ -835,9 +848,10 @@ struct ReceiveLightningView: View {
 				
 				ModifyInvoiceSheet(
 					mvi: mvi,
-					initialAmount: model.amount,
+					savedAmount: $modificationAmount,
+					amount: model.amount,
 					desc: model.desc ?? "",
-					unit: $modificationUnit
+					currencyConverterOpen: $currencyConverterOpen
 				)
 			}
 		}
@@ -897,6 +911,28 @@ struct ReceiveLightningView: View {
 			popoverState.display(dismissable: true) {
 				SwapInDisabledPopover()
 			}
+		}
+	}
+	
+	func currencyConvertDidClose() {
+		log.trace("currencyConverterDidClose()")
+		
+		var amount: Lightning_kmpMilliSatoshi? = nil
+		var desc: String? = nil
+		if let model = mvi.model as? Receive.Model_Generated {
+			amount = model.amount
+			desc = model.desc
+		}
+		
+		shortSheetState.display(dismissable: true) {
+			
+			ModifyInvoiceSheet(
+				mvi: mvi,
+				savedAmount: $modificationAmount,
+				amount: amount,
+				desc: desc ?? "",
+				currencyConverterOpen: $currencyConverterOpen
+			)
 		}
 	}
 }

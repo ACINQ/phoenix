@@ -16,11 +16,16 @@ struct ModifyInvoiceSheet: View {
 
 	@ObservedObject var mvi: MVIState<Receive.Model, Receive.Intent>
 
-	let initialAmount: Lightning_kmpMilliSatoshi?
+	@Binding var savedAmount: CurrencyAmount?
+	@Binding var currencyConverterOpen: Bool
 	
+	let initialAmount: Lightning_kmpMilliSatoshi?
 	@State var desc: String
 	
-	@Binding var unit: Currency
+	@State var currency: Currency = Currency.bitcoin(.sat)
+	@State var currencyList: [Currency] = [Currency.bitcoin(.sat)]
+	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).abbrev
+	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
@@ -39,16 +44,25 @@ struct ModifyInvoiceSheet: View {
 		value: { [$0.size.height] }
 	)
 	@State var textHeight: CGFloat? = nil
-	
-	func currencyStyler() -> TextFieldCurrencyStyler {
-		return TextFieldCurrencyStyler(
-			currency: unit,
-			amount: $amount,
-			parsedAmount: $parsedAmount,
-			hideMsats: false
-		)
-	}
 
+	init(
+		mvi: MVIState<Receive.Model, Receive.Intent>,
+		savedAmount: Binding<CurrencyAmount?>,
+		amount: Lightning_kmpMilliSatoshi?,
+		desc: String,
+		currencyConverterOpen: Binding<Bool>
+	) {
+		self.mvi = mvi
+		self._savedAmount = savedAmount
+		self.initialAmount = amount
+		self._desc = State<String>(initialValue: desc)
+		self._currencyConverterOpen = currencyConverterOpen
+	}
+	
+	// --------------------------------------------------
+	// MARK: ViewBuilders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -71,13 +85,11 @@ struct ModifyInvoiceSheet: View {
 				.padding(.trailing, 0)
 				
 				Picker(
-					selection: $unit,
-					label: Text(unit.abbrev).frame(minWidth: 40, alignment: Alignment.trailing)
+					selection: $currencyPickerChoice,
+					label: Text(currencyPickerChoice).frame(minWidth: 40, alignment: Alignment.trailing)
 				) {
-					let options = Currency.displayable(currencyPrefs: currencyPrefs)
-					ForEach(0 ..< options.count) {
-						let option = options[$0]
-						Text(option.abbrev).tag(option)
+					ForEach(currencyPickerOptions(), id: \.self) { option in
+						Text(option).tag(option)
 					}
 				}
 				.pickerStyle(MenuPickerStyle())
@@ -136,42 +148,105 @@ struct ModifyInvoiceSheet: View {
 		.onChange(of: amount) { _ in
 			amountDidChange()
 		}
-		.onChange(of: unit) { _  in
-			unitDidChange()
+		.onChange(of: currencyPickerChoice) { _ in
+			currencyPickerDidChange()
 		}
 		
 	} // </body>
 	
+	// --------------------------------------------------
+	// MARK: UI Content Helpers
+	// --------------------------------------------------
+	
+	func currencyStyler() -> TextFieldCurrencyStyler {
+		return TextFieldCurrencyStyler(
+			currency: currency,
+			amount: $amount,
+			parsedAmount: $parsedAmount,
+			hideMsats: false
+		)
+	}
+	
+	func currencyPickerOptions() -> [String] {
+		
+		var options = [String]()
+		for currency in currencyList {
+			options.append(currency.abbrev)
+		}
+		
+		options.append(NSLocalizedString("other",
+			comment: "Option in currency picker list. Sends user to Currency Converter")
+		)
+		
+		return options
+	}
+	
+	func currentAmount() -> CurrencyAmount? {
+		
+		guard let amt = try? parsedAmount.get(), amt > 0 else {
+			return nil
+		}
+		
+		return CurrencyAmount(currency: currency, amount: amt)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
+	
 	func onAppear() -> Void {
 		log.trace("onAppear()")
 		
-		let msat: Int64? = initialAmount?.msat
-		
-		switch unit {
-		case .fiat(let fiatCurrency):
+		if let savedAmount = savedAmount {
 			
-			if let msat = msat, let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+			// We have a saved amount from a previous modification.
+			// That is, from using the ModifyInvoiceSheet earlier, or from using the CurrencyConverter.
+			// So we display this amount as-is.
+			
+			let formattedAmt: FormattedAmount
+			switch savedAmount.currency {
+				case .bitcoin(let bitcoinUnit):
+					formattedAmt = Utils.formatBitcoin(
+						amount: savedAmount.amount,
+						bitcoinUnit: bitcoinUnit,
+						hideMsats: false
+					)
 				
-				let formattedAmt = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
-				parsedAmount = Result.success(formattedAmt.amount)
-				amount = formattedAmt.digits
-				
-			} else {
-				refreshAltAmount()
+				case .fiat(let fiatCurrency):
+					formattedAmt = Utils.formatFiat(
+						amount: savedAmount.amount,
+						fiatCurrency: fiatCurrency
+					)
 			}
 			
-		case .bitcoin(let bitcoinUnit):
+			parsedAmount = Result.success(formattedAmt.amount)
+			amount = formattedAmt.digits
+			currency = savedAmount.currency
 			
-			if let msat = msat {
-				
-				let formattedAmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
-				parsedAmount = Result.success(formattedAmt.amount)
-				amount = formattedAmt.digits
-				
-			} else {
-				refreshAltAmount()
-			}
+		} else if let initialAmount = initialAmount {
+			
+			// Since there's an amount in bitcoin, we use the user's preferred bitcoin unit.
+			// We try to use the user's preferred currency.
+			
+			let formattedAmt = Utils.formatBitcoin(
+				msat: initialAmount,
+				bitcoinUnit: currencyPrefs.bitcoinUnit,
+				hideMsats: false
+			)
+			parsedAmount = Result.success(formattedAmt.amount)
+			amount = formattedAmt.digits
+			currency = Currency.bitcoin(currencyPrefs.bitcoinUnit)
+			
+		} else {
+			
+			// There's no amount, so we default to the user's preferred currency
+			
+			currency = currencyPrefs.currency
+			refreshAltAmount()
 		}
+		
+		currencyList = Currency.displayable2(currencyPrefs: currencyPrefs, plus: currency)
+		currencyPickerChoice = currency.abbrev
 	}
 	
 	func amountDidChange() -> Void {
@@ -180,15 +255,32 @@ struct ModifyInvoiceSheet: View {
 		refreshAltAmount()
 	}
 	
-	func unitDidChange() -> Void {
-		log.trace("unitDidChange()")
+	func currencyPickerDidChange() -> Void {
+		log.trace("currencyPickerDidChange()")
 		
-		// We might want to apply a different formatter
-		let result = TextFieldCurrencyStyler.format(input: amount, currency: unit, hideMsats: false)
-		parsedAmount = result.1
-		amount = result.0
-		
-		refreshAltAmount()
+		if let newCurrency = currencyList.first(where: { $0.abbrev == currencyPickerChoice }) {
+			if currency != newCurrency {
+				currency = newCurrency
+				
+				// We might want to apply a different formatter
+				let result = TextFieldCurrencyStyler.format(input: amount, currency: currency, hideMsats: false)
+				parsedAmount = result.1
+				amount = result.0
+				
+				refreshAltAmount()
+			}
+			
+		} else { // user selected "other"
+			
+			if let amt = try? parsedAmount.get(), amt > 0 {
+				savedAmount = CurrencyAmount(currency: currency, amount: amt)
+			} else {
+				savedAmount = nil
+			}
+			
+			currencyConverterOpen = true
+			shortSheetState.close()
+		}
 	}
 	
 	func refreshAltAmount() -> Void {
@@ -210,37 +302,56 @@ struct ModifyInvoiceSheet: View {
 			isInvalidAmount = false
 			isEmptyAmount = false
 			
-			switch unit {
+			var msat: Int64? = nil
+			switch currency {
 			case .bitcoin(let bitcoinUnit):
-				// amt    => bitcoinUnit
-				// altAmt => fiatCurrency
-				
-				if let exchangeRate = currencyPrefs.fiatExchangeRate() {
-					
-					let msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
-					altAmount = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate).string
-					
-				} else {
-					// We don't know the exchange rate, so we can't display fiat value.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
-				}
+				msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
 				
 			case .fiat(let fiatCurrency):
-				// amt    => fiatCurrency
-				// altAmt => bitcoinUnit
-				
 				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-					
-					let msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-					altAmount = Utils.formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit).string
-					
-				} else {
-					// We don't know the exchange rate !
-					// We shouldn't get into this state since Currency.displayable() already filters for this.
-					altAmount = "?.?? \(currencyPrefs.fiatCurrency.shortName)"
+					msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
 				}
 			}
-		}
+			
+			if let msat = msat {
+				
+				var altBitcoinUnit: FormattedAmount? = nil
+				var altFiatCurrency: FormattedAmount? = nil
+				
+				let preferredBitcoinUnit = currencyPrefs.bitcoinUnit
+				if currency != Currency.bitcoin(preferredBitcoinUnit) {
+					altBitcoinUnit = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
+				}
+				
+				let preferredFiatCurrency = currencyPrefs.fiatCurrency
+				if currency != Currency.fiat(preferredFiatCurrency) {
+					if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: preferredFiatCurrency) {
+						altFiatCurrency = Utils.formatFiat(msat: msat, exchangeRate: exchangeRate)
+					} else {
+						altFiatCurrency = Utils.unknownFiatAmount(fiatCurrency: preferredFiatCurrency)
+					}
+				}
+				
+				if let altBitcoinUnit = altBitcoinUnit, let altFiatCurrency = altFiatCurrency {
+					altAmount = "≈ \(altBitcoinUnit.string)  /  ≈ \(altFiatCurrency.string)"
+					
+				} else if let altBitcoinUnit = altBitcoinUnit {
+					altAmount = "≈ \(altBitcoinUnit.string)"
+					
+				} else if let altFiatCurrency = altFiatCurrency {
+					altAmount = "≈ \(altFiatCurrency.string)"
+					
+				} else {
+					// We don't know the exchange rate
+					altAmount = ""
+				}
+				
+			} else {
+				// We don't know the exchange rate
+				altAmount = ""
+			}
+			
+		} // </switch>
 	}
 	
 	func didTapSaveButton() -> Void {
@@ -251,7 +362,8 @@ struct ModifyInvoiceSheet: View {
 		
 		if let amt = try? parsedAmount.get(), amt > 0 {
 			
-			switch unit {
+			savedAmount = CurrencyAmount(currency: currency, amount: amt)
+			switch currency {
 			case .bitcoin(let bitcoinUnit):
 							
 				msat = Lightning_kmpMilliSatoshi(msat:
@@ -266,6 +378,9 @@ struct ModifyInvoiceSheet: View {
 					)
 				}
 			}
+			
+		} else {
+			savedAmount = nil
 		}
 		
 		shortSheetState.close {

@@ -25,8 +25,8 @@ enum LastUpdated {
 
 struct CurrencyConverterView: View {
 	
-	let initialAmount: CurrencyAmount?
-	let amountDidChange: ((CurrencyAmount?) -> Void)?
+	let currencyAmountBinding: Binding<CurrencyAmount?>?
+	let didClose: (() -> Void)?
 	
 	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
 	
@@ -62,13 +62,16 @@ struct CurrencyConverterView: View {
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	init() {
-		self.initialAmount = nil
-		self.amountDidChange = nil
+		self.currencyAmountBinding = nil
+		self.didClose = nil
 	}
 	
-	init(initialAmount: CurrencyAmount?, amountDidChange: @escaping (CurrencyAmount?) -> Void) {
-		self.initialAmount = initialAmount
-		self.amountDidChange = amountDidChange
+	init(
+		currencyAmount: Binding<CurrencyAmount?>,
+		didClose: @escaping () -> Void
+	) {
+		self.currencyAmountBinding = currencyAmount
+		self.didClose = didClose
 	}
 	
 	// --------------------------------------------------
@@ -356,7 +359,7 @@ struct CurrencyConverterView: View {
 				currencies = defaultCurrencies()
 			}
 			
-			if let initialAmount = initialAmount {
+			if let initialAmount = currencyAmountBinding?.wrappedValue {
 				parsedRow = ParsedRow(
 					currency: initialAmount.currency,
 					parsedAmount: Result.success(initialAmount.amount)
@@ -380,6 +383,10 @@ struct CurrencyConverterView: View {
 				UITableView.appearance().backgroundColor = .primaryBackground
 			}
 		}
+		
+		if let didClose = didClose {
+			didClose()
+		}
 	}
 	
 	private func defaultCurrencies() -> [Currency] {
@@ -402,18 +409,21 @@ struct CurrencyConverterView: View {
 	private func parsedRowDidChange() {
 		log.trace("parsedRowDidChange()")
 		
-		guard
-			let parsedRow = parsedRow,
-			let amountDidChange = amountDidChange
-		else {
+		guard let currencyAmountBinding = currencyAmountBinding else {
 			return
 		}
-
-		switch parsedRow.parsedAmount {
-		case .success(let amount):
-			amountDidChange(CurrencyAmount(currency: parsedRow.currency, amount: amount))
-		case .failure(_):
-			amountDidChange(initialAmount)
+		
+		let oldCurrencyAmount = currencyAmountBinding.wrappedValue
+		var newCurrencyAmount: CurrencyAmount? = nil
+		
+		if let parsedRow = parsedRow {
+			if case .success(let amount) = parsedRow.parsedAmount {
+				newCurrencyAmount = CurrencyAmount(currency: parsedRow.currency, amount: amount)
+			}
+		}
+		
+		if oldCurrencyAmount != newCurrencyAmount {
+			currencyAmountBinding.wrappedValue = newCurrencyAmount
 		}
 	}
 	
