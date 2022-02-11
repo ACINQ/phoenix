@@ -384,7 +384,7 @@ struct CurrencyConverterView: View {
 			}
 		}
 		
-		if let didClose = didClose {
+		if !currencySelectorOpen, let didClose = didClose {
 			didClose()
 		}
 	}
