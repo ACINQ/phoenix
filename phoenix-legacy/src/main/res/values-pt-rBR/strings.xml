@@ -678,6 +678,12 @@
   <string name="paymentsettings_defaultdesc_dialog_title">Descrição padrão</string>
   <string name="paymentsettings_defaultdesc_dialog_description">As faturas que você gerar irão conter esta descrição. Você pode substituí-las caso a caso.</string>
   <string name="paymentsettings_defaultdesc_dialog_hint">Insira uma descrição</string>
+  
+  <string name="paymentsettings_expiry_title">Vencimento das faturas</string>
+  <string name="paymentsettings_expiry_dialog_title">Prazo máximo</string>
+  <string name="paymentsettings_expiry_dialog_description">As faturas que você gerar irão vencer nesse prazo (em segundos). O valor padrão é 1 semana.</string>
+  <string name="paymentsettings_expiry_dialog_hint">Insira um valor, em segundos</string>
+  <string name="paymentsettings_expiry_value">%1$s segundos</string>
 
   <string name="paymentsettings_trampoline_fees_title">Taxa máxima para pagamentos pela rede Relâmpago</string>
   <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
@@ -715,7 +721,7 @@
   Por exemplo, para receber 250 000 sat, a taxa seria de %2$s.
   ]]></string>
   <string name="ftue__backup_seed__header">Você no controle dos seus bitcoins</string>
-  <string name="ftue__backup_seed__body">Uma frase de backup foi gerada, contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
+  <string name="ftue__backup_seed__body">Uma frase de backup será gerada contendo todas as informações necessárias para recuperar seus bitcoins .\n\nMantenha-a segura e em local secreto!</string>
   <string name="ftue__backup_seed__button">Começar</string>
 
   <!-- patch notes -->
