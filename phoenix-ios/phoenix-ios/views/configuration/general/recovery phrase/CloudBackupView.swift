@@ -27,6 +27,19 @@ struct CloudBackupView: View {
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
+	var hasChanges: Bool {
+		if name != originalName {
+			return true
+		}
+		if backupSeed_enabled {
+			// Currently enabled.
+			return !toggle_enabled || !legal_appleRisk || !legal_governmentRisk
+		} else {
+			// Currently disabled.
+			return toggle_enabled || legal_appleRisk || legal_governmentRisk
+		}
+	}
+	
 	var canSave: Bool {
 		if backupSeed_enabled {
 			// Currently enabled.
@@ -77,12 +90,16 @@ struct CloudBackupView: View {
 			didTapBackButton()
 		} label: {
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				Image(systemName: "chevron.backward")
-					 .font(.title2)
-				if canSave {
-					Text("Save")
+				if hasChanges {
+					if canSave {
+						Image(systemName: "chevron.backward").font(.title2)
+						Text("Save")
+					} else {
+						Image(systemName: "chevron.backward").font(.title2).foregroundColor(Color.appNegative)
+						Text("Cancel").foregroundColor(Color.appNegative)
+					}
 				} else {
-					Text("Cancel")
+					Image(systemName: "chevron.backward").font(.title2)
 				}
 			}
 		}
