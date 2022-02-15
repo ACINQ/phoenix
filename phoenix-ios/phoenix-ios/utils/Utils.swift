@@ -75,7 +75,8 @@ class Utils {
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64) -> FormattedAmount {
 		
-		return format(currencyPrefs, msat: (sat * 1_000))
+		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		return format(currencyPrefs, msat: msat)
 	}
 	
 	/// Formats the given amount of millisatoshis into either a bitcoin or fiat amount,
@@ -217,22 +218,31 @@ class Utils {
 	) -> FormattedAmount {
 		
 		let targetAmount: Double = convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+		return formatBitcoin(amount: targetAmount, bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
+	}
+	
+	static func formatBitcoin(
+		amount      : Double,
+		bitcoinUnit : BitcoinUnit,
+		hideMsats   : Bool = true
+	) -> FormattedAmount {
+		
 		let formatter = bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
 		
-		var digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
 		// Zero edge-case check
 		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0"
 		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0"
 		
-		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && targetAmount != 0.0 {
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && amount != 0.0 {
 			
 			formatter.roundingMode = .up // Round away from zero
-			digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+			digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		}
 		
 		let formattedAmount = FormattedAmount(
-			amount: targetAmount,
+			amount: amount,
 			currency: Currency.bitcoin(bitcoinUnit),
 			digits: digits,
 			decimalSeparator: formatter.decimalSeparator
@@ -381,23 +391,31 @@ class Utils {
 	) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
-		let formatter = fiatFormatter(fiatCurrency: exchangeRate.fiatCurrency)
+		return formatFiat(amount: fiatAmount, fiatCurrency: exchangeRate.fiatCurrency)
+	}
+	
+	static func formatFiat(
+		amount: Double,
+		fiatCurrency: FiatCurrency
+	) -> FormattedAmount {
 		
-		var digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+		let formatter = fiatFormatter(fiatCurrency: fiatCurrency)
+		
+		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
 		// Zero edge-case check
 		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0.00"
 		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0.00"
 		
-		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && fiatAmount != 0.0 {
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && amount != 0.0 {
 			
 			formatter.roundingMode = .up // Round away from zero
-			digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+			digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		}
 		
 		return FormattedAmount(
-			amount: fiatAmount,
-			currency: Currency.fiat(exchangeRate.fiatCurrency),
+			amount: amount,
+			currency: Currency.fiat(fiatCurrency),
 			digits: digits,
 			decimalSeparator: formatter.currencyDecimalSeparator
 		)
