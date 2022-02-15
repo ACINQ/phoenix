@@ -50,18 +50,6 @@ val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "us
 /** This datastore persists miscellaneous internal data representing various states of the app. */
 val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
 
-/**
- * Describes how the legacy and modern apps interact:
- * - [INIT], the modern app is in control and will decide what to do ;
- * - [EXPECTED], the modern app should start the legacy app ;
- * - [RUNNING], the modern app should pause and wait ;
- * - [FINISHED], the modern app should take over ;
- * - [INTERRUPTED], the legacy app did not complete its job properly and should be started again ;
- */
-enum class LegacyAppStatus {
-  INIT, EXPECTED, RUNNING, FINISHED, INTERRUPTED
-}
-
 open class AppContext : Application() {
 
   val log = LoggerFactory.getLogger(this::class.java)
@@ -116,9 +104,6 @@ open class AppContext : Application() {
       return context.applicationContext as AppContext
     }
   }
-
-  /** Signals the status of the legacy app in regard to the migration process launched by the modern app. This is how the modern and the legacy apps communicate. */
-  val legacyAppStatus = MutableLiveData<LegacyAppStatus>()
 
   /** Settings for pay-to-open. */
   val payToOpenSettings = MutableLiveData<PayToOpenSettings?>()

@@ -39,26 +39,46 @@ object PrefsDatastore {
     }
   }
 
-  /**
-   * If [StartLegacyAppEnum.REQUIRED] we run the legacy app.
-   * If [StartLegacyAppEnum.NOT_REQUIRED] we run the modern KMP app.
-   * If [StartLegacyAppEnum.UNKNOWN] we run the modern KMP app and query the peer for information.
-   */
-  private val START_LEGACY_APP = stringPreferencesKey("START_LEGACY_APP")
-  fun getStartLegacyApp(context: Context): Flow<StartLegacyAppEnum> = prefs(context).map {
-    StartLegacyAppEnum.safeValueOf(it[START_LEGACY_APP])
-  }
-  suspend fun saveStartLegacyApp(context: Context, value: StartLegacyAppEnum) = context.internalData.edit { it[START_LEGACY_APP] = value.name }
-}
-
-enum class StartLegacyAppEnum {
-  UNKNOWN, REQUIRED, NOT_REQUIRED;
-
-  companion object {
-    fun safeValueOf(value: String?) = when (value) {
-      REQUIRED.name -> REQUIRED
-      NOT_REQUIRED.name -> NOT_REQUIRED
-      else -> UNKNOWN
+  private val LEGACY_APP_STATUS = stringPreferencesKey("LEGACY_APP_STATUS")
+  fun getLegacyAppStatus(context: Context): Flow<LegacyAppStatus> = prefs(context).map {
+    when (it[LEGACY_APP_STATUS]) {
+      LegacyAppStatus.Required.Expected.name() -> LegacyAppStatus.Required.Expected
+      LegacyAppStatus.Required.InitStart.name() -> LegacyAppStatus.Required.InitStart
+      LegacyAppStatus.Required.Running.name() -> LegacyAppStatus.Required.Running
+      LegacyAppStatus.Required.Finished.name() -> LegacyAppStatus.Required.Finished
+      LegacyAppStatus.Required.Interrupted.name() -> LegacyAppStatus.Required.Interrupted
+      LegacyAppStatus.NotRequired.name() -> LegacyAppStatus.NotRequired
+      else -> LegacyAppStatus.Unknown
     }
   }
+  suspend fun saveStartLegacyApp(context: Context, value: LegacyAppStatus) {
+    context.internalData.edit { it[LEGACY_APP_STATUS] = value.name() }
+  }
+}
+
+/**
+ * Describes the status of the legacy app.
+ *
+ * If [NotRequired] we can safely skip the legacy app and stick to lightning-kmp.
+ * If [Unknown] we should start lightning-kmp and request additional information from the peer.
+ *
+ * If [Required] the legacy app must be started, with the following possible statuses for UI/UX convenience:
+ *   - [Required.Expected]: the legacy app should be started ASAP;
+ *   - [Required.InitStart]: the legacy app is being started;
+ *   - [Required.Running]: the legacy app is running and the modern app should be in the background;
+ *   - [Required.Finished]: the legacy app has been started and completed the migration;
+ *   - [Required.Interrupted]: some error occurred and the legacy app has not done the migration properly;
+ */
+sealed class LegacyAppStatus {
+  object Unknown: LegacyAppStatus()
+  sealed class Required: LegacyAppStatus() {
+    object Expected: Required()
+    object InitStart: Required()
+    object Running: Required()
+    object Finished: Required()
+    object Interrupted: Required()
+  }
+  object NotRequired: LegacyAppStatus()
+
+  fun name() = javaClass.canonicalName ?: javaClass.simpleName
 }

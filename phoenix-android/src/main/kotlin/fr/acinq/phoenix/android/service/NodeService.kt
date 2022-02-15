@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.Connection
-import fr.acinq.phoenix.StartupOptions
 import fr.acinq.phoenix.android.BuildConfig
 import fr.acinq.phoenix.android.PhoenixApplication
 import fr.acinq.phoenix.android.R
@@ -25,6 +24,7 @@ import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.android.utils.datastore.InternalData
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
+import fr.acinq.phoenix.data.StartupParams
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -209,7 +209,7 @@ class NodeService : Service() {
         val seed = business.prepWallet(EncryptedSeed.toMnemonics(decryptedPayload))
 
         business.loadWallet(seed)
-        business.start(StartupOptions(requestCheckLegacyChannels = requestCheckLegacyChannels))
+        business.start(StartupParams(requestCheckLegacyChannels = requestCheckLegacyChannels))
         business.appConfigurationManager.updateElectrumConfig(electrumServer)
 
         serviceScope.launch {

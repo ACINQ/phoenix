@@ -39,9 +39,8 @@ import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.legacy.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import fr.acinq.phoenix.legacy.utils.StartLegacyAppEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -122,7 +121,7 @@ private fun AttemptStart(
     onKeyAbsent: () -> Unit,
     onBusinessStarted: () -> Unit,
 ) {
-    val startLegacyApp = PrefsDatastore.getStartLegacyApp(context).collectAsState(null).value
+    val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null).value
     when (walletState) {
         is WalletState.Off -> {
             val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
@@ -135,21 +134,16 @@ private fun AttemptStart(
                 is KeyState.Error.Unreadable -> Text(stringResource(id = R.string.startup_error_generic, keyState.message ?: ""))
                 is KeyState.Error.UnhandledSeedType -> Text(stringResource(id = R.string.startup_error_generic, "Unhandled seed type"))
                 is KeyState.Present -> {
-                    log.info { "wallet ready with startLegacyApp=$startLegacyApp" }
-                    when (startLegacyApp) {
-                        null -> Text(stringResource(id = R.string.startup_wait))
-                        StartLegacyAppEnum.UNKNOWN -> {
+                    log.info { "wallet ready to start with legacyAppStatus=$legacyAppStatus" }
+                    when (legacyAppStatus) {
+                        LegacyAppStatus.Unknown -> {
                             Text(stringResource(id = R.string.startup_wait_legacy_check))
-                            SwitchToLegacy(context, appVM)
+                            StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = true)
                         }
-                        StartLegacyAppEnum.REQUIRED -> {
-                            log.info { "starting legacy app with startLegacyApp=$startLegacyApp" }
-                            SwitchToLegacy(context, appVM)
-                        }
-                        StartLegacyAppEnum.NOT_REQUIRED -> {
-                            log.info { "start KMP backend with checkLegacyChannel=$startLegacyApp and checkLegacyChannel=false" }
+                        LegacyAppStatus.NotRequired -> {
                             StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = false)
                         }
+                        else -> Text(stringResource(id = R.string.startup_wait))
                     }
                 }
             }
@@ -157,7 +151,19 @@ private fun AttemptStart(
         is WalletState.Disconnected -> Text(stringResource(id = R.string.startup_binding_service))
         is WalletState.Bootstrap -> Text(stringResource(id = R.string.startup_starting))
         is WalletState.Error.Generic -> Text(stringResource(id = R.string.startup_error_generic, walletState.message))
-        is WalletState.Started -> LaunchedEffect(true) { onBusinessStarted() }
+        is WalletState.Started -> {
+            when (legacyAppStatus) {
+                LegacyAppStatus.Unknown -> {
+                    Text(stringResource(id = R.string.startup_wait_legacy_check))
+                }
+                LegacyAppStatus.NotRequired -> {
+                    LaunchedEffect(true) { onBusinessStarted() }
+                }
+                else -> {
+                    Text(stringResource(id = R.string.startup_starting))
+                }
+            }
+        }
     }
 }
 
@@ -180,10 +186,4 @@ private fun StartKMP(scope: CoroutineScope, service: NodeService?, encryptedSeed
             Text("seed=$encryptedSeed version is not handled yet")
         }
     }
-}
-
-@Composable
-private fun SwitchToLegacy(context: Context, appVM: AppViewModel) {
-    application.legacyAppStatus.value = LegacyAppStatus.INIT
-    LocalNavController.current?.navigate(Screen.SwitchToLegacy.route)
 }

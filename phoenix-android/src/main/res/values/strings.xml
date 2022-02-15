@@ -88,7 +88,7 @@
     <string name="startup_error_auth_failed_with_details">Authentication failed.\n—\n%1$s</string>
 
     <!-- -->
-    <string name="legacyswitch_title">Legacy app running…</string>
+    <string name="legacyswitch_title">Legacy app</string>
     <string name="legacyswitch_restart">Restart legacy app</string>
 
     <!-- //////////////// payment holder //////////////// -->

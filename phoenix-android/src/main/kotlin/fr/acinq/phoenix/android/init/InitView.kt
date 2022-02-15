@@ -18,35 +18,27 @@ package fr.acinq.phoenix.android.init
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import fr.acinq.lightning.Lightning
-import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.FilledButton
-import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
-import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.security.EncryptedSeed
-import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.InitializationController
 import fr.acinq.phoenix.controllers.init.Initialization
-import fr.acinq.phoenix.controllers.init.RestoreWallet
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
-import fr.acinq.phoenix.legacy.utils.StartLegacyAppEnum
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -107,7 +99,7 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
                     val encrypted = EncryptedSeed.V2.NoAuth.encrypt(EncryptedSeed.fromMnemonics(mnemonics))
                     SeedManager.writeSeedToDisk(context, encrypted)
                     writingState = WritingSeedState.WrittenToDisk(encrypted)
-                    PrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) StartLegacyAppEnum.NOT_REQUIRED else StartLegacyAppEnum.REQUIRED)
+                    PrefsDatastore.saveStartLegacyApp(context, if (isNewWallet) LegacyAppStatus.NotRequired else LegacyAppStatus.Unknown)
                     log.info("mnemonics has been written to disk")
                 } else {
                     log.warn("cannot overwrite existing seed=${existing.name()}")

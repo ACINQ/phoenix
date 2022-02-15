@@ -28,10 +28,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
+import fr.acinq.lightning.io.LegacyChannelsFound
+import fr.acinq.lightning.io.LegacyChannelsNone
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -42,11 +50,33 @@ class MainActivity : AppCompatActivity() {
     val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val appViewModel by viewModels<AppViewModel>()
 
+    @OptIn(InternalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 1234)
         appViewModel.walletState.observe(this) {
             log.debug("wallet state update=${it.name}")
+        }
+
+        // reset required status to expected if needed
+        lifecycleScope.launch {
+            if (PrefsDatastore.getLegacyAppStatus(applicationContext).filterNotNull().first() is LegacyAppStatus.Required) {
+                PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+            }
+        }
+
+        // listen to legacy channels events on the peer's event bus
+        lifecycleScope.launch {
+            val application = (application as PhoenixApplication)
+            application.business.peerManager.getPeer().openListenerEventSubscription().receiveAsFlow().collect {
+                if (it is LegacyChannelsFound) {
+                    log.debug("legacy channels have been found")
+                    PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+                } else if (it is LegacyChannelsNone) {
+                    log.debug("no legacy channels were found")
+                    PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+                }
+            }
         }
         setContent {
             PhoenixAndroidTheme {

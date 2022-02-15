@@ -18,16 +18,16 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class AppConnectionsDaemon(
+    loggerFactory: LoggerFactory,
     private val configurationManager: AppConfigurationManager,
     private val walletManager: WalletManager,
     private val peerManager: PeerManager,
     private val currencyManager: CurrencyManager,
     private val networkManager: NetworkManager,
     private val electrumClient: ElectrumClient,
-    loggerFactory: LoggerFactory,
 ) : CoroutineScope by MainScope() {
 
-    constructor(business: PhoenixBusiness): this(
+    constructor(business: PhoenixBusiness) : this(
         loggerFactory = business.loggerFactory,
         configurationManager = business.appConfigurationManager,
         walletManager = business.walletManager,

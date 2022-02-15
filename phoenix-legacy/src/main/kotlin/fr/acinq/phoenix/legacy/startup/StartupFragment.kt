@@ -28,17 +28,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.acinq.phoenix.legacy.*
+import fr.acinq.phoenix.legacy.AppLock
+import fr.acinq.phoenix.legacy.BaseFragment
+import fr.acinq.phoenix.legacy.MainActivity
+import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.background.KitState
 import fr.acinq.phoenix.legacy.databinding.FragmentStartupBinding
 import fr.acinq.phoenix.legacy.security.PinDialog
 import fr.acinq.phoenix.legacy.send.ReadInputFragmentDirections
-import fr.acinq.phoenix.legacy.utils.*
+import fr.acinq.phoenix.legacy.utils.Constants
+import fr.acinq.phoenix.legacy.utils.Migration
+import fr.acinq.phoenix.legacy.utils.Prefs
+import fr.acinq.phoenix.legacy.utils.Wallet
 import fr.acinq.phoenix.legacy.utils.crypto.AuthHelper
 import fr.acinq.phoenix.legacy.utils.crypto.EncryptedSeed
 import fr.acinq.phoenix.legacy.utils.crypto.KeystoreHelper
@@ -151,16 +154,6 @@ class StartupFragment : BaseFragment() {
       kitState is KitState.Error.Tor -> mBinding.errorMessage.text = getString(R.string.startup_error_tor, kitState.message)
       kitState is KitState.Error.UnreadableData -> mBinding.errorMessage.text = getString(R.string.startup_error_unreadable)
       kitState is KitState.Error.NoConnectivity -> mBinding.errorMessage.text = getString(R.string.startup_error_network)
-      kitState is KitState.MoveToModernApp -> {
-        lifecycleScope.launch(Dispatchers.Main + CoroutineExceptionHandler { _, e ->
-          log.error("failed to handle modern app switch: ", e)
-        }) {
-          log.info("moving to modern application...")
-          PrefsDatastore.saveStartLegacyApp(requireContext(), StartLegacyAppEnum.NOT_REQUIRED)
-          appContext(context).legacyAppStatus.value = LegacyAppStatus.FINISHED
-          requireActivity().finish()
-        }
-      }
       else -> {
         log.debug("kit=${kitState?.getName()}, standing by...")
       }

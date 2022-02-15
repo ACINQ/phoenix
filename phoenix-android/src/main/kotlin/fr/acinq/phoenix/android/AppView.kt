@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,8 +50,10 @@ import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 @Composable
@@ -68,7 +71,6 @@ fun AppView(
     val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
     val bitcoinUnit = UserPrefs.getBitcoinUnit(context).collectAsState(initial = BitcoinUnit.Sat)
     val electrumServer = UserPrefs.getElectrumServer(context).collectAsState(initial = null)
-    val startLegacyApp = PrefsDatastore.getStartLegacyApp(context).collectAsState(initial = null)
     val business = application.business
 
     CompositionLocalProvider(
@@ -80,7 +82,6 @@ fun AppView(
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
         LocalElectrumServer provides electrumServer.value,
-        LocalStartLegacyApp provides startLegacyApp.value
     ) {
 
         // this view model should not be tied to the HomeView composition because it contains a dynamic payments list that must not be lost when switching to another view
@@ -92,6 +93,11 @@ fun AppView(
                 getController = CF::home
             )
         )
+
+        val legacyAppStatus = PrefsDatastore.getLegacyAppStatus(context).collectAsState(null)
+        if (legacyAppStatus.value is LegacyAppStatus.Required && navController.currentDestination?.route != Screen.SwitchToLegacy.route) {
+            navController.navigate(Screen.SwitchToLegacy.route)
+        }
 
         Column(
             Modifier
@@ -213,7 +219,7 @@ fun AppView(
                     )
                 }
                 composable(Screen.SwitchToLegacy.route) {
-                    LegacySwitcherView { navController.navigate(Screen.Startup.route) }
+                    LegacySwitcherView(onLegacyFinished = { navController.navigate(Screen.Startup.route) })
                 }
             }
         }

@@ -48,12 +48,7 @@ fun SendView(request: PaymentRequest?) {
             AmountInput(
                 initialAmount = amount,
                 onAmountChange = { msat, fiat, fiatUnit ->
-                    if (msat == null) {
-                        amount = null
-
-                    } else {
-                        amount = msat
-                    }
+                    amount = msat
                 },
                 useBasicInput = true,
                 inputTextSize = 48.sp,

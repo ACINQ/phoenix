@@ -3,6 +3,7 @@ package fr.acinq.phoenix.data
 import fr.acinq.bitcoin.Block
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
 
@@ -219,3 +220,10 @@ sealed class ElectrumConfig {
     data class Custom(val server: ServerAddress) : ElectrumConfig()
     object Random : ElectrumConfig()
 }
+
+data class StartupParams(
+    /** When true, we use a [InitTlv] to ask our peer whether there are legacy channels to reestablish for the legacy node id. */
+    val requestCheckLegacyChannels: Boolean = false,
+
+    // TODO: add custom electrum address, fiat currencies, ...
+)

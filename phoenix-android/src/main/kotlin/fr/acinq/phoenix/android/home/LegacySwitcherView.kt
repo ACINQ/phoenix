@@ -16,28 +16,28 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.app.Activity
+import android.app.LocalActivityManager
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.application
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.Button
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.legacy.LegacyAppStatus
 import fr.acinq.phoenix.legacy.MainActivity
+import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
+import fr.acinq.phoenix.legacy.utils.PrefsDatastore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,55 +46,62 @@ fun LegacySwitcherView(
     onLegacyFinished: () -> Unit
 ) {
     val log = logger("LegacySwitcherView")
-    val app = application
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val legacyAppStatus by app.legacyAppStatus.observeAsState(initial = null)
-
-    log.debug { "legacy view with legacyAppStatus=${legacyAppStatus}" }
+    val legacyAppStatus by PrefsDatastore.getLegacyAppStatus(context).collectAsState(initial = null)
+    log.debug { "legacy switcher with legacyAppStatus=${legacyAppStatus}" }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = stringResource(id = R.string.legacyswitch_title))
-        Text(text = "[${legacyAppStatus}]", style = MaterialTheme.typography.caption)
         when (legacyAppStatus) {
             null -> {
                 // do nothing
             }
-            LegacyAppStatus.INIT -> {
-                app.legacyAppStatus.value = LegacyAppStatus.EXPECTED
-            }
-            LegacyAppStatus.RUNNING -> {
-                // just wait
-            }
-            LegacyAppStatus.EXPECTED -> {
+            LegacyAppStatus.Required.Expected -> {
                 LaunchedEffect(key1 = true) {
                     scope.launch {
-                        delay(1000)
-                        if (app.legacyAppStatus.value == LegacyAppStatus.EXPECTED) {
-                            context.startActivity(
-                                Intent(context, MainActivity::class.java)
-                                    .apply { addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) }
-                            )
-                            app.legacyAppStatus.value = LegacyAppStatus.RUNNING
+                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.InitStart)
+                    }
+                }
+            }
+            LegacyAppStatus.Required.InitStart -> {
+                LaunchedEffect(key1 = true) {
+                    scope.launch {
+                        if (legacyAppStatus == LegacyAppStatus.Required.InitStart) {
+                            PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)
+                            context.startActivity(Intent(context, MainActivity::class.java).apply{
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            })
+                            (context as? Activity)?.finish()
                         }
                     }
                 }
             }
-            LegacyAppStatus.FINISHED -> {
+            LegacyAppStatus.Required.Running -> {
+                // just wait
+            }
+            LegacyAppStatus.Required.Finished -> {
                 LaunchedEffect(key1 = true) {
                     scope.launch {
-                        delay(1000)
                         onLegacyFinished()
                     }
                 }
             }
-            LegacyAppStatus.INTERRUPTED -> {
-                BorderButton(text = R.string.legacyswitch_restart, onClick = { app.legacyAppStatus.value = LegacyAppStatus.INIT })
+            LegacyAppStatus.Required.Interrupted -> {
+                BorderButton(text = R.string.legacyswitch_restart, onClick = {
+                    scope.launch {
+                        PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                    }
+                })
             }
+            LegacyAppStatus.NotRequired -> onLegacyFinished()
+            LegacyAppStatus.Unknown -> onLegacyFinished()
         }
     }
 }
