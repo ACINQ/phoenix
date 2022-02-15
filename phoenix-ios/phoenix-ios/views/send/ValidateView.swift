@@ -59,7 +59,6 @@ struct ValidateView: View {
 	
 	@State var currencyPickerChoice: String = Currency.bitcoin(.sat).abbrev
 	@State var currencyConverterOpen = false
-	@State var currencyConverterAmount: CurrencyAmount? = nil
 	
 	@State var amount: String = ""
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
@@ -115,7 +114,8 @@ struct ValidateView: View {
 		
 			NavigationLink(
 				destination: CurrencyConverterView(
-					currencyAmount: $currencyConverterAmount,
+					initialAmount: currentAmount(),
+					didChange: currencyConverterAmountChanged,
 					didClose: {}
 				),
 				isActive: $currencyConverterOpen
@@ -180,9 +180,6 @@ struct ValidateView: View {
 		}
 		.onChange(of: currencyPickerChoice) { _ in
 			currencyPickerDidChange()
-		}
-		.onChange(of: currencyConverterAmount) { _ in
-			currencyConverterAmountChanged()
 		}
 	}
 	
@@ -727,6 +724,15 @@ struct ValidateView: View {
 		return options
 	}
 	
+	func currentAmount() -> CurrencyAmount? {
+		
+		if let amt = try? parsedAmount.get(), amt > 0 {
+			return CurrencyAmount(currency: currency, amount: amt)
+		} else {
+			return nil
+		}
+	}
+	
 	// --------------------------------------------------
 	// MARK: Actions
 	// --------------------------------------------------
@@ -823,14 +829,8 @@ struct ValidateView: View {
 			
 		} else { // user selected "other"
 			
-			if let amt = try? parsedAmount.get(), amt > 0 {
-				currencyConverterAmount = CurrencyAmount(currency: currency, amount: amt)
-			} else {
-				currencyConverterAmount = nil
-			}
-			
 			currencyConverterOpen = true
-			currencyPickerChoice = currency.abbrev
+			currencyPickerChoice = currency.abbrev // revert to last real currency
 		}
 	}
 	
@@ -1239,10 +1239,10 @@ struct ValidateView: View {
 		))
 	}
 	
-	func currencyConverterAmountChanged() {
+	func currencyConverterAmountChanged(_ result: CurrencyAmount?) {
 		log.trace("currencyConverterAmountChanged()")
 		
-		if let newAmt = currencyConverterAmount {
+		if let newAmt = result {
 
 			let newCurrencyList = Currency.displayable2(currencyPrefs: currencyPrefs, plus: newAmt.currency)
 

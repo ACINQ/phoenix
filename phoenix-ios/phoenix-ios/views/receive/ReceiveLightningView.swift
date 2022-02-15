@@ -79,7 +79,8 @@ struct ReceiveLightningView: View {
 		ZStack {
 			NavigationLink(
 				destination: CurrencyConverterView(
-					currencyAmount: $modificationAmount,
+					initialAmount: modificationAmount,
+					didChange: currencyConverterDidChange,
 					didClose: currencyConvertDidClose
 				),
 				isActive: $currencyConverterOpen
@@ -912,6 +913,12 @@ struct ReceiveLightningView: View {
 				SwapInDisabledPopover()
 			}
 		}
+	}
+	
+	func currencyConverterDidChange(_ amount: CurrencyAmount?) {
+		log.trace("currencyConverterDidChange()")
+		
+		modificationAmount = amount
 	}
 	
 	func currencyConvertDidClose() {
