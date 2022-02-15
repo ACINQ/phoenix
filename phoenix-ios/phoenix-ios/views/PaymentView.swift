@@ -205,7 +205,7 @@ fileprivate struct SummaryView: View {
 
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				let isOutgoing = payment is Lightning_kmpOutgoingPayment
-				let amount = Utils.format(currencyPrefs, msat: payment.amount, hideMsats: false)
+				let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsats)
 
 				if currencyPrefs.currencyType == .bitcoin &&
 				   currencyPrefs.bitcoinUnit == .sat &&
@@ -1149,8 +1149,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				
 			} valueColumn: {
 				
-				let minFormatted = Utils.formatBitcoin(msat: lnurlPay.minSendable, bitcoinUnit: .sat, hideMsats: false)
-				let maxFormatted = Utils.formatBitcoin(msat: lnurlPay.maxSendable, bitcoinUnit: .sat, hideMsats: false)
+				let minFormatted = Utils.formatBitcoin(msat: lnurlPay.minSendable, bitcoinUnit: .sat, policy: .showMsats)
+				let maxFormatted = Utils.formatBitcoin(msat: lnurlPay.maxSendable, bitcoinUnit: .sat, policy: .showMsats)
 				
 				// is there a cleaner way to do this ???
 				if minFormatted.hasFractionDigits {
@@ -1745,7 +1745,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							.frame(width: imgSize, height: imgSize)
 							.foregroundColor(Color.appPositive)
 						
-						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
+						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, policy: .showMsats)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
 							Text(verbatim: "\(formatted.integerDigits)") +
 							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
@@ -1768,7 +1768,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 							.frame(width: imgSize, height: imgSize)
 							.foregroundColor(.appNegative)
 						
-						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, hideMsats: false)
+						let formatted = Utils.formatBitcoin(msat: part.amount, bitcoinUnit: .sat, policy: .showMsats)
 						if formatted.hasFractionDigits { // has visible millisatoshi's
 							Text(verbatim: "\(formatted.integerDigits)") +
 							Text(verbatim: "\(formatted.decimalSeparator)\(formatted.fractionDigits)")
@@ -1892,7 +1892,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	
 	func displayAmounts(msat: Lightning_kmpMilliSatoshi) -> (FormattedAmount, FormattedAmount?) {
 		
-		let display_msat = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, hideMsats: false)
+		let display_msat = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, policy: .showMsats)
 		var display_fiat: FormattedAmount? = nil
 
 		if let fiatExchangeRate = currencyPrefs.fiatExchangeRate() {
@@ -2066,7 +2066,7 @@ extension Lightning_kmpWalletPayment {
 				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
+					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
 					
 					let exp = NSLocalizedString(
 						"""
@@ -2081,7 +2081,7 @@ extension Lightning_kmpWalletPayment {
 				else {
 					// I think it's nice to see "Fees: 0 sat" :)
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: 0, hideMsats: true)
+					let formattedAmt = Utils.format(currencyPrefs, msat: 0, policy: .hideMsats)
 					let exp = ""
 					
 					return (formattedAmt, exp)
@@ -2102,7 +2102,7 @@ extension Lightning_kmpWalletPayment {
 				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
 				let claimed = Lightning_kmpMilliSatoshi(sat: onChain.claimed)
 				let fees = channelDrain.minus(other: claimed)
-				let formattedAmt = Utils.format(currencyPrefs, msat: fees, hideMsats: false)
+				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsats)
 				
 				let txCount = onChain.component1().count
 				let exp: String
@@ -2123,7 +2123,7 @@ extension Lightning_kmpWalletPayment {
 			} else if let _ = outgoingPayment.status.asOffChain() {
 				
 				let msat = outgoingPayment.fees.msat
-				let formattedAmt = Utils.format(currencyPrefs, msat: msat, hideMsats: false)
+				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
 				
 				var parts = 0
 				var hops = 0

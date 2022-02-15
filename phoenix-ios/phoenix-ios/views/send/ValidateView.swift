@@ -762,7 +762,7 @@ struct ValidateView: View {
 		
 		if let amount_msat = amount_msat {
 			
-			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, hideMsats: false)
+			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, policy: .showMsats)
 			
 			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
@@ -1256,7 +1256,7 @@ struct ValidateView: View {
 			let formattedAmt: FormattedAmount
 			switch newAmt.currency {
 			case .bitcoin(let bitcoinUnit):
-				formattedAmt = Utils.formatBitcoin(amount: newAmt.amount, bitcoinUnit: bitcoinUnit, hideMsats: false)
+				formattedAmt = Utils.formatBitcoin(amount: newAmt.amount, bitcoinUnit: bitcoinUnit, policy: .showMsats)
 			case .fiat(let fiatCurrency):
 				formattedAmt = Utils.formatFiat(amount: newAmt.amount, fiatCurrency: fiatCurrency)
 			}

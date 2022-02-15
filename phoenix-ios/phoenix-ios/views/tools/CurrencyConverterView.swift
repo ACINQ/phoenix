@@ -746,7 +746,7 @@ fileprivate struct Row: View, ViewName {
 			switch currency {
 			case .bitcoin(let dstBitcoinUnit):
 					
-				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, hideMsats: true)
+				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, policy: .hideMsats)
 				newParsedAmount = Result.success(dstFormattedAmt.amount)
 				newAmount = dstFormattedAmt.digits
 			
@@ -938,7 +938,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 			switch currency {
 			case .bitcoin(let dstBitcoinUnit):
 					
-				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, hideMsats: true)
+				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, policy: .hideMsats)
 				newParsedAmount = Result.success(dstFormattedAmt.amount)
 				newAmount = dstFormattedAmt.digits
 			
