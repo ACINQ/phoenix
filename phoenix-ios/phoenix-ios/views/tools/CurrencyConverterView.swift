@@ -365,19 +365,29 @@ struct CurrencyConverterView: View {
 				currencies = defaultCurrencies()
 			}
 			
-			if let initialAmount = initialAmount {
-				lastChange = initialAmount
+			if didChange == nil {
+				// Created via init() - use default initial value
 				parsedRow = ParsedRow(
-					currency: initialAmount.currency,
-					parsedAmount: Result.success(initialAmount.amount)
+					currency: Currency.bitcoin(.btc),
+					parsedAmount: Result.success(1.0)
 				)
 			} else {
-				let defaultInitialAmount = CurrencyAmount(currency: Currency.bitcoin(.btc), amount: 1.0)
-				lastChange = defaultInitialAmount // don't fire didChange for defaultInitialValue
-				parsedRow = ParsedRow(
-					currency: defaultInitialAmount.currency,
-					parsedAmount: Result.success(defaultInitialAmount.amount)
-				)
+				// Created via init(initialAmount:didChange:didClose:).
+				// If an initialAmount was passed then use it.
+				// Otherwise all rows should remain empty.
+				if let initialAmount = initialAmount {
+					lastChange = initialAmount
+					parsedRow = ParsedRow(
+						currency: initialAmount.currency,
+						parsedAmount: Result.success(initialAmount.amount)
+					)
+				} else {
+					lastChange = nil
+					parsedRow = ParsedRow(
+						currency: Currency.bitcoin(.btc),
+						parsedAmount: Result.failure(.emptyInput)
+					)
+				}
 			}
 		}
 	}
