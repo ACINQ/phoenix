@@ -170,16 +170,17 @@ struct SendView: MVIView {
 		} else if let serviceError = model.reason as? Scan.BadRequestReason_ServiceError {
 			
 			let isLightningAddress = serviceError.url.description.contains("/.well-known/lnurlp/")
+			let origin = serviceError.error.origin
 			
 			switch serviceError.error {
 			case is LNUrl.Error_RemoteFailure_CouldNotConnect:
 				msg = NSLocalizedString(
-					"Could not connect to service",
+					"Could not connect to service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
 				)
 			case is LNUrl.Error_RemoteFailure_Unreadable:
 				msg = NSLocalizedString(
-					"Service returned unreadable response",
+					"Unreadable response from service: \(origin)",
 					comment: "Error message - scanning lightning invoice"
 				)
 			default:
@@ -187,12 +188,12 @@ struct SendView: MVIView {
 				// is LNUrl.Error_RemoteFailure_Detailed
 				if isLightningAddress {
 					msg = NSLocalizedString(
-						"Service doesn't support Lightning addresses, or doesn't know this user",
+						"The service (\(origin)) doesn't support Lightning addresses, or doesn't know this user",
 						comment: "Error message - scanning lightning invoice"
 					)
 				} else {
 					msg = NSLocalizedString(
-						"Service appears to be offline, or they have a down server",
+						"The service (\(origin)) appears to be offline, or they have a down server",
 						comment: "Error message - scanning lightning invoice"
 					)
 				}
