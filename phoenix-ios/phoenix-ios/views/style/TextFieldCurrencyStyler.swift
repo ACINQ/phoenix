@@ -113,7 +113,21 @@ struct TextFieldCurrencyStyler {
 			return (amount, Result.success(parsedAmount))
 		}
 		
-		// Get appropriate formatter for the current state
+		// Remove whitespace
+		
+		let RemoveWhitespace = {(_ str: String) -> String in
+			
+			return str.components(separatedBy: CharacterSet.whitespacesAndNewlines).joined()
+		}
+		
+		var rawInput = RemoveWhitespace(input)
+		
+		if rawInput.count == 0 {
+			log.debug("empty input")
+			return Fail(.emptyInput)
+		}
+		
+		// Get appropriate formatter for the currency
 		
 		let isFiatCurrency: Bool
 		let formatter: NumberFormatter
@@ -139,12 +153,7 @@ struct TextFieldCurrencyStyler {
 			formatter.minimumFractionDigits = 0
 		}
 		
-		// Setup helper tools
-		
-		let RemoveWhitespace = {(_ str: String) -> String in
-			
-			return str.components(separatedBy: CharacterSet.whitespacesAndNewlines).joined()
-		}
+		// Remove formatting characters from the input
 		
 		let RemoveGroupingCharacters = {(_ str: String) -> String in
 			
@@ -158,15 +167,6 @@ struct TextFieldCurrencyStyler {
 			}
 			
 			return str
-		}
-		
-		// Remove formatting characters from the input
-		
-		var rawInput = RemoveWhitespace(input)
-		
-		if rawInput.count == 0 {
-			log.debug("empty input")
-			return Fail(.emptyInput)
 		}
 		
 		rawInput = RemoveGroupingCharacters(rawInput)

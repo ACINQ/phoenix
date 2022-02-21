@@ -300,6 +300,8 @@ class Utils {
 		// So we need to remove it, and the associated padding.
 		formatter.currencySymbol = ""
 		formatter.paddingCharacter = ""
+		formatter.positivePrefix = "" // needed for: [nl, de_CH, es_BQ, ...]
+		formatter.positiveSuffix = "" // needed for: [he, ar, ar_AE, ...]
 		
 		// Rounding options:
 		// - ceiling  : Round towards positive infinity

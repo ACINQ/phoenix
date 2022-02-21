@@ -216,6 +216,7 @@ struct ValidateView: View {
 					.fixedSize()
 					.font(.title)
 					.multilineTextAlignment(.trailing)
+					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
 					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
 			
 				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
