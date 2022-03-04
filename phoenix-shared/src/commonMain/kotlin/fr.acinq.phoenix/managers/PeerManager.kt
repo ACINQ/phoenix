@@ -1,5 +1,6 @@
 package fr.acinq.phoenix.managers
 
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.blockchain.electrum.ElectrumWatcher
 import fr.acinq.lightning.io.Peer
 import fr.acinq.lightning.io.TcpSocket
@@ -49,7 +50,12 @@ class PeerManager(
 
             var initTlvs = TlvStream.empty<InitTlv>()
             if (startupParams.requestCheckLegacyChannels) {
-                initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(nodeParams.keyManager.legacyNodeKey.publicKey))
+                val legacyKey = nodeParams.keyManager.legacyNodeKey
+                val signature = Crypto.sign(
+                    data = Crypto.sha256(legacyKey.publicKey.toUncompressedBin()),
+                    privateKey = legacyKey.privateKey
+                )
+                initTlvs = initTlvs.addOrUpdate(InitTlv.PhoenixAndroidLegacyNodeId(legacyNodeId = legacyKey.publicKey, signature = signature))
             }
 
             logger.debug { "instantiating peer with nodeParams=$nodeParams walletParams=$walletParams initTlvs=$initTlvs" }

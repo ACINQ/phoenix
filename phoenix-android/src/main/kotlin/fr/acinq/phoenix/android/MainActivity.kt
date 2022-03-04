@@ -29,8 +29,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import fr.acinq.lightning.io.LegacyChannelsFound
-import fr.acinq.lightning.io.LegacyChannelsNone
+import fr.acinq.lightning.io.PhoenixAndroidLegacyInfoEvent
 import fr.acinq.phoenix.android.components.mvi.MockView
 import fr.acinq.phoenix.android.service.NodeService
 import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
@@ -69,12 +68,14 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val application = (application as PhoenixApplication)
             application.business.peerManager.getPeer().openListenerEventSubscription().receiveAsFlow().collect {
-                if (it is LegacyChannelsFound) {
-                    log.debug("legacy channels have been found")
-                    PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
-                } else if (it is LegacyChannelsNone) {
-                    log.debug("no legacy channels were found")
-                    PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+                if (it is PhoenixAndroidLegacyInfoEvent) {
+                    if (it.info.hasChannels) {
+                        log.info("legacy channels have been found")
+                        PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.Required.Expected)
+                    } else {
+                        log.info("no legacy channels were found")
+                        PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+                    }
                 }
             }
         }
