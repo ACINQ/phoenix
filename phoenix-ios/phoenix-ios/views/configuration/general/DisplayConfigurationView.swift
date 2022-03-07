@@ -31,10 +31,8 @@ struct DisplayConfigurationView: View {
 						Text("Fiat currency")
 						Spacer()
 						Text(verbatim: fiatCurrency.shortName)
-							.foregroundColor(Color.secondary) +
-						Text(verbatim: "  \(fiatCurrency.longName)")
-							.font(.footnote)
 							.foregroundColor(Color.secondary)
+						Text(verbatim: "  \(fiatCurrency.flag)")
 					}
 				}
 				
@@ -45,10 +43,13 @@ struct DisplayConfigurationView: View {
 						Text("Bitcoin unit")
 						Spacer()
 						Text(verbatim: bitcoinUnit.shortName)
-							.foregroundColor(Color.secondary) +
-						Text(verbatim: "  \(bitcoinUnit.explanation)")
-							.font(.footnote)
-							.foregroundColor(Color.secondary)
+							.foregroundColor(Color.secondary) // +
+						let imgSize = UIFont.preferredFont(forTextStyle: .body).pointSize
+						Image("bitcoin")
+							.resizable()
+							.frame(width: imgSize, height: imgSize, alignment: .center)
+							.padding(.leading, 6)
+							.offset(x: 0, y: 2)
 					}
 				}
 				
