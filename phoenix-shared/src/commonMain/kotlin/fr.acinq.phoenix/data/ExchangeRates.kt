@@ -106,3 +106,43 @@ data class CoinDeskResponse(
         val rate: Double
     )
 }
+
+/**
+ * Bluelytics example:
+ * {
+ *   "oficial":{
+ *     "value_avg":110.92,
+ *     "value_sell":113.92,
+ *     "value_buy":107.92
+ *   },
+ *   "blue":{
+ *     "value_avg":198.50,
+ *     "value_sell":200.50,
+ *     "value_buy":196.50
+ *   },
+ *   "oficial_euro":{
+ *     "value_avg":119.27,
+ *     "value_sell":122.49,
+ *     "value_buy":116.04
+ *   },
+ *   "blue_euro":{
+ *     "value_avg":213.44,
+ *     "value_sell":215.59,
+ *     "value_buy":211.29
+ *   },
+ *   "last_update":"2022-03-07T15:25:32.816374-03:00"
+ * }
+ */
+
+@Serializable
+data class BluelyticsResponse(
+    val blue: Rate,
+    val blue_euro: Rate
+) {
+    @Serializable
+    data class Rate(
+        val value_avg: Double,
+        val value_sell: Double,
+        val value_buy: Double
+    )
+}
