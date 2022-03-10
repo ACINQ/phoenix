@@ -14,6 +14,16 @@ fileprivate var log = Logger(OSLog.disabled)
 struct MsatRange {
 	let min: Lightning_kmpMilliSatoshi
 	let max: Lightning_kmpMilliSatoshi
+	
+	init(min: Lightning_kmpMilliSatoshi, max: Lightning_kmpMilliSatoshi) {
+		self.min = min
+		self.max = max
+	}
+	
+	init(min: Int64, max: Int64) {
+		self.min = Lightning_kmpMilliSatoshi(msat: min)
+		self.max = Lightning_kmpMilliSatoshi(msat: max)
+	}
 }
 
 enum FlowType {

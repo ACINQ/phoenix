@@ -67,6 +67,9 @@ struct ValidateView: View {
 	@State var isInvalidAmount: Bool = false
 	@State var isExpiredInvoice: Bool = false
 	
+	@State var preTipAmountMsat: Int64? = nil
+	@State var priceSliderVisible: Bool = false
+	
 	@State var comment: String = ""
 	@State var hasPromptedForComment = false
 	
@@ -242,12 +245,12 @@ struct ValidateView: View {
 				.padding(.top, 4)
 				.padding(.bottom)
 			
-			if hasExtendedMetadata() || supportsPriceRange() || supportsComment() {
+			if hasExtendedMetadata() || supportsPriceTarget() || supportsComment() {
 				HStack(alignment: VerticalAlignment.center, spacing: 20) {
 					if hasExtendedMetadata() {
 						metadataButton()
 					}
-					if supportsPriceRange() {
+					if supportsPriceTarget() {
 						priceTargetButton()
 					}
 					if supportsComment() {
@@ -438,6 +441,7 @@ struct ValidateView: View {
 		) {
 			priceTargetButtonTapped()
 		}
+		.disabled(priceTargetButtonDisabled())
 	}
 	
 	@ViewBuilder
@@ -462,7 +466,8 @@ struct ValidateView: View {
 			currency: currency,
 			amount: $amount,
 			parsedAmount: $parsedAmount,
-			hideMsats: false
+			hideMsats: false,
+			userDidEdit: { userDidEditTextField() }
 		)
 	}
 	
@@ -473,6 +478,11 @@ struct ValidateView: View {
 		} else {
 			return NSLocalizedString("tip", comment: "button label - try to make it short")
 		}
+	}
+	
+	func priceTargetButtonDisabled() -> Bool {
+		
+		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
 	}
 	
 	func paymentHost() -> String? {
@@ -523,10 +533,21 @@ struct ValidateView: View {
 		return false
 	}
 	
-	func supportsPriceRange() -> Bool {
+	func supportsPriceTarget() -> Bool {
+		
+		// The "price target" button has multiple uses/meanings:
+		//
+		// - for invoices, it means adding a tip
+		// - for lnurl-pay, it's the acceptable range (generally a tip)
+		// - for lnurl-withdraw, it's the range of money to withdraw
 		
 		if let tuple = priceRange() {
+			// true if there's an actual range
 			return tuple.max.msat > tuple.min.msat
+			
+		} else if isAmountlessInvoice() {
+			return true
+			
 		} else {
 			return false
 		}
@@ -636,6 +657,15 @@ struct ValidateView: View {
 		}
 	}
 	
+	func isAmountlessInvoice() -> Bool {
+		
+		if let paymentRequest = paymentRequest() {
+			return paymentRequest.amount == nil
+		} else {
+			return false
+		}
+	}
+	
 	func priceRange() -> MsatRange? {
 		
 		if let paymentRequest = paymentRequest() {
@@ -680,28 +710,22 @@ struct ValidateView: View {
 	
 	func tipNumbers() -> TipNumbers? {
 		
-		guard let totalAmt = try? parsedAmount.get(), totalAmt > 0 else {
+		guard let totalMsat = parsedAmountMsat() else {
+			log.debug("tipNumbers() -> nil: totalMsat is nil")
 			return nil
 		}
 		
-		var totalMsat: Int64? = nil
-		switch currency {
-		case .bitcoin(let bitcoinUnit):
-			totalMsat = Utils.toMsat(from: totalAmt, bitcoinUnit: bitcoinUnit)
-		case .fiat(let fiatCurrency):
-			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-				totalMsat = Utils.toMsat(fromFiat: totalAmt, exchangeRate: exchangeRate)
-			}
-		}
-		
 		var baseMsat: Int64? = nil
-		if let paymentRequest = paymentRequest() {
+		if let preTipAmountMsat = preTipAmountMsat {
+			baseMsat = preTipAmountMsat
+		} else if let paymentRequest = paymentRequest() {
 			baseMsat = paymentRequest.amount?.msat
 		} else if let lnurlPay = lnurlPay() {
 			baseMsat = lnurlPay.minSendable.msat
 		}
 		
-		guard let totalMsat = totalMsat, let baseMsat = baseMsat, totalMsat > baseMsat else {
+		guard let baseMsat = baseMsat, totalMsat > baseMsat else {
+			log.debug("tipNumbers() -> nil: baseMsat is nil")
 			return nil
 		}
 		
@@ -723,6 +747,25 @@ struct ValidateView: View {
 		)
 		
 		return options
+	}
+	
+	func parsedAmountMsat() -> Int64? {
+		
+		guard let amt = try? parsedAmount.get(), amt > 0 else {
+			return nil
+		}
+		
+		var msat: Int64? = nil
+		switch currency {
+		case .bitcoin(let bitcoinUnit):
+			msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
+		case .fiat(let fiatCurrency):
+			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
+				msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
+			}
+		}
+		
+		return msat
 	}
 	
 	func currentAmount() -> CurrencyAmount? {
@@ -806,6 +849,15 @@ struct ValidateView: View {
 		keyWindow?.endEditing(true)
 	}
 	
+	func userDidEditTextField() {
+		log.trace("userDidEditTextField()")
+		
+		// This is called if the user manually edits the TextField.
+		// Which is distinct from `amountDidChange`, which may be triggered via code.
+		
+		preTipAmountMsat = nil
+	}
+	
 	func amountDidChange() -> Void {
 		log.trace("amountDidChange()")
 		
@@ -832,6 +884,10 @@ struct ValidateView: View {
 			
 			currencyConverterOpen = true
 			currencyPickerChoice = currency.abbrev // revert to last real currency
+		}
+		
+		if !priceSliderVisible {
+			preTipAmountMsat = nil
 		}
 	}
 	
@@ -1030,25 +1086,29 @@ struct ValidateView: View {
 	func priceTargetButtonTapped() {
 		log.trace("priceTargetButtonTapped()")
 		
-		guard let range = priceRange() else {
-			return
-		}
+		var msat: Int64 = 0
+		var minMsat: Int64 = 0
+		var maxMsat: Int64 = 0
 		
-		let minMsat = range.min.msat
-		let maxMsat = range.max.msat
-		
-		var msat = minMsat
-		if let amt = try? parsedAmount.get(), amt > 0 {
+		if let range = priceRange() {
+			minMsat = range.min.msat
+			maxMsat = range.max.msat
 			
-			switch currency {
-			case .bitcoin(let bitcoinUnit):
-				msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
-				
-			case .fiat(let fiatCurrency):
-				if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-					msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-				}
+			msat = parsedAmountMsat() ?? minMsat
+			
+		} else if isAmountlessInvoice() {
+			
+			guard let parsedAmtMst = parsedAmountMsat() else {
+				return
 			}
+			
+			msat = parsedAmtMst
+			minMsat = parsedAmtMst
+			maxMsat = parsedAmtMst * 2
+			preTipAmountMsat = parsedAmtMst
+			
+		} else {
+			return
 		}
 		
 		let isRange = maxMsat > minMsat
@@ -1056,6 +1116,8 @@ struct ValidateView: View {
 			
 			// A range of valid amounts are possible.
 			// Show the PriceSliderSheet.
+			
+			let range = MsatRange(min: minMsat, max: maxMsat)
 			
 			if msat < minMsat {
 				msat = minMsat
@@ -1072,6 +1134,11 @@ struct ValidateView: View {
 			}
 			
 			if let flowType = flowType {
+				
+				priceSliderVisible = true
+				shortSheetState.onNextWillDisappear {
+					priceSliderVisible = false
+				}
 				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
@@ -1133,22 +1200,9 @@ struct ValidateView: View {
 	func sendPayment() {
 		log.trace("sendPayment()")
 		
-		guard
-			let amt = try? parsedAmount.get(),
-			amt > 0
-		else {
+		guard let msat = parsedAmountMsat() else {
 			isInvalidAmount = true
 			return
-		}
-		
-		var msat: Int64? = nil
-		switch currency {
-		case .bitcoin(let bitcoinUnit):
-			msat = Utils.toMsat(from: amt, bitcoinUnit: bitcoinUnit)
-		case .fiat(let fiatCurrency):
-			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-				msat = Utils.toMsat(fromFiat: amt, exchangeRate: exchangeRate)
-			}
 		}
 		
 		let saveTipPercentInPrefs = {
@@ -1160,14 +1214,12 @@ struct ValidateView: View {
 		
 		if let model = mvi.model as? Scan.Model_InvoiceFlow_InvoiceRequest {
 			
-			if let msat = msat {
-				saveTipPercentInPrefs()
-				mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
-					paymentRequest: model.paymentRequest,
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					maxFees: Prefs.shared.maxFees?.toKotlin()
-				))
-			}
+			saveTipPercentInPrefs()
+			mvi.intent(Scan.Intent_InvoiceFlow_SendInvoicePayment(
+				paymentRequest: model.paymentRequest,
+				amount: Lightning_kmpMilliSatoshi(msat: msat),
+				maxFees: Prefs.shared.maxFees?.toKotlin()
+			))
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			
@@ -1191,7 +1243,7 @@ struct ValidateView: View {
 					)
 				}
 				
-			} else if let msat = msat {
+			} else {
 				
 				saveTipPercentInPrefs()
 				mvi.intent(Scan.Intent_LnurlPayFlow_SendLnurlPayment(
@@ -1204,15 +1256,12 @@ struct ValidateView: View {
 			
 		} else if let model = mvi.model as? Scan.Model_LnurlWithdrawFlow_LnurlWithdrawRequest {
 			
-			if let msat = msat {
-				
-				saveTipPercentInPrefs()
-				mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
-					lnurlWithdraw: model.lnurlWithdraw,
-					amount: Lightning_kmpMilliSatoshi(msat: msat),
-					description: nil
-				))
-			}
+			saveTipPercentInPrefs()
+			mvi.intent(Scan.Intent_LnurlWithdrawFlow_SendLnurlWithdraw(
+				lnurlWithdraw: model.lnurlWithdraw,
+				amount: Lightning_kmpMilliSatoshi(msat: msat),
+				description: nil
+			))
 		}
 	}
 	

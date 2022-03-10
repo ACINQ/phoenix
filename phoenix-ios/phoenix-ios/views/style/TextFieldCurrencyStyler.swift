@@ -47,19 +47,23 @@ struct TextFieldCurrencyStyler {
 	@Binding private var amount: String
 	@Binding private var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 	
+	private let userDidEdit: (() -> Void)?
+	
 	let hideMsats: Bool
 	
 	init(
 		currency: Currency,
 		amount: Binding<String>,
 		parsedAmount: Binding<Result<Double, TextFieldCurrencyStylerError>>,
-		hideMsats: Bool = true
+		hideMsats: Bool = true,
+		userDidEdit: (() -> Void)? = nil
 	) {
 		self.currency = currency
 		self._amount = amount
 		self._parsedAmount = parsedAmount
 		
 		self.hideMsats = hideMsats
+		self.userDidEdit = userDidEdit
 	}
 
 	var amountProxy: Binding<String> {
@@ -71,6 +75,7 @@ struct TextFieldCurrencyStyler {
 			},
 			set: { (input: String) in
 				log.debug("-> set")
+				let oldAmount = amount
 				let (newAmount, result) = TextFieldCurrencyStyler.format(
 					input: input,
 					currency: currency,
@@ -78,6 +83,10 @@ struct TextFieldCurrencyStyler {
 				)
 				self.parsedAmount = result
 				self.amount = newAmount // contract: always change parsedAmount before amount
+				
+				if let userDidEdit = userDidEdit, oldAmount != newAmount {
+					userDidEdit()
+				}
 			}
 		)
 	}
