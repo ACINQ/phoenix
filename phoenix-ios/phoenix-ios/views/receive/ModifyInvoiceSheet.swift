@@ -245,7 +245,7 @@ struct ModifyInvoiceSheet: View {
 			refreshAltAmount()
 		}
 		
-		currencyList = Currency.displayable2(currencyPrefs: currencyPrefs, plus: currency)
+		currencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: currency)
 		currencyPickerChoice = currency.abbrev
 	}
 	

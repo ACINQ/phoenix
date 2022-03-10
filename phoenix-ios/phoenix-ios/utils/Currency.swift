@@ -36,28 +36,20 @@ enum Currency: Hashable, Identifiable, CustomStringConvertible {
 		}
 	}
 	
-	/// A list of all BitcoinUnit's and the currently selected FiatCurrency (IFF we know the exchangeRate).
+	/// Returns the list of preferred currencies. This includes:
+	/// - the user's chosen fiat currency (via Phoenix Settings -> Display -> Fiat)
+	/// - the user's chosen bitcoin unit (via Phoenix Settings -> Display -> Bitcoin)
+	/// - the list of currencies being used in the currency converter
 	///
-	static func displayable(currencyPrefs: CurrencyPrefs) -> [Currency] {
-		
-		var all = [Currency]()
-		
-		for bitcoinUnit in BitcoinUnit.companion.values {
-			all.append(Currency.bitcoin(bitcoinUnit))
-		}
-		
-		let fiatCurrency = currencyPrefs.fiatCurrency
-		if let _ = currencyPrefs.fiatExchangeRate(fiatCurrency: fiatCurrency) {
-			all.append(Currency.fiat(fiatCurrency))
-		} else {
-			// We don't have the exchange rate for the user's selected fiat currency.
-			// So we won't be able to perform conversion to millisatoshi.
-		}
-		
-		return all
-	}
-	
-	static func displayable2(currencyPrefs: CurrencyPrefs, plus: Currency? = nil) -> [Currency] {
+	/// The order is maintained from the currency converter (which the user can sort manually).
+	///
+	/// Any fiat currencies for which we don't have the current exchange rate are filtered out.
+	///
+	/// - Parameters:
+	///   - currencyPrefs: Pass the view's EvironmentObject instance
+	///   - plus: Optionally add an additional Currency to the end of the list
+	///
+	static func displayable(currencyPrefs: CurrencyPrefs, plus: Currency? = nil) -> [Currency] {
 		
 		var all = [Currency](Prefs.shared.currencyConverterList)
 		

@@ -746,7 +746,7 @@ struct ValidateView: View {
 		}
 		didAppear = true
 			
-		currencyList = Currency.displayable2(currencyPrefs: currencyPrefs)
+		currencyList = Currency.displayable(currencyPrefs: currencyPrefs)
 		
 		let bitcoinUnit = currencyPrefs.bitcoinUnit
 		currency = Currency.bitcoin(bitcoinUnit)
@@ -1245,7 +1245,7 @@ struct ValidateView: View {
 		
 		if let newAmt = result {
 
-			let newCurrencyList = Currency.displayable2(currencyPrefs: currencyPrefs, plus: newAmt.currency)
+			let newCurrencyList = Currency.displayable(currencyPrefs: currencyPrefs, plus: newAmt.currency)
 
 			if currencyList != newCurrencyList {
 				currencyList = newCurrencyList
