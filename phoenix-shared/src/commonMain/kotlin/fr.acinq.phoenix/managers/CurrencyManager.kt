@@ -55,6 +55,10 @@ class CurrencyManager(
     )
 
     private val log = newLogger(loggerFactory)
+    
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     /**
      * List of fiat currencies where we directly fetch the FIAT/BTC exchange rate.
@@ -435,9 +439,6 @@ class CurrencyManager(
             threadsCount = 1
             pipelining = true
         }}
-        val json = Json {
-            ignoreUnknownKeys = true
-        }
 
         fiatCurrencies.map { fiatCurrency ->
             val fiat = fiatCurrency.name // e.g.: "AUD"
@@ -539,9 +540,6 @@ class CurrencyManager(
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to get http response")
             }
             try {
-                val json = Json {
-                    ignoreUnknownKeys = true
-                }
                 json.decodeFromString<BluelyticsResponse>(response.receive())
             } catch (e: Exception) {
                 throw WrappedException(e, FiatCurrency.ARS_BM, "failed to parse json response")
