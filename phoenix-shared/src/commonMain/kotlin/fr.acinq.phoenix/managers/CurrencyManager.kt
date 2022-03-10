@@ -182,7 +182,7 @@ class CurrencyManager(
         refreshJob = null
     }
 
-    fun refresh(targets: List<FiatCurrency>) = launch {
+    fun refreshAll(targets: List<FiatCurrency>) = launch {
         stop().join()
         val deferred1 = async {
             refreshFromBlockchainInfo(targets = targets, forceRefresh = true)

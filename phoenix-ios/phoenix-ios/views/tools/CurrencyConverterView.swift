@@ -563,7 +563,7 @@ struct CurrencyConverterView: View {
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		AppDelegate.get().business.currencyManager.refresh(targets: FiatCurrency.companion.values)
+		AppDelegate.get().business.currencyManager.refreshAll(targets: FiatCurrency.companion.values)
 	}
 	
 	private func didSelectCurrency(_ newCurrency: Currency) {
