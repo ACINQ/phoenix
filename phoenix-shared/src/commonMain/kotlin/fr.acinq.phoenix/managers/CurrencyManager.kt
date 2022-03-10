@@ -19,7 +19,7 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 /**
- * Notes:
+ * Architecture Notes:
  *
  * At the time of implementation, it was determined that the bitcoin markets for both USD & EUR
  * were sufficiently deep & liquid enough to provide reliable rates.
@@ -36,6 +36,9 @@ import kotlin.time.ExperimentalTime
  * Thus, if we fetch both BTC-USD & USD-COP, we can easily convert between any of the 3 currencies.
  */
 
+/**
+ * Manages fetching and updating exchange rates.
+ */
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class, ExperimentalStdlibApi::class)
 class CurrencyManager(
     loggerFactory: LoggerFactory,
@@ -53,18 +56,34 @@ class CurrencyManager(
 
     private val log = newLogger(loggerFactory)
 
-    // List of fiat currencies where we directly fetch the FIAT/BTC exchange rate.
-    // See notes at top of file for discussion.
+    /**
+     * List of fiat currencies where we directly fetch the FIAT/BTC exchange rate.
+     * See "architecture notes" at top of file for discussion.
+     */
     private val highLiquidityMarkets = setOf(FiatCurrency.USD, FiatCurrency.EUR)
 
-    // We use a number of different API's to fetch all the data we need.
+    /**
+     * We use a number of different API's to fetch all the data we need.
+     * This interface defines the shared format for each API.
+     */
     interface API {
+        /**
+         * How often to perform an automatic refresh.
+         * Some API's impose limits, and others simply don't refresh (server-side) as often.
+         */
         val refreshDelay: Duration
+
+        /**
+         * List of fiat currencies updated by the API.
+         * A currency should only be represented in a single API.
+         */
         val fiatCurrencies: Set<FiatCurrency>
     }
 
-    // The blockchain.info API is used to refresh the BitcoinPriceRates.
-    // Since bitcoin prices are volatile, we refresh them often.
+    /**
+     * The blockchain.info API is used to refresh the BitcoinPriceRates.
+     * Since bitcoin prices are volatile, we refresh them often.
+     */
     private val blockchainInfoAPI = object: API {
         override val refreshDelay = Duration.minutes(20)
         override val fiatCurrencies = FiatCurrency.values.filter {
@@ -72,9 +91,11 @@ class CurrencyManager(
         }.toSet()
     }
 
-    // The coindesk API is used to refersh the UsdPriceRates.
-    // Since fiat prices are less volatile, we refresh them less often.
-    // Also, the source only refreshes the values once per hour.
+    /**
+     * The coindesk API is used to refersh the UsdPriceRates.
+     * Since fiat prices are less volatile, we refresh them less often.
+     * Also, the source only refreshes the values once per hour.
+     */
     private val coindeskAPI = object: API {
         override val refreshDelay = Duration.minutes(60)
         override val fiatCurrencies = FiatCurrency.values.filter {
@@ -82,18 +103,20 @@ class CurrencyManager(
         }.toSet()
     }
 
-    // The bluelytics API is used to fetch the "blue market" price for the Argentine Peso.
-    // ARS => government controlled exchange rate
-    // ARS_BM => free market exchange rate
+    /**
+     * The bluelytics API is used to fetch the "blue market" price for the Argentine Peso.
+     * - ARS => government controlled exchange rate
+     * - ARS_BM => free market exchange rate
+     */
     private val bluelyticsAPI = object: API {
         override val refreshDelay = Duration.minutes(120)
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
     }
 
-    // Public consumable flow that includes the most recent exchange rates
+    /** Public consumable flow that includes the most recent exchange rates */
     val ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
 
-    // Utility class useed to track refresh progress on a per-currency basis.
+    /** Utility class useed to track refresh progress on a per-currency basis. */
     data class RefreshInfo(
         val lastRefresh: Instant,
         val nextRefresh: Instant,
@@ -130,15 +153,19 @@ class CurrencyManager(
 
     private var networkAccessEnabled = false
 
-    // Used by AppConnectionsDaemon.
-    // Invoked when an internet connection is available.
+    /**
+     * Used by AppConnectionsDaemon.
+     * Invoked when an internet connection is available.
+     */
     internal fun enableNetworkAccess() {
         networkAccessEnabled = true
         start()
     }
 
-    // Used by AppConnectionsDaemon.
-    // Invoked when there is not an internet connection available.
+    /**
+     * Used by AppConnectionsDaemon.
+     * Invoked when there is not an internet connection available.
+     */
     internal fun disableNetworkAccess() {
         networkAccessEnabled = false
         stop()
@@ -210,10 +237,11 @@ class CurrencyManager(
         }
     }
 
-    // Updates the `refreshList` with fresh RefreshInfo values.
-    // Only the `attempted` currencies are updated.
-    // The `refreshed` parameter marks those currencies that were successfully refreshed.
-    //
+    /**
+     * Updates the `refreshList` with fresh RefreshInfo values.
+     * Only the `attempted` currencies are updated.
+     * The `refreshed` parameter marks those currencies that were successfully refreshed.
+     */
     private fun updateRefreshList(
         api: API,
         attempted: Collection<FiatCurrency>,
@@ -270,10 +298,11 @@ class CurrencyManager(
         }
     }
 
-    // Given a list of targets, filters the set to only include:
-    // - those in the given api
-    // - those that actually need to be refreshed (unless forceRefresh is true)
-    //
+    /**
+     * Given a list of targets, filters the set to only include:
+     * - those in the given api
+     * - those that actually need to be refreshed (unless forceRefresh is true)
+     */
     private fun filterTargets(
         targets: Collection<FiatCurrency>,
         forceRefresh: Boolean,
@@ -295,11 +324,20 @@ class CurrencyManager(
         }.toSet()
     }
 
+    /**
+     * Adds given targets to the publicly visible `refreshFlow`.
+     * The UI may use this flow to display a progress/spinner to indicate refresh activity.
+     */
     private fun addRefreshTargets(targets: Set<FiatCurrency>) {
         _refreshFlow.update { currentSet ->
             currentSet.plus(targets)
         }
     }
+
+    /**
+     * Removes the given targets from the publicly visible `refreshFlow`.
+     * The UI may use this flow to display a progress/spinner to indicate refresh activity.
+     */
     private fun removeRefreshTargets(targets: Set<FiatCurrency>) {
         _refreshFlow.update { currentSet ->
             currentSet.minus(targets)
