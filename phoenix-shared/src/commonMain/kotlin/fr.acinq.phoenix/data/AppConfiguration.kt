@@ -60,6 +60,7 @@ enum class FiatCurrency : CurrencyUnit {
     ANG, // Netherlands Antillean Guilder
     AOA, // Angolan Kwanza
     ARS, // Argentine Peso
+    ARS_BM, // Argentine Peso (blue market)
     AUD, // Australian Dollar
     AWG, // Aruban Florin
     AZN, // Azerbaijani Manat

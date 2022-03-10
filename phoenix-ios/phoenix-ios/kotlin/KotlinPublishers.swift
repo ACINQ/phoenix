@@ -61,13 +61,13 @@ extension CurrencyManager {
 		executeOnce(storageKey: &_Key.refreshPublisher) {
 			
 			// Transforming from Kotlin:
-			// `refreshFlow: StateFlow<Target>`
+			// `refreshFlow: StateFlow<Set<FiatCurrency>>`
 			//
-			KotlinCurrentValueSubject<Target, Target>(
+			KotlinCurrentValueSubject<NSSet, Set<FiatCurrency>>(
 				self.refreshFlow
 			)
-			.map { (target: Target) -> Bool in
-				return target != CurrencyManager.Target.companion.None
+			.map { (targets: Set<FiatCurrency>) -> Bool in
+				return !targets.isEmpty
 			}
 			.eraseToAnyPublisher()
 		}
