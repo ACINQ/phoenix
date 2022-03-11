@@ -1,6 +1,15 @@
 import Foundation
 import PhoenixShared
 
+enum MsatsPolicy {
+	/// Millisatoshi amounts are always shown
+	case showMsats
+	/// Millisatoshi amounts are never shown
+	case hideMsats
+	/// Millisatoshi amounts are shown if: `0 < msats < 1,000`
+	case showIfZeroSats
+}
+
 class Utils {
 	
 	public static let Millisatoshis_Per_Satoshi      =           1_000.0
@@ -75,7 +84,8 @@ class Utils {
 	///
 	static func format(_ currencyPrefs: CurrencyPrefs, sat: Int64) -> FormattedAmount {
 		
-		return format(currencyPrefs, msat: (sat * 1_000))
+		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		return format(currencyPrefs, msat: msat)
 	}
 	
 	/// Formats the given amount of millisatoshis into either a bitcoin or fiat amount,
@@ -86,10 +96,10 @@ class Utils {
 	static func format(
 		_ currencyPrefs : CurrencyPrefs,
 		msat            : Lightning_kmpMilliSatoshi,
-		hideMsats       : Bool = true
+		policy          : MsatsPolicy = .hideMsats
 	) -> FormattedAmount {
 		
-		return format(currencyPrefs, msat: msat.toLong(), hideMsats: hideMsats)
+		return format(currencyPrefs, msat: msat.toLong(), policy: policy)
 	}
 	
 	/// Formats the given amount of millisatoshis into either a bitcoin or fiat amount,
@@ -97,10 +107,14 @@ class Utils {
 	///
 	/// - Returns: a FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func format(_ currencyPrefs: CurrencyPrefs, msat: Int64, hideMsats: Bool = true) -> FormattedAmount {
+	static func format(
+		_ currencyPrefs : CurrencyPrefs,
+		msat            : Int64,
+		policy          : MsatsPolicy = .hideMsats
+	) -> FormattedAmount {
 		
 		if currencyPrefs.currencyType == .bitcoin {
-			return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, hideMsats: hideMsats)
+			return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy)
 		} else {
 			let selectedFiat = currencyPrefs.fiatCurrency
 			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: selectedFiat) {
@@ -199,10 +213,10 @@ class Utils {
 	static func formatBitcoin(
 		msat        : Lightning_kmpMilliSatoshi,
 		bitcoinUnit : BitcoinUnit,
-		hideMsats   : Bool = true
+		policy      : MsatsPolicy = .hideMsats
 	) -> FormattedAmount {
 		
-		return formatBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
+		return formatBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit, policy: policy)
 	}
 	
 	/// Converts from millisatoshis to the given BitcoinUnit.
@@ -213,26 +227,48 @@ class Utils {
 	static func formatBitcoin(
 		msat        : Int64,
 		bitcoinUnit : BitcoinUnit,
-		hideMsats   : Bool = true
+		policy      : MsatsPolicy = .hideMsats
 	) -> FormattedAmount {
 		
 		let targetAmount: Double = convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+		return formatBitcoin(amount: targetAmount, bitcoinUnit: bitcoinUnit, policy: policy)
+	}
+	
+	static func formatBitcoin(
+		amount      : Double,
+		bitcoinUnit : BitcoinUnit,
+		policy      : MsatsPolicy = .hideMsats
+	) -> FormattedAmount {
+		
+		let hideMsats: Bool
+		switch policy {
+			case .hideMsats: hideMsats = true
+			case .showMsats: hideMsats = false
+			case .showIfZeroSats:
+				let msats = toMsat(from: amount, bitcoinUnit: bitcoinUnit)
+				if (msats > 0) && (msats < 1_000) {
+					hideMsats = false
+				} else {
+					hideMsats = true
+				}
+		}
+		
 		let formatter = bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
 		
-		var digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
 		// Zero edge-case check
 		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0"
 		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0"
 		
-		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && targetAmount != 0.0 {
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && amount != 0.0 {
 			
 			formatter.roundingMode = .up // Round away from zero
-			digits = formatter.string(from: NSNumber(value: targetAmount)) ?? targetAmount.description
+			digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		}
 		
 		let formattedAmount = FormattedAmount(
-			amount: targetAmount,
+			amount: amount,
 			currency: Currency.bitcoin(bitcoinUnit),
 			digits: digits,
 			decimalSeparator: formatter.decimalSeparator
@@ -264,6 +300,8 @@ class Utils {
 		// So we need to remove it, and the associated padding.
 		formatter.currencySymbol = ""
 		formatter.paddingCharacter = ""
+		formatter.positivePrefix = "" // needed for: [nl, de_CH, es_BQ, ...]
+		formatter.positiveSuffix = "" // needed for: [he, ar, ar_AE, ...]
 		
 		// Rounding options:
 		// - ceiling  : Round towards positive infinity
@@ -381,23 +419,31 @@ class Utils {
 	) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
-		let formatter = fiatFormatter(fiatCurrency: exchangeRate.fiatCurrency)
+		return formatFiat(amount: fiatAmount, fiatCurrency: exchangeRate.fiatCurrency)
+	}
+	
+	static func formatFiat(
+		amount: Double,
+		fiatCurrency: FiatCurrency
+	) -> FormattedAmount {
 		
-		var digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+		let formatter = fiatFormatter(fiatCurrency: fiatCurrency)
+		
+		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
 		// Zero edge-case check
 		let positiveZeroDigits = formatter.string(from: NSNumber(value: 0.0)) ?? "0.00"
 		let negativeZeroDigits = formatter.string(from: NSNumber(value: -0.0)) ?? "-0.00"
 		
-		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && fiatAmount != 0.0 {
+		if (digits == positiveZeroDigits || digits == negativeZeroDigits) && amount != 0.0 {
 			
 			formatter.roundingMode = .up // Round away from zero
-			digits = formatter.string(from: NSNumber(value: fiatAmount)) ?? fiatAmount.description
+			digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		}
 		
 		return FormattedAmount(
-			amount: fiatAmount,
-			currency: Currency.fiat(exchangeRate.fiatCurrency),
+			amount: amount,
+			currency: Currency.fiat(fiatCurrency),
 			digits: digits,
 			decimalSeparator: formatter.currencyDecimalSeparator
 		)

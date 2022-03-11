@@ -150,7 +150,7 @@ class SyncSeedManager_State_Waiting: Equatable {
 	}
 	
 	private func timerFire() {
-		until?.parent?.updateState(finishing: self)
+		until?.parent?.finishWaiting(self)
 	}
 	
 	/// Allows the user to terminate the delay early.

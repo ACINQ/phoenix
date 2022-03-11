@@ -47,19 +47,23 @@ struct TextFieldCurrencyStyler {
 	@Binding private var amount: String
 	@Binding private var parsedAmount: Result<Double, TextFieldCurrencyStylerError>
 	
+	private let userDidEdit: (() -> Void)?
+	
 	let hideMsats: Bool
 	
 	init(
 		currency: Currency,
 		amount: Binding<String>,
 		parsedAmount: Binding<Result<Double, TextFieldCurrencyStylerError>>,
-		hideMsats: Bool = true
+		hideMsats: Bool = true,
+		userDidEdit: (() -> Void)? = nil
 	) {
 		self.currency = currency
 		self._amount = amount
 		self._parsedAmount = parsedAmount
 		
 		self.hideMsats = hideMsats
+		self.userDidEdit = userDidEdit
 	}
 
 	var amountProxy: Binding<String> {
@@ -71,6 +75,7 @@ struct TextFieldCurrencyStyler {
 			},
 			set: { (input: String) in
 				log.debug("-> set")
+				let oldAmount = amount
 				let (newAmount, result) = TextFieldCurrencyStyler.format(
 					input: input,
 					currency: currency,
@@ -78,6 +83,10 @@ struct TextFieldCurrencyStyler {
 				)
 				self.parsedAmount = result
 				self.amount = newAmount // contract: always change parsedAmount before amount
+				
+				if let userDidEdit = userDidEdit, oldAmount != newAmount {
+					userDidEdit()
+				}
 			}
 		)
 	}
@@ -113,7 +122,21 @@ struct TextFieldCurrencyStyler {
 			return (amount, Result.success(parsedAmount))
 		}
 		
-		// Get appropriate formatter for the current state
+		// Remove whitespace
+		
+		let RemoveWhitespace = {(_ str: String) -> String in
+			
+			return str.components(separatedBy: CharacterSet.whitespacesAndNewlines).joined()
+		}
+		
+		var rawInput = RemoveWhitespace(input)
+		
+		if rawInput.count == 0 {
+			log.debug("empty input")
+			return Fail(.emptyInput)
+		}
+		
+		// Get appropriate formatter for the currency
 		
 		let isFiatCurrency: Bool
 		let formatter: NumberFormatter
@@ -139,12 +162,7 @@ struct TextFieldCurrencyStyler {
 			formatter.minimumFractionDigits = 0
 		}
 		
-		// Setup helper tools
-		
-		let RemoveWhitespace = {(_ str: String) -> String in
-			
-			return str.components(separatedBy: CharacterSet.whitespacesAndNewlines).joined()
-		}
+		// Remove formatting characters from the input
 		
 		let RemoveGroupingCharacters = {(_ str: String) -> String in
 			
@@ -158,15 +176,6 @@ struct TextFieldCurrencyStyler {
 			}
 			
 			return str
-		}
-		
-		// Remove formatting characters from the input
-		
-		var rawInput = RemoveWhitespace(input)
-		
-		if rawInput.count == 0 {
-			log.debug("empty input")
-			return Fail(.emptyInput)
 		}
 		
 		rawInput = RemoveGroupingCharacters(rawInput)

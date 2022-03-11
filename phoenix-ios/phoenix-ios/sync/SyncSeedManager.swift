@@ -31,36 +31,6 @@ enum FetchSeedsError: Error {
 	case unknown(underlying: Error)
 }
 
-fileprivate struct AtomicState {
-	var waitingForInternet = true
-	var waitingForCloudCredentials = true
-	
-	var isEnabled: Bool
-	var needsUploadSeed: Bool
-	var needsDeleteSeed: Bool
-	
-	var active: SyncSeedManager_State
-	
-	init(isEnabled: Bool, hasUploadedSeed: Bool) {
-		self.isEnabled = isEnabled
-		if isEnabled {
-			needsUploadSeed = !hasUploadedSeed
-			needsDeleteSeed = false
-		} else {
-			needsUploadSeed = false
-			needsDeleteSeed = hasUploadedSeed
-		}
-		
-		if isEnabled && !needsUploadSeed {
-			active = .synced
-		} else if !isEnabled && !needsDeleteSeed {
-			active = .disabled
-		} else {
-			active = .waiting_forInternet()
-		}
-	}
-}
-
 // --------------------------------------------------------------------------------
 // MARK: -
 // --------------------------------------------------------------------------------
@@ -98,10 +68,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	///
 	public let statePublisher: CurrentValueSubject<SyncSeedManager_State, Never>
 	
-	private let record_table_name: String
-	
-	private let queue = DispatchQueue(label: "SyncSeedManager")
-	private var state: AtomicState // must be read/modified within queue
+	/// Implements the state machine in a thread-safe actor.
+	///
+	private let actor: SyncSeedManager_Actor
 	
 	private var consecutiveErrorCount = 0
 	
@@ -114,13 +83,11 @@ class SyncSeedManager: SyncManagerProtcol {
 		self.mnemonics = mnemonics.joined(separator: " ")
 		self.encryptedNodeId = encryptedNodeId
 		
-		record_table_name = SyncSeedManager.record_table_name(chain: chain)
-		
-		state = AtomicState(
+		actor = SyncSeedManager_Actor(
 			isEnabled: Prefs.shared.backupSeed_isEnabled,
 			hasUploadedSeed: Prefs.shared.backupSeed_hasUploadedSeed(encryptedNodeId: encryptedNodeId)
 		)
-		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(state.active)
+		statePublisher = CurrentValueSubject<SyncSeedManager_State, Never>(actor.initialState)
 		
 		startPreferencesMonitor()
 		startNameMonitor()
@@ -247,62 +214,14 @@ class SyncSeedManager: SyncManagerProtcol {
 				isFirstFire = false
 				return
 			}
+			guard let self = self else {
+				return
+			}
 			
 			log.debug("Prefs.shared.backupSeed_isEnabled_publisher = \(shouldEnable ? "true" : "false")")
-
-			self?.updateState { state, deferToSimplifiedStateFlow in
-				
-				if shouldEnable {
-					
-					if !state.isEnabled {
-					
-						// From disabled -> To enabled
-						log.debug("Transitioning to enabled state")
-						
-						state.isEnabled = true
-						state.needsUploadSeed = true
-						state.needsDeleteSeed = false
-						
-						switch state.active {
-							case .waiting(let details):
-								// Careful: calling `details.skip` within `queue.sync` will cause deadlock.
-								DispatchQueue.global(qos: .default).async {
-									details.skip()
-								}
-							case .disabled:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-						
-					} else {
-						log.debug("Reqeust to transition to enabled state, but already enabled")
-					}
-
-				} else /* if !shouldEnable */ {
-					
-					if state.isEnabled {
-					
-						// From enabled -> To disabled
-						log.debug("Transitioning to disabled state")
-						
-						state.isEnabled = false
-						state.needsUploadSeed = false
-						state.needsDeleteSeed = true
-						
-						switch state.active {
-							case .waiting(let details):
-								// Careful: calling `details.skip` within `queue.sync` will cause deadlock.
-								DispatchQueue.global(qos: .default).async {
-									details.skip()
-								}
-							case .synced:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-						
-					} else {
-						log.debug("Request to transition to disabled state, but already disabled")
-					}
+			Task {
+				if let newState = await self.actor.didChangeIsEnabled(shouldEnable) {
+					self.handleNewState(newState)
 				}
 			}
 			
@@ -314,15 +233,14 @@ class SyncSeedManager: SyncManagerProtcol {
 		
 		Prefs.shared.backupSeed_name_publisher.sink {[weak self] _ in
 			
+			guard let self = self else {
+				return
+			}
+			
 			log.debug("Prefs.shared.backupSeed_name_publisher => fired")
-
-			self?.updateState { state, deferToSimplifiedStateFlow in
-				state.needsUploadSeed = true
-				
-				switch state.active {
-					case .synced:
-						deferToSimplifiedStateFlow = true
-					default: break
+			Task {
+				if let newState = await self.actor.didChangeName() {
+					self.handleNewState(newState)
 				}
 			}
 			
@@ -352,85 +270,29 @@ class SyncSeedManager: SyncManagerProtcol {
 	// MARK: State Machine
 	// ----------------------------------------
 	
-	func updateState(finishing waiting: SyncSeedManager_State_Waiting) {
-		log.trace("updateState(finishing waiting)")
+	func finishWaiting(_ sender: SyncSeedManager_State_Waiting) {
+		log.trace("finishWaiting()")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			guard case .waiting(let details) = state.active, details == waiting else {
-				// Current state doesn't match parameter.
-				// So we ignore the function call.
-				return
-			}
-			
-			switch details.kind {
-				case .exponentialBackoff:
-					deferToSimplifiedStateFlow = true
-				default:
-					break
+		Task {
+			if let newState = await self.actor.finishWaiting(sender) {
+				self.handleNewState(newState)
 			}
 		}
 	}
 	
-	private func updateState(_ modifyStateBlock: (inout AtomicState, inout Bool) -> Void) {
+	private func handleNewState(_ newState: SyncSeedManager_State) {
 		
-		var changedState: SyncSeedManager_State? = nil
-		queue.sync {
-			let prvActive = state.active
-			var deferToSimplifiedStateFlow = false
-			modifyStateBlock(&state, &deferToSimplifiedStateFlow)
-			
-			if deferToSimplifiedStateFlow {
-				// State management deferred to this function.
-				// Executing simplified state flow.
-				
-				if state.isEnabled {
-					if state.needsUploadSeed {
-						if state.waitingForInternet {
-							state.active = .waiting_forInternet()
-						} else if state.waitingForCloudCredentials {
-							state.active = .waiting_forCloudCredentials()
-						} else {
-							state.active = .uploading
-						}
-					} else {
-						state.active = .synced
-					}
-				} else {
-					if state.needsDeleteSeed {
-						if state.waitingForInternet {
-							state.active = .waiting_forInternet()
-						} else if state.waitingForCloudCredentials {
-							state.active = .waiting_forCloudCredentials()
-						} else {
-							state.active = .deleting
-						}
-					} else {
-						state.active = .disabled
-					}
-				}
-			
-			} // </simplified_state_flow>
-			
-			if prvActive != state.active {
-				changedState = state.active
-			}
-		
-		} // </queue.sync>
-		
-		if let newState = changedState {
-			log.debug("state.active = \(newState)")
-			switch newState {
-				case .uploading:
-					uploadSeed()
-				case .deleting:
-					deleteSeed()
-				default:
-					break
-			}
-			
-			publishNewState(newState)
+		log.debug("state = \(newState)")
+		switch newState {
+			case .uploading:
+				uploadSeed()
+			case .deleting:
+				deleteSeed()
+			default:
+				break
 		}
+		
+		publishNewState(newState)
 	}
 	
 	// ----------------------------------------
@@ -442,29 +304,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	func networkStatusChanged(hasInternet: Bool) {
 		log.trace("networkStatusChanged(hasInternet: \(hasInternet)")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-
-			if hasInternet {
-				state.waitingForInternet = false
-
-				switch state.active {
-					case .waiting(let details):
-						switch details.kind {
-							case .forInternet:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-					default: break
-				}
-
-			} else {
-				state.waitingForInternet = true
-
-				switch state.active {
-					case .synced:
-						deferToSimplifiedStateFlow = true
-					default: break
-				}
+		Task {
+			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {
+				self.handleNewState(newState)
 			}
 		}
 	}
@@ -474,29 +316,9 @@ class SyncSeedManager: SyncManagerProtcol {
 	func cloudCredentialsChanged(hasCloudCredentials: Bool) {
 		log.trace("cloudCredentialsChanged(hasCloudCredentials: \(hasCloudCredentials))")
 		
-		updateState { state, deferToSimplifiedStateFlow in
-
-			if hasCloudCredentials {
-				state.waitingForCloudCredentials = false
-
-				switch state.active {
-					case .waiting(let details):
-						switch details.kind {
-							case .forCloudCredentials:
-								deferToSimplifiedStateFlow = true
-							default: break
-						}
-					default: break
-				}
-
-			} else {
-				state.waitingForCloudCredentials = true
-
-				switch state.active {
-					case .synced:
-						deferToSimplifiedStateFlow = true
-					default: break
-				}
+		Task {
+			if let newState = await self.actor.cloudCredentialsChanged(hasCloudCredentials: hasCloudCredentials) {
+				self.handleNewState(newState)
 			}
 		}
 	}
@@ -515,7 +337,6 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				let currentName = Prefs.shared.backupSeed_name(encryptedNodeId: self.encryptedNodeId) ?? ""
 				let needsReUpload = currentName != uploadedName
-				var startReUpload = false
 				
 				if needsReUpload {
 					log.debug("uploadSeed(): finish(): needsReUpload")
@@ -523,26 +344,10 @@ class SyncSeedManager: SyncManagerProtcol {
 					Prefs.shared.backupSeed_setHasUploadedSeed(true, encryptedNodeId: self.encryptedNodeId)
 				}
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					switch state.active {
-						case .uploading:
-							if needsReUpload {
-								state.needsUploadSeed = true
-								startReUpload = true
-							} else {
-								state.needsUploadSeed = false
-								deferToSimplifiedStateFlow = true
-							}
-							
-						default:
-							let state_active_str = state.active.description
-							log.warning("uploadSeed(): finish(): state.active =!> \(state_active_str)")
-							break
+				Task {
+					if let newState = await self.actor.didUploadSeed(needsReUpload: needsReUpload) {
+						self.handleNewState(newState)
 					}
-				}
-				
-				if startReUpload {
-					self.uploadSeed()
 				}
 				
 			case .failure(let error):
@@ -587,7 +392,7 @@ class SyncSeedManager: SyncManagerProtcol {
 		minDelayPublisher.send()
 		
 		let record = CKRecord(
-			recordType: record_table_name,
+			recordType: SyncSeedManager.record_table_name(chain: chain),
 			recordID: recordID()
 		)
 		
@@ -644,15 +449,9 @@ class SyncSeedManager: SyncManagerProtcol {
 				
 				Prefs.shared.backupSeed_setHasUploadedSeed(false, encryptedNodeId: self.encryptedNodeId)
 				self.consecutiveErrorCount = 0
-				self.updateState { state, deferToSimplifiedStateFlow in
-					switch state.active {
-						case .deleting:
-							state.needsDeleteSeed = false
-							deferToSimplifiedStateFlow = true
-						default:
-							let state_active_str = state.active.description
-							log.warning("deleteSeed(): finish(): state.active =!> \(state_active_str)")
-							break
+				Task {
+					if let newState = await self.actor.didDeleteSeed() {
+						self.handleNewState(newState)
 					}
 				}
 				
@@ -829,38 +628,32 @@ class SyncSeedManager: SyncManagerProtcol {
 			useExponentialBackoff = true
 		}
 		
-		var delay = 0.0
+		let wait: SyncSeedManager_State_Waiting?
 		if useExponentialBackoff {
 			self.consecutiveErrorCount += 1
-			delay = self.exponentialBackoff()
-		
+			var delay = self.exponentialBackoff()
 			if let minDelay = minDelay {
 				if delay < minDelay {
 					delay = minDelay
 				}
 			}
+			wait = SyncSeedManager_State_Waiting(
+				kind: .exponentialBackoff(error),
+				parent: self,
+				delay: delay
+			)
+		} else {
+			wait = nil
 		}
 		
-		updateState { state, deferToSimplifiedStateFlow in
-			
-			if isNotAuthenticated {
-				state.waitingForCloudCredentials = true
+		Task { [isNotAuthenticated] in
+			if let newState = await self.actor.handleError(
+				isNotAuthenticated: isNotAuthenticated,
+				wait: wait
+			) {
+				self.handleNewState(newState)
 			}
-			
-			switch state.active {
-				case .uploading: fallthrough
-				case .deleting:
-					
-					if useExponentialBackoff {
-						state.active = .waiting_exponentialBackoff(self, delay: delay, error: error)
-					} else {
-						deferToSimplifiedStateFlow = true
-					}
-					
-				default:
-					break
-			}
-		} // </updateState>
+		}
 		
 		if isNotAuthenticated {
 			DispatchQueue.main.async {

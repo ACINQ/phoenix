@@ -184,6 +184,12 @@ SELECT id, completed_at
 FROM   outgoing_payments
 WHERE  completed_at IS NOT NULL;
 
+deletePayment:
+DELETE FROM outgoing_payments WHERE id = ?;
+
+deletePaymentParts:
+DELETE FROM outgoing_payment_parts WHERE part_parent_id = ?;
+
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:
 SELECT changes();
