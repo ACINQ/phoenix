@@ -67,13 +67,11 @@ class SendViewModel : ViewModel() {
   val state = MutableLiveData<SendState>()
   /** Prevents early validation error message if amount is not set in invoice. */
   val isAmountFieldPristine = MutableLiveData<Boolean>()
-  val useMaxBalance = MutableLiveData<Boolean>()
   /** Contains strings resource id for amount error message. Not contained in the fragment Error state because an incorrect amount is not a fatal error. */
   val amountError = MutableLiveData<Exception?>()
 
   init {
     state.value = SendState.CheckingInvoice
-    useMaxBalance.value = false
     isAmountFieldPristine.value = true
     amountError.value = null
   }

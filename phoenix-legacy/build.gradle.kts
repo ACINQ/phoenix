@@ -24,13 +24,13 @@ val chain: String by project
 
 android {
   compileSdk = 30
-  ndkVersion = "21.3.6528147"
+  ndkVersion = "23.1.7779620"
   defaultConfig {
     applicationId = "fr.acinq.phoenix.mainnet"
     minSdk = 24
     targetSdk = 30
-    versionCode = 35
-    versionName = "1.4.20"
+    versionCode = 36
+    versionName = gitCommitHash()
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {

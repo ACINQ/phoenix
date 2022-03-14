@@ -205,7 +205,11 @@ class PaymentSettingsFragment : BaseFragment(stayIfNotStarted = true) {
             null
           }
           if (baseFee == null || proportionalFee == null) {
-            Toast.makeText(context, "Enter a valid maximum fee setting", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_invalid), Toast.LENGTH_SHORT).show()
+          } else if (baseFee.`$greater`(Satoshi(50_000L))) {
+            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_base_too_high), Toast.LENGTH_SHORT).show()
+          } else if (proportionalFee > 1_000_000) {
+            Toast.makeText(context, getString(R.string.paymentsettings_trampoline_fees_dialog_proportional_too_high), Toast.LENGTH_SHORT).show()
           } else {
             log.info("update max trampoline fee to base=$baseFee proportional=$proportionalFee")
             Prefs.setMaxTrampolineCustomFee(context, baseFee, proportionalFee)

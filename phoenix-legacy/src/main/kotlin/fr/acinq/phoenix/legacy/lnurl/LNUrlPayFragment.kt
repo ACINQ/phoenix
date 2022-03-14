@@ -302,7 +302,7 @@ class LNUrlPayFragment : BaseFragment() {
       model.state.value = LNUrlPayState.Error(e)
     }) {
       log.info("sending payment for invoice=$pr")
-      val paymentId = app.requireService.sendPaymentRequest(amount = pr.amount().get(), paymentRequest = pr, subtractFee = false)
+      val paymentId = app.requireService.sendPaymentRequest(amount = pr.amount().get(), paymentRequest = pr)
       if (paymentId != null) {
         model.saveLNUrlInfo(paymentId.toString(), action)
       }

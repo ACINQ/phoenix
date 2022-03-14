@@ -151,18 +151,6 @@ class SendFragment : BaseFragment() {
       }
     })
 
-    model.useMaxBalance.observe(viewLifecycleOwner, { useMax ->
-      if (useMax) {
-        context?.let { ctx ->
-          appContext(ctx).balance.value?.let {
-            val unit = Prefs.getCoinUnit(ctx)
-            mBinding.unit.setSelection(unitList.indexOf(unit.code()))
-            mBinding.amount.setText(Converter.printAmountRaw(it.sendable, ctx))
-          }
-        }
-      }
-    })
-
     app.networkInfo.observe(viewLifecycleOwner, {
       if (!it.lightningConnected) {
         mBinding.sendButton.setIsPaused(true)
@@ -290,8 +278,7 @@ class SendFragment : BaseFragment() {
       model.state.postValue(SendState.Onchain.Sending(swapOutData.uri, swapOutData.pr, swapOutData.feeratePerByte, swapOutData.fee))
       val uuid = app.requireService.sendPaymentRequest(
         amount = swapOutData.pr.amount().get(),
-        paymentRequest = swapOutData.pr,
-        subtractFee = model.useMaxBalance.value ?: false)
+        paymentRequest = swapOutData.pr)
       if (uuid != null) {
         context?.let {
           AppDb.getInstance(it.applicationContext).paymentMetaQueries.insertSwapOut(id = uuid.toString(),
@@ -318,7 +305,7 @@ class SendFragment : BaseFragment() {
         is SendState.Lightning -> SendState.Lightning.Sending(pr)
         else -> throw RuntimeException("unhandled state=$state when sending payment")
       }
-      app.requireService.sendPaymentRequest(amount = amount, paymentRequest = pr, subtractFee = model.useMaxBalance.value ?: false)
+      app.requireService.sendPaymentRequest(amount = amount, paymentRequest = pr)
       findNavController().navigate(R.id.action_send_to_main)
     }
   }
