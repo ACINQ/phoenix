@@ -24,7 +24,7 @@ val chain: String by project
 
 android {
   compileSdk = 30
-  ndkVersion = "21.3.6528147"
+  ndkVersion = "23.1.7779620"
   defaultConfig {
     applicationId = "fr.acinq.phoenix.testnet"
     minSdk = 24
