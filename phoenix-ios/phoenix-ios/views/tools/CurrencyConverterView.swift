@@ -25,11 +25,18 @@ enum LastUpdated {
 
 struct CurrencyConverterView: View {
 	
+	let initialAmount: CurrencyAmount?
+	let didChange: ((CurrencyAmount?) -> Void)?
+	let didClose: (() -> Void)?
+	
+	@State var lastChange: CurrencyAmount?
+	
 	@State var currencies: [Currency] = Prefs.shared.currencyConverterList
 	
 	@State var parsedRow: ParsedRow? = nil
-	@State var editingCurrency: Currency? = nil
+	
 	@State var currencySelectorOpen = false
+	@State var replacingCurrency: Currency? = nil
 	
 	@State var didAppear = false
 	@State var isRefreshingExchangeRates = false
@@ -57,6 +64,26 @@ struct CurrencyConverterView: View {
 	@Environment(\.colorScheme) var colorScheme
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
+	init() {
+		self.initialAmount = nil
+		self.didChange = nil
+		self.didClose = nil
+	}
+	
+	init(
+		initialAmount: CurrencyAmount?,
+		didChange: @escaping (CurrencyAmount?) -> Void,
+		didClose: @escaping () -> Void
+	) {
+		self.initialAmount = initialAmount
+		self.didChange = didChange
+		self.didClose = didClose
+	}
+	
+	// --------------------------------------------------
+	// MARK: ViewBuilders
+	// --------------------------------------------------
+	
 	@ViewBuilder
 	var body: some View {
 		
@@ -64,7 +91,7 @@ struct CurrencyConverterView: View {
 			
 			NavigationLink(destination: CurrencySelector(
 					selectedCurrencies: $currencies,
-					editingCurrency: $editingCurrency,
+					replacingCurrency: $replacingCurrency,
 					didSelectCurrency: didSelectCurrency
 				),
 				isActive: $currencySelectorOpen
@@ -123,6 +150,9 @@ struct CurrencyConverterView: View {
 		.onChange(of: currencies) { _ in
 			currenciesDidChange()
 		}
+		.onChange(of: parsedRow) { _ in
+			parsedRowDidChange()
+		}
 		.onReceive(refreshingExchangeRatesPublisher) {
 			refreshingExchangeRatesChanged($0)
 		}
@@ -166,7 +196,7 @@ struct CurrencyConverterView: View {
 	@available(iOS 15.0, *)
 	func currencyRows() -> some View {
 		
-		ForEach(currencies, id: \.identifiable) { currency in
+		ForEach(currencies) { currency in
 			Row(
 				currency: currency,
 				parsedRow: $parsedRow,
@@ -202,7 +232,7 @@ struct CurrencyConverterView: View {
 	@ViewBuilder
 	func currencyRows_iOS14() -> some View {
 		
-		ForEach(currencies, id: \.identifiable) { currency in
+		ForEach(currencies) { currency in
 			
 			Row_iOS14(
 				currency: currency,
@@ -285,6 +315,10 @@ struct CurrencyConverterView: View {
 		)
 	}
 	
+	// --------------------------------------------------
+	// MARK: UI Content Helpers
+	// --------------------------------------------------
+	
 	func lastUpdatedText() -> String {
 		
 		switch currenciesLastUpdated() {
@@ -303,6 +337,10 @@ struct CurrencyConverterView: View {
 			}
 		}
 	}
+	
+	// --------------------------------------------------
+	// MARK: Actions
+	// --------------------------------------------------
 	
 	private func onAppear() {
 		log.trace("onAppear()")
@@ -326,7 +364,31 @@ struct CurrencyConverterView: View {
 			if currencies.isEmpty {
 				currencies = defaultCurrencies()
 			}
-			parsedRow = ParsedRow(currency: Currency.bitcoin(.btc), parsedAmount: Result.success(1.0))
+			
+			if didChange == nil {
+				// Created via init() - use default initial value
+				parsedRow = ParsedRow(
+					currency: Currency.bitcoin(.btc),
+					parsedAmount: Result.success(1.0)
+				)
+			} else {
+				// Created via init(initialAmount:didChange:didClose:).
+				// If an initialAmount was passed then use it.
+				// Otherwise all rows should remain empty.
+				if let initialAmount = initialAmount {
+					lastChange = initialAmount
+					parsedRow = ParsedRow(
+						currency: initialAmount.currency,
+						parsedAmount: Result.success(initialAmount.amount)
+					)
+				} else {
+					lastChange = nil
+					parsedRow = ParsedRow(
+						currency: Currency.bitcoin(.btc),
+						parsedAmount: Result.failure(.emptyInput)
+					)
+				}
+			}
 		}
 	}
 	
@@ -339,6 +401,10 @@ struct CurrencyConverterView: View {
 				log.debug("Setting UITableView.background = .primaryBackground")
 				UITableView.appearance().backgroundColor = .primaryBackground
 			}
+		}
+		
+		if !currencySelectorOpen, let didClose = didClose {
+			didClose()
 		}
 	}
 	
@@ -356,6 +422,26 @@ struct CurrencyConverterView: View {
 			Prefs.shared.currencyConverterList = []
 		} else {
 			Prefs.shared.currencyConverterList = currencies
+		}
+	}
+	
+	private func parsedRowDidChange() {
+		log.trace("parsedRowDidChange()")
+		
+		guard let didChange = didChange else {
+			return
+		}
+		
+		var newCurrencyAmount: CurrencyAmount? = nil
+		if let parsedRow = parsedRow {
+			if case .success(let amount) = parsedRow.parsedAmount {
+				newCurrencyAmount = CurrencyAmount(currency: parsedRow.currency, amount: amount)
+			}
+		}
+		
+		if lastChange != newCurrencyAmount {
+			didChange(newCurrencyAmount)
+			lastChange = newCurrencyAmount
 		}
 	}
 	
@@ -463,33 +549,30 @@ struct CurrencyConverterView: View {
 	private func editRow(_ currency: Currency) {
 		log.trace("editRow()")
 		
-		editingCurrency = currency
+		replacingCurrency = currency
 		currencySelectorOpen = true
 	}
 	
 	private func addRow() {
 		log.trace("addRow()")
 		
-		editingCurrency = nil
+		replacingCurrency = nil
 		currencySelectorOpen = true
 	}
 	
 	private func refreshRates() {
 		log.trace("refreshRates()")
 		
-		let targets = CurrencyManager.Target.companion.Bitcoin.plus(other:
-			CurrencyManager.Target.companion.FiatPreferred
-		)
-		AppDelegate.get().business.currencyManager.refresh(targets: targets)
+		AppDelegate.get().business.currencyManager.refreshAll(targets: FiatCurrency.companion.values)
 	}
 	
 	private func didSelectCurrency(_ newCurrency: Currency) {
 		log.trace("didSelectCurrency(\(newCurrency))")
 		
-		if let oldCurrency = editingCurrency {
+		if let replaceMe = replacingCurrency {
 			log.debug("replacing currency...")
 			
-			if let idx = currencies.firstIndex(where: { $0 == oldCurrency }) {
+			if let idx = currencies.firstIndex(where: { $0 == replaceMe }) {
 				currencies[idx] = newCurrency
 			}
 			
@@ -660,7 +743,7 @@ fileprivate struct Row: View, ViewName {
 			switch currency {
 			case .bitcoin(let dstBitcoinUnit):
 					
-				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, hideMsats: true)
+				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, policy: .hideMsats)
 				newParsedAmount = Result.success(dstFormattedAmt.amount)
 				newAmount = dstFormattedAmt.digits
 			
@@ -852,7 +935,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 			switch currency {
 			case .bitcoin(let dstBitcoinUnit):
 					
-				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, hideMsats: true)
+				let dstFormattedAmt = Utils.formatBitcoin(msat: srcMsat, bitcoinUnit: dstBitcoinUnit, policy: .hideMsats)
 				newParsedAmount = Result.success(dstFormattedAmt.amount)
 				newAmount = dstFormattedAmt.digits
 			
@@ -885,7 +968,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 fileprivate struct CurrencySelector: View, ViewName {
 	
 	@Binding var selectedCurrencies: [Currency]
-	@Binding var editingCurrency: Currency?
+	@Binding var replacingCurrency: Currency?
 	
 	let didSelectCurrency: (Currency) -> Void
 	
@@ -1072,7 +1155,7 @@ fileprivate struct CurrencySelector: View, ViewName {
 		
 		if currency == selectedCurrency {
 			return true
-		} else if currency == editingCurrency {
+		} else if currency == replacingCurrency {
 			return false
 		} else {
 			return selectedCurrencies.contains(currency)

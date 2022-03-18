@@ -630,7 +630,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func examplePaymentAmountString() -> String {
-		return Utils.formatBitcoin(msat: examplePaymentAmount(), bitcoinUnit: .sat, hideMsats: true).string
+		return Utils.formatBitcoin(msat: examplePaymentAmount(), bitcoinUnit: .sat, policy: .hideMsats).string
 	}
 	
 	func exampleBaseFee() -> Lightning_kmpMilliSatoshi {
@@ -645,7 +645,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func exampleBaseFeeString() -> String {
-		return Utils.formatBitcoin(msat: exampleBaseFee(), bitcoinUnit: .sat, hideMsats: true).string
+		return Utils.formatBitcoin(msat: exampleBaseFee(), bitcoinUnit: .sat, policy: .hideMsats).string
 	}
 	
 	func exampleProportionalFee() -> Lightning_kmpMilliSatoshi {
@@ -668,7 +668,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func exampleProportionalFeeString() -> String {
-		return Utils.formatBitcoin(msat: exampleProportionalFee(), bitcoinUnit: .sat, hideMsats: true).string
+		return Utils.formatBitcoin(msat: exampleProportionalFee(), bitcoinUnit: .sat, policy: .hideMsats).string
 	}
 	
 	func exampleMaxFee() -> Lightning_kmpMilliSatoshi {
@@ -678,7 +678,7 @@ struct MaxFeeConfiguration: View, ViewName {
 	}
 	
 	func exampleMaxFeeString() -> String {
-		return Utils.formatBitcoin(msat: exampleMaxFee(), bitcoinUnit: .sat, hideMsats: true).string
+		return Utils.formatBitcoin(msat: exampleMaxFee(), bitcoinUnit: .sat, policy: .hideMsats).string
 	}
 	
 	func exampleMaxPercent() -> Double {

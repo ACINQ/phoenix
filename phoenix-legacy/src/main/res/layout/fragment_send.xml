@@ -204,7 +204,7 @@
           android:text=""
           android:textAlignment="viewEnd"
           android:textSize="48sp"
-          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping)}"
           app:layout_constrainedHeight="true"
           app:layout_constrainedWidth="true"
           app:layout_constraintEnd_toStartOf="@id/unit"
@@ -218,7 +218,7 @@
           style="@style/default_spinnerStyle"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping) &amp;&amp; !model.useMaxBalance}"
+          app:enableOrFade="@{!(model.state instanceof SendState.Onchain.Swapping)}"
           app:layout_constraintBaseline_toBaselineOf="@+id/amount"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toEndOf="@id/amount"
@@ -268,23 +268,6 @@
           app:barrierDirection="bottom"
           app:constraint_referenced_ids="amount_converted,amount_error" />
 
-        <CheckBox
-          android:id="@+id/max_checkbox"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md_p"
-          android:backgroundTint="?attr/colorPrimary"
-          android:buttonTint="?attr/colorPrimary"
-          android:checked="@={model.useMaxBalance}"
-          android:text="@string/send_use_all_balance"
-          android:textSize="@dimen/text_sm"
-          android:visibility="@{model.state instanceof SendState.Lightning}"
-          app:layout_constrainedWidth="true"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintHorizontal_bias="0.5"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
-
         <androidx.constraintlayout.widget.Guideline
           android:id="@+id/payment_labels_guideline"
           android:layout_width="wrap_content"
@@ -320,7 +303,7 @@
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintHorizontal_bias="0"
           app:layout_constraintStart_toEndOf="@id/payment_labels_guideline"
-          app:layout_constraintTop_toBottomOf="@id/max_checkbox" />
+          app:layout_constraintTop_toBottomOf="@id/amount_feedback_barrier" />
 
         <TextView
           android:id="@+id/description_label"

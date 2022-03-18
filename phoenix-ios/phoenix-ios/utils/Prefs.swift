@@ -3,7 +3,7 @@ import PhoenixShared
 import Combine
 import os.log
 
-#if DEBUG && true
+#if DEBUG && false
 fileprivate var log = Logger(
 	subsystem: Bundle.main.bundleIdentifier!,
 	category: "Prefs"
@@ -259,13 +259,19 @@ class Prefs {
 	
 	var preferredFiatCurrencies: [FiatCurrency] {
 		get {
-			var result = Set<FiatCurrency>(arrayLiteral: self.fiatCurrency)
+			var resultArray = [self.fiatCurrency]
+			var resultSet = Set<FiatCurrency>(resultArray)
+			
 			for currency in self.currencyConverterList {
 				if case .fiat(let fiat) = currency {
-					result.insert(fiat)
+					let (inserted, _) = resultSet.insert(fiat)
+					if inserted {
+						resultArray.append(fiat)
+					}
 				}
 			}
-			return Array(result)
+			
+			return resultArray
 		}
 	}
 	

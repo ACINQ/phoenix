@@ -557,7 +557,7 @@ class EclairNodeService : Service() {
   }
 
   @UiThread
-  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest, subtractFee: Boolean): UUID? = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
+  suspend fun sendPaymentRequest(amount: MilliSatoshi, paymentRequest: PaymentRequest): UUID? = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
     if (isHeadless) {
       throw CannotSendHeadless
     }
@@ -573,13 +573,6 @@ class EclairNodeService : Service() {
           } + pref
         } ?: run {
           appContext.trampolineFeeSettings.value!!
-        }.run {
-          if (subtractFee) {
-            // if fee is subtracted from amount, use ONLY the most expensive trampoline setting option, to make sure that the payment will go through
-            listOf(last())
-          } else {
-            this
-          }
         }
         val feeSettingsFromHints = getPessimisticRouteSettingsFromHint(amount, paymentRequest)
         log.info("most expensive fee/expiry from payment request hints=$feeSettingsFromHints")
@@ -590,13 +583,10 @@ class EclairNodeService : Service() {
           })
           .asScala().toList()
 
-        // 2 - compute amount to send, which changes if fees must be subtracted from it (empty wallet)
-        val amountFinal = if (subtractFee) amount.`$minus`(finalTrampolineFeesList.head()._1) else amount
-
-        // 3 - build trampoline payment object
-        log.info("sending payment (trampoline) [ amount=$amountFinal, fees=$finalTrampolineFeesList, subtractFee=$subtractFee ] for pr=${PaymentRequest.write(paymentRequest)}")
+        // 2 - build trampoline payment object
+        log.info("sending payment (trampoline) [ amount=$amount, fees=$finalTrampolineFeesList ] for pr=${PaymentRequest.write(paymentRequest)}")
         PaymentInitiator.SendTrampolinePaymentRequest(
-          /* amount to send */ amountFinal,
+          /* amount to send */ amount,
           /* payment request */ paymentRequest,
           /* trampoline node public key */ Wallet.ACINQ.nodeId(),
           /* fees and expiry delta for the trampoline node */ finalTrampolineFeesList,

@@ -14,6 +14,14 @@ actual fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatab
     )
 }
 
+actual fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase) {
+    database.cloudKitPaymentsQueries.addToQueue(
+        type = id.dbType.value,
+        id = id.dbId,
+        date_added = currentTimestampMillis()
+    )
+}
+
 actual fun didUpdateWalletPaymentMetadata(id: WalletPaymentId, database: PaymentsDatabase) {
     database.cloudKitPaymentsQueries.addToQueue(
         type = id.dbType.value,

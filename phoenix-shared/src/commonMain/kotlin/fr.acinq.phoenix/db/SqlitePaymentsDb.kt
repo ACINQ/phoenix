@@ -299,6 +299,31 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         }
     }
 
+    suspend fun deletePayment(
+        paymentId: WalletPaymentId
+    ) {
+        withContext(Dispatchers.Default) {
+            database.transaction {
+                when (paymentId) {
+                    is WalletPaymentId.IncomingPaymentId -> {
+                        database.incomingPaymentsQueries.delete(
+                            payment_hash = paymentId.paymentHash.toByteArray()
+                        )
+                    }
+                    is WalletPaymentId.OutgoingPaymentId -> {
+                        database.outgoingPaymentsQueries.deletePaymentParts(
+                            part_parent_id = paymentId.dbId
+                        )
+                        database.outgoingPaymentsQueries.deletePayment(
+                            id = paymentId.dbId
+                        )
+                    }
+                }
+                didDeleteWalletPayment(paymentId, database)
+            }
+        }
+    }
+
     companion object {
         private fun allPaymentsCountMapper(
             result: Long?
@@ -374,6 +399,12 @@ data class WalletPaymentOrderRow(
  * with respect to the referenced row.
  */
 expect fun didCompleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
+
+/**
+ * Implement this function to execute platform specific code when a payment is deleted.
+ * For example, on iOS this is used to enqueue an operation to delete the payment from CloudKit.
+ */
+expect fun didDeleteWalletPayment(id: WalletPaymentId, database: PaymentsDatabase)
 
 /**
  * Implement this function to execute platform specific code when a payment's metdata is updated.
