@@ -157,13 +157,13 @@ class SqliteAppDb(driver: SqlDriver) {
 
     suspend fun getValue(key: String): Pair<ByteArray, Long>? {
         return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
-            Pair(it.value, it.updated_at)
+            Pair(it.value_, it.updated_at)
         }
     }
 
     suspend fun <T> getValue(key: String, transform: (ByteArray) -> T): Pair<T, Long>? {
         return keyValueStoreQueries.get(key).executeAsOneOrNull()?.let {
-            val tValue = transform(it.value)
+            val tValue = transform(it.value_)
             Pair(tValue, it.updated_at)
         }
     }
@@ -173,9 +173,9 @@ class SqliteAppDb(driver: SqlDriver) {
             val exists = keyValueStoreQueries.exists(key).executeAsOne() > 0
             val now = currentTimestampMillis()
             if (exists) {
-                keyValueStoreQueries.update(key = key, value = value, updated_at = now)
+                keyValueStoreQueries.update(key = key, value_ = value, updated_at = now)
             } else {
-                keyValueStoreQueries.insert(key = key, value = value, updated_at = now)
+                keyValueStoreQueries.insert(key = key, value_ = value, updated_at = now)
             }
             now
         }

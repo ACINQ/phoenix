@@ -68,7 +68,7 @@ FROM   incoming_payments
 ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC
-LIMIT  ?, ?;
+LIMIT :limit OFFSET :offset;
 
 scanCompleted:
 SELECT payment_hash,

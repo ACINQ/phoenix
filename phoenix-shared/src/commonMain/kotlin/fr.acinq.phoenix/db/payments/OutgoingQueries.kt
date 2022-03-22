@@ -189,9 +189,13 @@ class OutgoingQueries(val database: PaymentsDatabase) {
     }
 
     fun listOutgoingPayments(count: Int, skip: Int): List<OutgoingPayment> {
-        // LIMIT ?, ? : "the first expression is used as the OFFSET expression and the second as the LIMIT expression."
-        return queries.listOutgoingInOffset(skip.toLong(), count.toLong(), ::mapOutgoingPayment).executeAsList()
-            .run { groupByRawOutgoing(this) }
+        return queries.listOutgoingInOffset(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::mapOutgoingPayment
+        )
+        .executeAsList()
+        .run { groupByRawOutgoing(this) }
     }
 
     /** Group a list of outgoing payments by parent id and parts. */
