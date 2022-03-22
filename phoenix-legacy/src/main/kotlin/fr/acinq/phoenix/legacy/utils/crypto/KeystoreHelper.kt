@@ -85,8 +85,8 @@ object KeystoreHelper {
         spec.setIsStrongBoxBacked(true)
         keygen.init(spec.build())
         keygen.generateKey()
-      } catch (e: StrongBoxUnavailableException) {
-        log.debug("strongbox is not available on this device")
+      } catch (e: Exception) {
+        log.warn("failed to generate key with strongbox enabled: ${e.javaClass.simpleName}: ${e.localizedMessage}, trying again without strongbox")
         spec.setIsStrongBoxBacked(false)
         keygen.init(spec.build())
         keygen.generateKey()
