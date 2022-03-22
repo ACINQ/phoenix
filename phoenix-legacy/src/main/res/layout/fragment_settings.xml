@@ -141,11 +141,30 @@
           app:text="@string/settings_display_seed" />
 
         <TextView
+          android:id="@+id/migration_title"
+          style="@style/SettingsCategory"
+          android:text="@string/settings_migration_title"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/display_seed_button" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/upgrade_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_square"
+          android:padding="@dimen/space_md"
+          app:hz_bias="0"
+          app:icon="@drawable/ic_fire"
+          app:layout_constraintTop_toBottomOf="@id/migration_title"
+          app:spacer_size="@dimen/space_md"
+          app:text="@string/settings_upgrade" />
+
+        <TextView
           android:id="@+id/advanced_title"
           style="@style/SettingsCategory"
           android:text="@string/settings_advanced_title"
           app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/display_seed_button" />
+          app:layout_constraintTop_toBottomOf="@id/upgrade_button" />
 
         <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
           android:id="@+id/list_all_channels_button"

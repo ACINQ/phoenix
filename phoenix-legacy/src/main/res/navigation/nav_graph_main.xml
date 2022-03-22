@@ -353,6 +353,9 @@
     <action
       android:id="@+id/action_settings_to_payment_settings"
       app:destination="@id/payment_settings_fragment" />
+    <action
+      android:id="@+id/action_settings_to_migration"
+      app:destination="@id/upgrade_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -444,6 +447,12 @@
     android:id="@+id/payment_settings_fragment"
     android:name="fr.acinq.phoenix.legacy.settings.PaymentSettingsFragment"
     android:label="PaymentSettingsFragment" />
+
+  <!-- settings: upgrade -->
+  <fragment
+    android:id="@+id/upgrade_fragment"
+    android:name="fr.acinq.phoenix.legacy.settings.MigrationSettingFragment"
+    android:label="MigrationSettingsFragment" />
 
   <!-- first time user exp -->
   <fragment

@@ -638,6 +638,14 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
+  /** Send message to the peer to prepare migration. */
+  fun sendLegacyMigrationSignal() = serviceScope.launch(Dispatchers.Default) {
+    kit?.run {
+      val newNodeId = nodeParams().keyManager().kmpNodeKey().publicKey()
+      switchboard().tell(Peer.SendPhoenixAndroidLegacyMigrate(Wallet.ACINQ.nodeId(), newNodeId), ActorRef.noSender())
+    } ?: throw KitNotInitialized
+  }
+
   /** Generate a BOLT 11 payment request. */
   @UiThread
   suspend fun generatePaymentRequest(description: String, amount_opt: Option<MilliSatoshi>, expirySeconds: Long): PaymentRequest = withContext(serviceScope.coroutineContext + Dispatchers.Default) {
