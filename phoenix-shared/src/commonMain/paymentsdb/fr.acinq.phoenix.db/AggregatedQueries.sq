@@ -102,13 +102,11 @@ UNION ALL
         received_at              AS completed_at
     FROM incoming_payments
     WHERE incoming_payments.received_at IS NOT NULL
-ORDER BY created_at DESC
--- ^^^^^ Within a UNION ALL statement, the ORDER BY clause is applied to
--- the combined result set, not within the individual result set.
 ) combined_payments
 LEFT OUTER JOIN payments_metadata ON
     payments_metadata.type = combined_payments.type AND
     payments_metadata.id = combined_payments.id
+ORDER BY combined_payments.created_at DESC
 LIMIT :limit OFFSET :offset;
 
 listAllPaymentsCount:
