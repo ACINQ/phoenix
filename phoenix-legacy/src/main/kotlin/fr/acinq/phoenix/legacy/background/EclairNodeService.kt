@@ -324,10 +324,6 @@ class EclairNodeService : Service() {
             log.error("error when bootstrapping Tor: ", e)
             updateState(KitState.Error.Tor(e.localizedMessage ?: e.javaClass.simpleName))
           }
-          is `NoActiveChannelsException$` -> {
-            log.info("legacy node does not have active channels anymore, restarting to modern app")
-            updateState(KitState.MoveToModernApp)
-          }
           else -> {
             log.error("error when starting node: ", e)
             updateState(KitState.Error.Generic(e.localizedMessage ?: e.javaClass.simpleName))
@@ -997,8 +993,6 @@ sealed class KitState {
       EclairImpl(kit)
     }
   }
-
-  object MoveToModernApp : KitState()
 
   /** Startup has failed, the state contains the error details. */
   sealed class Error : KitState() {

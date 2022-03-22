@@ -126,6 +126,14 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         }
     }
 
+    override suspend fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun listIncomingPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<IncomingPayment> {
+        TODO("Not yet implemented")
+    }
+
     suspend fun getOutgoingPayment(
         id: UUID,
         options: WalletPaymentFetchOptions
@@ -189,6 +197,10 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         withContext(Dispatchers.Default) {
             inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
         }
+    }
+
+    override suspend fun removeIncomingPayment(paymentHash: ByteVector32): Boolean {
+        TODO("Not yet implemented")
     }
 
     override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, receivedWith: Set<IncomingPayment.ReceivedWith>, createdAt: Long, receivedAt: Long) {

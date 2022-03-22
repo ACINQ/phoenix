@@ -28,8 +28,6 @@ android {
   defaultConfig {
     minSdk = 24
     targetSdk = 31
-    versionCode = 36
-    versionName = gitCommitHash()
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
