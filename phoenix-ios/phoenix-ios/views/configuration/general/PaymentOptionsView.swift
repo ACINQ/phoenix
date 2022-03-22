@@ -76,8 +76,7 @@ struct PaymentOptionsView: View {
 							set: { invoiceExpirationDays = $0 }
 						), label: Text("Invoice expiration")
 					) {
-						ForEach(0 ..< invoiceExpirationDaysOptions.count) {
-							let days = invoiceExpirationDaysOptions[$0]
+						ForEach(invoiceExpirationDaysOptions, id: \.self) { days in
 							Text("\(days) days").tag(days)
 						}
 					}

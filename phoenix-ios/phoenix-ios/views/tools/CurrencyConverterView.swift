@@ -109,19 +109,14 @@ struct CurrencyConverterView: View {
 			ScrollView {
 				VStack {
 					
-					let bitcoinUnits = BitcoinUnit.companion.values
-					let fiatCurrencies = FiatCurrency.companion.values
-					
-					ForEach(0 ..< bitcoinUnits.count) {
-						let bitcoinUnit = bitcoinUnits[$0]
+					ForEach(BitcoinUnit.companion.values) { bitcoinUnit in
 						
 						Text(bitcoinUnit.shortName)
 							.foregroundColor(Color.clear)
 							.read(currencyTextWidthReader)
 							.frame(width: currencyTextWidth, alignment: .leading) // required, or refreshes after display
 					}
-					ForEach(0 ..< fiatCurrencies.count) {
-						let fiatCurrency = fiatCurrencies[$0]
+					ForEach(FiatCurrency.companion.values) { fiatCurrency in
 
 						Text(fiatCurrency.shortName)
 							.foregroundColor(Color.clear)

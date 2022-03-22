@@ -248,8 +248,7 @@ struct PriceSliderSheet: View {
 		if case .pay(_) = flowType, !recentPercents.isEmpty {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				ForEach(0 ..< recentPercents.count) { idx in
-					let percent = recentPercents[idx]
+				ForEach(recentPercents, id: \.self) { percent in
 					Button {
 						recentButtonTapped(percent)
 					} label: {
@@ -261,7 +260,7 @@ struct PriceSliderSheet: View {
 						backgroundFill: Color(UIColor.systemGroupedBackground), // secondarySystemBackground
 						borderStroke: Color.appAccent
 					))
-					if idx+1 < recentPercents.count {
+					if percent != recentPercents.last {
 						Spacer()
 					}
 				} // </ForEach>
