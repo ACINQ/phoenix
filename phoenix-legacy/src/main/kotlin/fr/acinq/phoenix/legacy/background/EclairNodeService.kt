@@ -898,6 +898,17 @@ class EclairNodeService : Service() {
     } ?: log.info("could not refresh fcm token because kit is not ready yet")
   }
 
+  @Subscribe(threadMode = ThreadMode.BACKGROUND)
+  fun handleEvent(event: CheckHasActiveChannels) {
+    serviceScope.launch {
+      kit?.run {
+        if (nodeParams().db().channels().listLocalChannels().isEmpty) {
+          PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+        }
+      }
+    }
+  }
+
   // =========================================================== //
   //                 STATE UPDATE & NOTIFICATIONS                //
   // =========================================================== //

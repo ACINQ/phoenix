@@ -41,6 +41,7 @@ import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.utils.LegacyAppStatus
 import fr.acinq.phoenix.legacy.utils.PrefsDatastore
+import fr.acinq.phoenix.legacy.utils.Wallet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -138,7 +139,14 @@ private fun AttemptStart(
                     when (legacyAppStatus) {
                         LegacyAppStatus.Unknown -> {
                             Text(stringResource(id = R.string.startup_wait_legacy_check))
-                            StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = true)
+                            if (Wallet.getEclairDBFile(context).exists()) {
+                                log.info { "found legacy database file while in unknown legacy status; switching to legacy app" }
+                                LaunchedEffect(true) {
+                                    PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Expected)
+                                }
+                            } else {
+                                StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = true)
+                            }
                         }
                         LegacyAppStatus.NotRequired -> {
                             StartKMP(scope = scope, service = appVM.service, encryptedSeed = keyState.encryptedSeed, checkLegacyChannel = false)
