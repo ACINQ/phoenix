@@ -136,6 +136,9 @@ class SyncTxManager {
 	private func startQueueCountMonitor() {
 		log.trace("setupQueueCountMonitor()")
 		
+		// Kotlin will crash if we try to use multiple threads (like a real app)
+		assert(Thread.isMainThread, "Kotlin ahead: background threads unsupported")
+		
 		self.cloudKitDb.fetchQueueCountPublisher().sink {[weak self] (queueCount: Int64) in
 			log.debug("fetchQueueCountPublisher().sink(): count = \(queueCount)")
 			
@@ -307,8 +310,11 @@ class SyncTxManager {
 					self.handleNewState(newState)
 				}
 				
-				self.startQueueCountMonitor()
-				self.startPreferencesMonitor()
+				// Kotlin will crash if we try to use multiple threads (like a real app)
+				DispatchQueue.main.async {
+					self.startQueueCountMonitor()
+					self.startPreferencesMonitor()
+				}
 			}
 		}
 		
