@@ -113,13 +113,6 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             )
             if (queries.changes().executeAsOne() != 1L) {
                 result = false
-            } else {
-                queries.getOutgoingPart(
-                    part_id = partId.toString()
-                ).executeAsOneOrNull()?.let {
-                    val parentId = UUID.fromString(it.part_parent_id)
-                    didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(parentId), database)
-                }
             }
         }
         return result
@@ -141,13 +134,6 @@ class OutgoingQueries(val database: PaymentsDatabase) {
             )
             if (queries.changes().executeAsOne() != 1L) {
                 result = false
-            } else {
-                queries.getOutgoingPart(
-                    part_id = partId.toString()
-                ).executeAsOneOrNull()?.let {
-                    val parentId = UUID.fromString(it.part_parent_id)
-                    didCompleteWalletPayment(WalletPaymentId.OutgoingPaymentId(parentId), database)
-                }
             }
         }
         return result
