@@ -1,0 +1,8 @@
+-- Migration: v4 -> v5
+--
+-- Changes:
+-- * Added column: payments_metadata.original_fiat_type
+-- * Added column: payments_metadata.original_fiat_rate
+
+ALTER TABLE payments_metadata ADD COLUMN original_fiat_type TEXT DEFAULT NULL;
+ALTER TABLE payments_metadata ADD COLUMN original_fiat_rate REAL DEFAULT NULL;

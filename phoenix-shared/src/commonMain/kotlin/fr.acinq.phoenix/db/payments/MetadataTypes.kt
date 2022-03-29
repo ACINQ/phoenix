@@ -5,6 +5,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.phoenix.data.LNUrl
 import fr.acinq.phoenix.data.LnurlPayMetadata
+import fr.acinq.phoenix.data.OriginalFiat
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import io.ktor.http.*
 import kotlinx.serialization.*
@@ -222,17 +223,18 @@ data class WalletPaymentMetadataRow(
     val lnurl_metadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null,
     val lnurl_successAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null,
     val lnurl_description: String? = null,
+    val original_fiat: OriginalFiat? = null,
     val user_description: String? = null,
     val user_notes: String? = null,
     val modified_at: Long? = null
 ) {
 
     fun deserialize(): WalletPaymentMetadata {
-        val base = lnurl_base?.let {
-            when (val base = LNUrlBase.deserialize(it.first, it.second)) {
+        val base = lnurl_base?.let { (baseType, baseBlob) ->
+            when (val base = LNUrlBase.deserialize(baseType, baseBlob)) {
                 is LNUrlBase.Pay -> {
-                    lnurl_metadata?.let { (type, blob) ->
-                        when (val metadata = LNUrlMetadata.deserialize(type, blob)) {
+                    lnurl_metadata?.let { (metaType, metaBlob) ->
+                        when (val metadata = LNUrlMetadata.deserialize(metaType, metaBlob)) {
                             is LNUrlMetadata.PayMetadata -> {
                                 metadata.unwrap()
                             }
@@ -258,10 +260,24 @@ data class WalletPaymentMetadataRow(
 
         return WalletPaymentMetadata(
             lnurl = lnurl,
+            originalFiat = original_fiat,
             userDescription = user_description,
             userNotes = user_notes,
             modifiedAt = modified_at
         )
+    }
+
+    /**
+     * Returns true if all columns are null (excluding modified_at).
+     */
+    fun isEmpty(): Boolean {
+        return lnurl_base == null
+            && lnurl_metadata == null
+            && lnurl_successAction == null
+            && lnurl_description == null
+            && original_fiat == null
+            && user_description == null
+            && user_notes == null
     }
 
     /**
@@ -291,24 +307,18 @@ data class WalletPaymentMetadataRow(
                 lnurlDescription = it.pay.metadata.plainText
             }
 
-            if (lnurlBase == null
-             && lnurlMetadata == null
-             && lnurlSuccessAction == null
-             && lnurlDescription == null
-             && metadata.userDescription == null
-             && metadata.userNotes == null) {
-                return null
-            }
-
-            return WalletPaymentMetadataRow(
+            val row = WalletPaymentMetadataRow(
                 lnurl_base = lnurlBase,
                 lnurl_metadata = lnurlMetadata,
                 lnurl_successAction = lnurlSuccessAction,
                 lnurl_description = lnurlDescription,
+                original_fiat = metadata.originalFiat,
                 user_description = metadata.userDescription,
                 user_notes = metadata.userNotes,
                 modified_at = metadata.modifiedAt
             )
+
+            return if (row.isEmpty()) null else row
         }
     }
 }

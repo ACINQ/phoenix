@@ -22,14 +22,16 @@ class DatabaseManager(
     loggerFactory: LoggerFactory,
     private val ctx: PlatformContext,
     private val chain: Chain,
-    private val nodeParamsManager: NodeParamsManager
+    private val nodeParamsManager: NodeParamsManager,
+    private val currencyManager: CurrencyManager
 ) : CoroutineScope by MainScope() {
 
     constructor(business: PhoenixBusiness): this(
         loggerFactory = business.loggerFactory,
         ctx = business.ctx,
         chain = business.chain,
-        nodeParamsManager = business.nodeParamsManager
+        nodeParamsManager = business.nodeParamsManager,
+        currencyManager = business.currencyManager
     )
 
     private val log = newLogger(loggerFactory)
@@ -45,7 +47,7 @@ class DatabaseManager(
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
                 val channelsDb = SqliteChannelsDb(createChannelsDbDriver(ctx, chain, nodeIdHash), nodeParams.copy())
-                val paymentsDb = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash))
+                val paymentsDb = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash), currencyManager)
                 log.debug { "databases object created" }
                 _databases.value = object : Databases {
                     override val channels: ChannelsDb get() = channelsDb

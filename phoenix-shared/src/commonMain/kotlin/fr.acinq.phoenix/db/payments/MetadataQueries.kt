@@ -27,7 +27,9 @@ class MetadataQueries(val database: PaymentsDatabase) {
             lnurl_successAction_blob = data.lnurl_successAction?.second,
             user_description = data.user_description,
             user_notes = data.user_notes,
-            modified_at = data.modified_at
+            modified_at = data.modified_at,
+            original_fiat_type = data.original_fiat?.type,
+            original_fiat_rate = data.original_fiat?.rate
         )
     }
 
@@ -101,7 +103,9 @@ class MetadataQueries(val database: PaymentsDatabase) {
                     lnurl_successAction_blob = null,
                     user_description = userDescription,
                     user_notes = userNotes,
-                    modified_at = modifiedAt
+                    modified_at = modifiedAt,
+                    original_fiat_type = null,
+                    original_fiat_rate = null
                 )
             }
             didUpdateWalletPaymentMetadata(id, database)
@@ -134,7 +138,9 @@ class MetadataQueries(val database: PaymentsDatabase) {
             lnurl_successAction_blob: ByteArray?,
             user_description: String?,
             user_notes: String?,
-            modified_at: Long?
+            modified_at: Long?,
+            original_fiat_type: String?,
+            original_fiat_rate: Double?
         ): WalletPaymentMetadata {
             val lnurlBase =
                 if (lnurl_base_type != null && lnurl_base_blob != null) {
@@ -151,11 +157,17 @@ class MetadataQueries(val database: PaymentsDatabase) {
                     Pair(lnurl_successAction_type, lnurl_successAction_blob)
                 } else null
 
+            val originalFiat =
+                if (original_fiat_type != null && original_fiat_rate != null) {
+                    OriginalFiat(original_fiat_type, original_fiat_rate)
+                } else null
+
             return WalletPaymentMetadataRow(
                 lnurl_base = lnurlBase,
                 lnurl_metadata = lnurlMetadata,
                 lnurl_successAction = lnurlSuccesssAction,
                 lnurl_description = lnurl_description,
+                original_fiat = originalFiat,
                 user_description = user_description,
                 user_notes = user_notes,
                 modified_at = modified_at

@@ -34,6 +34,7 @@ import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
+import fr.acinq.phoenix.managers.CurrencyManager
 import fracinqphoenixdb.Incoming_payments
 import fracinqphoenixdb.Outgoing_payment_parts
 import fracinqphoenixdb.Outgoing_payments
@@ -43,7 +44,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 
-class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
+class SqlitePaymentsDb(
+    driver: SqlDriver,
+    private val currencyManager: CurrencyManager? = null
+) : PaymentsDb {
 
     private val database = PaymentsDatabase(
         driver = driver,
@@ -86,10 +90,9 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         withContext(Dispatchers.Default) {
             database.transaction {
                 outQueries.addOutgoingPayment(outgoingPayment)
-                // If there is pending metadata for the given payment,
-                // add it to the database now, within the same atomic database transaction.
-                metadataRow?.let { row ->
-                    metaQueries.addMetadata(paymentId, row)
+                // Add associated metadata within the same atomic database transaction.
+                if (!metadataRow.isEmpty()) {
+                    metaQueries.addMetadata(paymentId, metadataRow)
                 }
             }
 
@@ -176,24 +179,50 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
                     origin = origin,
                     createdAt = createdAt
                 )
-                // If there is pending metadata for the given payment,
-                // add it to the database now, within the same atomic database transaction.
-                metadataRow?.let { row ->
-                    metaQueries.addMetadata(paymentId, row)
+                // Add associated metadata within the same atomic database transaction.
+                if (!metadataRow.isEmpty()) {
+                    metaQueries.addMetadata(paymentId, metadataRow)
                 }
             }
         }
     }
 
-    override suspend fun receivePayment(paymentHash: ByteVector32, receivedWith: Set<IncomingPayment.ReceivedWith>, receivedAt: Long) {
+    override suspend fun receivePayment(
+        paymentHash: ByteVector32,
+        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        receivedAt: Long
+    ) {
         withContext(Dispatchers.Default) {
-            inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
+            database.transaction {
+                inQueries.receivePayment(paymentHash, receivedWith, receivedAt)
+            }
         }
     }
 
-    override suspend fun addAndReceivePayment(preimage: ByteVector32, origin: IncomingPayment.Origin, receivedWith: Set<IncomingPayment.ReceivedWith>, createdAt: Long, receivedAt: Long) {
+    override suspend fun addAndReceivePayment(
+        preimage: ByteVector32,
+        origin: IncomingPayment.Origin,
+        receivedWith: Set<IncomingPayment.ReceivedWith>,
+        createdAt: Long,
+        receivedAt: Long
+    ) {
+        val paymentHash = Crypto.sha256(preimage).toByteVector32()
+        val paymentId = WalletPaymentId.IncomingPaymentId(paymentHash)
+        val metadataRow = dequeueMetadata(paymentId)
         withContext(Dispatchers.Default) {
-            inQueries.addAndReceivePayment(preimage, origin, receivedWith, createdAt, receivedAt)
+            database.transaction {
+                inQueries.addAndReceivePayment(
+                    preimage,
+                    origin,
+                    receivedWith,
+                    createdAt,
+                    receivedAt
+                )
+                // Add associated metadata within the same atomic database transaction.
+                if (!metadataRow.isEmpty()) {
+                    metaQueries.addMetadata(paymentId, metadataRow)
+                }
+            }
         }
     }
 
@@ -272,17 +301,34 @@ class SqlitePaymentsDb(driver: SqlDriver) : PaymentsDb {
         filters: Set<PaymentTypeFilter>
     ): List<WalletPayment> = throw NotImplementedError("Use listPaymentsOrderFlow instead")
 
+    /**
+     * The lightning-kmp layer triggers the addition of a payment to the database.
+     * But sometimes there is associated metadata that we want to include,
+     * and we would like to write it to the database within the same transaction.
+     * So we have a system to enqueue/dequeue associated metadata.
+     */
     internal fun enqueueMetadata(row: WalletPaymentMetadataRow, id: WalletPaymentId) {
         val oldMap = metadataQueue.value
         val newMap = oldMap + (id to row)
         metadataQueue.value = newMap
     }
 
-    private fun dequeueMetadata(id: WalletPaymentId): WalletPaymentMetadataRow? {
+    /**
+     * Returns any enqueued metadata, and also appends the current fiat exchange rate.
+     */
+    private fun dequeueMetadata(id: WalletPaymentId): WalletPaymentMetadataRow {
         val oldMap = metadataQueue.value
         val newMap = oldMap - id
         metadataQueue.value = newMap
-        return oldMap[id]
+
+        val row = oldMap[id] ?: WalletPaymentMetadataRow()
+
+        // Append the current exchange rate, unless it was explicitly set earlier.
+        return if (row.original_fiat != null) {
+            row
+        } else {
+            row.copy(original_fiat = currencyManager?.calculateOriginalFiat())
+        }
     }
 
     suspend fun updateMetadata(

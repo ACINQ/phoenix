@@ -70,7 +70,7 @@ class CurrencyManager(
      * We use a number of different API's to fetch all the data we need.
      * This interface defines the shared format for each API.
      */
-    interface API {
+    private interface API {
         /**
          * How often to perform an automatic refresh.
          * Some API's impose limits, and others simply don't refresh (server-side) as often.
@@ -117,11 +117,61 @@ class CurrencyManager(
         override val fiatCurrencies = setOf(FiatCurrency.ARS_BM)
     }
 
+    val _ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
+
     /** Public consumable flow that includes the most recent exchange rates */
-    val ratesFlow: Flow<List<ExchangeRate>> = appDb.listBitcoinRates()
+    val ratesFlow: StateFlow<List<ExchangeRate>> = _ratesFlow.stateIn(
+        scope = this,
+        started = SharingStarted.Eagerly,
+        initialValue = listOf<ExchangeRate>()
+    )
+
+    /**
+     * Returns a snapshot of the ExchangeRate for the primary FiatCurrency.
+     * That is, an instance of OriginalFiat, where:
+     * - type => current primary FiatCurrency (via AppConfigurationManager)
+     * - price => BitcoinPriceRate.price for FiatCurrency type
+     */
+    fun calculateOriginalFiat(): OriginalFiat? {
+
+        val fiatCurrency = configurationManager.preferredFiatCurrencies().value?.primary
+        if (fiatCurrency == null) {
+            return null
+        }
+
+        val rates = ratesFlow.value
+
+        val fiatRate = rates.firstOrNull { it.fiatCurrency == fiatCurrency }
+        if (fiatRate == null) {
+            return null
+        }
+
+        return when (fiatRate) {
+            is ExchangeRate.BitcoinPriceRate -> {
+                // We have a direct exchange rate.
+                // BitcoinPriceRate.rate => The price of 1 BTC in this currency
+                OriginalFiat(
+                    type = fiatCurrency.name,
+                    rate = fiatRate.price
+                )
+            }
+            is ExchangeRate.UsdPriceRate -> {
+                // We have an indirect exchange rate.
+                // UsdPriceRate.price => The price of 1 US Dollar in this currency
+                rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
+                    it.fiatCurrency == FiatCurrency.USD
+                }?.let { usdRate ->
+                    OriginalFiat(
+                        type = fiatCurrency.name,
+                        rate = usdRate.price * fiatRate.price
+                    )
+                }
+            }
+        }
+    }
 
     /** Utility class useed to track refresh progress on a per-currency basis. */
-    data class RefreshInfo(
+    private data class RefreshInfo(
         val lastRefresh: Instant,
         val nextRefresh: Instant,
         val failCount: Int
@@ -221,8 +271,16 @@ class CurrencyManager(
                     log.debug { "API(coindesk): Next UsdPriceRate refresh: $nextDelay" }
                     delay(nextDelay)
                 }
-                val preferred = configurationManager.preferredFiatCurrencies().value.toSet()
-                val remaining = api.fiatCurrencies.filter { !preferred.contains(it) }
+                val preferredFiatCurrencies = configurationManager.preferredFiatCurrencies().value
+                val (preferred, remaining) = preferredFiatCurrencies?.let {
+                    val preferred = it.all
+                    val remaining = api.fiatCurrencies.filter { !preferred.contains(it) }
+                    Pair(preferred, remaining)
+                } ?: run {
+                    val preferred = setOf<FiatCurrency>()
+                    val remaining = api.fiatCurrencies.toList()
+                    Pair(preferred, remaining)
+                }
 
                 refreshFromCoinDesk(preferred, forceRefresh = false)
                 refreshFromCoinDesk(remaining, forceRefresh = false)
