@@ -71,6 +71,18 @@ class Utils {
 		return fiat
 	}
 	
+	static func convertToFiat(msat: Int64, originalFiat: OriginalFiat) -> Double {
+		
+		// OriginalFiat.rate: Double { get }
+		//
+		// originalFiat.rate => value of 1.0 BTC in fiat
+		
+		let btc = Double(msat) / Millisatoshis_Per_Bitcoin
+		let fiat = btc * originalFiat.rate
+		
+		return fiat
+	}
+	
 	/// Formats the given amount of satoshis into a FormattedAmount struct,
 	/// which contains the various string values needed for display.
 	///
@@ -420,6 +432,60 @@ class Utils {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
 		return formatFiat(amount: fiatAmount, fiatCurrency: exchangeRate.fiatCurrency)
+	}
+	
+	/// Converts from satoshi to a fiat amount, using the original exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(
+		sat: Bitcoin_kmpSatoshi,
+		originalFiat: OriginalFiat
+	) -> FormattedAmount? {
+		
+		return formatFiat(sat: sat.toLong(), originalFiat: originalFiat)
+	}
+	
+	/// Converts from satoshi to a fiat amount, using the original exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(
+		sat: Int64,
+		originalFiat: OriginalFiat
+	) -> FormattedAmount? {
+		
+		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
+		return formatFiat(msat: msat, originalFiat: originalFiat)
+	}
+	
+	/// Converts from millisatoshi to a fiat amount, using the original exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(
+		msat: Lightning_kmpMilliSatoshi,
+		originalFiat: OriginalFiat
+	) -> FormattedAmount? {
+		
+		return formatFiat(msat: msat.toLong(), originalFiat: originalFiat)
+	}
+	
+	/// Converts from millisatoshi to a fiat amount, using the original exchange rate.
+	///
+	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
+	///
+	static func formatFiat(
+		msat: Int64,
+		originalFiat: OriginalFiat
+	) -> FormattedAmount? {
+		
+		guard let fiatCurrency = FiatCurrency.companion.valueOfOrNull(code: originalFiat.type) else {
+			return nil
+		}
+		
+		let fiatAmount = convertToFiat(msat: msat, originalFiat: originalFiat)
+		return formatFiat(amount: fiatAmount, fiatCurrency: fiatCurrency)
 	}
 	
 	static func formatFiat(

@@ -343,7 +343,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			if let msat = paymentRequest.amount {
-				commonValue_amount(msat: msat)
+				commonValue_amounts(displayAmounts: displayAmounts(
+					msat: msat,
+					originalFiat: nil // we don't have this info (at time of invoice generation)
+				))
 			} else {
 				Text("Any amount")
 			}
@@ -408,7 +411,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			commonValue_amount(msat: receivedWith.amount)
+			commonValue_amounts(displayAmounts: displayAmounts(
+				msat: receivedWith.amount,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
 		}
 	}
 	
@@ -608,7 +614,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			commonValue_amount(msat: outgoingPayment.recipientAmount)
+			commonValue_amounts(displayAmounts: displayAmounts(
+				msat: outgoingPayment.recipientAmount,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
 		}
 	}
 	
@@ -626,11 +635,18 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let (display_msat, display_fiat) = displayAmounts(msat: outgoingPayment.fees)
-			let display_percent = displayFeePercent(fees: outgoingPayment.fees, total: outgoingPayment.amount)
+			let display_amounts = displayAmounts(
+				msat: outgoingPayment.fees,
+				originalFiat: paymentInfo.metadata.originalFiat
+			)
+			let display_percent = displayFeePercent(
+				fees: outgoingPayment.fees,
+				total: outgoingPayment.amount
+			)
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 				
+				let display_msat = display_amounts.bitcoin
 				if display_msat.hasFractionDigits { // has visible millisatoshi's
 					Text(verbatim: "\(display_msat.integerDigits)") +
 					Text(verbatim: "\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
@@ -640,8 +656,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					Text(verbatim: display_msat.string)
 				}
 				
-				if let display_fiat = display_fiat {
-					Text(verbatim: "≈ \(display_fiat.string)")
+				if let display_fiatCurrent = display_amounts.fiatCurrent {
+					Text(verbatim: "≈ \(display_fiatCurrent.string)") +
+					Text(" (now)")
+						.foregroundColor(.secondary)
+				}
+				if let display_fiatOriginal = display_amounts.fiatOriginal {
+					Text("≈ \(display_fiatOriginal.string)") +
+					Text(" (original)")
+						.foregroundColor(.secondary)
 				}
 				
 				Text(verbatim: display_percent)
@@ -663,7 +686,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			commonValue_amount(msat: outgoingPayment.amount)
+			commonValue_amounts(displayAmounts: displayAmounts(
+				msat: outgoingPayment.amount,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
 		}
 	}
 	
@@ -742,15 +768,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 			
-			let (display_sat, display_fiat) = displayAmounts(sat: onChain.claimed)
-			
-			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				
-				Text(display_sat.string)
-				if let display_fiat = display_fiat {
-					Text(display_fiat.string)
-				}
-			}
+			commonValue_amounts(displayAmounts: displayAmounts(
+				sat: onChain.claimed,
+				originalFiat: paymentInfo.metadata.originalFiat
+			))
 		}
 	}
 	
@@ -924,12 +945,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func commonValue_amount(msat: Lightning_kmpMilliSatoshi) -> some View {
-		
-		let (display_msat, display_fiat) = displayAmounts(msat: msat)
+	func commonValue_amounts(displayAmounts: DisplayAmounts) -> some View {
 		
 		VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 			
+			let display_msat = displayAmounts.bitcoin
 			if display_msat.hasFractionDigits { // has visible millisatoshi's
 				Text(verbatim: "\(display_msat.integerDigits)") +
 				Text(verbatim: "\(display_msat.decimalSeparator)\(display_msat.fractionDigits)")
@@ -939,8 +959,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 				Text(verbatim: display_msat.string)
 			}
 			
-			if let display_fiat = display_fiat {
-				Text(verbatim: "≈ \(display_fiat.string)")
+			if let display_fiatCurrent = displayAmounts.fiatCurrent {
+				Text(verbatim: "≈ \(display_fiatCurrent.string)") +
+				Text(" (now)")
+					.foregroundColor(.secondary)
+			}
+			if let display_fiatOriginal = displayAmounts.fiatOriginal {
+				Text(verbatim: "≈ \(display_fiatOriginal.string)") +
+				Text(" (original)")
+					.foregroundColor(.secondary)
 			}
 		}
 	}
@@ -1001,28 +1028,36 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		return (minutesStr, secondsStr)
 	}
 	
-	func displayAmounts(msat: Lightning_kmpMilliSatoshi) -> (FormattedAmount, FormattedAmount?) {
+	func displayAmounts(msat: Lightning_kmpMilliSatoshi, originalFiat: OriginalFiat?) -> DisplayAmounts {
 		
-		let display_msat = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, policy: .showMsats)
-		var display_fiat: FormattedAmount? = nil
+		let bitcoin = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, policy: .showMsats)
+		var fiatCurrent: FormattedAmount? = nil
+		var fiatOriginal: FormattedAmount? = nil
 
 		if let fiatExchangeRate = currencyPrefs.fiatExchangeRate() {
-			display_fiat = Utils.formatFiat(msat: msat, exchangeRate: fiatExchangeRate)
+			fiatCurrent = Utils.formatFiat(msat: msat, exchangeRate: fiatExchangeRate)
+		}
+		if let originalFiat = originalFiat {
+			fiatOriginal = Utils.formatFiat(msat: msat, originalFiat: originalFiat)
 		}
 		
-		return (display_msat, display_fiat)
+		return DisplayAmounts(bitcoin: bitcoin, fiatCurrent: fiatCurrent, fiatOriginal: fiatOriginal)
 	}
 	
-	func displayAmounts(sat: Bitcoin_kmpSatoshi) -> (FormattedAmount, FormattedAmount?) {
+	func displayAmounts(sat: Bitcoin_kmpSatoshi, originalFiat: OriginalFiat?) -> DisplayAmounts {
 		
-		let display_sat = Utils.formatBitcoin(sat: sat, bitcoinUnit: .sat)
-		var display_fiat: FormattedAmount? = nil
+		let bitcoin = Utils.formatBitcoin(sat: sat, bitcoinUnit: .sat)
+		var fiatCurrent: FormattedAmount? = nil
+		var fiatOriginal: FormattedAmount? = nil
 
 		if let fiatExchangeRate = currencyPrefs.fiatExchangeRate() {
-			display_fiat = Utils.formatFiat(sat: sat, exchangeRate: fiatExchangeRate)
+			fiatCurrent = Utils.formatFiat(sat: sat, exchangeRate: fiatExchangeRate)
+		}
+		if let originalFiat = originalFiat {
+			fiatOriginal = Utils.formatFiat(sat: sat, originalFiat: originalFiat)
 		}
 		
-		return (display_sat, display_fiat)
+		return DisplayAmounts(bitcoin: bitcoin, fiatCurrent: fiatCurrent, fiatOriginal: fiatOriginal)
 	}
 	
 	func displayFeePercent(fees: Lightning_kmpMilliSatoshi, total: Lightning_kmpMilliSatoshi) -> String {
@@ -1040,6 +1075,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		formatter.maximumFractionDigits = 3
 		
 		return formatter.string(from: NSNumber(value: percent)) ?? "?%"
+	}
+	
+	struct DisplayAmounts {
+		let bitcoin: FormattedAmount
+		let fiatCurrent: FormattedAmount?
+		let fiatOriginal: FormattedAmount?
 	}
 	
 	struct InfoGridRowWrapper<KeyColumn: View, ValueColumn: View>: View {
