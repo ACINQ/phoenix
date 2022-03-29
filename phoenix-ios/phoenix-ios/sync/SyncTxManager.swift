@@ -325,7 +325,7 @@ class SyncTxManager {
 			databaseManager.getDatabases().sink { databases in
 				
 				if let paymentsDb = databases.payments as? SqlitePaymentsDb,
-					let cloudKitDb = paymentsDb.cloudKitDb as? CloudKitDb
+					let cloudKitDb = paymentsDb.getCloudKitDb() as? CloudKitDb
 				{
 					self._paymentsDb = paymentsDb
 					self._cloudKitDb = cloudKitDb

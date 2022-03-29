@@ -46,8 +46,14 @@ class DatabaseManager(
                 log.info { "nodeParams available: building databases..." }
 
                 val nodeIdHash = nodeParams.nodeId.hash160().toHexString()
-                val channelsDb = SqliteChannelsDb(createChannelsDbDriver(ctx, chain, nodeIdHash), nodeParams.copy())
-                val paymentsDb = SqlitePaymentsDb(createPaymentsDbDriver(ctx, chain, nodeIdHash), currencyManager)
+                val channelsDb = SqliteChannelsDb(
+                    driver = createChannelsDbDriver(ctx, chain, nodeIdHash),
+                    nodeParams = nodeParams.copy()
+                )
+                val paymentsDb = SqlitePaymentsDb(
+                    driver = createPaymentsDbDriver(ctx, chain, nodeIdHash),
+                    currencyManager = currencyManager
+                )
                 log.debug { "databases object created" }
                 _databases.value = object : Databases {
                     override val channels: ChannelsDb get() = channelsDb
