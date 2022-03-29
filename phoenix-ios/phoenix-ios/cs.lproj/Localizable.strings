@@ -234,19 +234,19 @@
 "Cloud Backup" = "Záloha na Cloudu";
 
 /* No comment provided by engineer. */
-"Cloud sync complete" = "Cloudová synchronizace dokončena";
+"Cloud sync complete" = "Synchronizace s cloudem dokončena";
 
 /* No comment provided by engineer. */
-"Cloud sync disabled" = "Cloudová synchronizace zakázána";
+"Cloud sync disabled" = "Synchronizace s cloudem zakázána";
 
 /* No comment provided by engineer. */
 "Cloud sync error" = "Chyba synchronizace s cloudem";
 
 /* No comment provided by engineer. */
-"Cloud sync initializing" = "Inicializace cloudové synchronizace";
+"Cloud sync initializing" = "Inicializace synchronizace s cloudem";
 
 /* No comment provided by engineer. */
-"Cloud sync paused" = "Cloudová synchronizace pozastavena";
+"Cloud sync paused" = "Synchronizace s cloudem pozastavena";
 
 /* No comment provided by engineer. */
 "Coming Soon" = "Již brzy";
@@ -366,7 +366,7 @@
 "Edit payment request" = "Upravit žádost o platbu";
 
 /* Label in SummaryInfoGrid */
-"elapsed" = "Uplynulý čas";
+"elapsed" = "uplynulý čas";
 
 /* Navigation bar title */
 "Electrum server" = "Electrum server";
@@ -426,7 +426,7 @@
 "Force close channels" = "Vynutit uzavření kanálů";
 
 /* ForceCloseChannelsView */
-"Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "Vynucené uzavření kanálů vás bude stát peníze (na pokrytí poplatků na on-chainu) a způsobí, že vaše prostředky budou na několik dní zablokovány. **Neodinstalujte aplikaci, dokud nebudou kanály plně uzavřeny, nebo přijdete o své peníze. **";
+"Force closing channels will cost you money (to cover the on-chain fees) and will cause your funds to be locked for days. **Do not uninstall the app until your channels are fully closed or you will lose money.**" = "Vynucené uzavření kanálů vás bude stát peníze (na pokrytí poplatků na on-chainu) a způsobí, že vaše prostředky budou na několik dní zablokovány. **Nemažte aplikaci, dokud nebudou kanály plně uzavřeny, nebo přijdete o své peníze. **";
 
 /* No comment provided by engineer. */
 "Full Screen" = "Celá obrazovka";
@@ -507,7 +507,7 @@
 "Keep Control" = "Udržujte kontrolu";
 
 /* No comment provided by engineer. */
-"Keep it safe and secret!" = "Uchovejte to v tajnosti!";
+"Keep it safe and secret!" = "Uchovejte tuto frázi v tajnosti!";
 
 /* No comment provided by engineer. */
 "KEEP THIS SEED SAFE." = "TENTO SEED UCHOVÁVEJTE BEZPEČNĚ.";
@@ -606,11 +606,11 @@
 "Payment channels" = "Platební kanály";
 
 /* No comment provided by engineer. */
-"Payment channels are automatically created when needed." = "Platební kanály jsou vytvořeny automaticky když jsou potřeba.";
+"Payment channels are automatically created when needed." = "Platební kanály se v případě potřeby vytvářejí automaticky.";
 
 /* CloseChannelsView
    ForceCloseChannelsView */
-"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Platební kanály jsou vytvořeny automaticky, když dostanete platbu. K přijímání plateb prostřednictvím sítě Lightning použijte obrazovku **Přijmout**.";
+"Payment channels are automatically created when you receive payments. Use the **Receive** screen to receive via the Lightning network." = "Platební kanály jsou automaticky vytvořeny když dostanete platbu. K přijímání plateb prostřednictvím sítě Lightning použijte obrazovku **Přijmout**.";
 
 /* Label in DetailsView_IncomingPayment */
 "payment hash" = "hash platby";
@@ -709,7 +709,7 @@
 "Require Touch ID" = "Vyžadováno Touch ID";
 
 /* Navigation bar title */
-"Restore my wallet" = "Obnovit mou peněženku";
+"Restore my wallet" = "Obnovit moji peněženku";
 
 /* Currency name: RON */
 "Romanian Leu" = "Rumunský Leu";
@@ -871,13 +871,13 @@
 "This feature is not a \"fix everything magic button\". It is here as a safety measure and **should only be used in extreme scenarios**. For example, if your peer (ACINQ) disappears permanently, preventing you from spending your money. In all other cases, **if you experience issues with Phoenix you should contact support**." = "Tato funkce není \" tlačítko kouzelného opravení \". Je zde jako bezpečnostní opatření a ** by mělo být používáno pouze v extrémních případech **. Pokud například váš peer (ACINQ) trvale zmizí, což vám znemožní utrácení peněz. Ve všech ostatních případech, ** pokud máte problémy s Phoenixem, měli byste kontaktovat podporu **.";
 
 /* No comment provided by engineer. */
-"This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "Tento poplatek platí, když obdržíte platbu přes Lightning, a je třeba vytvořit nový kanál.";
+"This fee applies when you receive a payment over Lightning and a new channel needs to be created." = "Tento poplatek platí, když obdržíte platbu přes Lightning, a je nutné vytvořit nový kanál.";
 
 /* No comment provided by engineer. */
 "This fee is dynamic, and may change depending on the conditions of the bitcoin network." = "Tento poplatek je dynamický a může se měnit v závislosti na podmínkách bitcoinové sítě.";
 
 /* No comment provided by engineer. */
-"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Tento poplatek platí pouze v případě, pokud je potřebna vytvořit nový kanál. Platby využívající stávající kanály tento poplatek neplatí. Poplatek je dynamický a může se měnit v závislosti na podmínkách bitcoinové sítě.";
+"This fee only applies when a new channel needs to be created. Payments that use existing channels don't pay this fee. The fee is dynamic and may change depending on bitcoin network conditions." = "Tento poplatek platí pouze v případě, pokud je nutné vytvořit nový kanál. Platby využívající stávající kanály tento poplatek neplatí. Poplatek je dynamický a může se měnit v závislosti na podmínkách bitcoinové sítě.";
 
 /* No comment provided by engineer. */
 "This is a swap address. It is not controlled by your wallet. On-chain deposits sent to this address will be converted to Lightning channels." = "Toto je adresa pro výměnu. Není kontrolována vaší peněženkou. Vklady On-chain zaslané na tuto adresu budou převedeny na Lightning kanály.";
