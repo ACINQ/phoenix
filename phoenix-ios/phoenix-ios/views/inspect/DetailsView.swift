@@ -160,9 +160,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 			offChain_completedAt(offChain)
 			offChain_elapsed(outgoingPayment)
-			offChain_amountReceived(outgoingPayment)
+			offChain_amountSent(outgoingPayment)
 			offChain_fees(outgoingPayment)
-			offChain_totalAmount(outgoingPayment)
+			offChain_amountReceived(outgoingPayment)
 			offChain_recipientPubkey(outgoingPayment)
 		
 		} else if let onChain = outgoingPayment.status.asOnChain() {
@@ -656,6 +656,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					Text(verbatim: display_msat.string)
 				}
 				
+				Text(verbatim: display_percent)
+				
 				if let display_fiatCurrent = display_amounts.fiatCurrent {
 					Text(verbatim: "≈ \(display_fiatCurrent.string)") +
 					Text(" (now)")
@@ -666,14 +668,12 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					Text(" (original)")
 						.foregroundColor(.secondary)
 				}
-				
-				Text(verbatim: display_percent)
 			}
 		}
 	}
 	
 	@ViewBuilder
-	func offChain_totalAmount(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+	func offChain_amountSent(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -682,7 +682,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
 			
-			keyColumn(NSLocalizedString("total amount", comment: "Label in DetailsView_IncomingPayment"))
+			keyColumn(NSLocalizedString("amount sent", comment: "Label in DetailsView_IncomingPayment"))
 			
 		} valueColumn: {
 			
