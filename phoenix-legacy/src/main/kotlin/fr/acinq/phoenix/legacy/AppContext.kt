@@ -31,6 +31,8 @@ import fr.acinq.eclair.MilliSatoshi
 import fr.acinq.phoenix.legacy.background.BalanceEvent
 import fr.acinq.phoenix.legacy.main.InAppNotifications
 import fr.acinq.phoenix.legacy.utils.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -50,7 +52,7 @@ val Context.userPrefs: DataStore<Preferences> by preferencesDataStore(name = "us
 /** This datastore persists miscellaneous internal data representing various states of the app. */
 val Context.internalData: DataStore<Preferences> by preferencesDataStore(name = "internaldata")
 
-open class AppContext : Application() {
+abstract class AppContext : Application() {
 
   val log = LoggerFactory.getLogger(this::class.java)
 
@@ -196,6 +198,19 @@ open class AppContext : Application() {
 
   private fun handleWalletContext(json: JSONObject) {
     val inAppNotifs = notifications.value
+
+    // -- check if migration is ON
+    CoroutineScope(Dispatchers.Default).launch {
+      val hasMigrationBeenDone = PrefsDatastore.getMigrationResult(applicationContext).first() != null
+      if (!hasMigrationBeenDone) {
+        val isMigrationEnabled = if (json.has("migration_kmp")) json.getJSONObject("migration_kmp").getBoolean("is_enabled") else false
+        if (isMigrationEnabled) {
+          inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)
+        } else {
+          inAppNotifs?.remove(InAppNotifications.PREPARE_WALLET_MIGRATION)
+        }
+      }
+    }
 
     // -- check warning for high mempool usage (no free channels)
     json.getJSONObject("mempool").getJSONObject("v1").run {
@@ -388,6 +403,8 @@ open class AppContext : Application() {
     }
     Prefs.setExchangeRate(context, code, rate)
   }
+
+  abstract fun onLegacyFinish()
 }
 
 data class TrampolineFeeSetting(val feeBase: Satoshi, val feeProportionalMillionths: Long, val cltvExpiry: CltvExpiryDelta) {

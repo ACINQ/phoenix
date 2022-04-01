@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         // (application as? PhoenixApplication)?.business?.incrementDisconnectCount()
+        log.info("stopping kmp activity")
     }
 
     override fun onDestroy() {
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             log.error("failed to unbind activity from node service: {}", e.localizedMessage)
         }
-        log.info("main activity destroyed")
+        log.info("main kmp activity destroyed")
     }
 
 }

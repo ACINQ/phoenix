@@ -49,7 +49,10 @@ object InternalData {
     fun getIsLegacyPrefsMigrationDone(context: Context): Flow<Boolean> = prefs(context).map { it[IS_LEGACY_PREFS_MIGRATION_DONE] ?: false }
     suspend fun saveIsLegacyPrefsMigrationDone(context: Context, isDone: Boolean) = context.internalData.edit { it[IS_LEGACY_PREFS_MIGRATION_DONE] = isDone }
 
-
+    // -- Show a message summing up the migration result.
+    private val MIGRATION_RESULT_SHOWN = booleanPreferencesKey("MIGRATION_RESULT_SHOWN")
+    fun getMigrationResultShown(context: Context): Flow<Boolean> = prefs(context).map { it[MIGRATION_RESULT_SHOWN] ?: false }
+    suspend fun saveMigrationResultShown(context: Context, isShown: Boolean) = context.internalData.edit { it[MIGRATION_RESULT_SHOWN] = isShown }
 
     private fun prefs(context: Context): Flow<Preferences> {
         return context.internalData.data.catch { exception ->

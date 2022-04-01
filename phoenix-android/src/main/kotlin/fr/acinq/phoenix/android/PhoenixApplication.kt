@@ -16,11 +16,12 @@
 
 package fr.acinq.phoenix.android
 
-import android.app.Application
+import android.content.Intent
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.legacy.AppContext
 import fr.acinq.phoenix.utils.PlatformContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class PhoenixApplication : AppContext() {
 
@@ -31,4 +32,10 @@ class PhoenixApplication : AppContext() {
         Logging.setupLogger(applicationContext)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun onLegacyFinish() {
+        applicationContext.startActivity(Intent(applicationContext, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        })
+    }
 }

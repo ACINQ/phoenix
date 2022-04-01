@@ -36,20 +36,14 @@ import fr.acinq.eclair.payment.PaymentFailed
 import fr.acinq.eclair.payment.PaymentReceived
 import fr.acinq.eclair.payment.PaymentSent
 import fr.acinq.eclair.payment.relay.Relayer
-import fr.acinq.eclair.wire.SwapInConfirmed
-import fr.acinq.eclair.wire.SwapInPending
-import fr.acinq.eclair.wire.SwapInResponse
-import fr.acinq.eclair.wire.SwapOutResponse
+import fr.acinq.eclair.wire.*
 import fr.acinq.phoenix.legacy.Balance
 import fr.acinq.phoenix.legacy.R
 import fr.acinq.phoenix.legacy.db.AppDb
 import fr.acinq.phoenix.legacy.db.ClosingType
 import fr.acinq.phoenix.legacy.db.PayToOpenMetaRepository
 import fr.acinq.phoenix.legacy.db.PaymentMetaRepository
-import fr.acinq.phoenix.legacy.utils.Constants
-import fr.acinq.phoenix.legacy.utils.Converter
-import fr.acinq.phoenix.legacy.utils.Prefs
-import fr.acinq.phoenix.legacy.utils.Wallet
+import fr.acinq.phoenix.legacy.utils.*
 import org.greenrobot.eventbus.EventBus
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters
@@ -228,6 +222,12 @@ class EclairSupervisor(val applicationContext: Context) : UntypedActor() {
       }
       is PaymentReceived -> {
         log.info("payment has been successfully received: $event ")
+        EventBus.getDefault().post(event)
+      }
+
+      // -------------- MIGRATION -------------
+      is PhoenixAndroidLegacyMigrateResponse -> {
+        log.info("received migration ack from peer: $event")
         EventBus.getDefault().post(event)
       }
       // -------------- UNHANDLED -------------

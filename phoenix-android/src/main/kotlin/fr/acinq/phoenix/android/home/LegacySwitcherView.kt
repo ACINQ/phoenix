@@ -75,9 +75,11 @@ fun LegacySwitcherView(
                     scope.launch {
                         if (legacyAppStatus == LegacyAppStatus.Required.InitStart) {
                             PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.Required.Running)
-                            context.startActivity(Intent(context, MainActivity::class.java).apply{
+                            log.info { "switching to legacy app" }
+                            context.startActivity(Intent(context, MainActivity::class.java).apply {
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             })
+                            delay(200)
                             (context as? Activity)?.finish()
                         }
                     }
@@ -85,13 +87,6 @@ fun LegacySwitcherView(
             }
             LegacyAppStatus.Required.Running -> {
                 // just wait
-            }
-            LegacyAppStatus.Required.Finished -> {
-                LaunchedEffect(key1 = true) {
-                    scope.launch {
-                        onLegacyFinished()
-                    }
-                }
             }
             LegacyAppStatus.Required.Interrupted -> {
                 BorderButton(text = R.string.legacyswitch_restart, onClick = {

@@ -68,7 +68,6 @@ class SettingsFragment : BaseFragment(stayIfNotStarted = true) {
     mBinding.torButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_tor) }
     mBinding.aboutButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_about) }
     mBinding.paymentSettingsButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_payment_settings) }
-    mBinding.upgradeButton.setOnClickListener { findNavController().navigate(R.id.action_settings_to_migration) }
   }
 
 }

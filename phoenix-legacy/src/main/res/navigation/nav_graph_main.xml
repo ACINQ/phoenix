@@ -117,6 +117,12 @@
     <action
       android:id="@+id/action_main_to_connectivity"
       app:destination="@id/connectivity_dialog" />
+    <action
+      android:id="@+id/action_main_to_migration"
+      app:destination="@id/migration_fragment" />
+    <action
+      android:id="@+id/action_main_to_finish"
+      app:destination="@id/finish_fragment" />
   </fragment>
 
   <!-- init wallet -->
@@ -353,9 +359,6 @@
     <action
       android:id="@+id/action_settings_to_payment_settings"
       app:destination="@id/payment_settings_fragment" />
-    <action
-      android:id="@+id/action_settings_to_migration"
-      app:destination="@id/upgrade_fragment" />
   </fragment>
 
   <!-- settings: mutual close all channels -->
@@ -448,11 +451,17 @@
     android:name="fr.acinq.phoenix.legacy.settings.PaymentSettingsFragment"
     android:label="PaymentSettingsFragment" />
 
-  <!-- settings: upgrade -->
-  <fragment
-    android:id="@+id/upgrade_fragment"
-    android:name="fr.acinq.phoenix.legacy.settings.MigrationSettingFragment"
-    android:label="MigrationSettingsFragment" />
+  <!-- prepare migration -->
+  <dialog
+    android:id="@+id/migration_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.MigrationFragmentDialog"
+    android:label="MigrationDialog" />
+
+  <!-- finish app -->
+  <dialog
+    android:id="@+id/finish_fragment"
+    android:name="fr.acinq.phoenix.legacy.main.FinishLegacyFragmentDialog"
+    android:label="FinishDialog" />
 
   <!-- first time user exp -->
   <fragment
