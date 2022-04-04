@@ -448,7 +448,9 @@ class CloudKitDb(
                             lnurl_description = row.lnurl_description,
                             user_description = row.user_description,
                             user_notes = row.user_notes,
-                            modified_at = row.modified_at
+                            modified_at = row.modified_at,
+                            original_fiat_type = row.original_fiat?.first,
+                            original_fiat_rate = row.original_fiat?.second
                         )
                     }
                 } // </payments_metadata table>

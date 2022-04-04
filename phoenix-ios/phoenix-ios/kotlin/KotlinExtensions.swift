@@ -66,6 +66,7 @@ extension WalletPaymentMetadata {
 	static func empty() -> WalletPaymentMetadata {
 		return WalletPaymentMetadata(
 			lnurl: nil,
+			originalFiat: nil,
 			userDescription: nil,
 			userNotes: nil,
 			modifiedAt: nil

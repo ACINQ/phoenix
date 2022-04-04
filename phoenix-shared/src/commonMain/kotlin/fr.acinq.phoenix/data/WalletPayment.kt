@@ -100,6 +100,7 @@ data class WalletPaymentInfo(
  */
 data class WalletPaymentMetadata(
     val lnurl: LnurlPayMetadata? = null,
+    val originalFiat: ExchangeRate.BitcoinPriceRate? = null,
     val userDescription: String? = null,
     val userNotes: String? = null,
     val modifiedAt: Long? = null
@@ -138,7 +139,8 @@ data class WalletPaymentFetchOptions(val flags: Int) { // <- bitmask
         val Descriptions = WalletPaymentFetchOptions(1 shl 0)
         val Lnurl = WalletPaymentFetchOptions(1 shl 1)
         val UserNotes = WalletPaymentFetchOptions(1 shl 2)
+        val OriginalFiat = WalletPaymentFetchOptions(1 shl 3)
 
-        val All = Descriptions + Lnurl + UserNotes
+        val All = Descriptions + Lnurl + UserNotes + OriginalFiat
     }
 }
