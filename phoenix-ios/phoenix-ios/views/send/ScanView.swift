@@ -19,7 +19,10 @@ struct ScanView: View {
 	
 	@Binding var paymentRequest: String?
 	
+	@State var showingFullMenu = false
+	@State var menuIcon: AnimatedMenu.Icon = .menuIcon
 	@State var clipboardHasString = UIPasteboard.general.hasStrings
+	@State var clipboardContent: Scan.ClipboardContent? = nil
 	
 	@State var showingImagePicker = false
 	@State var imagePickerSelection: UIImage? = nil
@@ -28,8 +31,10 @@ struct ScanView: View {
 	@State var ignoreScanner: Bool = false
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
-	@Environment(\.shortSheetState) private var shortSheetState: ShortSheetState
+	@Environment(\.shortSheetState) var shortSheetState: ShortSheetState
 	@Environment(\.popoverState) var popoverState: PopoverState
+	
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	let willEnterForegroundPublisher = NotificationCenter.default.publisher(for:
 		UIApplication.willEnterForegroundNotification
@@ -58,17 +63,8 @@ struct ScanView: View {
 	var body: some View {
 		
 		ZStack {
-		
-			Color.primaryBackground
-				.edgesIgnoringSafeArea(.all)
 			
-			if AppDelegate.showTestnetBackground {
-				Image("testnet_bg")
-					.resizable(resizingMode: .tile)
-					.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
-			}
-			
-			content
+			content()
 			
 			if mvi.model is Scan.Model_LnurlServiceFetch {
 				LnurlFetchNotice(
@@ -89,6 +85,9 @@ struct ScanView: View {
 				removal: .move(edge: .bottom)
 			)
 		)
+		.onAppear {
+			onAppear()
+		}
 		.onReceive(willEnterForegroundPublisher) { _ in
 			willEnterForeground()
 		}
@@ -103,58 +102,15 @@ struct ScanView: View {
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
-		VStack {
+		ZStack(alignment: Alignment.bottom) {
 			
 			QrCodeScannerView {(request: String) in
 				didScanQRCode(request)
 			}
 			
-			Button {
-				manualInput()
-			} label: {
-				Label {
-					Text("Manual input")
-				} icon: {
-					Image(systemName: "square.and.pencil")
-				}
-			}
-			.font(.title3)
-			.padding(.top, 10)
-			
-			Divider()
-				.padding([.top, .bottom], 10)
-			
-			Button {
-				pasteFromClipboard()
-			} label: {
-				Label {
-					Text("Paste from clipboard")
-				} icon: {
-					Image(systemName: "arrow.right.doc.on.clipboard")
-				}
-			}
-			.font(.title3)
-			.disabled(!clipboardHasString)
-			
-			Divider()
-				.padding([.top, .bottom], 10)
-			
-			Button {
-				showingImagePicker = true
-			} label: {
-				Label {
-					Text("Choose image")
-				} icon: {
-					Image(systemName: "photo")
-				}
-			}
-			.font(.title3)
-			.padding(.bottom, 10)
-			.onChange(of: imagePickerSelection) { _ in
-				imagePickerDidChooseImage()
-			}
+			menu()
 		}
 		.ignoresSafeArea(.keyboard) // disable keyboard avoidance on this view
 		.sheet(isPresented: $showingImagePicker) {
@@ -162,10 +118,224 @@ struct ScanView: View {
 		}
 	}
 	
+	@ViewBuilder
+	func menu() -> some View {
+
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+
+			ZStack(alignment: Alignment.center) {
+				
+				Color.buttonFill
+					.frame(width: 42, height: 42)
+					.cornerRadius(100)
+					.overlay(
+						RoundedRectangle(cornerRadius: 100)
+							.stroke(Color(UIColor.separator), lineWidth: 1)
+					)
+					.onTapGesture {
+						withAnimation {
+							if showingFullMenu {
+								showingFullMenu = false
+								menuIcon = .menuIcon
+							} else {
+								showingFullMenu = true
+								menuIcon = .closeIcon
+							}
+						}
+					}
+				
+				AnimatedMenu(
+					icon: $menuIcon,
+					color: Color.appAccent,
+					lineWidth: 24,
+					lineHeight: 3,
+					lineSpacing: 6)
+				
+			} // </ZStack>
+			.padding(.horizontal, 10)
+			.offset(y: 10)
+			.zIndex(1)
+			
+			menuOptions()
+				.zIndex(0)
+		}
+	}
+	
+	@ViewBuilder
+	func menuOptions() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			menuOption_pasteFromClipboard()
+				.padding(.horizontal, 20)
+				.padding(.top, 20)
+				.padding(.bottom, 12)
+			
+			if showingFullMenu {
+				VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+					
+					Divider()
+					
+					menuOption_chooseImage()
+						.padding(.horizontal, 20)
+						.padding(.vertical, 12)
+					
+					Divider()
+					
+					menuOption_manualInput()
+						.padding(.horizontal, 20)
+						.padding(.vertical, 12)
+				}
+				.transition(.move(edge: .bottom).combined(with: .opacity))
+			}
+		}
+		.frame(maxWidth: .infinity)
+		.background(
+			ZStack {
+				Color.primaryBackground
+					.edgesIgnoringSafeArea(.all)
+				
+				if AppDelegate.showTestnetBackground {
+					Image("testnet_bg")
+						.resizable(resizingMode: .tile)
+						.edgesIgnoringSafeArea([.horizontal, .bottom]) // not underneath status bar
+				}
+			}
+		)
+	}
+	
+	@ViewBuilder
+	func menuOption_pasteFromClipboard() -> some View {
+		
+		Button {
+			pasteFromClipboard()
+		} label: {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				Label {
+					Text("Paste from clipboard")
+				} icon: {
+					Image(systemName: "arrow.right.doc.on.clipboard")
+				}
+				if clipboardContent != nil {
+					Group {
+						if let content = clipboardContent as? Scan.ClipboardContent_InvoiceRequest {
+						
+							let desc = content.paymentRequest.description_?.trimmingCharacters(in: .whitespaces) ?? ""
+							
+							if let msat = content.paymentRequest.amount {
+								let amt = Utils.format(currencyPrefs, msat: msat)
+							
+								if desc.isEmpty {
+									Text("Pay \(amt.string)")
+								} else {
+									Text("Pay \(amt.string) ") +
+									Text(Image(systemName: "arrow.forward")) +
+									Text(verbatim: " \(desc)")
+								}
+							} else if !desc.isEmpty {
+								Text("Pay ") +
+								Text(Image(systemName: "arrow.forward")) +
+								Text(verbatim: " \(desc)")
+							}
+						
+						} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
+							
+							let title = content.auth.actionPromptTitle
+							let domain = content.auth.url.host
+							
+							Text(verbatim: "\(title) ") +
+							Text(Image(systemName: "arrow.forward")) +
+							Text(verbatim: " \(domain)")
+						
+						} else if let content = clipboardContent as? Scan.ClipboardContent_LnurlRequest {
+							
+							let domain = content.url.host
+							
+							Text(verbatim: "LnUrl ") +
+							Text(Image(systemName: "bolt.fill")) +
+							Text(verbatim: " \(domain)")
+						}
+						
+					} // </Group>
+					.font(.footnote)
+					.foregroundColor(.secondary)
+					.lineLimit(1)
+					.truncationMode(.tail)
+					.padding(.top, 4)
+					
+				} // </if clipboardContent != nil>
+			} // </VStack>
+			
+		} // </Button>
+		.font(.title3)
+		.disabled(!clipboardHasString)
+	}
+	
+	@ViewBuilder
+	func menuOption_chooseImage() -> some View {
+		
+		Button {
+			showingImagePicker = true
+		} label: {
+			Label {
+				Text("Choose image")
+			} icon: {
+				Image(systemName: "photo")
+			}
+		}
+		.font(.title3)
+		.onChange(of: imagePickerSelection) { _ in
+			imagePickerDidChooseImage()
+		}
+	}
+	
+	@ViewBuilder
+	func menuOption_manualInput() -> some View {
+		
+		Button {
+			manualInput()
+		} label: {
+			Label {
+				Text("Manual input")
+			} icon: {
+				Image(systemName: "square.and.pencil")
+			}
+		}
+		.font(.title3)
+	}
+	
+	func onAppear() {
+		log.trace("onAppear()")
+		
+		checkClipboard()
+	}
+
 	func willEnterForeground() {
 		log.trace("willEnterForeground()")
 		
-		clipboardHasString = UIPasteboard.general.hasStrings
+		checkClipboard()
+	}
+	
+	func checkClipboard() {
+		if UIPasteboard.general.hasStrings {
+			clipboardHasString = true
+			
+			guard let string = UIPasteboard.general.string else {
+				// iOS lied to us ?!?
+				clipboardHasString = false
+				clipboardContent = nil
+				return
+			}
+			
+			let controller = mvi.controller as! AppScanController
+			controller.inspectClipboard(string: string) {(result, _) in
+				self.clipboardContent = result
+			}
+			
+		} else {
+			clipboardHasString = false
+			clipboardContent = nil
+		}
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) {
