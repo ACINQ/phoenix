@@ -28,8 +28,8 @@ class MetadataQueries(val database: PaymentsDatabase) {
             user_description = data.user_description,
             user_notes = data.user_notes,
             modified_at = data.modified_at,
-            original_fiat_type = data.original_fiat?.type,
-            original_fiat_rate = data.original_fiat?.rate
+            original_fiat_type = data.original_fiat?.first,
+            original_fiat_rate = data.original_fiat?.second
         )
     }
 
@@ -159,7 +159,7 @@ class MetadataQueries(val database: PaymentsDatabase) {
 
             val originalFiat =
                 if (original_fiat_type != null && original_fiat_rate != null) {
-                    OriginalFiat(original_fiat_type, original_fiat_rate)
+                    Pair(original_fiat_type, original_fiat_rate)
                 } else null
 
             return WalletPaymentMetadataRow(

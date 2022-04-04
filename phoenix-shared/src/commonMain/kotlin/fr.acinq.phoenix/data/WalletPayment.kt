@@ -100,7 +100,7 @@ data class WalletPaymentInfo(
  */
 data class WalletPaymentMetadata(
     val lnurl: LnurlPayMetadata? = null,
-    val originalFiat: OriginalFiat? = null,
+    val originalFiat: ExchangeRate.BitcoinPriceRate? = null,
     val userDescription: String? = null,
     val userNotes: String? = null,
     val modifiedAt: Long? = null
@@ -113,11 +113,6 @@ data class LnurlPayMetadata(
 ) {
     companion object {/* allow companion extensions */}
 }
-
-data class OriginalFiat(
-    val type: String,
-    val rate: Double // BitcoinPriceRate.price
-)
 
 /**
  * Represents options when fetching data from the `payments_metadata` table.

@@ -466,7 +466,9 @@ class SqlitePaymentsDb(
         return if (row.original_fiat != null) {
             row
         } else {
-            row.copy(original_fiat = currencyManager?.calculateOriginalFiat())
+            row.copy(original_fiat = currencyManager?.calculateOriginalFiat()?.let {
+                Pair(it.fiatCurrency.name, it.price)
+            })
         }
     }
 

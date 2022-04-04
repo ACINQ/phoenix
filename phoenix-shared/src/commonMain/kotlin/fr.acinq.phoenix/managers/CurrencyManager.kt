@@ -132,7 +132,7 @@ class CurrencyManager(
      * - type => current primary FiatCurrency (via AppConfigurationManager)
      * - price => BitcoinPriceRate.price for FiatCurrency type
      */
-    fun calculateOriginalFiat(): OriginalFiat? {
+    fun calculateOriginalFiat(): ExchangeRate.BitcoinPriceRate? {
 
         val fiatCurrency = configurationManager.preferredFiatCurrencies().value?.primary
         if (fiatCurrency == null) {
@@ -150,10 +150,7 @@ class CurrencyManager(
             is ExchangeRate.BitcoinPriceRate -> {
                 // We have a direct exchange rate.
                 // BitcoinPriceRate.rate => The price of 1 BTC in this currency
-                OriginalFiat(
-                    type = fiatCurrency.name,
-                    rate = fiatRate.price
-                )
+                fiatRate
             }
             is ExchangeRate.UsdPriceRate -> {
                 // We have an indirect exchange rate.
@@ -161,9 +158,13 @@ class CurrencyManager(
                 rates.filterIsInstance<ExchangeRate.BitcoinPriceRate>().firstOrNull {
                     it.fiatCurrency == FiatCurrency.USD
                 }?.let { usdRate ->
-                    OriginalFiat(
-                        type = fiatCurrency.name,
-                        rate = usdRate.price * fiatRate.price
+                    ExchangeRate.BitcoinPriceRate(
+                        fiatCurrency = fiatCurrency,
+                        price = usdRate.price * fiatRate.price,
+                        source = "${fiatRate.source}/${usdRate.source}",
+                        timestampMillis = fiatRate.timestampMillis.coerceAtMost(
+                            usdRate.timestampMillis
+                        )
                     )
                 }
             }

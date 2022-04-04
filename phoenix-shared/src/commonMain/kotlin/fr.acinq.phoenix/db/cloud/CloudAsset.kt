@@ -1,7 +1,8 @@
 package fr.acinq.phoenix.db.cloud
 
 import fr.acinq.lightning.utils.currentTimestampMillis
-import fr.acinq.phoenix.data.OriginalFiat
+import fr.acinq.phoenix.data.ExchangeRate
+import fr.acinq.phoenix.data.FiatCurrency
 import fr.acinq.phoenix.db.payments.LNUrlBase
 import fr.acinq.phoenix.db.payments.LNUrlMetadata
 import fr.acinq.phoenix.db.payments.LNUrlSuccessAction
@@ -101,7 +102,7 @@ fun WalletPaymentMetadataRow.cloudSerialize(): ByteArray {
         user_description = user_description,
         user_notes = user_notes,
         original_fiat = original_fiat?.let {
-            CloudAsset.OriginalFiatWrapper(it.type, it.rate)
+            CloudAsset.OriginalFiatWrapper(it.first, it.second)
         }
     )
     return Cbor.encodeToByteArray(wrapper)
@@ -131,7 +132,7 @@ fun CloudAsset.Companion.cloudDeserialize(blob: ByteArray): WalletPaymentMetadat
         user_description = wrapper.user_description,
         user_notes = wrapper.user_notes,
         original_fiat = wrapper.original_fiat?.let {
-          OriginalFiat(it.type, it.rate)
+            Pair(it.type, it.rate)
         },
         modified_at = currentTimestampMillis()
     )

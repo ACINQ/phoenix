@@ -2,11 +2,7 @@ package fr.acinq.phoenix.db.payments
 
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.WalletPayment
-import fr.acinq.phoenix.data.LNUrl
-import fr.acinq.phoenix.data.LnurlPayMetadata
-import fr.acinq.phoenix.data.OriginalFiat
-import fr.acinq.phoenix.data.WalletPaymentMetadata
+import fr.acinq.phoenix.data.*
 import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.cbor.ByteString
@@ -223,7 +219,7 @@ data class WalletPaymentMetadataRow(
     val lnurl_metadata: Pair<LNUrlMetadata.TypeVersion, ByteArray>? = null,
     val lnurl_successAction: Pair<LNUrlSuccessAction.TypeVersion, ByteArray>? = null,
     val lnurl_description: String? = null,
-    val original_fiat: OriginalFiat? = null,
+    val original_fiat: Pair<String, Double>? = null,
     val user_description: String? = null,
     val user_notes: String? = null,
     val modified_at: Long? = null
@@ -258,9 +254,20 @@ data class WalletPaymentMetadataRow(
             )
         }
 
+        val originalFiat = original_fiat?.let {
+            FiatCurrency.valueOfOrNull(it.first)?.let { fiatCurrency ->
+                ExchangeRate.BitcoinPriceRate(
+                    fiatCurrency = fiatCurrency,
+                    price = it.second,
+                    source = "originalFiat",
+                    timestampMillis = 0
+                )
+            }
+        }
+
         return WalletPaymentMetadata(
             lnurl = lnurl,
-            originalFiat = original_fiat,
+            originalFiat = originalFiat,
             userDescription = user_description,
             userNotes = user_notes,
             modifiedAt = modified_at
@@ -307,12 +314,16 @@ data class WalletPaymentMetadataRow(
                 lnurlDescription = it.pay.metadata.plainText
             }
 
+            val originalFiat = metadata.originalFiat?.let {
+                Pair(it.fiatCurrency.name, it.price)
+            }
+
             val row = WalletPaymentMetadataRow(
                 lnurl_base = lnurlBase,
                 lnurl_metadata = lnurlMetadata,
                 lnurl_successAction = lnurlSuccessAction,
                 lnurl_description = lnurlDescription,
-                original_fiat = metadata.originalFiat,
+                original_fiat = originalFiat,
                 user_description = metadata.userDescription,
                 user_notes = metadata.userNotes,
                 modified_at = metadata.modifiedAt

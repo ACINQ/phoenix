@@ -1028,7 +1028,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		return (minutesStr, secondsStr)
 	}
 	
-	func displayAmounts(msat: Lightning_kmpMilliSatoshi, originalFiat: OriginalFiat?) -> DisplayAmounts {
+	func displayAmounts(
+		msat: Lightning_kmpMilliSatoshi,
+		originalFiat: ExchangeRate.BitcoinPriceRate?
+	) -> DisplayAmounts {
 		
 		let bitcoin = Utils.formatBitcoin(msat: msat, bitcoinUnit: .sat, policy: .showMsats)
 		var fiatCurrent: FormattedAmount? = nil
@@ -1038,13 +1041,16 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			fiatCurrent = Utils.formatFiat(msat: msat, exchangeRate: fiatExchangeRate)
 		}
 		if let originalFiat = originalFiat {
-			fiatOriginal = Utils.formatFiat(msat: msat, originalFiat: originalFiat)
+			fiatOriginal = Utils.formatFiat(msat: msat, exchangeRate: originalFiat)
 		}
 		
 		return DisplayAmounts(bitcoin: bitcoin, fiatCurrent: fiatCurrent, fiatOriginal: fiatOriginal)
 	}
 	
-	func displayAmounts(sat: Bitcoin_kmpSatoshi, originalFiat: OriginalFiat?) -> DisplayAmounts {
+	func displayAmounts(
+		sat: Bitcoin_kmpSatoshi,
+		originalFiat: ExchangeRate.BitcoinPriceRate?
+	) -> DisplayAmounts {
 		
 		let bitcoin = Utils.formatBitcoin(sat: sat, bitcoinUnit: .sat)
 		var fiatCurrent: FormattedAmount? = nil
@@ -1054,7 +1060,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			fiatCurrent = Utils.formatFiat(sat: sat, exchangeRate: fiatExchangeRate)
 		}
 		if let originalFiat = originalFiat {
-			fiatOriginal = Utils.formatFiat(sat: sat, originalFiat: originalFiat)
+			fiatOriginal = Utils.formatFiat(sat: sat, exchangeRate: originalFiat)
 		}
 		
 		return DisplayAmounts(bitcoin: bitcoin, fiatCurrent: fiatCurrent, fiatOriginal: fiatOriginal)
