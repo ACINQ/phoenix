@@ -20,7 +20,7 @@ struct ScanView: View {
 	@Binding var paymentRequest: String?
 	
 	@State var showingFullMenu = false
-	@State var menuIcon: AnimatedMenu.Icon = .menuIcon
+	@State var chevronPosition: AnimatedChevron.Position = .pointingUp
 	@State var clipboardHasString = UIPasteboard.general.hasStrings
 	@State var clipboardContent: Scan.ClipboardContent? = nil
 	
@@ -123,37 +123,35 @@ struct ScanView: View {
 
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 
-			ZStack(alignment: Alignment.center) {
+			ZStack(alignment: Alignment.top) {
 				
-				Color.buttonFill
-					.frame(width: 42, height: 42)
-					.cornerRadius(100)
-					.overlay(
-						RoundedRectangle(cornerRadius: 100)
-							.stroke(Color(UIColor.separator), lineWidth: 1)
-					)
-					.onTapGesture {
-						withAnimation {
-							if showingFullMenu {
-								showingFullMenu = false
-								menuIcon = .menuIcon
-							} else {
-								showingFullMenu = true
-								menuIcon = .closeIcon
-							}
+				TopTab(
+					color: Color.primaryBackground,
+					size: CGSize(width: 72, height: 21)
+				)
+				.offset(y: 1)
+				.onTapGesture {
+					withAnimation {
+						if showingFullMenu {
+							showingFullMenu = false
+							chevronPosition = .pointingUp
+						} else {
+							showingFullMenu = true
+							chevronPosition = .pointingDown
 						}
 					}
+				}
 				
-				AnimatedMenu(
-					icon: $menuIcon,
+				AnimatedChevron(
+					position: $chevronPosition,
 					color: Color.appAccent,
-					lineWidth: 24,
-					lineHeight: 3,
-					lineSpacing: 6)
+					lineWidth: 22,
+					lineThickness: 3,
+					verticalOffset: 6
+				)
+				.offset(y: 7)
 				
 			} // </ZStack>
-			.padding(.horizontal, 10)
-			.offset(y: 10)
 			.zIndex(1)
 			
 			menuOptions()
