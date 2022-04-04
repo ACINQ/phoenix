@@ -58,7 +58,7 @@ class MigrationFragmentDialog : DialogFragment() {
       app = ViewModelProvider(activity).get(AppViewModel::class.java)
     } ?: dismiss()
 
-
+    isCancelable = false
 
     model.state.observe(viewLifecycleOwner) {
       log.info("migration state=>$it")
@@ -93,11 +93,13 @@ class MigrationFragmentDialog : DialogFragment() {
               app.requireService.mutualCloseAllChannels(it.address)
               log.info("channels closing completed!")
               model.state.value = MigrationScreenState.CompletedChannelsClosing(newNodeId, it.address)
-              PrefsDatastore.saveMigrationResult(context, MigrationResult(
-                legacyNodeId = app.state.value?.getNodeId()?.toString()!!,
-                newNodeId = newNodeId.toString(),
-                address = it.address
-              ))
+              PrefsDatastore.saveMigrationResult(
+                context, MigrationResult(
+                  legacyNodeId = app.state.value?.getNodeId()?.toString()!!,
+                  newNodeId = newNodeId.toString(),
+                  address = it.address
+                )
+              )
               PrefsDatastore.saveStartLegacyApp(context, LegacyAppStatus.NotRequired)
             }
           }
@@ -119,6 +121,7 @@ class MigrationFragmentDialog : DialogFragment() {
     if (!EventBus.getDefault().isRegistered(this)) {
       EventBus.getDefault().register(this)
     }
+    mBinding.dismissButton.setOnClickListener { dismiss() }
     mBinding.upgradeButton.setOnClickListener {
       if (model.state.value is MigrationScreenState.Ready) {
         model.state.value = MigrationScreenState.Notifying
@@ -150,16 +153,16 @@ class MigrationFragmentDialog : DialogFragment() {
 }
 
 sealed class MigrationScreenState {
-  object Ready: MigrationScreenState()
-  object Notifying: MigrationScreenState()
-  data class Acked(val newNodeId: Crypto.PublicKey): MigrationScreenState()
-  data class RequestingSwapInAddress(val newNodeId: Crypto.PublicKey): MigrationScreenState()
-  data class ReceivedSwapInAddress(val newNodeId: Crypto.PublicKey, val address: String): MigrationScreenState()
-  data class RequestingChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String): MigrationScreenState()
-  data class CompletedChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String): MigrationScreenState()
-  sealed class Failure: MigrationScreenState() {
-    object ClosingError: Failure()
-    object SwapInError: Failure()
+  object Ready : MigrationScreenState()
+  object Notifying : MigrationScreenState()
+  data class Acked(val newNodeId: Crypto.PublicKey) : MigrationScreenState()
+  data class RequestingSwapInAddress(val newNodeId: Crypto.PublicKey) : MigrationScreenState()
+  data class ReceivedSwapInAddress(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
+  data class RequestingChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
+  data class CompletedChannelsClosing(val newNodeId: Crypto.PublicKey, val address: String) : MigrationScreenState()
+  sealed class Failure : MigrationScreenState() {
+    object ClosingError : Failure()
+    object SwapInError : Failure()
   }
 }
 

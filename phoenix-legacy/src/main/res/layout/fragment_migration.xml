@@ -63,12 +63,22 @@
           android:id="@+id/upgrade_button"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/space_md"
+          android:layout_marginTop="@dimen/space_lg"
           android:background="@drawable/button_bg_primary_border"
           app:icon="@drawable/ic_arrow_right_circle"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toBottomOf="@id/message"
           app:text="@string/migration_prepare_button" />
+
+        <fr.acinq.phoenix.legacy.utils.customviews.ButtonView
+          android:id="@+id/dismiss_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/button_bg_no_border"
+          android:layout_marginTop="@dimen/space_md"
+          app:layout_constraintTop_toBottomOf="@id/upgrade_button"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:text="@string/migration_dismiss_button" />
       </androidx.constraintlayout.widget.ConstraintLayout>
 
       <androidx.constraintlayout.widget.ConstraintLayout

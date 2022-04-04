@@ -779,6 +779,7 @@
   <string name="migration_prepare_message">You can upgrade to the next version of Phoenix, with a modern Lightning engine and improved features.\n\nThe process will take some time during which your channels and balance are moved to this new version.\n\nThe downtime should not take more than 1 hour. There is no cost involved.</string>
   <string name="migration_more_info_button">Learn more…</string>
   <string name="migration_prepare_button">Upgrade</string>
+  <string name="migration_dismiss_button">Skip for now</string>
   <string name="migration_notifying_message">Initiating migration…</string>
   <string name="migration_swapin">Getting new address…</string>
   <string name="migration_closing_channels">Moving funds to new address…</string>
