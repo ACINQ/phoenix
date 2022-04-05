@@ -74,37 +74,6 @@ extension WalletPaymentMetadata {
 	}
 }
 
-extension PaymentsManager {
-	
-	func getCachedPayment(
-		row: WalletPaymentOrderRow,
-		options: WalletPaymentFetchOptions
-	) -> WalletPaymentInfo? {
-		
-		return fetcher.getCachedPayment(row: row, options: options)
-	}
-	
-	func getCachedStalePayment(
-		row: WalletPaymentOrderRow,
-		options: WalletPaymentFetchOptions
-	) -> WalletPaymentInfo? {
-		
-		return fetcher.getCachedStalePayment(row: row, options: options)
-	}
-	
-	func getPayment(
-		row: WalletPaymentOrderRow,
-		options: WalletPaymentFetchOptions,
-		completion: @escaping (WalletPaymentInfo?) -> Void
-	) -> Void {
-		
-		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _: Error?) in
-			
-			completion(result)
-		}
-	}
-}
-
 struct FetchQueueBatchResult {
 	let rowids: [Int64]
 	let rowidMap: [Int64: WalletPaymentId]

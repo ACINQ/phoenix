@@ -17,6 +17,8 @@ fileprivate let explainFeesButtonViewId = "explainFeesButtonViewId"
 struct SummaryView: View {
 	
 	@State var paymentInfo: WalletPaymentInfo
+	@State var paymentInfoIsStale: Bool
+	
 	let closeSheet: () -> Void
 	
 	@State var explainFeesText: String = ""
@@ -24,6 +26,8 @@ struct SummaryView: View {
 	@State var explainFeesPopoverFrame = CGRect(x: 0, y: 0, width: 200, height:500)
 	
 	@State var showDeletePaymentConfirmationDialog = false
+	
+	@State var didAppear = false
 	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
@@ -42,10 +46,30 @@ struct SummaryView: View {
 	@State var buttonHeight: CGFloat? = nil
 	
 	init(paymentInfo: WalletPaymentInfo, closeSheet: @escaping () -> Void) {
-	//	self.payment = payment
-		// ^^^ This compiles on Xcode 12.5, but crashes on the device.
-		// To be more specific, it seems to crash on _some_ devices, and only when running in Release mode.
-		self._paymentInfo = State<WalletPaymentInfo>(initialValue: paymentInfo)
+		
+		// Try to optimize by using the in-memory cache.
+		// If we get a cache hit, we can skip the UI refresh/flicker.
+		if let row = paymentInfo.toOrderRow() {
+			
+			let fetcher = AppDelegate.get().business.paymentsManager.fetcher
+			let options = WalletPaymentFetchOptions.companion.All
+			
+			if let result = fetcher.getCachedPayment(row: row, options: options) {
+				
+				self._paymentInfo = State(initialValue: result)
+				self._paymentInfoIsStale = State(initialValue: false)
+				
+			} else {
+				
+				self._paymentInfo = State(initialValue: paymentInfo)
+				self._paymentInfoIsStale = State(initialValue: true)
+			}
+			
+		} else {
+			
+			self._paymentInfo = State(initialValue: paymentInfo)
+			self._paymentInfoIsStale = State(initialValue: true)
+		}
 		
 		self.closeSheet = closeSheet
 	}
@@ -362,21 +386,56 @@ struct SummaryView: View {
 	func onAppear() {
 		log.trace("onAppear()")
 		
-		// Update text in explainFeesPopover
-		explainFeesText = explainFeesPopoverText()
-		
-		// We don't have the full payment information.
-		// We need to fetch all the metadata.
-		
-		let paymentId = paymentInfo.id()
+		let business = AppDelegate.get().business
 		let options = WalletPaymentFetchOptions.companion.All
 		
-		AppDelegate.get().business.paymentsManager.getPayment(id: paymentId, options: options) {
-			(result: WalletPaymentInfo?, error: Error?) in
+		if !didAppear {
+			didAppear = true
 			
-			if let result = result {
-				paymentInfo = result
-				explainFeesText = explainFeesPopoverText()
+			// First time displaying the SummaryView (coming from HomeView)
+			
+			// Update text in explainFeesPopover
+			explainFeesText = explainFeesPopoverText()
+			
+			if paymentInfoIsStale {
+				
+				// We either don't have the full payment information (missing metadata info),
+				// or the payment information is possibly stale, and needs to be refreshed.
+				
+				if let row = paymentInfo.toOrderRow() {
+
+					business.paymentsManager.fetcher.getPayment(row: row, options: options) { (result, _) in
+
+						if let result = result {
+							paymentInfo = result
+							explainFeesText = explainFeesPopoverText()
+						}
+					}
+
+				} else {
+				
+					business.paymentsManager.getPayment(id: paymentInfo.id(), options: options) { (result, _) in
+						
+						if let result = result {
+							paymentInfo = result
+							explainFeesText = explainFeesPopoverText()
+						}
+					}
+				}
+			}
+			
+		} else {
+			
+			// We are returning from the DetailsView/EditInfoView (via the NavigationController)
+			// The payment metadata may have changed (e.g. description/notes modified).
+			// So we need to refresh the payment info.
+			
+			business.paymentsManager.getPayment(id: paymentInfo.id(), options: options) { (result, _) in
+				
+				if let result = result {
+					paymentInfo = result
+					explainFeesText = explainFeesPopoverText()
+				}
 			}
 		}
 	}
@@ -438,7 +497,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 			
 			paymentServiceRow
 			paymentDescriptionRow
-			paymentMessaegRow
+			paymentMessageRow
 			paymentNotesRow
 			paymentTypeRow
 			channelClosingRow
@@ -503,7 +562,7 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	var paymentMessaegRow: some View {
+	var paymentMessageRow: some View {
 		let identifier: String = #function
 		let successAction = paymentInfo.metadata.lnurl?.successAction
 		

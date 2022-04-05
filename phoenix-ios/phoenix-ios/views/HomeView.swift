@@ -403,8 +403,9 @@ struct HomeView : MVIView {
 		log.trace("didSelectPayment()")
 		
 		// pretty much guaranteed to be in the cache
+		let fetcher = HomeView.phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		HomeView.phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
+		fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 			
 			if let result = result {
 				selectedItem = result
@@ -456,7 +457,11 @@ struct HomeView : MVIView {
 		log.trace("lastCompletedPaymentChanged()")
 		
 		let paymentId = payment.walletPaymentId()
-		let options = WalletPaymentFetchOptions.companion.Descriptions
+		
+		// PaymentView will need `WalletPaymentFetchOptions.companion.All`,
+		// so as long as we're fetching from the database, we might as well fetch everything we need.
+		let options = WalletPaymentFetchOptions.companion.All
+		
 		phoenixBusiness.paymentsManager.getPayment(id: paymentId, options: options) { result, _ in
 			
 			if selectedItem == nil {
@@ -512,8 +517,9 @@ struct HomeView : MVIView {
 		let row = paymentsPage.rows[idx]
 		log.debug("Pre-fetching: \(row.identifiable)")
 
+		let fetcher = phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { _ in
+		fetcher.getPayment(row: row, options: options) { (_, _) in
 			prefetchPaymentsFromDatabase(idx: idx + 1)
 		}
 	}
@@ -774,15 +780,16 @@ fileprivate struct PaymentCell : View, ViewName {
 		self.row = row
 		self.didAppearCallback = didAppearCallback
 		
+		let fetcher = phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
-		var result = phoenixBusiness.paymentsManager.getCachedPayment(row: row, options: options)
+		var result = fetcher.getCachedPayment(row: row, options: options)
 		if let _ = result {
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: false)
 		} else {
 			
-			result = phoenixBusiness.paymentsManager.getCachedStalePayment(row: row, options: options)
+			result = fetcher.getCachedStalePayment(row: row, options: options)
 			
 			self._fetched = State(initialValue: result)
 			self._fetchedIsStale = State(initialValue: true)
@@ -913,8 +920,9 @@ fileprivate struct PaymentCell : View, ViewName {
 		
 		if fetched == nil || fetchedIsStale {
 			
+			let fetcher = phoenixBusiness.paymentsManager.fetcher
 			let options = WalletPaymentFetchOptions.companion.Descriptions
-			phoenixBusiness.paymentsManager.getPayment(row: row, options: options) { (result: WalletPaymentInfo?) in
+			fetcher.getPayment(row: row, options: options) { (result: WalletPaymentInfo?, _) in
 				self.fetched = result
 			}
 		}
