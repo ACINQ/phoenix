@@ -115,13 +115,16 @@ class MetadataQueries(val database: PaymentsDatabase) {
     companion object {
         fun mapDescriptions(
             lnurl_description: String?,
-            user_description: String?
+            user_description: String?,
+            modified_at: Long?
         ): WalletPaymentMetadata {
+            val lnurl = if (lnurl_description != null) {
+                LnurlPayMetadata.placeholder(lnurl_description)
+            } else null
             return WalletPaymentMetadata(
                 userDescription = user_description,
-                lnurl = if (lnurl_description != null) {
-                    LnurlPayMetadata.placeholder(lnurl_description)
-                } else null
+                lnurl = lnurl,
+                modifiedAt = modified_at
             )
         }
 

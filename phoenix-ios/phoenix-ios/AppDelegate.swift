@@ -386,7 +386,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			let currencyPrefs = CurrencyPrefs()
 			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amount)
 
-			let paymentInfo = WalletPaymentInfo(payment: payment, metadata: WalletPaymentMetadata.empty())
+			let paymentInfo = WalletPaymentInfo(
+				payment: payment,
+				metadata: WalletPaymentMetadata.empty(),
+				fetchOptions: WalletPaymentFetchOptions.companion.None
+			)
 			
 			var body: String
 			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {

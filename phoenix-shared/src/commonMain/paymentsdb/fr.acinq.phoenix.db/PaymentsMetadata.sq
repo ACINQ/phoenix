@@ -50,7 +50,8 @@ WHERE  type = ? AND id = ?;
 
 fetchDescriptions:
 SELECT lnurl_description,
-       user_description
+       user_description,
+       modified_at
 FROM   payments_metadata
 WHERE  type = ? AND id = ?;
 

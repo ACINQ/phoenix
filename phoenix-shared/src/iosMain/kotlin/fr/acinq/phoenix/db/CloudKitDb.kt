@@ -138,6 +138,7 @@ class CloudKitDb(
                 // In order to optimize disk access, we fetch from 1 table at a time.
 
                 val metadataPlaceholder = WalletPaymentMetadata()
+                val emptyOptions = WalletPaymentFetchOptions.None
 
                 uniquePaymentIds.filterIsInstance<
                     WalletPaymentId.IncomingPaymentId
@@ -145,7 +146,11 @@ class CloudKitDb(
                     inQueries.getIncomingPayment(
                         paymentHash = paymentId.paymentHash
                     )?.let { payment ->
-                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
+                        rowMap[paymentId] = WalletPaymentInfo(
+                            payment = payment,
+                            metadata = metadataPlaceholder,
+                            fetchOptions = emptyOptions
+                        )
                     }
                 } // </incoming_payments>
 
@@ -155,7 +160,11 @@ class CloudKitDb(
                     outQueries.getOutgoingPayment(
                         id = paymentId.id
                     )?.let { payment ->
-                        rowMap[paymentId] = WalletPaymentInfo(payment, metadataPlaceholder)
+                        rowMap[paymentId] = WalletPaymentInfo(
+                            payment = payment,
+                            metadata = metadataPlaceholder,
+                            fetchOptions = emptyOptions
+                        )
                     }
                 } // </outgoing_payments>
 
@@ -163,7 +172,10 @@ class CloudKitDb(
                 uniquePaymentIds.forEach { paymentId ->
                     metaQueries.getMetadata(paymentId, fetchOptions)?.let { metadata ->
                         rowMap[paymentId]?.let {
-                            rowMap[paymentId] = it.copy(metadata = metadata)
+                            rowMap[paymentId] = it.copy(
+                                metadata = metadata,
+                                fetchOptions = fetchOptions
+                            )
                         }
                     }
                 } // </payments_metadata>
