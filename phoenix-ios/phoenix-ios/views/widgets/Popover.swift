@@ -31,12 +31,18 @@ public class PopoverState: ObservableObject {
 	//
 	var closePublisher = PassthroughSubject<Void, Never>()
 	
-	func display<Content: View>(dismissable: Bool, @ViewBuilder builder: () -> Content) {
+	func display<Content: View>(
+		dismissable: Bool,
+		@ViewBuilder builder: () -> Content,
+		onWillDisappear: (() -> Void)? = nil
+	) {
 		publisher.send(PopoverItem(
 			dismissable: dismissable,
 			view: builder().anyView
 		))
-
+		if let willDisappearLambda = onWillDisappear {
+			onNextWillDisappear(willDisappearLambda)
+		}
 	}
 	
 	func close() {
