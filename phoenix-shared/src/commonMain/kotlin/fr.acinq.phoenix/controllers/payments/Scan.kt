@@ -175,4 +175,18 @@ object Scan {
             ) : LnurlAuthFlow()
         }
     }
+
+    sealed class ClipboardContent {
+        data class InvoiceRequest(
+            val paymentRequest: PaymentRequest
+        ): ClipboardContent()
+
+        data class LnurlRequest(
+            val url: Url
+        ) : ClipboardContent()
+
+        data class LoginRequest(
+            val auth: LNUrl.Auth
+        ) : ClipboardContent()
+    }
 }

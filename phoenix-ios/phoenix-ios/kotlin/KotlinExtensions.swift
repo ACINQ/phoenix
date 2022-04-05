@@ -287,6 +287,43 @@ extension ExchangeRate {
 	}
 }
 
+extension LNUrl.Auth {
+	
+	static var defaultActionPromptTitle: String {
+		return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
+	}
+	
+	var actionPromptTitle: String {
+		if let action = self.action() {
+			switch action {
+				case .register_ : return NSLocalizedString("Register",     comment: "lnurl-auth: login button title")
+				case .login     : return NSLocalizedString("Login",        comment: "lnurl-auth: login button title")
+				case .link      : return NSLocalizedString("Link",         comment: "lnurl-auth: login button title")
+				case .auth      : return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
+				default         : break
+			}
+		}
+		return LNUrl.Auth.defaultActionPromptTitle
+	}
+	
+	static var defaultActionSuccessTitle: String {
+		return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
+	}
+	
+	var actionSuccessTitle: String {
+		if let action = self.action() {
+			switch action {
+				case .register_ : return NSLocalizedString("Registered",    comment: "lnurl-auth: success text")
+				case .login     : return NSLocalizedString("Logged In",     comment: "lnurl-auth: success text")
+				case .link      : return NSLocalizedString("Linked",        comment: "lnurl-auth: success text")
+				case .auth      : return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
+				default         : break
+			}
+		}
+		return LNUrl.Auth.defaultActionSuccessTitle
+	}
+}
+
 extension FiatCurrency {
 	
 	var shortName: String {

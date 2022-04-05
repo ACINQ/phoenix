@@ -170,30 +170,12 @@ struct LoginView: View {
 	
 	func buttonTitle() -> String {
 		
-		if let action = auth?.action() {
-			switch action {
-				case .register_ : return NSLocalizedString("Register", comment: "lnurl-auth: login button title")
-				case .login     : return NSLocalizedString("Login",    comment: "lnurl-auth: login button title")
-				case .link      : return NSLocalizedString("Link",     comment: "lnurl-auth: login button title")
-				case .auth      : fallthrough
-				default         : break
-			}
-		}
-		return NSLocalizedString("Authenticate", comment: "lnurl-auth: login button title")
+		return auth?.actionPromptTitle ?? LNUrl.Auth.defaultActionPromptTitle
 	}
 	
 	func successTitle() -> String {
 		
-		if let action = auth?.action() {
-			switch action {
-				case .register_ : return NSLocalizedString("Registered", comment: "lnurl-auth: success text")
-				case .login     : return NSLocalizedString("Logged In",  comment: "lnurl-auth: success text")
-				case .link      : return NSLocalizedString("Linked",     comment: "lnurl-auth: success text")
-				case .auth      : fallthrough
-				default         : break
-			}
-		}
-		return NSLocalizedString("Authenticated", comment: "lnurl-auth: success text")
+		return auth?.actionSuccessTitle ?? LNUrl.Auth.defaultActionSuccessTitle
 	}
 	
 	func errorText() -> String? {
