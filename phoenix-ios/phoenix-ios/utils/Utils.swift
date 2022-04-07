@@ -438,7 +438,7 @@ class Utils {
 	// MARK: Alt Formatting
 	// --------------------------------------------------
 	
-	static let hiddenCharacter = "\u{066D}"
+	static let hiddenCharacter = "\u{2217}" // asterisk operator
 	
 	static func hiddenAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
 		
