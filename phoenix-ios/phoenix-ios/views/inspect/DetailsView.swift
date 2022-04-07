@@ -110,9 +110,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			// There's usually just one receivedWith instance.
 			// But there could technically be multiple, so we'll show a section for each if that's the case.
 			
-			let receivedWithArray = received.receivedWith.sorted { $0.identifiable < $1.identifiable }
-			ForEach(receivedWithArray, id: \.identifiable) { receivedWith in
+			let receivedWithArray = received.receivedWith.sorted { $0.hash < $1.hash }
+			ForEach(receivedWithArray.indices, id: \.self) { index in
 				
+				let receivedWith = receivedWithArray[index]
 				header(NSLocalizedString("Payment Received", comment: "Title in DetailsView_IncomingPayment"))
 				
 				paymentReceived_receivedAt(received)

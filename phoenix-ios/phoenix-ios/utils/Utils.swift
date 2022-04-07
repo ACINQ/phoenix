@@ -127,11 +127,15 @@ class Utils {
 	
 	static func unknownFiatAmount(fiatCurrency: FiatCurrency) -> FormattedAmount {
 		
-		let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
+		let formatter = NumberFormatter()
+		
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
+		let digits = fiatCurrency.usesCents() ? "?\(decimalSeparator)??" : "?"
+		
 		return FormattedAmount(
 			amount: 0.0,
 			currency: Currency.fiat(fiatCurrency),
-			digits: "?\(decimalSeparator)??",
+			digits: digits,
 			decimalSeparator: decimalSeparator
 		)
 	}
@@ -340,33 +344,12 @@ class Utils {
 		// And the opposite problem occurs if an American (with currentLocale=en_US) formats COP,
 		// the result WILL display cents. Which is inappropriate for COP.
 		
-		if let locale = fiatCurrency.matchingLocales().first {
-			
-			// Unfortunately, we can't simply set formatter.locale.
-			// To continue the example from above:
-			//
-			// A Colombian (with currentLocale=es_CO) would expect to see: 12.345,67 USD
-			// An American (with currentLocale=en_US) would expect to see: 12,345 COP
-			//
-			// Changing the locale changes more than just the display of cents.
-			// It could also inappropriately change the grouping separator, decimal separator, etc.
-			//
-			// So we're going to try to just tweak the min/max fractionDigits.
-			
-			let altFormatter = formatter.copy() as! NumberFormatter
-			altFormatter.locale = locale
-			
-			if let str = altFormatter.string(from: NSNumber(value: 1.0)) {
-				
-				let usesCents = str.contains(altFormatter.currencyDecimalSeparator)
-				if usesCents {
-					formatter.minimumFractionDigits = 2
-					formatter.maximumFractionDigits = 2
-				} else {
-					formatter.minimumFractionDigits = 0
-					formatter.maximumFractionDigits = 0
-				}
-			}
+		if fiatCurrency.usesCents() {
+			formatter.minimumFractionDigits = 2
+			formatter.maximumFractionDigits = 2
+		} else {
+			formatter.minimumFractionDigits = 0
+			formatter.maximumFractionDigits = 0
 		}
 		
 		return formatter

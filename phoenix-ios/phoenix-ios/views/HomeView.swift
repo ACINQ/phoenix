@@ -289,21 +289,20 @@ struct HomeView : MVIView {
 			ScrollView {
 				LazyVStack {
 					// paymentsPage.rows: [WalletPaymentOrderRow]
-					// WalletPaymentOrderRow.identifiable: String (defined in KotlinExtensions)
 					//
 					// Here's how this works:
-					// - ForEach uses the given `id` (which conforms to Swift's Identifiable protocol)
+					// - ForEach uses the given type (which conforms to Swift's Identifiable protocol)
 					//   to determine whether or not the row is new/modified or the same as before.
 					// - If the row is new/modified, then it it initialized with fresh state,
 					//   and the row's `onAppear` will fire.
 					// - If the row is unmodified, then it is initialized with existing state,
 					//   and the row's `onAppear` with NOT fire.
 					//
-					// Since we use WalletPaymentOrderRow.identifiable, our unique identifier
+					// Since we ultimately use WalletPaymentOrderRow.identifier, our unique identifier
 					// contains the row's completedAt date, which is modified when the row changes.
 					// Thus our row is automatically refreshed after it fails/succeeds.
 					//
-					ForEach(paymentsPage.rows, id: \.identifiable) { row in
+					ForEach(paymentsPage.rows) { row in
 						Button {
 							didSelectPayment(row: row)
 						} label: {
@@ -515,7 +514,7 @@ struct HomeView : MVIView {
 		}
 
 		let row = paymentsPage.rows[idx]
-		log.debug("Pre-fetching: \(row.identifiable)")
+		log.debug("Pre-fetching: \(row.id)")
 
 		let fetcher = phoenixBusiness.paymentsManager.fetcher
 		let options = WalletPaymentFetchOptions.companion.Descriptions
