@@ -39,7 +39,7 @@ struct PriceSliderSheet: View {
 	init(flowType: FlowType, msat: Int64, valueChanged: @escaping (Int64) -> Void) {
 		self.flowType = flowType
 		self.valueChanged = valueChanged
-		_amountSats = State(initialValue: Utils.convertBitcoin(msat: msat, bitcoinUnit: .sat))
+		_amountSats = State(initialValue: Utils.convertBitcoin(msat: msat, to: .sat))
 	}
 	
 	// The Slider family works with BinaryFloatingPoint.
@@ -469,7 +469,7 @@ struct PriceSliderSheet: View {
 		}
 		
 		let newMsat = percentToMsat(floorPercent / 100.0)
-		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+		amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 	}
 	
 	func plusButtonTapped() {
@@ -496,7 +496,7 @@ struct PriceSliderSheet: View {
 		}
 		
 		let newMsat = percentToMsat(ceilingPercent / 100.0)
-		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+		amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 	}
 	
 	func recentPercents() -> [Int] {
@@ -565,7 +565,7 @@ struct PriceSliderSheet: View {
 			// - anything above min is treated like a tip
 			
 			let newMsat = percentToMsat(Double(percent) / 100.0)
-			amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+			amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 		}
 	}
 	

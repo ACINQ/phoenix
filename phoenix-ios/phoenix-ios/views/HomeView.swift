@@ -159,7 +159,10 @@ struct HomeView : MVIView {
 			
 				HStack(alignment: VerticalAlignment.firstTextBaseline) {
 					
-					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showIfZeroSats)
+					let amount = currencyPrefs.hideAmountsOnHomeScreen
+						? Utils.hiddenAmount(currencyPrefs)
+						: Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showMsatsIfZeroSats)
+					
 					if currencyPrefs.currencyType == .bitcoin &&
 						currencyPrefs.bitcoinUnit == .sat &&
 						amount.hasFractionDigits
@@ -392,7 +395,9 @@ struct HomeView : MVIView {
 			return sum + item.msat
 		}
 		if msatTotal > 0 {
-			return Utils.format(currencyPrefs, msat: msatTotal)
+			return currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
 			return nil
 		}
@@ -844,17 +849,26 @@ fileprivate struct PaymentCell : View, ViewName {
 
 				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 
-				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-					Text(verbatim: isOutgoing ? "-" : "+")
-						.foregroundColor(color)
-						.padding(.trailing, 1)
+				if currencyPrefs.hideAmountsOnHomeScreen {
 					
+					// Do not display any indication as to whether payment in incoming or outgoing
 					Text(verbatim: amount.digits)
-						.foregroundColor(color)
+						.foregroundColor(.primary)
+					
+				} else {
+					
+					let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					
+						Text(verbatim: isOutgoing ? "-" : "+")
+							.foregroundColor(color)
+							.padding(.trailing, 1)
+						
+						Text(verbatim: amount.digits)
+							.foregroundColor(color)
+					}
+					.environment(\.layoutDirection, .leftToRight) // issue #237
 				}
-				.environment(\.layoutDirection, .leftToRight) // issue #237
 				
 				Text(verbatim: " ") // separate for RTL languages
 					.font(.caption)
@@ -896,7 +910,9 @@ fileprivate struct PaymentCell : View, ViewName {
 
 		if let payment = fetched?.payment {
 
-			let amount = Utils.format(currencyPrefs, msat: payment.amount)
+			let amount = currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, msat: payment.amount)
 
 			let isFailure = payment.state() == WalletPaymentState.failure
 			let isOutgoing = payment is Lightning_kmpOutgoingPayment
@@ -1082,6 +1098,7 @@ fileprivate struct ToolsButton: View, ViewName {
 	@Binding var navLinkTag: NavLinkTag?
 	
 	@Environment(\.openURL) var openURL
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	var body: some View {
 		
@@ -1094,6 +1111,22 @@ fileprivate struct ToolsButton: View, ViewName {
 					systemImage: "globe"
 				)
 			}
+			Button {
+				currencyPrefs.toggleHideAmountsOnHomeScreen()
+			} label: {
+				if currencyPrefs.hideAmountsOnHomeScreen {
+					Label(
+						NSLocalizedString("Show amounts", comment: "HomeView: Tools menu: Label"),
+						systemImage: "eye"
+					)
+				} else {
+					Label(
+						NSLocalizedString("Hide amounts", comment: "HomeView: Tools menu: Label"),
+						systemImage: "eye.slash"
+					)
+				}
+			}
+			Divider()
 			Button {
 				sendFeedbackButtonTapped()
 			} label: {
