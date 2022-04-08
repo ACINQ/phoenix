@@ -159,43 +159,54 @@ struct HomeView : MVIView {
 			
 				HStack(alignment: VerticalAlignment.firstTextBaseline) {
 					
-					let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showIfZeroSats)
-					if currencyPrefs.currencyType == .bitcoin &&
-						currencyPrefs.bitcoinUnit == .sat &&
-						amount.hasFractionDigits
-					{
-						// We're showing the value in satoshis, but the value contains a fractional
-						// component representing the millisatoshis.
-						// This can be a little confusing for those new to Lightning.
-						// So we're going to downplay the millisatoshis visually.
-						HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-							Text(amount.integerDigits)
-								.font(.largeTitle)
-								.onTapGesture { toggleCurrencyType() }
-							Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
-								.font(.title)
-								.foregroundColor(.secondary)
-								.onTapGesture { toggleCurrencyType() }
-						}
-						.environment(\.layoutDirection, .leftToRight) // issue #237
+					if currencyPrefs.hideAmountsOnHomeScreen {
+						let amount = Utils.hiddenAmount(currencyPrefs)
 						
-					} else {
 						Text(amount.digits)
 							.font(.largeTitle)
 							.onTapGesture { toggleCurrencyType() }
+						
+					} else {
+						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showMsatsIfZeroSats)
+						
+						if currencyPrefs.currencyType == .bitcoin &&
+							currencyPrefs.bitcoinUnit == .sat &&
+							amount.hasFractionDigits
+						{
+							// We're showing the value in satoshis, but the value contains a fractional
+							// component representing the millisatoshis.
+							// This can be a little confusing for those new to Lightning.
+							// So we're going to downplay the millisatoshis visually.
+							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+								Text(amount.integerDigits)
+									.font(.largeTitle)
+									.onTapGesture { toggleCurrencyType() }
+								Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
+									.font(.title)
+									.foregroundColor(.secondary)
+									.onTapGesture { toggleCurrencyType() }
+							}
+							.environment(\.layoutDirection, .leftToRight) // issue #237
+							
+						} else {
+							Text(amount.digits)
+								.font(.largeTitle)
+								.onTapGesture { toggleCurrencyType() }
+						}
+						
+						Text(amount.type)
+							.font(.title2)
+							.foregroundColor(Color.appAccent)
+							.padding(.bottom, 4)
+							.onTapGesture { toggleCurrencyType() }
+						
 					}
-					
-					Text(amount.type)
-						.font(.title2)
-						.foregroundColor(Color.appAccent)
-						.padding(.bottom, 4)
-						.onTapGesture { toggleCurrencyType() }
-					
 				} // </HStack>
 				.lineLimit(1)            // SwiftUI bugs
 				.minimumScaleFactor(0.5) // Truncating text
 				
 				if let incoming = incomingAmount() {
+					let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string
 					
 					HStack(alignment: VerticalAlignment.center, spacing: 0) {
 					
@@ -205,7 +216,7 @@ struct HomeView : MVIView {
 								.padding(.trailing, 2)
 								.onTapGesture { showBlockchainExplorerOptions = true }
 							
-							Text("+\(incoming.string) incoming".lowercased())
+							Text("+\(incomingAmountStr) incoming".lowercased())
 								.onTapGesture { showBlockchainExplorerOptions = true }
 								.confirmationDialog("Blockchain Explorer",
 									isPresented: $showBlockchainExplorerOptions,
@@ -236,7 +247,7 @@ struct HomeView : MVIView {
 							Image(systemName: "link")
 								.padding(.trailing, 2)
 							
-							Text("+\(incoming.string) incoming".lowercased())
+							Text("+\(incomingAmountStr) incoming".lowercased())
 								.onTapGesture { toggleCurrencyType() }
 						}
 					}
@@ -392,7 +403,9 @@ struct HomeView : MVIView {
 			return sum + item.msat
 		}
 		if msatTotal > 0 {
-			return Utils.format(currencyPrefs, msat: msatTotal)
+			return currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, msat: msatTotal)
 		} else {
 			return nil
 		}
@@ -596,7 +609,22 @@ struct HomeView : MVIView {
 	}
 	
 	func toggleCurrencyType() -> Void {
-		currencyPrefs.toggleCurrencyType()
+		log.trace("toggleCurrencyType()")
+		
+		// bitcoin -> fiat -> hidden
+		
+		if currencyPrefs.hideAmountsOnHomeScreen {
+			currencyPrefs.toggleHideAmountsOnHomeScreen()
+			if currencyPrefs.currencyType == .fiat {
+				currencyPrefs.toggleCurrencyType()
+			}
+			
+		} else if currencyPrefs.currencyType == .bitcoin {
+			currencyPrefs.toggleCurrencyType()
+			
+		} else if currencyPrefs.currencyType == .fiat {
+			currencyPrefs.toggleHideAmountsOnHomeScreen()
+		}
 	}
 	
 	func mempoolFullInfo() -> Void {
@@ -844,24 +872,33 @@ fileprivate struct PaymentCell : View, ViewName {
 
 				let (amount, isFailure, isOutgoing) = paymentAmountInfo()
 
-				let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
-				HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-				
-					Text(verbatim: isOutgoing ? "-" : "+")
-						.foregroundColor(color)
-						.padding(.trailing, 1)
+				if currencyPrefs.hideAmountsOnHomeScreen {
 					
+					// Do not display any indication as to whether payment in incoming or outgoing
 					Text(verbatim: amount.digits)
-						.foregroundColor(color)
+						.foregroundColor(.primary)
+					
+				} else {
+					
+					let color: Color = isFailure ? .secondary : (isOutgoing ? .appNegative : .appPositive)
+					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
+					
+						Text(verbatim: isOutgoing ? "-" : "+")
+							.foregroundColor(color)
+							.padding(.trailing, 1)
+						
+						Text(verbatim: amount.digits)
+							.foregroundColor(color)
+					}
+					.environment(\.layoutDirection, .leftToRight) // issue #237
+					
+					Text(verbatim: " ") // separate for RTL languages
+						.font(.caption)
+						.foregroundColor(.gray)
+					Text(verbatim: amount.type)
+						.font(.caption)
+						.foregroundColor(.gray)
 				}
-				.environment(\.layoutDirection, .leftToRight) // issue #237
-				
-				Text(verbatim: " ") // separate for RTL languages
-					.font(.caption)
-					.foregroundColor(.gray)
-				Text(verbatim: amount.type)
-					.font(.caption)
-					.foregroundColor(.gray)
 			}
 		}
 		.padding([.top, .bottom], 14)
@@ -896,7 +933,9 @@ fileprivate struct PaymentCell : View, ViewName {
 
 		if let payment = fetched?.payment {
 
-			let amount = Utils.format(currencyPrefs, msat: payment.amount)
+			let amount = currencyPrefs.hideAmountsOnHomeScreen
+				? Utils.hiddenAmount(currencyPrefs)
+				: Utils.format(currencyPrefs, msat: payment.amount)
 
 			let isFailure = payment.state() == WalletPaymentState.failure
 			let isOutgoing = payment is Lightning_kmpOutgoingPayment
@@ -1082,6 +1121,7 @@ fileprivate struct ToolsButton: View, ViewName {
 	@Binding var navLinkTag: NavLinkTag?
 	
 	@Environment(\.openURL) var openURL
+	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	
 	var body: some View {
 		
