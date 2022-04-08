@@ -330,7 +330,8 @@ struct ReceiveLightningView: View {
 	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-		   qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 		   let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
@@ -628,7 +629,9 @@ struct ReceiveLightningView: View {
 		
 		if let m = model as? Receive.Model_Generated {
 			log.debug("updating qr code...")
-			qrCode.generate(value: m.request)
+			
+			// Issue #196: Use uppercase lettering for invoices and address QRs
+			qrCode.generate(value: m.request.uppercased())
 		}
 	}
 	
@@ -767,7 +770,8 @@ struct ReceiveLightningView: View {
 		log.trace("copyImageToPasteboard()")
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-			qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
@@ -813,7 +817,8 @@ struct ReceiveLightningView: View {
 		log.trace("shareImageToSystem()")
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-			qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
