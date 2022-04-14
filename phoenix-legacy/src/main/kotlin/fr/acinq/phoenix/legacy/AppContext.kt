@@ -210,6 +210,7 @@ abstract class AppContext : Application() {
           inAppNotifs?.remove(InAppNotifications.PREPARE_WALLET_MIGRATION)
         }
       }
+      inAppNotifs?.add(InAppNotifications.PREPARE_WALLET_MIGRATION)
     }
 
     // -- check warning for high mempool usage (no free channels)

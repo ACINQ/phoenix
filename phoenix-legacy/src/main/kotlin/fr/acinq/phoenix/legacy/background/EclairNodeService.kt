@@ -916,9 +916,11 @@ class EclairNodeService : Service() {
     serviceScope.launch {
       kit?.run {
         if (nodeParams().db().channels().listLocalChannels().isEmpty) {
-          doSendLegacyMigrationSignal(this)
+//          doSendLegacyMigrationSignal(this)
           delay(1000)
-          PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
+          // FIXME we should not move to KMP automatically because this method can be triggered for many cases
+          // migration should be manually triggered.
+          // PrefsDatastore.saveStartLegacyApp(applicationContext, LegacyAppStatus.NotRequired)
         }
       }
     }

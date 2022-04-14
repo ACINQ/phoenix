@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
         setContent {
             PhoenixAndroidTheme {
                 AppView(this@MainActivity, appViewModel)
