@@ -546,7 +546,9 @@ struct PriceSliderSheet: View {
 				if let minDiff = diffs.min(), let minIdx = diffs.firstIndex(of: minDiff) {
 					
 					let defaultValue = extras.remove(at: minIdx)
-					recents.append(defaultValue)
+					if !recents.contains(defaultValue) {
+						recents.append(defaultValue)
+					}
 				}
 				
 			} while recents.count < targetCount && !extras.isEmpty
