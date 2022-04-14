@@ -257,6 +257,7 @@ struct PriceSliderSheet: View {
 							.padding(.horizontal, 12)
 					}
 					.buttonStyle(ScaleButtonStyle(
+						cornerRadius: 16,
 						backgroundFill: Color(UIColor.systemGroupedBackground), // secondarySystemBackground
 						borderStroke: Color.appAccent
 					))

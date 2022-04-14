@@ -147,6 +147,7 @@ struct WarningView: View {
 			.disabled(!iUnderstand)
 			.buttonStyle(
 				ScaleButtonStyle(
+					cornerRadius: 16,
 					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appAccent,
 					disabledBorderStroke: Color(UIColor.separator)
@@ -314,6 +315,7 @@ struct EnterSeedView: View {
 				.disabled(mnemonics.count != 12)
 				.buttonStyle(
 					ScaleButtonStyle(
+						cornerRadius: 16,
 						backgroundFill: Color.primaryBackground,
 						borderStroke: Color.appAccent,
 						disabledBorderStroke: Color(UIColor.separator)

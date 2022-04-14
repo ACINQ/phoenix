@@ -46,8 +46,7 @@ struct IntroView: View {
 				IntroView3(finish: finish)
 					.tag(2)
 			}
-			.tabViewStyle(PageTabViewStyle())
-			.indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+			.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 			.padding(.bottom, deviceInfo.isShortHeight ? 0 : 40)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -73,17 +72,23 @@ struct IntroView1: View {
 	@ViewBuilder
 	var body: some View {
 		
-		GeometryReader { geometry in
-			ScrollView(.vertical) {
-				content
-					.frame(width: geometry.size.width)
-					.frame(minHeight: geometry.size.height)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
 			}
+			
+			button().padding()
 		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -99,30 +104,35 @@ struct IntroView1: View {
 			.padding(.horizontal, 20) // 20+20=40
 			.padding(.bottom, 40)
 			
-			Button {
-				advance()
-			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Text("Next")
-					Image(systemName: "arrow.forward")
-						.imageScale(.medium)
-				}
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					backgroundFill: Color.primaryBackground,
-					borderStroke: Color.appAccent,
-					disabledBorderStroke: Color(UIColor.separator)
-				)
-			)
-			
 			if !deviceInfo.isShortHeight {
 				Spacer().frame(height: 40) // move center upwards (for tall devices)
 			}
 		}
 		.padding(.horizontal)
+	}
+	
+	@ViewBuilder
+	func button() -> some View {
+			
+		Button {
+			advance()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Text("Next")
+				Image(systemName: "arrow.forward")
+					.imageScale(.medium)
+			}
+			.foregroundColor(Color.white)
+			.frame(maxWidth: .infinity)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			)
+		)
 	}
 }
 
@@ -140,17 +150,22 @@ struct IntroView2: View {
 	@ViewBuilder
 	var body: some View {
 		
-		GeometryReader { geometry in
-			ScrollView(.vertical) {
-				content
-					.frame(width: geometry.size.width)
-					.frame(minHeight: geometry.size.height)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
 			}
+			
+			button().padding()
 		}
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -185,25 +200,6 @@ struct IntroView2: View {
 			.padding(.horizontal, 20) // 20+20=40
 			.padding(.bottom, 40)
 			
-			Button {
-				advance()
-			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Text("I understand")
-					Image(systemName: "arrow.forward")
-						.imageScale(.medium)
-				}
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					backgroundFill: Color.primaryBackground,
-					borderStroke: Color.appAccent,
-					disabledBorderStroke: Color(UIColor.separator)
-				)
-			)
-			
 			if !deviceInfo.isShortHeight {
 				Spacer().frame(height: 40) // move center upwards (for tall devices)
 			}
@@ -212,6 +208,30 @@ struct IntroView2: View {
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
+	}
+	
+	@ViewBuilder
+	func button() -> some View {
+		
+		Button {
+			advance()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Text("I understand")
+				Image(systemName: "arrow.forward")
+					.imageScale(.medium)
+			}
+			.foregroundColor(Color.white)
+			.frame(maxWidth: .infinity)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			)
+		)
 	}
 	
 	func chainContextChanged(_ context: WalletContext.V0ChainContext) -> Void {
@@ -240,17 +260,22 @@ struct IntroView3: View {
 	@ViewBuilder
 	var body: some View {
 		
-		GeometryReader { geometry in
-			ScrollView(.vertical) {
-				content
-					.frame(width: geometry.size.width)
-					.frame(minHeight: geometry.size.height)
+		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+			
+			GeometryReader { geometry in
+				ScrollView(.vertical) {
+					content()
+						.frame(width: geometry.size.width)
+						.frame(minHeight: geometry.size.height)
+				}
 			}
+			
+			button().padding()
 		}
 	}
 	
 	@ViewBuilder
-	var content: some View {
+	func content() -> some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -269,29 +294,34 @@ struct IntroView3: View {
 			.padding(.horizontal, 20) // 20+20=40
 			.padding(.bottom, 40)
 			
-			Button {
-				finish()
-			} label: {
-				HStack(alignment: VerticalAlignment.center, spacing: 4) {
-					Text("Get started")
-					Image(systemName: "bolt.fill")
-						.imageScale(.medium)
-				}
-				.padding([.top, .bottom], 8)
-				.padding([.leading, .trailing], 16)
-			}
-			.buttonStyle(
-				ScaleButtonStyle(
-					backgroundFill: Color.primaryBackground,
-					borderStroke: Color.appAccent,
-					disabledBorderStroke: Color(UIColor.separator)
-				)
-			)
-			
 			if !deviceInfo.isShortHeight {
 				Spacer().frame(height: 40) // move center upwards (for tall devices)
 			}
 		}
 		.padding(.horizontal)
+	}
+	
+	@ViewBuilder
+	func button() -> some View {
+		
+		Button {
+			finish()
+		} label: {
+			HStack(alignment: VerticalAlignment.center, spacing: 4) {
+				Text("Get started")
+				Image(systemName: "bolt.fill")
+					.imageScale(.medium)
+			}
+			.foregroundColor(Color.white)
+			.frame(maxWidth: .infinity)
+			.padding([.top, .bottom], 8)
+			.padding([.leading, .trailing], 16)
+		}
+		.buttonStyle(
+			ScaleButtonStyle(
+				cornerRadius: 100,
+				backgroundFill: Color.appAccent
+			)
+		)
 	}
 }
