@@ -16,8 +16,10 @@ fileprivate var log = Logger(OSLog.disabled)
 struct IntroView: View {
 	
 	let finish: () -> Void
-	
+	 
 	@State private var selectedPage = 0
+	
+	@EnvironmentObject var deviceInfo: DeviceInfo
 	
 	@ViewBuilder
 	var body: some View {
@@ -46,7 +48,7 @@ struct IntroView: View {
 			}
 			.tabViewStyle(PageTabViewStyle())
 			.indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-			.padding(.bottom, 40)
+			.padding(.bottom, deviceInfo.isShortHeight ? 0 : 40)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.navigationBarTitle("", displayMode: .inline)
@@ -66,8 +68,22 @@ struct IntroView1: View {
 	
 	let advance: () -> Void
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	
 	@ViewBuilder
 	var body: some View {
+		
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				content
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -101,9 +117,12 @@ struct IntroView1: View {
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
+			
+			if !deviceInfo.isShortHeight {
+				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			}
 		}
 		.padding(.horizontal)
-		.offset(x: 0, y: -40) // move center upwards
 	}
 }
 
@@ -116,8 +135,22 @@ struct IntroView2: View {
 	
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	
 	@ViewBuilder
 	var body: some View {
+		
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				content
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -170,9 +203,12 @@ struct IntroView2: View {
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
+			
+			if !deviceInfo.isShortHeight {
+				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			}
 		}
 		.padding(.horizontal)
-		.offset(x: 0, y: -40) // move center upwards
 		.onReceive(chainContextPublisher) {
 			chainContextChanged($0)
 		}
@@ -199,8 +235,22 @@ struct IntroView3: View {
 	
 	let finish: () -> Void
 	
+	@EnvironmentObject var deviceInfo: DeviceInfo
+	
 	@ViewBuilder
 	var body: some View {
+		
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				content
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	var content: some View {
 		
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
@@ -237,8 +287,11 @@ struct IntroView3: View {
 					disabledBorderStroke: Color(UIColor.separator)
 				)
 			)
+			
+			if !deviceInfo.isShortHeight {
+				Spacer().frame(height: 40) // move center upwards (for tall devices)
+			}
 		}
 		.padding(.horizontal)
-		.offset(x: 0, y: -40) // move center upwards
 	}
 }

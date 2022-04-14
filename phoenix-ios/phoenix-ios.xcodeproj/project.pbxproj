@@ -136,6 +136,7 @@
 		DCB493CD269F8531001B0F09 /* Int+TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */; };
 		DCB493CF269F859E001B0F09 /* SyncTxManager_State.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493CE269F859E001B0F09 /* SyncTxManager_State.swift */; };
 		DCB493D1269F890D001B0F09 /* SyncTxManager_PendingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB493D0269F890D001B0F09 /* SyncTxManager_PendingSettings.swift */; };
+		DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */; };
 		DCB6235A25B0A42D005AD4B7 /* ComingSoonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */; };
 		DCB876302735AA7300657570 /* Prefs+Serialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB8762F2735AA7300657570 /* Prefs+Serialization.swift */; };
 		DCB876322735AAB500657570 /* Prefs+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB876312735AAB500657570 /* Prefs+Codable.swift */; };
@@ -348,6 +349,7 @@
 		DCB493CC269F8531001B0F09 /* Int+TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+TimeInterval.swift"; sourceTree = "<group>"; };
 		DCB493CE269F859E001B0F09 /* SyncTxManager_State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager_State.swift; sourceTree = "<group>"; };
 		DCB493D0269F890D001B0F09 /* SyncTxManager_PendingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTxManager_PendingSettings.swift; sourceTree = "<group>"; };
+		DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		DCB6235925B0A42D005AD4B7 /* ComingSoonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComingSoonView.swift; sourceTree = "<group>"; };
 		DCB8762F2735AA7300657570 /* Prefs+Serialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Serialization.swift"; sourceTree = "<group>"; };
 		DCB876312735AAB500657570 /* Prefs+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Prefs+Codable.swift"; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				C8D7A7335040D755924F8FFC /* configuration */,
 				53BEF0E7A62D4973FCC99476 /* widgets */,
 				DC49DA8C258BB85F005BC4BC /* style */,
+				DCB5D2DD280879160020B8F5 /* environment */,
 				DC99E94725BA258C00FB20F7 /* html */,
 			);
 			path = views;
@@ -681,7 +684,6 @@
 			children = (
 				DC1706D826A71D8E00BAFCD0 /* ErrorView.swift */,
 				DC71E7322728645B0063613D /* CurrencyConverterView.swift */,
-				DCAC5B6F27726FC80077BB98 /* DeepLink.swift */,
 			);
 			path = tools;
 			sourceTree = "<group>";
@@ -772,6 +774,15 @@
 			children = (
 			);
 			path = "phoenix-ios-framework";
+			sourceTree = "<group>";
+		};
+		DCB5D2DD280879160020B8F5 /* environment */ = {
+			isa = PBXGroup;
+			children = (
+				DCAC5B6F27726FC80077BB98 /* DeepLink.swift */,
+				DCB5D2DE280879460020B8F5 /* DeviceInfo.swift */,
+			);
+			path = environment;
 			sourceTree = "<group>";
 		};
 		DCC9D998267BD26D00EA36DD /* sync */ = {
@@ -1090,6 +1101,7 @@
 				DC2F432227B69FAA0006FCC4 /* SwapInDisabledPopover.swift in Sources */,
 				53BEF90975122B844248569C /* ReceiveView.swift in Sources */,
 				DC118C0427B454720080BBAC /* PaymentInFlightView.swift in Sources */,
+				DCB5D2DF280879460020B8F5 /* DeviceInfo.swift in Sources */,
 				DCACF6FB2566D0BA0009B01E /* GenericPasswordStore.swift in Sources */,
 				DC48D2C42593DE30008D138C /* TextFieldCurrencyStyler.swift in Sources */,
 				DC18C41D256FF91100A2D083 /* Utils.swift in Sources */,
