@@ -93,6 +93,7 @@ struct ErrorView: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					cornerRadius: 16,
 					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appNegative
 				)
@@ -118,6 +119,7 @@ struct ErrorView: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					cornerRadius: 16,
 					backgroundFill: Color.primaryBackground,
 					borderStroke: Color.appAccent
 				)

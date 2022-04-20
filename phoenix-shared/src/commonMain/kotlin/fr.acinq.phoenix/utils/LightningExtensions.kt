@@ -14,6 +14,11 @@ import org.kodein.memory.util.freeze
 
 enum class WalletPaymentState { Success, Pending, Failure }
 
+val WalletPayment.createdAt: Long get() = when (this) {
+    is OutgoingPayment -> this.createdAt
+    is IncomingPayment -> this.createdAt
+}
+
 fun WalletPayment.id(): String = when (this) {
     is OutgoingPayment -> this.id.toString()
     is IncomingPayment -> this.paymentHash.toHex()

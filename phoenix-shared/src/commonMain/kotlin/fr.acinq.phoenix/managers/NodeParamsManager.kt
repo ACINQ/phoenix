@@ -89,8 +89,8 @@ class NodeParamsManager(
                     checkHtlcTimeoutAfterStartupDelaySeconds = 15,
                     htlcMinimum = 1000.msat,
                     minDepthBlocks = 3,
-                    toRemoteDelayBlocks = CltvExpiryDelta(144),
-                    maxToLocalDelayBlocks = CltvExpiryDelta(1000),
+                    toRemoteDelayBlocks = CltvExpiryDelta(2016),
+                    maxToLocalDelayBlocks = CltvExpiryDelta(1008),
                     feeBase = 1000.msat,
                     feeProportionalMillionth = 100,
                     reserveToFundingRatio = 0.01, // note: not used (overridden below)

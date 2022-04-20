@@ -196,6 +196,7 @@ fileprivate struct StandardWalletView : View {
 				}
 				.buttonStyle(
 					ScaleButtonStyle(
+						cornerRadius: 100,
 						borderStroke: Color.appAccent,
 						disabledBorderStroke: Color(UIColor.separator)
 					)

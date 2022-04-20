@@ -70,6 +70,10 @@ extension Scan {
 	typealias BadRequestReason_ServiceError = BadRequestReasonServiceError
 	typealias BadRequestReason_UnknownFormat = BadRequestReasonUnknownFormat
 	typealias BadRequestReason_UnsupportedLnUrl = BadRequestReasonUnsupportedLnUrl
+	
+	typealias ClipboardContent_InvoiceRequest = ClipboardContentInvoiceRequest
+	typealias ClipboardContent_LoginRequest = ClipboardContentLoginRequest
+	typealias ClipboardContent_LnurlRequest = ClipboardContentLnurlRequest
 }
 
 extension LNUrl {

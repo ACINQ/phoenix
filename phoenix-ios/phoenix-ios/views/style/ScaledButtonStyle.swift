@@ -25,6 +25,7 @@ import SwiftUI
 struct ScaleButtonStyle: ButtonStyle {
 
 	let scaleAmount: CGFloat
+	let cornerRadius: CGFloat
 	
 	let backgroundFill: Color
 	let disabledBackgroundFill: Color
@@ -37,6 +38,7 @@ struct ScaleButtonStyle: ButtonStyle {
 	
 	init(
 		scaleAmount: CGFloat = 0.98,
+		cornerRadius: CGFloat,
 		backgroundFill: Color = Color.clear,
 		disabledBackgroundFill: Color = Color.clear,
 		borderStroke: Color = Color.clear,
@@ -45,6 +47,7 @@ struct ScaleButtonStyle: ButtonStyle {
 		disabledOpacity: Double = 0.65
 	) {
 		self.scaleAmount = scaleAmount
+		self.cornerRadius = cornerRadius
 		self.backgroundFill = backgroundFill
 		self.disabledBackgroundFill = disabledBackgroundFill
 		self.borderStroke = borderStroke
@@ -57,6 +60,7 @@ struct ScaleButtonStyle: ButtonStyle {
 		ScaleButtonStyleView(
 			configuration: configuration,
 			scaleAmount: scaleAmount,
+			cornerRadius: cornerRadius,
 			backgroundFill: backgroundFill,
 			disabledBackgroundFill: disabledBackgroundFill,
 			borderStroke: borderStroke,
@@ -76,6 +80,7 @@ struct ScaleButtonStyle: ButtonStyle {
 		
 		let configuration: ButtonStyle.Configuration
 		let scaleAmount: CGFloat
+		let cornerRadius: CGFloat
 		
 		let backgroundFill: Color
 		let disabledBackgroundFill: Color
@@ -93,9 +98,9 @@ struct ScaleButtonStyle: ButtonStyle {
 				.opacity(isEnabled ? (configuration.isPressed ? pressedOpacity : 1.0) : disabledOpacity)
 				.scaleEffect(configuration.isPressed ? scaleAmount : 1.0)
 				.background(isEnabled ? backgroundFill : disabledBackgroundFill)
-				.cornerRadius(100)
+				.cornerRadius(cornerRadius)
 				.overlay(
-					RoundedRectangle(cornerRadius: 16)
+					RoundedRectangle(cornerRadius: cornerRadius)
 						.stroke(isEnabled ? borderStroke : disabledBorderStroke, lineWidth: 1.5)
 				)
 		}

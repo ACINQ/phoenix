@@ -86,8 +86,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let electrumConfig = Prefs.shared.electrumConfig
 		business.appConfigurationManager.updateElectrumConfig(server: electrumConfig?.serverAddress)
 		
-		let fiatCurrencies = Prefs.shared.preferredFiatCurrencies
-		business.appConfigurationManager.updatePreferredFiatCurrencies(list: fiatCurrencies)
+		let preferredFiatCurrencies = AppConfigurationManager.PreferredFiatCurrencies(
+			primary: Prefs.shared.fiatCurrency,
+			others: Prefs.shared.preferredFiatCurrencies
+		)
+		business.appConfigurationManager.updatePreferredFiatCurrencies(current: preferredFiatCurrencies)
 		
 		business.start()
 	}
@@ -154,8 +157,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			Prefs.shared.fiatCurrencyPublisher,
 			Prefs.shared.currencyConverterListPublisher
 		).sink { _ in
-			let list = Prefs.shared.preferredFiatCurrencies
-			self.business.appConfigurationManager.updatePreferredFiatCurrencies(list: list)
+			let current = AppConfigurationManager.PreferredFiatCurrencies(
+				primary: Prefs.shared.fiatCurrency,
+				others: Prefs.shared.preferredFiatCurrencies
+			)
+			self.business.appConfigurationManager.updatePreferredFiatCurrencies(current: current)
 		}.store(in: &cancellables)
 		
 		return true
@@ -380,7 +386,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			let currencyPrefs = CurrencyPrefs()
 			let formattedAmt = Utils.format(currencyPrefs, msat: payment.amount)
 
-			let paymentInfo = WalletPaymentInfo(payment: payment, metadata: WalletPaymentMetadata.empty())
+			let paymentInfo = WalletPaymentInfo(
+				payment: payment,
+				metadata: WalletPaymentMetadata.empty(),
+				fetchOptions: WalletPaymentFetchOptions.companion.None
+			)
 			
 			var body: String
 			if let desc = paymentInfo.paymentDescription(), desc.count > 0 {

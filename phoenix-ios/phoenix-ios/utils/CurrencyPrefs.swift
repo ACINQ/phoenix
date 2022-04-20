@@ -2,6 +2,17 @@ import Foundation
 import PhoenixShared
 import Combine
 import UIKit
+import os.log
+
+#if DEBUG && true
+fileprivate var log = Logger(
+	subsystem: Bundle.main.bundleIdentifier!,
+	category: "CurrencyPrefs"
+)
+#else
+fileprivate var log = Logger(OSLog.disabled)
+#endif
+
 
 /// An ObservableObject that monitors the currently stored values in UserDefaults.
 /// Available as an EnvironmentObject:
@@ -10,9 +21,10 @@ import UIKit
 ///
 class CurrencyPrefs: ObservableObject {
 	
-	@Published var currencyType: CurrencyType
-	@Published var fiatCurrency: FiatCurrency
-	@Published var bitcoinUnit: BitcoinUnit
+	@Published private(set) var currencyType: CurrencyType
+	@Published private(set) var fiatCurrency: FiatCurrency
+	@Published private(set) var bitcoinUnit: BitcoinUnit
+	@Published private(set) var hideAmountsOnHomeScreen: Bool
 	
 	@Published var fiatExchangeRates: [ExchangeRate] = []
 	
@@ -32,10 +44,7 @@ class CurrencyPrefs: ObservableObject {
 		currencyType = Prefs.shared.currencyType
 		fiatCurrency = Prefs.shared.fiatCurrency
 		bitcoinUnit = Prefs.shared.bitcoinUnit
-		
-		Prefs.shared.currencyTypePublisher.sink {[weak self](newValue: CurrencyType) in
-			self?.currencyType = newValue
-		}.store(in: &cancellables)
+		hideAmountsOnHomeScreen = Prefs.shared.hideAmountsOnHomeScreen
 		
 		Prefs.shared.fiatCurrencyPublisher.sink {[weak self](newValue: FiatCurrency) in
 			self?.fiatCurrency = newValue
@@ -55,11 +64,13 @@ class CurrencyPrefs: ObservableObject {
 		currencyType: CurrencyType,
 		fiatCurrency: FiatCurrency,
 		bitcoinUnit: BitcoinUnit,
-		exchangeRate: Double
+		exchangeRate: Double,
+		hideAmountsOnHomeScreen: Bool
 	) {
 		self.currencyType = currencyType
 		self.fiatCurrency = fiatCurrency
 		self.bitcoinUnit = bitcoinUnit
+		self.hideAmountsOnHomeScreen = hideAmountsOnHomeScreen
 		
 		let exchangeRate = ExchangeRate.BitcoinPriceRate(
 			fiatCurrency: fiatCurrency,
@@ -70,7 +81,7 @@ class CurrencyPrefs: ObservableObject {
 		fiatExchangeRates.append(exchangeRate)
 	}
 	
-	func toggleCurrencyType() -> Void {
+	func toggleCurrencyType() {
 		
 		assert(Thread.isMainThread, "This function is restricted to the main-thread")
 		
@@ -83,6 +94,14 @@ class CurrencyPrefs: ObservableObject {
 		currencyTypeDelayedSave.save(withDelay: 10.0) {
 			Prefs.shared.currencyType = self.currencyType
 		}
+	}
+	
+	func toggleHideAmountsOnHomeScreen() {
+		
+		assert(Thread.isMainThread, "This function is restricted to the main-thread")
+		
+		hideAmountsOnHomeScreen.toggle()
+		Prefs.shared.hideAmountsOnHomeScreen = self.hideAmountsOnHomeScreen
 	}
 	
 	/// Returns the exchangeRate for the currently set fiatCurrency.
@@ -149,7 +168,7 @@ class CurrencyPrefs: ObservableObject {
 		
 		switch dstCurrency {
 		case .bitcoin(let bitcoinUnit):
-			return Utils.convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+			return Utils.convertBitcoin(msat: msat, to: bitcoinUnit)
 			
 		case .fiat(let fiatCurrency):
 			if let exchangeRate = fiatExchangeRate(fiatCurrency: fiatCurrency) {
@@ -162,10 +181,22 @@ class CurrencyPrefs: ObservableObject {
 	}
 	
 	static func mockUSD() -> CurrencyPrefs {
-		return CurrencyPrefs(currencyType: .bitcoin, fiatCurrency: .usd, bitcoinUnit: .sat, exchangeRate: 20_000.00)
+		return CurrencyPrefs(
+			currencyType: .bitcoin,
+			fiatCurrency: .usd,
+			bitcoinUnit: .sat,
+			exchangeRate: 20_000.00,
+			hideAmountsOnHomeScreen: false
+		)
 	}
 	
 	static func mockEUR() -> CurrencyPrefs {
-		return CurrencyPrefs(currencyType: .bitcoin, fiatCurrency: .eur, bitcoinUnit: .sat, exchangeRate: 17_000.00)
+		return CurrencyPrefs(
+			currencyType: .bitcoin,
+			fiatCurrency: .eur,
+			bitcoinUnit: .sat,
+			exchangeRate: 17_000.00,
+			hideAmountsOnHomeScreen: false
+		)
 	}
 }

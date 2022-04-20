@@ -5,6 +5,8 @@ import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.phoenix.db.WalletPaymentOrderRow
+import fr.acinq.phoenix.utils.createdAt
 
 /* Represents a unique WalletPayment row in the database,
  * which exists in either the `incoming_payments` table,
@@ -87,12 +89,39 @@ fun WalletPayment.walletPaymentId(): WalletPaymentId = when (this) {
 
 /**
  * Represents a payment & its associated metadata.
+ *
+ * Note that the metadata may have only partial values if the fetchOptions is
+ * anything other than WalletPaymentFetchOptions.All.
+ * For example, if we fetch from the database using WalletPaymentFetchOptions.Descriptions,
+ * then the metadata will only have its description values filled in.
  */
 data class WalletPaymentInfo(
     val payment: WalletPayment,
-    val metadata: WalletPaymentMetadata
+    val metadata: WalletPaymentMetadata,
+    val fetchOptions: WalletPaymentFetchOptions
 ) {
     fun id() = payment.walletPaymentId()
+
+    /**
+     * Converts the info to a `WalletPaymentOrderRow`, if possible.
+     * This may be useful if you want to use the PaymentsFetcher
+     * to take advantage of the in-memory cache.
+     */
+    fun toOrderRow(): WalletPaymentOrderRow? {
+        return if (fetchOptions == WalletPaymentFetchOptions.None) {
+            // We don't have enough information. Since we didn't fetch any metadata,
+            // we don't know the `metadataModifiedAt` value.
+            // All other fetch types give us this value.
+            return null
+        } else {
+            WalletPaymentOrderRow(
+                id = payment.walletPaymentId(),
+                createdAt = payment.createdAt,
+                completedAt = payment.completedAt(),
+                metadataModifiedAt = metadata.modifiedAt
+            )
+        }
+    }
 }
 
 /**
@@ -100,6 +129,7 @@ data class WalletPaymentInfo(
  */
 data class WalletPaymentMetadata(
     val lnurl: LnurlPayMetadata? = null,
+    val originalFiat: ExchangeRate.BitcoinPriceRate? = null,
     val userDescription: String? = null,
     val userNotes: String? = null,
     val modifiedAt: Long? = null
@@ -138,7 +168,8 @@ data class WalletPaymentFetchOptions(val flags: Int) { // <- bitmask
         val Descriptions = WalletPaymentFetchOptions(1 shl 0)
         val Lnurl = WalletPaymentFetchOptions(1 shl 1)
         val UserNotes = WalletPaymentFetchOptions(1 shl 2)
+        val OriginalFiat = WalletPaymentFetchOptions(1 shl 3)
 
-        val All = Descriptions + Lnurl + UserNotes
+        val All = Descriptions + Lnurl + UserNotes + OriginalFiat
     }
 }

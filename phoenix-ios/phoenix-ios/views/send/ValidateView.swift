@@ -303,6 +303,7 @@ struct ValidateView: View {
 				.padding([.leading, .trailing], 24)
 			}
 			.buttonStyle(ScaleButtonStyle(
+				cornerRadius: 100,
 				backgroundFill: Color.appAccent,
 				disabledBackgroundFill: Color.gray
 			))
@@ -1136,10 +1137,6 @@ struct ValidateView: View {
 			if let flowType = flowType {
 				
 				priceSliderVisible = true
-				shortSheetState.onNextWillDisappear {
-					priceSliderVisible = false
-				}
-				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
 					
@@ -1148,6 +1145,9 @@ struct ValidateView: View {
 						msat: msat,
 						valueChanged: priceSliderChanged
 					)
+					
+				} onWillDisappear: {
+					priceSliderVisible = false
 				}
 			}
 			
@@ -1227,12 +1227,6 @@ struct ValidateView: View {
 				
 				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
 				
-				shortSheetState.onNextWillDisappear {
-					
-					log.debug("shortSheetState.onNextWillDisappear {}")
-					hasPromptedForComment = true
-				}
-				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
 					
@@ -1241,6 +1235,11 @@ struct ValidateView: View {
 						maxCommentLength: maxCommentLength,
 						sendButtonAction: { sendPayment() }
 					)
+				
+				} onWillDisappear: {
+					
+					log.debug("shortSheetState.onWillDisappear {}")
+					hasPromptedForComment = true
 				}
 				
 			} else {

@@ -164,7 +164,8 @@ struct SwapInView: View {
 	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
-			qrCode.value == m.address,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
@@ -269,7 +270,9 @@ struct SwapInView: View {
 		
 		if let m = model as? Receive.Model_SwapIn_Generated {
 			log.debug("updating qr code...")
-			qrCode.generate(value: m.address)
+			
+			// Issue #196: Use uppercase lettering for invoices and address QRs
+			qrCode.generate(value: m.address.uppercased())
 		}
 	}
 	
@@ -316,7 +319,8 @@ struct SwapInView: View {
 		log.trace("copyImageToPasteboard()")
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
-			qrCode.value == m.address,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
@@ -360,7 +364,8 @@ struct SwapInView: View {
 		log.trace("shareImageToSystem()")
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
-			qrCode.value == m.address,
+		   let qrCodeValue = qrCode.value,
+			qrCodeValue.caseInsensitiveCompare(m.address) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)

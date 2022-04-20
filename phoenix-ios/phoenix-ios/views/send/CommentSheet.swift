@@ -129,6 +129,7 @@ struct CommentSheet: View {
 				.padding([.leading, .trailing], 24)
 			}
 			.buttonStyle(ScaleButtonStyle(
+				cornerRadius: 100,
 				backgroundFill: Color.appAccent,
 				disabledBackgroundFill: Color.gray
 			))

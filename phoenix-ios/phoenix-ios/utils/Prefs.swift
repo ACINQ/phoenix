@@ -45,6 +45,7 @@ class Prefs {
 		case isNewWallet
 		case invoiceExpirationDays
 		case maxFees
+		case hideAmountsOnHomeScreen
 	}
 	
 	public static let shared = Prefs()
@@ -56,11 +57,6 @@ class Prefs {
 		])
 	}
 	
-	lazy private(set) var currencyTypePublisher: CurrentValueSubject<CurrencyType, Never> = {
-		var value = self.currencyType
-		return CurrentValueSubject<CurrencyType, Never>(value)
-	}()
-	
 	var currencyType: CurrencyType {
 		get {
 			let key = Keys.currencyType.rawValue
@@ -70,7 +66,6 @@ class Prefs {
 		set {
 			let key = Keys.currencyType.rawValue
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
-			currencyTypePublisher.send(newValue)
 	  }
 	}
 	
@@ -223,6 +218,15 @@ class Prefs {
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
 			log.debug("Prefs.maxFees: \(String(describing: newValue))")
 			maxFeesPublisher.send(newValue)
+		}
+	}
+	
+	var hideAmountsOnHomeScreen: Bool {
+		get {
+			 UserDefaults.standard.bool(forKey: Keys.hideAmountsOnHomeScreen.rawValue)
+		}
+		set {
+			UserDefaults.standard.set(newValue, forKey: Keys.hideAmountsOnHomeScreen.rawValue)
 		}
 	}
 	
