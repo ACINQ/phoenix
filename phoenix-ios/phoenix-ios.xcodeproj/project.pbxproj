@@ -1447,7 +1447,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"\"-Xlinker -interposable\"",
@@ -1475,7 +1475,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"\"-Xlinker -interposable\"",
