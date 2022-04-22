@@ -450,7 +450,23 @@ class EclairNodeService : Service() {
     } ?: throw KitNotInitialized
   }
 
-  /** Retrieve list of channels from router. Can filter by state. */
+  /** Adds a channel to the database. */
+  suspend fun decryptChannelData(data: ByteVector): HasCommitments {
+    return kit?.let {
+      Helpers.decrypt(it.nodeParams().privateKey().value(), data)
+    } ?: throw KitNotInitialized
+  }
+
+  /** Adds a channel to the database. */
+  suspend fun addChannels(channels: List<HasCommitments>) {
+    kit?.let {
+      channels.forEach { channel ->
+        it.nodeParams().db().channels().addOrUpdateChannel(channel)
+      }
+    } ?: throw KitNotInitialized
+  }
+
+  /** Retrieves list of channels from router. Can filter by state. */
   @UiThread
   suspend fun getChannels(channelState: State? = null): Iterable<RES_GETINFO> {
     return withContext(serviceScope.coroutineContext + Dispatchers.IO) {

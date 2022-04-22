@@ -768,4 +768,20 @@
   <string name="paymentmode_lightning">Pay with Lightning</string>
   <string name="paymentmode_lightning_desc">This is the recommended option</string>
 
+  <!-- channels data manual import-->
+
+  <string name="channels_import_title">Manual channels import</string>
+  <string name="channels_import_instructions">This screen is a debugging tool that can be used to manually import encrypted channels data.\n\nUse with caution.</string>
+  <string name="channels_import_hint">Enter channels data here</string>
+  <string name="channels_import_start_button">Import</string>
+  <string name="channels_import_reading">Reading channels data…</string>
+  <string name="channels_import_decrypting">Decrypting channels data…</string>
+  <string name="channels_import_writing">Writing channels to database…</string>
+  <string name="channels_import_success">%1$d channel(s) successfully imported.\nThe app must now be restarted.</string>
+  <string name="channels_import_success_button">Restart</string>
+  <string name="channels_import_failure">Failed to import channels: %1$s\n\nMake sure the data are correct and try again.</string>
+  <string name="channels_import_failure_invalid">data are not valid.</string>
+  <string name="channels_import_failure_decryption">could not decrypt data.</string>
+  <string name="channels_import_failure_db">could not write channels to database.</string>
+
 </resources>
