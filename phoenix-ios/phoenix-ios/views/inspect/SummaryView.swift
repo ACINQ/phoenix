@@ -82,6 +82,7 @@ struct SummaryView: View {
 			ScrollView {
 				self.main
 			}
+			.frame(maxWidth: .infinity)
 
 			// Close button in upper right-hand corner
 			VStack {

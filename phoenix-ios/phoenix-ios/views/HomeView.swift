@@ -798,6 +798,8 @@ fileprivate struct PaymentCell : View, ViewName {
 	@State var fetched: WalletPaymentInfo?
 	@State var fetchedIsStale: Bool
 	
+	@ScaledMetric var textScaling: CGFloat = 100
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 
 	init(
@@ -919,14 +921,25 @@ fileprivate struct PaymentCell : View, ViewName {
 	
 	func paymentTimestamp() -> String {
 
-		if let payment = fetched?.payment {
-			let timestamp = payment.completedAt()
-			return timestamp > 0
-				? timestamp.formatDateMS()
-				: NSLocalizedString("pending", comment: "timestamp string for pending transaction")
-		} else {
+		guard let payment = fetched?.payment else {
 			return ""
 		}
+		let timestamp = payment.completedAt()
+		guard timestamp > 0 else {
+			return NSLocalizedString("pending", comment: "timestamp string for pending transaction")
+		}
+			
+		let date = timestamp.toDate(from: .milliseconds)
+		
+		let formatter = DateFormatter()
+		if textScaling > 100 {
+			formatter.dateStyle = .short
+		} else {
+			formatter.dateStyle = .long
+		}
+		formatter.timeStyle = .short
+		
+		return formatter.string(from: date)
 	}
 	
 	func paymentAmountInfo() -> (FormattedAmount, Bool, Bool) {

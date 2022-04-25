@@ -93,64 +93,6 @@ struct ReceiveView: MVIView {
 		
 		return (colorScheme == .dark) ? Color(UIColor.separator) : Color.appAccent
 	}
-	
-	/// Shared button builder. Used by:
-	/// - ReceiveLightningView
-	/// - SwapInView
-	///
-	@ViewBuilder
-	static func actionButton(
-		image: Image,
-		width: CGFloat = 20,
-		height: CGFloat = 20,
-		xOffset: CGFloat = 0,
-		yOffset: CGFloat = 0,
-		action: @escaping () -> Void
-	) -> some View {
-		
-		Button(action: action) {
-			ZStack {
-				Color.buttonFill
-					.frame(width: 40, height: 40)
-					.cornerRadius(50)
-					.overlay(
-						RoundedRectangle(cornerRadius: 50)
-							.stroke(Color(UIColor.separator), lineWidth: 1)
-					)
-				
-				image
-					.renderingMode(.template)
-					.resizable()
-					.scaledToFit()
-					.frame(width: width, height: height)
-					.offset(x: xOffset, y: yOffset)
-			}
-		}
-	}
-	
-	/// Shared logic
-	@ViewBuilder
-	static func copyButton(action: @escaping () -> Void) -> some View {
-		
-		ReceiveView.actionButton(
-			image: Image(systemName: "square.on.square"),
-			width: 20, height: 20,
-			xOffset: 0, yOffset: 0,
-			action: action
-		)
-	}
-	
-	/// Shared logic
-	@ViewBuilder
-	static func shareButton(action: @escaping () -> Void) -> some View {
-		
-		ReceiveView.actionButton(
-			image: Image(systemName: "square.and.arrow.up"),
-			width: 21, height: 21,
-			xOffset: 0, yOffset: -1,
-			action: action
-		)
-	}
 }
 
 // MARK: -
