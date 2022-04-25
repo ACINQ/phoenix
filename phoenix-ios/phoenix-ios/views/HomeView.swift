@@ -164,46 +164,49 @@ struct HomeView : MVIView {
 						
 						Text(amount.digits)
 							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
 						
 					} else {
 						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showMsatsIfZeroSats)
 						
-						if currencyPrefs.currencyType == .bitcoin &&
-							currencyPrefs.bitcoinUnit == .sat &&
-							amount.hasFractionDigits
-						{
-							// We're showing the value in satoshis, but the value contains a fractional
-							// component representing the millisatoshis.
-							// This can be a little confusing for those new to Lightning.
-							// So we're going to downplay the millisatoshis visually.
+						if amount.hasSubFractionDigits {
+							
+							// We're showing sub-fractional values.
+							// For example, we're showing millisatoshis.
+							//
+							// It's helpful to downplay the sub-fractional part visually.
+							
+							let hasStdFractionDigits = amount.hasStdFractionDigits
+							
 							HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
-								Text(amount.integerDigits)
+								Text(verbatim: amount.integerDigits)
 									.font(.largeTitle)
-									.onTapGesture { toggleCurrencyType() }
-								Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
+								Text(verbatim: amount.decimalSeparator)
+									.font(hasStdFractionDigits ? .largeTitle : .title)
+									.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+								if hasStdFractionDigits {
+									Text(verbatim: amount.stdFractionDigits)
+										.font(.largeTitle)
+								}
+								Text(verbatim: amount.subFractionDigits)
 									.font(.title)
 									.foregroundColor(.secondary)
-									.onTapGesture { toggleCurrencyType() }
 							}
 							.environment(\.layoutDirection, .leftToRight) // issue #237
-							
+						
 						} else {
 							Text(amount.digits)
 								.font(.largeTitle)
-								.onTapGesture { toggleCurrencyType() }
 						}
 						
 						Text(amount.type)
 							.font(.title2)
 							.foregroundColor(Color.appAccent)
 							.padding(.bottom, 4)
-							.onTapGesture { toggleCurrencyType() }
-						
 					}
 				} // </HStack>
-				.lineLimit(1)            // SwiftUI bugs
-				.minimumScaleFactor(0.5) // Truncating text
+				.lineLimit(1)            // SwiftUI truncation bugs
+				.minimumScaleFactor(0.5) // SwiftUI truncation bugs
+				.onTapGesture { toggleCurrencyType() }
 				
 				if let incoming = incomingAmount() {
 					let incomingAmountStr = currencyPrefs.hideAmountsOnHomeScreen ? incoming.digits : incoming.string

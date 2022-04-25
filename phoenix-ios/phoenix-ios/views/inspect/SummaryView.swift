@@ -200,38 +200,36 @@ struct SummaryView: View {
 
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 				let isOutgoing = payment is Lightning_kmpOutgoingPayment
-				let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsats)
+				let amount = Utils.format(currencyPrefs, msat: payment.amount, policy: .showMsatsIfNonZero)
 
-				if currencyPrefs.currencyType == .bitcoin &&
-				   currencyPrefs.bitcoinUnit == .sat &&
-				   amount.hasFractionDigits
-				{
-					// We're showing the value in satoshis, but the value contains a fractional
-					// component representing the millisatoshis.
-					// This can be a little confusing for those new to Lightning.
-					// So we're going to downplay the millisatoshis visually.
+				if amount.hasSubFractionDigits {
+					
+					// We're showing sub-fractional values.
+					// For example, we're showing millisatoshis.
+					//
+					// It's helpful to downplay the sub-fractional part visually.
+					
+					let hasStdFractionDigits = amount.hasStdFractionDigits
+					
 					HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {
 						Text(verbatim: isOutgoing ? "-" : "+")
 							.font(.largeTitle)
 							.foregroundColor(Color.secondary)
-							.onTapGesture { toggleCurrencyType() }
 						Text(verbatim: amount.integerDigits)
 							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
-						Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
-							.lineLimit(1)            // SwiftUI bugs
-							.minimumScaleFactor(0.5) // Truncating text
+						Text(verbatim: amount.decimalSeparator)
+							.font(hasStdFractionDigits ? .largeTitle : .title)
+							.foregroundColor(hasStdFractionDigits ? Color.primary : Color.secondary)
+						if hasStdFractionDigits {
+							Text(verbatim: amount.stdFractionDigits)
+								.font(.largeTitle)
+								.foregroundColor(Color.primary)
+						}
+						Text(verbatim: amount.subFractionDigits)
 							.font(.title)
 							.foregroundColor(Color.secondary)
-							.onTapGesture { toggleCurrencyType() }
 					}
-					.environment(\.layoutDirection, .leftToRight) // issue #237
-					.padding(.trailing, 6)
-					Text(verbatim: amount.type)
-						.font(.title3)
-						.foregroundColor(Color.appAccent)
-						.padding(.bottom, 4)
-						.onTapGesture { toggleCurrencyType() }
+					.environment(\.layoutDirection, .leftToRight) // Issue #237
 					
 				} else {
 					
@@ -239,20 +237,21 @@ struct SummaryView: View {
 						Text(verbatim: isOutgoing ? "-" : "+")
 							.font(.largeTitle)
 							.foregroundColor(Color.secondary)
-							.onTapGesture { toggleCurrencyType() }
 						Text(amount.digits)
 							.font(.largeTitle)
-							.onTapGesture { toggleCurrencyType() }
 					}
-					.environment(\.layoutDirection, .leftToRight) // issue #237
-					.padding(.trailing, 6)
-					Text(amount.type)
-						.font(.title3)
-						.foregroundColor(Color.appAccent)
-						.padding(.bottom, 4)
-						.onTapGesture { toggleCurrencyType() }
+					.environment(\.layoutDirection, .leftToRight) // Issue #237
 				}
+				
+				Text(amount.type)
+					.font(.title3)
+					.foregroundColor(Color.appAccent)
+					.padding(.leading, 6)
+					.padding(.bottom, 4)
 			}
+			.lineLimit(1)              // SwiftUI truncation bugs
+			.minimumScaleFactor(0.5)   // SwiftUI truncation bugs
+			.onTapGesture { toggleCurrencyType() }
 			.padding([.top, .leading, .trailing], 8)
 			.padding(.bottom, 33)
 			.background(
@@ -787,13 +786,21 @@ fileprivate struct SummaryInfoGrid: InfoGridView {
 					
 					let amount: FormattedAmount = pFees.0
 					
-					if currencyPrefs.currencyType == .bitcoin &&
-						currencyPrefs.bitcoinUnit == .sat &&
-						amount.hasFractionDigits
-					{
+					if amount.hasSubFractionDigits {
+						
+						// We're showing sub-fractional values.
+						// For example, we're showing millisatoshis.
+						//
+						// It's helpful to downplay the sub-fractional part visually.
+						
+						let hasStdFractionDigits = amount.hasStdFractionDigits
+						
 						let styledText: Text =
-							Text(verbatim: "\(amount.integerDigits)")
-						+	Text(verbatim: "\(amount.decimalSeparator)\(amount.fractionDigits)")
+							Text(verbatim: amount.integerDigits)
+						+	Text(verbatim: amount.decimalSeparator)
+								.foregroundColor(hasStdFractionDigits ? .primary : .secondary)
+						+	Text(verbatim: amount.stdFractionDigits)
+						+	Text(verbatim: amount.subFractionDigits)
 								.foregroundColor(.secondary)
 								.font(.callout)
 								.fontWeight(.light)

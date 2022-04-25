@@ -1,15 +1,14 @@
 import XCTest
 @testable import Phoenix
-import SwiftUI
 
-class appNameTests: XCTestCase {
+class aes256Tests: XCTestCase {
 
-	override func setUp() {
+	override func setUpWithError() throws {
 		// Put setup code here.
 		// This method is called before the invocation of each test method in the class.
 	}
 	
-	override func tearDown() {
+	override func tearDownWithError() throws {
 		// Put teardown code here.
 		// This method is called after the invocation of each test method in the class.
 	}
@@ -21,7 +20,7 @@ class appNameTests: XCTestCase {
 		let ciphertext: Data
 	}
 	
-	func testVectors() -> TestVectors {
+	func getTestVectors() -> TestVectors {
 		/**
 		 * Source:
 		 * https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
@@ -48,7 +47,7 @@ class appNameTests: XCTestCase {
 	
 	func testEncryptionDecryption() {
 		
-		let v = testVectors()
+		let v = getTestVectors()
 		let aes = try? AES256(key: v.key, iv: v.iv)
 		
 		let encrypted = try? aes?.encrypt(v.plaintext, padding: .None)
@@ -60,7 +59,7 @@ class appNameTests: XCTestCase {
 	
 	func testPadding() {
 		
-		let v = testVectors()
+		let v = getTestVectors()
 		let aes = try? AES256(key: v.key, iv: v.iv)
 		
 		// We should be able to drop bytes from the end of the plaintext,
@@ -81,5 +80,4 @@ class appNameTests: XCTestCase {
 			length -= 1
 		}
 	}
-		
 }

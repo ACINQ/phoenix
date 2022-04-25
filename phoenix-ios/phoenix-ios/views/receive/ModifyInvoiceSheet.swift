@@ -209,7 +209,7 @@ struct ModifyInvoiceSheet: View {
 					formattedAmt = Utils.formatBitcoin(
 						amount: savedAmount.amount,
 						bitcoinUnit: bitcoinUnit,
-						policy: .showMsats
+						policy: .showMsatsIfNonZero
 					)
 				
 				case .fiat(let fiatCurrency):
@@ -231,7 +231,7 @@ struct ModifyInvoiceSheet: View {
 			let formattedAmt = Utils.formatBitcoin(
 				msat: initialAmount,
 				bitcoinUnit: currencyPrefs.bitcoinUnit,
-				policy: .showMsats
+				policy: .showMsatsIfNonZero
 			)
 			parsedAmount = Result.success(formattedAmt.amount)
 			amount = formattedAmt.digits
