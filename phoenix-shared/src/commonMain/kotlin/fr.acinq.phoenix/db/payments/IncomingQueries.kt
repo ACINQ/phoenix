@@ -138,7 +138,11 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     }
 
     fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.list(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
+        return queries.list(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::mapIncomingPayment
+        ).executeAsList()
     }
 
     companion object {

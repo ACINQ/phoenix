@@ -177,7 +177,7 @@ SELECT parent.id,
 FROM outgoing_payments AS parent
 LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
 ORDER BY parent.completed_at DESC, parent.id DESC
-LIMIT ?, ?;
+LIMIT :limit OFFSET :offset;
 
 scanCompleted:
 SELECT id, completed_at
