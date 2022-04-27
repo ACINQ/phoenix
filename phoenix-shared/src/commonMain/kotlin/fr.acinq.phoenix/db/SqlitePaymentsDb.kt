@@ -84,7 +84,7 @@ class SqlitePaymentsDb(
      * }
      * ```
      */
-    private class Properties(driver: SqlDriver) {
+    class Properties(driver: SqlDriver) {
         val database = PaymentsDatabase(
             driver = driver,
             outgoing_payment_partsAdapter = Outgoing_payment_parts.Adapter(
@@ -112,7 +112,8 @@ class SqlitePaymentsDb(
 
         val cloudKitDb = makeCloudKitDb(database)
     }
-    private val _doNotFreezeMe = Properties(driver)
+
+    val _doNotFreezeMe = Properties(driver)
 
     fun getCloudKitDb(): CloudKitInterface? {
         return _doNotFreezeMe.cloudKitDb
@@ -384,6 +385,36 @@ class SqlitePaymentsDb(
         return withContext(Dispatchers.Default) {
             inQueries.listReceivedPayments(count, skip)
         }
+    }
+
+    override suspend fun listIncomingPayments(count: Int, skip: Int, filters: Set<PaymentTypeFilter>): List<IncomingPayment> {
+        val inQueries = _doNotFreezeMe.inQueries
+
+        return withContext(Dispatchers.Default) {
+            inQueries.listIncomingPayments(count, skip)
+        }
+    }
+
+    // ---- cleaning expired payments
+
+    override suspend fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
+        val inQueries = _doNotFreezeMe.inQueries
+
+        return withContext(Dispatchers.Default) {
+            inQueries.listExpiredPayments(fromCreatedAt, toCreatedAt)
+        }
+    }
+
+    override suspend fun removeIncomingPayment(paymentHash: ByteVector32): Boolean {
+        val database = _doNotFreezeMe.database
+
+//        withContext(Dispatchers.Default) {
+//            database.incomingPaymentsQueries.delete(
+//                payment_hash = paymentHash.toByteArray()
+//            )
+//        }
+
+        return false
     }
 
     // ---- list ALL payments

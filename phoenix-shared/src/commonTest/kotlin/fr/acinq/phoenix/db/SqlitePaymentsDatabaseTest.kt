@@ -203,8 +203,8 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPart(it.id)) }
 
         // We should never update non-existing parts.
-        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
-        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Other payment parts are added.
         val newParts = listOf(
@@ -262,7 +262,7 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(paymentSucceeded, db.getOutgoingPayment(p.id))
 
         // Cannot succeed a payment that does not exist
-        assertFalse { db.outQueries.completeOutgoingPayment(
+        assertFalse { db._doNotFreezeMe.outQueries.completeOutgoingPayment(
             id = UUID.randomUUID(),
             completed = paymentStatus
         ) }
@@ -312,7 +312,7 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
 
         // Cannot fail a payment that does not exist
-        assertFalse { db.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
+        assertFalse { db._doNotFreezeMe.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {

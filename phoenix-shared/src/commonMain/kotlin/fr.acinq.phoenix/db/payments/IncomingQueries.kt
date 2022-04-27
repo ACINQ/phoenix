@@ -137,8 +137,18 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         return queries.get(payment_hash = paymentHash.toByteArray(), ::mapIncomingPayment).executeAsOneOrNull()
     }
 
+    fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
+        return queries.listAllWithin(fromCreatedAt, toCreatedAt, ::mapIncomingPayment).executeAsList().filter {
+            it.received == null
+        }
+    }
+
+    fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
+        return queries.listAll(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
+    }
+
     fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.list(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
+        return queries.listReceived(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
     }
 
     companion object {
