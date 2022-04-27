@@ -97,7 +97,7 @@ extension Lightning_kmpWalletPayment {
 				let msat = received.receivedWith.map { $0.fees.msat }.reduce(0, +)
 				if msat > 0 {
 					
-					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
+					let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 					
 					let exp = NSLocalizedString(
 						"""
@@ -133,7 +133,7 @@ extension Lightning_kmpWalletPayment {
 				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
 				let claimed = Lightning_kmpMilliSatoshi(sat: onChain.claimed)
 				let fees = channelDrain.minus(other: claimed)
-				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsats)
+				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
 				
 				let txCount = onChain.component1().count
 				let exp: String
@@ -154,7 +154,7 @@ extension Lightning_kmpWalletPayment {
 			} else if let _ = outgoingPayment.status.asOffChain() {
 				
 				let msat = outgoingPayment.fees.msat
-				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsats)
+				let formattedAmt = Utils.format(currencyPrefs, msat: msat, policy: .showMsatsIfNonZero)
 				
 				var parts = 0
 				var hops = 0

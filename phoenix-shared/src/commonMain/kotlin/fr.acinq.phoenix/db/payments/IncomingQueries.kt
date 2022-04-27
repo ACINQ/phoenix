@@ -144,11 +144,19 @@ class IncomingQueries(private val database: PaymentsDatabase) {
     }
 
     fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listAll(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
+        return queries.listAll(
+            limit = skip.toLong(),
+            offset = count.toLong(),
+            mapper = ::mapIncomingPayment
+        ).executeAsList()
     }
 
     fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.listReceived(skip.toLong(), count.toLong(), ::mapIncomingPayment).executeAsList()
+        return queries.listReceived(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::mapIncomingPayment
+        ).executeAsList()
     }
 
     companion object {

@@ -68,7 +68,7 @@ FROM   incoming_payments
 ORDER BY
        coalesce(received_at, created_at) DESC,
        payment_hash DESC
-LIMIT  ?, ?;
+LIMIT :limit OFFSET :offset;
 
 listAllWithin:
 SELECT payment_hash, preimage, created_at, origin_type, origin_blob, received_amount_msat, received_at, received_with_type, received_with_blob
@@ -85,7 +85,7 @@ WHERE  received_at IS NOT NULL
 ORDER BY
       -- coalesce(received_at, created_at) DESC,
        payment_hash DESC
-LIMIT  ?, ?;
+LIMIT :limit OFFSET :offset;
 
 scanCompleted:
 SELECT payment_hash,

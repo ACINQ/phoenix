@@ -39,12 +39,32 @@ struct SwapInView: View {
 	let incomingSwapsPublisher = AppDelegate.get().business.paymentsManager.incomingSwapsPublisher()
 	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
 	
+	// For the cicular buttons: [copy, share]
+	enum MaxButtonWidth: Preference {}
+	let maxButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxButtonWidth: CGFloat? = nil
+	
 	@ViewBuilder
 	var body: some View {
 		
+		GeometryReader { geometry in
+			ScrollView(.vertical) {
+				content()
+					.frame(width: geometry.size.width)
+					.frame(minHeight: geometry.size.height)
+			}
+		}
+	}
+	
+	@ViewBuilder
+	func content() -> some View {
+		
 		VStack {
 			
-			qrCodeView
+			qrCodeView()
 				.frame(width: 200, height: 200)
 				.padding(.all, 20)
 				.background(Color.white)
@@ -58,57 +78,15 @@ struct SwapInView: View {
 				)
 				.padding([.top, .bottom])
 			
-			HStack(alignment: VerticalAlignment.top, spacing: 8) {
-				
-				Text("Address")
-					.foregroundColor(.secondary)
-				
-				if let btcAddr = bitcoinAddress() {
-					
-					Text(btcAddr)
-						.contextMenu {
-							Button(action: {
-								UIPasteboard.general.string = btcAddr
-								toast.pop(
-									Text("Copied to pasteboard!").anyView,
-									colorScheme: colorScheme.opposite
-								)
-							}) {
-								Text("Copy")
-							}
-						}
-				} else {
-					Text(verbatim: "…")
-				}
-			}
-			.padding([.leading, .trailing], 40)
-			.padding(.bottom)
+			addressView()
+				.padding([.leading, .trailing], 40)
+				.padding(.bottom)
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 30) {
-				
-				ReceiveView.copyButton {
-					// using simultaneousGesture's below
-				}
-				.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
-				.simultaneousGesture(LongPressGesture().onEnded { _ in
-					didLongPressCopyButton()
-				})
-				.simultaneousGesture(TapGesture().onEnded {
-					didTapCopyButton()
-				})
-				
-				ReceiveView.shareButton {
-					// using simultaneousGesture's below
-				}
-				.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
-				.simultaneousGesture(LongPressGesture().onEnded { _ in
-					didLongPressShareButton()
-				})
-				.simultaneousGesture(TapGesture().onEnded {
-					didTapShareButton()
-				})
-				
-			} // </HStack>
+				copyButton()
+				shareButton()
+			}
+			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
 			feesInfoView
 				.padding([.top, .leading, .trailing])
@@ -161,7 +139,7 @@ struct SwapInView: View {
 	}
 	
 	@ViewBuilder
-	var qrCodeView: some View {
+	func qrCodeView() -> some View {
 		
 		if let m = mvi.model as? Receive.Model_SwapIn_Generated,
 		   let qrCodeValue = qrCode.value,
@@ -201,6 +179,115 @@ struct SwapInView: View {
 				.font(.caption)
 			}
 		}
+	}
+	
+	@ViewBuilder
+	func addressView() -> some View {
+		
+		VStack(alignment: HorizontalAlignment.center, spacing: 4) {
+			
+			Text("Address")
+				.foregroundColor(.secondary)
+				.font(.subheadline)
+			
+			if let btcAddr = bitcoinAddress() {
+				Text(btcAddr)
+					.font(.footnote)
+					.multilineTextAlignment(.center)
+					.contextMenu {
+						Button {
+							didTapCopyButton()
+						} label: {
+							Text("Copy")
+						}
+					}
+			} else {
+				Text(verbatim: "…")
+					.font(.footnote)
+			}
+		
+		} // </HStack>
+	}
+	
+	@ViewBuilder
+	func actionButton(
+		text: String,
+		image: Image,
+		width: CGFloat = 20,
+		height: CGFloat = 20,
+		xOffset: CGFloat = 0,
+		yOffset: CGFloat = 0,
+		action: @escaping () -> Void
+	) -> some View {
+		
+		Button(action: action) {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				ZStack {
+					Color.buttonFill
+						.frame(width: 40, height: 40)
+						.cornerRadius(50)
+						.overlay(
+							RoundedRectangle(cornerRadius: 50)
+								.stroke(Color(UIColor.separator), lineWidth: 1)
+						)
+					
+					image
+						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
+						.frame(width: width, height: height)
+						.offset(x: xOffset, y: yOffset)
+				} // </ZStack>
+				
+				Text(text.lowercased())
+					.font(.caption)
+					.foregroundColor(Color.secondary)
+					.padding(.top, 2)
+				
+			} // </VStack>
+		} // </Button>
+		.frame(width: maxButtonWidth)
+		.read(maxButtonWidthReader)
+	}
+	
+	@ViewBuilder
+	func copyButton() -> some View {
+		
+		actionButton(
+			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.on.square"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0
+		) {
+			// using simultaneousGesture's below
+		}
+		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressCopyButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapCopyButton()
+		})
+	}
+	
+	@ViewBuilder
+	func shareButton() -> some View {
+		
+		actionButton(
+			text: NSLocalizedString("share", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.and.arrow.up"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: -1
+		) {
+			// using simultaneousGesture's below
+		}
+		.disabled(!(mvi.model is Receive.Model_SwapIn_Generated))
+		.simultaneousGesture(LongPressGesture().onEnded { _ in
+			didLongPressShareButton()
+		})
+		.simultaneousGesture(TapGesture().onEnded {
+			didTapShareButton()
+		})
 	}
 	
 	@ViewBuilder
