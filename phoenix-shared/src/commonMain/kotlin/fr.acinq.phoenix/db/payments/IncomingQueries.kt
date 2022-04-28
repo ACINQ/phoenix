@@ -145,8 +145,8 @@ class IncomingQueries(private val database: PaymentsDatabase) {
 
     fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
         return queries.listAll(
-            limit = skip.toLong(),
-            offset = count.toLong(),
+            limit = count.toLong(),
+            offset = skip.toLong(),
             mapper = ::mapIncomingPayment
         ).executeAsList()
     }
@@ -157,6 +157,14 @@ class IncomingQueries(private val database: PaymentsDatabase) {
             offset = skip.toLong(),
             mapper = ::mapIncomingPayment
         ).executeAsList()
+    }
+
+    /** Try to delete an incoming payment ; return true if an element was deleted, false otherwise. */
+    fun deleteIncomingPayment(paymentHash: ByteVector32): Boolean {
+        return database.transactionWithResult {
+            queries.delete(payment_hash = paymentHash.toByteArray())
+            queries.changes().executeAsOne() != 0L
+        }
     }
 
     companion object {

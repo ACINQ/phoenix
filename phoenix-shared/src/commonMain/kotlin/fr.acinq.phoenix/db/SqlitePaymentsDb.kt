@@ -406,15 +406,10 @@ class SqlitePaymentsDb(
     }
 
     override suspend fun removeIncomingPayment(paymentHash: ByteVector32): Boolean {
-        val database = _doNotFreezeMe.database
-
-//        withContext(Dispatchers.Default) {
-//            database.incomingPaymentsQueries.delete(
-//                payment_hash = paymentHash.toByteArray()
-//            )
-//        }
-
-        return false
+        val inQueries = _doNotFreezeMe.inQueries
+        return withContext(Dispatchers.Default) {
+            inQueries.deleteIncomingPayment(paymentHash)
+        }
     }
 
     // ---- list ALL payments
