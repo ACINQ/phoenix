@@ -78,6 +78,7 @@ class NodeParamsManager(
                         Feature.ChannelType to FeatureSupport.Mandatory,
                         Feature.PaymentMetadata to FeatureSupport.Optional,
                         Feature.TrampolinePayment to FeatureSupport.Optional,
+                        Feature.ExperimentalTrampolinePayment to FeatureSupport.Optional,
                         Feature.ZeroReserveChannels to FeatureSupport.Optional,
                         Feature.ZeroConfChannels to FeatureSupport.Optional,
                         Feature.WakeUpNotificationClient to FeatureSupport.Optional,
