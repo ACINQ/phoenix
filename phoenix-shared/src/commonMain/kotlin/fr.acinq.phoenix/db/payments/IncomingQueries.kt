@@ -137,12 +137,34 @@ class IncomingQueries(private val database: PaymentsDatabase) {
         return queries.get(payment_hash = paymentHash.toByteArray(), ::mapIncomingPayment).executeAsOneOrNull()
     }
 
-    fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
-        return queries.list(
+    fun listExpiredPayments(fromCreatedAt: Long, toCreatedAt: Long): List<IncomingPayment> {
+        return queries.listAllWithin(fromCreatedAt, toCreatedAt, ::mapIncomingPayment).executeAsList().filter {
+            it.received == null
+        }
+    }
+
+    fun listIncomingPayments(count: Int, skip: Int): List<IncomingPayment> {
+        return queries.listAll(
             limit = count.toLong(),
             offset = skip.toLong(),
             mapper = ::mapIncomingPayment
         ).executeAsList()
+    }
+
+    fun listReceivedPayments(count: Int, skip: Int): List<IncomingPayment> {
+        return queries.listReceived(
+            limit = count.toLong(),
+            offset = skip.toLong(),
+            mapper = ::mapIncomingPayment
+        ).executeAsList()
+    }
+
+    /** Try to delete an incoming payment ; return true if an element was deleted, false otherwise. */
+    fun deleteIncomingPayment(paymentHash: ByteVector32): Boolean {
+        return database.transactionWithResult {
+            queries.delete(payment_hash = paymentHash.toByteArray())
+            queries.changes().executeAsOne() != 0L
+        }
     }
 
     companion object {

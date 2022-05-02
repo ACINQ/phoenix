@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -72,8 +73,8 @@ object Prefs {
             log.info("retrieved preferred electrum=$address from datastore")
             if (address.contains(":")) {
                 val (host, port) = address.split(":")
-                ServerAddress(host, port.toInt())
-            } else ServerAddress(address, 50002)
+                ServerAddress(host, port.toInt(), TcpSocket.TLS.TRUSTED_CERTIFICATES)
+            } else ServerAddress(address, 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES)
         }
     }
 

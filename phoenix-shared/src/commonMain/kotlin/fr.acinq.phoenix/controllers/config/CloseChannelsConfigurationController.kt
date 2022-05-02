@@ -135,7 +135,7 @@ class AppCloseChannelsConfigurationController(
 
             filteredChannels.keys.forEach { channelId ->
                 val command: CloseCommand = if (scriptPubKey != null) {
-                    CMD_CLOSE(scriptPubKey = ByteVector(scriptPubKey))
+                    CMD_CLOSE(scriptPubKey = ByteVector(scriptPubKey), feerates = null)
                 } else {
                     CMD_FORCECLOSE
                 }

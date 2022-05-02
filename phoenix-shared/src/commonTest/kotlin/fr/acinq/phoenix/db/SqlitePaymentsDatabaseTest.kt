@@ -20,6 +20,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.ChannelUnavailable
@@ -64,7 +65,7 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__receive_lightning() = runTest {
         db.addIncomingPayment(preimage1, origin1, 0)
-        db.listReceivedPayments(10, 0)[0].let {
+        db.listIncomingPayments(10, 0)[0].let {
             assertEquals(paymentHash1, it.paymentHash)
             assertEquals(preimage1, it.preimage)
             assertEquals(origin1, it.origin)
@@ -85,7 +86,7 @@ class SqlitePaymentsDatabaseTest {
     @Test
     fun incoming__receive_new_channel() = runTest {
         db.addIncomingPayment(preimage1, origin3, 0)
-        db.listReceivedPayments(10, 0)[0].let {
+        db.listIncomingPayments(10, 0)[0].let {
             assertEquals(paymentHash1, it.paymentHash)
             assertEquals(preimage1, it.preimage)
             assertEquals(origin3, it.origin)
@@ -109,22 +110,24 @@ class SqlitePaymentsDatabaseTest {
         db.addIncomingPayment(preimage2, origin2, 15)
 
         // -- test ordering
-        db.listReceivedPayments(10, 0).let {
+        db.listIncomingPayments(10, 0).let {
             // older payments are last
             assertEquals(db.getIncomingPayment(paymentHash2), it[0])
             assertEquals(db.getIncomingPayment(paymentHash1), it[1])
         }
+
         db.receivePayment(paymentHash1, receivedWith1, 20)
-        db.listReceivedPayments(10, 0).let {
+        db.listIncomingPayments(10, 0).let {
             // reception date takes precedence over creation date
             assertEquals(db.getIncomingPayment(paymentHash1), it[0])
             assertTrue(it[0].received != null)
             assertEquals(db.getIncomingPayment(paymentHash2), it[1])
+            assertTrue(it[1].received == null)
         }
 
         // -- test paging
-        assertEquals(1, db.listReceivedPayments(10, 1).size)
-        assertEquals(0, db.listReceivedPayments(10, 2).size)
+        assertEquals(1, db.listIncomingPayments(10, 1).size)
+        assertEquals(0, db.listIncomingPayments(10, 2).size)
     }
 
     @Test
@@ -159,6 +162,43 @@ class SqlitePaymentsDatabaseTest {
         db.addIncomingPayment(preimage1, IncomingPayment.Origin.Invoice(expiredInvoice), 0)
         db.receivePayment(paymentHash1, receivedWith1, 10)
         assertTrue(db.getIncomingPayment(paymentHash1)!!.isExpired())
+    }
+
+    @Test
+    fun incoming__purge_expired() = runTest {
+        val expiredPreimage = randomBytes32()
+        val expiredInvoice = PaymentRequest.create(
+            chainHash = Block.TestnetGenesisBlock.hash,
+            amount = 150_000.msat,
+            paymentHash = Crypto.sha256(expiredPreimage).toByteVector32(),
+            privateKey = Lightning.randomKey(),
+            description ="invoice",
+            minFinalCltvExpiryDelta = CltvExpiryDelta(16),
+            features =  defaultFeatures,
+            timestampSeconds = 1
+        )
+        db.addIncomingPayment(expiredPreimage, IncomingPayment.Origin.Invoice(expiredInvoice), 0)
+        db.addIncomingPayment(preimage1, origin1, 100)
+        db.receivePayment(paymentHash1, receivedWith1, 150)
+
+        // -- the incoming payments list contains the expired payment
+        var allIncomingPayments = db.listIncomingPayments(count = 10, skip = 0, filters = emptySet())
+        assertEquals(2, allIncomingPayments.size)
+        assertEquals(expiredInvoice.paymentHash, allIncomingPayments[1].paymentHash)
+
+        // -- the expired incoming payments list contains the expired payment
+        var expiredPayments = db.listExpiredPayments(fromCreatedAt = 0, toCreatedAt = currentTimestampMillis())
+        assertEquals(1, expiredPayments.size)
+        assertEquals(expiredInvoice.paymentHash, expiredPayments[0].paymentHash)
+
+        val isDeleted = db.removeIncomingPayment(expiredInvoice.paymentHash)
+        assertTrue { isDeleted }
+
+        expiredPayments = db.listExpiredPayments(fromCreatedAt = 0, toCreatedAt = currentTimestampMillis())
+        assertEquals(0, expiredPayments.size)
+
+        allIncomingPayments = db.listIncomingPayments(count = 10, skip = 0, filters = emptySet())
+        assertEquals(1, allIncomingPayments.size)
     }
 
     private fun createOutgoing(): OutgoingPayment {
@@ -203,8 +243,8 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPart(it.id)) }
 
         // We should never update non-existing parts.
-        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
-        assertFalse { db.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Other payment parts are added.
         val newParts = listOf(
@@ -219,10 +259,12 @@ class SqlitePaymentsDatabaseTest {
         } else {
             assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
             // New parts must have a unique id.
-            assertFails { db.addOutgoingParts(
-                parentId = onePartFailed.id,
-                parts = newParts.map { it.copy(id = p.parts[0].id) }
-            ) }
+            assertFails {
+                db.addOutgoingParts(
+                    parentId = onePartFailed.id,
+                    parts = newParts.map { it.copy(id = p.parts[0].id) }
+                )
+            }
         }
 
         // Can add new parts to existing payment.
@@ -262,10 +304,12 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(paymentSucceeded, db.getOutgoingPayment(p.id))
 
         // Cannot succeed a payment that does not exist
-        assertFalse { db.outQueries.completeOutgoingPayment(
-            id = UUID.randomUUID(),
-            completed = paymentStatus
-        ) }
+        assertFalse {
+            db._doNotFreezeMe.outQueries.completeOutgoingPayment(
+                id = UUID.randomUUID(),
+                completed = paymentStatus
+            )
+        }
         // Using failed part id does not return a settled payment
         assertNull(db.getOutgoingPart(partsSettled.parts[0].id))
         partsSettled.parts.drop(1).forEach {
@@ -312,7 +356,7 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
 
         // Cannot fail a payment that does not exist
-        assertFalse { db.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
+        assertFalse { db._doNotFreezeMe.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {

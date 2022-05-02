@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.combine
 import plus
 
 data class Connections(
-    val internet: Connection = Connection.CLOSED,
-    val peer: Connection = Connection.CLOSED,
-    val electrum: Connection = Connection.CLOSED
+    val internet: Connection = Connection.CLOSED(reason = null),
+    val peer: Connection = Connection.CLOSED(reason = null),
+    val electrum: Connection = Connection.CLOSED(reason = null)
 ) {
     val global : Connection
         get() = internet + peer + electrum
@@ -50,7 +50,7 @@ class ConnectionsManager(
                     electrum = electrumState,
                     internet = when (internetState) {
                         NetworkState.Available -> Connection.ESTABLISHED
-                        NetworkState.NotAvailable -> Connection.CLOSED
+                        NetworkState.NotAvailable -> Connection.CLOSED(reason = null)
                     }
                 )
             }.collect {
