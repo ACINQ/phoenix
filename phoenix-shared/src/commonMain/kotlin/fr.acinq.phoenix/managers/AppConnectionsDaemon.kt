@@ -331,7 +331,7 @@ class AppConnectionsDaemon(
     ) = launch {
         var pause = Duration.seconds(0)
         statusStateFlow.collect {
-            if (it == Connection.CLOSED) {
+            if (it is Connection.CLOSED) {
                 logger.debug { "next $name connection attempt in $pause" }
                 delay(pause)
                 val minPause = Duration.seconds(0.25)

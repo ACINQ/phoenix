@@ -21,6 +21,7 @@ import androidx.datastore.preferences.core.*
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
@@ -76,8 +77,8 @@ object UserPrefs {
             log.info("retrieved preferred electrum=$address from datastore")
             if (address.contains(":")) {
                 val (host, port) = address.split(":")
-                ServerAddress(host, port.toInt())
-            } else ServerAddress(address, 50002)
+                ServerAddress(host, port.toInt(), TcpSocket.TLS.TRUSTED_CERTIFICATES)
+            } else ServerAddress(address, 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES)
         }
     }
     suspend fun saveElectrumServer(context: Context, address: String) = context.userPrefs.edit { it[PREFS_ELECTRUM_ADDRESS] = address }

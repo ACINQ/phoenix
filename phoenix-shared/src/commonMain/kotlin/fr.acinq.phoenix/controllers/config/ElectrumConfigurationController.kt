@@ -66,7 +66,7 @@ class AppElectrumConfigurationController(
                         intent.address.split(":").let {
                             val host = it.first()
                             val port = it.last()
-                            val serverAddress = ServerAddress(host, port.toInt(), TcpSocket.TLS.SAFE)
+                            val serverAddress = ServerAddress(host, port.toInt(), TcpSocket.TLS.TRUSTED_CERTIFICATES)
                             configurationManager.updateElectrumConfig(serverAddress)
                         }
                         null

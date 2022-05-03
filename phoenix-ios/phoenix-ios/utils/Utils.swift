@@ -2,12 +2,12 @@ import Foundation
 import PhoenixShared
 
 enum MsatsPolicy {
-	/// Millisatoshi amounts are always shown
-	case showMsats
 	/// Millisatoshi amounts are never shown
 	case hideMsats
-	/// Millisatoshi amounts are shown if: `0 < msats < 1,000`
-	case showIfZeroSats
+	/// Millisatoshi amounts are shown if non-zero
+	case showMsatsIfNonZero
+	/// Millisatoshi amounts are only shown if: `0 < msats < 1,000`
+	case showMsatsIfZeroSats
 }
 
 class Utils {
@@ -16,6 +16,10 @@ class Utils {
 	public static let Millisatoshis_Per_Bit          =         100_000.0
 	public static let Millisatoshis_Per_Millibitcoin =     100_000_000.0
 	public static let Millisatoshis_Per_Bitcoin      = 100_000_000_000.0
+	
+	// --------------------------------------------------
+	// MARK: Conversion
+	// --------------------------------------------------
 	
 	/// Converts to millisatoshi, the preferred unit for performing conversions.
 	///
@@ -44,11 +48,11 @@ class Utils {
 		}
 	}
 	
-	static func convertBitcoin(msat: Lightning_kmpMilliSatoshi, bitcoinUnit: BitcoinUnit) -> Double {
-		return convertBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit)
+	static func convertBitcoin(msat: Lightning_kmpMilliSatoshi, to bitcoinUnit: BitcoinUnit) -> Double {
+		return convertBitcoin(msat: msat.toLong(), to: bitcoinUnit)
 	}
 	
-	static func convertBitcoin(msat: Int64, bitcoinUnit: BitcoinUnit) -> Double {
+	static func convertBitcoin(msat: Int64, to bitcoinUnit: BitcoinUnit) -> Double {
 		
 		switch bitcoinUnit {
 			case .sat          : return Double(msat) / Millisatoshis_Per_Satoshi
@@ -70,6 +74,10 @@ class Utils {
 		
 		return fiat
 	}
+	
+	// --------------------------------------------------
+	// MARK: Standard Formatting
+	// --------------------------------------------------
 	
 	/// Formats the given amount of satoshis into a FormattedAmount struct,
 	/// which contains the various string values needed for display.
@@ -113,9 +121,10 @@ class Utils {
 		policy          : MsatsPolicy = .hideMsats
 	) -> FormattedAmount {
 		
-		if currencyPrefs.currencyType == .bitcoin {
+		switch currencyPrefs.currencyType {
+		case .bitcoin:
 			return formatBitcoin(msat: msat, bitcoinUnit: currencyPrefs.bitcoinUnit, policy: policy)
-		} else {
+		case .fiat:
 			let selectedFiat = currencyPrefs.fiatCurrency
 			if let exchangeRate = currencyPrefs.fiatExchangeRate(fiatCurrency: selectedFiat) {
 				return formatFiat(msat: msat, exchangeRate: exchangeRate)
@@ -125,24 +134,25 @@ class Utils {
 		}
 	}
 	
-	static func unknownFiatAmount(fiatCurrency: FiatCurrency) -> FormattedAmount {
-		
-		let decimalSeparator = NumberFormatter().currencyDecimalSeparator ?? "."
-		return FormattedAmount(
-			amount: 0.0,
-			currency: Currency.fiat(fiatCurrency),
-			digits: "?\(decimalSeparator)??",
-			decimalSeparator: decimalSeparator
-		)
-	}
+	// --------------------------------------------------
+	// MARK: Bitcoin Formatting
+	// --------------------------------------------------
 	
 	/// Returns a formatter that's appropriate for the given BitcoinUnit & configuration.
 	///
-	static func bitcoinFormatter(bitcoinUnit: BitcoinUnit, hideMsats: Bool = true) -> NumberFormatter {
+	static func bitcoinFormatter(
+		bitcoinUnit : BitcoinUnit,
+		hideMsats   : Bool = true,
+		locale      : Locale? = nil
+	) -> NumberFormatter {
 		
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
 		formatter.usesGroupingSeparator = true // thousands separator (US="10,000", FR="10 000")
+		
+		if let locale = locale {
+			formatter.locale = locale
+		}
 		
 		switch bitcoinUnit {
 			case .sat          : formatter.maximumFractionDigits = 0
@@ -154,6 +164,8 @@ class Utils {
 		if !hideMsats {
 			formatter.maximumFractionDigits += 3
 		}
+		
+		formatter.minimumFractionDigits = formatter.maximumFractionDigits
 		
 		// Rounding will respect our configured maximumFractionDigits.
 		//
@@ -190,19 +202,27 @@ class Utils {
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatBitcoin(sat: Bitcoin_kmpSatoshi, bitcoinUnit: BitcoinUnit) -> FormattedAmount {
+	static func formatBitcoin(
+		sat         : Bitcoin_kmpSatoshi,
+		bitcoinUnit : BitcoinUnit,
+		locale      : Locale? = nil
+	) -> FormattedAmount {
 		
-		return formatBitcoin(sat: sat.toLong(), bitcoinUnit: bitcoinUnit)
+		return formatBitcoin(sat: sat.toLong(), bitcoinUnit: bitcoinUnit, locale: locale)
 	}
 	
 	/// Converts from satoshis to the given BitcoinUnit.
 	///
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
-	static func formatBitcoin(sat: Int64, bitcoinUnit: BitcoinUnit) -> FormattedAmount {
+	static func formatBitcoin(
+		sat         : Int64,
+		bitcoinUnit : BitcoinUnit,
+		locale      : Locale? = nil
+	) -> FormattedAmount {
 		
 		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
-		return formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
+		return formatBitcoin(msat: msat, bitcoinUnit: bitcoinUnit, locale: locale)
 	}
 	
 	/// Converts from millisatoshis to the given BitcoinUnit.
@@ -213,10 +233,11 @@ class Utils {
 	static func formatBitcoin(
 		msat        : Lightning_kmpMilliSatoshi,
 		bitcoinUnit : BitcoinUnit,
-		policy      : MsatsPolicy = .hideMsats
+		policy      : MsatsPolicy = .hideMsats,
+		locale      : Locale? = nil
 	) -> FormattedAmount {
 		
-		return formatBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit, policy: policy)
+		return formatBitcoin(msat: msat.toLong(), bitcoinUnit: bitcoinUnit, policy: policy, locale: locale)
 	}
 	
 	/// Converts from millisatoshis to the given BitcoinUnit.
@@ -227,33 +248,42 @@ class Utils {
 	static func formatBitcoin(
 		msat        : Int64,
 		bitcoinUnit : BitcoinUnit,
-		policy      : MsatsPolicy = .hideMsats
+		policy      : MsatsPolicy = .hideMsats,
+		locale      : Locale? = nil
 	) -> FormattedAmount {
 		
-		let targetAmount: Double = convertBitcoin(msat: msat, bitcoinUnit: bitcoinUnit)
-		return formatBitcoin(amount: targetAmount, bitcoinUnit: bitcoinUnit, policy: policy)
+		let targetAmount: Double = convertBitcoin(msat: msat, to: bitcoinUnit)
+		return formatBitcoin(amount: targetAmount, bitcoinUnit: bitcoinUnit, policy: policy, locale: locale)
 	}
 	
 	static func formatBitcoin(
 		amount      : Double,
 		bitcoinUnit : BitcoinUnit,
-		policy      : MsatsPolicy = .hideMsats
+		policy      : MsatsPolicy = .hideMsats,
+		locale      : Locale? = nil
 	) -> FormattedAmount {
 		
 		let hideMsats: Bool
 		switch policy {
-			case .hideMsats: hideMsats = true
-			case .showMsats: hideMsats = false
-			case .showIfZeroSats:
-				let msats = toMsat(from: amount, bitcoinUnit: bitcoinUnit)
-				if (msats > 0) && (msats < 1_000) {
-					hideMsats = false
-				} else {
-					hideMsats = true
-				}
+		case .hideMsats:
+			hideMsats = true
+		case .showMsatsIfNonZero:
+			let msatsRemainder = toMsat(from: amount, bitcoinUnit: bitcoinUnit) % Int64(1_000)
+			if (msatsRemainder > 0) {
+				hideMsats = false
+			} else {
+				hideMsats = true
+			}
+		case .showMsatsIfZeroSats:
+			let totalMsats = toMsat(from: amount, bitcoinUnit: bitcoinUnit)
+			if (totalMsats > 0) && (totalMsats < 1_000) {
+				hideMsats = false
+			} else {
+				hideMsats = true
+			}
 		}
 		
-		let formatter = bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats)
+		let formatter = bitcoinFormatter(bitcoinUnit: bitcoinUnit, hideMsats: hideMsats, locale: locale)
 		
 		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
@@ -274,22 +304,26 @@ class Utils {
 			decimalSeparator: formatter.decimalSeparator
 		)
 		
-		if formatter.maximumFractionDigits > 3 {
-			// The number may have a large fraction component.
-			// See discussion in: FormattedAmount.withFormattedFractionDigits()
-			//
-			return formattedAmount.withFormattedFractionDigits()
-		} else {
-			return formattedAmount
-		}
+		return formattedAmount.withTruncatedFractionDigits().withFormattedFractionDigits()
 	}
+	
+	// --------------------------------------------------
+	// MARK: Fiat Formatting
+	// --------------------------------------------------
 	
 	/// Returns a formatter appropriate for any fiat currency.
 	///
-	static func fiatFormatter(fiatCurrency: FiatCurrency) -> NumberFormatter {
+	static func fiatFormatter(
+		fiatCurrency : FiatCurrency,
+		locale       : Locale? = nil
+	) -> NumberFormatter {
 		
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
+		
+		if let locale = locale {
+			formatter.locale = locale
+		}
 		
 		// The currency formatter embeds the currency symbol:
 		// - "$1,234.57"
@@ -340,33 +374,12 @@ class Utils {
 		// And the opposite problem occurs if an American (with currentLocale=en_US) formats COP,
 		// the result WILL display cents. Which is inappropriate for COP.
 		
-		if let locale = fiatCurrency.matchingLocales().first {
-			
-			// Unfortunately, we can't simply set formatter.locale.
-			// To continue the example from above:
-			//
-			// A Colombian (with currentLocale=es_CO) would expect to see: 12.345,67 USD
-			// An American (with currentLocale=en_US) would expect to see: 12,345 COP
-			//
-			// Changing the locale changes more than just the display of cents.
-			// It could also inappropriately change the grouping separator, decimal separator, etc.
-			//
-			// So we're going to try to just tweak the min/max fractionDigits.
-			
-			let altFormatter = formatter.copy() as! NumberFormatter
-			altFormatter.locale = locale
-			
-			if let str = altFormatter.string(from: NSNumber(value: 1.0)) {
-				
-				let usesCents = str.contains(altFormatter.currencyDecimalSeparator)
-				if usesCents {
-					formatter.minimumFractionDigits = 2
-					formatter.maximumFractionDigits = 2
-				} else {
-					formatter.minimumFractionDigits = 0
-					formatter.maximumFractionDigits = 0
-				}
-			}
+		if fiatCurrency.usesCents() {
+			formatter.minimumFractionDigits = 2
+			formatter.maximumFractionDigits = 2
+		} else {
+			formatter.minimumFractionDigits = 0
+			formatter.maximumFractionDigits = 0
 		}
 		
 		return formatter
@@ -377,11 +390,12 @@ class Utils {
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
 	static func formatFiat(
-		sat: Bitcoin_kmpSatoshi,
-		exchangeRate: ExchangeRate.BitcoinPriceRate
+		sat          : Bitcoin_kmpSatoshi,
+		exchangeRate : ExchangeRate.BitcoinPriceRate,
+		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
-		return formatFiat(sat: sat.toLong(), exchangeRate: exchangeRate)
+		return formatFiat(sat: sat.toLong(), exchangeRate: exchangeRate, locale: locale)
 	}
 	
 	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
@@ -389,12 +403,13 @@ class Utils {
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
 	static func formatFiat(
-		sat: Int64,
-		exchangeRate: ExchangeRate.BitcoinPriceRate
+		sat          : Int64,
+		exchangeRate : ExchangeRate.BitcoinPriceRate,
+		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
 		let msat = sat * Int64(Millisatoshis_Per_Satoshi)
-		return formatFiat(msat: msat, exchangeRate: exchangeRate)
+		return formatFiat(msat: msat, exchangeRate: exchangeRate, locale: locale)
 	}
 	
 	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
@@ -402,11 +417,12 @@ class Utils {
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
 	static func formatFiat(
-		msat: Lightning_kmpMilliSatoshi,
-		exchangeRate: ExchangeRate.BitcoinPriceRate
+		msat         : Lightning_kmpMilliSatoshi,
+		exchangeRate : ExchangeRate.BitcoinPriceRate,
+		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
-		return formatFiat(msat: msat.toLong(), exchangeRate: exchangeRate)
+		return formatFiat(msat: msat.toLong(), exchangeRate: exchangeRate, locale: locale)
 	}
 	
 	/// Converts from millisatoshi to a fiat amount, using the given exchange rate.
@@ -414,20 +430,22 @@ class Utils {
 	/// - Returns: A FormattedAmount struct, which contains the various string values needed for display.
 	///
 	static func formatFiat(
-		msat: Int64,
-		exchangeRate: ExchangeRate.BitcoinPriceRate
+		msat         : Int64,
+		exchangeRate : ExchangeRate.BitcoinPriceRate,
+		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
 		let fiatAmount = convertToFiat(msat: msat, exchangeRate: exchangeRate)
-		return formatFiat(amount: fiatAmount, fiatCurrency: exchangeRate.fiatCurrency)
+		return formatFiat(amount: fiatAmount, fiatCurrency: exchangeRate.fiatCurrency, locale: locale)
 	}
 	
 	static func formatFiat(
-		amount: Double,
-		fiatCurrency: FiatCurrency
+		amount       : Double,
+		fiatCurrency : FiatCurrency,
+		locale       : Locale? = nil
 	) -> FormattedAmount {
 		
-		let formatter = fiatFormatter(fiatCurrency: fiatCurrency)
+		let formatter = fiatFormatter(fiatCurrency: fiatCurrency, locale: locale)
 		
 		var digits = formatter.string(from: NSNumber(value: amount)) ?? amount.description
 		
@@ -446,6 +464,68 @@ class Utils {
 			currency: Currency.fiat(fiatCurrency),
 			digits: digits,
 			decimalSeparator: formatter.currencyDecimalSeparator
+		)
+	}
+	
+	// --------------------------------------------------
+	// MARK: Alt Formatting
+	// --------------------------------------------------
+	
+	static let hiddenCharacter = "\u{2217}" // asterisk operator
+	
+	static func hiddenAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
+		
+		switch currencyPrefs.currencyType {
+			case .bitcoin : return hiddenBitcoinAmount(currencyPrefs)
+			case .fiat    : return hiddenFiatAmount(currencyPrefs)
+		}
+	}
+	
+	static func hiddenBitcoinAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
+		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		return FormattedAmount(
+			amount: 0.0,
+			currency: Currency.bitcoin(currencyPrefs.bitcoinUnit),
+			digits: digits,
+			decimalSeparator: decimalSeparator
+		)
+	}
+	
+	static func hiddenFiatAmount(_ currencyPrefs: CurrencyPrefs) -> FormattedAmount {
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .currency
+		
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
+		let digits = "\(hiddenCharacter)\(hiddenCharacter)\(hiddenCharacter)"
+		
+		return FormattedAmount(
+			amount: 0.0,
+			currency: Currency.fiat(currencyPrefs.fiatCurrency),
+			digits: digits,
+			decimalSeparator: decimalSeparator
+		)
+	}
+	
+	static func unknownFiatAmount(fiatCurrency: FiatCurrency) -> FormattedAmount {
+		
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .currency
+		
+		let decimalSeparator: String = formatter.currencyDecimalSeparator ?? formatter.decimalSeparator ?? "."
+		let digits = fiatCurrency.usesCents() ? "?\(decimalSeparator)??" : "?"
+		
+		return FormattedAmount(
+			amount: 0.0,
+			currency: Currency.fiat(fiatCurrency),
+			digits: digits,
+			decimalSeparator: decimalSeparator
 		)
 	}
 }

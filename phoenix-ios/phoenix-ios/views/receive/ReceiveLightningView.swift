@@ -69,6 +69,14 @@ struct ReceiveLightningView: View {
 		UIApplication.willEnterForegroundNotification
 	)
 	
+	// For the cicular buttons: [copy, share, edit]
+	enum MaxButtonWidth: Preference {}
+	let maxButtonWidthReader = GeometryPreferenceReader(
+		key: AppendValue<MaxButtonWidth>.self,
+		value: { [$0.size.width] }
+	)
+	@State var maxButtonWidth: CGFloat? = nil
+	
 	// --------------------------------------------------
 	// MARK: ViewBuilders
 	// --------------------------------------------------
@@ -218,6 +226,7 @@ struct ReceiveLightningView: View {
 				shareButton()
 				editButton()
 			}
+			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			
 			warningButton(paddingTop: 8)
 			
@@ -263,6 +272,7 @@ struct ReceiveLightningView: View {
 				shareButton()
 				editButton()
 			}
+			.assignMaxPreference(for: maxButtonWidthReader.key, to: $maxButtonWidth)
 			.padding()
 			
 			VStack(alignment: HorizontalAlignment.center) {
@@ -330,7 +340,8 @@ struct ReceiveLightningView: View {
 	var qrCodeView: some View {
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-		   qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 		   let qrCodeImage = qrCode.image
 		{
 			qrCodeImage
@@ -376,9 +387,55 @@ struct ReceiveLightningView: View {
 	}
 	
 	@ViewBuilder
+	func actionButton(
+		text: String,
+		image: Image,
+		width: CGFloat = 20,
+		height: CGFloat = 20,
+		xOffset: CGFloat = 0,
+		yOffset: CGFloat = 0,
+		action: @escaping () -> Void
+	) -> some View {
+		
+		Button(action: action) {
+			VStack(alignment: HorizontalAlignment.center, spacing: 0) {
+				ZStack {
+					Color.buttonFill
+						.frame(width: 40, height: 40)
+						.cornerRadius(50)
+						.overlay(
+							RoundedRectangle(cornerRadius: 50)
+								.stroke(Color(UIColor.separator), lineWidth: 1)
+						)
+					
+					image
+						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
+						.frame(width: width, height: height)
+						.offset(x: xOffset, y: yOffset)
+				} // </ZStack>
+				
+				Text(text.lowercased())
+					.font(.caption)
+					.foregroundColor(Color.secondary)
+					.padding(.top, 2)
+				
+			} // </VStack>
+		} // </Button>
+		.frame(width: maxButtonWidth)
+		.read(maxButtonWidthReader)
+	}
+	
+	@ViewBuilder
 	func copyButton() -> some View {
 		
-		ReceiveView.copyButton {
+		actionButton(
+			text: NSLocalizedString("copy", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.on.square"),
+			width: 20, height: 20,
+			xOffset: 0, yOffset: 0
+		) {
 			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.Model_Generated))
@@ -393,7 +450,12 @@ struct ReceiveLightningView: View {
 	@ViewBuilder
 	func shareButton() -> some View {
 		
-		ReceiveView.shareButton {
+		actionButton(
+			text: NSLocalizedString("share", comment: "button label - try to make it short"),
+			image: Image(systemName: "square.and.arrow.up"),
+			width: 21, height: 21,
+			xOffset: 0, yOffset: -1
+		) {
 			// using simultaneousGesture's below
 		}
 		.disabled(!(mvi.model is Receive.Model_Generated))
@@ -408,7 +470,8 @@ struct ReceiveLightningView: View {
 	@ViewBuilder
 	func editButton() -> some View {
 		
-		ReceiveView.actionButton(
+		actionButton(
+			text: NSLocalizedString("edit", comment: "button label - try to make it short"),
 			image: Image(systemName: "square.and.pencil"),
 			width: 19, height: 19,
 			xOffset: 1, yOffset: -1
@@ -628,7 +691,9 @@ struct ReceiveLightningView: View {
 		
 		if let m = model as? Receive.Model_Generated {
 			log.debug("updating qr code...")
-			qrCode.generate(value: m.request)
+			
+			// Issue #196: Use uppercase lettering for invoices and address QRs
+			qrCode.generate(value: m.request.uppercased())
 		}
 	}
 	
@@ -767,7 +832,8 @@ struct ReceiveLightningView: View {
 		log.trace("copyImageToPasteboard()")
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-			qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)
@@ -813,7 +879,8 @@ struct ReceiveLightningView: View {
 		log.trace("shareImageToSystem()")
 		
 		if let m = mvi.model as? Receive.Model_Generated,
-			qrCode.value == m.request,
+		   let qrCodeValue = qrCode.value,
+		   qrCodeValue.caseInsensitiveCompare(m.request) == .orderedSame,
 			let qrCodeCgImage = qrCode.cgImage
 		{
 			let uiImg = UIImage(cgImage: qrCodeCgImage)

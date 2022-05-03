@@ -153,7 +153,8 @@ class PaymentsManager(
             paymentsDb().getIncomingPayment(id.paymentHash, options)?.let {
                 WalletPaymentInfo(
                     payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata()
+                    metadata = it.second ?: WalletPaymentMetadata(),
+                    fetchOptions = options
                 )
             }
         }
@@ -161,7 +162,8 @@ class PaymentsManager(
             paymentsDb().getOutgoingPayment(id.id, options)?.let {
                 WalletPaymentInfo(
                     payment = it.first,
-                    metadata = it.second ?: WalletPaymentMetadata()
+                    metadata = it.second ?: WalletPaymentMetadata(),
+                    fetchOptions = options
                 )
             }
         }

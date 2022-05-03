@@ -21,47 +21,51 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 		return _model!
 	}
 	
-	private let getController: ((ControllerFactory) -> MVIController<Model, Intent>)?
-	private var controller: MVIController<Model, Intent>?
+	private let _getController: ((ControllerFactory) -> MVIController<Model, Intent>)?
+	private var _controller: MVIController<Model, Intent>?
+	
+	var controller: MVIController<Model, Intent>? {
+		return _controller
+	}
 	
 	private var unsub: (() -> Void)? = nil
 	private var subCount: Int = 0
 
 	init(_ getController: @escaping (ControllerFactory) -> MVIController<Model, Intent>) {
-		self.getController = getController
-		self.controller = nil
+		_getController = getController
+		_controller = nil
 	}
 	
 	init(_ controller: MVIController<Model, Intent>) {
-		self.getController = nil
-		self.controller = controller
+		_getController = nil
+		_controller = controller
 		_model = controller.firstModel
 	}
-	
 
 	deinit {
-		let _unsub = unsub
-		let _controller = controller
+		let __unsub = unsub
+		let __controller = _controller
 		DispatchQueue.main.async {
-			_unsub?()
-			_controller?.stop()
+			__unsub?()
+			__controller?.stop()
 		}
 	}
 	
 	/// Called automatically when using MVIView.
 	/// 
 	fileprivate func initializeControllerIfNeeded(_ factory: ControllerFactory) -> Void {
-		if controller == nil {
-			if let getController = getController {
-				controller = getController(factory)
-				_model = controller!.firstModel
+		if _controller == nil {
+			if let getController = _getController {
+				let controller = getController(factory)
+				_controller = controller
+				_model = controller.firstModel
 			}
 		}
 	}
 
 	fileprivate func subscribe() {
 		if unsub == nil {
-			unsub = controller!.subscribe {[weak self](newModel: Model) in
+			unsub = _controller!.subscribe {[weak self](newModel: Model) in
 				self?._model = newModel
 			}
 		}
@@ -78,7 +82,7 @@ class MVIState<Model: MVI.Model, Intent: MVI.Intent>: ObservableObject {
 	}
 
 	func intent(_ intent: Intent) {
-		controller?.intent(intent: intent)
+		_controller?.intent(intent: intent)
 	}
 }
 

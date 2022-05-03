@@ -70,8 +70,7 @@ struct DisplayConfigurationView: View {
 						set: { Prefs.shared.theme = $0 }
 					), label: Text("App theme")
 				) {
-					ForEach(0 ..< Theme.allCases.count) {
-						let theme = Theme.allCases[$0]
+					ForEach(Theme.allCases, id: \.self) { theme in
 						Text(theme.localized()).tag(theme)
 					}
 				}
@@ -290,9 +289,7 @@ struct BitcoinUnitSelector: View, ViewName {
 		VStack(alignment: HorizontalAlignment.center, spacing: 0) {
 			
 			List {
-				let bitcoinUnits = BitcoinUnit.companion.values
-				ForEach(0 ..< bitcoinUnits.count) {
-					let bitcoinUnit = bitcoinUnits[$0]
+				ForEach(BitcoinUnit.companion.values) { bitcoinUnit in
 					Button {
 						didSelect(bitcoinUnit)
 					} label: {

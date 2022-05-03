@@ -215,10 +215,26 @@ class AppConfigurationManager(
     }
 
     // Fiat preferences
-    private val _preferredFiatCurrencies by lazy { MutableStateFlow<List<FiatCurrency>>(listOf()) }
-    fun preferredFiatCurrencies(): StateFlow<List<FiatCurrency>> = _preferredFiatCurrencies
+    data class PreferredFiatCurrencies(
+        val primary: FiatCurrency,
+        val others: Set<FiatCurrency>
+    ) {
+        constructor(primary: FiatCurrency, others: List<FiatCurrency>):
+            this(primary = primary, others = others.toSet())
 
-    fun updatePreferredFiatCurrencies(list: List<FiatCurrency>) {
-        _preferredFiatCurrencies.value = list
+        val all: Set<FiatCurrency> get() {
+            return if (others.contains(primary)) {
+                others
+            } else {
+                others.toMutableSet().apply { add(primary) }
+            }
+        }
+    }
+
+    private val _preferredFiatCurrencies by lazy { MutableStateFlow<PreferredFiatCurrencies?>(null) }
+    fun preferredFiatCurrencies(): StateFlow<PreferredFiatCurrencies?> = _preferredFiatCurrencies
+
+    fun updatePreferredFiatCurrencies(current: PreferredFiatCurrencies) {
+        _preferredFiatCurrencies.value = current
     }
 }

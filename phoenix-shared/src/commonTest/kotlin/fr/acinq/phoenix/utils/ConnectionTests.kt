@@ -20,20 +20,21 @@ import fr.acinq.lightning.utils.Connection
 import plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ConnectionTests {
     @Test
     fun connectionPlusOperator() {
         assertEquals(Connection.ESTABLISHED, Connection.ESTABLISHED + Connection.ESTABLISHED)
         assertEquals(Connection.ESTABLISHING, Connection.ESTABLISHING + Connection.ESTABLISHING)
-        assertEquals(Connection.CLOSED, Connection.CLOSED + Connection.CLOSED)
+        assertTrue(Connection.CLOSED(null) + Connection.CLOSED(null) is Connection.CLOSED)
 
         assertEquals(Connection.ESTABLISHING, Connection.ESTABLISHED + Connection.ESTABLISHING)
         assertEquals(Connection.ESTABLISHING, Connection.ESTABLISHING + Connection.ESTABLISHED)
-        assertEquals(Connection.ESTABLISHING, Connection.CLOSED + Connection.ESTABLISHING)
-        assertEquals(Connection.ESTABLISHING, Connection.ESTABLISHING + Connection.CLOSED)
+        assertEquals(Connection.ESTABLISHING, Connection.CLOSED(null) + Connection.ESTABLISHING)
+        assertEquals(Connection.ESTABLISHING, Connection.ESTABLISHING + Connection.CLOSED(null))
 
-        assertEquals(Connection.CLOSED, Connection.ESTABLISHED + Connection.CLOSED)
-        assertEquals(Connection.CLOSED, Connection.CLOSED + Connection.ESTABLISHED)
+        assertTrue(Connection.ESTABLISHED + Connection.CLOSED(null) is Connection.CLOSED)
+        assertTrue(Connection.CLOSED(null) + Connection.ESTABLISHED is Connection.CLOSED)
     }
 }

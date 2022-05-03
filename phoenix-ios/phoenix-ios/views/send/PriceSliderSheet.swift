@@ -39,7 +39,7 @@ struct PriceSliderSheet: View {
 	init(flowType: FlowType, msat: Int64, valueChanged: @escaping (Int64) -> Void) {
 		self.flowType = flowType
 		self.valueChanged = valueChanged
-		_amountSats = State(initialValue: Utils.convertBitcoin(msat: msat, bitcoinUnit: .sat))
+		_amountSats = State(initialValue: Utils.convertBitcoin(msat: msat, to: .sat))
 	}
 	
 	// The Slider family works with BinaryFloatingPoint.
@@ -248,8 +248,7 @@ struct PriceSliderSheet: View {
 		if case .pay(_) = flowType, !recentPercents.isEmpty {
 			
 			HStack(alignment: VerticalAlignment.center, spacing: 0) {
-				ForEach(0 ..< recentPercents.count) { idx in
-					let percent = recentPercents[idx]
+				ForEach(recentPercents, id: \.self) { percent in
 					Button {
 						recentButtonTapped(percent)
 					} label: {
@@ -258,10 +257,11 @@ struct PriceSliderSheet: View {
 							.padding(.horizontal, 12)
 					}
 					.buttonStyle(ScaleButtonStyle(
+						cornerRadius: 16,
 						backgroundFill: Color(UIColor.systemGroupedBackground), // secondarySystemBackground
 						borderStroke: Color.appAccent
 					))
-					if idx+1 < recentPercents.count {
+					if percent != recentPercents.last {
 						Spacer()
 					}
 				} // </ForEach>
@@ -470,7 +470,7 @@ struct PriceSliderSheet: View {
 		}
 		
 		let newMsat = percentToMsat(floorPercent / 100.0)
-		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+		amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 	}
 	
 	func plusButtonTapped() {
@@ -497,7 +497,7 @@ struct PriceSliderSheet: View {
 		}
 		
 		let newMsat = percentToMsat(ceilingPercent / 100.0)
-		amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+		amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 	}
 	
 	func recentPercents() -> [Int] {
@@ -547,7 +547,9 @@ struct PriceSliderSheet: View {
 				if let minDiff = diffs.min(), let minIdx = diffs.firstIndex(of: minDiff) {
 					
 					let defaultValue = extras.remove(at: minIdx)
-					recents.append(defaultValue)
+					if !recents.contains(defaultValue) {
+						recents.append(defaultValue)
+					}
 				}
 				
 			} while recents.count < targetCount && !extras.isEmpty
@@ -566,7 +568,7 @@ struct PriceSliderSheet: View {
 			// - anything above min is treated like a tip
 			
 			let newMsat = percentToMsat(Double(percent) / 100.0)
-			amountSats = Utils.convertBitcoin(msat: newMsat, bitcoinUnit: .sat)
+			amountSats = Utils.convertBitcoin(msat: newMsat, to: .sat)
 		}
 	}
 	

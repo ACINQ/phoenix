@@ -12,11 +12,13 @@ fileprivate var log = Logger(OSLog.disabled)
 #endif
 
 struct GlobalEnvironment: ViewModifier {
+	static var deviceInfo = DeviceInfo()
 	static var currencyPrefs = CurrencyPrefs()
 	static var deepLinkManager = DeepLinkManager()
 
 	func body(content: Self.Content) -> some View {
 		content
+			.environmentObject(Self.deviceInfo)
 			.environmentObject(Self.currencyPrefs)
 			.environmentObject(Self.deepLinkManager)
 	}

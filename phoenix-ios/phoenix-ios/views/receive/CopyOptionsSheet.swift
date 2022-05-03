@@ -37,6 +37,7 @@ struct CopyOptionsSheet: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					cornerRadius: 16,
 					borderStroke: Color.appAccent
 				)
 			)
@@ -62,6 +63,7 @@ struct CopyOptionsSheet: View {
 			}
 			.buttonStyle(
 				ScaleButtonStyle(
+					cornerRadius: 16,
 					borderStroke: Color.appAccent
 				)
 			)

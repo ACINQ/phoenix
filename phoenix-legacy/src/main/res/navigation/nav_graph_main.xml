@@ -381,6 +381,9 @@
     <action
       android:id="@+id/action_list_channels_to_channel_details"
       app:destination="@id/channel_details" />
+    <action
+      android:id="@+id/action_list_channels_to_channels_import"
+      app:destination="@id/channels_import" />
   </fragment>
 
   <!-- settings: channel details dialog -->
@@ -485,5 +488,12 @@
       android:name="version"
       app:argType="long" />
   </fragment>
+
+  <!-- settings: channels import dialog -->
+  <dialog
+    android:id="@+id/channels_import"
+    android:name="fr.acinq.phoenix.legacy.settings.ChannelsImportDialog"
+    android:label="channels_import">
+  </dialog>
 
 </navigation>

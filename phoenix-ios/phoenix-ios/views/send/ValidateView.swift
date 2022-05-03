@@ -303,6 +303,7 @@ struct ValidateView: View {
 				.padding([.leading, .trailing], 24)
 			}
 			.buttonStyle(ScaleButtonStyle(
+				cornerRadius: 100,
 				backgroundFill: Color.appAccent,
 				disabledBackgroundFill: Color.gray
 			))
@@ -806,7 +807,11 @@ struct ValidateView: View {
 		
 		if let amount_msat = amount_msat {
 			
-			let formattedAmt = Utils.formatBitcoin(msat: amount_msat, bitcoinUnit: bitcoinUnit, policy: .showMsats)
+			let formattedAmt = Utils.formatBitcoin(
+				msat: amount_msat,
+				bitcoinUnit: bitcoinUnit,
+				policy: .showMsatsIfNonZero
+			)
 			
 			parsedAmount = Result.success(formattedAmt.amount) // do this first !
 			amount = formattedAmt.digits
@@ -1136,10 +1141,6 @@ struct ValidateView: View {
 			if let flowType = flowType {
 				
 				priceSliderVisible = true
-				shortSheetState.onNextWillDisappear {
-					priceSliderVisible = false
-				}
-				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
 					
@@ -1148,6 +1149,9 @@ struct ValidateView: View {
 						msat: msat,
 						valueChanged: priceSliderChanged
 					)
+					
+				} onWillDisappear: {
+					priceSliderVisible = false
 				}
 			}
 			
@@ -1227,12 +1231,6 @@ struct ValidateView: View {
 				
 				let maxCommentLength = model.lnurlPay.maxCommentLength?.intValue ?? 140
 				
-				shortSheetState.onNextWillDisappear {
-					
-					log.debug("shortSheetState.onNextWillDisappear {}")
-					hasPromptedForComment = true
-				}
-				
 				dismissKeyboardIfVisible()
 				shortSheetState.display(dismissable: true) {
 					
@@ -1241,6 +1239,11 @@ struct ValidateView: View {
 						maxCommentLength: maxCommentLength,
 						sendButtonAction: { sendPayment() }
 					)
+				
+				} onWillDisappear: {
+					
+					log.debug("shortSheetState.onWillDisappear {}")
+					hasPromptedForComment = true
 				}
 				
 			} else {
@@ -1306,9 +1309,16 @@ struct ValidateView: View {
 			let formattedAmt: FormattedAmount
 			switch newAmt.currency {
 			case .bitcoin(let bitcoinUnit):
-				formattedAmt = Utils.formatBitcoin(amount: newAmt.amount, bitcoinUnit: bitcoinUnit, policy: .showMsats)
+				formattedAmt = Utils.formatBitcoin(
+					amount: newAmt.amount,
+					bitcoinUnit: bitcoinUnit,
+					policy: .showMsatsIfNonZero
+				)
 			case .fiat(let fiatCurrency):
-				formattedAmt = Utils.formatFiat(amount: newAmt.amount, fiatCurrency: fiatCurrency)
+				formattedAmt = Utils.formatFiat(
+					amount: newAmt.amount,
+					fiatCurrency: fiatCurrency
+				)
 			}
 
 			parsedAmount = Result.success(newAmt.amount)

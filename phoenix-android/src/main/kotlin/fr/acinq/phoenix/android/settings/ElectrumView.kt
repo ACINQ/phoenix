@@ -88,7 +88,7 @@ fun ElectrumView() {
                 SettingInteractive(
                     title = stringResource(id = R.string.electrum_server_connection),
                     description = when (model.connection) {
-                        Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
+                        is Connection.CLOSED -> if (config is ElectrumConfig.Custom) {
                             stringResource(id = R.string.electrum_not_connected_to_custom, config.server.host)
                         } else {
                             stringResource(id = R.string.electrum_not_connected)

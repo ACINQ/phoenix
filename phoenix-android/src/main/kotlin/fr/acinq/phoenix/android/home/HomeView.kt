@@ -224,7 +224,7 @@ fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State
             .height(40.dp)
             .clipToBounds()
     ) {
-        if (connectionsState.value.electrum == Connection.CLOSED || connectionsState.value.peer == Connection.CLOSED) {
+        if (connectionsState.value.electrum is Connection.CLOSED || connectionsState.value.peer is Connection.CLOSED) {
             val connectionsTransition = rememberInfiniteTransition()
             val connectionsButtonAlpha by connectionsTransition.animateFloat(
                 initialValue = 0.3f,

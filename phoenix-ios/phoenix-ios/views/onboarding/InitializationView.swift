@@ -76,17 +76,17 @@ struct InitializationView: MVIView {
 							.imageScale(.small)
 						Text("Create new wallet")
 					}
+					.foregroundColor(Color.white)
+					.font(.title3)
 					.read(buttonWidthReader)
 					.frame(width: buttonWidth)
-					.font(.title3)
 					.padding([.top, .bottom], 8)
 					.padding([.leading, .trailing], 16)
 				}
 				.buttonStyle(
 					ScaleButtonStyle(
-						backgroundFill: Color.primaryBackground,
-						borderStroke: Color.appAccent,
-						disabledBorderStroke: Color(UIColor.separator)
+						cornerRadius: 100,
+						backgroundFill: Color.appAccent
 					)
 				)
 				.padding(.bottom, 40)
@@ -97,17 +97,18 @@ struct InitializationView: MVIView {
 							.imageScale(.small)
 						Text("Restore my wallet")
 					}
+					.foregroundColor(Color.primary)
+					.font(.title3)
 					.read(buttonWidthReader)
 					.frame(width: buttonWidth)
-					.font(.title3)
 					.padding([.top, .bottom], 8)
 					.padding([.leading, .trailing], 16)
 				}
 				.buttonStyle(
 					ScaleButtonStyle(
+						cornerRadius: 100,
 						backgroundFill: Color.primaryBackground,
-						borderStroke: Color.appAccent,
-						disabledBorderStroke: Color(UIColor.separator)
+						borderStroke: Color.appAccent
 					)
 				)
 				.padding([.top, .bottom], 0)

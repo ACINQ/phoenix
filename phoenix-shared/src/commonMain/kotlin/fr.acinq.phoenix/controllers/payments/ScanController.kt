@@ -130,48 +130,28 @@ class AppScanController(
     private suspend fun processIntent(
         intent: Scan.Intent.Parse
     ) {
-        val input = intent.request.replace("\\u00A0", "").trim() // \u00A0 = '\n'
+        val input = stringPrep(intent.request)
 
         // Is it a Lightning invoice ?
-        readPaymentRequest(input)?.let { return when (it) {
-            is Either.Left -> { // it.value: Scan.BadRequestReason
-                model(Scan.Model.BadRequest(it.value))
+        readPaymentRequest(input)?.let { paymentRequest ->
+            checkForBadRequest(paymentRequest)?.let {
+                return model(Scan.Model.BadRequest(it))
             }
-            is Either.Right -> {
-                val paymentRequest = it.value
-                val isDangerousAmountless = if (paymentRequest.amount != null) {
-                    false
-                } else {
-                    // amountless invoice -> dangerous unless full trampoline is in effect
-                    val features = Features(paymentRequest.features)
-                    !features.hasFeature(Feature.TrampolinePayment)
-                }
-                when {
-                    isDangerousAmountless -> {
-                        model(Scan.Model.InvoiceFlow.DangerousRequest(
-                            reason = Scan.DangerousRequestReason.IsAmountlessInvoice,
-                            request = intent.request,
-                            paymentRequest = paymentRequest
-                        ))
-                    }
-                    paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId -> {
-                        model(Scan.Model.InvoiceFlow.DangerousRequest(
-                            reason = Scan.DangerousRequestReason.IsOwnInvoice,
-                            request = intent.request,
-                            paymentRequest = paymentRequest
-                        ))
-                    }
-                    else -> {
-                        val balance = getBalance()
-                        model(Scan.Model.InvoiceFlow.InvoiceRequest(
-                            request = intent.request,
-                            paymentRequest = paymentRequest,
-                            balanceMsat = balance.msat
-                        ))
-                    }
-                }
+            checkForDangerousRequest(paymentRequest)?.let {
+                return model(Scan.Model.InvoiceFlow.DangerousRequest(
+                    reason = it,
+                    request = intent.request,
+                    paymentRequest = paymentRequest
+                ))
             }
-        }}
+
+            val balance = getBalance()
+            return model(Scan.Model.InvoiceFlow.InvoiceRequest(
+                request = intent.request,
+                paymentRequest = paymentRequest,
+                balanceMsat = balance.msat
+            ))
+        }
 
         // Is it an LNURL ?
         readLNURL(input)?.let { return when (it) {
@@ -530,6 +510,45 @@ class AppScanController(
         }
     }
 
+    suspend fun inspectClipboard(string: String): Scan.ClipboardContent? {
+        val input = stringPrep(string)
+
+        // Is it a Lightning invoice ?
+        readPaymentRequest(input)?.let {
+            return Scan.ClipboardContent.InvoiceRequest(it)
+        }
+
+        // Is it an LNURL ?
+        readLNURL(input)?.let { return when (it) {
+            is Either.Left -> { // it.value: LnUrl.Auth
+                Scan.ClipboardContent.LoginRequest(it.value)
+            }
+            is Either.Right -> { // it.value: Url
+                Scan.ClipboardContent.LnurlRequest(it.value)
+            }
+        }}
+
+        // Is it a bitcoin address ?
+        readBitcoinAddress(input).let { when (it) {
+            is Either.Left -> { // it.value: Scan.BadRequestReason
+                // ignore/continue
+            }
+            is Either.Right -> { // it.value: Utilities.BitcoinAddressInfo
+                it.value.params.get("lightning")?.let { lnParam ->
+                    return inspectClipboard(lnParam)
+                }
+            }
+        }}
+
+        return null
+    }
+
+    private fun stringPrep(input: String): String {
+        return input
+            .replace("\\u00A0", "") // \u00A0 = '\n'
+            .trim() // leading & trailing whitespace
+    }
+
     private fun trimMatchingPrefix(
         input: String,
         prefixes: List<String>
@@ -550,21 +569,26 @@ class AppScanController(
 
     private suspend fun readPaymentRequest(
         input: String
-    ) : Either<Scan.BadRequestReason, PaymentRequest>? {
+    ) : PaymentRequest? {
 
         val (_, request) = trimMatchingPrefix(input, listOf(
             "lightning://", "lightning:", "bitcoin://", "bitcoin:"
         ))
 
-        val paymentRequest = try {
+        return try {
             PaymentRequest.read(request) // <- throws
         } catch (t: Throwable) {
-            return null
+            null
         }
+    }
+
+    private suspend fun checkForBadRequest(
+        paymentRequest: PaymentRequest
+    ): Scan.BadRequestReason? {
 
         val requestChain = paymentRequest.chain()
         if (chain != requestChain) {
-            return Either.Left(Scan.BadRequestReason.ChainMismatch(chain, requestChain))
+            return Scan.BadRequestReason.ChainMismatch(chain, requestChain)
         }
 
         val db = databaseManager.databases.filterNotNull().first()
@@ -572,10 +596,27 @@ class AppScanController(
             it.status is OutgoingPayment.Status.Completed.Succeeded
         }
         return if (previousInvoicePayment != null) {
-            Either.Left(Scan.BadRequestReason.AlreadyPaidInvoice)
+            Scan.BadRequestReason.AlreadyPaidInvoice
         } else {
-            Either.Right(paymentRequest)
+            null
         }
+    }
+
+    private suspend fun checkForDangerousRequest(
+        paymentRequest: PaymentRequest
+    ): Scan.DangerousRequestReason? {
+
+        if (paymentRequest.amount == null) {
+            // amountless invoice -> dangerous unless full trampoline is in effect
+            val features = Features(paymentRequest.features)
+            if (!features.hasFeature(Feature.TrampolinePayment)) {
+                return Scan.DangerousRequestReason.IsAmountlessInvoice
+            }
+        }
+        if (paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId) {
+            return Scan.DangerousRequestReason.IsOwnInvoice
+        }
+        return null
     }
 
     private fun readLNURL(input: String): Either<LNUrl.Auth, Url>? {

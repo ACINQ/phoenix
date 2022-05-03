@@ -7,7 +7,7 @@ object Versions {
     const val serialization = "1.2.2"
 
     const val ktor = "1.6.3"
-    const val sqlDelight = "1.5.0"
+    const val sqlDelight = "1.5.3"
     const val kodeinMemory = "0.8.0"
 
     const val slf4j = "1.7.30"
