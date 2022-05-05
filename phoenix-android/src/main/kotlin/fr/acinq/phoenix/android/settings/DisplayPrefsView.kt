@@ -42,7 +42,7 @@ fun DisplayPrefsView() {
         SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
         Card {
             BitcoinUnitPreference(context = context, scope = scope)
-            FiatCurrencyPreference(context = context, scope = scope)
+            //FiatCurrencyPreference(context = context, scope = scope)
             UserThemePreference(context = context, scope = scope)
         }
     }
@@ -53,8 +53,8 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
     var prefsEnabled by remember { mutableStateOf(true) }
     val preferences = listOf(
         PreferenceItem(item = BitcoinUnit.Sat, title = BitcoinUnit.Sat.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
-        PreferenceItem(item = BitcoinUnit.Bit, title = BitcoinUnit.Bit.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
-        PreferenceItem(item = BitcoinUnit.MBtc, title = BitcoinUnit.MBtc.label(), description = stringResource(id = R.string.prefs_display_coin_sat_desc)),
+        PreferenceItem(item = BitcoinUnit.Bit, title = BitcoinUnit.Bit.label(), description = stringResource(id = R.string.prefs_display_coin_bit_desc)),
+        PreferenceItem(item = BitcoinUnit.MBtc, title = BitcoinUnit.MBtc.label(), description = stringResource(id = R.string.prefs_display_coin_mbtc_desc)),
         PreferenceItem(item = BitcoinUnit.Btc, title = BitcoinUnit.Btc.label()),
     )
     val currentPref = LocalBitcoinUnit.current
