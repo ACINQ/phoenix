@@ -42,7 +42,7 @@ fun DisplayPrefsView() {
         SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
         Card {
             BitcoinUnitPreference(context = context, scope = scope)
-            //FiatCurrencyPreference(context = context, scope = scope)
+            FiatCurrencyPreference(context = context, scope = scope)
             UserThemePreference(context = context, scope = scope)
         }
     }
@@ -77,9 +77,14 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
 @Composable
 private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
-    val preferences = FiatCurrency.values.map {
+
+    val elements = FiatCurrency.values.toMutableList()
+    elements.remove(FiatCurrency.ARS_BM)
+
+    val preferences = elements.map {
         PreferenceItem(it, it.label())
     }
+
     val currentPref = LocalFiatCurrency.current
     ListPreferenceButton(
         title = stringResource(id = R.string.prefs_display_fiat_label),
