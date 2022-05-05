@@ -46,7 +46,7 @@ fun BitcoinUnit.label(): String = when (this) {
 
 @Composable
 fun FiatCurrency.label(): String = remember(key1 = this.name) {
-    Currency.getInstance(this.name).displayName
+    "(" + this.name + ") " + if (this.name.length == 3) Currency.getInstance(this.name).displayName else ""
 }
 
 @Composable

@@ -78,10 +78,7 @@ private fun BitcoinUnitPreference(context: Context, scope: CoroutineScope) {
 private fun FiatCurrencyPreference(context: Context, scope: CoroutineScope) {
     var prefEnabled by remember { mutableStateOf(true) }
 
-    val elements = FiatCurrency.values.toMutableList()
-    elements.remove(FiatCurrency.ARS_BM)
-
-    val preferences = elements.map {
+    val preferences = FiatCurrency.values.map {
         PreferenceItem(it, it.label())
     }
 
