@@ -3,7 +3,6 @@ package fr.acinq.phoenix.db.cloud
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.phoenix.db.payments.*
@@ -23,12 +22,12 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
-    constructor(payment: OutgoingPayment): this(
+    constructor(payment: OutgoingPayment) : this(
         id = payment.id,
         msat = payment.recipientAmount.msat,
         recipient = payment.recipient.value.toByteArray(),
         details = DetailsWrapper(payment.details),
-        parts = payment.parts.map { OutgoingPartWrapper(it) },
+        parts = payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().map { OutgoingPartWrapper(it) },
         status = StatusWrapper(payment.status),
         createdAt = payment.createdAt
     )
@@ -111,7 +110,8 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
 
     } // </StatusWrapper>
 
-} // </OutgoingPaymentData>
+    companion object
+} // </OutgoingPaymentWrapper>
 
 @OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.cborSerialize(): ByteArray {
@@ -120,10 +120,8 @@ fun OutgoingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun OutgoingPaymentWrapper.Companion.cborDeserialize(blob: ByteArray): OutgoingPayment? {
-    var result: OutgoingPayment? = null
-    try {
-        result = Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
-    } catch (e: Throwable) {}
-    return result
+fun OutgoingPaymentWrapper.cborDeserialize(blob: ByteArray): OutgoingPayment? = try {
+    Cbor.decodeFromByteArray<OutgoingPaymentWrapper>(blob).unwrap()
+} catch (e: Throwable) {
+    null
 }

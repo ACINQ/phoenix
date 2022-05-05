@@ -25,6 +25,7 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.channel.ChannelException
 import fr.acinq.lightning.db.*
+import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.ensureNeverFrozen
@@ -36,16 +37,11 @@ import fr.acinq.phoenix.data.WalletPaymentMetadata
 import fr.acinq.phoenix.data.walletPaymentId
 import fr.acinq.phoenix.db.payments.*
 import fr.acinq.phoenix.managers.CurrencyManager
-import fracinqphoenixdb.Incoming_payments
-import fracinqphoenixdb.Outgoing_payment_parts
-import fracinqphoenixdb.Outgoing_payments
-import fracinqphoenixdb.Payments_metadata
+import fracinqphoenixdb.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
-import org.kodein.log.LoggerFactory
-import org.kodein.log.newLogger
 
 class SqlitePaymentsDb(
     driver: SqlDriver,
@@ -103,6 +99,9 @@ class SqlitePaymentsDb(
                 lnurl_base_typeAdapter = EnumColumnAdapter(),
                 lnurl_metadata_typeAdapter = EnumColumnAdapter(),
                 lnurl_successAction_typeAdapter = EnumColumnAdapter()
+            ),
+            outgoing_payment_closing_tx_partsAdapter = Outgoing_payment_closing_tx_parts.Adapter(
+                part_closing_info_typeAdapter = EnumColumnAdapter()
             )
         )
         val inQueries = IncomingQueries(database)
@@ -121,14 +120,14 @@ class SqlitePaymentsDb(
 
     private var metadataQueue = MutableStateFlow(mapOf<WalletPaymentId, WalletPaymentMetadataRow>())
 
-    override suspend fun addOutgoingParts(
+    override suspend fun addOutgoingLightningParts(
         parentId: UUID,
-        parts: List<OutgoingPayment.Part>
+        parts: List<OutgoingPayment.LightningPart>
     ) {
         val outQueries = _doNotFreezeMe.outQueries
 
         withContext(Dispatchers.Default) {
-            outQueries.addOutgoingParts(parentId, parts)
+            outQueries.addLightningParts(parentId, parts)
         }
     }
 
@@ -144,28 +143,52 @@ class SqlitePaymentsDb(
 
         withContext(Dispatchers.Default) {
             database.transaction {
-                outQueries.addOutgoingPayment(outgoingPayment)
+                outQueries.addPayment(outgoingPayment)
                 // Add associated metadata within the same atomic database transaction.
                 if (!metadataRow.isEmpty()) {
                     metaQueries.addMetadata(paymentId, metadataRow)
                 }
             }
-
         }
     }
 
-    override suspend fun completeOutgoingPayment(
+    override suspend fun completeOutgoingPaymentForClosing(
         id: UUID,
-        completed: OutgoingPayment.Status.Completed
+        parts: List<OutgoingPayment.ClosingTxPart>,
+        completedAt: Long
     ) {
         val outQueries = _doNotFreezeMe.outQueries
 
         withContext(Dispatchers.Default) {
-            outQueries.completeOutgoingPayment(id, completed)
+            outQueries.completePaymentForClosing(id, parts, OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt))
         }
     }
 
-    override suspend fun updateOutgoingPart(
+    override suspend fun completeOutgoingPaymentOffchain(
+        id: UUID,
+        preimage: ByteVector32,
+        completedAt: Long
+    ) {
+        val outQueries = _doNotFreezeMe.outQueries
+
+        withContext(Dispatchers.Default) {
+            outQueries.completePayment(id, OutgoingPayment.Status.Completed.Succeeded.OffChain(preimage, completedAt))
+        }
+    }
+
+    override suspend fun completeOutgoingPaymentFailed(
+        id: UUID,
+        finalFailure: FinalFailure,
+        completedAt: Long
+    ) {
+        val outQueries = _doNotFreezeMe.outQueries
+
+        withContext(Dispatchers.Default) {
+            outQueries.completePayment(id, OutgoingPayment.Status.Completed.Failed(finalFailure, completedAt))
+        }
+    }
+
+    override suspend fun completeOutgoingLightningPart(
         partId: UUID,
         preimage: ByteVector32,
         completedAt: Long
@@ -173,11 +196,11 @@ class SqlitePaymentsDb(
         val outQueries = _doNotFreezeMe.outQueries
 
         withContext(Dispatchers.Default) {
-            outQueries.updateOutgoingPart(partId, preimage, completedAt)
+            outQueries.updateLightningPart(partId, preimage, completedAt)
         }
     }
 
-    override suspend fun updateOutgoingPart(
+    override suspend fun completeOutgoingLightningPart(
         partId: UUID,
         failure: Either<ChannelException, FailureMessage>,
         completedAt: Long
@@ -185,17 +208,17 @@ class SqlitePaymentsDb(
         val outQueries = _doNotFreezeMe.outQueries
 
         withContext(Dispatchers.Default) {
-            outQueries.updateOutgoingPart(partId, failure, completedAt)
+            outQueries.updateLightningPart(partId, failure, completedAt)
         }
     }
 
-    override suspend fun getOutgoingPart(
+    override suspend fun getOutgoingPaymentFromPartId(
         partId: UUID
     ): OutgoingPayment? {
         val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
-            outQueries.getOutgoingPart(partId)
+            outQueries.getPaymentFromPartId(partId)
         }
     }
 
@@ -205,7 +228,7 @@ class SqlitePaymentsDb(
         val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
-            outQueries.getOutgoingPayment(id)
+            outQueries.getPayment(id)
         }
     }
 
@@ -219,7 +242,7 @@ class SqlitePaymentsDb(
 
         return withContext(Dispatchers.Default) {
             database.transactionWithResult {
-                outQueries.getOutgoingPayment(id)?.let { payment ->
+                outQueries.getPayment(id)?.let { payment ->
                     val metadata = metaQueries.getMetadata(
                         id = WalletPaymentId.OutgoingPaymentId(id),
                         options = options
@@ -238,7 +261,7 @@ class SqlitePaymentsDb(
         val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
-            outQueries.listOutgoingPayments(paymentHash)
+            outQueries.listPayments(paymentHash)
         }
     }
 
@@ -251,7 +274,7 @@ class SqlitePaymentsDb(
         val outQueries = _doNotFreezeMe.outQueries
 
         return withContext(Dispatchers.Default) {
-            outQueries.listOutgoingPayments(count, skip)
+            outQueries.listPayments(count, skip)
         }
     }
 
@@ -528,7 +551,7 @@ class SqlitePaymentsDb(
                         )
                     }
                     is WalletPaymentId.OutgoingPaymentId -> {
-                        database.outgoingPaymentsQueries.deletePaymentParts(
+                        database.outgoingPaymentsQueries.deleteLightningPartsForParentId(
                             part_parent_id = paymentId.dbId
                         )
                         database.outgoingPaymentsQueries.deletePayment(
@@ -590,11 +613,12 @@ data class WalletPaymentOrderRow(
      * - "outgoing|id|createdAt|completedAt|metadataModifiedAt"
      * - "incoming|paymentHash|createdAt|completedAt|metadataModifiedAt"
      */
-    val identifier: String get() {
-        return this.staleIdentifierPrefix +
-                (completedAt?.toString() ?: "null") + "|" +
-                (metadataModifiedAt?.toString() ?: "null")
-    }
+    val identifier: String
+        get() {
+            return this.staleIdentifierPrefix +
+                    (completedAt?.toString() ?: "null") + "|" +
+                    (metadataModifiedAt?.toString() ?: "null")
+        }
 
     /**
      * Returns a prefix that can be used to detect older (stale) versions of the row.
@@ -602,9 +626,10 @@ data class WalletPaymentOrderRow(
      * - "outgoing|id|createdAt|"
      * - "incoming|paymentHash|createdAt|"
      */
-    val staleIdentifierPrefix: String get() {
-        return "${id.identifier}|${createdAt}|"
-    }
+    val staleIdentifierPrefix: String
+        get() {
+            return "${id.identifier}|${createdAt}|"
+        }
 }
 
 /**

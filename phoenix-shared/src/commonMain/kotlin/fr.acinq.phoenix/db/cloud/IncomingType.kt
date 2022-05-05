@@ -15,7 +15,7 @@ data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     val received: ReceivedWrapper?,
     val createdAt: Long
 ) {
-    constructor(payment: IncomingPayment): this(
+    constructor(payment: IncomingPayment) : this(
         preimage = payment.preimage.toByteArray(),
         origin = OriginWrapper(payment.origin),
         received = ReceivedWrapper(payment.received),
@@ -95,7 +95,8 @@ data class IncomingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         }
     } // </ReceivedWrapper>
 
-} // </IncomingPaymentData>
+    companion object
+}
 
 @OptIn(ExperimentalSerializationApi::class)
 fun IncomingPayment.cborSerialize(): ByteArray {
@@ -104,10 +105,8 @@ fun IncomingPayment.cborSerialize(): ByteArray {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-fun IncomingPaymentWrapper.Companion.cborDeserialize(blob: ByteArray): IncomingPayment? {
-    var result: IncomingPayment? = null
-    try {
-        result = Cbor.decodeFromByteArray<IncomingPaymentWrapper>(blob).unwrap()
-    } catch (e: Throwable) {}
-    return result
+fun IncomingPaymentWrapper.Companion.cborDeserialize(blob: ByteArray): IncomingPayment? = try {
+    Cbor.decodeFromByteArray<IncomingPaymentWrapper>(blob).unwrap()
+} catch (e: Throwable) {
+    null
 }

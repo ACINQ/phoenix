@@ -20,21 +20,17 @@ import com.squareup.sqldelight.db.SqlDriver
 import fr.acinq.bitcoin.Block
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.byteVector
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
-import fr.acinq.lightning.channel.ChannelUnavailable
 import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
 import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.db.WalletPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.OutgoingPaymentFailure
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.*
 import fr.acinq.lightning.wire.TemporaryNodeFailure
-import fr.acinq.phoenix.db.payments.IncomingQueries
 import fr.acinq.phoenix.runTest
 import kotlin.test.*
 
@@ -305,7 +301,7 @@ class SqlitePaymentsDatabaseTest {
 
         // Cannot succeed a payment that does not exist
         assertFalse {
-            db._doNotFreezeMe.outQueries.completeOutgoingPayment(
+            db._doNotFreezeMe.outQueries.completePayment(
                 id = UUID.randomUUID(),
                 completed = paymentStatus
             )
@@ -356,7 +352,7 @@ class SqlitePaymentsDatabaseTest {
         p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
 
         // Cannot fail a payment that does not exist
-        assertFalse { db._doNotFreezeMe.outQueries.completeOutgoingPayment(UUID.randomUUID(), paymentStatus) }
+        assertFalse { db._doNotFreezeMe.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }
     }
 
     companion object {
