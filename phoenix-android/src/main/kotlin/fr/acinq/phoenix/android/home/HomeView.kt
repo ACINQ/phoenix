@@ -16,6 +16,9 @@
 
 package fr.acinq.phoenix.android.home
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -198,7 +201,7 @@ private fun SideMenu(
         Button(
             text = stringResource(id = R.string.home__drawer__faq),
             icon = R.drawable.ic_help_circle,
-            onClick = { },
+            onClick = { openLink(context, "https://phoenix.acinq.co/faq") },
             padding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
@@ -213,6 +216,10 @@ private fun SideMenu(
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+private fun openLink(context: Context, link: String) {
+    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
 }
 
 @Composable
