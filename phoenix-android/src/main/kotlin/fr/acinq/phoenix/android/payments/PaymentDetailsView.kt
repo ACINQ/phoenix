@@ -134,7 +134,8 @@ private fun PaymentDetailsSuccess(
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 32.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
             unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
             separatorSpace = 4.dp,
-            isOutgoing = payment is OutgoingPayment
+            isOutgoing = payment is OutgoingPayment,
+            onSwitchUnitClick = {}
         )
         Spacer(modifier = Modifier.height(32.dp))
         PrimarySeparator(height = 6.dp)

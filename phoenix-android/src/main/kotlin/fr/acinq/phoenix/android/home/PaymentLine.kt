@@ -113,7 +113,8 @@ fun PaymentLine(
                         amount = amount,
                         amountTextStyle = MaterialTheme.typography.body1.copy(color = if (isOutgoing) negativeColor() else positiveColor()),
                         unitTextStyle = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                        isOutgoing = isOutgoing
+                        isOutgoing = isOutgoing,
+                        onSwitchUnitClick = {}
                     )
                 }
             }

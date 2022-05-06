@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,18 +44,24 @@ fun AmountView(
     isOutgoing: Boolean? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    separatorSpace: Dp = 8.dp
+    separatorSpace: Dp = 8.dp,
+    onSwitchUnitClick: (Boolean) -> Unit
 ) {
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
     } else {
         LocalBitcoinUnit.current
     }
-    Row(horizontalArrangement = Arrangement.Center, modifier = modifier) {
+    val inFiat = LocalShowInFiat.current
+
+    Row(horizontalArrangement = Arrangement.Center,
+        modifier = modifier.clickable { onSwitchUnitClick(!inFiat) })
+    {
         if (isOutgoing != null && amount > MilliSatoshi(0)) {
             Text(
                 text = stringResource(id = if (isOutgoing) R.string.paymentline_sent_prefix else R.string.paymentline_received_prefix),
-                style = amountTextStyle
+                style = amountTextStyle,
+                modifier = Modifier.alignBy(FirstBaseline)
             )
         }
         Text(

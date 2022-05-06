@@ -105,11 +105,11 @@ private fun ChannelLine(channel: ChannelsConfiguration.Model.Channel, onClick: (
             modifier = Modifier.weight(1.0f)
         )
         Spacer(modifier = Modifier.width(8.dp))
-        AmountView(amount = balance.toMilliSatoshi(), showUnit = false)
+        AmountView(amount = balance.toMilliSatoshi(), showUnit = false, onSwitchUnitClick = { })
         Spacer(modifier = Modifier.width(2.dp))
         Text(text = "/")
         Spacer(modifier = Modifier.width(2.dp))
-        AmountView(amount = capacity.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption)
+        AmountView(amount = capacity.toMilliSatoshi(), unitTextStyle = MaterialTheme.typography.caption, onSwitchUnitClick = { })
     }
 }
 
