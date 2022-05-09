@@ -206,8 +206,8 @@ class SqlitePaymentsDatabaseTest {
             pr.nodeId,
             OutgoingPayment.Details.Normal(pr),
             listOf(
-                OutgoingPayment.Part(UUID.randomUUID(), 20_000.msat, listOf(HopDesc(a, c, ShortChannelId(42))), OutgoingPayment.Part.Status.Pending, 100),
-                OutgoingPayment.Part(UUID.randomUUID(), 30_000.msat, listOf(HopDesc(a, b), HopDesc(b, c)), OutgoingPayment.Part.Status.Pending, 105)
+                OutgoingPayment.LightningPart(UUID.randomUUID(), 20_000.msat, listOf(HopDesc(a, c, ShortChannelId(42))), OutgoingPayment.LightningPart.Status.Pending, 100),
+                OutgoingPayment.LightningPart(UUID.randomUUID(), 30_000.msat, listOf(HopDesc(a, b), HopDesc(b, c)), OutgoingPayment.LightningPart.Status.Pending, 105)
             ),
             OutgoingPayment.Status.Pending,
             createdAt = 108,
@@ -220,8 +220,8 @@ class SqlitePaymentsDatabaseTest {
         db.addOutgoingPayment(p)
         assertEquals(p, db.getOutgoingPayment(p.id))
         assertNull(db.getOutgoingPayment(UUID.randomUUID()))
-        p.parts.forEach { assertEquals(p, db.getOutgoingPart(it.id)) }
-        assertNull(db.getOutgoingPart(UUID.randomUUID()))
+        p.parts.forEach { assertEquals(p, db.getOutgoingPaymentFromPartId(it.id)) }
+        assertNull(db.getOutgoingPaymentFromPartId(UUID.randomUUID()))
     }
 
     @Test
@@ -230,22 +230,24 @@ class SqlitePaymentsDatabaseTest {
         db.addOutgoingPayment(p)
         val onePartFailed = p.copy(
             parts = listOf(
-                p.parts[0].copy(status = OutgoingPayment.Part.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)),
+                (p.parts[0] as OutgoingPayment.LightningPart).copy(
+                    status = OutgoingPayment.LightningPart.Status.Failed(TemporaryNodeFailure.code, TemporaryNodeFailure.message, 110)
+                ),
                 p.parts[1]
             )
         )
-        db.updateOutgoingPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
+        db.completeOutgoingLightningPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
         assertEquals(onePartFailed, db.getOutgoingPayment(p.id))
-        p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPart(it.id)) }
+        p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // We should never update non-existing parts.
-        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
-        assertFalse { db._doNotFreezeMe.outQueries.updateOutgoingPart(UUID.randomUUID(), randomBytes32(), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
+        assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
 
         // Other payment parts are added.
         val newParts = listOf(
-            OutgoingPayment.Part(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 115),
-            OutgoingPayment.Part(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.Part.Status.Pending, 120),
+            OutgoingPayment.LightningPart(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 115),
+            OutgoingPayment.LightningPart(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 120),
         )
         // Parts need a valid parent.
         if (isIOS()) {
@@ -253,10 +255,10 @@ class SqlitePaymentsDatabaseTest {
             // The problem is that foreign key constraints are disabled.
             // See iosDbFactory.kt for discussion.
         } else {
-            assertFails { db.addOutgoingParts(UUID.randomUUID(), newParts) }
+            assertFails { db.addOutgoingLightningParts(UUID.randomUUID(), newParts) }
             // New parts must have a unique id.
             assertFails {
-                db.addOutgoingParts(
+                db.addOutgoingLightningParts(
                     parentId = onePartFailed.id,
                     parts = newParts.map { it.copy(id = p.parts[0].id) }
                 )
@@ -264,27 +266,27 @@ class SqlitePaymentsDatabaseTest {
         }
 
         // Can add new parts to existing payment.
-        db.addOutgoingParts(onePartFailed.id, newParts)
+        db.addOutgoingLightningParts(onePartFailed.id, newParts)
         val withMoreParts = onePartFailed.copy(parts = onePartFailed.parts + newParts)
         assertEquals(withMoreParts, db.getOutgoingPayment(p.id))
-        withMoreParts.parts.forEach { assertEquals(withMoreParts, db.getOutgoingPart(it.id)) }
+        withMoreParts.parts.forEach { assertEquals(withMoreParts, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Payment parts succeed.
         val preimage = randomBytes32()
         val partsSettled = withMoreParts.copy(
             parts = listOf(
                 withMoreParts.parts[0], // this one was failed
-                withMoreParts.parts[1].copy(status = OutgoingPayment.Part.Status.Succeeded(preimage, 125)),
-                withMoreParts.parts[2].copy(status = OutgoingPayment.Part.Status.Succeeded(preimage, 126)),
-                withMoreParts.parts[3].copy(status = OutgoingPayment.Part.Status.Succeeded(preimage, 127)),
+                (withMoreParts.parts[1] as OutgoingPayment.LightningPart).copy(status = OutgoingPayment.LightningPart.Status.Succeeded(preimage, 125)),
+                (withMoreParts.parts[2] as OutgoingPayment.LightningPart).copy(status = OutgoingPayment.LightningPart.Status.Succeeded(preimage, 126)),
+                (withMoreParts.parts[3] as OutgoingPayment.LightningPart).copy(status = OutgoingPayment.LightningPart.Status.Succeeded(preimage, 127)),
             )
         )
         assertEquals(OutgoingPayment.Status.Pending, partsSettled.status)
-        db.updateOutgoingPart(withMoreParts.parts[1].id, preimage, 125)
-        db.updateOutgoingPart(withMoreParts.parts[2].id, preimage, 126)
-        db.updateOutgoingPart(withMoreParts.parts[3].id, preimage, 127)
+        db.completeOutgoingLightningPart(withMoreParts.parts[1].id, preimage, 125)
+        db.completeOutgoingLightningPart(withMoreParts.parts[2].id, preimage, 126)
+        db.completeOutgoingLightningPart(withMoreParts.parts[3].id, preimage, 127)
         assertEquals(partsSettled, db.getOutgoingPayment(p.id))
-        partsSettled.parts.forEach { assertEquals(partsSettled, db.getOutgoingPart(it.id)) }
+        partsSettled.parts.forEach { assertEquals(partsSettled, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Parts are successful BUT parent payment is not successful yet.
         assertTrue(db.getOutgoingPayment(p.id)!!.status is OutgoingPayment.Status.Pending)
@@ -294,7 +296,7 @@ class SqlitePaymentsDatabaseTest {
             status = paymentStatus,
             parts = partsSettled.parts.drop(1)
         )
-        db.completeOutgoingPayment(p.id, preimage, 130)
+        db.completeOutgoingPaymentOffchain(p.id, preimage, 130)
 
         // Failed and pending parts are now ignored because payment has succeeded
         assertEquals(paymentSucceeded, db.getOutgoingPayment(p.id))
@@ -307,9 +309,9 @@ class SqlitePaymentsDatabaseTest {
             )
         }
         // Using failed part id does not return a settled payment
-        assertNull(db.getOutgoingPart(partsSettled.parts[0].id))
+        assertNull(db.getOutgoingPaymentFromPartId(partsSettled.parts[0].id))
         partsSettled.parts.drop(1).forEach {
-            assertEquals(paymentSucceeded, db.getOutgoingPart(it.id))
+            assertEquals(paymentSucceeded, db.getOutgoingPaymentFromPartId(it.id))
         }
     }
 
@@ -321,7 +323,7 @@ class SqlitePaymentsDatabaseTest {
         p.copy(recipientAmount = 1000.msat).let {
             assertFails { db.addOutgoingPayment(it) }
         }
-        p.copy(id = UUID.randomUUID(), parts = p.parts.map { it.copy(id = p.parts[0].id) }).let {
+        p.copy(id = UUID.randomUUID(), parts = p.parts.map { (it as OutgoingPayment.LightningPart).copy(id = p.parts[0].id) }).let {
             assertFails { db.addOutgoingPayment(it) }
         }
     }
@@ -333,23 +335,23 @@ class SqlitePaymentsDatabaseTest {
         val channelId = randomBytes32()
         val partsFailed = p.copy(
             parts = listOf(
-                p.parts[0].copy(status = OutgoingPaymentFailure.convertFailure(Either.Right(TemporaryNodeFailure), 110)),
-                p.parts[1].copy(status = OutgoingPaymentFailure.convertFailure(Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)),
+                (p.parts[0] as OutgoingPayment.LightningPart).copy(status = OutgoingPaymentFailure.convertFailure(Either.Right(TemporaryNodeFailure), 110)),
+                (p.parts[1] as OutgoingPayment.LightningPart).copy(status = OutgoingPaymentFailure.convertFailure(Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)),
             )
         )
-        db.updateOutgoingPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
-        db.updateOutgoingPart(p.parts[1].id, Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)
+        db.completeOutgoingLightningPart(p.parts[0].id, Either.Right(TemporaryNodeFailure), 110)
+        db.completeOutgoingLightningPart(p.parts[1].id, Either.Left(TooManyAcceptedHtlcs(channelId, 10)), 111)
         assertEquals(partsFailed, db.getOutgoingPayment(p.id))
-        p.parts.forEach { assertEquals(partsFailed, db.getOutgoingPart(it.id)) }
+        p.parts.forEach { assertEquals(partsFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         val paymentStatus = OutgoingPayment.Status.Completed.Failed(
             reason = FinalFailure.NoRouteToRecipient,
             completedAt = 120
         )
         val paymentFailed = partsFailed.copy(status = paymentStatus)
-        db.completeOutgoingPayment(p.id, paymentStatus)
+        db.completeOutgoingPaymentOffchain(p.id, paymentStatus.reason, paymentStatus.completedAt)
         assertEquals(paymentFailed, db.getOutgoingPayment(p.id))
-        p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPart(it.id)) }
+        p.parts.forEach { assertEquals(paymentFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
         // Cannot fail a payment that does not exist
         assertFalse { db._doNotFreezeMe.outQueries.completePayment(UUID.randomUUID(), paymentStatus) }

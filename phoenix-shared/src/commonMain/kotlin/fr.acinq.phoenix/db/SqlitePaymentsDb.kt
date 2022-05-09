@@ -176,7 +176,7 @@ class SqlitePaymentsDb(
         }
     }
 
-    override suspend fun completeOutgoingPaymentFailed(
+    override suspend fun completeOutgoingPaymentOffchain(
         id: UUID,
         finalFailure: FinalFailure,
         completedAt: Long

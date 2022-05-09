@@ -166,11 +166,11 @@ class CloudDataTest {
         val recipientAmount = 500_000.msat
         val invoice = createInvoice(preimage, recipientAmount)
         val (a, b) = listOf(randomKey().publicKey(), randomKey().publicKey())
-        val part = OutgoingPayment.Part(
+        val part = OutgoingPayment.LightningPart(
             id = UUID.randomUUID(),
             amount = 500_005.msat,
             route = listOf(HopDesc(a, b)),
-            status = OutgoingPayment.Part.Status.Failed(
+            status = OutgoingPayment.LightningPart.Status.Failed(
                 remoteFailureCode = 418,
                 details = "I'm a teapot"
             )
@@ -202,17 +202,17 @@ class CloudDataTest {
         val recipientAmount = 500_000.msat
         val invoice = createInvoice(preimage, recipientAmount)
         val (a, b) = listOf(randomKey().publicKey(), randomKey().publicKey())
-        val part1 = OutgoingPayment.Part(
+        val part1 = OutgoingPayment.LightningPart(
             id = UUID.randomUUID(),
             amount = 250_005.msat,
             route = listOf(HopDesc(a, b)),
-            status = OutgoingPayment.Part.Status.Succeeded(preimage)
+            status = OutgoingPayment.LightningPart.Status.Succeeded(preimage)
         )
-        val part2 = OutgoingPayment.Part(
+        val part2 = OutgoingPayment.LightningPart(
             id = UUID.randomUUID(),
             amount = 250_005.msat,
             route = listOf(HopDesc(a, b)),
-            status = OutgoingPayment.Part.Status.Succeeded(preimage)
+            status = OutgoingPayment.LightningPart.Status.Succeeded(preimage)
         )
         testRoundtrip(OutgoingPayment(
             id = uuid,
@@ -236,11 +236,7 @@ class CloudDataTest {
                 isSentToDefaultAddress = true
             ),
             parts = listOf(),
-            status = OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                txids = listOf(randomBytes32()),
-                claimed = 1_000.sat,
-                closingType = ChannelClosingType.Mutual
-            )
+            status = OutgoingPayment.Status.Completed.Succeeded.OnChain()
         ))
     }
 

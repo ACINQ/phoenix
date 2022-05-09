@@ -16,11 +16,8 @@
 
 package fr.acinq.phoenix.db
 
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.InvalidFinalScript
-import fr.acinq.lightning.db.ChannelClosingType
-import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.payment.FinalFailure
 import fr.acinq.lightning.payment.PaymentRequest
@@ -68,10 +65,11 @@ class OutgoingPaymentDbTypeVersionTest {
 
     @Test
     fun outgoing_status_success_onchain() {
-        val closingType = ChannelClosingType.Local
-        val status = OutgoingPayment.Status.Completed.Succeeded.OnChain(txs1, Satoshi(42), closingType, completedAt = 123)
-        val deserialized = OutgoingStatusData.deserialize(OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0, status.mapToDb().second, completedAt = 123)
-        assertEquals(status, deserialized)
+        val status = OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = 123)
+        val deserialized1 = OutgoingStatusData.deserialize(OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0, status.mapToDb().second, completedAt = 123)
+        assertEquals(status, deserialized1)
+        val deserialized2 = OutgoingStatusData.deserialize(OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V1, status.mapToDb().second, completedAt = 123)
+        assertEquals(status, deserialized2)
     }
 
     @Test
@@ -90,21 +88,21 @@ class OutgoingPaymentDbTypeVersionTest {
 
     @Test
     fun outgoing_part_status_failed_channelexception() {
-        val status = OutgoingPayment.Part.Status.Failed(null, InvalidFinalScript(channelId1).details(), completedAt = 123)
+        val status = OutgoingPayment.LightningPart.Status.Failed(null, InvalidFinalScript(channelId1).details(), completedAt = 123)
         val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V0, status.mapToDb().second, completedAt = 123)
         assertEquals(status, deserialized)
     }
 
     @Test
     fun outgoing_part_status_failed_remotefailure() {
-        val status = OutgoingPayment.Part.Status.Failed(PermanentNodeFailure.code, PermanentNodeFailure.message, completedAt = 345)
+        val status = OutgoingPayment.LightningPart.Status.Failed(PermanentNodeFailure.code, PermanentNodeFailure.message, completedAt = 345)
         val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.FAILED_V0, status.mapToDb().second, completedAt = 345)
         assertEquals(status, deserialized)
     }
 
     @Test
     fun outgoing_part_status_succeeded() {
-        val status = OutgoingPayment.Part.Status.Succeeded(preimage1, completedAt = 3456)
+        val status = OutgoingPayment.LightningPart.Status.Succeeded(preimage1, completedAt = 3456)
         val deserialized = OutgoingPartStatusData.deserialize(OutgoingPartStatusTypeVersion.SUCCEEDED_V0, status.mapToDb().second, completedAt = 3456)
         assertEquals(status, deserialized)
     }
