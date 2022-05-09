@@ -324,6 +324,9 @@ class OutgoingQueries(val database: PaymentsDatabase) {
                         createdAt = closingtx_part_created_at
                     )
                 )
+            } else if (status_type == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0 && status_blob != null && completed_at != null) {
+                // we used to store closing txs data in the payment status blob
+                OutgoingStatusData.getClosingPartsFromV0Status(status_blob, completed_at)
             } else emptyList()
 
             return mapOutgoingPaymentWithoutParts(
