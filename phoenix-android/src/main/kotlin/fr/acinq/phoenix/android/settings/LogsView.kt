@@ -51,6 +51,14 @@ fun LogsView() {
     }
     val shareIntent = Intent.createChooser(sendIntent, null)
 
+    val localViewIntent: Intent = Intent().apply {
+        action = Intent.ACTION_VIEW
+        type = "text/plain"
+        setDataAndType(uri, "text/plain")
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    val viewIntent = Intent.createChooser(localViewIntent, stringResource(R.string.logs_view_with))
+
     SettingScreen {
         SettingHeader(
             onBackClick = { nc.popBackStack() },
@@ -62,6 +70,7 @@ fun LogsView() {
                 text = R.string.logs_view_button,
                 icon = R.drawable.ic_eye,
                 onClick = {
+                    context.startActivity(viewIntent)
                 }
             )
             SettingButton(
