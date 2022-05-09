@@ -596,7 +596,7 @@
     <string name="about_privacy_link">Privacy</string>
     <string name="about_terms_link">Terms</string>
 
-    <!-- //////////////// settings: options for payments //////////////// -->
+  <!-- //////////////// settings: options for payments //////////////// -->
 
     <string name="paymentsettings_title">Payment settings</string>
     <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
