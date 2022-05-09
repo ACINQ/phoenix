@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -52,6 +53,8 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
+import fr.acinq.phoenix.android.utils.datastore.InternalData
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.mutedTextColor
 import fr.acinq.phoenix.android.utils.negativeColor
 import fr.acinq.phoenix.android.utils.positiveColor
@@ -60,6 +63,7 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.utils.errorMessage
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
 
@@ -115,6 +119,8 @@ private fun PaymentDetailsSuccess(
 ) {
     val payment = data.payment
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // status
     PaymentStatus(payment)
@@ -134,8 +140,7 @@ private fun PaymentDetailsSuccess(
             amountTextStyle = MaterialTheme.typography.body1.copy(fontSize = 32.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
             unitTextStyle = MaterialTheme.typography.body1.copy(fontSize = 14.sp, fontFamily = FontFamily.Default, fontWeight = FontWeight.Light),
             separatorSpace = 4.dp,
-            isOutgoing = payment is OutgoingPayment,
-            onSwitchUnitClick = {}
+            isOutgoing = payment is OutgoingPayment
         )
         Spacer(modifier = Modifier.height(32.dp))
         PrimarySeparator(height = 6.dp)

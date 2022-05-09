@@ -104,9 +104,6 @@ fun HomeView(
                         amount = model.balance,
                         amountTextStyle = MaterialTheme.typography.h1,
                         unitTextStyle = MaterialTheme.typography.h3.copy(color = MaterialTheme.colors.primary),
-                        onSwitchUnitClick = {
-                            homeViewModel.switchUnit(context, it)
-                        }
                     )
                     model.incomingBalance?.run {
                         Spacer(modifier = Modifier.height(8.dp))

@@ -24,8 +24,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -33,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.CurrencyUnit
+import kotlinx.coroutines.launch
 
 @Composable
 fun AmountView(
@@ -45,7 +49,6 @@ fun AmountView(
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
     separatorSpace: Dp = 8.dp,
-    onSwitchUnitClick: (Boolean) -> Unit
 ) {
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
@@ -54,8 +57,15 @@ fun AmountView(
     }
     val inFiat = LocalShowInFiat.current
 
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Row(horizontalArrangement = Arrangement.Center,
-        modifier = modifier.clickable { onSwitchUnitClick(!inFiat) })
+        modifier = modifier.clickable {
+            scope.launch {
+                UserPrefs.saveIsAmountInFiat(context, !inFiat)
+            }
+        })
     {
         if (isOutgoing != null && amount > MilliSatoshi(0)) {
             Text(

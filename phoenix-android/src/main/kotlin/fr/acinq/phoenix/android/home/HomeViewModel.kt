@@ -107,12 +107,6 @@ class HomeViewModel(
         }
     }
 
-    fun switchUnit(context: Context, toFiatCurrency: Boolean) {
-        viewModelScope.launch(Dispatchers.Default) {
-            UserPrefs.saveIsAmountInFiat(context, toFiatCurrency)
-        }
-    }
-
     class Factory(
         private val connectionsFlow: StateFlow<Connections>,
         private val paymentsManager: PaymentsManager,
