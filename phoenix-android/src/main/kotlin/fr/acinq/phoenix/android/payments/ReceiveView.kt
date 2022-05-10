@@ -50,6 +50,7 @@ import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.QRCode
 import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.controllers.ControllerFactory
@@ -120,16 +121,22 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 @Composable
 fun ReceiveView() {
     val log = logger("ReceiveView")
-    val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
-    when (val state = vm.state) {
-        is ReceiveViewState.Default -> DefaultView(vm = vm)
-        is ReceiveViewState.EditInvoice -> EditInvoiceView(
-            description = vm.customDesc,
-            onDescriptionChange = { vm.customDesc = it },
-            onAmountChange = { vm.customAmount = it },
-            onSubmit = { vm.generateInvoice() },
-            onCancel = { vm.state = ReceiveViewState.Default })
-        is ReceiveViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
+
+    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(null)
+    invoiceDefaultDesc?.let {
+
+        val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
+        vm.customDesc = it
+        when (val state = vm.state) {
+            is ReceiveViewState.Default -> DefaultView(vm = vm)
+            is ReceiveViewState.EditInvoice -> EditInvoiceView(
+                description = vm.customDesc,
+                onDescriptionChange = { vm.customDesc = it },
+                onAmountChange = { vm.customAmount = it },
+                onSubmit = { vm.generateInvoice() },
+                onCancel = { vm.state = ReceiveViewState.Default })
+            is ReceiveViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
+        }
     }
 }
 
