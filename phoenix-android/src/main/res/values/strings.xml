@@ -601,11 +601,18 @@
     <string name="paymentsettings_title">Payment settings</string>
     <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
 
-    <string name="paymentsettings_defaultdesc_title">Default payment description</string>
+    <string name="paymentsettings_defaultdesc_title">Incoming payment description</string>
     <string name="paymentsettings_defaultdesc_none">No description set…</string>
     <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
     <string name="paymentsettings_defaultdesc_dialog_description">Payment requests that you create will use this description. You can override it on a case-by-case basis.</string>
     <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
+
+
+    <string name="paymentsettings_expiry_title">Incoming payment expiry</string>
+    <string name="paymentsettings_expiry_dialog_title">Payment expiry</string>
+    <string name="paymentsettings_expiry_dialog_description">Payment requests that you create will use this expiry time (in seconds). Default value is 1 week.</string>
+    <string name="paymentsettings_expiry_dialog_hint">Enter an expiry, in seconds</string>
+    <string name="paymentsettings_expiry_value">%1$s seconds</string>
 
     <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
     <string name="paymentsettings_paytoopen_auto_desc">It is sometimes necessary to create a new Lightning payment channel in order to receive an incoming payment.\n\nIn this case a fee of %1$s%% is deducted from the amount received, to cover the cost of creating the channel.</string>
@@ -619,6 +626,15 @@
     <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Enter a base fee in satoshi</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
+
+  <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s minimum)</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
+    This fee applies when you receive a payment over Lightning and a new channel needs to be created.
+    <br /><br />
+    See <a href="https://phoenix.acinq.co/faq#what-are-the-fees">the FAQ</a> for more information.
+  ]]></string>
 
   <!-- ////////////// migration result dialog //////////////// -->
 

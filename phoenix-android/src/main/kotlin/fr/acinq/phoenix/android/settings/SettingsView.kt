@@ -41,7 +41,7 @@ fun SettingsView() {
             SettingButton(text = R.string.settings_display_prefs, icon = R.drawable.ic_brush, onClick = { nc.navigate(Screen.Preferences) })
             SettingButton(text = R.string.settings_electrum, icon = R.drawable.ic_chain, onClick = { nc.navigate(Screen.ElectrumServer) })
             SettingButton(text = R.string.settings_tor, icon = R.drawable.ic_tor_shield, onClick = { })
-            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { })
+            SettingButton(text = R.string.settings_payment_settings, icon = R.drawable.ic_tool, onClick = { nc.navigate(Screen.PaymentSettings)})
         }
 
         // -- security

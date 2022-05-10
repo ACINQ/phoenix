@@ -210,6 +210,9 @@ fun AppView(
                 composable(Screen.About.route) {
                     AboutView()
                 }
+                composable(Screen.PaymentSettings.route) {
+                    PaymentSettingsView()
+                }
                 composable(Screen.AppLock.route) {
                     AppLockView(
                         mainActivity = mainActivity,
