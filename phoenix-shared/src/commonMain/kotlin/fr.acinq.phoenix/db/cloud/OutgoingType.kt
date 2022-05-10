@@ -19,6 +19,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
     val recipient: ByteArray,
     val details: DetailsWrapper,
     val parts: List<OutgoingPartWrapper>,
+    val closingTxsParts: List<OutgoingClosingTxPartWrapper> = emptyList(),
     val status: StatusWrapper?,
     val createdAt: Long
 ) {
@@ -28,6 +29,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         recipient = payment.recipient.value.toByteArray(),
         details = DetailsWrapper(payment.details),
         parts = payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().map { OutgoingPartWrapper(it) },
+        closingTxsParts = payment.parts.filterIsInstance<OutgoingPayment.ClosingTxPart>().map { OutgoingClosingTxPartWrapper(it) },
         status = StatusWrapper(payment.status),
         createdAt = payment.createdAt
     )
@@ -38,7 +40,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         recipient = PublicKey(ByteVector(recipient)),
         details = details.unwrap()
     ).copy(
-        parts = parts.map { it.unwrap() },
+        parts = parts.map { it.unwrap() } + closingTxsParts.map { it.unwrap() },
         status = status?.unwrap() ?: OutgoingPayment.Status.Pending,
         createdAt = createdAt
     )
