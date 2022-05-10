@@ -88,6 +88,35 @@ fun TextInput(
     )
 }
 
+@Composable
+fun NumberInput(
+    modifier: Modifier = Modifier,
+    text: String,
+    maxLines: Int = 1,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    onTextChange: (String) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    TextField(
+        value = text,
+        onValueChange = onTextChange,
+        maxLines = maxLines,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Number
+        ),
+        label = label,
+        placeholder = placeholder,
+        enabled = enabled,
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        colors = textFieldColors(),
+        shape = RectangleShape,
+        modifier = modifier
+    )
+}
+
 @Preview
 @Composable
 fun ComposablePreview() {

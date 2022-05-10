@@ -26,6 +26,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,23 +45,42 @@ fun PaymentSettingsView() {
     val nc = navController
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
+    var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState("")
+    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState("")
 
-    if (showDialog) {
+    if (showDescriptionDialog) {
         DefaultDescriptionInvoiceDialog(
             description = invoiceDefaultDesc,
             onDismiss = {
                 scope.launch {
-                    showDialog = false
+                    showDescriptionDialog = false
                 }
             },
             onConfirm = {
                 scope.launch {
                     UserPrefs.saveInvoiceDefaultDesc(context, it)
                 }
-                showDialog = false
+                showDescriptionDialog = false
+            }
+        )
+    }
+
+    if (showExpiryDialog) {
+        DefaultExpiryInvoiceDialog(
+            expiry = 1L,
+            onDismiss = {
+                scope.launch {
+                    showExpiryDialog = false
+                }
+            },
+            onConfirm = {
+                scope.launch {
+                    UserPrefs.saveInvoiceDefaultExpiry(context, 1L)
+                }
+                showExpiryDialog = false
             }
         )
     }
@@ -75,12 +95,12 @@ fun PaymentSettingsView() {
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_defaultdesc_title),
                 description = invoiceDefaultDesc.ifEmpty { stringResource(id = R.string.paymentsettings_defaultdesc_none) },
-                onClick = { showDialog = true}
+                onClick = { showDescriptionDialog = true}
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_expiry_title),
                 description = "Hello World",
-                onClick = { showDialog = true}
+                onClick = { showExpiryDialog = true}
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
@@ -91,12 +111,65 @@ fun PaymentSettingsView() {
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
                 description = "",
-                onClick = {showDialog = true}
+                onClick = {showDescriptionDialog = true}
             )
         }
     }
 }
 
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun DefaultExpiryInvoiceDialog(
+    expiry: (Long),
+    onDismiss: () -> Unit,
+    onConfirm: (Long) -> Unit,
+) {
+    var paymentExpiry by rememberSaveable { mutableStateOf(expiry) }
+
+    Dialog(
+        onDismiss = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        buttons = {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
+            Button(
+                onClick = {
+                    onConfirm(paymentExpiry)
+                },
+                text = stringResource(id = R.string.btn_ok)
+            )
+        }
+    ) {
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(16.dp))
+            // -- checkbox
+            // -- input
+            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .enableOrFade(enabled = true)
+                    .padding(horizontal = 24.dp)
+            ) {
+                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title), style = MaterialTheme.typography.h5)
+                Spacer(Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_description))
+                Spacer(Modifier.height(8.dp))
+                NumberInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = paymentExpiry.toString(),
+                    placeholder = {
+                        Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
+                    onTextChange = {
+                        paymentExpiry = it.toLong()
+                    },
+                    enabled = true
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -141,27 +214,15 @@ private fun DefaultDescriptionInvoiceDialog(
                     text = paymentDescription,
                     placeholder = {
                         Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
-                        //Text(invoiceDefaultDesc) },
                     onTextChange = {
-                        //addressError = false
                         paymentDescription = it
                     },
                     enabled = true
                 )
-                /*
-                if (addressError) {
-                    Text("Invalid address, must be <host>:<port>")
-                }
-                 */
             }
         }
     }
 }
-
-
-
-
-
 
 @Preview(device = Devices.PIXEL_3A)
 @Composable
