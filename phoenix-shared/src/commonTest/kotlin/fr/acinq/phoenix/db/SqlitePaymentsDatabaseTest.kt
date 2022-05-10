@@ -23,6 +23,7 @@ import fr.acinq.bitcoin.Crypto
 import fr.acinq.lightning.*
 import fr.acinq.lightning.Lightning.randomBytes32
 import fr.acinq.lightning.channel.TooManyAcceptedHtlcs
+import fr.acinq.lightning.db.ChannelClosingType
 import fr.acinq.lightning.db.HopDesc
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
@@ -197,7 +198,7 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(1, allIncomingPayments.size)
     }
 
-    private fun createOutgoing(): OutgoingPayment {
+    private fun createOutgoingForLightning(): OutgoingPayment {
         val (a, b, c) = listOf(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())
         val pr = createInvoice(randomBytes32())
         return OutgoingPayment(
@@ -214,9 +215,23 @@ class SqlitePaymentsDatabaseTest {
         )
     }
 
+    private fun createOutgoingForClosing(): OutgoingPayment = OutgoingPayment(
+        id = UUID.randomUUID(),
+        recipientAmount = 100_000_000.msat,
+        recipient = Lightning.randomKey().publicKey(),
+        details = OutgoingPayment.Details.ChannelClosing(
+            channelId = randomBytes32(),
+            closingAddress = "2MuvDe2JTFhkU3DfHCnxgyX6JdP7BKVgmaS",
+            isSentToDefaultAddress = false
+        ),
+        parts = emptyList(),
+        status = OutgoingPayment.Status.Pending,
+        createdAt = 120,
+    )
+
     @Test
     fun outgoing__get() = runTest {
-        val p = createOutgoing()
+        val p = createOutgoingForLightning()
         db.addOutgoingPayment(p)
         assertEquals(p, db.getOutgoingPayment(p.id))
         assertNull(db.getOutgoingPayment(UUID.randomUUID()))
@@ -225,9 +240,11 @@ class SqlitePaymentsDatabaseTest {
     }
 
     @Test
-    fun outgoing__get_status() = runTest {
-        val p = createOutgoing()
+    fun outgoing__get_status__lightning() = runTest {
+        val p = createOutgoingForLightning()
         db.addOutgoingPayment(p)
+
+        // Test status where a part has failed.
         val onePartFailed = p.copy(
             parts = listOf(
                 (p.parts[0] as OutgoingPayment.LightningPart).copy(
@@ -240,23 +257,21 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(onePartFailed, db.getOutgoingPayment(p.id))
         p.parts.forEach { assertEquals(onePartFailed, db.getOutgoingPaymentFromPartId(it.id)) }
 
-        // We should never update non-existing parts.
+        // Updating non-existing parts should fail.
         assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), Either.Right(TemporaryNodeFailure), 110) }
         assertFalse { db._doNotFreezeMe.outQueries.updateLightningPart(UUID.randomUUID(), randomBytes32(), 110) }
 
-        // Other payment parts are added.
+        // Additional parts must have a unique id.
         val newParts = listOf(
             OutgoingPayment.LightningPart(UUID.randomUUID(), 5_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 115),
             OutgoingPayment.LightningPart(UUID.randomUUID(), 10_000.msat, listOf(HopDesc(Lightning.randomKey().publicKey(), Lightning.randomKey().publicKey())), OutgoingPayment.LightningPart.Status.Pending, 120),
         )
-        // Parts need a valid parent.
         if (isIOS()) {
             // This is a known bug in SQLDelight on iOS.
             // The problem is that foreign key constraints are disabled.
             // See iosDbFactory.kt for discussion.
         } else {
             assertFails { db.addOutgoingLightningParts(UUID.randomUUID(), newParts) }
-            // New parts must have a unique id.
             assertFails {
                 db.addOutgoingLightningParts(
                     parentId = onePartFailed.id,
@@ -271,7 +286,7 @@ class SqlitePaymentsDatabaseTest {
         assertEquals(withMoreParts, db.getOutgoingPayment(p.id))
         withMoreParts.parts.forEach { assertEquals(withMoreParts, db.getOutgoingPaymentFromPartId(it.id)) }
 
-        // Payment parts succeed.
+        // Test status when those new payments parts succeed.
         val preimage = randomBytes32()
         val partsSettled = withMoreParts.copy(
             parts = listOf(
@@ -301,13 +316,14 @@ class SqlitePaymentsDatabaseTest {
         // Failed and pending parts are now ignored because payment has succeeded
         assertEquals(paymentSucceeded, db.getOutgoingPayment(p.id))
 
-        // Cannot succeed a payment that does not exist
+        // Should not be able to complete a payment that does not exist
         assertFalse {
             db._doNotFreezeMe.outQueries.completePayment(
                 id = UUID.randomUUID(),
                 completed = paymentStatus
             )
         }
+
         // Using failed part id does not return a settled payment
         assertNull(db.getOutgoingPaymentFromPartId(partsSettled.parts[0].id))
         partsSettled.parts.drop(1).forEach {
@@ -316,8 +332,37 @@ class SqlitePaymentsDatabaseTest {
     }
 
     @Test
+    fun outgoing__get_status__closing_txs() = runTest {
+        val p = createOutgoingForClosing()
+        db.addOutgoingPayment(p)
+        assertEquals(p, db.getOutgoingPayment(p.id))
+        assertTrue(db.getOutgoingPayment(p.id)!!.status is OutgoingPayment.Status.Pending)
+        assertTrue(db.getOutgoingPayment(p.id)!!.parts.isEmpty())
+
+        val parts = listOf(
+            OutgoingPayment.ClosingTxPart(
+                id = UUID.randomUUID(),
+                txId = randomBytes32(),
+                claimed = 79_000.sat,
+                closingType = ChannelClosingType.Mutual,
+                createdAt = 100
+            ),
+            OutgoingPayment.ClosingTxPart(
+                id = UUID.randomUUID(),
+                txId = randomBytes32(),
+                claimed = 19_500.sat,
+                closingType = ChannelClosingType.Local,
+                createdAt = 110
+            ),
+        )
+        db.completeOutgoingPaymentForClosing(id = p.id, parts = parts, completedAt = 200)
+        assertTrue(db.getOutgoingPayment(p.id)!!.status is OutgoingPayment.Status.Completed.Succeeded.OnChain)
+        assertEquals(parts, db.getOutgoingPayment(p.id)!!.parts)
+    }
+
+    @Test
     fun outgoing__do_not_reuse_ids() = runTest {
-        val p = createOutgoing()
+        val p = createOutgoingForLightning()
         db.addOutgoingPayment(p)
         assertFails { db.addOutgoingPayment(p) }
         p.copy(recipientAmount = 1000.msat).let {
@@ -330,7 +375,7 @@ class SqlitePaymentsDatabaseTest {
 
     @Test
     fun outgoing__fail_payment() = runTest {
-        val p = createOutgoing()
+        val p = createOutgoingForLightning()
         db.addOutgoingPayment(p)
         val channelId = randomBytes32()
         val partsFailed = p.copy(
