@@ -48,11 +48,8 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.QRCode
-import fr.acinq.phoenix.android.utils.copyToClipboard
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.monoTypo
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
 import fr.acinq.phoenix.controllers.payments.Receive
@@ -81,17 +78,21 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
     /** Custom invoice amount */
     var customAmount by mutableStateOf<MilliSatoshi?>(null)
 
+    /** Custom invoice expiry */
+    var customExpiry by mutableStateOf<Long?>(null)
+
     @UiThread
     fun generateInvoice() {
         val amount = customAmount
         val desc = customDesc
+        val expiry = customExpiry
         viewModelScope.launch(Dispatchers.Default + CoroutineExceptionHandler { _, e ->
             log.error("failed to generate invoice with amount=$amount desc=$desc :", e)
             state = ReceiveViewState.Error(e)
         }) {
             log.info("generating invoice with amount=$amount desc=$desc")
             state = ReceiveViewState.Default
-            controller.intent(Receive.Intent.Ask(amount = amount, desc = desc))
+            controller.intent(Receive.Intent.Ask(amount = amount, desc = desc, expirySeconds = expiry))
         }
     }
 
@@ -123,10 +124,12 @@ fun ReceiveView() {
     val log = logger("ReceiveView")
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(null)
-    invoiceDefaultDesc?.let {
+    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
+    safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
 
         val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
-        vm.customDesc = it
+        vm.customDesc = description
+        vm.customExpiry = expiry
         when (val state = vm.state) {
             is ReceiveViewState.Default -> DefaultView(vm = vm)
             is ReceiveViewState.EditInvoice -> EditInvoiceView(

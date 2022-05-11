@@ -20,7 +20,8 @@ object Receive {
         data class Ask(
             val amount: MilliSatoshi?,
             val desc: String?,
-            val expirySeconds: Long = 3600 * 24 * 7 // 7 days
+            //val expirySeconds: Long = 3600 * 24 * 7 // 7 days
+            val expirySeconds: Long?
         ) : Intent()
         object RequestSwapIn : Intent()
     }
