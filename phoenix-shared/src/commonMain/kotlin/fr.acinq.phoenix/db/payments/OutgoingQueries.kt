@@ -199,6 +199,13 @@ class OutgoingQueries(val database: PaymentsDatabase) {
         }
     }
 
+    fun getPaymentWithoutParts(id: UUID): OutgoingPayment? {
+        return queries.getPaymentWithoutParts(
+            id = id.toString(),
+            mapper = ::mapOutgoingPaymentWithoutParts
+        ).executeAsOneOrNull()
+    }
+
     fun getPayment(id: UUID): OutgoingPayment? {
         return queries.getPayment(
             id = id.toString(),

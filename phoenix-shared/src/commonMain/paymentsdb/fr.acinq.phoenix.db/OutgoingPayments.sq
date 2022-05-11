@@ -67,6 +67,10 @@ CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_closing_tx_parts(pa
 
 -- queries for outgoing payments
 
+hasPayment:
+SELECT COUNT(*) FROM outgoing_payments
+WHERE id = ?;
+
 insertPayment:
 INSERT INTO outgoing_payments (
             id,
@@ -90,6 +94,9 @@ deletePayment:
 DELETE FROM outgoing_payments WHERE id = ?;
 
 -- queries for lightning parts
+
+countLightningPart:
+SELECT COUNT(*) FROM outgoing_payment_parts WHERE part_id = ?;
 
 insertLightningPart:
 INSERT INTO outgoing_payment_parts (
@@ -115,6 +122,9 @@ DELETE FROM outgoing_payment_parts WHERE part_parent_id = ?;
 
 -- queries for closing tx parts
 
+countClosingTxPart:
+SELECT COUNT(*) FROM outgoing_payment_closing_tx_parts WHERE part_id = ?;
+
 insertClosingTxPart:
 INSERT INTO outgoing_payment_closing_tx_parts (
             part_id,
@@ -127,6 +137,20 @@ INSERT INTO outgoing_payment_closing_tx_parts (
 ) VALUES (:id, :parent_id, :tx_id, :amount_msat, :closing_info_type, :closing_info_blob, :created_at);
 
 -- queries mixing outgoing payments and parts
+
+getPaymentWithoutParts:
+SELECT id,
+       recipient_amount_msat,
+       recipient_node_id,
+       payment_hash,
+       details_type,
+       details_blob,
+       created_at,
+       completed_at,
+       status_type,
+       status_blob
+FROM outgoing_payments
+WHERE id=?;
 
 getPayment:
 SELECT parent.id,
