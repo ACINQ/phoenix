@@ -32,6 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
@@ -50,9 +53,17 @@ fun PaymentSettingsView() {
     val context = LocalContext.current
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
+    var showTrampolineMaxFeeDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
+
+    //val trampolineMaxBaseFee by UserPrefs.getTrampolineMaxBaseFee(LocalContext.current).collectAsState(null)
+    //val trampolineMaxFeeProportional by UserPrefs.getTrampolineMaxBaseFeeProportional(LocalContext.current).collectAsState(null)
+
+    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(
+        TrampolineFees(Satoshi(1L), 2L, CltvExpiryDelta(144))
+    )
 
     if (showDescriptionDialog) {
         DefaultDescriptionInvoiceDialog(
@@ -88,6 +99,23 @@ fun PaymentSettingsView() {
         )
     }
 
+    if (showTrampolineMaxFeeDialog) {
+        TrampolineMaxFeesDialog(
+            trampolineMaxFees = trampolineMaxFees,
+            onDismiss = {
+                scope.launch {
+                    showTrampolineMaxFeeDialog = false
+                }
+            },
+            onConfirm = {
+                scope.launch {
+                    UserPrefs.saveTrampolineMaxFee(context, it)
+                }
+                showTrampolineMaxFeeDialog = false
+            }
+        )
+    }
+
     SettingScreen {
         SettingHeader(
             onBackClick = { nc.popBackStack() },
@@ -107,14 +135,14 @@ fun PaymentSettingsView() {
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = "",
-                onClick = {}
+                description = trampolineMaxFees?.let { it.feeBase.toString() + " " + it.feeProportional.toString() },
+                onClick = {showTrampolineMaxFeeDialog = true}
             )
 
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
                 description = "",
-                onClick = {showDescriptionDialog = true}
+                onClick = {}
             )
         }
     }
@@ -229,6 +257,98 @@ private fun DefaultDescriptionInvoiceDialog(
                         Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
                     onTextChange = {
                         paymentDescription = it
+                    },
+                    enabled = true
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun TrampolineMaxFeesDialog(
+    trampolineMaxFees: (TrampolineFees),
+    onDismiss: () -> Unit,
+    onConfirm: (TrampolineFees) -> Unit,
+) {
+    var feeBase by rememberSaveable { mutableStateOf(trampolineMaxFees.feeBase.toLong().toString()) }
+    var feeProportional by rememberSaveable { mutableStateOf(trampolineMaxFees.feeProportional.toString()) }
+
+    Dialog(
+        onDismiss = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        buttons = {
+            Button(onClick = onDismiss, text = stringResource(id = R.string.btn_cancel))
+            Button(
+                onClick = {
+                    onConfirm(TrampolineFees(Satoshi(feeBase.toLong()), feeProportional.toLong(), CltvExpiryDelta(144)))
+                },
+                text = stringResource(id = R.string.btn_ok)
+            )
+        }
+    ) {
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(16.dp))
+            // -- checkbox
+            // -- input
+            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .enableOrFade(enabled = true)
+                    .padding(horizontal = 24.dp)
+            ) {
+                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox), style = MaterialTheme.typography.h5)
+                Spacer(Modifier.height(16.dp))
+                //Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_description))
+                //Spacer(Modifier.height(8.dp))
+
+                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_label), style = MaterialTheme.typography.subtitle2)
+                // max fee
+                NumberInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = feeBase,
+                    placeholder = {
+                        Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
+                    onTextChange = {
+                        val maxChar = 5
+                        if (it.length <= maxChar) {
+                            feeBase = if (it.isEmpty()) {
+                                ""
+                            } else {
+                                when (it.toLongOrNull()) {
+                                    null -> feeBase //old value
+                                    else -> it   //new value
+                                }
+                            }
+                        }
+                    },
+                    enabled = true
+                )
+                Spacer(Modifier.height(16.dp))
+
+                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label), style = MaterialTheme.typography.subtitle2)
+                // max fee proportional
+                NumberInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = feeProportional,
+                    placeholder = {
+                        Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
+                    onTextChange = {
+                        val maxChar = 3
+                        if (it.length <= maxChar) {
+                            feeProportional = if (it.isEmpty()) {
+                                ""
+                            } else {
+                                when (it.toLongOrNull()) {
+                                    null -> feeProportional //old value
+                                    else -> it   //new value
+                                }
+                            }
+                        }
                     },
                     enabled = true
                 )

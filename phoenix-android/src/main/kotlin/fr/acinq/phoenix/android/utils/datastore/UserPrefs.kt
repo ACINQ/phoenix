@@ -102,16 +102,16 @@ object UserPrefs {
 
     private val TRAMPOLINE_MAX_BASE_FEE = longPreferencesKey("TRAMPOLINE_MAX_BASE_FEE")
     private val TRAMPOLINE_MAX_PROPORTIONAL_FEE = longPreferencesKey("TRAMPOLINE_MAX_PROPORTIONAL_FEE")
-    fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees?> = prefs(context).map {
-        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE]?.let { Satoshi(it) }
-        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE]
-        if (feeBase != null && feeProportional != null) {
-            TrampolineFees(feeBase = feeBase, feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
-        } else null
-    }
+
     suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees) = context.userPrefs.edit {
-        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.sat
-        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeProportional
+        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.toLong()
+        it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] = fee.feeProportional
+    }
+
+    fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees> = prefs(context).map {
+        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE] ?: 1L
+        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] ?: 2L
+        TrampolineFees(feeBase = Satoshi(feeBase), feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
     }
 
     private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
