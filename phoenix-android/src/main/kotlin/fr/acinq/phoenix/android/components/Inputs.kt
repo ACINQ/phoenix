@@ -102,6 +102,7 @@ fun NumberInput(
     TextField(
         value = text,
         onValueChange = onTextChange,
+        singleLine = true,
         maxLines = maxLines,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done,

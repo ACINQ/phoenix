@@ -31,12 +31,15 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.legacy.utils.Prefs
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 
 
 @Composable
@@ -48,8 +51,8 @@ fun PaymentSettingsView() {
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
 
-    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState("")
-    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState("")
+    val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
+    val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
 
     if (showDescriptionDialog) {
         DefaultDescriptionInvoiceDialog(
@@ -70,7 +73,7 @@ fun PaymentSettingsView() {
 
     if (showExpiryDialog) {
         DefaultExpiryInvoiceDialog(
-            expiry = 1L,
+            expiry = invoiceDefaultExpiry,
             onDismiss = {
                 scope.launch {
                     showExpiryDialog = false
@@ -78,7 +81,7 @@ fun PaymentSettingsView() {
             },
             onConfirm = {
                 scope.launch {
-                    UserPrefs.saveInvoiceDefaultExpiry(context, 1L)
+                    UserPrefs.saveInvoiceDefaultExpiry(context, it.toLongOrNull() ?: 60 * 60 * 24 * 7)
                 }
                 showExpiryDialog = false
             }
@@ -99,7 +102,7 @@ fun PaymentSettingsView() {
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_expiry_title),
-                description = "Hello World",
+                description = stringResource(id = R.string.paymentsettings_expiry_value, NumberFormat.getInstance().format(invoiceDefaultExpiry)),
                 onClick = { showExpiryDialog = true}
             )
             SettingInteractive(
@@ -123,9 +126,9 @@ fun PaymentSettingsView() {
 private fun DefaultExpiryInvoiceDialog(
     expiry: (Long),
     onDismiss: () -> Unit,
-    onConfirm: (Long) -> Unit,
+    onConfirm: (String) -> Unit,
 ) {
-    var paymentExpiry by rememberSaveable { mutableStateOf(expiry) }
+    var paymentExpiry by rememberSaveable { mutableStateOf(expiry.toString()) }
 
     Dialog(
         onDismiss = onDismiss,
@@ -143,8 +146,6 @@ private fun DefaultExpiryInvoiceDialog(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(Modifier.height(16.dp))
-            // -- checkbox
-            // -- input
             Spacer(Modifier.height(12.dp))
             Column(
                 Modifier
@@ -152,17 +153,29 @@ private fun DefaultExpiryInvoiceDialog(
                     .enableOrFade(enabled = true)
                     .padding(horizontal = 24.dp)
             ) {
-                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title), style = MaterialTheme.typography.h5)
+                Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_title), style = MaterialTheme.typography.h5)
                 Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_description))
+                Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_description))
                 Spacer(Modifier.height(8.dp))
+
                 NumberInput(
                     modifier = Modifier.fillMaxWidth(),
-                    text = paymentExpiry.toString(),
+                    text = paymentExpiry,
                     placeholder = {
-                        Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
+                        Text(stringResource(id = R.string.paymentsettings_expiry_dialog_hint)) },
                     onTextChange = {
-                        paymentExpiry = it.toLong()
+
+                        val maxChar = 7
+                        if (it.length <= maxChar) {
+                            paymentExpiry = if (it.isEmpty()) {
+                                ""
+                            } else {
+                                when (it.toLongOrNull()) {
+                                    null -> paymentExpiry //old value
+                                    else -> it   //new value
+                                }
+                            }
+                        }
                     },
                     enabled = true
                 )
