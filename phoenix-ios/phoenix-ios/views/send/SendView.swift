@@ -211,7 +211,7 @@ struct SendView: MVIView {
 			colorScheme: colorScheme.opposite,
 			style: .chrome,
 			duration: 30.0,
-			location: .middle,
+			alignment: .middle,
 			showCloseButton: true
 		)
 	}
