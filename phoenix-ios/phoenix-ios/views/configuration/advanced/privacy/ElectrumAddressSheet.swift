@@ -783,6 +783,7 @@ struct ElectrumAddressSheet: View {
 	func tlsConnectionCheckDidFinish(_ result: Result<TLSConnectionStatus, TLSConnectionError>) {
 		log.trace("tlsConnectionCheckDidFinish()")
 		
+		var isTrustedCert = false
 		switch result {
 		case .failure(let error):
 			switch error {
@@ -798,6 +799,7 @@ struct ElectrumAddressSheet: View {
 			switch status {
 			case .trusted:
 				log.debug("SUCCESS: trusted")
+				isTrustedCert = true
 			case .untrusted(_):
 				log.debug("SUCCESS: untrusted")
 			}
@@ -805,6 +807,9 @@ struct ElectrumAddressSheet: View {
 		
 		activeCheck = nil
 		checkResult = result
+		if isTrustedCert {
+			saveConfig() // closes sheet too
+		}
 	}
 }
 
