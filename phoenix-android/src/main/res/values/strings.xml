@@ -628,13 +628,10 @@
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
 
   <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
-  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s minimum)</string>
+  <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s sat minimum)</string>
   <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
-  <string name="paymentsettings_paytoopen_fees_dialog_message"><![CDATA[
-    This fee applies when you receive a payment over Lightning and a new channel needs to be created.
-    <br /><br />
-    See <a href="https://phoenix.acinq.co/faq#what-are-the-fees">the FAQ</a> for more information.
-  ]]></string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
+  <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
 
   <!-- ////////////// migration result dialog //////////////// -->
 

@@ -16,6 +16,7 @@
 
 package fr.acinq.phoenix.android
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -64,6 +65,7 @@ fun AppView(
 
     val navController = rememberNavController()
     val fiatRates = application.business.currencyManager.ratesFlow.collectAsState(listOf())
+    val walletContext = application.business.appConfigurationManager.chainContext.collectAsState(initial = null)
     val context = LocalContext.current
     val isAmountInFiat = UserPrefs.getIsAmountInFiat(context).collectAsState(false)
     val fiatCurrency = UserPrefs.getFiatCurrency(context).collectAsState(initial = FiatCurrency.USD)
@@ -79,6 +81,7 @@ fun AppView(
         LocalBitcoinUnit provides bitcoinUnit.value,
         LocalFiatCurrency provides fiatCurrency.value,
         LocalShowInFiat provides isAmountInFiat.value,
+        LocalWalletContext provides walletContext.value,
         LocalElectrumServer provides electrumServer.value,
     ) {
 

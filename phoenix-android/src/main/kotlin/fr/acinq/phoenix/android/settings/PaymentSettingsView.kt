@@ -17,6 +17,10 @@
 package fr.acinq.phoenix.android.settings
 
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -24,23 +28,26 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.phoenix.android.LocalBusiness
+import fr.acinq.phoenix.android.LocalWalletContext
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.legacy.utils.Prefs
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
@@ -54,16 +61,16 @@ fun PaymentSettingsView() {
     var showDescriptionDialog by rememberSaveable { mutableStateOf(false) }
     var showExpiryDialog by rememberSaveable { mutableStateOf(false) }
     var showTrampolineMaxFeeDialog by rememberSaveable { mutableStateOf(false) }
+    var showPayToOpenDialog by rememberSaveable { mutableStateOf(false) }
 
     val invoiceDefaultDesc by UserPrefs.getInvoiceDefaultDesc(LocalContext.current).collectAsState(initial = "")
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
 
-    //val trampolineMaxBaseFee by UserPrefs.getTrampolineMaxBaseFee(LocalContext.current).collectAsState(null)
-    //val trampolineMaxFeeProportional by UserPrefs.getTrampolineMaxBaseFeeProportional(LocalContext.current).collectAsState(null)
-
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(
         TrampolineFees(Satoshi(1L), 2L, CltvExpiryDelta(144))
     )
+
+    val walletContext = LocalWalletContext.current
 
     if (showDescriptionDialog) {
         DefaultDescriptionInvoiceDialog(
@@ -116,6 +123,15 @@ fun PaymentSettingsView() {
         )
     }
 
+
+    if (showPayToOpenDialog) {
+        PayToOpenDialog(
+            onDismiss = {
+                showPayToOpenDialog = false
+            }
+        )
+    }
+
     SettingScreen {
         SettingHeader(
             onBackClick = { nc.popBackStack() },
@@ -139,10 +155,13 @@ fun PaymentSettingsView() {
                 onClick = {showTrampolineMaxFeeDialog = true}
             )
 
+            //val walletContext = business?.appConfigurationManager?.chainContext?.collectAsState(null)?.value
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
-                description = "",
-                onClick = {}
+                description = walletContext?.let {
+                    stringResource(id = R.string.paymentsettings_paytoopen_fees_desc, String.format("%.2f", 100 * (it.payToOpen.v1.feePercent)),it.payToOpen.v1.minFeeSat )
+                },
+                onClick = {showPayToOpenDialog = true}
             )
         }
     }
@@ -355,6 +374,56 @@ private fun TrampolineMaxFeesDialog(
             }
         }
     }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun PayToOpenDialog(
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismiss = onDismiss,
+        buttons = { Spacer(Modifier.height(24.dp))},
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.height(16.dp))
+            // -- checkbox
+            // -- input
+            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .enableOrFade(enabled = true)
+                    .padding(horizontal = 24.dp)
+            ) {
+                Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title), style = MaterialTheme.typography.h5)
+                Spacer(Modifier.height(8.dp))
+                Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))
+                Spacer(Modifier.height(8.dp))
+                val apiString = AnnotatedString.Builder()
+                apiString.pushStyle(
+                    style = SpanStyle(
+                        color = Blue,
+                        textDecoration = TextDecoration.Underline
+                    )
+                )
+                apiString.append(stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message_clickable))
+                val context = LocalContext.current
+                Text(
+                    modifier = Modifier.clickable(enabled = true) {
+                         openLink(context, "https://phoenix.acinq.co/faq#what-are-the-fees")
+                    },
+                    text = apiString.toAnnotatedString(),
+                )
+            }
+        }
+    }
+}
+
+private fun openLink(context: Context, link: String) {
+    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
 }
 
 @Preview(device = Devices.PIXEL_3A)

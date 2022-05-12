@@ -17,14 +17,18 @@
 package fr.acinq.phoenix.android.utils
 
 
+import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import fr.acinq.bitcoin.scala.BtcAmount
+import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
+import fr.acinq.phoenix.legacy.utils.Prefs
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -104,5 +108,16 @@ object Converter {
                 and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
                 and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
                 and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
+    }
+
+    /** Convert a per millionths Long to a percentage String (max 4 decimals). */
+    fun perMillionthsToPercentageString(perMillionths: Long): String {
+        return DecimalFormat("0.00##").apply { roundingMode = RoundingMode.FLOOR }.run {
+            format(perMillionths
+                .coerceAtLeast(0)
+                .toBigDecimal()
+                .divide(BigDecimal.valueOf(1000000))
+                .multiply(BigDecimal(100)))
+        }
     }
 }
