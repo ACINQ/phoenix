@@ -65,21 +65,29 @@ object Prefs {
 
     // -- electrum
 
-    val PREFS_ELECTRUM_ADDRESS = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS")
+    val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
+    val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
     const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
 
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
-        it[PREFS_ELECTRUM_ADDRESS]?.takeIf { it.isNotBlank() }?.let { address ->
-            log.info("retrieved preferred electrum=$address from datastore")
-            if (address.contains(":")) {
-                val (host, port) = address.split(":")
-                ServerAddress(host, port.toInt(), TcpSocket.TLS.TRUSTED_CERTIFICATES)
-            } else ServerAddress(address, 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
+        val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
+        log.info("retrieved preferred electrum host=$host port=$port from datastore")
+        if (host != null && port != null) {
+            ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        } else {
+            null
         }
     }
-
-    suspend fun saveElectrumServer(context: Context, address: String) = context.datastore.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
-    suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
+    suspend fun saveElectrumServer(context: Context, address: ServerAddress?) = context.datastore.edit {
+        if (address == null) {
+            it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
+            it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
+        } else {
+            it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
+            it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
+        }
+    }
 
     // -- FCM
 
