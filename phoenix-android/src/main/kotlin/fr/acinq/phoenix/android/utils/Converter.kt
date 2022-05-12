@@ -120,4 +120,11 @@ object Converter {
                 .multiply(BigDecimal(100)))
         }
     }
+
+    /** Convert a raw stringified percentage to a fee per millionths (decimals after the 4th are ignored). For example, 0.01% becomes 100. */
+    fun percentageToPerMillionths(percent: String): Long {
+        return (DecimalFormat().parse(percent.trim())!!.toDouble() * 1000000 / 100)
+            .toLong()
+            .coerceAtLeast(0)
+    }
 }

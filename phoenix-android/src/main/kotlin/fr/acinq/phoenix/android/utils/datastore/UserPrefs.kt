@@ -26,6 +26,7 @@ import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.legacy.TrampolineFeeSetting
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -109,12 +110,12 @@ object UserPrefs {
     }
 
     fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees> = prefs(context).map {
-        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE] ?: 1L
-        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] ?: 2L
+        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE] ?: -1L
+        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] ?: -1L
         TrampolineFees(feeBase = Satoshi(feeBase), feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
     }
 
-    private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
+        private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 

@@ -48,6 +48,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.legacy.utils.Converter
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
@@ -67,7 +68,7 @@ fun PaymentSettingsView() {
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
 
     val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(
-        TrampolineFees(Satoshi(1L), 2L, CltvExpiryDelta(144))
+        TrampolineFees(Satoshi(-1L), -1L, CltvExpiryDelta(144))
     )
 
     val walletContext = LocalWalletContext.current
@@ -151,11 +152,22 @@ fun PaymentSettingsView() {
             )
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
-                description = trampolineMaxFees?.let { it.feeBase.toString() + " " + it.feeProportional.toString() },
+                description = trampolineMaxFees?.let { customTrampolineMaxFees ->
+                    if (customTrampolineMaxFees.feeBase.toLong() < 0L)
+                    {
+                        walletContext?.let {
+                            val trampolineFees = it.trampoline.v2.attempts.last()
+                            stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBaseSat, Converter.perMillionthsToPercentageString(trampolineFees.feePerMillionths) )
+                        }
+                    }
+                    else
+                    {
+                        customTrampolineMaxFees?.let { it.feeBase.toString() + " " + it.feeProportional.toString() }
+                    }
+                },
                 onClick = {showTrampolineMaxFeeDialog = true}
             )
 
-            //val walletContext = business?.appConfigurationManager?.chainContext?.collectAsState(null)?.value
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_paytoopen_fees_title),
                 description = walletContext?.let {
