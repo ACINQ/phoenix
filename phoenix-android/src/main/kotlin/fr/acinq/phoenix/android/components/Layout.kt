@@ -92,6 +92,7 @@ fun Dialog(
             // content, must set the padding etc...
             content()
             // buttons
+            Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier.align(Alignment.End)
             ) {

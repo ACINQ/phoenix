@@ -23,11 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.bitcoin.Satoshi
-import fr.acinq.bitcoin.sat
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountInput
@@ -71,9 +70,7 @@ fun SendView(request: PaymentRequest?) {
             ) {
                 val finalAmount = amount
                 if (request != null && finalAmount != null) {
-                    val maxFees = trampolineMaxFees?.let { trMaxFees ->
-                        MaxFees(trMaxFees.feeBase, trMaxFees.feeProportional).takeIf { it.feeBase > 0.sat() }
-                    }
+                    val maxFees = trampolineMaxFees?.takeUnless { it.feeBase < 0.sat || it.feeProportional < 0 } ?.let { MaxFees(it.feeBase, it.feeProportional) }
 
                     postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = request, amount = finalAmount, maxFees = maxFees))
                     nc.navigate(Screen.Home)
