@@ -20,21 +20,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.CltvExpiryDelta
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.AmountInput
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.mvi.MVIView
+import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.controllers.payments.MaxFees
 import fr.acinq.phoenix.controllers.payments.Scan
 
 @Composable
 fun SendView(request: PaymentRequest?) {
     val log = logger("SendView")
     log.info { "init sendview amount=${request?.amount} desc=${request?.description}" }
+
+    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
+
     MVIView(CF::scan) { model, postIntent ->
         val nc = navController
         Column(
@@ -61,7 +70,17 @@ fun SendView(request: PaymentRequest?) {
             ) {
                 val finalAmount = amount
                 if (request != null && finalAmount != null) {
-                    postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = request, amount = finalAmount, maxFees = null))
+                    val maxFees = trampolineMaxFees?.let {
+                        if (it.feeBase.toLong() > 0)
+                        {
+                            MaxFees(it.feeBase, it.feeProportional)
+                        }
+                        else {
+                            null
+                        }
+                    }
+
+                    postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = request, amount = finalAmount, maxFees = maxFees))
                     nc.navigate(Screen.Home)
                 }
             }
