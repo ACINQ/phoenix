@@ -293,7 +293,7 @@ struct ConfigurationView: View {
 	}
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged()")
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
 		// This is a hack, courtesy of bugs in Apple's NavigationLink:
 		// https://developer.apple.com/forums/thread/677333
@@ -306,40 +306,50 @@ struct ConfigurationView: View {
 		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
 		// and forcibly undo it.
 		
-		DispatchQueue.main.async {
+		if value == nil {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 1.0)
+			
+		} else {
+			
+			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-			case .backup:
-				newNavLinkTag = NavLinkTag.RecoveryPhraseView
-			default:
-				break
+				case .backup   : newNavLinkTag = NavLinkTag.RecoveryPhraseView
+				case .electrum : newNavLinkTag = NavLinkTag.PrivacyView
+				default        : break
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 5.0)
 				
-				let idx = self.swiftUiBugWorkaroundIdx
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
-				
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-					
-					if self.swiftUiBugWorkaroundIdx == idx {
-						self.swiftUiBugWorkaround = nil
-					}
-				}
 			}
 		}
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged()")
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
 				
 			log.trace("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
+		}
+	}
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				self.swiftUiBugWorkaround = nil
+			}
 		}
 	}
 	

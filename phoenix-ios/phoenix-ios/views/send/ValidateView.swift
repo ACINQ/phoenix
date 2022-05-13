@@ -189,7 +189,7 @@ struct ValidateView: View {
 	@ViewBuilder
 	var content: some View {
 	
-		let isDisconnected = connectionsManager.connections.global != .established
+		let isDisconnected = !(connectionsManager.connections.global is Lightning_kmpConnection.ESTABLISHED)
 		VStack {
 	
 			if let host = paymentHost() {
@@ -566,13 +566,13 @@ struct ValidateView: View {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""

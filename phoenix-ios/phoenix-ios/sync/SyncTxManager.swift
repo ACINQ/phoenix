@@ -343,7 +343,7 @@ class SyncTxManager {
 	/// Called from SyncManager; part of SyncManagerProtocol
 	///
 	func networkStatusChanged(hasInternet: Bool) {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet)")
+		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
 		
 		Task {
 			if let newState = await self.actor.networkStatusChanged(hasInternet: hasInternet) {

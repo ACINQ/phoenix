@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.Connection
 import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.*
@@ -45,6 +46,7 @@ import fr.acinq.phoenix.android.utils.mutedBgColor
 import fr.acinq.phoenix.controllers.config.ElectrumConfiguration
 import fr.acinq.phoenix.data.ElectrumConfig
 import kotlinx.coroutines.launch
+import java.net.URI
 import java.text.NumberFormat
 
 @Composable
@@ -69,10 +71,11 @@ fun ElectrumView() {
                 if (showServerDialog) {
                     ElectrumServerDialog(
                         initialAddress = prefElectrumServer,
-                        onConfirm = { address ->
+                        onConfirm = { host, port ->
                             scope.launch {
+                                val address = host?.let { ServerAddress(it, port ?: 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES) }
                                 Prefs.saveElectrumServer(context, address)
-                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address = address))
+                                postIntent(ElectrumConfiguration.Intent.UpdateElectrumServer(address))
                                 showServerDialog = false
                             }
                         },
@@ -125,7 +128,7 @@ fun ElectrumView() {
 @Composable
 private fun ElectrumServerDialog(
     initialAddress: ServerAddress?,
-    onConfirm: (String) -> Unit,
+    onConfirm: (String?, Int?) -> Unit,
     onDismiss: () -> Unit
 ) {
     var useCustomServer by rememberSaveable { mutableStateOf(initialAddress != null) }
@@ -139,13 +142,16 @@ private fun ElectrumServerDialog(
             Button(
                 onClick = {
                     if (useCustomServer) {
-                        if (address.matches("""(.*):(\d*)""".toRegex())) {
-                            onConfirm(address)
+                        if (address.matches("""(.*):*(\d*)""".toRegex())) {
+                            val (host, port) = address.trim().run {
+                                substringBeforeLast(":") to (substringAfterLast(":").toIntOrNull())
+                            }
+                            onConfirm(host, port)
                         } else {
                             addressError = true
                         }
                     } else {
-                        onConfirm("")
+                        onConfirm(null, 0)
                     }
                 },
                 text = stringResource(id = R.string.btn_save)

@@ -188,7 +188,11 @@ class AppConfigurationManager(
         Chain.Testnet -> electrumTestnetConfigurations.random()
         Chain.Regtest -> platformElectrumRegtestConf()
     }.let {
-        ServerAddress(it.host, it.sslPort, TcpSocket.TLS.UNSAFE_CERTIFICATES)
+        if (it.pinnedPublicKey != null) {
+            ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.PINNED_PUBLIC_KEY(it.pinnedPublicKey))
+        }  else {
+            ServerAddress(it.host, it.tlsPort, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        }
     }
 
     /** The flow containing the electrum header responses messages. */

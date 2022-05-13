@@ -81,7 +81,7 @@ struct AppStatusPopover: View {
 			Group {
 				
 				let globalStatus = monitor.connections.global
-				if globalStatus == .closed {
+				if globalStatus is Lightning_kmpConnection.CLOSED {
 					
 					Label {
 						Text("Offline")
@@ -92,7 +92,7 @@ struct AppStatusPopover: View {
 							.frame(width: titleIconWidth, alignment: .center)
 					}
 				
-				} else if globalStatus == .establishing {
+				} else if globalStatus is Lightning_kmpConnection.ESTABLISHING {
 					
 					Label {
 						Text("Connecting...")
@@ -360,13 +360,13 @@ fileprivate struct ConnectionCell: View {
 		HStack(alignment: VerticalAlignment.center) {
 			let bullet = Image(systemName: "circle.fill").imageScale(.small)
 
-			if connection == .established {
+			if connection is Lightning_kmpConnection.ESTABLISHED{
 				bullet.foregroundColor(.appPositive)
 			}
-			else if connection == .establishing {
+			else if connection is Lightning_kmpConnection.ESTABLISHING {
 				bullet.foregroundColor(.appWarn)
 			}
-			else if connection == .closed {
+			else if connection is Lightning_kmpConnection.CLOSED {
 				bullet.foregroundColor(.appNegative)
 			}
 
