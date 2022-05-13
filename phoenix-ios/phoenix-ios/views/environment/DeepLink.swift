@@ -1,7 +1,8 @@
 import Foundation
 
-enum DeepLink: Equatable {
+enum DeepLink: String, Equatable {
 	case backup
+	case electrum
 }
 
 class DeepLinkManager: ObservableObject {
@@ -11,12 +12,18 @@ class DeepLinkManager: ObservableObject {
 	
 	func broadcast(_ value: DeepLink?) {
 		self.deepLinkIdx += 1
-		let idx = self.deepLinkIdx
-		
 		self.deepLink = value
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-			if self.deepLinkIdx == idx {
-				self.deepLink = nil
+		
+		if value != nil {
+			
+			// The value should get unset when the UI reaches the final destination.
+			// But if anything prevents that for any reason, this acts as a backup.
+			
+			let idx = self.deepLinkIdx
+			DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+				if self.deepLinkIdx == idx {
+					self.deepLink = nil
+				}
 			}
 		}
 	}

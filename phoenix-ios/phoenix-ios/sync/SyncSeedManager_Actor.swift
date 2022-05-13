@@ -131,7 +131,7 @@ actor SyncSeedManager_Actor {
 	}
 	
 	func networkStatusChanged(hasInternet: Bool) -> SyncSeedManager_State? {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet)")
+		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
 		
 		if hasInternet {
 			waitingForInternet = false

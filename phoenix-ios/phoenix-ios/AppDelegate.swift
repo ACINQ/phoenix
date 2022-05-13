@@ -772,8 +772,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 		let prvPeerConnectionState = peerConnectionState
 		peerConnectionState = connections.peer
 		
-		if prvPeerConnectionState != Lightning_kmpConnection.established &&
-		   peerConnectionState == Lightning_kmpConnection.established
+		if !(prvPeerConnectionState is Lightning_kmpConnection.ESTABLISHED) &&
+		   (peerConnectionState is Lightning_kmpConnection.ESTABLISHED)
 		{
 			maybeRegisterFcmToken()
 		}
@@ -791,7 +791,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
 			log.debug("maybeRegisterFcmToken: no: !fcmToken")
 			return
 		}
-		if peerConnectionState != Lightning_kmpConnection.established {
+		if !(peerConnectionState is Lightning_kmpConnection.ESTABLISHED) {
 			log.debug("maybeRegisterFcmToken: no: !peerConnection")
 			return
 		}

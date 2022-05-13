@@ -70,8 +70,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var fiatCurrencyPublisher: CurrentValueSubject<FiatCurrency, Never> = {
-		var value = self.fiatCurrency
-		return CurrentValueSubject<FiatCurrency, Never>(value)
+		return CurrentValueSubject<FiatCurrency, Never>(self.fiatCurrency)
 	}()
 	
 	var fiatCurrency: FiatCurrency {
@@ -92,8 +91,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var bitcoinUnitPublisher: CurrentValueSubject<BitcoinUnit, Never> = {
-		var value = self.bitcoinUnit
-		return CurrentValueSubject<BitcoinUnit, Never>(value)
+		return CurrentValueSubject<BitcoinUnit, Never>(self.bitcoinUnit)
 	}()
 	
 	var bitcoinUnit: BitcoinUnit {
@@ -114,8 +112,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var themePublisher: CurrentValueSubject<Theme, Never> = {
-		var value = self.theme
-		return CurrentValueSubject<Theme, Never>(value)
+		return CurrentValueSubject<Theme, Never>(self.theme)
 	}()
 	
 	var theme: Theme {
@@ -132,8 +129,7 @@ class Prefs {
 	}
 
 	lazy private(set) var isTorEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		var value = self.isTorEnabled
-		return CurrentValueSubject<Bool, Never>(value)
+		return CurrentValueSubject<Bool, Never>(self.isTorEnabled)
 	}()
 
 	var isTorEnabled: Bool {
@@ -146,6 +142,10 @@ class Prefs {
 		}
 	}
 	
+	lazy private(set) var electrumConfigPublisher: CurrentValueSubject<ElectrumConfigPrefs?, Never> = {
+		return CurrentValueSubject<ElectrumConfigPrefs?, Never>(self.electrumConfig)
+	}()
+	
 	var electrumConfig: ElectrumConfigPrefs? {
 		get {
 			let key = Keys.electrumConfig.rawValue
@@ -155,6 +155,7 @@ class Prefs {
 		set {
 			let key = Keys.electrumConfig.rawValue
 			UserDefaults.standard.setCodable(value: newValue, forKey: key)
+			electrumConfigPublisher.send(newValue)
 		}
 	}
 	
@@ -203,8 +204,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var maxFeesPublisher: CurrentValueSubject<MaxFees?, Never> = {
-		let currentValue = self.maxFees
-		return CurrentValueSubject<MaxFees?, Never>(currentValue)
+		return CurrentValueSubject<MaxFees?, Never>(self.maxFees)
 	}()
 	
 	var maxFees: MaxFees? {
@@ -235,8 +235,7 @@ class Prefs {
 	// --------------------------------------------------
 	
 	lazy private(set) var currencyConverterListPublisher: CurrentValueSubject<[Currency], Never> = {
-		var list = self.currencyConverterList
-		return CurrentValueSubject<[Currency], Never>(list)
+		return CurrentValueSubject<[Currency], Never>(self.currencyConverterList)
 	}()
 	
 	var currencyConverterList: [Currency] {
@@ -383,8 +382,7 @@ class Prefs {
 	}
 	
 	lazy private(set) var backupTransactions_isEnabledPublisher: CurrentValueSubject<Bool, Never> = {
-		var value = self.backupTransactions_isEnabled
-		return CurrentValueSubject<Bool, Never>(value)
+		return CurrentValueSubject<Bool, Never>(self.backupTransactions_isEnabled)
 	}()
 	
 	var backupTransactions_isEnabled: Bool {
@@ -438,8 +436,7 @@ class Prefs {
 	// --------------------------------------------------
 	
 	lazy private(set) var backupSeed_isEnabled_publisher: CurrentValueSubject<Bool, Never> = {
-		var value = self.backupSeed_isEnabled
-		return CurrentValueSubject<Bool, Never>(value)
+		return CurrentValueSubject<Bool, Never>(self.backupSeed_isEnabled)
 	}()
 	
 	var backupSeed_isEnabled: Bool {
