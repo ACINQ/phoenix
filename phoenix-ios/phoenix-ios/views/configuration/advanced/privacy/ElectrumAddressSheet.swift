@@ -362,7 +362,7 @@ struct ElectrumAddressSheet: View {
 				Button {
 					certInfoType = certInfoType.next()
 				} label: {
-					Image(systemName: "arrowshape.turn.up.forward.fill")
+					Image(systemName: "chevron.forward.circle.fill")
 				}
 				.font(.body)
 			}
