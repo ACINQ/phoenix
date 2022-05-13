@@ -29,9 +29,8 @@ import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.components.SettingHeader
 import fr.acinq.phoenix.android.components.SettingScreen
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.Logging
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.legacy.BuildConfig
-import fr.acinq.phoenix.legacy.utils.Logging
 
 @Composable
 fun LogsView() {
