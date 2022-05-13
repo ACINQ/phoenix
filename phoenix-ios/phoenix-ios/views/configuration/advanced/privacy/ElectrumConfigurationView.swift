@@ -16,6 +16,8 @@ struct ElectrumConfigurationView: MVIView {
 	
 	@StateObject var mvi = MVIState({ $0.electrumConfiguration() })
 	
+	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
+	
 	@State var didAppear = false
 	
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
@@ -101,8 +103,8 @@ struct ElectrumConfigurationView: MVIView {
 					Text(address).bold()
 						.padding(.top, 2)
 					
-					if let errMsg = mvi.model.error?.message {
-						Text(errMsg)
+					if customElectrumServerObserver.problem == .badCertificate {
+						Text("Bad certificate !")
 							.foregroundColor(Color.appNegative)
 							.padding(.top, 2)
 					}
