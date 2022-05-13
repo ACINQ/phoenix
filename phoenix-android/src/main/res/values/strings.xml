@@ -620,12 +620,15 @@
     <string name="paymentsettings_paytoopen_dialog_description">The app will automatically create a channel when needed to receive a payment.\n\nNote that a %1$s%% fee is deducted from the amount received, to cover the cost of creating the channel.</string>
 
     <string name="paymentsettings_trampoline_fees_title">Maximum fee for outgoing Lightning payments</string>
-    <string name="paymentsettings_trampoline_fees_desc">%1$s sat + %2$s%%</string>
+    <string name="paymentsettings_trampoline_fees_desc">%1$s + %2$s%%</string>
     <string name="paymentsettings_trampoline_fees_dialog_override_default_checkbox">Override default fee for outgoing payments</string>
     <string name="paymentsettings_trampoline_fees_dialog_base_fee_label">Base fee (satoshi)</string>
     <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Enter a base fee in satoshi</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
+  <string name="paymentsettings_trampoline_fees_dialog_invalid">Enter a valid maximum fee setting</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_too_high">Base fee cannot exceed 50 000 sat.</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_too_high">Proportional fee cannot exceed 100%.</string>
 
   <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s sat minimum)</string>
