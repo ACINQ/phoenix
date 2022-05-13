@@ -38,26 +38,6 @@ fun LogsView() {
     val nc = navController
     val context = LocalContext.current
 
-    val logFile = Logging.getLastLogFile(LocalContext.current)
-    val authority = "fr.acinq.phoenix.android.provider"
-
-    val uri = FileProvider.getUriForFile(LocalContext.current, authority, logFile)
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        type = "text/plain"
-        putExtra(Intent.EXTRA_STREAM, uri)
-        putExtra(Intent.EXTRA_SUBJECT, stringResource(R.string.logs_share_subject))
-    }
-    val shareIntent = Intent.createChooser(sendIntent, null)
-
-    val localViewIntent: Intent = Intent().apply {
-        action = Intent.ACTION_VIEW
-        type = "text/plain"
-        setDataAndType(uri, "text/plain")
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    val viewIntent = Intent.createChooser(localViewIntent, stringResource(R.string.logs_view_with))
-
     SettingScreen {
         SettingHeader(
             onBackClick = { nc.popBackStack() },
@@ -65,17 +45,43 @@ fun LogsView() {
             subtitle = stringResource(id = R.string.logs_subtitle)
         )
         Card {
+
             SettingButton(
                 text = R.string.logs_view_button,
                 icon = R.drawable.ic_eye,
                 onClick = {
+
+                    val logFile = Logging.getLastLogFile(context)
+                    val authority = "fr.acinq.phoenix.android.provider"
+
+                    val uri = FileProvider.getUriForFile(context, authority, logFile)
+                    val localViewIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_VIEW
+                        type = "text/plain"
+                        setDataAndType(uri, "text/plain")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    val viewIntent = Intent.createChooser(localViewIntent, context.getString(R.string.logs_view_with))
                     context.startActivity(viewIntent)
                 }
             )
             SettingButton(
                 text = R.string.logs_share_button,
                 icon = R.drawable.ic_share,
+
                 onClick = {
+
+                    val logFile = Logging.getLastLogFile(context)
+                    val authority = "fr.acinq.phoenix.android.provider"
+
+                    val uri = FileProvider.getUriForFile(context, authority, logFile)
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.logs_share_subject))
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
                     context.startActivity(shareIntent)
                 }
             )
