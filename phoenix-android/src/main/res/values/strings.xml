@@ -596,7 +596,7 @@
     <string name="about_privacy_link">Privacy</string>
     <string name="about_terms_link">Terms</string>
 
-  <!-- //////////////// settings: options for payments //////////////// -->
+    <!-- //////////////// settings: options for payments //////////////// -->
 
     <string name="paymentsettings_title">Payment settings</string>
     <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
@@ -620,9 +620,9 @@
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
 
-  <!-- ////////////// migration result dialog //////////////// -->
+    <!-- ////////////// migration result dialog //////////////// -->
 
-  <string name="migration_dialog_title">Congratulations!</string>
-  <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
+    <string name="migration_dialog_title">Congratulations!</string>
+    <string name="migration_dialog_message">You are now using the new Phoenix version. Your channels are being migrated and will be ready soon.</string>
 
 </resources>
