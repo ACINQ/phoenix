@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.acinq.bitcoin.Satoshi
+import fr.acinq.bitcoin.sat
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
@@ -70,14 +71,8 @@ fun SendView(request: PaymentRequest?) {
             ) {
                 val finalAmount = amount
                 if (request != null && finalAmount != null) {
-                    val maxFees = trampolineMaxFees?.let {
-                        if (it.feeBase.toLong() > 0)
-                        {
-                            MaxFees(it.feeBase, it.feeProportional)
-                        }
-                        else {
-                            null
-                        }
+                    val maxFees = trampolineMaxFees?.let { trMaxFees ->
+                        MaxFees(trMaxFees.feeBase, trMaxFees.feeProportional).takeIf { it.feeBase > 0.sat() }
                     }
 
                     postIntent(Scan.Intent.InvoiceFlow.SendInvoicePayment(paymentRequest = request, amount = finalAmount, maxFees = maxFees))
