@@ -35,10 +35,13 @@ fun copyToClipboard(context: Context, data: String, dataLabel: String = "") {
 fun readClipboard(context: Context): String? = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
     .primaryClip?.getItemAt(0)?.text?.toString().takeIf { !it.isNullOrBlank() }
 
-fun share(context: Context, data: String, subject: String, chooserTitle: String? = null) {
-    val shareIntent = Intent(Intent.ACTION_SEND)
-    shareIntent.type = "text/plain"
-    shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-    shareIntent.putExtra(Intent.EXTRA_TEXT, data)
+fun share(context: Context, data: String, subject: String, chooserTitle: String?=null)
+{
+    val shareIntent = Intent.createChooser(Intent().apply {
+        action = Intent.ACTION_SEND
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, data)
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+    }, null)
     context.startActivity(Intent.createChooser(shareIntent, chooserTitle))
 }
