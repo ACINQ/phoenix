@@ -611,6 +611,12 @@
     <string name="paymentsettings_expiry_title">Incoming payment expiry</string>
     <string name="paymentsettings_expiry_dialog_title">Payment expiry</string>
     <string name="paymentsettings_expiry_dialog_description">Payment requests that you create will use this expiry time (in seconds). Default value is 1 week.</string>
+
+
+    <string name="paymentsettings_expiry_dialog_one_week">1 week</string>
+    <string name="paymentsettings_expiry_dialog_two_weeks">2 weeks</string>
+    <string name="paymentsettings_expiry_dialog_three_weeks">3 weeks</string>
+
     <string name="paymentsettings_expiry_dialog_hint">Enter an expiry, in seconds</string>
     <string name="paymentsettings_expiry_value">%1$s seconds</string>
 

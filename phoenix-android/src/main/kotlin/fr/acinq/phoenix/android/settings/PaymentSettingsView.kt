@@ -23,17 +23,18 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -113,7 +114,7 @@ fun PaymentSettingsView() {
             },
             onConfirm = {
                 scope.launch {
-                    UserPrefs.saveInvoiceDefaultExpiry(context, it.toLongOrNull() ?: 60 * 60 * 24 * 7)
+                    UserPrefs.saveInvoiceDefaultExpiry(context, it.toLong())
                 }
                 showExpiryDialog = false
             }
@@ -209,9 +210,9 @@ fun PaymentSettingsView() {
 private fun DefaultExpiryInvoiceDialog(
     expiry: (Long),
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
+    onConfirm: (Float) -> Unit,
 ) {
-    var paymentExpiry by rememberSaveable { mutableStateOf(expiry.toString()) }
+    var paymentExpiry by rememberSaveable { mutableStateOf(expiry.toFloat()) }
 
     Dialog(
         onDismiss = onDismiss,
@@ -241,27 +242,46 @@ private fun DefaultExpiryInvoiceDialog(
                 Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_description))
                 Spacer(Modifier.height(8.dp))
 
-                NumberInput(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = paymentExpiry,
-                    placeholder = {
-                        Text(stringResource(id = R.string.paymentsettings_expiry_dialog_hint)) },
-                    onTextChange = {
-
-                        val maxChar = 7
-                        if (it.length <= maxChar) {
-                            paymentExpiry = if (it.isEmpty()) {
-                                ""
-                            } else {
-                                when (it.toLongOrNull()) {
-                                    null -> paymentExpiry //old value
-                                    else -> it   //new value
-                                }
-                            }
-                        }
-                    },
-                    enabled = true
-                )
+                Row {
+                    Slider(
+                        value = paymentExpiry,
+                        onValueChange = {
+                            //sliderPosition.value = it
+                            paymentExpiry = it
+                        },
+                        valueRange = 604800f..1814400f,
+                        steps = 1,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp)
+                    )
+                }
+                Row {
+                    Text(
+                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_one_week),
+                        style = MaterialTheme.typography.caption,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1.8f)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_two_weeks),
+                        style = MaterialTheme.typography.caption,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1.8f)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_three_weeks),
+                        style = MaterialTheme.typography.caption,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1.8f)
+                    )
+                }
             }
         }
     }
