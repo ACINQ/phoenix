@@ -190,7 +190,7 @@ fun PaymentSettingsView() {
             SettingInteractive(
                 title = stringResource(id = R.string.paymentsettings_trampoline_fees_title),
                 description = trampolineFees?.let {  stringResource(id = R.string.paymentsettings_trampoline_fees_desc, trampolineFees.feeBase, Converter.perMillionthsToPercentageString(trampolineFees.feeProportional)) },
-                onClick = {showTrampolineMaxFeeDialog = true}
+                onClick = { showTrampolineMaxFeeDialog = true }
             )
 
             SettingInteractive(

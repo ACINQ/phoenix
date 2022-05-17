@@ -115,7 +115,7 @@ object UserPrefs {
         TrampolineFees(feeBase = Satoshi(feeBase), feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
     }
 
-        private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
+    private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")
     fun getIsAutoPayToOpenEnabled(context: Context): Flow<Boolean> = prefs(context).map { it[AUTO_PAY_TO_OPEN] ?: true }
     suspend fun saveIsAutoPayToOpenEnabled(context: Context, isEnabled: Boolean) = context.userPrefs.edit { it[AUTO_PAY_TO_OPEN] = isEnabled }
 
