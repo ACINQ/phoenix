@@ -43,6 +43,7 @@ import androidx.compose.ui.window.DialogProperties
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.LocalWalletContext
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
@@ -146,7 +147,7 @@ fun PaymentSettingsView() {
                 {
                     val feeProportionalPercent = Converter.percentageToPerMillionths(feeProportionalParam.toString())
 
-                    if (feeBase > 50000)
+                    if (feeBase.sat > 50_000.sat)
                     {
                         Toast.makeText(context, R.string.paymentsettings_trampoline_fees_dialog_base_too_high, Toast.LENGTH_SHORT).show()
                     }
