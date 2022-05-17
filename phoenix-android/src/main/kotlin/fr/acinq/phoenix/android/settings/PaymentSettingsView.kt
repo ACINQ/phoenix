@@ -70,9 +70,7 @@ fun PaymentSettingsView() {
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(initial = -1L)
 
     val walletContext = LocalWalletContext.current
-    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(
-        TrampolineFees(Satoshi(-1L), -1L, CltvExpiryDelta(144))
-    )
+    val trampolineMaxFees by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val trampolineFees = trampolineMaxFees?.let { customTrampolineMaxFees ->
         if (customTrampolineMaxFees.feeBase.toLong() < 0L) {
             walletContext?.let {
