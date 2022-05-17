@@ -73,16 +73,21 @@ fun PaymentSettingsView() {
         TrampolineFees(Satoshi(-1L), -1L, CltvExpiryDelta(144))
     )
     val trampolineFees = trampolineMaxFees?.let { customTrampolineMaxFees ->
-        if (customTrampolineMaxFees.feeBase.toLong() < 0L)
-        {
+        if (customTrampolineMaxFees.feeBase.toLong() < 0L) {
             walletContext?.let {
                 val trampolineFees = it.trampoline.v2.attempts.last()
-                TrampolineFees(Satoshi(trampolineFees.feeBaseSat), trampolineFees.feePerMillionths, CltvExpiryDelta(trampolineFees.cltvExpiry))
+                TrampolineFees(
+                    Satoshi(trampolineFees.feeBaseSat),
+                    trampolineFees.feePerMillionths,
+                    CltvExpiryDelta(trampolineFees.cltvExpiry)
+                )
             }
-        }
-        else
-        {
-            TrampolineFees(customTrampolineMaxFees.feeBase, customTrampolineMaxFees.feeProportional, customTrampolineMaxFees.cltvExpiryDelta)
+        } else {
+            TrampolineFees(
+                customTrampolineMaxFees.feeBase,
+                customTrampolineMaxFees.feeProportional,
+                customTrampolineMaxFees.cltvExpiryDelta
+            )
         }
     }
 
