@@ -441,6 +441,16 @@
     <string name="paymentdetails_created_at_label">Created at</string>
     <string name="paymentdetails_completed_at_label">Completed at</string>
 
+    <string name="paymentdetails_invoice_created">Invoice created</string>
+    <string name="paymentdetails_amount_requested">Amount requested</string>
+    <string name="paymentdetails_payment_hash">Payment hash</string>
+    <string name="paymentdetails_sent_at">Sent at</string>
+    <string name="paymentdetails_elapsed">Elapsed</string>
+    <string name="paymentdetails_amount_sent">Amount sent</string>
+    <string name="paymentdetails_fees_paid">Fees paid</string>
+    <string name="paymentdetails_amount_received">Amount received</string>
+    <string name="paymentdetails_recipient_pubkey">Recipient pubkey</string>
+
     <!-- //////////////// channel state state //////////////// -->
 
     <string name="state_wait_confirmed">Funding tx is being confirmed</string>

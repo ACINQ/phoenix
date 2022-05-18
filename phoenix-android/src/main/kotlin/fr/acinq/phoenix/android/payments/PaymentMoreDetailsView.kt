@@ -41,17 +41,61 @@ fun PaymentMoreDetailsView() {
     SettingScreen {
         SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.paymentdetails_title))
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(text = annotatedStringResource(id = R.string.about_general_content))
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = annotatedStringResource(id = R.string.about_seed_title), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.paymentdetails_invoice_created), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_seed_content))
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = annotatedStringResource(id = R.string.about_seed_content))
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = annotatedStringResource(id = R.string.about_rates_title), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.paymentdetails_amount_requested), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = annotatedStringResource(id = R.string.about_rates_content))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_payment_hash), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_sent_at), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_elapsed), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_amount_sent), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_fees_paid), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_amount_sent), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_fees_paid), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_amount_received), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = stringResource(id = R.string.paymentdetails_recipient_pubkey), style = MaterialTheme.typography.h5)
+            Text(text = stringResource(id = R.string.about_faq_link))
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
