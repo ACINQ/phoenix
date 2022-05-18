@@ -330,7 +330,7 @@ private fun DefaultDescriptionInvoiceDialog(
                 Spacer(Modifier.height(8.dp))
                 TextInput(
                     modifier = Modifier.fillMaxWidth(),
-                    text = paymentDescription,
+                    text= paymentDescription,
                     placeholder = {
                         Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
                     onTextChange = {
@@ -402,21 +402,12 @@ private fun TrampolineMaxFeesDialog(
                 // max fee proportional
                 TextInput(
                     modifier = Modifier.fillMaxWidth(),
-                    text = feeProportional ?: "",
+                    maxChar = 10,
+                    text= feeProportional ?: "",
                     placeholder = {
                         Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
                     onTextChange = {
-                        val maxChar = 10
-                        if (it.length <= maxChar) {
-                            feeProportional = if (it.isEmpty()) {
-                                ""
-                            } else {
-                                when (it.toDoubleOrNull()) {
-                                    null -> feeProportional //old value
-                                    else -> it   //new value
-                                }
-                            }
-                        }
+                        feeProportional = it
                     },
                     enabled = true
                 )

@@ -64,15 +64,34 @@ fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
+    maxChar: Int? = null,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    var textChars by remember { mutableStateOf(text) }
     TextField(
         value = text,
-        onValueChange = onTextChange,
+        onValueChange = {
+            if (maxChar != null)
+            {
+                if (it.length <= maxChar) {
+                    textChars = if (it.isEmpty()) {
+                        ""
+                    } else {
+                        when (it.toDoubleOrNull()) {
+                            null -> text //old value
+                            else -> it   //new value
+                        }
+                    }
+                }
+            } else {
+                textChars = it
+            }
+            onTextChange(textChars)
+        },
         maxLines = maxLines,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done,
