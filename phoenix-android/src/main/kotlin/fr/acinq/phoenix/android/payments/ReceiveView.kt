@@ -63,7 +63,7 @@ sealed class ReceiveViewState {
     data class Error(val e: Throwable) : ReceiveViewState()
 }
 
-private class ReceiveViewModel(controller: ReceiveController) : MVIControllerViewModel<Receive.Model, Receive.Intent>(controller) {
+private class ReceiveViewModel(controller: ReceiveController, description: String, expiry: Long) : MVIControllerViewModel<Receive.Model, Receive.Intent>(controller) {
 
     /** State of the view */
     var state by mutableStateOf<ReceiveViewState>(ReceiveViewState.Default)
@@ -73,13 +73,13 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
         private set
 
     /** Custom invoice description */
-    var customDesc by mutableStateOf("")
+    var customDesc by mutableStateOf(description)
 
     /** Custom invoice amount */
     var customAmount by mutableStateOf<MilliSatoshi?>(null)
 
     /** Custom invoice expiry */
-    var customExpiry by mutableStateOf<Long?>(null)
+    var customExpiry by mutableStateOf<Long?>(expiry)
 
     @UiThread
     fun generateInvoice() {
@@ -110,11 +110,13 @@ private class ReceiveViewModel(controller: ReceiveController) : MVIControllerVie
 
     class Factory(
         private val controllerFactory: ControllerFactory,
-        private val getController: ControllerFactory.() -> ReceiveController
+        private val getController: ControllerFactory.() -> ReceiveController,
+        private val description: String,
+        private val expiry: Long,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
-            return ReceiveViewModel(controllerFactory.getController()) as T
+            return ReceiveViewModel(controllerFactory.getController(), description, expiry) as T
         }
     }
 }
@@ -127,11 +129,11 @@ fun ReceiveView() {
     val invoiceDefaultExpiry by UserPrefs.getInvoiceDefaultExpiry(LocalContext.current).collectAsState(null)
     safeLet(invoiceDefaultDesc, invoiceDefaultExpiry) { description, expiry ->
 
-        val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive))
-        vm.customDesc = description
-        vm.customExpiry = expiry
+        val vm: ReceiveViewModel = viewModel(factory = ReceiveViewModel.Factory(controllerFactory, CF::receive, description, expiry))
         when (val state = vm.state) {
-            is ReceiveViewState.Default -> DefaultView(vm = vm)
+            is ReceiveViewState.Default -> DefaultView(
+                vm = vm
+            )
             is ReceiveViewState.EditInvoice -> EditInvoiceView(
                 description = vm.customDesc,
                 onDescriptionChange = { vm.customDesc = it },
