@@ -16,12 +16,9 @@
 
 package fr.acinq.phoenix.android.payments
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -32,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,8 +47,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.db.WalletPayment
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.utils.Converter.toRelativeDateString
 import fr.acinq.phoenix.android.utils.datastore.InternalData
@@ -122,6 +120,7 @@ private fun PaymentDetailsSuccess(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val nc = navController
     // status
     PaymentStatus(payment)
     Spacer(modifier = Modifier.height(72.dp))
@@ -199,7 +198,7 @@ private fun PaymentDetailsSuccess(
                 textStyle = MaterialTheme.typography.caption,
                 space = 4.dp,
                 padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                onClick = { /*TODO*/ })
+                onClick = { nc.navigate(Screen.PaymentMoreDetails) })
             VSeparator(padding = PaddingValues(vertical = 8.dp))
             Button(
                 text = stringResource(id = R.string.paymentdetails_edit_button),

@@ -34,6 +34,7 @@ sealed class Screen(val route: String) {
     object ReadData : Screen("readdata")
     object Send : Screen("send/{request}")
     object PaymentDetails : Screen("payment")
+    object PaymentMoreDetails : Screen("payment/details")
 
     // -- settings
     object Settings : Screen("settings")

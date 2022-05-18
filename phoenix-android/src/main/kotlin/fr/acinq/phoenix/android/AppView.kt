@@ -37,6 +37,7 @@ import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.payments.PaymentMoreDetailsView
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
@@ -209,6 +210,9 @@ fun AppView(
                 }
                 composable(Screen.About.route) {
                     AboutView()
+                }
+                composable(Screen.PaymentMoreDetails.route) {
+                    PaymentMoreDetailsView()
                 }
                 composable(Screen.AppLock.route) {
                     AppLockView(
