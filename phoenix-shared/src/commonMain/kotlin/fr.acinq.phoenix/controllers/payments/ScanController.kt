@@ -1,6 +1,7 @@
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
@@ -8,19 +9,17 @@ import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.io.ReceivePayment
 import fr.acinq.lightning.io.SendPayment
 import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.lightning.utils.Either
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.secure
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.data.*
 import fr.acinq.phoenix.db.payments.WalletPaymentMetadataRow
-import fr.acinq.phoenix.managers.*
-import fr.acinq.phoenix.managers.Utilities.BitcoinAddressInfo
-import fr.acinq.phoenix.utils.PublicSuffixList
-import fr.acinq.phoenix.utils.chain
-import fr.acinq.phoenix.utils.calculateBalance
-import fr.acinq.phoenix.utils.createTrampolineFees
+import fr.acinq.phoenix.managers.AppConfigurationManager
+import fr.acinq.phoenix.managers.DatabaseManager
+import fr.acinq.phoenix.managers.LNUrlManager
+import fr.acinq.phoenix.managers.PeerManager
+import fr.acinq.phoenix.utils.*
 import io.ktor.http.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -43,7 +42,6 @@ class AppScanController(
     private val lnurlManager: LNUrlManager,
     private val databaseManager: DatabaseManager,
     private val appConfigManager: AppConfigurationManager,
-    private val utilities: Utilities,
     private val chain: Chain
 ) : AppController<Scan.Model, Scan.Intent>(
     loggerFactory = loggerFactory,
@@ -56,14 +54,13 @@ class AppScanController(
     private var requestPayInvoiceTask: Deferred<LNUrl.PayInvoice>? = null
     private var sendWithdrawInvoiceTask: Deferred<JsonObject>? = null
 
-    constructor(business: PhoenixBusiness, firstModel: Scan.Model?): this(
+    constructor(business: PhoenixBusiness, firstModel: Scan.Model?) : this(
         loggerFactory = business.loggerFactory,
         firstModel = firstModel,
         peerManager = business.peerManager,
         lnurlManager = business.lnUrlManager,
         databaseManager = business.databaseManager,
         appConfigManager = business.appConfigurationManager,
-        utilities = business.util,
         chain = business.chain,
     )
 
@@ -71,21 +68,23 @@ class AppScanController(
         launch {
             peerManager.getPeer().channelsFlow.collect { channels ->
                 val balance = calculateBalance(channels)
-                model { when (this) {
-                    is Scan.Model.InvoiceFlow.InvoiceRequest -> {
-                        this.copy(balanceMsat = balance.msat)
+                model {
+                    when (this) {
+                        is Scan.Model.InvoiceFlow.InvoiceRequest -> {
+                            this.copy(balanceMsat = balance.msat)
+                        }
+                        is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
+                            this.copy(balanceMsat = balance.msat)
+                        }
+                        is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest -> {
+                            this.copy(balanceMsat = balance.msat)
+                        }
+                        is Scan.Model.LnurlPayFlow.LnurlPayFetch -> {
+                            this.copy(balanceMsat = balance.msat)
+                        }
+                        else -> this
                     }
-                    is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
-                        this.copy(balanceMsat = balance.msat)
-                    }
-                    is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest -> {
-                        this.copy(balanceMsat = balance.msat)
-                    }
-                    is Scan.Model.LnurlPayFlow.LnurlPayFetch -> {
-                        this.copy(balanceMsat = balance.msat)
-                    }
-                    else -> this
-                }}
+                }
             }
         }
     }
@@ -130,37 +129,69 @@ class AppScanController(
     private suspend fun processIntent(
         intent: Scan.Intent.Parse
     ) {
-        val input = stringPrep(intent.request)
+        val input = Parser.removeExcessInput(intent.request)
 
-        // Is it a Lightning invoice ?
-        readPaymentRequest(input)?.let { paymentRequest ->
-            checkForBadRequest(paymentRequest)?.let {
-                return model(Scan.Model.BadRequest(it))
-            }
-            checkForDangerousRequest(paymentRequest)?.let {
-                return model(Scan.Model.InvoiceFlow.DangerousRequest(
-                    reason = it,
-                    request = intent.request,
-                    paymentRequest = paymentRequest
-                ))
-            }
-
-            val balance = getBalance()
-            return model(Scan.Model.InvoiceFlow.InvoiceRequest(
-                request = intent.request,
-                paymentRequest = paymentRequest,
-                balanceMsat = balance.msat
-            ))
+        Parser.readPaymentRequest(input)?.let {
+            processLightningInvoice(it)
+        } ?: readLNURL(input)?.let {
+            processLnurlData(it)
+        } ?: Parser.readBitcoinAddress(chain, input).let {
+            processBitcoinAddress(it)
         }
+    }
 
-        // Is it an LNURL ?
-        readLNURL(input)?.let { return when (it) {
-            is Either.Left -> { // it.value: LnUrl.Auth
+    /** Inspects the Lightning invoice for errors and update the model with the adequate value. */
+    private suspend fun processLightningInvoice(paymentRequest: PaymentRequest) {
+        val model = checkForBadRequest(paymentRequest)?.let {
+            Scan.Model.BadRequest(it)
+        } ?: checkForDangerousRequest(paymentRequest)?.let {
+            Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
+        } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
+            request = paymentRequest.write(),
+            paymentRequest = paymentRequest,
+            balanceMsat = getBalance().msat
+        )
+        model(model)
+    }
+
+    /** Return the adequate model for a Bitcoin address result. */
+    private suspend fun processBitcoinAddress(data: Either<BitcoinAddressError, BitcoinAddressInfo>) {
+        logger.info { "processing bitcoin address=$data" }
+        val model = when (data) {
+            is Either.Right -> {
+                val address = data.value
+                if (address.paymentRequest != null) {
+                    Scan.Model.InvoiceFlow.InvoiceRequest(
+                        request = address.paymentRequest.write(),
+                        paymentRequest = address.paymentRequest,
+                        balanceMsat = getBalance().msat
+                    )
+                } else {
+                    // we can't pay on-chain addresses yet.
+                    Scan.Model.BadRequest(Scan.BadRequestReason.IsBitcoinAddress)
+                }
+            }
+            is Either.Left -> {
+                val error = data.value
+                if (error is BitcoinAddressError.ChainMismatch) {
+                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.ChainMismatch(myChain = error.myChain, requestChain = error.addrChain))
+                } else {
+                    Scan.Model.BadRequest(reason = Scan.BadRequestReason.UnknownFormat)
+                }
+            }
+        }
+        model(model)
+    }
+
+    private suspend fun processLnurlData(data: Either<LNUrl.Auth, Url>) {
+        when (data) {
+            is Either.Left -> {
+                // proceed to lnurl-auth flow
                 prefetchPublicSuffixListTask = appConfigManager.fetchPublicSuffixListAsync()
-                model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = it.value))
+                model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = data.value))
             }
             is Either.Right -> { // it.value: Url
-                val url = it.value
+                val url = data.value
                 val requestId = lnurlRequestId
                 model(Scan.Model.LnurlServiceFetch)
                 val task = lnurlManager.continueLnurlAsync(url)
@@ -171,7 +202,8 @@ class AppScanController(
                     when (e) {
                         is LNUrl.Error.RemoteFailure -> {
                             Either.Left(Scan.BadRequestReason.ServiceError(url, e))
-                        } else -> {
+                        }
+                        else -> {
                             Either.Left(Scan.BadRequestReason.InvalidLnUrl(url))
                         }
                     }
@@ -188,53 +220,45 @@ class AppScanController(
                         when (val lnurl = result.value) {
                             is LNUrl.Pay -> {
                                 val balance = getBalance()
-                                model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
-                                    lnurlPay = lnurl,
-                                    balanceMsat = balance.msat,
-                                    error = null
-                                ))
+                                model(
+                                    Scan.Model.LnurlPayFlow.LnurlPayRequest(
+                                        lnurlPay = lnurl,
+                                        balanceMsat = balance.msat,
+                                        error = null
+                                    )
+                                )
                             }
                             is LNUrl.Withdraw -> {
                                 val balance = getBalance()
-                                model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
-                                    lnurlWithdraw = lnurl,
-                                    balanceMsat = balance.msat,
-                                    error = null
-                                ))
+                                model(
+                                    Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+                                        lnurlWithdraw = lnurl,
+                                        balanceMsat = balance.msat,
+                                        error = null
+                                    )
+                                )
                             }
                             else -> {
-                                model(Scan.Model.BadRequest(
-                                    Scan.BadRequestReason.UnsupportedLnUrl(url))
-                                )
+                                model(Scan.Model.BadRequest(Scan.BadRequestReason.UnsupportedLnUrl(url)))
                             }
                         }
                     }
                 }
             }
-        }}
-
-        // Is it a bitcoin address ?
-        readBitcoinAddress(input).let { return when (it) {
-            is Either.Left -> { // it.value: Scan.BadRequestReason
-                model(Scan.Model.BadRequest(it.value))
-            }
-            is Either.Right -> {
-                it.value.params.get("lightning")?.let { lnParam ->
-                    processIntent(Scan.Intent.Parse(lnParam))
-                } ?: model(Scan.Model.BadRequest(Scan.BadRequestReason.IsBitcoinAddress))
-            }
-        }}
+        }
     }
 
     private suspend fun processIntent(
         intent: Scan.Intent.InvoiceFlow.ConfirmDangerousRequest
     ) {
         val balance = getBalance()
-        model(Scan.Model.InvoiceFlow.InvoiceRequest(
-            request = intent.request,
-            paymentRequest = intent.paymentRequest,
-            balanceMsat = balance.msat
-        ))
+        model(
+            Scan.Model.InvoiceFlow.InvoiceRequest(
+                request = intent.request,
+                paymentRequest = intent.paymentRequest,
+                balanceMsat = balance.msat
+            )
+        )
     }
 
     private suspend fun processIntent(
@@ -277,10 +301,12 @@ class AppScanController(
         val requestId = lnurlRequestId
         run { // scoping
             val balance = getBalance()
-            model(Scan.Model.LnurlPayFlow.LnurlPayFetch(
-                lnurlPay = intent.lnurlPay,
-                balanceMsat = balance.msat
-            ))
+            model(
+                Scan.Model.LnurlPayFlow.LnurlPayFetch(
+                    lnurlPay = intent.lnurlPay,
+                    balanceMsat = balance.msat
+                )
+            )
         }
 
         val task = lnurlManager.requestPayInvoiceAsync(
@@ -308,21 +334,25 @@ class AppScanController(
                     Either.Right(invoice)
                 }
             }
-        } catch (err: Throwable) { when (err) {
-            is LNUrl.Error.RemoteFailure -> {
-                Either.Left(Scan.LnurlPayError.RemoteError(err))
-            }
-            is LNUrl.Error.PayInvoice -> {
-                Either.Left(Scan.LnurlPayError.BadResponseError(err))
-            }
-            else -> { // unexpected exception: map to generic error
-                Either.Left(Scan.LnurlPayError.RemoteError(
-                    LNUrl.Error.RemoteFailure.Unreadable(
-                        origin = intent.lnurlPay.callback.host
+        } catch (err: Throwable) {
+            when (err) {
+                is LNUrl.Error.RemoteFailure -> {
+                    Either.Left(Scan.LnurlPayError.RemoteError(err))
+                }
+                is LNUrl.Error.PayInvoice -> {
+                    Either.Left(Scan.LnurlPayError.BadResponseError(err))
+                }
+                else -> { // unexpected exception: map to generic error
+                    Either.Left(
+                        Scan.LnurlPayError.RemoteError(
+                            LNUrl.Error.RemoteFailure.Unreadable(
+                                origin = intent.lnurlPay.callback.host
+                            )
+                        )
                     )
-                ))
+                }
             }
-        }}
+        }
         if (requestId != lnurlRequestId) {
             // Intent.LnurlPayFlow.CancelLnurlPayment has been issued
             return
@@ -330,11 +360,13 @@ class AppScanController(
         when (result) {
             is Either.Left -> {
                 val balance = getBalance()
-                model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
-                    lnurlPay = intent.lnurlPay,
-                    balanceMsat = balance.msat,
-                    error = result.value
-                ))
+                model(
+                    Scan.Model.LnurlPayFlow.LnurlPayRequest(
+                        lnurlPay = intent.lnurlPay,
+                        balanceMsat = balance.msat,
+                        error = result.value
+                    )
+                )
             }
             is Either.Right -> {
                 val paymentRequest = result.value.paymentRequest
@@ -380,11 +412,13 @@ class AppScanController(
         requestPayInvoiceTask?.cancel()
         requestPayInvoiceTask = null
         val balance = getBalance()
-        model(Scan.Model.LnurlPayFlow.LnurlPayRequest(
-            lnurlPay = intent.lnurlPay,
-            balanceMsat = balance.msat,
-            error = null
-        ))
+        model(
+            Scan.Model.LnurlPayFlow.LnurlPayRequest(
+                lnurlPay = intent.lnurlPay,
+                balanceMsat = balance.msat,
+                error = null
+            )
+        )
     }
 
     private suspend fun processIntent(
@@ -393,10 +427,12 @@ class AppScanController(
         val requestId = lnurlRequestId
         run { // scoping
             val balance = getBalance()
-            model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch(
-                lnurlWithdraw = intent.lnurlWithdraw,
-                balanceMsat = balance.msat
-            ))
+            model(
+                Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch(
+                    lnurlWithdraw = intent.lnurlWithdraw,
+                    balanceMsat = balance.msat
+                )
+            )
         }
 
         val deferred = CompletableDeferred<PaymentRequest>()
@@ -423,36 +459,42 @@ class AppScanController(
         val error: Scan.LnurlWithdrawError? = try {
             task.await()
             null
-        } catch (err: Throwable) { when (err) {
-            is LNUrl.Error.RemoteFailure -> {
-                Scan.LnurlWithdrawError.RemoteError(err)
-            }
-            else -> { // unexpected exception: map to generic error
-                Scan.LnurlWithdrawError.RemoteError(
-                    LNUrl.Error.RemoteFailure.Unreadable(
-                        origin = intent.lnurlWithdraw.callback.host
+        } catch (err: Throwable) {
+            when (err) {
+                is LNUrl.Error.RemoteFailure -> {
+                    Scan.LnurlWithdrawError.RemoteError(err)
+                }
+                else -> { // unexpected exception: map to generic error
+                    Scan.LnurlWithdrawError.RemoteError(
+                        LNUrl.Error.RemoteFailure.Unreadable(
+                            origin = intent.lnurlWithdraw.callback.host
+                        )
                     )
-                )
+                }
             }
-        }}
+        }
         if (requestId != lnurlRequestId) {
             // Intent.LnurlWithdrawFlow.CancelLnurlWithdraw has been issued
             return
         }
         if (error != null) {
             val balance = getBalance()
-            model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
-                lnurlWithdraw = intent.lnurlWithdraw,
-                balanceMsat = balance.msat,
-                error = error
-            ))
+            model(
+                Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+                    lnurlWithdraw = intent.lnurlWithdraw,
+                    balanceMsat = balance.msat,
+                    error = error
+                )
+            )
         } else {
-            model(Scan.Model.LnurlWithdrawFlow.Receiving(
-                lnurlWithdraw = intent.lnurlWithdraw,
-                amount = intent.amount,
-                description = intent.description,
-                paymentHash = paymentRequest.paymentHash.toHex()
-            ))
+            model(
+                Scan.Model.LnurlWithdrawFlow.Receiving(
+                    lnurlWithdraw = intent.lnurlWithdraw,
+                    amount = intent.amount,
+                    description = intent.description,
+                    paymentHash = paymentRequest.paymentHash.toHex()
+                )
+            )
         }
     }
 
@@ -463,11 +505,13 @@ class AppScanController(
         sendWithdrawInvoiceTask?.cancel()
         sendWithdrawInvoiceTask = null
         val balance = getBalance()
-        model(Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
-            lnurlWithdraw = intent.lnurlWithdraw,
-            balanceMsat = balance.msat,
-            error = null
-        ))
+        model(
+            Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
+                lnurlWithdraw = intent.lnurlWithdraw,
+                balanceMsat = balance.msat,
+                error = null
+            )
+        )
     }
 
     @OptIn(ExperimentalTime::class)
@@ -478,12 +522,14 @@ class AppScanController(
         val start = TimeSource.Monotonic.markNow()
         val psl = prefetchPublicSuffixListTask?.await()
         if (psl == null) {
-            model(Scan.Model.LnurlAuthFlow.LoginResult(
-                auth = intent.auth,
-                error = Scan.LoginError.OtherError(
-                    details = LNUrl.Error.Auth.MissingPublicSuffixList
+            model(
+                Scan.Model.LnurlAuthFlow.LoginResult(
+                    auth = intent.auth,
+                    error = Scan.LoginError.OtherError(
+                        details = LNUrl.Error.Auth.MissingPublicSuffixList
+                    )
                 )
-            ))
+            )
             return
         }
         val error = try {
@@ -510,76 +556,35 @@ class AppScanController(
         }
     }
 
+    /** Directly called by swift code in iOS app. */
     suspend fun inspectClipboard(string: String): Scan.ClipboardContent? {
-        val input = stringPrep(string)
+        val input = Parser.removeExcessInput(string)
 
         // Is it a Lightning invoice ?
-        readPaymentRequest(input)?.let {
+        Parser.readPaymentRequest(input)?.let {
             return Scan.ClipboardContent.InvoiceRequest(it)
         }
 
         // Is it an LNURL ?
-        readLNURL(input)?.let { return when (it) {
-            is Either.Left -> { // it.value: LnUrl.Auth
-                Scan.ClipboardContent.LoginRequest(it.value)
-            }
-            is Either.Right -> { // it.value: Url
-                Scan.ClipboardContent.LnurlRequest(it.value)
-            }
-        }}
-
-        // Is it a bitcoin address ?
-        readBitcoinAddress(input).let { when (it) {
-            is Either.Left -> { // it.value: Scan.BadRequestReason
-                // ignore/continue
-            }
-            is Either.Right -> { // it.value: Utilities.BitcoinAddressInfo
-                it.value.params.get("lightning")?.let { lnParam ->
-                    return inspectClipboard(lnParam)
+        readLNURL(input)?.let {
+            return when (it) {
+                is Either.Left -> { // it.value: LnUrl.Auth
+                    Scan.ClipboardContent.LoginRequest(it.value)
+                }
+                is Either.Right -> { // it.value: Url
+                    Scan.ClipboardContent.LnurlRequest(it.value)
                 }
             }
-        }}
+        }
 
-        return null
-    }
-
-    private fun stringPrep(input: String): String {
-        return input
-            .replace("\\u00A0", "") // \u00A0 = '\n'
-            .trim() // leading & trailing whitespace
-    }
-
-    private fun trimMatchingPrefix(
-        input: String,
-        prefixes: List<String>
-    ): Pair<Boolean, String> {
-
-        // The trimming is done in a case-insenstive manner.
-        // Because often QR codes will use upper-case, such as:
-        // LIGHTNING:LNURL1...
-
-        val inputLowerCase = input.lowercase()
-        for (prefix in prefixes) {
-            if (inputLowerCase.startsWith(prefix.lowercase())) {
-                return Pair(true, input.drop(prefix.length))
+        // Is it a bitcoin address ?
+        readBitcoinAddress(input).let {
+            if (it is Either.Right) {
+                return it.value.paymentRequest?.let { Scan.ClipboardContent.InvoiceRequest(it) }
             }
         }
-        return Pair(false, input)
-    }
 
-    private suspend fun readPaymentRequest(
-        input: String
-    ) : PaymentRequest? {
-
-        val (_, request) = trimMatchingPrefix(input, listOf(
-            "lightning://", "lightning:", "bitcoin://", "bitcoin:"
-        ))
-
-        return try {
-            PaymentRequest.read(request) // <- throws
-        } catch (t: Throwable) {
-            null
-        }
+        return null
     }
 
     private suspend fun checkForBadRequest(
@@ -619,44 +624,32 @@ class AppScanController(
         return null
     }
 
-    private fun readLNURL(input: String): Either<LNUrl.Auth, Url>? {
-
-        val (_, request) = trimMatchingPrefix(input, listOf(
-            "lightning://", "lightning:"
-        ))
-
-        return try {
-            lnurlManager.interactiveExtractLnurl(request)
-        } catch (t: Throwable) {
-            return null
-        }
+    private fun readLNURL(input: String): Either<LNUrl.Auth, Url>? = try {
+        lnurlManager.interactiveExtractLnurl(Parser.trimMatchingPrefix(input, listOf("lightning://", "lightning:")))
+    } catch (t: Throwable) {
+        null
     }
 
     private fun readBitcoinAddress(
         input: String
-    ): Either<Scan.BadRequestReason, BitcoinAddressInfo> {
-
-        return when (val result = utilities.parseBitcoinAddress(input)) {
-            is Either.Left -> {
-                when (val reason = result.value) {
-                    is Utilities.BitcoinAddressError.ChainMismatch -> {
-                        // Two problems here:
-                        // - they're scanning a bitcoin address, but we don't support swap-out yet
-                        // - the bitcoin address is for the wrong chain
-                        Either.Left(Scan.BadRequestReason.ChainMismatch(
+    ): Either<Scan.BadRequestReason, BitcoinAddressInfo> = when (val result = Parser.readBitcoinAddress(chain, input)) {
+        is Either.Left -> {
+            when (val reason = result.value) {
+                is BitcoinAddressError.ChainMismatch -> {
+                    Either.Left(
+                        Scan.BadRequestReason.ChainMismatch(
                             myChain = reason.myChain,
                             requestChain = reason.addrChain
-                        ))
-                    }
-                    else -> {
-                        Either.Left(Scan.BadRequestReason.UnknownFormat)
-                    }
+                        )
+                    )
+                }
+                else -> {
+                    Either.Left(Scan.BadRequestReason.UnknownFormat)
                 }
             }
-            is Either.Right -> {
-                // Yup, it's a bitcoin address
-                Either.Right(result.value)
-            }
+        }
+        is Either.Right -> {
+            Either.Right(result.value)
         }
     }
 }

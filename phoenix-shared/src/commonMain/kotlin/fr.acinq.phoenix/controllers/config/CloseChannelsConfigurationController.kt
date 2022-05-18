@@ -6,11 +6,11 @@ import fr.acinq.lightning.channel.*
 import fr.acinq.lightning.io.WrappedChannelEvent
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.managers.Utilities
 import fr.acinq.phoenix.managers.WalletManager
 import fr.acinq.phoenix.controllers.AppController
 import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration.Model.ChannelInfoStatus
 import fr.acinq.phoenix.data.Chain
+import fr.acinq.phoenix.utils.Parser
 import fr.acinq.phoenix.utils.localCommitmentSpec
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -21,7 +21,6 @@ class AppCloseChannelsConfigurationController(
     private val peerManager: PeerManager,
     private val walletManager: WalletManager,
     private val chain: Chain,
-    private val util: Utilities,
     private val isForceClose: Boolean
 ) : AppController<CloseChannelsConfiguration.Model, CloseChannelsConfiguration.Intent>(
     loggerFactory = loggerFactory,
@@ -32,7 +31,6 @@ class AppCloseChannelsConfigurationController(
         peerManager = business.peerManager,
         walletManager = business.walletManager,
         chain = business.chain,
-        util = business.util,
         isForceClose = isForceClose
     )
 
@@ -115,7 +113,7 @@ class AppCloseChannelsConfigurationController(
     override fun process(intent: CloseChannelsConfiguration.Intent) {
         var scriptPubKey : ByteArray? = null
         if (intent is CloseChannelsConfiguration.Intent.MutualCloseAllChannels) {
-            scriptPubKey = util.addressToPublicKeyScript(address = intent.address)
+            scriptPubKey = Parser.addressToPublicKeyScript(chain, intent.address)
             if (scriptPubKey == null) {
                 throw IllegalArgumentException(
                     "Address is invalid. Caller MUST validate user input via parseBitcoinAddress"
