@@ -91,17 +91,32 @@ fun TextInput(
 @Composable
 fun NumberInput(
     modifier: Modifier = Modifier,
-    text: String,
     maxLines: Int = 1,
+    maxLong: Long,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
-    onTextChange: (String) -> Unit,
+    onTextChange: (Long?) -> Unit,
 ) {
+    var text by remember { mutableStateOf(maxLong.toString()) }
+
     val focusManager = LocalFocusManager.current
     TextField(
         value = text,
-        onValueChange = onTextChange,
+        onValueChange = {
+            val maxChar = 10
+            if (it.length <= maxChar) {
+                text = if (it.isEmpty()) {
+                    ""
+                } else {
+                    when (it.toLongOrNull()) {
+                        null -> text //old value
+                        else -> it   //new value
+                    }
+                }
+            }
+            onTextChange(text.toLongOrNull())
+        },
         singleLine = true,
         maxLines = maxLines,
         keyboardOptions = KeyboardOptions.Default.copy(

@@ -135,9 +135,8 @@ fun PaymentSettingsView() {
             },
             onConfirm = { feeBaseParam, feeProportionalParam, expiryDeltaParam ->
 
-                val feeBase = feeBaseParam?.toLongOrNull()
                 val feeProportional = feeProportionalParam?.toDoubleOrNull()
-                if (feeBase == null || feeProportional == null)
+                if (feeBaseParam == null || feeProportional == null)
                 {
                     Toast.makeText(context, R.string.paymentsettings_trampoline_fees_dialog_invalid, Toast.LENGTH_SHORT).show()
                 }
@@ -145,7 +144,7 @@ fun PaymentSettingsView() {
                 {
                     val feeProportionalPercent = Converter.percentageToPerMillionths(feeProportionalParam.toString())
 
-                    if (feeBase.sat > 50_000.sat)
+                    if (feeBaseParam.sat > 50_000.sat)
                     {
                         Toast.makeText(context, R.string.paymentsettings_trampoline_fees_dialog_base_too_high, Toast.LENGTH_SHORT).show()
                     }
@@ -155,7 +154,7 @@ fun PaymentSettingsView() {
                     }
                     else {
                         scope.launch {
-                            val trampolineMax = TrampolineFees(Satoshi(feeBase), Converter.percentageToPerMillionths(feeProportional.toString()), CltvExpiryDelta(expiryDeltaParam))
+                            val trampolineMax = TrampolineFees(Satoshi(feeBaseParam), Converter.percentageToPerMillionths(feeProportional.toString()), CltvExpiryDelta(expiryDeltaParam))
                             UserPrefs.saveTrampolineMaxFee(context, trampolineMax)
 
                             showTrampolineMaxFeeDialog = false
@@ -350,10 +349,11 @@ private fun DefaultDescriptionInvoiceDialog(
 private fun TrampolineMaxFeesDialog(
     trampolineMaxFees: (TrampolineFees?),
     onDismiss: () -> Unit,
-    onConfirm: (String?, String?, Int) -> Unit,
+    onConfirm: (Long?, String?, Int) -> Unit,
 ) {
-    var feeBase by rememberSaveable { mutableStateOf(trampolineMaxFees?.let { it.feeBase.toLong().toString() }) }
     var feeProportional by rememberSaveable { mutableStateOf( trampolineMaxFees?.let { Converter.perMillionthsToPercentageString(it.feeProportional)}) }
+
+    var feeBase by rememberSaveable { mutableStateOf(trampolineMaxFees?.let { it.feeBase.toLong() }) }
 
     Dialog(
         onDismiss = onDismiss,
@@ -384,27 +384,18 @@ private fun TrampolineMaxFeesDialog(
                 Spacer(Modifier.height(16.dp))
 
                 Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_label), style = MaterialTheme.typography.subtitle2)
-                // max fee
+
                 NumberInput(
                     modifier = Modifier.fillMaxWidth(),
-                    text = feeBase ?: "",
+                    maxLong = feeBase ?: -1L,
                     placeholder = {
                         Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
+                    enabled = true,
                     onTextChange = {
-                        val maxChar = 10
-                        if (it.length <= maxChar) {
-                            feeBase = if (it.isEmpty()) {
-                                ""
-                            } else {
-                                when (it.toLongOrNull()) {
-                                    null -> feeBase //old value
-                                    else -> it   //new value
-                                }
-                            }
-                        }
+                        feeBase = it
                     },
-                    enabled = true
                 )
+
                 Spacer(Modifier.height(16.dp))
 
                 Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label), style = MaterialTheme.typography.subtitle2)
