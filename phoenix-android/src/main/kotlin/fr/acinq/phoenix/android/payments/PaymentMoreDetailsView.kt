@@ -16,11 +16,19 @@
 
 package fr.acinq.phoenix.android.payments
 
+import android.content.ClipData
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
@@ -32,6 +40,7 @@ import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.annotatedStringResource
 import fr.acinq.phoenix.android.utils.logger
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PaymentMoreDetailsView() {
     val log = logger("PaymentMoreDetailsView")
@@ -39,63 +48,164 @@ fun PaymentMoreDetailsView() {
     val context = LocalContext.current
 
     SettingScreen {
-        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.paymentdetails_title))
+        SettingHeader(
+            onBackClick = { nc.popBackStack() },
+            title = stringResource(id = R.string.paymentdetails_title)
+        )
         Card(internalPadding = PaddingValues(16.dp)) {
 
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_invoice_created),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_invoice_created), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_seed_content))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_amount_requested),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_amount_requested), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_payment_hash),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_payment_hash), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_sent_at),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_sent_at), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_elapsed),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_elapsed), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_amount_sent),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_amount_sent), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_fees_paid),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_fees_paid), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_amount_requested),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_amount_sent), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_fees_paid), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_amount_received), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = stringResource(id = R.string.paymentdetails_recipient_pubkey), style = MaterialTheme.typography.h5)
-            Text(text = stringResource(id = R.string.about_faq_link))
-            Spacer(modifier = Modifier.height(10.dp))
+            Row {
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.paymentdetails_recipient_pubkey),
+                        style = MaterialTheme.typography.subtitle2
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(
+                    Modifier.weight(3f)
+                ) {
+                    Text(text = stringResource(id = R.string.about_seed_content))
+                }
+            }
         }
     }
 }
