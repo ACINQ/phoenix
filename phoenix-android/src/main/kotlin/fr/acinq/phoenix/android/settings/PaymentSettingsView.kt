@@ -29,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -387,7 +386,7 @@ private fun TrampolineMaxFeesDialog(
 
                 NumberInput(
                     modifier = Modifier.fillMaxWidth(),
-                    maxLong = feeBase ?: -1L,
+                    initialValue = feeBase ?: -1L,
                     placeholder = {
                         Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
                     enabled = true,

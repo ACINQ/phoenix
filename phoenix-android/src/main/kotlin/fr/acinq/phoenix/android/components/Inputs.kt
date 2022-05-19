@@ -111,13 +111,13 @@ fun TextInput(
 fun NumberInput(
     modifier: Modifier = Modifier,
     maxLines: Int = 1,
-    maxLong: Long,
+    initialValue: Long,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     onTextChange: (Long?) -> Unit,
 ) {
-    var text by remember { mutableStateOf(maxLong.toString()) }
+    var text by remember { mutableStateOf(initialValue.toString()) }
 
     val focusManager = LocalFocusManager.current
     TextField(
