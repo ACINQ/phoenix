@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.settings
 
-
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -52,7 +51,6 @@ import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.legacy.utils.Converter
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-
 
 @Composable
 fun PaymentSettingsView() {
@@ -230,60 +228,56 @@ private fun DefaultExpiryInvoiceDialog(
         }
     ) {
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.height(16.dp))
-            Spacer(Modifier.height(12.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .enableOrFade(enabled = true)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_title), style = MaterialTheme.typography.h5)
-                Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_description))
-                Spacer(Modifier.height(8.dp))
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .enableOrFade(enabled = true)
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_title), style = MaterialTheme.typography.h4)
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_description))
+            Spacer(Modifier.height(8.dp))
 
-                Row {
-                    Slider(
-                        value = paymentExpiry,
-                        onValueChange = {
-                            //sliderPosition.value = it
-                            paymentExpiry = it
-                        },
-                        valueRange = 604800f..1814400f,
-                        steps = 1,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp)
-                    )
-                }
-                Row {
-                    Text(
-                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_one_week),
-                        style = MaterialTheme.typography.caption,
-                        textAlign = TextAlign.Start,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1.8f)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_two_weeks),
-                        style = MaterialTheme.typography.caption,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1.8f)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.paymentsettings_expiry_dialog_three_weeks),
-                        style = MaterialTheme.typography.caption,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1.8f)
-                    )
-                }
+            Row {
+                Slider(
+                    value = paymentExpiry,
+                    onValueChange = {
+                        //sliderPosition.value = it
+                        paymentExpiry = it
+                    },
+                    valueRange = 604800f..1814400f,
+                    steps = 1,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
+                )
+            }
+            Row {
+                Text(
+                    text = stringResource(id = R.string.paymentsettings_expiry_dialog_one_week),
+                    style = MaterialTheme.typography.caption,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f)
+                )
+                Text(
+                    text = stringResource(id = R.string.paymentsettings_expiry_dialog_two_weeks),
+                    style = MaterialTheme.typography.caption,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f)
+                )
+                Text(
+                    text = stringResource(id = R.string.paymentsettings_expiry_dialog_three_weeks),
+                    style = MaterialTheme.typography.caption,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f)
+                )
             }
         }
     }
@@ -312,32 +306,26 @@ private fun DefaultDescriptionInvoiceDialog(
         }
     ) {
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.height(16.dp))
-            // -- checkbox
-            // -- input
-            Spacer(Modifier.height(12.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .enableOrFade(enabled = true)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title), style = MaterialTheme.typography.h5)
-                Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_description))
-                Spacer(Modifier.height(8.dp))
-                TextInput(
-                    modifier = Modifier.fillMaxWidth(),
-                    text= paymentDescription,
-                    placeholder = {
-                        Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
-                    onTextChange = {
-                        paymentDescription = it
-                    },
-                    enabled = true
-                )
-            }
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .enableOrFade(enabled = true)
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title), style = MaterialTheme.typography.h4)
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_description))
+            Spacer(Modifier.height(8.dp))
+            TextInput(
+                modifier = Modifier.fillMaxWidth(),
+                text= paymentDescription,
+                placeholder = {
+                    Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
+                onTextChange = {
+                    paymentDescription = it
+                },
+                enabled = true
+            )
         }
     }
 }
@@ -367,54 +355,46 @@ private fun TrampolineMaxFeesDialog(
             )
         }
     ) {
-
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .enableOrFade(enabled = true)
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox), style = MaterialTheme.typography.h4)
             Spacer(Modifier.height(16.dp))
-            // -- checkbox
-            // -- input
-            Spacer(Modifier.height(12.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .enableOrFade(enabled = true)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox), style = MaterialTheme.typography.h5)
-                Spacer(Modifier.height(16.dp))
 
-                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_label), style = MaterialTheme.typography.subtitle2)
+            Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_label), style = MaterialTheme.typography.subtitle2)
 
-                NumberInput(
-                    modifier = Modifier.fillMaxWidth(),
-                    initialValue = feeBase ?: -1L,
-                    placeholder = {
-                        Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
-                    enabled = true,
-                    onTextChange = {
-                        feeBase = it
-                    },
-                )
+            NumberInput(
+                modifier = Modifier.fillMaxWidth(),
+                initialValue = feeBase ?: -1L,
+                placeholder = {
+                    Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
+                enabled = true,
+                onTextChange = {
+                    feeBase = it
+                },
+            )
 
-                Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-                Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label), style = MaterialTheme.typography.subtitle2)
-                // max fee proportional
-                TextInput(
-                    modifier = Modifier.fillMaxWidth(),
-                    maxChar = 10,
-                    text= feeProportional ?: "",
-                    placeholder = {
-                        Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
-                    onTextChange = {
-                        feeProportional = it
-                    },
-                    enabled = true
-                )
-            }
+            Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label), style = MaterialTheme.typography.subtitle2)
+            // max fee proportional
+            TextInput(
+                modifier = Modifier.fillMaxWidth(),
+                maxChar = 10,
+                text= feeProportional ?: "",
+                placeholder = {
+                    Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
+                onTextChange = {
+                    feeProportional = it
+                },
+                enabled = true
+            )
         }
     }
 }
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -426,37 +406,31 @@ private fun PayToOpenDialog(
         buttons = { Spacer(Modifier.height(24.dp))},
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.height(16.dp))
-            // -- checkbox
-            // -- input
-            Spacer(Modifier.height(12.dp))
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .enableOrFade(enabled = true)
-                    .padding(horizontal = 24.dp)
-            ) {
-                Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title), style = MaterialTheme.typography.h5)
-                Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))
-                Spacer(Modifier.height(8.dp))
-                val apiString = AnnotatedString.Builder()
-                apiString.pushStyle(
-                    style = SpanStyle(
-                        color = Blue,
-                        textDecoration = TextDecoration.Underline
-                    )
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .enableOrFade(enabled = true)
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title), style = MaterialTheme.typography.h4)
+            Spacer(Modifier.height(8.dp))
+            Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message))
+            Spacer(Modifier.height(8.dp))
+            val apiString = AnnotatedString.Builder()
+            apiString.pushStyle(
+                style = SpanStyle(
+                    color = Blue,
+                    textDecoration = TextDecoration.Underline
                 )
-                apiString.append(stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message_clickable))
-                val context = LocalContext.current
-                Text(
-                    modifier = Modifier.clickable(enabled = true) {
-                         openLink(context, "https://phoenix.acinq.co/faq#what-are-the-fees")
-                    },
-                    text = apiString.toAnnotatedString(),
-                )
-            }
+            )
+            apiString.append(stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_message_clickable))
+            val context = LocalContext.current
+            Text(
+                modifier = Modifier.clickable(enabled = true) {
+                    openLink(context, "https://phoenix.acinq.co/faq#what-are-the-fees")
+                },
+                text = apiString.toAnnotatedString(),
+            )
         }
     }
 }
