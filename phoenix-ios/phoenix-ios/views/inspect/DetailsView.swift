@@ -187,7 +187,11 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			header(NSLocalizedString("Payment Parts", comment: "Title in DetailsView_IncomingPayment"))
 			
 			ForEach(outgoingPayment.parts.indices, id: \.self) { index in
-				part_row(outgoingPayment.parts[index])
+				// FIXME: handle closing txs parts as well
+				let part = outgoingPayment.parts[index]
+				if (part is Lightning_kmpOutgoingPayment.LightningPart) {
+					part_row(part as! Lightning_kmpOutgoingPayment.LightningPart)
+				}
 			}
 		}
 	}
@@ -748,15 +752,15 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumn(NSLocalizedString("type", comment: "Label in DetailsView_IncomingPayment"))
 			
 		} valueColumn: {
-			
-			switch onChain.closingType {
-				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
-				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
-				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
-				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
-				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
-				default                                      : Text(verbatim: "?")
-			}
+			// FIXME: use closing txs parts instead of the payment's status.
+//			switch onChain.closingType {
+//				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
+//				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
+//				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
+//				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
+//				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
+//				default                                      : Text(verbatim: "?")
+//			}
 		}
 	}
 	
@@ -793,7 +797,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			commonValue_amounts(displayAmounts: displayAmounts(
-				sat: onChain.claimed,
+				// FIXME: the payment's status does not contain the claimed amount anymore. Use closing txs parts instead.
+				sat: Bitcoin_kmpSatoshi(sat: 1),
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
 		}
@@ -814,19 +819,19 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				
-				ForEach(onChain.txids.indices, id: \.self) { index in
-					
-					let txid = onChain.txids[index].toHex()
-					Text(txid)
-						.contextMenu {
-							Button(action: {
-								UIPasteboard.general.string = txid
-							}) {
-								Text("Copy")
-							}
-						}
-				}
+				// FIXME: the payment's status does not contain the list of closing transactions anymore. Use closing txs parts instead.
+//				ForEach(onChain.txids.indices, id: \.self) { index in
+//
+//					let txid = onChain.txids[index].toHex()
+//					Text(txid)
+//						.contextMenu {
+//							Button(action: {
+//								UIPasteboard.general.string = txid
+//							}) {
+//								Text("Copy")
+//							}
+//						}
+//				}
 			}
 		}
 	}
@@ -868,7 +873,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func part_row(_ part: Lightning_kmpOutgoingPayment.Part) -> some View {
+	func part_row(_ part: Lightning_kmpOutgoingPayment.LightningPart) -> some View {
 		let identifier: String = #function
 		let imgSize: CGFloat = 20
 		
@@ -878,19 +883,20 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
 			
-			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 				keyColumn(shortDisplayTime(date: part_succeeded.completedAtDate))
 				
-			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 				keyColumn(shortDisplayTime(date: part_failed.completedAtDate))
 				
 			} else {
+				// FIXME: also handle the closing txs parts
 				keyColumn(shortDisplayTime(date: part.createdAtDate))
 			}
 			
 		} valueColumn: {
 		
-			if let _ = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+			if let _ = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
@@ -920,7 +926,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					}
 				}
 				
-			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
