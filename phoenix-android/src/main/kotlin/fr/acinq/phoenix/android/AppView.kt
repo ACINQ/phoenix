@@ -185,9 +185,25 @@ fun AppView(
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
                     if (direction != null && id != null) {
-                        PaymentDetailsView(direction = direction, id = id, onBackClick = {
+                        PaymentDetailsView(direction = direction, id = id, onPaymentClick = { walletPaymentId ->
+                            navigateToPaymentMoreDetails(navController, walletPaymentId)
+                        }, onBackClick = {
                             navController.navigate(Screen.Home.route)
                         })
+                    }
+                }
+                composable(
+                    route = "${Screen.PaymentMoreDetails.route}/{direction}/{id}",
+                    arguments = listOf(
+                        navArgument("direction") { type = NavType.LongType },
+                        navArgument("id") { type = NavType.StringType }
+                    ),
+                )
+                {
+                    val direction = it.arguments?.getLong("direction")
+                    val id = it.arguments?.getString("id")
+                    if (direction != null && id != null) {
+                        PaymentMoreDetailsView(direction = direction, id = id)
                     }
                 }
                 composable(Screen.Settings.route) {
@@ -210,9 +226,6 @@ fun AppView(
                 }
                 composable(Screen.About.route) {
                     AboutView()
-                }
-                composable(Screen.PaymentMoreDetails.route) {
-                    PaymentMoreDetailsView()
                 }
                 composable(Screen.AppLock.route) {
                     AppLockView(
@@ -239,6 +252,10 @@ fun AppView(
 
 private fun navigateToPaymentDetails(navController: NavController, id: WalletPaymentId) {
     navController.navigate("${Screen.PaymentDetails.route}/${id.dbType.value}/${id.dbId}")
+}
+
+private fun navigateToPaymentMoreDetails(navController: NavController, id: WalletPaymentId) {
+    navController.navigate("${Screen.PaymentMoreDetails.route}/${id.dbType.value}/${id.dbId}")
 }
 
 @Composable

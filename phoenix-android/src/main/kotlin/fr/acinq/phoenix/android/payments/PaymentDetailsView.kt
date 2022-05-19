@@ -74,7 +74,8 @@ sealed class PaymentDetailsState {
 @Composable
 fun PaymentDetailsView(
     direction: Long, id: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     val vm: PaymentDetailsViewModel = viewModel(factory = PaymentDetailsViewModel.Factory(business.paymentsManager))
     val paymentState = produceState<PaymentDetailsState>(initialValue = PaymentDetailsState.Loading) {
@@ -105,7 +106,7 @@ fun PaymentDetailsView(
                     .padding(horizontal = 16.dp, vertical = 44.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PaymentDetailsSuccess(state.payment)
+                PaymentDetailsSuccess(state.payment, onPaymentClick)
             }
         }
     }
@@ -113,7 +114,8 @@ fun PaymentDetailsView(
 
 @Composable
 private fun PaymentDetailsSuccess(
-    data: WalletPaymentInfo
+    data: WalletPaymentInfo,
+    onPaymentClick: (WalletPaymentId) -> Unit
 ) {
     val payment = data.payment
     var showEditDescriptionDialog by remember { mutableStateOf(false) }
@@ -198,7 +200,9 @@ private fun PaymentDetailsSuccess(
                 textStyle = MaterialTheme.typography.caption,
                 space = 4.dp,
                 padding = PaddingValues(horizontal = 20.dp, vertical = 10.dp),
-                onClick = { nc.navigate(Screen.PaymentMoreDetails) })
+                onClick = {
+                    onPaymentClick(data.id())
+                })
             VSeparator(padding = PaddingValues(vertical = 8.dp))
             Button(
                 text = stringResource(id = R.string.paymentdetails_edit_button),
