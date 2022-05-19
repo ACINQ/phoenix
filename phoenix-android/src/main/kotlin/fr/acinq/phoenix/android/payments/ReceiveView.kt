@@ -79,7 +79,7 @@ private class ReceiveViewModel(controller: ReceiveController, description: Strin
     var customAmount by mutableStateOf<MilliSatoshi?>(null)
 
     /** Custom invoice expiry */
-    var customExpiry by mutableStateOf<Long?>(expiry)
+    var customExpiry by mutableStateOf<Long>(expiry)
 
     @UiThread
     fun generateInvoice() {

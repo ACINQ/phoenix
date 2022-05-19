@@ -232,7 +232,7 @@ private fun DefaultExpiryInvoiceDialog(
             Modifier
                 .fillMaxWidth()
                 .enableOrFade(enabled = true)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Text(text = stringResource(id = R.string.paymentsettings_expiry_dialog_title), style = MaterialTheme.typography.h4)
             Spacer(Modifier.height(8.dp))
@@ -310,7 +310,7 @@ private fun DefaultDescriptionInvoiceDialog(
             Modifier
                 .fillMaxWidth()
                 .enableOrFade(enabled = true)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Text(text = stringResource(id = R.string.paymentsettings_defaultdesc_dialog_title), style = MaterialTheme.typography.h4)
             Spacer(Modifier.height(8.dp))
@@ -359,7 +359,7 @@ private fun TrampolineMaxFeesDialog(
             Modifier
                 .fillMaxWidth()
                 .enableOrFade(enabled = true)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_override_default_checkbox), style = MaterialTheme.typography.h4)
             Spacer(Modifier.height(16.dp))
@@ -410,7 +410,7 @@ private fun PayToOpenDialog(
             Modifier
                 .fillMaxWidth()
                 .enableOrFade(enabled = true)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Text(text = stringResource(id = R.string.paymentsettings_paytoopen_fees_dialog_title), style = MaterialTheme.typography.h4)
             Spacer(Modifier.height(8.dp))
