@@ -181,6 +181,7 @@ class AppScanController(
         model(model)
     }
 
+    /** Utility method wrapping a cancellable lnurl task and updating the requestId field. */
     private suspend fun <T, U> executeLnurlAction(action: suspend () -> Either<T, U>): Either<T, U>? {
         val requestId = lnurlRequestId
         val result = action()
@@ -193,12 +194,15 @@ class AppScanController(
 
     private suspend fun processLnurlData(data: Either<LNUrl.Auth, Url>) {
         when (data) {
+            // lnurl-auths are not called automatically. The user must initiate the request.
             is Either.Left -> {
                 // proceed to lnurl-auth flow
                 prefetchPublicSuffixListTask = appConfigManager.fetchPublicSuffixListAsync()
                 model(Scan.Model.LnurlAuthFlow.LoginRequest(auth = data.value))
             }
-            is Either.Right -> { // it.value: Url
+            // this is a standard url, and it can be executed immediately in order to get the actual
+            // lnurl details from the service (the service should return either a LNUrl.Pay or a LNUrl.Withdraw).
+            is Either.Right -> {
                 val url = data.value
                 model(Scan.Model.LnurlServiceFetch)
                 val result = executeLnurlAction {
@@ -217,12 +221,10 @@ class AppScanController(
                         }
                     }
                 }
-                when (result) {
-                    null -> {} // do nothing, this request has been cancelled.
-                    is Either.Left -> { // result: BadRequestReason
-                        model(Scan.Model.BadRequest(result.value))
-                    }
-                    is Either.Right -> { // result: LNUrl
+                when {
+                    result == null -> {} // do nothing, this request has been cancelled.
+                    result is Either.Left -> model(Scan.Model.BadRequest(result.value))
+                    result is Either.Right && result.value is LNUrl.Pay-> { // result: LNUrl
                         when (val lnurl = result.value) {
                             is LNUrl.Pay -> {
                                 val balance = getBalance()
@@ -528,38 +530,25 @@ class AppScanController(
         }
     }
 
-    /** Directly called by swift code in iOS app. */
-    suspend fun inspectClipboard(string: String): Scan.ClipboardContent? {
-        val input = Parser.removeExcessInput(string)
+    /** Directly called by swift code in iOS app. Parses the data looking for a Lightning invoice, Lnurl, or Bitcoin address. */
+    suspend fun inspectClipboard(data: String): Scan.ClipboardContent? {
+        val input = Parser.removeExcessInput(data)
 
-        // Is it a Lightning invoice ?
-        Parser.readPaymentRequest(input)?.let {
-            return Scan.ClipboardContent.InvoiceRequest(it)
-        }
-
-        // Is it an LNURL ?
-        readLNURL(input)?.let {
-            return when (it) {
-                is Either.Left -> { // it.value: LnUrl.Auth
-                    Scan.ClipboardContent.LoginRequest(it.value)
-                }
-                is Either.Right -> { // it.value: Url
-                    Scan.ClipboardContent.LnurlRequest(it.value)
-                }
+        return Parser.readPaymentRequest(input)?.let {
+            Scan.ClipboardContent.InvoiceRequest(it)
+        } ?: readLNURL(input)?.let {
+            when (it) {
+                is Either.Left -> Scan.ClipboardContent.LoginRequest(it.value)
+                is Either.Right -> Scan.ClipboardContent.LnurlRequest(it.value)
+            }
+        } ?: Parser.readBitcoinAddress(chain, input).let {
+            (it as? Either.Right)?.value?.paymentRequest?.let { pr ->
+                Scan.ClipboardContent.InvoiceRequest(pr)
             }
         }
-
-        // Is it a bitcoin address ?
-        readBitcoinAddress(input).let {
-            if (it is Either.Right) {
-                return it.value.paymentRequest?.let { Scan.ClipboardContent.InvoiceRequest(it) }
-            }
-        }
-
-        return null
     }
 
-    /** Check that the invoice is on same chain and has not already been paid. */
+    /** Checks that the invoice is on same chain and has not already been paid. */
     private suspend fun checkForBadRequest(
         paymentRequest: PaymentRequest
     ): Scan.BadRequestReason? {
@@ -577,49 +566,17 @@ class AppScanController(
         }
     }
 
-    private suspend fun checkForDangerousRequest(
-        paymentRequest: PaymentRequest
-    ): Scan.DangerousRequestReason? {
-
-        if (paymentRequest.amount == null) {
-            // amountless invoice -> dangerous unless full trampoline is in effect
-            val features = Features(paymentRequest.features)
-            if (!features.hasFeature(Feature.TrampolinePayment)) {
-                return Scan.DangerousRequestReason.IsAmountlessInvoice
-            }
-        }
-        if (paymentRequest.nodeId == peerManager.getPeer().nodeParams.nodeId) {
-            return Scan.DangerousRequestReason.IsOwnInvoice
-        }
-        return null
+    /** Checks for payment request that should not be made: amountless invoice without trampoline ; pay-to-self... */
+    private suspend fun checkForDangerousRequest(pr: PaymentRequest): Scan.DangerousRequestReason? = when {
+        pr.amount == null && !Features(pr.features).hasFeature(Feature.TrampolinePayment) -> Scan.DangerousRequestReason.IsAmountlessInvoice
+        pr.nodeId == peerManager.getPeer().nodeParams.nodeId -> Scan.DangerousRequestReason.IsOwnInvoice
+        else -> null
     }
 
+    /** Reads a lnurl and return either a lnurl-auth (i.e. a http query that must not be called automatically), or the actual url embedded in the lnurl (that can be called afterwards). */
     private fun readLNURL(input: String): Either<LNUrl.Auth, Url>? = try {
         lnurlManager.interactiveExtractLnurl(Parser.trimMatchingPrefix(input, listOf("lightning://", "lightning:")))
     } catch (t: Throwable) {
         null
-    }
-
-    private fun readBitcoinAddress(
-        input: String
-    ): Either<Scan.BadRequestReason, BitcoinAddressInfo> = when (val result = Parser.readBitcoinAddress(chain, input)) {
-        is Either.Left -> {
-            when (val reason = result.value) {
-                is BitcoinAddressError.ChainMismatch -> {
-                    Either.Left(
-                        Scan.BadRequestReason.ChainMismatch(
-                            myChain = reason.myChain,
-                            requestChain = reason.addrChain
-                        )
-                    )
-                }
-                else -> {
-                    Either.Left(Scan.BadRequestReason.UnknownFormat)
-                }
-            }
-        }
-        is Either.Right -> {
-            Either.Right(result.value)
-        }
     }
 }
