@@ -34,6 +34,7 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
+import fr.acinq.lightning.utils.msat
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
@@ -105,24 +106,30 @@ fun PaymentMoreDetailsView(
                             Text(text = payment.amount.truncateToSatoshi().toString())
                         }
                     }
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    Row {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.paymentdetails_fees_paid),
-                                style = MaterialTheme.typography.subtitle2
-                            )
+
+                    payment.fees.takeUnless { it <= 0.msat }?.let {
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_fees_paid),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text(text = it.truncateToSatoshi().toString() )
+                            }
                         }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(
-                            Modifier.weight(3f)
-                        ) {
-                            Text(text = payment.fees.truncateToSatoshi().toString())
-                        }
+
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                     Row {
                         Column(
                             Modifier.weight(1f)
@@ -171,11 +178,13 @@ fun PaymentMoreDetailsView(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+
+                    /*
                     when (payment) {
                         is OutgoingPayment -> payment.recipientAmount
                         else -> null
                     }?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
                         Row {
                             Column(
                                 Modifier.weight(1f)
@@ -193,29 +202,7 @@ fun PaymentMoreDetailsView(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    when (payment) {
-                        is OutgoingPayment -> payment.recipient
-                        else -> null
-                    }?.let {
-                        Row {
-                            Column(
-                                Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.paymentdetails_recipient_pubkey),
-                                    style = MaterialTheme.typography.subtitle2
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Column(
-                                Modifier.weight(3f)
-                            ) {
-                                Text(text = it.toString())
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    */
                     when (payment) {
                         is OutgoingPayment -> when (val details = payment.details) {
                             is OutgoingPayment.Details.Normal -> details.paymentRequest.timestampSeconds
@@ -227,6 +214,7 @@ fun PaymentMoreDetailsView(
                         }
                         else -> null
                     }?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
                         Row {
                             Column(
                                 Modifier.weight(1f)
@@ -245,14 +233,36 @@ fun PaymentMoreDetailsView(
                             }
                         }
                     }
+                    when (payment) {
+                        is OutgoingPayment -> payment.recipient
+                        else -> null
+                    }?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_recipient_pubkey),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text(text = it.toString())
+                            }
+                        }
+                    }
                 }
-
 
                 Card(internalPadding = PaddingValues(16.dp)) {
 
                     when (payment) {
                         is OutgoingPayment -> when (val status = payment.status) {
                             is OutgoingPayment.Status.Completed.Succeeded.OffChain -> status.completedAt
+                            is OutgoingPayment.Status.Completed.Succeeded.OnChain -> status.completedAt
                             else -> null
                         }
                         else -> null
@@ -276,7 +286,7 @@ fun PaymentMoreDetailsView(
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
+
                     when (payment) {
                         is OutgoingPayment -> when (val details = payment.details) {
                             is OutgoingPayment.Details.Normal -> details.paymentRequest.paymentHash.toHex()
@@ -305,6 +315,34 @@ fun PaymentMoreDetailsView(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    when (payment) {
+                        is OutgoingPayment -> when (val status = payment.status) {
+                            is OutgoingPayment.Status.Completed.Succeeded.OffChain -> status.preimage
+                            else -> null
+                        }
+                        else -> null
+                    }?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_preimage_label),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text (it.toHex())
+                                //Text(text = (it-payment.createdAt).toString())
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
