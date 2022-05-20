@@ -71,53 +71,77 @@ fun PaymentMoreDetailsView(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentdetails_title)
         )
-        Card(internalPadding = PaddingValues(16.dp)) {
 
-            when (val state = paymentState.value) {
-                is PaymentDetailsState.Loading -> Card {
-                    Text(stringResource(id = R.string.paymentdetails_loading))
-                }
-                is PaymentDetailsState.Failure -> Card {
-                    Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
-                }
-                is PaymentDetailsState.Success -> Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 44.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val payment = state.payment.payment
+        when (val state = paymentState.value) {
+            is PaymentDetailsState.Loading -> Card {
+                Text(stringResource(id = R.string.paymentdetails_loading))
+            }
+            is PaymentDetailsState.Failure -> Card {
+                Text(stringResource(id = R.string.paymentdetails_error, state.error.message ?: stringResource(id = R.string.utils_unknown)))
+            }
+            is PaymentDetailsState.Success -> Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 44.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val payment = state.payment.payment
 
-                    when (payment) {
-                        is OutgoingPayment -> when (val details = payment.details) {
-                            is OutgoingPayment.Details.Normal -> details.paymentRequest.timestampSeconds
-                            else -> null
+                Card(internalPadding = PaddingValues(16.dp)) {
+
+                    Row {
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.paymentdetails_amount_sent),
+                                style = MaterialTheme.typography.subtitle2
+                            )
                         }
-                        is IncomingPayment -> when (val origin = payment.origin) {
-                            is IncomingPayment.Origin.Invoice -> origin.paymentRequest.timestampSeconds
-                            else -> null
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(
+                            Modifier.weight(3f)
+                        ) {
+                            Text(text = payment.amount.truncateToSatoshi().toString())
                         }
-                        else -> null
-                    }?.let {
-                        Row {
-                            Column(
-                                Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.paymentdetails_invoice_created),
-                                    style = MaterialTheme.typography.subtitle2
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Column(
-                                Modifier.weight(3f)
-                            ) {
-                                val date = Date(it*1000)
-                                Text(text = date.toString())
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row {
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.paymentdetails_fees_paid),
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(
+                            Modifier.weight(3f)
+                        ) {
+                            Text(text = payment.fees.truncateToSatoshi().toString())
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row {
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.paymentdetails_sent_at),
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(
+                            Modifier.weight(3f)
+                        ) {
+                            Text(text = Date(payment.createdAt).toString())
+                        }
+                    }
+                }
+
+                Card(internalPadding = PaddingValues(16.dp)) {
 
                     when (payment) {
                         is OutgoingPayment -> when (val details = payment.details) {
@@ -146,16 +170,59 @@ fun PaymentMoreDetailsView(
                                 Text(text = it.truncateToSatoshi().toString())
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
-
+                    Spacer(modifier = Modifier.height(16.dp))
+                    when (payment) {
+                        is OutgoingPayment -> payment.recipientAmount
+                        else -> null
+                    }?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_amount_received),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text(text = it.truncateToSatoshi().toString())
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    when (payment) {
+                        is OutgoingPayment -> payment.recipient
+                        else -> null
+                    }?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_recipient_pubkey),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text(text = it.toString())
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     when (payment) {
                         is OutgoingPayment -> when (val details = payment.details) {
-                            is OutgoingPayment.Details.Normal -> details.paymentRequest.paymentHash.toHex()
+                            is OutgoingPayment.Details.Normal -> details.paymentRequest.timestampSeconds
                             else -> null
                         }
                         is IncomingPayment -> when (val origin = payment.origin) {
-                            is IncomingPayment.Origin.Invoice -> origin.paymentRequest.paymentHash.toHex()
+                            is IncomingPayment.Origin.Invoice -> origin.paymentRequest.timestampSeconds
                             else -> null
                         }
                         else -> null
@@ -165,7 +232,7 @@ fun PaymentMoreDetailsView(
                                 Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.paymentdetails_payment_hash),
+                                    text = stringResource(id = R.string.paymentdetails_invoice_created),
                                     style = MaterialTheme.typography.subtitle2
                                 )
                             }
@@ -173,29 +240,15 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it)
+                                val date = Date(it * 1000)
+                                Text(text = date.toString())
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
+                }
 
-                    Row {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.paymentdetails_sent_at),
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(
-                            Modifier.weight(3f)
-                        ) {
-                            Text(text = Date(payment.createdAt).toString())
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
+
+                Card(internalPadding = PaddingValues(16.dp)) {
 
                     when (payment) {
                         is OutgoingPayment -> when (val status = payment.status) {
@@ -221,47 +274,18 @@ fun PaymentMoreDetailsView(
                                 //Text(text = (it-payment.createdAt).toString())
                             }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    Row {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.paymentdetails_amount_sent),
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(
-                            Modifier.weight(3f)
-                        ) {
-                            Text(text = payment.amount.truncateToSatoshi().toString())
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.paymentdetails_fees_paid),
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(
-                            Modifier.weight(3f)
-                        ) {
-                            Text(text = payment.fees.truncateToSatoshi().toString())
-                        }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-
+                    Spacer(modifier = Modifier.height(16.dp))
                     when (payment) {
-                        is OutgoingPayment -> payment.recipientAmount
+                        is OutgoingPayment -> when (val details = payment.details) {
+                            is OutgoingPayment.Details.Normal -> details.paymentRequest.paymentHash.toHex()
+                            else -> null
+                        }
+                        is IncomingPayment -> when (val origin = payment.origin) {
+                            is IncomingPayment.Origin.Invoice -> origin.paymentRequest.paymentHash.toHex()
+                            else -> null
+                        }
                         else -> null
                     }?.let {
                         Row {
@@ -269,7 +293,7 @@ fun PaymentMoreDetailsView(
                                 Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.paymentdetails_amount_received),
+                                    text = stringResource(id = R.string.paymentdetails_payment_hash),
                                     style = MaterialTheme.typography.subtitle2
                                 )
                             }
@@ -277,30 +301,7 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it.truncateToSatoshi().toString())
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    when (payment) {
-                        is OutgoingPayment -> payment.recipient
-                        else -> null
-                    }?.let {
-                        Row {
-                            Column(
-                                Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.paymentdetails_recipient_pubkey),
-                                    style = MaterialTheme.typography.subtitle2
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Column(
-                                Modifier.weight(3f)
-                            ) {
-                                Text(text = it.toString())
+                                Text(text = it)
                             }
                         }
                     }
