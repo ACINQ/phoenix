@@ -384,6 +384,7 @@
     <!-- //////////////// payment details //////////////// -->
 
     <string name="paymentdetails_title">Payment details</string>
+    <string name="paymentdetails_subtitle">More details about this selected payment</string>
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 

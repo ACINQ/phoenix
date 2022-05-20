@@ -70,7 +70,8 @@ fun PaymentMoreDetailsView(
     SettingScreen {
         SettingHeader(
             onBackClick = { nc.popBackStack() },
-            title = stringResource(id = R.string.paymentdetails_title)
+            title = stringResource(id = R.string.paymentdetails_title),
+            subtitle = stringResource(id = R.string.paymentdetails_subtitle)
         )
 
         when (val state = paymentState.value) {
@@ -83,7 +84,7 @@ fun PaymentMoreDetailsView(
             is PaymentDetailsState.Success -> Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 44.dp),
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val payment = state.payment.payment
@@ -107,8 +108,6 @@ fun PaymentMoreDetailsView(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     payment.fees.takeUnless { it <= 0.msat }?.let {
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -130,6 +129,7 @@ fun PaymentMoreDetailsView(
                         }
 
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                     Row {
                         Column(
                             Modifier.weight(1f)
@@ -314,8 +314,8 @@ fun PaymentMoreDetailsView(
                                 Text(text = it)
                             }
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
 
                     when (payment) {
                         is OutgoingPayment -> when (val status = payment.status) {
@@ -341,8 +341,39 @@ fun PaymentMoreDetailsView(
                                 //Text(text = (it-payment.createdAt).toString())
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                    when (payment) {
+                        is OutgoingPayment -> when (val details = payment.details) {
+                            is OutgoingPayment.Details.Normal -> details.paymentRequest.write()
+                            else -> null
+                        }
+                        is IncomingPayment -> when (val origin = payment.origin) {
+                            is IncomingPayment.Origin.Invoice -> origin.paymentRequest.write()
+                            else -> null
+                        }
+                        else -> null
+                    }?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_payment_request_label),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text(text = it)
+                            }
+                        }
+                    }
                 }
             }
         }
