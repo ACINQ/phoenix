@@ -446,6 +446,7 @@
     <string name="paymentdetails_payment_hash">Payment hash</string>
     <string name="paymentdetails_sent_at">Sent at</string>
     <string name="paymentdetails_elapsed">Elapsed</string>
+    <string name="paymentdetails_elapsed_ms">%1$d ms</string>
     <string name="paymentdetails_amount_sent">Amount sent</string>
     <string name="paymentdetails_fees_paid">Fees paid</string>
     <string name="paymentdetails_amount_received">Amount received</string>

@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.acinq.bitcoin.Satoshi
+import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.phoenix.android.R
@@ -44,6 +46,8 @@ import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.managers.PaymentsManager
 import fr.acinq.phoenix.utils.createdAt
 import org.slf4j.LoggerFactory
+import java.util.*
+import kotlin.NoSuchElementException
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -108,7 +112,8 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it.toString())
+                                val date = Date(it*1000)
+                                Text(text = date.toString())
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -138,7 +143,7 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it.toString())
+                                Text(text = it.truncateToSatoshi().toString())
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -187,30 +192,38 @@ fun PaymentMoreDetailsView(
                         Column(
                             Modifier.weight(3f)
                         ) {
-                            Text(text = payment.createdAt.toString())
+                            Text(text = Date(payment.createdAt).toString())
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    /*
-                    Row {
-                        Column(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.paymentdetails_elapsed),
-                                style = MaterialTheme.typography.subtitle2
-                            )
+                    when (payment) {
+                        is OutgoingPayment -> when (val status = payment.status) {
+                            is OutgoingPayment.Status.Completed.Succeeded.OffChain -> status.completedAt
+                            else -> null
                         }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(
-                            Modifier.weight(3f)
-                        ) {
-                            Text(text = stringResource(id = R.string.about_seed_content))
+                        else -> null
+                    }?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_elapsed),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                Text (stringResource(id = R.string.paymentdetails_elapsed_ms, it-payment.createdAt))
+                                //Text(text = (it-payment.createdAt).toString())
+                            }
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    */
+
                     Row {
                         Column(
                             Modifier.weight(1f)
@@ -224,7 +237,7 @@ fun PaymentMoreDetailsView(
                         Column(
                             Modifier.weight(3f)
                         ) {
-                            Text(text = payment.amount.toString())
+                            Text(text = payment.amount.truncateToSatoshi().toString())
                         }
                     }
 
@@ -242,7 +255,7 @@ fun PaymentMoreDetailsView(
                         Column(
                             Modifier.weight(3f)
                         ) {
-                            Text(text = payment.fees.toString())
+                            Text(text = payment.fees.truncateToSatoshi().toString())
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -264,12 +277,11 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it.toString())
+                                Text(text = it.truncateToSatoshi().toString())
                             }
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-
 
                     when (payment) {
                         is OutgoingPayment -> payment.recipient
