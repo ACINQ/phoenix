@@ -112,6 +112,7 @@ fun NumberInput(
     modifier: Modifier = Modifier,
     maxLines: Int = 1,
     initialValue: Long,
+    maxChar: Int = 10,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
@@ -122,19 +123,9 @@ fun NumberInput(
     val focusManager = LocalFocusManager.current
     TextField(
         value = text,
-        onValueChange = {
-            val maxChar = 10
-            if (it.length <= maxChar) {
-                text = if (it.isEmpty()) {
-                    ""
-                } else {
-                    when (it.toLongOrNull()) {
-                        null -> text //old value
-                        else -> it   //new value
-                    }
-                }
-            }
-            onTextChange(text.toLongOrNull())
+        onValueChange = { strValue ->
+            text = strValue.take(maxChar).takeWhile { it.isDigit()}
+            onTextChange (text.toLongOrNull())
         },
         singleLine = true,
         maxLines = maxLines,

@@ -369,6 +369,7 @@ private fun TrampolineMaxFeesDialog(
             NumberInput(
                 modifier = Modifier.fillMaxWidth(),
                 initialValue = feeBase ?: -1L,
+                maxChar = 5,
                 placeholder = {
                     Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
                 enabled = true,
