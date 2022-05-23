@@ -64,6 +64,36 @@ fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    onTextChange: (String) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    TextField(
+        value = text,
+        onValueChange = onTextChange,
+        maxLines = maxLines,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text
+        ),
+        label = label,
+        placeholder = placeholder,
+        enabled = enabled,
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        colors = textFieldColors(),
+        shape = RectangleShape,
+        modifier = modifier
+    )
+}
+
+
+@Composable
+fun PercentInput(
+    modifier: Modifier = Modifier,
+    text: String,
+    maxLines: Int = 1,
     maxChar: Int? = null,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -74,23 +104,10 @@ fun TextInput(
     var textChars by remember { mutableStateOf(text) }
     TextField(
         value = text,
-        onValueChange = {
-            if (maxChar != null)
-            {
-                if (it.length <= maxChar) {
-                    textChars = if (it.isEmpty()) {
-                        ""
-                    } else {
-                        when (it.toDoubleOrNull()) {
-                            null -> text //old value
-                            else -> it   //new value
-                        }
-                    }
-                }
-            } else {
-                textChars = it
-            }
-            onTextChange(textChars)
+        onValueChange = { strValue ->
+            val maxCharStr = if (maxChar != null) strValue.take(maxChar) else strValue
+            textChars = maxCharStr.takeIf { it.toDoubleOrNull() != null || it.isEmpty() } ?: textChars
+            onTextChange (textChars)
         },
         maxLines = maxLines,
         keyboardOptions = KeyboardOptions.Default.copy(

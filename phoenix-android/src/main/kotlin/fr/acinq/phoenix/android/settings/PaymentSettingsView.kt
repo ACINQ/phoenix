@@ -382,9 +382,9 @@ private fun TrampolineMaxFeesDialog(
 
             Text(text = stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_label), style = MaterialTheme.typography.subtitle2)
             // max fee proportional
-            TextInput(
+            PercentInput(
                 modifier = Modifier.fillMaxWidth(),
-                maxChar = 10,
+                maxChar = 6,
                 text= feeProportional ?: "",
                 placeholder = {
                     Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_proportional_fee_hint)) },
