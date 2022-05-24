@@ -633,8 +633,8 @@
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
   <string name="paymentsettings_trampoline_fees_dialog_invalid">Enter a valid maximum fee setting</string>
-  <string name="paymentsettings_trampoline_fees_dialog_base_too_high">Base fee cannot exceed 50 000 sat.</string>
-  <string name="paymentsettings_trampoline_fees_dialog_proportional_too_high">Proportional fee cannot exceed 100%.</string>
+  <string name="paymentsettings_trampoline_fees_dialog_base_too_high">Base fee cannot exceed %1$s.</string>
+  <string name="paymentsettings_trampoline_fees_dialog_proportional_too_high">Proportional fee cannot exceed %1$s%%.</string>
 
   <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
   <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s sat minimum)</string>

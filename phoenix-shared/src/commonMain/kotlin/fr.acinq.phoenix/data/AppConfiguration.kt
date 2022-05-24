@@ -1,8 +1,10 @@
 package fr.acinq.phoenix.data
 
 import fr.acinq.bitcoin.Block
+import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.wire.InitTlv
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
@@ -228,3 +230,10 @@ data class StartupParams(
 
     // TODO: add custom electrum address, fiat currencies, ...
 )
+
+object PaymentOptionsConstants {
+    val minBaseFee:Satoshi = 0.sat
+    val maxBaseFee:Satoshi = 100_000.sat
+    const val minProportionalFee:Long = 0
+    const val maxProportionalFee:Long = 500000
+}

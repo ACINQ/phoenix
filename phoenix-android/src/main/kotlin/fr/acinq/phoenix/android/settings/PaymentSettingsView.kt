@@ -42,12 +42,16 @@ import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.utils.sat
+import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.phoenix.android.LocalWalletContext
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.data.BitcoinUnit
+import fr.acinq.phoenix.data.PaymentOptionsConstants
 import fr.acinq.phoenix.legacy.utils.Converter
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -141,20 +145,20 @@ fun PaymentSettingsView() {
                 {
                     val feeProportionalPercent = Converter.percentageToPerMillionths(feeProportionalParam.toString())
 
-                    if (feeBaseParam.sat > 50_000.sat)
-                    {
-                        Toast.makeText(context, R.string.paymentsettings_trampoline_fees_dialog_base_too_high, Toast.LENGTH_SHORT).show()
-                    }
-                    else if (feeProportionalPercent > 1000000)
-                    {
-                        Toast.makeText(context, R.string.paymentsettings_trampoline_fees_dialog_proportional_too_high, Toast.LENGTH_SHORT).show()
-                    }
-                    else {
-                        scope.launch {
-                            val trampolineMax = TrampolineFees(Satoshi(feeBaseParam), Converter.percentageToPerMillionths(feeProportional.toString()), CltvExpiryDelta(expiryDeltaParam))
-                            UserPrefs.saveTrampolineMaxFee(context, trampolineMax)
+                    when {
+                        feeBaseParam.sat > PaymentOptionsConstants.maxBaseFee -> {
+                            Toast.makeText(context, context.getString(R.string.paymentsettings_trampoline_fees_dialog_base_too_high, PaymentOptionsConstants.maxBaseFee.toMilliSatoshi().toPrettyString(BitcoinUnit.Sat, withUnit = true)), Toast.LENGTH_SHORT).show()
+                        }
+                        feeProportionalPercent > PaymentOptionsConstants.maxProportionalFee -> {
+                            Toast.makeText(context, context.getString(R.string.paymentsettings_trampoline_fees_dialog_proportional_too_high, Converter.perMillionthsToPercentageString(PaymentOptionsConstants.maxProportionalFee)), Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                            scope.launch {
+                                val trampolineMax = TrampolineFees(Satoshi(feeBaseParam), Converter.percentageToPerMillionths(feeProportional.toString()), CltvExpiryDelta(expiryDeltaParam))
+                                UserPrefs.saveTrampolineMaxFee(context, trampolineMax)
 
-                            showTrampolineMaxFeeDialog = false
+                                showTrampolineMaxFeeDialog = false
+                            }
                         }
                     }
                 }
@@ -369,7 +373,7 @@ private fun TrampolineMaxFeesDialog(
             NumberInput(
                 modifier = Modifier.fillMaxWidth(),
                 initialValue = feeBase ?: -1L,
-                maxChar = 5,
+                maxChar = 6,
                 placeholder = {
                     Text(stringResource(id = R.string.paymentsettings_trampoline_fees_dialog_base_fee_hint)) },
                 enabled = true,
