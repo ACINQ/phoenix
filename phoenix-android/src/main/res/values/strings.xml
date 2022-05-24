@@ -449,6 +449,7 @@
     <string name="paymentdetails_elapsed">Elapsed</string>
     <string name="paymentdetails_elapsed_ms">%1$d ms</string>
     <string name="paymentdetails_amount_sent">Amount sent</string>
+    <string name="paymentdetails_current_rate">Current rate</string>
     <string name="paymentdetails_fees_paid">Fees paid</string>
     <string name="paymentdetails_amount_received">Amount received</string>
     <string name="paymentdetails_recipient_pubkey">Recipient pubkey</string>

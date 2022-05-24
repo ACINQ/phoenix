@@ -35,13 +35,15 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.IncomingPayment
 import fr.acinq.lightning.db.OutgoingPayment
 import fr.acinq.lightning.utils.msat
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.business
 import fr.acinq.phoenix.android.components.Card
 import fr.acinq.phoenix.android.components.SettingHeader
 import fr.acinq.phoenix.android.components.SettingScreen
-import fr.acinq.phoenix.android.navController
+import fr.acinq.phoenix.android.utils.Converter.toFiat
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
+import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.managers.PaymentsManager
@@ -59,6 +61,8 @@ fun PaymentMoreDetailsView(
     val log = logger("PaymentMoreDetailsView")
     val nc = navController
     val context = LocalContext.current
+    val rate = fiatRate
+    val prefFiat = LocalFiatCurrency.current
 
     val vm: PaymentMoreDetailsViewModel = viewModel(factory = PaymentMoreDetailsViewModel.Factory(business.paymentsManager))
     val paymentState = produceState<PaymentDetailsState>(initialValue = PaymentDetailsState.Loading) {
@@ -104,7 +108,27 @@ fun PaymentMoreDetailsView(
                         Column(
                             Modifier.weight(3f)
                         ) {
-                            Text(text = payment.amount.truncateToSatoshi().toString())
+                            Text(text = payment.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
+                        }
+                    }
+
+                    rate?.let {
+                        Row {
+                            Column(
+                                Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.paymentdetails_current_rate),
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                Modifier.weight(3f)
+                            ) {
+                                val fiatAmount = payment.amount.toFiat(rate.price).toPrettyString(prefFiat, withUnit = true)
+                                Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount))
+                            }
                         }
                     }
 
@@ -174,7 +198,8 @@ fun PaymentMoreDetailsView(
                             Column(
                                 Modifier.weight(3f)
                             ) {
-                                Text(text = it.truncateToSatoshi().toString())
+                                //Text(text = it.truncateToSatoshi().toString())
+                                Text(text = payment.amount.toPrettyString(BitcoinUnit.Sat, withUnit = true))
                             }
                         }
                     }
