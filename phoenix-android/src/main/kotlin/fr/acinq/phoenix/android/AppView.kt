@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,26 +31,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import fr.acinq.lightning.payment.PaymentRequest
-import fr.acinq.phoenix.android.home.HomeView
-import fr.acinq.phoenix.android.home.HomeViewModel
-import fr.acinq.phoenix.android.home.ReadDataView
-import fr.acinq.phoenix.android.home.StartupView
+import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
-import fr.acinq.phoenix.android.payments.PaymentDetailsView
-import fr.acinq.phoenix.android.payments.ReceiveView
-import fr.acinq.phoenix.android.payments.SendView
+import fr.acinq.phoenix.android.payments.*
 import fr.acinq.phoenix.android.service.WalletState
 import fr.acinq.phoenix.android.settings.*
 import fr.acinq.phoenix.android.utils.Prefs
 import fr.acinq.phoenix.android.utils.appBackground
 import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.data.BitcoinUnit
-import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.data.WalletPaymentId
-import fr.acinq.phoenix.data.walletPaymentId
+import fr.acinq.phoenix.data.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -128,7 +118,7 @@ fun AppView(
                             onSettingsClick = { navController.navigate(Screen.Settings.route) },
                             onReceiveClick = { navController.navigate(Screen.Receive.route) },
                             onSendClick = {
-                                navController.navigate(Screen.ReadData.route) { launchSingleTop = true }
+                                navController.navigate(Screen.ScanData.route) { launchSingleTop = true }
                             }
                         )
                     }
@@ -136,39 +126,8 @@ fun AppView(
                 composable(Screen.Receive.route) {
                     ReceiveView()
                 }
-                composable(Screen.ReadData.route) {
-                    ReadDataView(
-                        onBackClick = { navController.popBackStack() },
-                        onInvoiceRead = {
-                            navController.navigate("${Screen.Send.route}/${it.write()}") {
-                                popUpTo(Screen.Home.route) {
-                                    inclusive = true
-                                    saveState = true
-                                }
-                            }
-                        }
-                    )
-                }
-                composable(
-                    route = "${Screen.Send.route}/{request}",
-                    arguments = listOf(
-                        navArgument("request") { type = NavType.StringType },
-                    ),
-                ) {
-                    val request = try {
-                        PaymentRequest.read(it.arguments!!.getString("request")!!)
-                    } catch (e: Exception) {
-                        val context = LocalContext.current
-                        LaunchedEffect(key1 = true) {
-                            Toast.makeText(context, "Invalid payment request", Toast.LENGTH_SHORT).show()
-                        }
-                        null
-                    }
-                    if (request == null) {
-                        // navController.navigate(Screen.Home.route)
-                    } else {
-                        SendView(request)
-                    }
+                composable(Screen.ScanData.route) {
+                    ScanDataView(onBackClick = { navController.popBackStack() })
                 }
                 composable(
                     route = "${Screen.PaymentDetails.route}/{direction}/{id}",

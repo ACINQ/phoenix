@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 ACINQ SAS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package fr.acinq.phoenix.controllers.payments
 
 import fr.acinq.bitcoin.Satoshi
@@ -5,6 +21,7 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.data.Chain
 import fr.acinq.phoenix.controllers.MVI
+import fr.acinq.phoenix.data.BitcoinAddressInfo
 import fr.acinq.phoenix.data.LNUrl
 import io.ktor.http.*
 import kotlin.time.ExperimentalTime
@@ -68,6 +85,15 @@ object Scan {
                 val balanceMsat: Long
             ): InvoiceFlow()
             object Sending: InvoiceFlow()
+        }
+
+        sealed class SwapOutFlow: Model() {
+            abstract val address: BitcoinAddressInfo
+            data class Init(override val address: BitcoinAddressInfo): SwapOutFlow()
+            data class RequestingSwapout(override val address: BitcoinAddressInfo): SwapOutFlow()
+            /** The swap-out is ready to be settled with a Lightning payment. The user must confirm the swap (the fee should be shown prominently). */
+            data class SwapOutReady(override val address: BitcoinAddressInfo, val initialUserAmount: Satoshi, val fee: Satoshi, val paymentRequest: PaymentRequest): SwapOutFlow()
+            data class SendingSwapOut(override val address: BitcoinAddressInfo, val paymentRequest: PaymentRequest): SwapOutFlow()
         }
 
         object LnurlServiceFetch : Model()
@@ -139,6 +165,26 @@ object Scan {
                 val amount: MilliSatoshi,
                 val maxFees: MaxFees?
             ) : InvoiceFlow()
+        }
+
+        sealed class SwapOutFlow: Intent() {
+            /**
+             * Use this to go back to the initial state [Model.SwapOutFlow.Init], when the swap-out
+             * amount has been edited by the user, which invalidates the current model.
+             */
+            data class Invalidate(val address: BitcoinAddressInfo): SwapOutFlow()
+
+            data class PrepareSwapOut(
+                val address: BitcoinAddressInfo,
+                val amount: Satoshi,
+            ): SwapOutFlow()
+
+            data class SendSwapOut(
+                val amount: Satoshi,
+                val address: BitcoinAddressInfo,
+                val paymentRequest: PaymentRequest,
+                val maxFees: MaxFees?,
+            ): SwapOutFlow()
         }
 
         object CancelLnurlServiceFetch : Intent()
