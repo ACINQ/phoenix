@@ -48,10 +48,7 @@ import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.navController
-import fr.acinq.phoenix.android.utils.QRCode
-import fr.acinq.phoenix.android.utils.copyToClipboard
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.monoTypo
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
 import fr.acinq.phoenix.controllers.payments.Receive
@@ -135,7 +132,7 @@ fun ReceiveView() {
 
 @Composable
 private fun DefaultView(vm: ReceiveViewModel) {
-    val context = LocalContext.current.applicationContext
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -163,7 +160,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.request) },
-                        onShare = { /*TODO*/ },
+                        onShare = { share(context, model.request, subject = "") },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(48.dp))
                     BorderButton(
