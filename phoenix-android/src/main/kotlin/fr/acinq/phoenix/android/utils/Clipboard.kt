@@ -21,8 +21,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import fr.acinq.phoenix.android.R
 
 
@@ -32,11 +30,11 @@ fun copyToClipboard(context: Context, data: String, dataLabel: String = "") {
     Toast.makeText(context, R.string.utils_copied, Toast.LENGTH_SHORT).show()
 }
 
-fun readClipboard(context: Context): String? = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
-    .primaryClip?.getItemAt(0)?.text?.toString().takeIf { !it.isNullOrBlank() }
+fun readClipboard(context: Context): String? =
+    (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+        .primaryClip?.getItemAt(0)?.text?.toString().takeIf { !it.isNullOrBlank() }
 
-fun share(context: Context, data: String, subject: String, chooserTitle: String?=null)
-{
+fun share(context: Context, data: String, subject: String, chooserTitle: String? = null) {
     val shareIntent = Intent.createChooser(Intent().apply {
         action = Intent.ACTION_SEND
         type = "text/plain"
