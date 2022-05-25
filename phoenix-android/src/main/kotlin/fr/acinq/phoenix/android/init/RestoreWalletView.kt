@@ -16,14 +16,20 @@
 
 package fr.acinq.phoenix.android.init
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Checkbox
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
@@ -44,7 +50,8 @@ fun RestoreWalletView(
     val log = logger("RestoreWallet")
     val context = LocalContext.current
 
-    val vm: InitViewModel = viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
+    val vm: InitViewModel =
+        viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
 
     val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
         value = SeedManager.getSeedState(context)
@@ -59,8 +66,24 @@ fun RestoreWalletView(
                         .fillMaxWidth()
                 ) {
                     var wordsInput by remember { mutableStateOf("") }
+
+                    Text(stringResource(R.string.restore_instructions))
+                    TextInput(
+                        text = wordsInput,
+                        onTextChange = {
+                            wordsInput = it
+                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = it))
+                        },
+                        maxLines = 4,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp)
+                    )
+
                     when (model) {
+
                         is RestoreWallet.Model.Ready -> {
+                            /*
                             var showDisclaimer by remember { mutableStateOf(true) }
                             var hasCheckedWarning by remember { mutableStateOf(false) }
                             if (showDisclaimer) {
@@ -93,18 +116,34 @@ fun RestoreWalletView(
                                     enabled = wordsInput.isNotBlank()
                                 )
                             }
+                            */
                         }
                         is RestoreWallet.Model.InvalidMnemonics -> {
                             Text(stringResource(R.string.restore_error))
                         }
+                        is RestoreWallet.Model.FilteredWordlist -> {
+                            Text(model.words.toString())
+                        }
+
                         is RestoreWallet.Model.ValidMnemonics -> {
                             val writingState = vm.writingState
                             if (writingState is WritingSeedState.Error) {
-                                Text(stringResource(id = R.string.autocreate_error, writingState.e.localizedMessage ?: writingState.e::class.java.simpleName))
+                                Text(
+                                    stringResource(
+                                        id = R.string.autocreate_error,
+                                        writingState.e.localizedMessage
+                                            ?: writingState.e::class.java.simpleName
+                                    )
+                                )
                             } else {
                                 Text(stringResource(R.string.restore_in_progress))
                                 LaunchedEffect(keyState) {
-                                    vm.writeSeed(context, wordsInput.split(" "), false, onSeedWritten)
+                                    vm.writeSeed(
+                                        context,
+                                        wordsInput.split(" "),
+                                        false,
+                                        onSeedWritten
+                                    )
                                 }
                             }
                         }
@@ -112,6 +151,42 @@ fun RestoreWalletView(
                             Text(stringResource(id = R.string.restore_in_progress))
                         }
                     }
+
+                    LazyRow {
+                        // Add a single item
+                        item {
+                            Text(text = "First item")
+                        }
+
+                        // Add 5 items
+                        items(5) { index ->
+                            Text(text = "Item: $index")
+                        }
+
+                        // Add another single item
+                        item {
+                            val apiString = AnnotatedString.Builder()
+                            apiString.pushStyle(
+                                style = SpanStyle(
+                                    //color = Color.Blue,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            )
+                            apiString.append(stringResource(id = R.string.logs_title))
+                            Text(
+                                modifier = Modifier.clickable(enabled = true) {},
+                                text = apiString.toAnnotatedString(),
+                            )
+                        }
+                    }
+
+
+                    BorderButton(
+                        text = R.string.restore_import_button,
+                        icon = R.drawable.ic_check_circle,
+                        onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
+                        enabled = wordsInput.isNotBlank()
+                    )
                 }
             }
         }
