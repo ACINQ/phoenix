@@ -40,7 +40,7 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
         recipient = PublicKey(ByteVector(recipient)),
         details = details.unwrap()
     ).copy(
-        parts = parts.map { it.unwrap() } + closingTxsParts.map { it.unwrap() },
+        parts = parts.map { it.unwrap() } + closingTxsParts.map { it.unwrap() } + (status?.getClosingPartsFromV0OnchainStatus() ?: emptyList()),
         status = status?.unwrap() ?: OutgoingPayment.Status.Pending,
         createdAt = createdAt
     )
@@ -108,6 +108,15 @@ data class OutgoingPaymentWrapper @OptIn(ExperimentalSerializationApi::class) co
                 blob = blob,
                 completedAt = ts
             )
+        }
+
+        /** The status blob may contain closing transaction data, when type is [OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0]. */
+        fun getClosingPartsFromV0OnchainStatus(): List<OutgoingPayment.ClosingTxPart> {
+            return if (OutgoingStatusTypeVersion.valueOf(type) == OutgoingStatusTypeVersion.SUCCEEDED_ONCHAIN_V0) {
+                OutgoingStatusData.getClosingPartsFromV0Status(blob, ts)
+            } else {
+                emptyList()
+            }
         }
 
     } // </StatusWrapper>
