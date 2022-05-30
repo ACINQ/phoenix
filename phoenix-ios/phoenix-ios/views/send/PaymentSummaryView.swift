@@ -29,7 +29,7 @@ struct PaymentSummaryStrings {
 
 struct PaymentSummaryView: View {
 	
-	@Binding var isInvalidAmount: Bool
+	@Binding var problem: Problem?
 	
 	let paymentNumbers: PaymentNumbers?
 
@@ -173,7 +173,21 @@ struct PaymentSummaryView: View {
 		// Note: All these calculations are done here,and not in init(),
 		// because we need access to `currencyPrefs`.
 		
-		guard let nums = paymentNumbers else {
+		let shouldDisplay: Bool
+		if let problem = problem {
+			switch problem {
+				case .emptyInput: shouldDisplay = false
+				case .invalidInput: shouldDisplay = false
+				case .expiredInvoice: shouldDisplay = false
+				case .amountOutOfRange: shouldDisplay = true // problem might be the tip
+				case .amountExceedsBalance: shouldDisplay = true // problem might be the tip
+				case .finalAmountExceedsBalance: shouldDisplay = true // problem is miner fee
+			}
+		} else {
+			shouldDisplay = true
+		}
+		
+		guard shouldDisplay, let nums = paymentNumbers else {
 			let zeroBitcoin = Utils.formatBitcoin(msat: 0, bitcoinUnit: currencyPrefs.bitcoinUnit)
 			let exchangeRate =  ExchangeRate.BitcoinPriceRate(
 				fiatCurrency: currencyPrefs.fiatCurrency,

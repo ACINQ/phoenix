@@ -20,6 +20,15 @@ struct PaymentNumbers {
 	let minerFeePercent: Double
 }
 
+enum Problem: Error {
+	case emptyInput
+	case invalidInput
+	case expiredInvoice
+	case amountExceedsBalance
+	case finalAmountExceedsBalance // including minerFee
+	case amountOutOfRange
+}
+
 struct ValidateView: View {
 	
 	@ObservedObject var mvi: MVIState<Scan.Model, Scan.Intent>
@@ -34,8 +43,7 @@ struct ValidateView: View {
 	@State var parsedAmount: Result<Double, TextFieldCurrencyStylerError> = Result.failure(.emptyInput)
 	
 	@State var altAmount: String = ""
-	@State var isInvalidAmount: Bool = false
-	@State var isExpiredInvoice: Bool = false
+	@State var problem: Problem? = nil
 	
 	@State var preTipAmountMsat: Int64? = nil
 	@State var priceSliderVisible: Bool = false
@@ -188,7 +196,7 @@ struct ValidateView: View {
 					.font(.title)
 					.multilineTextAlignment(.trailing)
 					.minimumScaleFactor(0.95) // SwiftUI bugs: truncating text in RTL
-					.foregroundColor(isInvalidAmount ? Color.appNegative : Color.primaryForeground)
+					.foregroundColor(isInvalidAmount() ? Color.appNegative : Color.primaryForeground)
 			
 				Picker(selection: $currencyPickerChoice, label: Text(currencyPickerChoice).frame(minWidth: 40)) {
 					ForEach(currencyPickerOptions(), id: \.self) { option in
@@ -209,7 +217,7 @@ struct ValidateView: View {
 			
 			Text(altAmount)
 				.font(.caption)
-				.foregroundColor((isInvalidAmount || isExpiredInvoice) ? Color.appNegative : .secondary)
+				.foregroundColor(problem != nil ? Color.appNegative : .secondary)
 				.padding(.top, 4)
 				.padding(.bottom)
 			
@@ -251,35 +259,22 @@ struct ValidateView: View {
 					if mvi.model is Scan.Model_SwapOutFlow_Init {
 						Image(systemName: "hammer")
 							.renderingMode(.template)
-						//	.resizable()
-						//	.aspectRatio(contentMode: .fit)
-						//	.foregroundColor(Color.white)
-						//	.frame(width: 22, height: 22)
-						//	.font(.title2)
 						Text("Prepare Transaction")
-						//	.font(.title2)
-						//	.foregroundColor(Color.white)
 					}
 					else if mvi.model is Scan.Model_LnurlWithdrawFlow {
 						Image("ic_receive")
 							.renderingMode(.template)
 							.resizable()
 							.aspectRatio(contentMode: .fit)
-						//	.foregroundColor(Color.white)
 							.frame(width: 22, height: 22)
 						Text("Redeem")
-						//	.font(.title2)
-						//	.foregroundColor(Color.white)
 					} else {
 						Image("ic_send")
 							.renderingMode(.template)
 							.resizable()
 							.aspectRatio(contentMode: .fit)
-						//	.foregroundColor(Color.white)
 							.frame(width: 22, height: 22)
 						Text("Pay")
-						//	.font(.title2)
-						//	.foregroundColor(Color.white)
 					}
 				}
 				.font(.title2)
@@ -293,9 +288,9 @@ struct ValidateView: View {
 				backgroundFill: Color.appAccent,
 				disabledBackgroundFill: Color.gray
 			))
-			.disabled(isInvalidAmount || isExpiredInvoice || isDisconnected)
+			.disabled(problem != nil || isDisconnected)
 		
-			if !isInvalidAmount && !isExpiredInvoice && isDisconnected {
+			if problem == nil && isDisconnected {
 				
 				Button {
 					showAppStatusPopover()
@@ -310,13 +305,9 @@ struct ValidateView: View {
 				.padding(.top, 4)
 			}
 			
-			// If `isInvalidAmount` is true (e.g. exceeds balance), then we don't display anything.
-			// This is because we're displaying an error message,
-			// and we don't want the tip information to distract from the error message.
-			// 
 			PaymentSummaryView(
-				isInvalidAmount : $isInvalidAmount,
-				paymentNumbers  : paymentNumbers()
+				problem: $problem,
+				paymentNumbers: paymentNumbers()
 			)
 			.padding(.top)
 			.padding(.top)
@@ -417,20 +408,6 @@ struct ValidateView: View {
 		)
 	}
 	
-	func priceTargetButtonText() -> String {
-		
-		if let _ = lnurlWithdraw() {
-			return NSLocalizedString("range", comment: "button label - try to make it short")
-		} else {
-			return NSLocalizedString("tip", comment: "button label - try to make it short")
-		}
-	}
-	
-	func priceTargetButtonDisabled() -> Bool {
-		
-		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
-	}
-	
 	func paymentHost() -> String? {
 		
 		if let lnurlPay = lnurlPay() {
@@ -441,6 +418,23 @@ struct ValidateView: View {
 			
 		} else {
 			return nil
+		}
+	}
+	
+	func isInvalidAmount() -> Bool {
+		
+		if let problem = problem {
+			switch problem {
+				case .emptyInput: return true
+				case .invalidInput: return true
+				case .amountOutOfRange: return true
+				case .amountExceedsBalance: return true
+				case .finalAmountExceedsBalance: return false // problem isn't amount, it's the minerFee
+				case .expiredInvoice: return false // problem isn't amount, it's the invoice
+			}
+			
+		} else {
+			return false
 		}
 	}
 	
@@ -500,6 +494,20 @@ struct ValidateView: View {
 		} else {
 			return false
 		}
+	}
+	
+	func priceTargetButtonText() -> String {
+		
+		if let _ = lnurlWithdraw() {
+			return NSLocalizedString("range", comment: "button label - try to make it short")
+		} else {
+			return NSLocalizedString("tip", comment: "button label - try to make it short")
+		}
+	}
+	
+	func priceTargetButtonDisabled() -> Bool {
+		
+		return isAmountlessInvoice() && (parsedAmountMsat() == nil)
 	}
 	
 	func supportsComment() -> Bool {
@@ -610,19 +618,15 @@ struct ValidateView: View {
 			return nil
 		}
 		
-		var baseMsat: Int64? = nil
+		var preTipMsat: Int64? = nil
 		if let preTipAmountMsat = preTipAmountMsat {
-			baseMsat = preTipAmountMsat
+			preTipMsat = preTipAmountMsat
 		} else if let paymentRequest = paymentRequest() {
-			baseMsat = paymentRequest.amount?.msat
+			preTipMsat = paymentRequest.amount?.msat
 		} else if let lnurlPay = lnurlPay() {
-			baseMsat = lnurlPay.minSendable.msat
+			preTipMsat = lnurlPay.minSendable.msat
 		}
-		
-		guard let baseMsat = baseMsat else {
-			log.debug("paymentNumbers() -> nil: baseMsat is nil")
-			return nil
-		}
+		let baseMsat = preTipMsat ?? preMinerFeeMsat
 		
 		let tipMsat = preMinerFeeMsat - baseMsat
 		let tipPercent = Double(tipMsat) / Double(baseMsat)
@@ -733,14 +737,18 @@ struct ValidateView: View {
 			amount = formattedAmt.digits
 		} else {
 			altAmount = NSLocalizedString("Enter an amount", comment: "error message")
-			isInvalidAmount = false // display in gray at very beginning
+			problem = nil // display in gray at very beginning
 		}
 	}
 	
 	func modelDidChange(_ newModel: Scan.Model) -> Void {
 		log.trace("modelDidChange()")
 		
-		if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
+		if newModel is Scan.Model_SwapOutFlow_Ready {
+			
+			refreshAltAmount() // amount + minerFee >? balance
+		
+		} else if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			if let payError = model.error {
 				
 				popoverState.display(dismissable: true) {
@@ -833,17 +841,18 @@ struct ValidateView: View {
 		
 		switch parsedAmount {
 		case .failure(let error):
-			isInvalidAmount = true
 			
 			switch error {
 			case .emptyInput:
+				problem = .emptyInput
 				altAmount = NSLocalizedString("Enter an amount", comment: "error message")
 			case .invalidInput:
+				problem = .invalidInput
 				altAmount = NSLocalizedString("Enter a valid amount", comment: "error message")
 			}
 			
 		case .success(let amt):
-			isInvalidAmount = false
+			problem = nil
 			
 			var msat: Int64? = nil
 			switch currency {
@@ -857,10 +866,19 @@ struct ValidateView: View {
 			}
 			
 			if let msat = msat {
-				
-				if msat > balanceMsat && !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
-					isInvalidAmount = true
-					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
+				if !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
+					
+					if msat > balanceMsat {
+						problem = .amountExceedsBalance
+						altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
+						
+					} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+						let totalMsat = msat + Utils.toMsat(sat: model.fee)
+						if totalMsat > balanceMsat {
+							problem = .finalAmountExceedsBalance
+							altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
+						}
+					}
 				}
 			}
 			
@@ -868,15 +886,13 @@ struct ValidateView: View {
 			   let expiryTimestampSeconds = paymentRequest.expiryTimestampSeconds()?.doubleValue,
 			   Date(timeIntervalSince1970: expiryTimestampSeconds) <= Date()
 			{
-				isExpiredInvoice = true
-				if !isInvalidAmount {
+				if problem == nil {
+					problem = .expiredInvoice
 					altAmount = NSLocalizedString("Invoice is expired", comment: "error message")
 				}
-			} else {
-				isExpiredInvoice = false
 			}
 			
-			if !isInvalidAmount,
+			if problem == nil,
 			   let msat = msat,
 			   let range = priceRange()
 			{
@@ -902,7 +918,7 @@ struct ValidateView: View {
 				// And render fiat conversions as approximate.
 				
 				if !isRange && msat != minMsat { // amount must be exact
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let exactBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -922,7 +938,7 @@ struct ValidateView: View {
 					}
 					
 				} else if msat < minMsat { // amount is too low
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let minBitcoin = Utils.formatBitcoin(msat: minMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -942,7 +958,7 @@ struct ValidateView: View {
 					}
 					
 				} else if msat > maxMsat { // amount is too high
-					isInvalidAmount = true
+					problem = .amountOutOfRange
 					
 					let maxBitcoin = Utils.formatBitcoin(msat: maxMsat, bitcoinUnit: bitcoinUnit)
 					
@@ -963,7 +979,7 @@ struct ValidateView: View {
 				}
 			}
 			
-			if !isInvalidAmount && !isExpiredInvoice {
+			if problem == nil {
 				
 				if let msat = msat {
 					
@@ -1132,7 +1148,6 @@ struct ValidateView: View {
 		log.trace("prepareTransaction()")
 		
 		guard let msat = parsedAmountMsat() else {
-			isInvalidAmount = true
 			return
 		}
 		
@@ -1150,7 +1165,6 @@ struct ValidateView: View {
 		log.trace("sendPayment()")
 		
 		guard let msat = parsedAmountMsat() else {
-			isInvalidAmount = true
 			return
 		}
 		
