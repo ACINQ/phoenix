@@ -168,7 +168,9 @@ struct HomeView : MVIView {
 							.font(.largeTitle)
 						
 					} else {
-						let amount = Utils.format(currencyPrefs, msat: mvi.model.balance.msat, policy: .showMsatsIfZeroSats)
+						let amount = Utils.format( currencyPrefs,
+						                     msat: mvi.model.balance.msat,
+						                   policy: .showMsatsIfZeroSats)
 						
 						if amount.hasSubFractionDigits {
 							

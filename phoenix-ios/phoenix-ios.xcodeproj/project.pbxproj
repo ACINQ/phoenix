@@ -47,7 +47,7 @@
 		DC118C0227B453110080BBAC /* PaymentRequestedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0127B453110080BBAC /* PaymentRequestedView.swift */; };
 		DC118C0427B454720080BBAC /* PaymentInFlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0327B454720080BBAC /* PaymentInFlightView.swift */; };
 		DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0527B4557D0080BBAC /* ValidateView.swift */; };
-		DC118C0827B457520080BBAC /* LnurlFetchNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */; };
+		DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0727B457520080BBAC /* FetchActivityNotice.swift */; };
 		DC118C0A27B457F70080BBAC /* LnurlFlowErrorNotice.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */; };
 		DC118C0C27B561210080BBAC /* CurrencyAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC118C0B27B561210080BBAC /* CurrencyAmount.swift */; };
 		DC142135261E72320075857A /* AboutHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC142134261E72320075857A /* AboutHTML.swift */; };
@@ -158,6 +158,7 @@
 		DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */; };
 		DCE77A5627C5240500F0FA24 /* TLSConnectionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */; };
 		DCE77A5827C671D600F0FA24 /* ElectrumAddressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */; };
+		DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */; };
 		DCEC6A1827A82A98002C20BA /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEC6A1727A82A98002C20BA /* ImagePicker.swift */; };
 		DCED09D42625DBC4005D5EE2 /* AnimationCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */; };
 		DCEFD922276A796800001767 /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEFD921276A796800001767 /* SyncManager.swift */; };
@@ -262,7 +263,7 @@
 		DC118C0127B453110080BBAC /* PaymentRequestedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentRequestedView.swift; sourceTree = "<group>"; };
 		DC118C0327B454720080BBAC /* PaymentInFlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentInFlightView.swift; sourceTree = "<group>"; };
 		DC118C0527B4557D0080BBAC /* ValidateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateView.swift; sourceTree = "<group>"; };
-		DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlFetchNotice.swift; sourceTree = "<group>"; };
+		DC118C0727B457520080BBAC /* FetchActivityNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchActivityNotice.swift; sourceTree = "<group>"; };
 		DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LnurlFlowErrorNotice.swift; sourceTree = "<group>"; };
 		DC118C0B27B561210080BBAC /* CurrencyAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyAmount.swift; sourceTree = "<group>"; };
 		DC142134261E72320075857A /* AboutHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHTML.swift; sourceTree = "<group>"; };
@@ -372,6 +373,7 @@
 		DCE7232F27B167240017CF56 /* SyncSeedManager_Actor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSeedManager_Actor.swift; sourceTree = "<group>"; };
 		DCE77A5527C5240500F0FA24 /* TLSConnectionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TLSConnectionCheck.swift; sourceTree = "<group>"; };
 		DCE77A5727C671D600F0FA24 /* ElectrumAddressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectrumAddressSheet.swift; sourceTree = "<group>"; };
+		DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSummaryView.swift; sourceTree = "<group>"; };
 		DCEC6A1727A82A98002C20BA /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DCED09D32625DBC4005D5EE2 /* AnimationCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationCompletion.swift; sourceTree = "<group>"; };
 		DCEFD921276A796800001767 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
@@ -606,13 +608,14 @@
 				53BEFCB8A24A5FAA785AFD03 /* SendView.swift */,
 				DC118BFB27B4504B0080BBAC /* ScanView.swift */,
 				DC118C0527B4557D0080BBAC /* ValidateView.swift */,
+				DCE9F95628412A9D005E03ED /* PaymentSummaryView.swift */,
 				DC118BF927B44F840080BBAC /* PriceSliderSheet.swift */,
 				DC118BFD27B451890080BBAC /* MetadataSheet.swift */,
 				DC118BFF27B4523B0080BBAC /* CommentSheet.swift */,
 				DC118BF727B44E6E0080BBAC /* LoginView.swift */,
 				DC118C0327B454720080BBAC /* PaymentInFlightView.swift */,
 				DC118C0127B453110080BBAC /* PaymentRequestedView.swift */,
-				DC118C0727B457520080BBAC /* LnurlFetchNotice.swift */,
+				DC118C0727B457520080BBAC /* FetchActivityNotice.swift */,
 				DC118C0927B457F70080BBAC /* LnurlFlowErrorNotice.swift */,
 			);
 			path = send;
@@ -1086,6 +1089,7 @@
 				7555FF81242A565900829871 /* SceneDelegate.swift in Sources */,
 				DCC9D99A267BD28600EA36DD /* SyncTxManager.swift in Sources */,
 				DCB876302735AA7300657570 /* Prefs+Serialization.swift in Sources */,
+				DCE9F95728412A9D005E03ED /* PaymentSummaryView.swift in Sources */,
 				DCE1E5FA26418183005465B8 /* Toast.swift in Sources */,
 				DC81B79F25BF2AA200F5A52C /* MVI.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
@@ -1101,7 +1105,7 @@
 				DCCD045D27EE0173007D57A5 /* EditInfoView.swift in Sources */,
 				DC1D2B4B2593EB860036AD38 /* Currency.swift in Sources */,
 				DC118C0627B4557D0080BBAC /* ValidateView.swift in Sources */,
-				DC118C0827B457520080BBAC /* LnurlFetchNotice.swift in Sources */,
+				DC118C0827B457520080BBAC /* FetchActivityNotice.swift in Sources */,
 				DCE7233027B167240017CF56 /* SyncSeedManager_Actor.swift in Sources */,
 				DCBA371B2758076F00610EC8 /* SyncSeedManager.swift in Sources */,
 				53BEFD54160278C5E393E319 /* HomeView.swift in Sources */,

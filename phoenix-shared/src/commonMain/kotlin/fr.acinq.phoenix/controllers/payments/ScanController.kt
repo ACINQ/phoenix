@@ -150,7 +150,6 @@ class AppScanController(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     private suspend fun processScannedInput(
         intent: Scan.Intent.Parse
     ) {
@@ -562,7 +561,7 @@ class AppScanController(
     }
 
     /** Directly called by swift code in iOS app. Parses the data looking for a Lightning invoice, Lnurl, or Bitcoin address. */
-    suspend fun inspectClipboard(data: String): Scan.ClipboardContent? {
+    fun inspectClipboard(data: String): Scan.ClipboardContent? {
         val input = Parser.removeExcessInput(data)
 
         return Parser.readPaymentRequest(input)?.let {

@@ -67,7 +67,7 @@ struct ScanView: View {
 			content()
 			
 			if mvi.model is Scan.Model_LnurlServiceFetch {
-				LnurlFetchNotice(
+				FetchActivityNotice(
 					title: NSLocalizedString("Fetching Lightning URL", comment: "Progress title"),
 					onCancel: { didCancelLnurlServiceFetch() }
 				)
@@ -326,9 +326,7 @@ struct ScanView: View {
 			}
 			
 			let controller = mvi.controller as! AppScanController
-			controller.inspectClipboard(string: string) {(result, _) in
-				self.clipboardContent = result
-			}
+			self.clipboardContent = controller.inspectClipboard(data: string)
 			
 		} else {
 			clipboardHasString = false
