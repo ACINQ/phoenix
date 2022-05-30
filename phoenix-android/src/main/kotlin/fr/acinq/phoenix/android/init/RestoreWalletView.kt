@@ -17,10 +17,7 @@
 package fr.acinq.phoenix.android.init
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -37,14 +34,17 @@ import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.RestoreWallet
+import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun RestoreWalletView(
@@ -180,6 +180,120 @@ fun RestoreWalletView(
                                     val index2 = index
                                 },
                                 text = apiString.toAnnotatedString(),
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#1",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#7",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#2",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#8",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#3",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#9",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#4",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#10",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#5",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#11",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                    }
+
+                    Row {
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#6",
+                                style = MaterialTheme.typography.subtitle2
+                            )
+                        }
+                        Row(
+                            Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "#12",
+                                style = MaterialTheme.typography.subtitle2
                             )
                         }
                     }
