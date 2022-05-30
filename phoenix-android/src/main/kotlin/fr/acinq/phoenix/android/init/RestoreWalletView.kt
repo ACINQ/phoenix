@@ -16,6 +16,8 @@
 
 package fr.acinq.phoenix.android.init
 
+import android.graphics.drawable.Icon
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +39,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
@@ -205,6 +209,18 @@ fun RestoreWalletView(
                                             text = if(selectedWords.count() > index) selectedWords[index] else "",
                                             style = MaterialTheme.typography.h5
                                         )
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        val isVisible = selectedWords.count() > index
+                                        if (isVisible) {
+                                            Image(
+                                                modifier = Modifier.clickable { selectedWords.clear() },
+                                                painter = painterResource(id = R.drawable.ic_cross),
+                                                contentDescription = "",
+
+                                                )
+                                            Spacer(Modifier.width(8.dp))
+                                        }
                                     }
                                 }
                             }
@@ -224,6 +240,18 @@ fun RestoreWalletView(
                                             text = if(selectedWords.count() > index + 6) selectedWords[index + 6] else "",
                                             style = MaterialTheme.typography.h5
                                         )
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        val isVisible = selectedWords.count() > index + 6
+                                        if (isVisible) {
+                                            Image(
+                                                modifier = Modifier.clickable { selectedWords.clear() },
+                                                painter = painterResource(id = R.drawable.ic_cross),
+                                                contentDescription = "",
+
+                                                )
+                                            Spacer(Modifier.width(8.dp))
+                                        }
                                     }
                                 }
                             }
