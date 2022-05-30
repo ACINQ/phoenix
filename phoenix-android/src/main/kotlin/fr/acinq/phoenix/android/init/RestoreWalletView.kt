@@ -17,6 +17,7 @@
 package fr.acinq.phoenix.android.init
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.TextInput
 import fr.acinq.phoenix.android.components.mvi.MVIView
@@ -56,6 +59,10 @@ fun RestoreWalletView(
     val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
         value = SeedManager.getSeedState(context)
     }
+
+    //val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
+    //var filteredWord = remember { mutableStateOf(listOf<String>()) }
+    var filteredWord = remember { listOf<String>() }
 
     when (keyState.value) {
         is KeyState.Absent -> {
@@ -122,7 +129,7 @@ fun RestoreWalletView(
                             Text(stringResource(R.string.restore_error))
                         }
                         is RestoreWallet.Model.FilteredWordlist -> {
-                            Text(model.words.toString())
+                            filteredWord = model.words
                         }
 
                         is RestoreWallet.Model.ValidMnemonics -> {
@@ -152,19 +159,13 @@ fun RestoreWalletView(
                         }
                     }
 
-                    LazyRow {
-                        // Add a single item
-                        item {
-                            Text(text = "First item")
-                        }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
 
                         // Add 5 items
-                        items(5) { index ->
-                            Text(text = "Item: $index")
-                        }
+                        itemsIndexed(filteredWord) { index, item ->
 
-                        // Add another single item
-                        item {
                             val apiString = AnnotatedString.Builder()
                             apiString.pushStyle(
                                 style = SpanStyle(
@@ -172,14 +173,16 @@ fun RestoreWalletView(
                                     textDecoration = TextDecoration.Underline
                                 )
                             )
-                            apiString.append(stringResource(id = R.string.logs_title))
+                            apiString.append(item)
                             Text(
-                                modifier = Modifier.clickable(enabled = true) {},
+                                modifier = Modifier.clickable(enabled = true) {
+                                    val index = index
+                                    val index2 = index
+                                },
                                 text = apiString.toAnnotatedString(),
                             )
                         }
                     }
-
 
                     BorderButton(
                         text = R.string.restore_import_button,
