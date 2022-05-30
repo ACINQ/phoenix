@@ -18,6 +18,7 @@ package fr.acinq.phoenix.android.init
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -35,8 +36,8 @@ import fr.acinq.phoenix.android.R
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
-import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.TextInput
+import androidx.compose.ui.Alignment
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.security.KeyState
@@ -60,9 +61,8 @@ fun RestoreWalletView(
         value = SeedManager.getSeedState(context)
     }
 
-    //val payments = homeViewModel.paymentsFlow.collectAsState().value.values.toList()
-    //var filteredWord = remember { mutableStateOf(listOf<String>()) }
     var filteredWord = remember { listOf<String>() }
+    var selectedWords = remember { mutableStateListOf<String>() }
 
     when (keyState.value) {
         is KeyState.Absent -> {
@@ -84,7 +84,7 @@ fun RestoreWalletView(
                         maxLines = 4,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 32.dp)
+                            .padding(vertical = 24.dp)
                     )
 
                     when (model) {
@@ -160,7 +160,7 @@ fun RestoreWalletView(
                     }
 
                     LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
 
                         // Add 5 items
@@ -176,128 +176,61 @@ fun RestoreWalletView(
                             apiString.append(item)
                             Text(
                                 modifier = Modifier.clickable(enabled = true) {
-                                    val index = index
-                                    val index2 = index
+                                    selectedWords.add(item)
                                 },
                                 text = apiString.toAnnotatedString(),
+
                             )
                         }
                     }
+
+                    Spacer(Modifier.height(24.dp))
+                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        PrimarySeparator()
+                    }
+                    Spacer(Modifier.height(24.dp))
 
                     Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#1",
-                                style = MaterialTheme.typography.subtitle2
-                            )
+                        Column(Modifier.weight(1f)) {
+
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(6) { index ->
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = String.format("#%02d", index + 1),
+                                            style = MaterialTheme.typography.subtitle2
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = if(selectedWords.count() > index) selectedWords[index] else "",
+                                            style = MaterialTheme.typography.h5
+                                        )
+                                    }
+                                }
+                            }
                         }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#7",
-                                style = MaterialTheme.typography.subtitle2
-                            )
+
+                        Column(Modifier.weight(1f)) {
+
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(6) { index ->
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = String.format("#%02d", index + 7),
+                                            style = MaterialTheme.typography.subtitle2
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            text = if(selectedWords.count() > index + 6) selectedWords[index + 6] else "",
+                                            style = MaterialTheme.typography.h5
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#2",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#8",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                    }
-
-                    Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#3",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#9",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                    }
-
-                    Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#4",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#10",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                    }
-
-                    Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#5",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#11",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                    }
-
-                    Row {
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#6",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                        Row(
-                            Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "#12",
-                                style = MaterialTheme.typography.subtitle2
-                            )
-                        }
-                    }
-
+                    Spacer(Modifier.height(24.dp))
                     BorderButton(
                         text = R.string.restore_import_button,
                         icon = R.drawable.ic_check_circle,
