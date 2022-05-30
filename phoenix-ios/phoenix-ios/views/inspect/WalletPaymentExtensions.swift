@@ -126,17 +126,14 @@ extension Lightning_kmpWalletPayment {
 				// no fees for failed payments
 				return nil
 				
-			} else if let onChain = outgoingPayment.status.asOnChain() {
+			} else if let _ = outgoingPayment.status.asOnChain() {
 				
 				// for on-chain payments, the fees are extracted from the mined transaction(s)
 				
-				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
-				// FIXME: the OutgoingPayment.fees() method should compute the fee for on-chain payment using the closing txs parts when needed. Maybe we should use that?
-				let claimed = Lightning_kmpMilliSatoshi(msat: 1000)
-				let fees = channelDrain.minus(other: claimed)
+				let fees = outgoingPayment.fees
 				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
 				
-				let txCount = 1 // FIXME use the correct value, using the closing txs parts instead.
+				let txCount = outgoingPayment.closingTxParts().count
 				let exp: String
 				if txCount == 1 {
 					exp = NSLocalizedString(
@@ -232,5 +229,30 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+}
+
+extension Lightning_kmpOutgoingPayment {
+	
+	func closingTxParts() -> [Lightning_kmpOutgoingPayment.ClosingTxPart] {
+		
+		var closingTxParts = [Lightning_kmpOutgoingPayment.ClosingTxPart]()
+		for part in self.parts {
+			if let closingTxPart = part as? Lightning_kmpOutgoingPayment.ClosingTxPart {
+				closingTxParts.append(closingTxPart)
+			}
+		}
+		
+		return closingTxParts
+	}
+	
+	func claimedOnChain() -> Bitcoin_kmpSatoshi {
+		
+		var sat: Int64 = 0
+		for part in closingTxParts() {
+			sat += part.claimed.sat
+		}
+		
+		return Bitcoin_kmpSatoshi(sat: sat)
 	}
 }
