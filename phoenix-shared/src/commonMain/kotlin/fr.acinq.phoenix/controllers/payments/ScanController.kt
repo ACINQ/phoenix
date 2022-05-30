@@ -22,9 +22,7 @@ import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.io.ReceivePayment
-import fr.acinq.lightning.io.SendPayment
-import fr.acinq.lightning.io.SwapOutResponseEvent
+import fr.acinq.lightning.io.*
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
 import fr.acinq.lightning.utils.secure
@@ -117,6 +115,7 @@ class AppScanController(
             is Scan.Intent.Parse -> launch { processScannedInput(intent) }
             is Scan.Intent.InvoiceFlow.ConfirmDangerousRequest -> launch { confirmAmountlessInvoice(intent) }
             is Scan.Intent.InvoiceFlow.SendInvoicePayment -> launch {
+                model(Scan.Model.InvoiceFlow.Sending)
                 sendPayment(
                     amountToSend = intent.amount,
                     paymentRequest = intent.paymentRequest,
@@ -124,7 +123,6 @@ class AppScanController(
                     lnurlPayMetadata = null,
                     swapOutInfo = null
                 )
-                model(Scan.Model.InvoiceFlow.Sending)
             }
             is Scan.Intent.CancelLnurlServiceFetch -> launch { cancelLnurlFetch() }
             is Scan.Intent.LnurlPayFlow.SendLnurlPayment -> launch { processLnurlPay(intent) }
@@ -316,18 +314,28 @@ class AppScanController(
         }
 
         peer.send(
-            SendPayment(
-                paymentId = paymentId,
-                amount = amountToSend,
-                recipient = paymentRequest.nodeId,
-                details = if (swapOutInfo == null) {
-                    OutgoingPayment.Details.Normal(paymentRequest)
-                } else {
-                    // OutgoingPayment.Details.SwapOut(address = swapOutInfo.address, paymentHash = paymentRequest.paymentHash)
-                    OutgoingPayment.Details.Normal(paymentRequest)
-                },
-                trampolineFeesOverride = trampolineFees
-            )
+            if (swapOutInfo != null) {
+                SendPaymentSwapOut(
+                    paymentId = paymentId,
+                    amount = amountToSend,
+                    recipient = paymentRequest.nodeId,
+                    details = OutgoingPayment.Details.SwapOut(
+                        address = swapOutInfo.address,
+                        paymentRequest = paymentRequest
+                    ),
+                    trampolineFeesOverride = trampolineFees
+                )
+            } else {
+                SendPaymentNormal(
+                    paymentId = paymentId,
+                    amount = amountToSend,
+                    recipient = paymentRequest.nodeId,
+                    details = OutgoingPayment.Details.Normal(
+                        paymentRequest = paymentRequest
+                    ),
+                    trampolineFeesOverride = trampolineFees
+                )
+            }
         )
     }
 

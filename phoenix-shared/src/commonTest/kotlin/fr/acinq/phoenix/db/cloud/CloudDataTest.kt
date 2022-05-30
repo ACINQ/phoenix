@@ -155,12 +155,13 @@ class CloudDataTest {
 
     @Test
     fun outgoing__swapOut() = runTest {
+        val invoice = createInvoice(preimage, 1_000_000.msat)
         testRoundtrip(
             OutgoingPayment(
                 id = uuid,
                 amount = 1_000_000.msat,
                 recipient = publicKey,
-                details = OutgoingPayment.Details.SwapOut(bitcoinAddress, paymentHash)
+                details = OutgoingPayment.Details.SwapOut(bitcoinAddress, invoice)
             )
         )
     }
