@@ -169,6 +169,10 @@ class AppScanController(
                     lnurlPayMetadata = null,
                     swapOutInfo = intent.address
                 )
+                model(Scan.Model.SwapOutFlow.SendingSwapOut(
+                    address = intent.address,
+                    paymentRequest = intent.paymentRequest
+                ))
             }
         }
     }
