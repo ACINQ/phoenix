@@ -81,8 +81,7 @@ object Scan {
             ): InvoiceFlow()
             data class InvoiceRequest(
                 val request: String,
-                val paymentRequest: PaymentRequest,
-                val balanceMsat: Long
+                val paymentRequest: PaymentRequest
             ): InvoiceFlow()
             object Sending: InvoiceFlow()
         }
@@ -101,13 +100,11 @@ object Scan {
         sealed class LnurlPayFlow : Model() {
             data class LnurlPayRequest(
                 val lnurlPay: LNUrl.Pay,
-                val balanceMsat: Long,
                 val error: LnurlPayError?
             ) : LnurlPayFlow()
 
             data class LnurlPayFetch(
                 val lnurlPay: LNUrl.Pay,
-                val balanceMsat: Long
             ) : LnurlPayFlow()
 
             object Sending : LnurlPayFlow()
@@ -116,13 +113,11 @@ object Scan {
         sealed class LnurlWithdrawFlow : Model() {
             data class LnurlWithdrawRequest(
                 val lnurlWithdraw: LNUrl.Withdraw,
-                val balanceMsat: Long,
                 val error: LnurlWithdrawError?
             ) : LnurlWithdrawFlow()
 
             data class LnurlWithdrawFetch(
                 val lnurlWithdraw: LNUrl.Withdraw,
-                val balanceMsat: Long
             ) : LnurlWithdrawFlow()
 
             data class Receiving(

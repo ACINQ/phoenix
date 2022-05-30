@@ -44,7 +44,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -93,28 +92,6 @@ class AppScanController(
 
     init {
         launch {
-            peerManager.getPeer().channelsFlow.collect { channels ->
-                val balance = calculateBalance(channels)
-                model {
-                    when (this) {
-                        is Scan.Model.InvoiceFlow.InvoiceRequest -> {
-                            this.copy(balanceMsat = balance.msat)
-                        }
-                        is Scan.Model.LnurlPayFlow.LnurlPayRequest -> {
-                            this.copy(balanceMsat = balance.msat)
-                        }
-                        is Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest -> {
-                            this.copy(balanceMsat = balance.msat)
-                        }
-                        is Scan.Model.LnurlPayFlow.LnurlPayFetch -> {
-                            this.copy(balanceMsat = balance.msat)
-                        }
-                        else -> this
-                    }
-                }
-            }
-        }
-        launch {
             peerManager.getPeer().openListenerEventSubscription().consumeEach { event ->
                 when (event) {
                     is SwapOutResponseEvent -> {
@@ -133,10 +110,6 @@ class AppScanController(
                 }
             }
         }
-    }
-
-    private suspend fun getBalance(): MilliSatoshi {
-        return calculateBalance(peerManager.getPeer().channels)
     }
 
     override fun process(intent: Scan.Intent) {
@@ -200,8 +173,7 @@ class AppScanController(
             Scan.Model.InvoiceFlow.DangerousRequest(paymentRequest.write(), paymentRequest, it)
         } ?: Scan.Model.InvoiceFlow.InvoiceRequest(
             request = paymentRequest.write(),
-            paymentRequest = paymentRequest,
-            balanceMsat = getBalance().msat
+            paymentRequest = paymentRequest
         )
         model(model)
     }
@@ -216,8 +188,7 @@ class AppScanController(
                     // address contains a valid payment request
                     Scan.Model.InvoiceFlow.InvoiceRequest(
                         request = addressInfo.paymentRequest.write(),
-                        paymentRequest = addressInfo.paymentRequest,
-                        balanceMsat = getBalance().msat
+                        paymentRequest = addressInfo.paymentRequest
                     )
                 } else {
                     // we can't pay on-chain addresses yet.
@@ -282,21 +253,17 @@ class AppScanController(
                     result is Either.Right && result.value is LNUrl.Pay -> { // result: LNUrl
                         when (val lnurl = result.value) {
                             is LNUrl.Pay -> {
-                                val balance = getBalance()
                                 model(
                                     Scan.Model.LnurlPayFlow.LnurlPayRequest(
                                         lnurlPay = lnurl,
-                                        balanceMsat = balance.msat,
                                         error = null
                                     )
                                 )
                             }
                             is LNUrl.Withdraw -> {
-                                val balance = getBalance()
                                 model(
                                     Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
                                         lnurlWithdraw = lnurl,
-                                        balanceMsat = balance.msat,
                                         error = null
                                     )
                                 )
@@ -314,12 +281,10 @@ class AppScanController(
     private suspend fun confirmAmountlessInvoice(
         intent: Scan.Intent.InvoiceFlow.ConfirmDangerousRequest
     ) {
-        val balance = getBalance()
         model(
             Scan.Model.InvoiceFlow.InvoiceRequest(
                 request = intent.request,
                 paymentRequest = intent.paymentRequest,
-                balanceMsat = balance.msat
             )
         )
     }
@@ -378,7 +343,7 @@ class AppScanController(
     private suspend fun processLnurlPay(
         intent: Scan.Intent.LnurlPayFlow.SendLnurlPayment
     ) {
-        model(Scan.Model.LnurlPayFlow.LnurlPayFetch(lnurlPay = intent.lnurlPay, balanceMsat = getBalance().msat))
+        model(Scan.Model.LnurlPayFlow.LnurlPayFetch(lnurlPay = intent.lnurlPay))
         val result = executeLnurlAction {
             val task = lnurlManager.requestPayInvoiceAsync(
                 lnurlPay = intent.lnurlPay,
@@ -415,11 +380,9 @@ class AppScanController(
         when (result) {
             null -> Unit
             is Either.Left -> {
-                val balance = getBalance()
                 model(
                     Scan.Model.LnurlPayFlow.LnurlPayRequest(
                         lnurlPay = intent.lnurlPay,
-                        balanceMsat = balance.msat,
                         error = result.value
                     )
                 )
@@ -447,11 +410,9 @@ class AppScanController(
         lnurlRequestId += 1
         requestPayInvoiceTask?.cancel()
         requestPayInvoiceTask = null
-        val balance = getBalance()
         model(
             Scan.Model.LnurlPayFlow.LnurlPayRequest(
                 lnurlPay = intent.lnurlPay,
-                balanceMsat = balance.msat,
                 error = null
             )
         )
@@ -462,11 +423,9 @@ class AppScanController(
     ) {
         val requestId = lnurlRequestId
         run { // scoping
-            val balance = getBalance()
             model(
                 Scan.Model.LnurlWithdrawFlow.LnurlWithdrawFetch(
-                    lnurlWithdraw = intent.lnurlWithdraw,
-                    balanceMsat = balance.msat
+                    lnurlWithdraw = intent.lnurlWithdraw
                 )
             )
         }
@@ -514,11 +473,9 @@ class AppScanController(
             return
         }
         if (error != null) {
-            val balance = getBalance()
             model(
                 Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
                     lnurlWithdraw = intent.lnurlWithdraw,
-                    balanceMsat = balance.msat,
                     error = error
                 )
             )
@@ -540,11 +497,9 @@ class AppScanController(
         lnurlRequestId += 1
         sendWithdrawInvoiceTask?.cancel()
         sendWithdrawInvoiceTask = null
-        val balance = getBalance()
         model(
             Scan.Model.LnurlWithdrawFlow.LnurlWithdrawRequest(
                 lnurlWithdraw = intent.lnurlWithdraw,
-                balanceMsat = balance.msat,
                 error = null
             )
         )
