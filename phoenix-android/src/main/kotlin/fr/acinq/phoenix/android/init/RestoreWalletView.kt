@@ -34,6 +34,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
@@ -67,6 +69,7 @@ fun RestoreWalletView(
             MVIView(CF::restoreWallet) { model, postIntent ->
                 Column(
                     modifier = Modifier
+                        .verticalScroll(rememberScrollState())
                         .padding(24.dp)
                         .fillMaxWidth()
                 ) {
@@ -193,20 +196,22 @@ fun RestoreWalletView(
                         }
                     }
 
-                    Spacer(Modifier.height(24.dp))
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        PrimarySeparator()
-                    }
-                    Spacer(Modifier.height(24.dp))
+                    Column() {
 
-                    Row {
-                        Column(Modifier.weight(1f)) {
+                        Spacer(Modifier.height(24.dp))
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            HSeparator()
+                        }
+                        Spacer(Modifier.height(24.dp))
 
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(6) { index ->
+                        Row {
+                            Column(Modifier.weight(1f)) {
+
+                                for (index in 0..5)
+                                {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             text = String.format("#%02d", index + 1),
@@ -231,14 +236,13 @@ fun RestoreWalletView(
                                             Spacer(Modifier.width(8.dp))
                                         }
                                     }
+                                    Spacer(Modifier.height(8.dp))
                                 }
                             }
-                        }
 
-                        Column(Modifier.weight(1f)) {
+                            Column(Modifier.weight(1f)) {
 
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(6) { index ->
+                                for (index in 0..5) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
                                             text = String.format("#%02d", index + 7),
@@ -255,7 +259,10 @@ fun RestoreWalletView(
                                         if (isVisible) {
                                             Image(
                                                 modifier = Modifier.clickable {
-                                                    selectedWords.removeRange(index + 6, selectedWords.count())
+                                                    selectedWords.removeRange(
+                                                        index + 6,
+                                                        selectedWords.count()
+                                                    )
                                                 },
                                                 painter = painterResource(id = R.drawable.ic_cross),
                                                 contentDescription = "",
@@ -264,20 +271,22 @@ fun RestoreWalletView(
                                             Spacer(Modifier.width(8.dp))
                                         }
                                     }
+
+                                    Spacer(Modifier.height(8.dp))
                                 }
                             }
                         }
-                    }
 
-                    Spacer(Modifier.height(24.dp))
-                    BorderButton(
-                        text = R.string.restore_import_button,
-                        icon = R.drawable.ic_check_circle,
-                        onClick = {
-                            postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
-                        },
-                        enabled = selectedWords.count() == 12
-                    )
+                        Spacer(Modifier.height(24.dp))
+                        BorderButton(
+                            text = R.string.restore_import_button,
+                            icon = R.drawable.ic_check_circle,
+                            onClick = {
+                                postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
+                            },
+                            enabled = selectedWords.count() == 12
+                        )
+                    }
                 }
             }
         }
