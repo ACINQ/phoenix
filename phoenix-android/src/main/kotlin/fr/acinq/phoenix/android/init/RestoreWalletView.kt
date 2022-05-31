@@ -16,14 +16,19 @@
 
 package fr.acinq.phoenix.android.init
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Checkbox
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -32,10 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
@@ -69,7 +70,7 @@ fun RestoreWalletView(
         }
 
         var filteredWords = remember { listOf<String>() }
-        var selectedWords = remember { mutableStateListOf<String>() }
+        val selectedWords = vm.selectedWords
 
         when (keyState.value) {
             is KeyState.Absent -> {
@@ -87,7 +88,7 @@ fun RestoreWalletView(
                             onTextChange = {
                                 wordsInput = if (it.contains(" ")) {
                                     if (filteredWords.count() > 0) {
-                                        selectedWords.add(filteredWords[0])
+                                        vm.addWord(filteredWords[0])
                                     }
                                     ""
                                 } else {
@@ -95,7 +96,7 @@ fun RestoreWalletView(
                                 }
                                 postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
                             },
-                            enabled = selectedWords.count() != 12,
+                            enabled = vm.selectedWords.count() != 12,
                             maxLines = 4,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -105,40 +106,29 @@ fun RestoreWalletView(
                         when (model) {
 
                             is RestoreWallet.Model.Ready -> {
-                                /*
-                            var showDisclaimer by remember { mutableStateOf(true) }
-                            var hasCheckedWarning by remember { mutableStateOf(false) }
-                            if (showDisclaimer) {
-                                Text(stringResource(R.string.restore_disclaimer_message))
-                                Row(Modifier.padding(vertical = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Checkbox(hasCheckedWarning, onCheckedChange = { hasCheckedWarning = it })
-                                    Spacer(Modifier.width(16.dp))
-                                    Text(stringResource(R.string.restore_disclaimer_checkbox))
+                                var showDisclaimer by remember { mutableStateOf(true) }
+                                var hasCheckedWarning by remember { mutableStateOf(false) }
+                                if (showDisclaimer) {
+                                    Text(stringResource(R.string.restore_disclaimer_message))
+                                    Row(
+                                        Modifier.padding(vertical = 24.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            hasCheckedWarning,
+                                            onCheckedChange = { hasCheckedWarning = it })
+                                        Spacer(Modifier.width(16.dp))
+                                        Text(stringResource(R.string.restore_disclaimer_checkbox))
+                                    }
+                                    BorderButton(
+                                        text = R.string.restore_disclaimer_next,
+                                        icon = R.drawable.ic_arrow_next,
+                                        onClick = { showDisclaimer = false },
+                                        enabled = hasCheckedWarning
+                                    )
+                                } else {
+
                                 }
-                                BorderButton(
-                                    text = R.string.restore_disclaimer_next,
-                                    icon = R.drawable.ic_arrow_next,
-                                    onClick = { showDisclaimer = false },
-                                    enabled = hasCheckedWarning
-                                )
-                            } else {
-                                Text(stringResource(R.string.restore_instructions))
-                                TextInput(
-                                    text = wordsInput,
-                                    onTextChange = { wordsInput = it },
-                                    maxLines = 4,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 32.dp)
-                                )
-                                BorderButton(
-                                    text = R.string.restore_import_button,
-                                    icon = R.drawable.ic_check_circle,
-                                    onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
-                                    enabled = wordsInput.isNotBlank()
-                                )
-                            }
-                            */
                             }
                             is RestoreWallet.Model.InvalidMnemonics -> {
                                 Text(stringResource(R.string.restore_error))
@@ -162,7 +152,7 @@ fun RestoreWalletView(
                                     LaunchedEffect(keyState) {
                                         vm.writeSeed(
                                             context,
-                                            selectedWords.toList(),
+                                            vm.selectedWords.toList(),
                                             false,
                                             onSeedWritten
                                         )
@@ -191,7 +181,7 @@ fun RestoreWalletView(
                                 Text(
                                     modifier = Modifier.clickable(enabled = true) {
                                         if (selectedWords.count() < 12) {
-                                            selectedWords.add(item)
+                                            vm.addWord(item)
                                             wordsInput = ""
                                             postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
                                         }
@@ -233,7 +223,7 @@ fun RestoreWalletView(
                                             if (isVisible) {
                                                 Image(
                                                     modifier = Modifier.clickable {
-                                                        selectedWords.removeRange(
+                                                        vm.removeRangeWords(
                                                             index,
                                                             selectedWords.count()
                                                         )
@@ -267,7 +257,7 @@ fun RestoreWalletView(
                                             if (isVisible) {
                                                 Image(
                                                     modifier = Modifier.clickable {
-                                                        selectedWords.removeRange(
+                                                        vm.removeRangeWords(
                                                             index + 6,
                                                             selectedWords.count()
                                                         )

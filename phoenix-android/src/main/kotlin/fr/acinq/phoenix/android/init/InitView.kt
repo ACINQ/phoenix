@@ -18,10 +18,7 @@ package fr.acinq.phoenix.android.init
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -83,6 +80,17 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
     /** State of the view */
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)
         private set
+
+    private val _selectedWords = mutableStateListOf<String>()
+    val selectedWords: List<String> = _selectedWords
+
+    fun addWord(word:String) {
+        _selectedWords.add(word)
+    }
+
+    fun removeRangeWords(from:Int, to:Int) {
+        _selectedWords.removeRange(from, to)
+    }
 
     suspend fun writeSeed(
         context: Context,
