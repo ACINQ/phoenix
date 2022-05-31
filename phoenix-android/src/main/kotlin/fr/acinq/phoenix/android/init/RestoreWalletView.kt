@@ -76,8 +76,15 @@ fun RestoreWalletView(
                     TextInput(
                         text = wordsInput,
                         onTextChange = {
-                            wordsInput = it
-                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = it))
+                            wordsInput = if (it.contains(" ")) {
+                                if (filteredWords.count() > 0) {
+                                    selectedWords.add(filteredWords[0])
+                                }
+                                ""
+                            } else {
+                                it
+                            }
+                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
                         },
                         enabled = selectedWords.count() != 12,
                         maxLines = 4,
@@ -146,7 +153,7 @@ fun RestoreWalletView(
                                 LaunchedEffect(keyState) {
                                     vm.writeSeed(
                                         context,
-                                        wordsInput.split(" "),
+                                        selectedWords.toList(),
                                         false,
                                         onSeedWritten
                                     )
@@ -168,7 +175,6 @@ fun RestoreWalletView(
                             val apiString = AnnotatedString.Builder()
                             apiString.pushStyle(
                                 style = SpanStyle(
-                                    //color = Color.Blue,
                                     textDecoration = TextDecoration.Underline
                                 )
                             )
@@ -267,7 +273,9 @@ fun RestoreWalletView(
                     BorderButton(
                         text = R.string.restore_import_button,
                         icon = R.drawable.ic_check_circle,
-                        onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
+                        onClick = {
+                            postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
+                        },
                         enabled = selectedWords.count() == 12
                     )
                 }
