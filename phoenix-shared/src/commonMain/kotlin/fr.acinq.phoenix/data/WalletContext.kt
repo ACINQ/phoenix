@@ -186,6 +186,8 @@ object WalletContext {
             @Serializable
             data class V1(
                 @SerialName("min_feerate_sat_byte") val minFeerateSatByte: Int,
+                @SerialName("min_amount_sat") val minAmountSat: Long,
+                @SerialName("max_amount_sat") val maxAmountSat: Long,
                 @SerialName("status") private val _status: Int
             ) {
                 @Transient
