@@ -234,8 +234,40 @@ struct ScanView: View {
 								Text("Pay ") +
 								Text(Image(systemName: "arrow.forward")) +
 								Text(verbatim: " \(desc)")
+							} else {
+								Text("Pay Invoice")
 							}
 						
+						} else if let content = clipboardContent as? Scan.ClipboardContent_BitcoinRequest {
+							
+							let addrInfo: BitcoinAddressInfo = content.address
+							
+							let desc: String = {
+								return addrInfo.label ?? addrInfo.message
+							}()?.trimmingCharacters(in: .whitespaces) ?? ""
+							
+							if let sat = addrInfo.amount {
+								let amt = Utils.format(currencyPrefs, sat: sat)
+							
+								if desc.isEmpty {
+									Text("Pay \(amt.string)")
+								} else {
+									Text("Pay \(amt.string) ") +
+									Text(Image(systemName: "arrow.forward")) +
+									Text(verbatim: " \(desc)")
+								}
+							} else if !desc.isEmpty {
+								Text("Pay ") +
+								Text(Image(systemName: "arrow.forward")) +
+								Text(verbatim: " \(desc)")
+							} else {
+								let addr = addrInfo.address.prefix(6) + "..." + addrInfo.address.suffix(6)
+								
+								Text("Pay ") +
+								Text(Image(systemName: "arrow.forward")) +
+								Text(verbatim: " \(addr)")
+							}
+							
 						} else if let content = clipboardContent as? Scan.ClipboardContent_LoginRequest {
 							
 							let title = content.auth.actionPromptTitle

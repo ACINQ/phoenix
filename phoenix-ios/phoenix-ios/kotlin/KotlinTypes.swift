@@ -82,6 +82,7 @@ extension Scan {
 	typealias BadRequestReason_UnsupportedLnUrl = BadRequestReasonUnsupportedLnUrl
 	
 	typealias ClipboardContent_InvoiceRequest = ClipboardContentInvoiceRequest
+	typealias ClipboardContent_BitcoinRequest = ClipboardContentBitcoinRequest
 	typealias ClipboardContent_LoginRequest = ClipboardContentLoginRequest
 	typealias ClipboardContent_LnurlRequest = ClipboardContentLnurlRequest
 }

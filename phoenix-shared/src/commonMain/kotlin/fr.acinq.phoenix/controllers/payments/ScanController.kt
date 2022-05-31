@@ -580,8 +580,14 @@ class AppScanController(
                 is Either.Right -> Scan.ClipboardContent.LnurlRequest(it.value)
             }
         } ?: Parser.readBitcoinAddress(chain, input).let {
-            (it as? Either.Right)?.value?.paymentRequest?.let { pr ->
-                Scan.ClipboardContent.InvoiceRequest(pr)
+            when (it) {
+                is Either.Left -> null
+                is Either.Right -> {
+                    val bitcoinAddrInfo = it.value
+                    bitcoinAddrInfo.paymentRequest?.let { paymentRequest ->
+                        Scan.ClipboardContent.InvoiceRequest(paymentRequest)
+                    } ?: Scan.ClipboardContent.BitcoinRequest(bitcoinAddrInfo)
+                }
             }
         }
     }

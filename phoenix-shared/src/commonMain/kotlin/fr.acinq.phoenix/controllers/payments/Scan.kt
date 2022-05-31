@@ -222,6 +222,10 @@ object Scan {
             val paymentRequest: PaymentRequest
         ): ClipboardContent()
 
+        data class BitcoinRequest(
+            val address: BitcoinAddressInfo
+        ): ClipboardContent()
+
         data class LnurlRequest(
             val url: Url
         ) : ClipboardContent()
