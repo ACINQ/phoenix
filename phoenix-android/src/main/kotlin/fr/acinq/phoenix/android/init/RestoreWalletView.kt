@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.init
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +24,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -35,21 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
-import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.RestoreWallet
-import fr.acinq.phoenix.data.BitcoinUnit
 
 @Composable
 fun RestoreWalletView(
@@ -65,7 +59,7 @@ fun RestoreWalletView(
         value = SeedManager.getSeedState(context)
     }
 
-    var filteredWord = remember { listOf<String>() }
+    var filteredWords = remember { listOf<String>() }
     var selectedWords = remember { mutableStateListOf<String>() }
 
     when (keyState.value) {
@@ -85,6 +79,7 @@ fun RestoreWalletView(
                             wordsInput = it
                             postIntent(RestoreWallet.Intent.FilterWordList(predicate = it))
                         },
+                        enabled = selectedWords.count() != 12,
                         maxLines = 4,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -133,7 +128,7 @@ fun RestoreWalletView(
                             Text(stringResource(R.string.restore_error))
                         }
                         is RestoreWallet.Model.FilteredWordlist -> {
-                            filteredWord = model.words
+                            filteredWords = model.words
                         }
 
                         is RestoreWallet.Model.ValidMnemonics -> {
@@ -168,7 +163,7 @@ fun RestoreWalletView(
                     ) {
 
                         // Add 5 items
-                        itemsIndexed(filteredWord) { index, item ->
+                        itemsIndexed(filteredWords) { index, item ->
 
                             val apiString = AnnotatedString.Builder()
                             apiString.pushStyle(
@@ -180,16 +175,23 @@ fun RestoreWalletView(
                             apiString.append(item)
                             Text(
                                 modifier = Modifier.clickable(enabled = true) {
-                                    selectedWords.add(item)
+                                    if (selectedWords.count() < 12) {
+                                        selectedWords.add(item)
+                                        wordsInput = ""
+                                        postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
+                                    }
                                 },
                                 text = apiString.toAnnotatedString(),
 
-                            )
+                                )
                         }
                     }
 
                     Spacer(Modifier.height(24.dp))
-                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         PrimarySeparator()
                     }
                     Spacer(Modifier.height(24.dp))
@@ -206,7 +208,7 @@ fun RestoreWalletView(
                                         )
                                         Spacer(Modifier.width(8.dp))
                                         Text(
-                                            text = if(selectedWords.count() > index) selectedWords[index] else "",
+                                            text = if (selectedWords.count() > index) selectedWords[index] else "",
                                             style = MaterialTheme.typography.h5
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
@@ -214,11 +216,12 @@ fun RestoreWalletView(
                                         val isVisible = selectedWords.count() > index
                                         if (isVisible) {
                                             Image(
-                                                modifier = Modifier.clickable { selectedWords.clear() },
+                                                modifier = Modifier.clickable {
+                                                    selectedWords.removeRange(index, selectedWords.count())
+                                                },
                                                 painter = painterResource(id = R.drawable.ic_cross),
                                                 contentDescription = "",
-
-                                                )
+                                            )
                                             Spacer(Modifier.width(8.dp))
                                         }
                                     }
@@ -237,7 +240,7 @@ fun RestoreWalletView(
                                         )
                                         Spacer(Modifier.width(8.dp))
                                         Text(
-                                            text = if(selectedWords.count() > index + 6) selectedWords[index + 6] else "",
+                                            text = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
                                             style = MaterialTheme.typography.h5
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
@@ -245,7 +248,9 @@ fun RestoreWalletView(
                                         val isVisible = selectedWords.count() > index + 6
                                         if (isVisible) {
                                             Image(
-                                                modifier = Modifier.clickable { selectedWords.clear() },
+                                                modifier = Modifier.clickable {
+                                                    selectedWords.removeRange(index + 6, selectedWords.count())
+                                                },
                                                 painter = painterResource(id = R.drawable.ic_cross),
                                                 contentDescription = "",
 
@@ -263,7 +268,7 @@ fun RestoreWalletView(
                         text = R.string.restore_import_button,
                         icon = R.drawable.ic_check_circle,
                         onClick = { postIntent(RestoreWallet.Intent.Validate(wordsInput.split(" "))) },
-                        enabled = wordsInput.isNotBlank()
+                        enabled = selectedWords.count() == 12
                     )
                 }
             }
