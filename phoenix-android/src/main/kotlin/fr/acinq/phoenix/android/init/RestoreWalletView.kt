@@ -16,8 +16,7 @@
 
 package fr.acinq.phoenix.android.init
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -34,14 +33,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
@@ -51,55 +49,63 @@ import fr.acinq.phoenix.controllers.init.RestoreWallet
 fun RestoreWalletView(
     onSeedWritten: () -> Unit
 ) {
-    val log = logger("RestoreWallet")
-    val context = LocalContext.current
+    InitScreen {
 
-    val vm: InitViewModel =
-        viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
+        val nc = navController
+        InitHeader(
+            onBackClick = { nc.popBackStack() },
+            title = stringResource(id = R.string.restore_title),
+            subtitle = stringResource(id = R.string.restore_instructions)
+        )
 
-    val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
-        value = SeedManager.getSeedState(context)
-    }
+        val log = logger("RestoreWallet")
+        val context = LocalContext.current
 
-    var filteredWords = remember { listOf<String>() }
-    var selectedWords = remember { mutableStateListOf<String>() }
+        val vm: InitViewModel =
+            viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
 
-    when (keyState.value) {
-        is KeyState.Absent -> {
-            MVIView(CF::restoreWallet) { model, postIntent ->
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(24.dp)
-                        .fillMaxWidth()
-                ) {
-                    var wordsInput by remember { mutableStateOf("") }
+        val keyState = produceState<KeyState>(initialValue = KeyState.Unknown, true) {
+            value = SeedManager.getSeedState(context)
+        }
 
-                    Text(stringResource(R.string.restore_instructions))
-                    TextInput(
-                        text = wordsInput,
-                        onTextChange = {
-                            wordsInput = if (it.contains(" ")) {
-                                if (filteredWords.count() > 0) {
-                                    selectedWords.add(filteredWords[0])
-                                }
-                                ""
-                            } else {
-                                it
-                            }
-                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
-                        },
-                        enabled = selectedWords.count() != 12,
-                        maxLines = 4,
+        var filteredWords = remember { listOf<String>() }
+        var selectedWords = remember { mutableStateListOf<String>() }
+
+        when (keyState.value) {
+            is KeyState.Absent -> {
+                MVIView(CF::restoreWallet) { model, postIntent ->
+                    Column(
                         modifier = Modifier
+                            .padding(start = 24.dp, bottom = 24.dp, end = 24.dp)
                             .fillMaxWidth()
-                            .padding(vertical = 24.dp)
-                    )
+                    ) {
 
-                    when (model) {
+                        var wordsInput by remember { mutableStateOf("") }
 
-                        is RestoreWallet.Model.Ready -> {
-                            /*
+                        TextInput(
+                            text = wordsInput,
+                            onTextChange = {
+                                wordsInput = if (it.contains(" ")) {
+                                    if (filteredWords.count() > 0) {
+                                        selectedWords.add(filteredWords[0])
+                                    }
+                                    ""
+                                } else {
+                                    it
+                                }
+                                postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
+                            },
+                            enabled = selectedWords.count() != 12,
+                            maxLines = 4,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 24.dp)
+                        )
+
+                        when (model) {
+
+                            is RestoreWallet.Model.Ready -> {
+                                /*
                             var showDisclaimer by remember { mutableStateOf(true) }
                             var hasCheckedWarning by remember { mutableStateOf(false) }
                             if (showDisclaimer) {
@@ -133,171 +139,174 @@ fun RestoreWalletView(
                                 )
                             }
                             */
-                        }
-                        is RestoreWallet.Model.InvalidMnemonics -> {
-                            Text(stringResource(R.string.restore_error))
-                        }
-                        is RestoreWallet.Model.FilteredWordlist -> {
-                            filteredWords = model.words
-                        }
+                            }
+                            is RestoreWallet.Model.InvalidMnemonics -> {
+                                Text(stringResource(R.string.restore_error))
+                            }
+                            is RestoreWallet.Model.FilteredWordlist -> {
+                                filteredWords = model.words
+                            }
 
-                        is RestoreWallet.Model.ValidMnemonics -> {
-                            val writingState = vm.writingState
-                            if (writingState is WritingSeedState.Error) {
-                                Text(
-                                    stringResource(
-                                        id = R.string.autocreate_error,
-                                        writingState.e.localizedMessage
-                                            ?: writingState.e::class.java.simpleName
+                            is RestoreWallet.Model.ValidMnemonics -> {
+                                val writingState = vm.writingState
+                                if (writingState is WritingSeedState.Error) {
+                                    Text(
+                                        stringResource(
+                                            id = R.string.autocreate_error,
+                                            writingState.e.localizedMessage
+                                                ?: writingState.e::class.java.simpleName
+                                        )
                                     )
-                                )
-                            } else {
-                                Text(stringResource(R.string.restore_in_progress))
-                                LaunchedEffect(keyState) {
-                                    vm.writeSeed(
-                                        context,
-                                        selectedWords.toList(),
-                                        false,
-                                        onSeedWritten
-                                    )
+                                } else {
+                                    Text(stringResource(R.string.restore_in_progress))
+                                    LaunchedEffect(keyState) {
+                                        vm.writeSeed(
+                                            context,
+                                            selectedWords.toList(),
+                                            false,
+                                            onSeedWritten
+                                        )
+                                    }
                                 }
                             }
+                            else -> {
+                                Text(stringResource(id = R.string.restore_in_progress))
+                            }
                         }
-                        else -> {
-                            Text(stringResource(id = R.string.restore_in_progress))
-                        }
-                    }
 
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-
-                        // Add 5 items
-                        itemsIndexed(filteredWords) { index, item ->
-
-                            val apiString = AnnotatedString.Builder()
-                            apiString.pushStyle(
-                                style = SpanStyle(
-                                    textDecoration = TextDecoration.Underline
-                                )
-                            )
-                            apiString.append(item)
-                            Text(
-                                modifier = Modifier.clickable(enabled = true) {
-                                    if (selectedWords.count() < 12) {
-                                        selectedWords.add(item)
-                                        wordsInput = ""
-                                        postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
-                                    }
-                                },
-                                text = apiString.toAnnotatedString(),
-
-                                )
-                        }
-                    }
-
-                    Column() {
-
-                        Spacer(Modifier.height(24.dp))
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            HSeparator()
+
+                            // Add 5 items
+                            itemsIndexed(filteredWords) { index, item ->
+
+                                val apiString = AnnotatedString.Builder()
+                                apiString.pushStyle(
+                                    style = SpanStyle(
+                                        textDecoration = TextDecoration.Underline
+                                    )
+                                )
+                                apiString.append(item)
+                                Text(
+                                    modifier = Modifier.clickable(enabled = true) {
+                                        if (selectedWords.count() < 12) {
+                                            selectedWords.add(item)
+                                            wordsInput = ""
+                                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
+                                        }
+                                    },
+                                    text = apiString.toAnnotatedString(),
+
+                                    )
+                            }
                         }
-                        Spacer(Modifier.height(24.dp))
 
-                        Row {
-                            Column(Modifier.weight(1f)) {
+                        Column() {
 
-                                for (index in 0..5)
-                                {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = String.format("#%02d", index + 1),
-                                            style = MaterialTheme.typography.subtitle2
-                                        )
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(
-                                            text = if (selectedWords.count() > index) selectedWords[index] else "",
-                                            style = MaterialTheme.typography.h5
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
+                            Spacer(Modifier.height(24.dp))
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                HSeparator()
+                            }
+                            Spacer(Modifier.height(24.dp))
 
-                                        val isVisible = selectedWords.count() > index
-                                        if (isVisible) {
-                                            Image(
-                                                modifier = Modifier.clickable {
-                                                    selectedWords.removeRange(index, selectedWords.count())
-                                                },
-                                                painter = painterResource(id = R.drawable.ic_cross),
-                                                contentDescription = "",
+                            Row {
+                                Column(Modifier.weight(1f)) {
+
+                                    for (index in 0..5) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = String.format("#%02d", index + 1),
+                                                style = MaterialTheme.typography.subtitle2
                                             )
                                             Spacer(Modifier.width(8.dp))
-                                        }
-                                    }
-                                    Spacer(Modifier.height(8.dp))
-                                }
-                            }
+                                            Text(
+                                                text = if (selectedWords.count() > index) selectedWords[index] else "",
+                                                style = MaterialTheme.typography.h5
+                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
 
-                            Column(Modifier.weight(1f)) {
-
-                                for (index in 0..5) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = String.format("#%02d", index + 7),
-                                            style = MaterialTheme.typography.subtitle2
-                                        )
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(
-                                            text = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
-                                            style = MaterialTheme.typography.h5
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-
-                                        val isVisible = selectedWords.count() > index + 6
-                                        if (isVisible) {
-                                            Image(
-                                                modifier = Modifier.clickable {
-                                                    selectedWords.removeRange(
-                                                        index + 6,
-                                                        selectedWords.count()
-                                                    )
-                                                },
-                                                painter = painterResource(id = R.drawable.ic_cross),
-                                                contentDescription = "",
-
+                                            val isVisible = selectedWords.count() > index
+                                            if (isVisible) {
+                                                Image(
+                                                    modifier = Modifier.clickable {
+                                                        selectedWords.removeRange(
+                                                            index,
+                                                            selectedWords.count()
+                                                        )
+                                                    },
+                                                    painter = painterResource(id = R.drawable.ic_cross),
+                                                    contentDescription = "",
                                                 )
-                                            Spacer(Modifier.width(8.dp))
+                                                Spacer(Modifier.width(8.dp))
+                                            }
                                         }
+                                        Spacer(Modifier.height(8.dp))
                                     }
+                                }
 
-                                    Spacer(Modifier.height(8.dp))
+                                Column(Modifier.weight(1f)) {
+
+                                    for (index in 0..5) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = String.format("#%02d", index + 7),
+                                                style = MaterialTheme.typography.subtitle2
+                                            )
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                text = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
+                                                style = MaterialTheme.typography.h5
+                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
+
+                                            val isVisible = selectedWords.count() > index + 6
+                                            if (isVisible) {
+                                                Image(
+                                                    modifier = Modifier.clickable {
+                                                        selectedWords.removeRange(
+                                                            index + 6,
+                                                            selectedWords.count()
+                                                        )
+                                                    },
+                                                    painter = painterResource(id = R.drawable.ic_cross),
+                                                    contentDescription = "",
+
+                                                    )
+                                                Spacer(Modifier.width(8.dp))
+                                            }
+                                        }
+
+                                        Spacer(Modifier.height(8.dp))
+                                    }
                                 }
                             }
-                        }
 
-                        Spacer(Modifier.height(24.dp))
-                        BorderButton(
-                            text = R.string.restore_import_button,
-                            icon = R.drawable.ic_check_circle,
-                            onClick = {
-                                postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
-                            },
-                            enabled = selectedWords.count() == 12
-                        )
+                            Spacer(Modifier.height(24.dp))
+                            BorderButton(
+                                text = R.string.restore_import_button,
+                                icon = R.drawable.ic_check_circle,
+                                onClick = {
+                                    postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
+                                },
+                                enabled = selectedWords.count() == 12
+                            )
+                        }
                     }
                 }
             }
-        }
-        KeyState.Unknown -> {
-            Text(stringResource(id = R.string.startup_wait))
-        }
-        else -> {
-            // we should not be here
-            Text(stringResource(id = R.string.startup_wait))
-            LaunchedEffect(true) {
-                onSeedWritten()
+            KeyState.Unknown -> {
+                Text(stringResource(id = R.string.startup_wait))
+            }
+            else -> {
+                // we should not be here
+                Text(stringResource(id = R.string.startup_wait))
+                LaunchedEffect(true) {
+                    onSeedWritten()
+                }
             }
         }
     }
