@@ -56,6 +56,9 @@ struct ValidateView: View {
 	let balancePublisher = AppDelegate.get().business.peerManager.balancePublisher()
 	@State var balanceMsat: Int64 = 0
 	
+	let chainContextPublisher = AppDelegate.get().business.appConfigurationManager.chainContextPublisher()
+	@State var chainContext: WalletContext.V0ChainContext? = nil
+	
 	@StateObject var connectionsManager = ObservableConnectionsManager()
 	
 	@Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -157,6 +160,9 @@ struct ValidateView: View {
 		}
 		.onReceive(balancePublisher) {
 			balanceDidChange($0)
+		}
+		.onReceive(chainContextPublisher) {
+			chainContextDidChange($0)
 		}
 	}
 	
@@ -481,7 +487,7 @@ struct ValidateView: View {
 		// The "price target" button has multiple uses/meanings:
 		//
 		// - for invoices, it means adding a tip
-		// - for lnurl-pay, it's the acceptable range (generally a tip)
+		// - for lnurl-pay, it's the acceptable range (could be a tip, depends on context)
 		// - for lnurl-withdraw, it's the range of money to withdraw
 		
 		if let tuple = priceRange() {
@@ -595,12 +601,13 @@ struct ValidateView: View {
 					max: min.times(m: 2.0)
 				)
 			}
-		}
-		else if let lnurlPay = lnurlPay() {
+			
+		} else if let lnurlPay = lnurlPay() {
 			return MsatRange(
 				min: lnurlPay.minSendable,
 				max: lnurlPay.maxSendable
 			)
+			
 		} else if let lnurlWithdraw = lnurlWithdraw() {
 			return MsatRange(
 				min: lnurlWithdraw.minWithdrawable,
@@ -609,6 +616,18 @@ struct ValidateView: View {
 		}
 		
 		return nil
+	}
+	
+	func swapOutRange() -> MsatRange? {
+		
+		guard let chainContext = chainContext, mvi.model is Scan.Model_SwapOutFlow else {
+			return nil
+		}
+
+		return MsatRange(
+			min: Utils.toMsat(sat: chainContext.swapOut.v1.minAmountSat),
+			max: Utils.toMsat(sat: chainContext.swapOut.v1.maxAmountSat)
+		)
 	}
 	
 	func paymentNumbers() -> PaymentNumbers? {
@@ -744,9 +763,14 @@ struct ValidateView: View {
 	func modelDidChange(_ newModel: Scan.Model) -> Void {
 		log.trace("modelDidChange()")
 		
-		if newModel is Scan.Model_SwapOutFlow_Ready {
+		if newModel is Scan.Model_SwapOutFlow {
 			
-			refreshAltAmount() // amount + minerFee >? balance
+			// Possible transitions:
+			// - Init -> Requesting
+			// - Requesting -> Ready => amount + minerFee >? balance
+			// - Ready -> Init       => remove minerFee from calculations
+			
+			refreshAltAmount()
 		
 		} else if let model = newModel as? Scan.Model_LnurlPayFlow_LnurlPayRequest {
 			if let payError = model.error {
@@ -836,6 +860,12 @@ struct ValidateView: View {
 		}
 	}
 	
+	func chainContextDidChange(_ context: WalletContext.V0ChainContext) -> Void {
+		log.trace("chainContextDidChange()")
+		
+		chainContext = context
+	}
+	
 	func refreshAltAmount() -> Void {
 		log.trace("refreshAltAmount()")
 		
@@ -865,19 +895,24 @@ struct ValidateView: View {
 				}
 			}
 			
-			if let msat = msat {
-				if !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
+			if let msat = msat, !(mvi.model is Scan.Model_LnurlWithdrawFlow) {
+				
+				// There are 2 scenarios that we handle slightly differently:
+				// - amount user selected (amount + tip) exceeds balance
+				// - total amount (including server-selected miner fee) exceeds balance
+				//
+				// In one scenario, the user is at fault.
+				// In the other, the user unexpectedly went over the limit.
+				
+				if msat > balanceMsat {
+					problem = .amountExceedsBalance
+					altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
 					
-					if msat > balanceMsat {
-						problem = .amountExceedsBalance
-						altAmount = NSLocalizedString("Amount exceeds your balance", comment: "error message")
-						
-					} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
-						let totalMsat = msat + Utils.toMsat(sat: model.fee)
-						if totalMsat > balanceMsat {
-							problem = .finalAmountExceedsBalance
-							altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
-						}
+				} else if let model = mvi.model as? Scan.Model_SwapOutFlow_Ready {
+					let totalMsat = msat + Utils.toMsat(sat: model.fee)
+					if totalMsat > balanceMsat {
+						problem = .finalAmountExceedsBalance
+						altAmount = NSLocalizedString("Total amount exceeds your balance", comment: "error message")
 					}
 				}
 			}
@@ -894,7 +929,7 @@ struct ValidateView: View {
 			
 			if problem == nil,
 			   let msat = msat,
-			   let range = priceRange()
+			   let range = priceRange() ?? swapOutRange()
 			{
 				let minMsat = range.min.msat
 				let maxMsat = range.max.msat

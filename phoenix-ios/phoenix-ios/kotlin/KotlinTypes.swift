@@ -24,8 +24,8 @@ extension Scan {
 	
 	typealias Model_SwapOutFlow = ModelSwapOutFlow
 	typealias Model_SwapOutFlow_Init = ModelSwapOutFlowInit
-	typealias Model_SwapOutFlow_Ready = ModelSwapOutFlowSwapOutReady
 	typealias Model_SwapOutFlow_Requesting = ModelSwapOutFlowRequestingSwapout
+	typealias Model_SwapOutFlow_Ready = ModelSwapOutFlowSwapOutReady
 	typealias Model_SwapOutFlow_Sending = ModelSwapOutFlowSendingSwapOut
 	
 	typealias Model_LnurlServiceFetch = ModelLnurlServiceFetch
