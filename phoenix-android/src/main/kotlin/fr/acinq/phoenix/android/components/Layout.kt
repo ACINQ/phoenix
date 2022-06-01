@@ -147,13 +147,15 @@ fun Card(
     modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
             .clip(shape)
             .background(MaterialTheme.colors.surface)
-            .padding(internalPadding)
+            .padding(internalPadding),
+        verticalArrangement = verticalArrangement
     ) {
         content()
     }
