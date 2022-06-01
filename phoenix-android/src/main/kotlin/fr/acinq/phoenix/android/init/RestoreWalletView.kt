@@ -134,9 +134,6 @@ fun RestoreWalletView(
                                     }
                                 }
                             }
-                            else -> {
-                                Text(stringResource(id = R.string.restore_in_progress))
-                            }
                         }
 
                         LazyRow(
