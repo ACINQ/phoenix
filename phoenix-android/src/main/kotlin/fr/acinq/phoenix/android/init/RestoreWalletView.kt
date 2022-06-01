@@ -166,12 +166,7 @@ fun RestoreWalletView(
                         Column() {
 
                             Spacer(Modifier.height(24.dp))
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                HSeparator()
-                            }
+                            HSeparator()
                             Spacer(Modifier.height(24.dp))
 
                             Row {
