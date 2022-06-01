@@ -72,9 +72,6 @@ fun RestoreDisclaimerView(
                 onClick = (onClickNext),
                 enabled = hasCheckedWarning
             )
-
-            val vm: InitViewModel =
-                viewModel(factory = InitViewModel.Factory(controllerFactory, CF::initialization))
         }
     }
 }
