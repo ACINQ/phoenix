@@ -140,7 +140,6 @@ fun RestoreWalletView(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
 
-                            // Add 5 items
                             items(filteredWords) {
 
                                 val apiString = AnnotatedString.Builder()
