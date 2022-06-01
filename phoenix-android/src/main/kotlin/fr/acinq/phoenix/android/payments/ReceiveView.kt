@@ -147,7 +147,7 @@ fun ReceiveView() {
 
 @Composable
 private fun DefaultView(vm: ReceiveViewModel) {
-    val context = LocalContext.current.applicationContext
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +175,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.request) },
-                        onShare = { /*TODO*/ },
+                        onShare = { share(context, model.request, subject = "") },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
                     Spacer(modifier = Modifier.height(48.dp))
                     BorderButton(

@@ -186,10 +186,13 @@ fun AppView(
                 ) {
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
-                    if (direction != null && id != null) {
-                        PaymentDetailsView(direction = direction, id = id, onBackClick = {
-                            navController.navigate(Screen.Home.route)
-                        })
+                    val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
+                    if (paymentId != null) {
+                        PaymentDetailsView(
+                            paymentId = paymentId,
+                            onBackClick = {
+                                navController.navigate(Screen.Home.route)
+                            })
                     }
                 }
                 composable(Screen.Settings.route) {
@@ -221,6 +224,9 @@ fun AppView(
                         mainActivity = mainActivity,
                         appVM = appVM
                     )
+                }
+                composable(Screen.Logs.route) {
+                    LogsView()
                 }
                 composable(Screen.SwitchToLegacy.route) {
                     LegacySwitcherView(onLegacyFinished = { navController.navigate(Screen.Startup.route) })
