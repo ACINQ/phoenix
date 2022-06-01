@@ -96,7 +96,9 @@ struct ModifyInvoiceSheet: View {
 				.frame(height: textHeight) // workaround for SwiftUI bug
 				.padding(.trailing, 16)
 			}
-			.background(Capsule().stroke(Color(UIColor.separator)))
+			.background(
+				Capsule().stroke(Color.textFieldBorder)
+			)
 
 			Text(altAmount)
 				.font(.caption)
@@ -124,8 +126,7 @@ struct ModifyInvoiceSheet: View {
 			.padding(.leading, 16)
 			.padding(.trailing, 8)
 			.background(
-				Capsule()
-					.strokeBorder(Color(UIColor.separator))
+				Capsule().strokeBorder(Color.textFieldBorder)
 			)
 			.padding(.bottom)
 			
