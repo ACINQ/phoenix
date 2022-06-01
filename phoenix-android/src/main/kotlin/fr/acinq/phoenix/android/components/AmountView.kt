@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
+import fr.acinq.phoenix.android.utils.MSatDisplayPolicy
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.data.CurrencyUnit
 import kotlinx.coroutines.launch
@@ -48,7 +49,8 @@ fun AmountView(
     isOutgoing: Boolean? = null,
     amountTextStyle: TextStyle = MaterialTheme.typography.body1,
     unitTextStyle: TextStyle = MaterialTheme.typography.body1,
-    separatorSpace: Dp = 8.dp,
+    separatorSpace: Dp = 4.dp,
+    mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE
 ) {
     val unit = forceUnit ?: if (LocalShowInFiat.current) {
         LocalFiatCurrency.current
@@ -75,7 +77,7 @@ fun AmountView(
             )
         }
         Text(
-            text = amount.toPrettyString(unit, fiatRate),
+            text = amount.toPrettyString(unit, fiatRate, mSatDisplayPolicy = mSatDisplayPolicy),
             style = amountTextStyle,
             modifier = Modifier.alignBy(FirstBaseline)
         )
@@ -84,8 +86,7 @@ fun AmountView(
             Text(
                 text = unit.toString(),
                 style = unitTextStyle,
-                modifier = Modifier
-                    .alignBy(FirstBaseline)
+                modifier = Modifier.alignBy(FirstBaseline)
             )
         }
     }

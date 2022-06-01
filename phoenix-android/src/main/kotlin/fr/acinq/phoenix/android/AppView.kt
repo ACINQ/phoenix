@@ -37,7 +37,6 @@ import fr.acinq.phoenix.android.home.*
 import fr.acinq.phoenix.android.init.CreateWalletView
 import fr.acinq.phoenix.android.init.InitWallet
 import fr.acinq.phoenix.android.init.RestoreWalletView
-import fr.acinq.phoenix.android.payments.PaymentMoreDetailsView
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
@@ -184,26 +183,13 @@ fun AppView(
                 ) {
                     val direction = it.arguments?.getLong("direction")
                     val id = it.arguments?.getString("id")
-                    if (direction != null && id != null) {
-                        PaymentDetailsView(direction = direction, id = id, onPaymentClick = { walletPaymentId ->
-                            navigateToPaymentMoreDetails(navController, walletPaymentId)
-                        }, onBackClick = {
-                            navController.navigate(Screen.Home.route)
-                        })
-                    }
-                }
-                composable(
-                    route = "${Screen.PaymentMoreDetails.route}/{direction}/{id}",
-                    arguments = listOf(
-                        navArgument("direction") { type = NavType.LongType },
-                        navArgument("id") { type = NavType.StringType }
-                    ),
-                )
-                {
-                    val direction = it.arguments?.getLong("direction")
-                    val id = it.arguments?.getString("id")
-                    if (direction != null && id != null) {
-                        PaymentMoreDetailsView(direction = direction, id = id)
+                    val paymentId = if (id != null && direction != null) WalletPaymentId.create(direction, id) else null
+                    if (paymentId != null) {
+                        PaymentDetailsView(
+                            paymentId = paymentId,
+                            onBackClick = {
+                                navController.navigate(Screen.Home.route)
+                            })
                     }
                 }
                 composable(Screen.Settings.route) {

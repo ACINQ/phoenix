@@ -26,7 +26,6 @@ import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -34,11 +33,16 @@ import java.text.NumberFormat
 import java.util.*
 import kotlin.math.abs
 
+enum class MSatDisplayPolicy {
+    HIDE, SHOW, SHOW_IF_ZERO_SATS
+}
+
 object Converter {
 
     private val log = LoggerFactory.getLogger(Converter::class.java)
 
     private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
+    private var SAT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.###")
     private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0")
     private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.##")
     private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.#####")
@@ -64,16 +68,24 @@ object Converter {
     /** Converts [MilliSatoshi] to a fiat amount. */
     fun MilliSatoshi.toFiat(rate: Double): Double = this.toUnit(BitcoinUnit.Btc) * rate
 
-    fun Double?.toPrettyString(unit: CurrencyUnit, withUnit: Boolean = false): String = (when (unit) {
-        is BitcoinUnit -> this?.run { getCoinFormat(unit).format(this) }
-        is FiatCurrency -> this?.run { FIAT_FORMAT.format(this) }
-        else -> "?!"
-    } ?: "").run {
+    fun Double?.toPrettyString(unit: CurrencyUnit, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String = (this?.let { amount ->
+        when {
+            unit == BitcoinUnit.Sat && amount < 1.0 && mSatDisplayPolicy == MSatDisplayPolicy.SHOW_IF_ZERO_SATS -> {
+                SAT_FORMAT_WITH_MILLIS.format(amount)
+            }
+            unit == BitcoinUnit.Sat && mSatDisplayPolicy == MSatDisplayPolicy.SHOW -> {
+                SAT_FORMAT_WITH_MILLIS.format(amount)
+            }
+            unit is BitcoinUnit -> getCoinFormat(unit).format(amount)
+            unit is FiatCurrency -> FIAT_FORMAT.format(amount)
+            else -> "?!"
+        }
+    } ?: "N/A").run {
         if (withUnit) "$this $unit" else this
     }
 
-    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false): String = when {
-        unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit)
+    fun MilliSatoshi.toPrettyString(unit: CurrencyUnit, rate: ExchangeRate.BitcoinPriceRate? = null, withUnit: Boolean = false, mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.HIDE): String = when {
+        unit is BitcoinUnit -> this.toUnit(unit).toPrettyString(unit, withUnit, mSatDisplayPolicy)
         unit is FiatCurrency && rate != null -> this.toFiat(rate.price).toPrettyString(unit, withUnit)
         else -> "?!"
     }
@@ -99,10 +111,12 @@ object Converter {
     }
 
     public fun html(source: String): Spanned {
-        return Html.fromHtml(source, Html.FROM_HTML_MODE_COMPACT
-                and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
-                and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
-                and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
-                and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
+        return Html.fromHtml(
+            source, Html.FROM_HTML_MODE_COMPACT
+                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING
+                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
+                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
+                    and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
+        )
     }
 }
