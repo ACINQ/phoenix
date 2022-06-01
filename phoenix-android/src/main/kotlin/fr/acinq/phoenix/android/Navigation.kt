@@ -27,6 +27,7 @@ sealed class Screen(val route: String) {
     object SwitchToLegacy : Screen("switchtolegacy")
     object InitWallet : Screen("initwallet")
     object CreateWallet : Screen("createwallet")
+    object RestoreDisclaimer : Screen("restoredisclaimer")
     object RestoreWallet : Screen("restorewallet")
     object Startup : Screen("startup")
     object Home : Screen("home")

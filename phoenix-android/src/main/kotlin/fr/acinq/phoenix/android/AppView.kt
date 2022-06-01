@@ -34,9 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.*
-import fr.acinq.phoenix.android.init.CreateWalletView
-import fr.acinq.phoenix.android.init.InitWallet
-import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView
@@ -115,11 +113,14 @@ fun AppView(
                 composable(Screen.InitWallet.route) {
                     InitWallet(
                         onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
-                        onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
+                        onRestoreWalletClick = { navController.navigate(Screen.RestoreDisclaimer.route) },
                     )
                 }
                 composable(Screen.CreateWallet.route) {
                     CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
+                }
+                composable(Screen.RestoreDisclaimer.route) {
+                    RestoreDisclaimerView (onClickNext = { navController.navigate(Screen.RestoreWallet.route) })
                 }
                 composable(Screen.RestoreWallet.route) {
                     RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })

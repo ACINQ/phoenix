@@ -20,8 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Checkbox
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -105,31 +104,7 @@ fun RestoreWalletView(
 
                         when (model) {
 
-                            is RestoreWallet.Model.Ready -> {
-                                var showDisclaimer by remember { mutableStateOf(true) }
-                                var hasCheckedWarning by remember { mutableStateOf(false) }
-                                if (showDisclaimer) {
-                                    Text(stringResource(R.string.restore_disclaimer_message))
-                                    Row(
-                                        Modifier.padding(vertical = 24.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Checkbox(
-                                            hasCheckedWarning,
-                                            onCheckedChange = { hasCheckedWarning = it })
-                                        Spacer(Modifier.width(16.dp))
-                                        Text(stringResource(R.string.restore_disclaimer_checkbox))
-                                    }
-                                    BorderButton(
-                                        text = R.string.restore_disclaimer_next,
-                                        icon = R.drawable.ic_arrow_next,
-                                        onClick = { showDisclaimer = false },
-                                        enabled = hasCheckedWarning
-                                    )
-                                } else {
-
-                                }
-                            }
+                            is RestoreWallet.Model.Ready -> {}
                             is RestoreWallet.Model.InvalidMnemonics -> {
                                 Text(stringResource(R.string.restore_error))
                             }
@@ -169,7 +144,7 @@ fun RestoreWalletView(
                         ) {
 
                             // Add 5 items
-                            itemsIndexed(filteredWords) { index, item ->
+                            items(filteredWords) {
 
                                 val apiString = AnnotatedString.Builder()
                                 apiString.pushStyle(
@@ -177,11 +152,11 @@ fun RestoreWalletView(
                                         textDecoration = TextDecoration.Underline
                                     )
                                 )
-                                apiString.append(item)
+                                apiString.append(it)
                                 Text(
                                     modifier = Modifier.clickable(enabled = true) {
                                         if (selectedWords.count() < 12) {
-                                            vm.addWord(item)
+                                            vm.addWord(it)
                                             wordsInput = ""
                                             postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
                                         }
