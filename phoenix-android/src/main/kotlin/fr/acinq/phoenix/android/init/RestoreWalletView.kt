@@ -163,7 +163,7 @@ fun RestoreWalletView(
                             }
                         }
 
-                        Column() {
+                        Column {
 
                             Spacer(Modifier.height(24.dp))
                             HSeparator()
@@ -173,33 +173,17 @@ fun RestoreWalletView(
                                 Column(Modifier.weight(1f)) {
 
                                     for (index in 0..5) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = String.format("#%02d", index + 1),
-                                                style = MaterialTheme.typography.subtitle2
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            Text(
-                                                text = if (selectedWords.count() > index) selectedWords[index] else "",
-                                                style = MaterialTheme.typography.h5
-                                            )
-                                            Spacer(modifier = Modifier.weight(1f))
-
-                                            val isVisible = selectedWords.count() > index
-                                            if (isVisible) {
-                                                Image(
-                                                    modifier = Modifier.clickable {
-                                                        vm.removeRangeWords(
-                                                            index,
-                                                            selectedWords.count()
-                                                        )
-                                                    },
-                                                    painter = painterResource(id = R.drawable.ic_cross),
-                                                    contentDescription = "",
+                                        WordRow(
+                                            wordNumber = index + 1,
+                                            word = if (selectedWords.count() > index) selectedWords[index] else "",
+                                            crossVisible = selectedWords.count() > index,
+                                            onCrossClick = {
+                                                vm.removeRangeWords(
+                                                    index,
+                                                    selectedWords.count()
                                                 )
-                                                Spacer(Modifier.width(8.dp))
                                             }
-                                        }
+                                        )
                                         Spacer(Modifier.height(8.dp))
                                     }
                                 }
@@ -207,35 +191,17 @@ fun RestoreWalletView(
                                 Column(Modifier.weight(1f)) {
 
                                     for (index in 0..5) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = String.format("#%02d", index + 7),
-                                                style = MaterialTheme.typography.subtitle2
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            Text(
-                                                text = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
-                                                style = MaterialTheme.typography.h5
-                                            )
-                                            Spacer(modifier = Modifier.weight(1f))
-
-                                            val isVisible = selectedWords.count() > index + 6
-                                            if (isVisible) {
-                                                Image(
-                                                    modifier = Modifier.clickable {
-                                                        vm.removeRangeWords(
-                                                            index + 6,
-                                                            selectedWords.count()
-                                                        )
-                                                    },
-                                                    painter = painterResource(id = R.drawable.ic_cross),
-                                                    contentDescription = "",
-
-                                                    )
-                                                Spacer(Modifier.width(8.dp))
+                                        WordRow(
+                                            wordNumber = index + 7,
+                                            word = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
+                                            crossVisible = selectedWords.count() > index + 6,
+                                            onCrossClick = {
+                                                vm.removeRangeWords(
+                                                    index + 6,
+                                                    selectedWords.count()
+                                                )
                                             }
-                                        }
-
+                                        )
                                         Spacer(Modifier.height(8.dp))
                                     }
                                 }
@@ -264,6 +230,39 @@ fun RestoreWalletView(
                     onSeedWritten()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun WordRow(
+    wordNumber: Int,
+    word: String,
+    crossVisible: Boolean,
+    onCrossClick: () -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = String.format("#%02d", wordNumber),
+            style = MaterialTheme.typography.subtitle2
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = word,
+            style = MaterialTheme.typography.h5
+        )
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (crossVisible) {
+            Image(
+                modifier = Modifier.clickable(
+                    onClick = onCrossClick
+                ),
+                painter = painterResource(id = R.drawable.ic_cross),
+                contentDescription = "",
+
+                )
+            Spacer(Modifier.width(8.dp))
         }
     }
 }
