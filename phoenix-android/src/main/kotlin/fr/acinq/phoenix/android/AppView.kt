@@ -240,10 +240,6 @@ private fun navigateToPaymentDetails(navController: NavController, id: WalletPay
     navController.navigate("${Screen.PaymentDetails.route}/${id.dbType.value}/${id.dbId}")
 }
 
-private fun navigateToPaymentMoreDetails(navController: NavController, id: WalletPaymentId) {
-    navController.navigate("${Screen.PaymentMoreDetails.route}/${id.dbType.value}/${id.dbId}")
-}
-
 @Composable
 private fun RequireKey(
     walletState: WalletState?, // TODO: replace by UI lock state
