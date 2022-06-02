@@ -95,7 +95,7 @@ fun RestoreWalletView(
                                 }
                                 postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
                             },
-                            enabled = vm.selectedWords.count() != 12,
+                            enabled = vm.selectedWords.count() < 12,
                             maxLines = 4,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -190,14 +190,14 @@ fun RestoreWalletView(
 
                                 Column(Modifier.weight(1f)) {
 
-                                    for (index in 0..5) {
+                                    for (index in 6..11) {
                                         WordRow(
-                                            wordNumber = index + 7,
-                                            word = if (selectedWords.count() > index + 6) selectedWords[index + 6] else "",
-                                            crossVisible = selectedWords.count() > index + 6,
+                                            wordNumber = index + 1,
+                                            word = if (selectedWords.count() > index) selectedWords[index] else "",
+                                            crossVisible = selectedWords.count() > index,
                                             onCrossClick = {
                                                 vm.removeRangeWords(
-                                                    index + 6,
+                                                    index,
                                                     selectedWords.count()
                                                 )
                                             }
