@@ -1,5 +1,5 @@
 object Versions {
-    const val lightningKmp = "1.3.0-SNAPSHOT"
+    const val lightningKmp = "1.3.0"
     const val secp256k1 = "0.6.0"
 
     const val kotlin = "1.5.31"
