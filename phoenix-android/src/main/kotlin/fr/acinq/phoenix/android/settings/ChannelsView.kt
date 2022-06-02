@@ -65,8 +65,8 @@ fun ChannelsView() {
         )
     }
 
-    SettingScreen(isScrollable = false) {
-        SettingHeader(
+    ColumnScreen(isScrollable = false) {
+        RowHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.listallchannels_title),
         )

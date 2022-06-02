@@ -26,26 +26,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.InitHeader
-import fr.acinq.phoenix.android.components.InitScreen
-import fr.acinq.phoenix.android.controllerFactory
+import fr.acinq.phoenix.android.components.ColumnScreen
+import fr.acinq.phoenix.android.components.RowHeader
 import fr.acinq.phoenix.android.navController
 
 @Composable
 fun RestoreDisclaimerView(
     onClickNext: () -> Unit
 ) {
-    InitScreen {
+    ColumnScreen(backgroundColor = Color.Unspecified) {
         val nc = navController
-        InitHeader(
+        RowHeader(
             onBackClick = { nc.popBackStack() },
-            title = stringResource(id = R.string.restore_title)
+            title = stringResource(id = R.string.restore_title),
+            backgroundColor = Color.Unspecified
         )
 
         Column(

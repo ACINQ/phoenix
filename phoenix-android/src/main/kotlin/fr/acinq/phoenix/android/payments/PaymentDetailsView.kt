@@ -93,7 +93,7 @@ fun PaymentDetailsView(
             .fillMaxHeight()
             .verticalScroll(scrollState),
     ) {
-        SettingHeader(onBackClick = onBackClick, backgroundColor = Color.Unspecified)
+        RowHeader(onBackClick = onBackClick, backgroundColor = Color.Unspecified)
         when (val state = paymentState.value) {
             is PaymentDetailsState.Loading -> Card {
                 Text(stringResource(id = R.string.paymentdetails_loading))

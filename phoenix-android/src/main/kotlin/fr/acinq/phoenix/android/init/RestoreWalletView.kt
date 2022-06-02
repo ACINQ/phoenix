@@ -26,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,13 +50,14 @@ import fr.acinq.phoenix.controllers.init.RestoreWallet
 fun RestoreWalletView(
     onSeedWritten: () -> Unit
 ) {
-    InitScreen {
+    ColumnScreen(backgroundColor = Color.Unspecified) {
 
         val nc = navController
-        InitHeader(
+        RowHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
-            subtitle = stringResource(id = R.string.restore_instructions)
+            subtitle = stringResource(id = R.string.restore_instructions),
+            backgroundColor = Color.Unspecified
         )
 
         val log = logger("RestoreWallet")

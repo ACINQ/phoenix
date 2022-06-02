@@ -57,8 +57,8 @@ fun ElectrumView() {
     val prefElectrumServer = LocalElectrumServer.current
     var showServerDialog by rememberSaveable { mutableStateOf(false) }
 
-    SettingScreen {
-        SettingHeader(
+    ColumnScreen {
+        RowHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.electrum_title),
             subtitle = stringResource(id = R.string.electrum_subtitle)

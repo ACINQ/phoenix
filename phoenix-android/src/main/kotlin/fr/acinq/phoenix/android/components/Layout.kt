@@ -105,6 +105,47 @@ fun Dialog(
     }
 }
 
+
+@Composable
+fun ColumnScreen(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(backgroundColor)
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun RowHeader(
+    title: String? = null,
+    subtitle: String? = null,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = MaterialTheme.colors.background,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .padding(horizontal = 0.dp, vertical = 6.dp),
+    ) {
+        BackButton(onClick = onBackClick)
+        Column(
+            modifier = Modifier.padding(horizontal = 0.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            title?.run { Text(text = this) }
+            subtitle?.run {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
+            }
+        }
+    }
+}
+
 @Composable
 fun HSeparator(
     width: Dp? = null,

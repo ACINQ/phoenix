@@ -43,8 +43,8 @@ fun AboutView() {
     val nc = navController
     val context = LocalContext.current
 
-    SettingScreen {
-        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.about_title))
+    ColumnScreen {
+        RowHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.about_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.about_general_content))
 

@@ -25,8 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.SettingHeader
-import fr.acinq.phoenix.android.components.SettingScreen
+import fr.acinq.phoenix.android.components.ColumnScreen
+import fr.acinq.phoenix.android.components.RowHeader
 import fr.acinq.phoenix.android.components.SettingSwitch
 import fr.acinq.phoenix.android.utils.BiometricsHelper
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -46,8 +46,8 @@ fun AppLockView(
     val isScreenLockActive = UserPrefs.getIsScreenLockActive(context).collectAsState(initial = false)
     val nc = navController
 
-    SettingScreen {
-        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title), subtitle = stringResource(id = R.string.accessctrl_subtitle))
+    ColumnScreen {
+        RowHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.accessctrl_title), subtitle = stringResource(id = R.string.accessctrl_subtitle))
         Card {
             SettingSwitch(
                 title = stringResource(id = R.string.accessctrl_screen_lock_switch),

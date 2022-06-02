@@ -38,8 +38,8 @@ fun DisplayPrefsView() {
     val nc = navController
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    SettingScreen {
-        SettingHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
+    ColumnScreen {
+        RowHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.prefs_display_title))
         Card {
             BitcoinUnitPreference(context = context, scope = scope)
             FiatCurrencyPreference(context = context, scope = scope)

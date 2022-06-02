@@ -141,7 +141,7 @@ private fun DefaultView(vm: ReceiveViewModel) {
         verticalArrangement = Arrangement.Top,
     ) {
         val nc = navController
-        SettingHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
+        RowHeader(onBackClick = { nc.popBackStack() }, backgroundColor = Color.Unspecified)
         MVIView(vm) { model, postIntent ->
             when (model) {
                 is Receive.Model.Awaiting -> {
@@ -250,8 +250,8 @@ private fun EditInvoiceView(
     onCancel: () -> Unit
 ) {
     val log = logger("EditInvoiceView")
-    SettingScreen {
-        SettingHeader(
+    ColumnScreen {
+        RowHeader(
             title = stringResource(id = R.string.receive__edit__title),
             subtitle = stringResource(id = R.string.receive__edit__subtitle),
             onBackClick = onCancel
