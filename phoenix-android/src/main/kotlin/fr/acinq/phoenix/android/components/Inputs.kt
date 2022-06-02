@@ -66,24 +66,44 @@ fun TextInput(
     maxLines: Int = 1,
     label: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
+    isOutlined: Boolean = false,
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    TextField(
-        value = text,
-        onValueChange = onTextChange,
-        maxLines = maxLines,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Text
-        ),
-        label = label,
-        enabled = enabled,
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        colors = textFieldColors(),
-        shape = RectangleShape,
-        modifier = modifier
-    )
+    if (isOutlined) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = onTextChange,
+            maxLines = maxLines,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Password,
+                autoCorrect = false
+            ),
+            label = label,
+            enabled = enabled,
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            colors = textFieldColors(),
+            shape = RectangleShape,
+            modifier = modifier
+        )
+    } else {
+        TextField(
+            value = text,
+            onValueChange = onTextChange,
+            maxLines = maxLines,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Text
+            ),
+            label = label,
+            enabled = enabled,
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            colors = textFieldColors(),
+            shape = RectangleShape,
+            modifier = modifier
+        )
+    }
 }
 
 @Preview
@@ -93,7 +113,11 @@ fun ComposablePreview() {
         Column {
             AmountInput(initialAmount = 123456.msat, onAmountChange = { _, _, _ -> Unit })
             Spacer(modifier = Modifier.height(24.dp))
-            AmountInput(initialAmount = -123456.msat, onAmountChange = { _, _, _ -> Unit }, useBasicInput = true)
+            AmountInput(
+                initialAmount = -123456.msat,
+                onAmountChange = { _, _, _ -> Unit },
+                useBasicInput = true
+            )
         }
     }
 }
@@ -116,7 +140,13 @@ fun AmountInput(
     val prefBitcoinUnit = LocalBitcoinUnit.current
     val prefFiat = LocalFiatCurrency.current
     val rate = fiatRate
-    val units = listOf<CurrencyUnit>(BitcoinUnit.Sat, BitcoinUnit.Bit, BitcoinUnit.MBtc, BitcoinUnit.Btc, prefFiat)
+    val units = listOf<CurrencyUnit>(
+        BitcoinUnit.Sat,
+        BitcoinUnit.Bit,
+        BitcoinUnit.MBtc,
+        BitcoinUnit.Btc,
+        prefFiat
+    )
     val focusManager = LocalFocusManager.current
 
     // unit selected in the dropdown menu
@@ -149,7 +179,8 @@ fun AmountInput(
                         val msat = d.toMilliSatoshi(rate.price)
 
                         if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
-                            convertedAmount = context.getString(R.string.send_amount_error_too_large)
+                            convertedAmount =
+                                context.getString(R.string.send_amount_error_too_large)
                             null to null
                         } else if (msat < 0.msat) {
                             convertedAmount = context.getString(R.string.send_amount_error_negative)
@@ -300,7 +331,13 @@ fun AmountInput(
                 units = units,
                 onUnitChange = {
                     unit = it
-                    convertInputToAmount().let { (msat, fiat) -> onAmountChange(msat, fiat, prefFiat) }
+                    convertInputToAmount().let { (msat, fiat) ->
+                        onAmountChange(
+                            msat,
+                            fiat,
+                            prefFiat
+                        )
+                    }
                 },
                 onDismiss = { },
                 modifier = dropdownModifier.layoutId(unitRef)
@@ -322,7 +359,8 @@ fun AmountInput(
         }
 
         Text(
-            text = convertedAmount.takeIf { it.isNotBlank() }?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
+            text = convertedAmount.takeIf { it.isNotBlank() }
+                ?.let { stringResource(id = R.string.utils_converted_amount, it) } ?: "",
             style = if (useBasicInput) MaterialTheme.typography.caption.copy(textAlign = TextAlign.Center) else MaterialTheme.typography.caption,
             modifier = Modifier
                 .layoutId(altAmountRef)

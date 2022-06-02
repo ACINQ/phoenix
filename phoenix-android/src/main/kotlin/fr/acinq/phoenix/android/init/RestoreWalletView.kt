@@ -76,7 +76,7 @@ fun RestoreWalletView(
                 MVIView(CF::restoreWallet) { model, postIntent ->
                     Column(
                         modifier = Modifier
-                            .padding(start = 24.dp, bottom = 24.dp, end = 24.dp)
+                            .padding(start = 24.dp, top = 16.dp, bottom = 24.dp, end = 24.dp)
                             .fillMaxWidth()
                     ) {
 
@@ -99,7 +99,8 @@ fun RestoreWalletView(
                             maxLines = 4,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 24.dp)
+                                .padding(bottom = 24.dp),
+                            isOutlined = true
                         )
 
                         when (model) {
