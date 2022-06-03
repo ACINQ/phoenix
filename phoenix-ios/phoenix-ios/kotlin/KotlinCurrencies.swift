@@ -567,10 +567,10 @@ extension BitcoinUnit {
 		
 		let s = FormattedAmount.fractionGroupingSeparator // narrow no-break space
 		switch (self) {
-			case BitcoinUnit.sat  : return "0.000\(s)000\(s)01 BTC"
-			case BitcoinUnit.bit  : return "0.000\(s)001 BTC"
-			case BitcoinUnit.mbtc : return "0.001 BTC"
-			case BitcoinUnit.btc  : return "1 BTC"
+			case BitcoinUnit.sat  : return "1 sat = 0.00\(s)000\(s)001 btc"
+			case BitcoinUnit.bit  : return "1 bit = 0.00\(s)000\(s)100 btc"
+			case BitcoinUnit.mbtc : return "1 mbtc = 0.00\(s)100 btc"
+			case BitcoinUnit.btc  : return "1 btc"
 			default               : break
 		}
 		
