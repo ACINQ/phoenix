@@ -100,12 +100,14 @@ fun ScanDataView(
             is Scan.Model.InvoiceFlow.InvoiceRequest -> {
                 SendLightningPaymentView(
                     paymentRequest = model.paymentRequest,
+                    onBackClick = onBackClick,
                     onPayClick = { postIntent(it) }
                 )
             }
             is Scan.Model.SwapOutFlow -> {
                 SendSwapOutView(
                     model = model,
+                    onBackClick = onBackClick,
                     onInvalidate = { postIntent(it) },
                     onPrepareSwapOutClick = { postIntent(it) },
                     onSendSwapOutClick = { postIntent(it) }

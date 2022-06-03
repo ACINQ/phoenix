@@ -21,10 +21,16 @@ import fr.acinq.bitcoin.utils.Either
 import fr.acinq.lightning.Feature
 import fr.acinq.lightning.Features
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.blockchain.fee.FeeratePerByte
+import fr.acinq.lightning.blockchain.fee.FeeratePerKw
 import fr.acinq.lightning.db.OutgoingPayment
-import fr.acinq.lightning.io.*
+import fr.acinq.lightning.io.ReceivePayment
+import fr.acinq.lightning.io.SendPaymentNormal
+import fr.acinq.lightning.io.SendPaymentSwapOut
+import fr.acinq.lightning.io.SwapOutResponseEvent
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.UUID
+import fr.acinq.lightning.utils.sat
 import fr.acinq.lightning.utils.secure
 import fr.acinq.lightning.utils.toMilliSatoshi
 import fr.acinq.lightning.wire.SwapOutRequest
@@ -36,7 +42,10 @@ import fr.acinq.phoenix.managers.AppConfigurationManager
 import fr.acinq.phoenix.managers.DatabaseManager
 import fr.acinq.phoenix.managers.LNUrlManager
 import fr.acinq.phoenix.managers.PeerManager
-import fr.acinq.phoenix.utils.*
+import fr.acinq.phoenix.utils.Parser
+import fr.acinq.phoenix.utils.PublicSuffixList
+import fr.acinq.phoenix.utils.chain
+import fr.acinq.phoenix.utils.createTrampolineFees
 import io.ktor.http.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
@@ -140,10 +149,12 @@ class AppScanController(
                     lnurlPayMetadata = null,
                     swapOutInfo = intent.address
                 )
-                model(Scan.Model.SwapOutFlow.SendingSwapOut(
-                    address = intent.address,
-                    paymentRequest = intent.paymentRequest
-                ))
+                model(
+                    Scan.Model.SwapOutFlow.SendingSwapOut(
+                        address = intent.address,
+                        paymentRequest = intent.paymentRequest
+                    )
+                )
             }
         }
     }
@@ -557,12 +568,13 @@ class AppScanController(
     private suspend fun prepareSwapOutTransaction(
         intent: Scan.Intent.SwapOutFlow.PrepareSwapOut
     ) {
+        val feeRate = FeeratePerKw(FeeratePerByte((appConfigManager.chainContext.value?.swapOut?.v1?.minFeerateSatByte ?: 20).sat))
         peerManager.getPeer().sendToPeer(
             SwapOutRequest(
                 chainHash = chain.chainHash,
                 amount = intent.amount,
                 bitcoinAddress = intent.address.address,
-                feePerKw = 123456 // FIXME
+                feePerKw = feeRate.toLong()
             )
         )
         model(Scan.Model.SwapOutFlow.RequestingSwapout(intent.address))
