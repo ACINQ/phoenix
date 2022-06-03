@@ -16,12 +16,10 @@
 
 package fr.acinq.phoenix.android.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -147,12 +145,15 @@ fun Card(
     modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    withBorder: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
             .clip(shape)
-            .background(MaterialTheme.colors.surface)
+            .then (
+                if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
+            ).background(MaterialTheme.colors.surface)
             .padding(internalPadding)
     ) {
         content()

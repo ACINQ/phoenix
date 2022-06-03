@@ -149,10 +149,10 @@ fun AmountInput(
                         val msat = d.toMilliSatoshi(rate.price)
 
                         if (msat.toUnit(BitcoinUnit.Btc) > 21e6) {
-                            convertedAmount = context.getString(R.string.send_amount_error_too_large)
+                            convertedAmount = context.getString(R.string.send_error_amount_too_large)
                             null to null
                         } else if (msat < 0.msat) {
-                            convertedAmount = context.getString(R.string.send_amount_error_negative)
+                            convertedAmount = context.getString(R.string.send_error_amount_negative)
                             null to null
                         } else {
                             convertedAmount = msat.toPrettyString(prefBitcoinUnit, withUnit = true)
@@ -162,10 +162,10 @@ fun AmountInput(
                 }
                 is BitcoinUnit -> d.toMilliSatoshi(u).run {
                     if (this.toUnit(BitcoinUnit.Btc) > 21e6) {
-                        convertedAmount = context.getString(R.string.send_amount_error_too_large)
+                        convertedAmount = context.getString(R.string.send_error_amount_too_large)
                         null to null
                     } else if (this < 0.msat) {
-                        convertedAmount = context.getString(R.string.send_amount_error_negative)
+                        convertedAmount = context.getString(R.string.send_error_amount_negative)
                         null to null
                     } else if (rate == null) {
                         convertedAmount = context.getString(R.string.utils_no_conversion)

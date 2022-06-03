@@ -48,12 +48,12 @@ fun BorderButton(
     modifier: Modifier = Modifier,
     text: Int? = null,
     icon: Int? = null,
+    enabled: Boolean = true,
+    space: Dp = 16.dp,
+    textStyle: TextStyle = MaterialTheme.typography.button,
+    padding: PaddingValues = PaddingValues(12.dp),
     isPrimary: Boolean = true,
     onClick: () -> Unit,
-    enabled: Boolean = true,
-    textStyle: TextStyle = MaterialTheme.typography.button,
-    space: Dp = 16.dp,
-    padding: PaddingValues = PaddingValues(12.dp)
 ) {
     Button(
         text = text?.run { stringResource(this) },

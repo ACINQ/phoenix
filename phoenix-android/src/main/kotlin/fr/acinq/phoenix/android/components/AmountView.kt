@@ -16,13 +16,11 @@
 
 package fr.acinq.phoenix.android.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.res.stringResource
@@ -31,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fr.acinq.lightning.MilliSatoshi
 import fr.acinq.phoenix.android.*
+import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.data.CurrencyUnit
 
@@ -71,5 +70,24 @@ fun AmountView(
                     .alignBy(FirstBaseline)
             )
         }
+    }
+}
+
+@Composable
+fun AmountWithFiatView(
+    amount: MilliSatoshi,
+    modifier: Modifier = Modifier,
+    amountTextStyle: TextStyle = MaterialTheme.typography.body1,
+    unitTextStyle: TextStyle = MaterialTheme.typography.body1,
+    separatorSpace: Dp = 4.dp
+) {
+    val prefBtcUnit = LocalBitcoinUnit.current
+    val prefFiatCurrency = LocalFiatCurrency.current
+    val rate = fiatRate
+    val fiatAmount = remember(amount) { amount.toPrettyString(prefFiatCurrency, rate, withUnit = true) }
+
+    Column {
+        AmountView(amount = amount, amountTextStyle = amountTextStyle, unitTextStyle = unitTextStyle, separatorSpace = separatorSpace, modifier = modifier, forceUnit = prefBtcUnit)
+        Text(text = stringResource(id = R.string.utils_converted_amount, fiatAmount), style = MaterialTheme.typography.caption)
     }
 }

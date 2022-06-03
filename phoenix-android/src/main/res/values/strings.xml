@@ -94,7 +94,6 @@
     <string name="paymentline_failed">Failed</string>
     <string name="paymentline_sent_prefix">-</string>
     <string name="paymentline_received_prefix">+</string>
-    <string name="paymentline_no_desc">No description</string>
     <string name="paymentline_keysend_outgoing">Donation</string>
     <string name="paymentline_keysend_incoming">Spontaneous payment</string>
     <string name="paymentline_closing_desc_no_address">Channel closing</string>
@@ -149,13 +148,12 @@
 
     <string name="send_balance_prefix">Balance:</string>
     <string name="send_use_all_balance">Send all</string>
-    <string name="send_loading">Checking payment…</string>
-    <string name="send_invalid_pr_generic">This payment is not valid. You may have scanned an incorrect invoice.\n\nPlease try again.</string>
-    <string name="send_amount_error">Please enter a valid amount.</string>
-    <string name="send_amount_error_balance">Amount exceeds your balance.</string>
-    <string name="send_amount_error_too_large">Amount is too large.</string>
-    <string name="send_amount_error_negative">Amount cannot be negative.</string>
-    <string name="send_amount_error_swap_out_too_small">Min. 10000 sat for on-chain payment.</string>
+    <string name="send_error_amount_too_large">Amount is too large.</string>
+    <string name="send_error_amount_negative">Amount cannot be negative.</string>
+    <string name="send_error_amount_invalid">This is not a valid amount.</string>
+    <string name="send_error_amount_over_balance">This amount exceeds your balance.</string>
+    <string name="send_error_amount_overpaying">Cannot pay more than 2 times the requested amount.</string>
+    <string name="send_error_amount_below_requested">This amount is below the requested amount.</string>
     <string name="send_destination_label">Send to</string>
     <string name="send_description_label">Desc.</string>
     <string name="send_chain_fees_edit">Edit fees</string>
