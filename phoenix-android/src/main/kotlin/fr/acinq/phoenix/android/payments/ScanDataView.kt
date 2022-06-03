@@ -30,7 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,7 +45,7 @@ import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import fr.acinq.phoenix.android.CF
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.Button
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.controllerFactory
@@ -76,7 +79,7 @@ fun ScanDataView(
     MVIView(vm) { model, postIntent ->
         when (model) {
             Scan.Model.Ready, is Scan.Model.BadRequest, is Scan.Model.InvoiceFlow.DangerousRequest,
-                is Scan.Model.LnurlWithdrawFlow, is Scan.Model.LnurlAuthFlow, is Scan.Model.LnurlServiceFetch, is Scan.Model.LnurlPayFlow -> {
+            is Scan.Model.LnurlWithdrawFlow, is Scan.Model.LnurlAuthFlow, is Scan.Model.LnurlServiceFetch, is Scan.Model.LnurlPayFlow -> {
                 ReadDataView(
                     model = model,
                     onBackClick = onBackClick,
@@ -105,13 +108,30 @@ fun ScanDataView(
                 )
             }
             is Scan.Model.SwapOutFlow -> {
-                SendSwapOutView(
-                    model = model,
-                    onBackClick = onBackClick,
-                    onInvalidate = { postIntent(it) },
-                    onPrepareSwapOutClick = { postIntent(it) },
-                    onSendSwapOutClick = { postIntent(it) }
-                )
+                val paymentRequest = model.address.paymentRequest
+                if (paymentRequest == null) {
+                    SendSwapOutView(
+                        model = model,
+                        onBackClick = onBackClick,
+                        onInvalidate = { postIntent(it) },
+                        onPrepareSwapOutClick = { postIntent(it) },
+                        onSendSwapOutClick = { postIntent(it) }
+                    )
+                } else {
+                    var hasPickedSwapOutMode by remember { mutableStateOf(false) }
+                    if (!hasPickedSwapOutMode) {
+                        SwapOutOrLightningDialog(
+                            onPayWithLightningClick = {
+                                hasPickedSwapOutMode = true
+                                postIntent(Scan.Intent.Parse(request = paymentRequest.write()))
+                            },
+                            onPayWithSwapOutClick = {
+                                hasPickedSwapOutMode = true
+                                postIntent(Scan.Intent.Parse(request = model.address.copy(paymentRequest = null).write()))
+                            }
+                        )
+                    }
+                }
             }
             Scan.Model.InvoiceFlow.Sending -> Text("Sending payment...")
         }
@@ -240,4 +260,35 @@ private fun FeedbackText(modifier: Modifier, text: String, onTimeout: () -> Unit
         text = text,
         modifier = modifier
     )
+}
+
+@Composable
+private fun SwapOutOrLightningDialog(
+    onPayWithSwapOutClick: () -> Unit,
+    onPayWithLightningClick: () -> Unit,
+) {
+    Dialog(onDismissRequest = {}, properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)) {
+        DialogBody(isScrollable = true) {
+            Clickable(onClick = { onPayWithSwapOutClick() }) {
+                Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PhoenixIcon(resourceId = R.drawable.ic_chain)
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text(text = stringResource(id = R.string.send_paymentmode_onchain), style = MaterialTheme.typography.body2)
+                        Text(text = stringResource(id = R.string.send_paymentmode_onchain_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+                    }
+                }
+            }
+            Clickable(onClick = { onPayWithLightningClick() }) {
+                Row(modifier = Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PhoenixIcon(resourceId = R.drawable.ic_zap)
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text(text = stringResource(id = R.string.send_paymentmode_lightning), style = MaterialTheme.typography.body2)
+                        Text(text = stringResource(id = R.string.send_paymentmode_lightning_desc), style = MaterialTheme.typography.caption.copy(fontSize = 14.sp))
+                    }
+                }
+            }
+        }
+    }
 }

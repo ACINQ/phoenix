@@ -140,10 +140,16 @@ class ParserTest {
     @Test
     fun parse_bitcoin_uri_with_amount() {
         listOf<Pair<String, Either<BitcoinAddressError, BitcoinAddressInfo>>>(
-            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.78912345" to Either.Right(
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=0.0123" to Either.Right(
                 BitcoinAddressInfo(
                     "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
-                    amount = 178_912_345.sat
+                    amount = 12_30000.sat
+                )
+            ),
+            "bitcoin:bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4?amount=1.23456789" to Either.Right(
+                BitcoinAddressInfo(
+                    "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Chain.Mainnet, BitcoinAddressType.SegWitPubKeyHash, ByteVector.fromHex("751e76e8199196d454941c45d1b3a323f1433bd6"),
+                    amount = 1_234_56789.sat
                 )
             ),
             // invalid amount is ignored

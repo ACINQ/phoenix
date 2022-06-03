@@ -190,19 +190,7 @@ class AppScanController(
     private suspend fun processBitcoinAddress(data: Either<BitcoinAddressError, BitcoinAddressInfo>) {
         logger.info { "processing bitcoin address=$data" }
         val model = when (data) {
-            is Either.Right -> {
-                val addressInfo = data.value
-                if (addressInfo.paymentRequest != null) {
-                    // address contains a valid payment request
-                    Scan.Model.InvoiceFlow.InvoiceRequest(
-                        request = addressInfo.paymentRequest.write(),
-                        paymentRequest = addressInfo.paymentRequest
-                    )
-                } else {
-                    // we can't pay on-chain addresses yet.
-                    Scan.Model.SwapOutFlow.Init(address = addressInfo)
-                }
-            }
+            is Either.Right -> Scan.Model.SwapOutFlow.Init(address = data.value)
             is Either.Left -> {
                 val error = data.value
                 if (error is BitcoinAddressError.ChainMismatch) {

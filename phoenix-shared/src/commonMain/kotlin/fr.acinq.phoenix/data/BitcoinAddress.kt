@@ -43,7 +43,17 @@ data class BitcoinAddressInfo(
     val paymentRequest: PaymentRequest? = null,
     /** Other bip-21 parameters in the URI that we do not handle. */
     val ignoredParams: Parameters = Parameters.Empty,
-)
+) {
+    fun write(): String {
+        val params = Parameters.build {
+            label?.let { append("label", it) }
+            message?.let { append("message", it) }
+            amount?.let { append("amount", (it.toLong().toBigDecimal().movePointLeft(8).toPlainString())) } // amount field is in BTC
+            paymentRequest?.let { append("lightning", it.write()) }
+        }
+        return "bitcoin:$address?${(params + ignoredParams).formUrlEncode()}"
+    }
+}
 
 sealed class BitcoinAddressError {
     data class ChainMismatch(val myChain: Chain, val addrChain: Chain): BitcoinAddressError()

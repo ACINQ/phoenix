@@ -69,20 +69,7 @@ fun Dialog(
     content: @Composable () -> Unit,
 ) {
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss, properties = properties) {
-        Column(
-            Modifier
-                .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
-                .clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colors.surface)
-                .widthIn(max = 600.dp)
-                .then(
-                    if (isScrollable) {
-                        Modifier.verticalScroll(rememberScrollState())
-                    } else {
-                        Modifier
-                    }
-                )
-        ) {
+        DialogBody(isScrollable) {
             // optional title
             title?.run {
                 Text(text = title, modifier = Modifier.padding(24.dp), style = MaterialTheme.typography.subtitle2.copy(fontSize = 20.sp))
@@ -100,6 +87,29 @@ fun Dialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DialogBody(
+    isScrollable: Boolean = true,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        Modifier
+            .padding(vertical = 50.dp, horizontal = 16.dp) // min padding for tall/wide dialogs
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colors.surface)
+            .widthIn(max = 600.dp)
+            .then(
+                if (isScrollable) {
+                    Modifier.verticalScroll(rememberScrollState())
+                } else {
+                    Modifier
+                }
+            )
+    ) {
+        content()
     }
 }
 
@@ -151,9 +161,10 @@ fun Card(
     Column(
         modifier = modifier
             .clip(shape)
-            .then (
+            .then(
                 if (withBorder) Modifier.border(BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary), shape) else Modifier
-            ).background(MaterialTheme.colors.surface)
+            )
+            .background(MaterialTheme.colors.surface)
             .padding(internalPadding)
     ) {
         content()

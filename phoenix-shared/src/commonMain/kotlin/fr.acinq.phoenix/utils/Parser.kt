@@ -83,8 +83,9 @@ object Parser {
         if (requiredParams.isNotEmpty()) {
             return Either.Left(BitcoinAddressError.UnhandledRequiredParams(requiredParams))
         }
-        val amount = url.parameters["amount"]?.toDoubleOrNull()
-            ?.let { (100_000_000L * it).toLong().sat }
+        val amount = url.parameters["amount"]?.toBigDecimalOrNull()
+            ?.movePointRight(8)
+            ?.toLong()?.sat
             ?.takeIf { it > 0.sat && it <= (21_000_000 * 100_000_000L).sat }
         val label = url.parameters["label"]
         val message = url.parameters["message"]
