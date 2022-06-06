@@ -165,7 +165,7 @@ fileprivate struct StandardWalletView : View {
 				}
 				.padding([.top, .bottom], 8)
 				.padding([.leading, .trailing], 16)
-				.background(Capsule().stroke(Color(UIColor.separator)))
+				.background(Capsule().stroke(Color.textFieldBorder))
 				
 				// [Scan QRCode Button]
 				Button {

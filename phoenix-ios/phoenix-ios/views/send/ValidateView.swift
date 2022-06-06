@@ -1175,11 +1175,11 @@ struct ValidateView: View {
 		// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
 		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
 		
-		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
-		let result = TextFieldCurrencyStyler.format(input: amt.digits, currency: currency, hideMsats: false)
+		let amtDbl = Utils.convertBitcoin(msat: msat, to: preferredBitcoinUnit)
+		let amtFrmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit, policy: .showMsatsIfNonZero)
 		
-		parsedAmount = result.1
-		amount = result.0
+		parsedAmount = Result.success(amtDbl)
+		amount = amtFrmt.digits
 	}
 	
 	func commentButtonTapped() {

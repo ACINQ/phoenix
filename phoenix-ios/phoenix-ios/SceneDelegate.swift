@@ -250,6 +250,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 			} else {
 				self.showLockWindow()
 			}
+			
+			if mnemonics == nil && danger == nil && enabledSecurity.isEmpty {
+				// The user doesn't have a wallet yet.
+				//
+				// Issue #282 - Face ID remains enabled between app installs.
+				// Items stored in the iOS keychain remain persisted between iOS installs.
+				// So we clear the flag here.
+				AppSecurity.shared.setSoftBiometrics(enabled: false) { _ in }
+			}
 		}
 	}
 	

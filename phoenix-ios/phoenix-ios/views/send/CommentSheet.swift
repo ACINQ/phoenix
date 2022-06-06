@@ -75,7 +75,7 @@ struct CommentSheet: View {
 				.padding(.all, 4)
 				.background(
 					RoundedRectangle(cornerRadius: 4)
-						.stroke(Color(UIColor.separator), lineWidth: 1)
+						.stroke(Color.textFieldBorder, lineWidth: 1)
 				)
 			
 			HStack(alignment: VerticalAlignment.firstTextBaseline, spacing: 0) {

@@ -631,7 +631,7 @@ fileprivate struct Row: View, ViewName {
 			.padding(.horizontal, 12)
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color(UIColor.separator), lineWidth: 1)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			
 			Text(currency.abbrev)
@@ -823,7 +823,7 @@ fileprivate struct Row_iOS14: View, ViewName {
 			.padding(.horizontal, 12)
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color(UIColor.separator), lineWidth: 1)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			
 			Text(currency.abbrev)
