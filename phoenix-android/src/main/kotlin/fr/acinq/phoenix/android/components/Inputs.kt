@@ -20,6 +20,7 @@ package fr.acinq.phoenix.android.components
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -51,12 +52,10 @@ import fr.acinq.phoenix.android.LocalBitcoinUnit
 import fr.acinq.phoenix.android.LocalFiatCurrency
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.fiatRate
+import fr.acinq.phoenix.android.utils.*
 import fr.acinq.phoenix.android.utils.Converter.toFiat
 import fr.acinq.phoenix.android.utils.Converter.toPlainString
 import fr.acinq.phoenix.android.utils.Converter.toPrettyString
-import fr.acinq.phoenix.android.utils.PhoenixAndroidTheme
-import fr.acinq.phoenix.android.utils.logger
-import fr.acinq.phoenix.android.utils.textFieldColors
 import fr.acinq.phoenix.data.*
 
 @Composable
@@ -70,7 +69,7 @@ fun TextInput(
     onTextChange: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    TextField(
+    OutlinedTextField(
         value = text,
         onValueChange = onTextChange,
         maxLines = maxLines,
@@ -82,82 +81,98 @@ fun TextInput(
         placeholder = placeholder,
         enabled = enabled,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        colors = textFieldColors(),
-        shape = RectangleShape,
+        colors = outlinedTextFieldColors(),
+        shape = RoundedCornerShape(8.dp),
         modifier = modifier
     )
 }
 
 
-@Composable
-fun PercentInput(
-    modifier: Modifier = Modifier,
-    text: String,
-    maxLines: Int = 1,
-    maxChar: Int? = null,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    enabled: Boolean = true,
-    onTextChange: (String) -> Unit,
-) {
-    val focusManager = LocalFocusManager.current
-    var textChars by remember { mutableStateOf(text) }
-    TextField(
-        value = text,
-        onValueChange = { strValue ->
-            val maxCharStr = if (maxChar != null) strValue.take(maxChar) else strValue
-            textChars = maxCharStr.takeIf { it.toDoubleOrNull() != null || it.isEmpty() } ?: textChars
-            onTextChange (textChars)
-        },
-        maxLines = maxLines,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Text
-        ),
-        label = label,
-        placeholder = placeholder,
-        enabled = enabled,
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        colors = textFieldColors(),
-        shape = RectangleShape,
-        modifier = modifier
-    )
-}
-
+/**
+ * @param onValueChange the value in this callback will be null if the input is not valid and an error is
+ *      displayed in the component. If the value is not null, then the value can be assumed to be valid.
+ * @param acceptDecimal if false, an error will be raised when the user enters a value with a decimal part
+ *      and the input will be invalid.
+ */
 @Composable
 fun NumberInput(
     modifier: Modifier = Modifier,
-    maxLines: Int = 1,
-    initialValue: Long,
-    maxChar: Int = 10,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
-    onTextChange: (Long?) -> Unit,
+    initialValue: Double?,
+    onValueChange: (Double?) -> Unit,
+    minValue: Double = 0.0,
+    minErrorMessage: String? = null,
+    maxValue: Double = Double.MAX_VALUE,
+    maxErrorMessage: String? = null,
+    acceptDecimal: Boolean = true,
 ) {
-    var text by remember { mutableStateOf(initialValue.toString()) }
-
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    TextField(
-        value = text,
-        onValueChange = { strValue ->
-            text = strValue.take(maxChar).takeWhile { it.isDigit()}
-            onTextChange (text.toLongOrNull())
-        },
-        singleLine = true,
-        maxLines = maxLines,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Number
-        ),
-        label = label,
-        placeholder = placeholder,
-        enabled = enabled,
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        colors = textFieldColors(),
-        shape = RectangleShape,
-        modifier = modifier
-    )
+    var internalText by remember { mutableStateOf(initialValue?.let { if (acceptDecimal) it.toString() else it.toLong().toString() } ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    fun processValueChange(newValue: String) {
+        errorMessage = ""
+        internalText = newValue
+        if (newValue.isBlank()) {
+            errorMessage = context.getString(R.string.validation_empty)
+            onValueChange(null)
+        } else {
+            val doubleValue = newValue.toDoubleOrNull()
+            when {
+                doubleValue == null -> {
+                    errorMessage = context.getString(R.string.validation_invalid)
+                    onValueChange(null)
+                }
+                !acceptDecimal && doubleValue.rem(1) != 0.0 -> {
+                    errorMessage = context.getString(R.string.validation_no_decimal)
+                    onValueChange(null)
+                }
+                doubleValue < minValue -> {
+                    errorMessage = minErrorMessage ?: context.getString(R.string.validation_below_min, minValue.toString())
+                    onValueChange(null)
+                }
+                doubleValue > maxValue -> {
+                    errorMessage = maxErrorMessage ?: context.getString(R.string.validation_above_max, maxValue.toString())
+                    onValueChange(null)
+                }
+                else -> {
+                    onValueChange(doubleValue)
+                }
+            }
+        }
+    }
+
+    Column {
+        OutlinedTextField(
+            value = internalText,
+            onValueChange = { processValueChange(it) },
+            isError = errorMessage.isNotEmpty(),
+            enabled = enabled,
+            label = label,
+            placeholder = placeholder,
+            singleLine = true,
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Number,
+                capitalization = KeyboardCapitalization.None,
+                autoCorrect = false,
+            ),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            colors = outlinedTextFieldColors(),
+            shape = RoundedCornerShape(8.dp),
+            modifier = modifier.enableOrFade(enabled)
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = if (enabled) errorMessage else "",
+            style = MaterialTheme.typography.body1.copy(color = negativeColor(), fontSize = 13.sp),
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+    }
 }
 
 @Preview

@@ -23,6 +23,7 @@ import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -103,16 +104,21 @@ object UserPrefs {
 
     private val TRAMPOLINE_MAX_BASE_FEE = longPreferencesKey("TRAMPOLINE_MAX_BASE_FEE")
     private val TRAMPOLINE_MAX_PROPORTIONAL_FEE = longPreferencesKey("TRAMPOLINE_MAX_PROPORTIONAL_FEE")
-
-    suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees) = context.userPrefs.edit {
-        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.toLong()
-        it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] = fee.feeProportional
+    fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees?> = prefs(context).map {
+        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE]?.sat
+        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE]
+        if (feeBase != null && feeProportional != null) {
+            TrampolineFees(feeBase, feeProportional, CltvExpiryDelta(144))
+        } else null
     }
-
-    fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees> = prefs(context).map {
-        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE] ?: -1L
-        val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] ?: -1L
-        TrampolineFees(feeBase = Satoshi(feeBase), feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
+    suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees?) = context.userPrefs.edit {
+        if (fee == null) {
+            it.remove(TRAMPOLINE_MAX_BASE_FEE)
+            it.remove(TRAMPOLINE_MAX_PROPORTIONAL_FEE)
+        } else {
+            it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.toLong()
+            it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] = fee.feeProportional
+        }
     }
 
     private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")

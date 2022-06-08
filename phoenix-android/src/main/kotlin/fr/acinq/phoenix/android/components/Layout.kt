@@ -87,13 +87,15 @@ fun Dialog(
         ) {
             // optional title
             title?.run {
-                Text(text = title, modifier = Modifier.padding(24.dp), style = MaterialTheme.typography.subtitle2.copy(fontSize = 20.sp))
+                Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
             }
             // content, must set the padding etc...
             content()
+            Spacer(Modifier.height(24.dp))
             // buttons
             Row(
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
             ) {
                 if (buttons != null) {
                     buttons()

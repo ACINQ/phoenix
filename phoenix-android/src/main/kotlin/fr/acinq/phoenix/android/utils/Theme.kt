@@ -150,13 +150,13 @@ fun typography(palette: Colors) = Typography(
     ),
     h4 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         color = palette.onSurface,
     ),
     h5 = TextStyle(
         fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         color = palette.onSurface,
     ),
@@ -259,6 +259,17 @@ fun whiteLowOp(): Color = Color(0x33ffffff)
 fun textFieldColors() = TextFieldDefaults.textFieldColors(
     focusedLabelColor = MaterialTheme.colors.primary,
     backgroundColor = MaterialTheme.colors.surface,
+)
+
+@Composable
+fun outlinedTextFieldColors() = TextFieldDefaults.outlinedTextFieldColors(
+    focusedLabelColor = MaterialTheme.colors.primary,
+    focusedBorderColor = MaterialTheme.colors.primary,
+    disabledTextColor = MaterialTheme.colors.onSurface,
+    disabledBorderColor = MaterialTheme.colors.onSurface,
+    disabledLabelColor = MaterialTheme.colors.onSurface,
+    disabledPlaceholderColor = MaterialTheme.colors.onSurface,
+
 )
 
 /** Get a color using the old way. Use in legacy AndroidView. */

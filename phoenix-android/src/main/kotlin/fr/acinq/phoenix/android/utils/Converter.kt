@@ -17,19 +17,17 @@
 package fr.acinq.phoenix.android.utils
 
 
-import android.content.Context
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import fr.acinq.bitcoin.scala.BtcAmount
-import fr.acinq.eclair.`CoinUtils$`
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
-import fr.acinq.phoenix.legacy.utils.Prefs
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -124,21 +122,16 @@ object Converter {
         )
     }
 
-    /** Convert a per millionths Long to a percentage String (max 4 decimals). */
-    fun perMillionthsToPercentageString(perMillionths: Long): String {
-        return DecimalFormat("0.00##").apply { roundingMode = RoundingMode.FLOOR }.run {
-            format(perMillionths
-                .coerceAtLeast(0)
-                .toBigDecimal()
-                .divide(BigDecimal.valueOf(1000000))
-                .multiply(BigDecimal(100)))
-        }
-    }
+    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
+    val TrampolineFees.proportionalFeeAsPercentage: Double
+        get() = feeProportional.toBigDecimal().divide(BigDecimal.valueOf(10_000)).toDouble()
 
-    /** Convert a raw stringified percentage to a fee per millionths (decimals after the 4th are ignored). For example, 0.01% becomes 100. */
-    fun percentageToPerMillionths(percent: String): Long {
-        return (DecimalFormat().parse(percent.trim())!!.toDouble() * 1000000 / 100)
-            .toLong()
-            .coerceAtLeast(0)
+    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
+    val TrampolineFees.proportionalFeeAsPercentageString: String
+        get() = DecimalFormat("0.####").format(this.proportionalFeeAsPercentage)
+
+    /** Convert a percentage Long to a fee per millionths Long. For example, 0.01% becomes 100. */
+    fun percentageToPerMillionths(percent: Double): Long {
+        return (percent * 10_000L).toLong().coerceAtLeast(0L)
     }
 }
