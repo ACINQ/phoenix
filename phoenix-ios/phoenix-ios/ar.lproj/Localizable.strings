@@ -473,9 +473,9 @@
 "The address is for %@, but you're on %@" = "العنوان لـ %@ ، لكنك على %@";
 "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "الـ mempool (المعاملات المعلقة) الخاصة بالبيتكوين مزدحمة حالياً والرسوم مرتفعة للغاية. تم تعطيل خدمة مبادلة الايداعات على السلسلة الرئيسية مؤقتًا.";
 /* label text */
-"The closing transaction is in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "معاملة إغلاق القناة موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
+"The closing transaction is in your transactions list." = "معاملة إغلاق القناة موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
 /* label text */
-"The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "معاملات إغلاق القنوات موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
+"The closing transactions are in your transactions list." = "معاملات إغلاق القنوات موجودة في قائمة المعاملات الخاصة بك على __الشاشة الرئيسية__. ويمكنك عرض حالة قنواتك في شاشة __قائمة القنوات__.";
 "The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "يتم تشفير البيانات المخزنة في السحابة، ولا يمكن فك تشفيرها إلا بعبارة الاسترداد الخاصة بك.";
 /* IntroView */
 "The fee is **%@%%** with a minimum fee of **%@**." = "الرسوم **%@٪** مع حد أدنى للرسوم **%@**.";

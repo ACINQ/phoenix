@@ -18,13 +18,13 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfigurationView
 	case PaymentOptionsView
 	case RecoveryPhraseView
+	case CloseChannelsView
 	// Security
 	case AppAccessView
 	// Advanced
 	case PrivacyView
 	case LogsConfigurationView
 	case ChannelsConfigurationView
-	case CloseChannelsView
 	case ForceCloseChannelsView
 }
 
@@ -127,6 +127,16 @@ struct ConfigurationView: View {
 							Image(systemName: "squareshape.split.3x3")
 						}
 					}
+					
+					NavigationLink(
+						destination: CloseChannelsView(),
+						tag: NavLinkTag.CloseChannelsView,
+						selection: $navLinkTag
+					) {
+						Label { Text("Drain wallet") } icon: {
+							Image(systemName: "xmark.circle")
+						}
+					}
 				
 				} // </if: hasWallet>
 				
@@ -161,16 +171,6 @@ struct ConfigurationView: View {
 					}
 				}
 
-				NavigationLink(
-					destination: LogsConfigurationView(),
-					tag: NavLinkTag.LogsConfigurationView,
-					selection: $navLinkTag
-				) {
-					Label { Text("Logs") } icon: {
-						Image(systemName: "doc.text")
-					}
-				}
-
 				if hasWallet {
 
 					NavigationLink(
@@ -183,27 +183,28 @@ struct ConfigurationView: View {
 						}
 					}
 
-					NavigationLink(
-						destination: CloseChannelsView(),
-						tag: NavLinkTag.CloseChannelsView,
-						selection: $navLinkTag
-					) {
-						Label { Text("Close all channels") } icon: {
-							Image(systemName: "xmark.circle")
-						}
-					}
-
-					NavigationLink(
-						destination: ForceCloseChannelsView(),
-						tag: NavLinkTag.ForceCloseChannelsView,
-						selection: $navLinkTag
-					) {
-						Label { Text("Danger zone") } icon: {
-							Image(systemName: "exclamationmark.triangle")
-						}
-					}.foregroundColor(.appNegative)
+//					NavigationLink(
+//						destination: ForceCloseChannelsView(),
+//						tag: NavLinkTag.ForceCloseChannelsView,
+//						selection: $navLinkTag
+//					) {
+//						Label { Text("Danger zone") } icon: {
+//							Image(systemName: "exclamationmark.triangle")
+//						}
+//					}.foregroundColor(.appNegative)
 
 				} // </if: hasWallet>
+				
+				NavigationLink(
+					destination: LogsConfigurationView(),
+					tag: NavLinkTag.LogsConfigurationView,
+					selection: $navLinkTag
+				) {
+					Label { Text("Logs") } icon: {
+						Image(systemName: "doc.text")
+					}
+				}
+				
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
@@ -306,18 +307,14 @@ struct ConfigurationView: View {
 		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
 		// and forcibly undo it.
 		
-		if value == nil {
-			// We reached the final destination of the deep link
-			clearSwiftUiBugWorkaround(delay: 1.0)
-			
-		} else {
+		if let value = value {
 			
 			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-				case .backup   : newNavLinkTag = NavLinkTag.RecoveryPhraseView
-				case .electrum : newNavLinkTag = NavLinkTag.PrivacyView
-				default        : break
+				case .backup      : newNavLinkTag = NavLinkTag.RecoveryPhraseView
+				case .drainWallet : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .electrum    : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
@@ -328,6 +325,10 @@ struct ConfigurationView: View {
 				
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
 			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 1.0)
 		}
 	}
 	
