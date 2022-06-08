@@ -1182,7 +1182,7 @@
 "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Le réseau Bitcoin est saturé et les frais sont très élevés. Le service de swap on-chain a été désactivé temporairement.";
 
 /* label text */
-"The closing transaction is in your transactions list." = "La transaction de fermeture est visible dans la liste des transaction.";
+"The closing transaction is in your transactions list." = "La transaction de fermeture est visible dans la liste des transactions.";
 
 /* No comment provided by engineer. */
 "The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "Les données stockées dans le cloud sont chiffrées, et ne peuvent être lues sans votre clé secrète.";
