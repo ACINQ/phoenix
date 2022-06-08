@@ -344,7 +344,8 @@ class AppScanController(
                         pay = intent.lnurlPay,
                         description = intent.lnurlPay.metadata.plainText,
                         successAction = result.value.successAction
-                    )
+                    ),
+                    userNotes = intent.comment
                 )
                 WalletPaymentMetadataRow.serialize(metadata)?.let { row ->
                     databaseManager.paymentsDb().enqueueMetadata(
