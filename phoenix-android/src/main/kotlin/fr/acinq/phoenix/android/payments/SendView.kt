@@ -23,13 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.acinq.lightning.CltvExpiryDelta
-import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
-import fr.acinq.phoenix.android.components.AmountInput
+import fr.acinq.phoenix.android.components.AmountHeroInput
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
@@ -54,12 +52,9 @@ fun SendView(request: PaymentRequest?) {
         ) {
             var amount by remember { mutableStateOf(request?.amount) }
             Spacer(modifier = Modifier.height(80.dp))
-            AmountInput(
+            AmountHeroInput(
                 initialAmount = amount,
-                onAmountChange = { msat, fiat, fiatUnit ->
-                    amount = msat
-                },
-                useBasicInput = true,
+                onAmountChange = { amount = it?.amount },
                 inputTextSize = 48.sp,
             )
             Spacer(modifier = Modifier.height(24.dp))

@@ -17,10 +17,7 @@
 package fr.acinq.phoenix.android.payments
 
 import androidx.annotation.UiThread
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -33,22 +30,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.lightning.MilliSatoshi
-import fr.acinq.phoenix.android.CF
+import fr.acinq.phoenix.android.*
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
 import fr.acinq.phoenix.android.components.mvi.MVIView
-import fr.acinq.phoenix.android.controllerFactory
-import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.*
+import fr.acinq.phoenix.android.utils.Converter.toPrettyString
 import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.ControllerFactory
 import fr.acinq.phoenix.controllers.ReceiveController
@@ -135,6 +134,7 @@ fun ReceiveView() {
                 vm = vm
             )
             is ReceiveViewState.EditInvoice -> EditInvoiceView(
+                amount = vm.customAmount,
                 description = vm.customDesc,
                 onDescriptionChange = { vm.customDesc = it },
                 onAmountChange = { vm.customAmount = it },
@@ -151,7 +151,8 @@ private fun DefaultView(vm: ReceiveViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
@@ -170,14 +171,23 @@ private fun DefaultView(vm: ReceiveViewModel) {
                     LaunchedEffect(model.request) {
                         vm.generateQrCodeBitmap(invoice = model.request)
                     }
+                    val amount = model.amount
+                    val description = model.desc
                     Spacer(modifier = Modifier.height(24.dp))
                     vm.qrBitmap?.let { QRCode(it) }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    if (amount != null) {
+                        QRCodeDetail(label = stringResource(id = R.string.receive__qr_amount_label), value = amount.toPrettyString(unit = LocalBitcoinUnit.current, rate = null, withUnit = true))
+                    }
+                    if (!description.isNullOrBlank()) {
+                        QRCodeDetail(label = stringResource(id = R.string.receive__qr_desc_label), value = description)
+                    }
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.request) },
                         onShare = { share(context, model.request, subject = "") },
                         onEdit = { vm.state = ReceiveViewState.EditInvoice })
-                    Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     BorderButton(
                         text = R.string.receive__swapin_button,
                         icon = R.drawable.ic_swap,
@@ -185,15 +195,13 @@ private fun DefaultView(vm: ReceiveViewModel) {
                 }
                 is Receive.Model.SwapIn.Requesting -> Text(stringResource(id = R.string.receive__swapin__wait))
                 is Receive.Model.SwapIn.Generated -> {
-                    vm.generateQrCodeBitmap(invoice = model.address)
+                    LaunchedEffect(model.address) {
+                        vm.generateQrCodeBitmap(invoice = model.address)
+                    }
                     Spacer(modifier = Modifier.height(24.dp))
                     vm.qrBitmap?.let { QRCode(it) }
                     Spacer(modifier = Modifier.height(24.dp))
-                    Row(modifier = Modifier.padding(horizontal = 32.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(id = R.string.receive__swapin__address_label))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(model.address, style = monoTypo(), modifier = Modifier.widthIn(32.dp, 250.dp))
-                    }
+                    QRCodeDetail(label = stringResource(id = R.string.receive__swapin__address_label), value = model.address)
                     Spacer(modifier = Modifier.height(24.dp))
                     CopyShareEditButtons(
                         onCopy = { copyToClipboard(context, data = model.address) },
@@ -220,7 +228,7 @@ fun QRCode(bitmap: ImageBitmap) {
     ) {
         Image(
             bitmap = bitmap,
-            contentDescription = "invoice qr code",
+            contentDescription = stringResource(id = R.string.receive__qr_about),
             alignment = Alignment.Center,
             modifier = Modifier
                 .width(220.dp)
@@ -230,12 +238,25 @@ fun QRCode(bitmap: ImageBitmap) {
 }
 
 @Composable
-fun CopyShareEditButtons(
+private fun QRCodeDetail(label: String, value: String) {
+    Row(modifier = Modifier.width(280.dp)) {
+        Text(text = label.uppercase(), style = MaterialTheme.typography.caption.copy(fontSize = 12.sp), modifier = Modifier
+            .alignBy(FirstBaseline)
+            .weight(0.9f), textAlign = TextAlign.End)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = value, modifier = Modifier
+            .alignBy(FirstBaseline)
+            .weight(1f))
+    }
+}
+
+@Composable
+private fun CopyShareEditButtons(
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onEdit: (() -> Unit)?,
 ) {
-    Row {
+    Row(modifier = Modifier.padding(horizontal = 32.dp)) {
         BorderButton(
             icon = R.drawable.ic_copy,
             onClick = onCopy
@@ -258,6 +279,7 @@ fun CopyShareEditButtons(
 
 @Composable
 private fun EditInvoiceView(
+    amount: MilliSatoshi?,
     description: String,
     onDescriptionChange: (String) -> Unit,
     onAmountChange: (MilliSatoshi?) -> Unit,
@@ -272,23 +294,23 @@ private fun EditInvoiceView(
             onBackClick = onCancel
         )
         Card(internalPadding = PaddingValues(16.dp)) {
-            Text(
-                text = stringResource(id = R.string.receive__edit__amount_label),
-                style = MaterialTheme.typography.subtitle1,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
             AmountInput(
-                initialAmount = null,
-                onAmountChange = { amount, amountFiat, fiatCode ->
-                    log.debug { "invoice amount update amount=$amount msat fiat=$amountFiat $fiatCode" }
-                    onAmountChange(amount)
+                initialAmount = amount,
+                label = { Text(text = stringResource(id = R.string.receive__edit__amount_label)) },
+                placeholder = { Text(text = stringResource(id = R.string.receive__edit__amount_placeholder)) },
+                onAmountChange = { complexAmount ->
+                    log.debug { "invoice amount update amount=$complexAmount" }
+                    onAmountChange(complexAmount?.amount)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(16.dp))
             TextInput(
                 text = description,
                 onTextChange = onDescriptionChange,
                 label = { Text(stringResource(id = R.string.receive__edit__desc_label)) },
+                maxLines = 3,
+                maxChars = 180,
                 modifier = Modifier.fillMaxWidth()
             )
         }
