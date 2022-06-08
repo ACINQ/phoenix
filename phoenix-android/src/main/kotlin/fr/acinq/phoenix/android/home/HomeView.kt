@@ -221,10 +221,6 @@ private fun SideMenu(
     }
 }
 
-private fun openLink(context: Context, link: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-}
-
 @Composable
 fun TopBar(showConnectionsDialog: MutableState<Boolean>, connectionsState: State<Connections>) {
     Row(

@@ -23,9 +23,11 @@ import android.text.format.DateUtils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import fr.acinq.lightning.MilliSatoshi
+import fr.acinq.lightning.TrampolineFees
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.data.*
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -118,5 +120,18 @@ object Converter {
                     and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST
                     and Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
         )
+    }
+
+    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
+    val TrampolineFees.proportionalFeeAsPercentage: Double
+        get() = feeProportional.toBigDecimal().divide(BigDecimal.valueOf(10_000)).toDouble()
+
+    /** Convert a per millionths Long to a percentage Long. For example, 100 per millionths is 0.01%. */
+    val TrampolineFees.proportionalFeeAsPercentageString: String
+        get() = DecimalFormat("0.####").format(this.proportionalFeeAsPercentage)
+
+    /** Convert a percentage Long to a fee per millionths Long. For example, 0.01% becomes 100. */
+    fun percentageToPerMillionths(percent: Double): Long {
+        return (percent * 10_000L).toLong().coerceAtLeast(0L)
     }
 }

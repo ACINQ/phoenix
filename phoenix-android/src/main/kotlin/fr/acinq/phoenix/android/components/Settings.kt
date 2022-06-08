@@ -37,7 +37,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.utils.mutedTextColor
 
 @Composable
-fun SettingScreen(isScrollable: Boolean = true, content: @Composable () -> Unit) {
+fun SettingScreen(isScrollable: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -64,7 +64,7 @@ fun SettingHeader(
     ) {
         BackButton(onClick = onBackClick)
         Column(
-            modifier = Modifier.padding(horizontal = 0.dp, vertical = 14.dp),
+            modifier = Modifier.padding(start = 0.dp, end = 16.dp, top = 14.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.Center
         ) {
             title?.run { Text(text = this) }

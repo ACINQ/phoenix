@@ -85,10 +85,6 @@ fun AboutView() {
     }
 }
 
-private fun openLink(context: Context, link: String) {
-    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
-}
-
 @Preview(device = Devices.PIXEL_3A)
 @Composable
 private fun Preview() {
