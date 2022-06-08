@@ -2,6 +2,7 @@ import Foundation
 
 enum DeepLink: String, Equatable {
 	case backup
+	case drainWallet
 	case electrum
 }
 

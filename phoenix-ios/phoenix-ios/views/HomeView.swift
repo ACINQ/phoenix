@@ -825,6 +825,8 @@ struct HomeView : MVIView {
 			switch value {
 			case .backup:
 				self.navLinkTag = .ConfigurationView
+			case .drainWallet:
+				self.navLinkTag = .ConfigurationView
 			case .electrum:
 				self.navLinkTag = .ConfigurationView
 			}
