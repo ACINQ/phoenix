@@ -29,6 +29,7 @@ import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
 import fr.acinq.phoenix.android.components.FilledButton
 import fr.acinq.phoenix.android.components.mvi.MVIControllerViewModel
+import fr.acinq.phoenix.android.payments.ReceiveViewState
 import fr.acinq.phoenix.android.security.EncryptedSeed
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.controllers.ControllerFactory
@@ -80,6 +81,9 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
     /** State of the view */
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)
         private set
+
+    /** State of the view */
+    var restoreWalletState by mutableStateOf<RestoreWalletViewState>(RestoreWalletViewState.Disclaimer)
 
     private val _selectedWords = mutableStateListOf<String>()
     val selectedWords: List<String> = _selectedWords

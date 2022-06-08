@@ -21,9 +21,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +47,12 @@ import fr.acinq.phoenix.android.security.KeyState
 import fr.acinq.phoenix.android.security.SeedManager
 import fr.acinq.phoenix.android.utils.logger
 import fr.acinq.phoenix.controllers.init.RestoreWallet
+
+sealed class RestoreWalletViewState {
+    object Disclaimer : RestoreWalletViewState()
+    object Restore : RestoreWalletViewState()
+    data class Error(val e: Throwable) : RestoreWalletViewState()
+}
 
 @Composable
 fun RestoreWalletView(
@@ -70,157 +78,19 @@ fun RestoreWalletView(
             value = SeedManager.getSeedState(context)
         }
 
-        var filteredWords = remember { listOf<String>() }
-        val selectedWords = vm.selectedWords
-
         when (keyState.value) {
             is KeyState.Absent -> {
-                MVIView(CF::restoreWallet) { model, postIntent ->
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 24.dp, top = 16.dp, bottom = 24.dp, end = 24.dp)
-                            .fillMaxWidth()
-                    ) {
 
-                        var wordsInput by remember { mutableStateOf("") }
-
-                        TextInput(
-                            text = wordsInput,
-                            onTextChange = {
-                                wordsInput = if (it.contains(" ")) {
-                                    if (filteredWords.count() > 0) {
-                                        vm.addWord(filteredWords[0])
-                                    }
-                                    ""
-                                } else {
-                                    it
-                                }
-                                postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
-                            },
-                            enabled = vm.selectedWords.count() < 12,
-                            maxLines = 4,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 24.dp),
-                            isOutlined = true
-                        )
-
-                        when (model) {
-
-                            is RestoreWallet.Model.Ready -> {}
-                            is RestoreWallet.Model.InvalidMnemonics -> {
-                                Text(stringResource(R.string.restore_error))
-                            }
-                            is RestoreWallet.Model.FilteredWordlist -> {
-                                filteredWords = model.words
-                            }
-
-                            is RestoreWallet.Model.ValidMnemonics -> {
-                                val writingState = vm.writingState
-                                if (writingState is WritingSeedState.Error) {
-                                    Text(
-                                        stringResource(
-                                            id = R.string.autocreate_error,
-                                            writingState.e.localizedMessage
-                                                ?: writingState.e::class.java.simpleName
-                                        )
-                                    )
-                                } else {
-                                    Text(stringResource(R.string.restore_in_progress))
-                                    LaunchedEffect(keyState) {
-                                        vm.writeSeed(
-                                            context,
-                                            vm.selectedWords.toList(),
-                                            false,
-                                            onSeedWritten
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-
-                            items(filteredWords) {
-
-                                val apiString = AnnotatedString.Builder()
-                                apiString.pushStyle(
-                                    style = SpanStyle(
-                                        textDecoration = TextDecoration.Underline
-                                    )
-                                )
-                                apiString.append(it)
-                                Text(
-                                    modifier = Modifier.clickable(enabled = true) {
-                                        if (selectedWords.count() < 12) {
-                                            vm.addWord(it)
-                                            wordsInput = ""
-                                            postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
-                                        }
-                                    },
-                                    text = apiString.toAnnotatedString(),
-
-                                    )
-                            }
-                        }
-
-                        Column {
-
-                            Spacer(Modifier.height(24.dp))
-                            HSeparator()
-                            Spacer(Modifier.height(24.dp))
-
-                            Row {
-                                Column(Modifier.weight(1f)) {
-
-                                    for (index in 0..5) {
-                                        WordRow(
-                                            wordNumber = index + 1,
-                                            word = if (selectedWords.count() > index) selectedWords[index] else "",
-                                            crossVisible = selectedWords.count() > index,
-                                            onCrossClick = {
-                                                vm.removeRangeWords(
-                                                    index,
-                                                    selectedWords.count()
-                                                )
-                                            }
-                                        )
-                                        Spacer(Modifier.height(8.dp))
-                                    }
-                                }
-
-                                Column(Modifier.weight(1f)) {
-
-                                    for (index in 6..11) {
-                                        WordRow(
-                                            wordNumber = index + 1,
-                                            word = if (selectedWords.count() > index) selectedWords[index] else "",
-                                            crossVisible = selectedWords.count() > index,
-                                            onCrossClick = {
-                                                vm.removeRangeWords(
-                                                    index,
-                                                    selectedWords.count()
-                                                )
-                                            }
-                                        )
-                                        Spacer(Modifier.height(8.dp))
-                                    }
-                                }
-                            }
-
-                            Spacer(Modifier.height(24.dp))
-                            BorderButton(
-                                text = R.string.restore_import_button,
-                                icon = R.drawable.ic_check_circle,
-                                onClick = {
-                                    postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
-                                },
-                                enabled = selectedWords.count() == 12
-                            )
-                        }
-                    }
+                when (val state = vm.restoreWalletState) {
+                    is RestoreWalletViewState.Disclaimer -> DisclaimerView(onClickNext = {
+                        vm.restoreWalletState = RestoreWalletViewState.Restore
+                    })
+                    is RestoreWalletViewState.Restore -> RestoreView(
+                        vm,
+                        keyState = keyState,
+                        onSeedWritten = onSeedWritten
+                    )
+                    is RestoreWalletViewState.Error -> Text("There was an error: ${state.e.localizedMessage}")
                 }
             }
             KeyState.Unknown -> {
@@ -234,6 +104,199 @@ fun RestoreWalletView(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RestoreView(
+    vm: InitViewModel,
+    keyState: State<KeyState>,
+    onSeedWritten: () -> Unit
+) {
+
+    var filteredWords = remember { listOf<String>() }
+    val selectedWords = vm.selectedWords
+
+    val context = LocalContext.current
+
+    MVIView(CF::restoreWallet) { model, postIntent ->
+        Column(
+            modifier = Modifier
+                .padding(start = 24.dp, top = 16.dp, bottom = 24.dp, end = 24.dp)
+                .fillMaxWidth()
+        ) {
+
+            var wordsInput by remember { mutableStateOf("") }
+
+            TextInput(
+                text = wordsInput,
+                onTextChange = {
+                    wordsInput = if (it.contains(" ")) {
+                        if (filteredWords.count() > 0) {
+                            vm.addWord(filteredWords[0])
+                        }
+                        ""
+                    } else {
+                        it
+                    }
+                    postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
+                },
+                enabled = vm.selectedWords.count() < 12,
+                maxLines = 4,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                isOutlined = true
+            )
+
+            when (model) {
+
+                is RestoreWallet.Model.Ready -> {}
+                is RestoreWallet.Model.InvalidMnemonics -> {
+                    Text(stringResource(R.string.restore_error))
+                }
+                is RestoreWallet.Model.FilteredWordlist -> {
+                    filteredWords = model.words
+                }
+
+                is RestoreWallet.Model.ValidMnemonics -> {
+                    val writingState = vm.writingState
+                    if (writingState is WritingSeedState.Error) {
+                        Text(
+                            stringResource(
+                                id = R.string.autocreate_error,
+                                writingState.e.localizedMessage
+                                    ?: writingState.e::class.java.simpleName
+                            )
+                        )
+                    } else {
+                        Text(stringResource(R.string.restore_in_progress))
+                        LaunchedEffect(keyState) {
+                            vm.writeSeed(
+                                context,
+                                vm.selectedWords.toList(),
+                                false,
+                                onSeedWritten
+                            )
+                        }
+                    }
+                }
+            }
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                items(filteredWords) {
+
+                    val apiString = AnnotatedString.Builder()
+                    apiString.pushStyle(
+                        style = SpanStyle(
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                    apiString.append(it)
+                    Text(
+                        modifier = Modifier.clickable(enabled = true) {
+                            if (selectedWords.count() < 12) {
+                                vm.addWord(it)
+                                wordsInput = ""
+                                postIntent(RestoreWallet.Intent.FilterWordList(predicate = wordsInput))
+                            }
+                        },
+                        text = apiString.toAnnotatedString(),
+
+                        )
+                }
+            }
+
+            Column {
+
+                Spacer(Modifier.height(24.dp))
+                HSeparator()
+                Spacer(Modifier.height(24.dp))
+
+                Row {
+                    Column(Modifier.weight(1f)) {
+
+                        for (index in 0..5) {
+                            WordRow(
+                                wordNumber = index + 1,
+                                word = if (selectedWords.count() > index) selectedWords[index] else "",
+                                crossVisible = selectedWords.count() > index,
+                                onCrossClick = {
+                                    vm.removeRangeWords(
+                                        index,
+                                        selectedWords.count()
+                                    )
+                                }
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+
+                    Column(Modifier.weight(1f)) {
+
+                        for (index in 6..11) {
+                            WordRow(
+                                wordNumber = index + 1,
+                                word = if (selectedWords.count() > index) selectedWords[index] else "",
+                                crossVisible = selectedWords.count() > index,
+                                onCrossClick = {
+                                    vm.removeRangeWords(
+                                        index,
+                                        selectedWords.count()
+                                    )
+                                }
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+                BorderButton(
+                    text = R.string.restore_import_button,
+                    icon = R.drawable.ic_check_circle,
+                    onClick = {
+                        postIntent(RestoreWallet.Intent.Validate(selectedWords.toList()))
+                    },
+                    enabled = selectedWords.count() == 12
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun DisclaimerView(
+    onClickNext: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth()
+    )
+    {
+        var hasCheckedWarning by rememberSaveable { mutableStateOf(false) }
+        Text(stringResource(R.string.restore_disclaimer_message))
+        Row(
+            Modifier.padding(vertical = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                hasCheckedWarning,
+                onCheckedChange = { hasCheckedWarning = it })
+            Spacer(Modifier.width(16.dp))
+            Text(stringResource(R.string.restore_disclaimer_checkbox))
+        }
+        BorderButton(
+            text = R.string.restore_disclaimer_next,
+            icon = R.drawable.ic_arrow_next,
+            onClick = (onClickNext),
+            enabled = hasCheckedWarning
+        )
     }
 }
 

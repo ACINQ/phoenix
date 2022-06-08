@@ -113,14 +113,11 @@ fun AppView(
                 composable(Screen.InitWallet.route) {
                     InitWallet(
                         onCreateWalletClick = { navController.navigate(Screen.CreateWallet.route) },
-                        onRestoreWalletClick = { navController.navigate(Screen.RestoreDisclaimer.route) },
+                        onRestoreWalletClick = { navController.navigate(Screen.RestoreWallet.route) },
                     )
                 }
                 composable(Screen.CreateWallet.route) {
                     CreateWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
-                }
-                composable(Screen.RestoreDisclaimer.route) {
-                    RestoreDisclaimerView (onClickNext = { navController.navigate(Screen.RestoreWallet.route) })
                 }
                 composable(Screen.RestoreWallet.route) {
                     RestoreWalletView(onSeedWritten = { navController.navigate(Screen.Startup.route) })
