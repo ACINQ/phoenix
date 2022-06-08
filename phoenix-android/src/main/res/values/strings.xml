@@ -122,7 +122,7 @@
     <string name="receive__share__button">Share…</string>
 
     <string name="receive__edit__title">Edit my invoice</string>
-    <string name="receive__edit__subtitle">You can change the requested amount and the description of the invoice.</string>
+    <string name="receive__edit__subtitle">The amount and the description of an invoice are editable. Note that invoices are not reusable. A new one must be generated for each payment you receive.</string>
     <string name="receive__edit__amount_label">Amount (optional)</string>
     <string name="receive__edit__desc_label">Description (optional):</string>
     <string name="receive__edit__generate_button">Create invoice</string>

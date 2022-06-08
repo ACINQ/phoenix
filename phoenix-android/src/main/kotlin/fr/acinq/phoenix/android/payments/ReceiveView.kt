@@ -285,16 +285,10 @@ private fun EditInvoiceView(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-        Card(internalPadding = PaddingValues(16.dp)) {
-            Text(
-                text = stringResource(id = R.string.receive__edit__desc_label),
-                style = MaterialTheme.typography.subtitle1,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
             TextInput(
-                text = description, // TODO use value from prefs
+                text = description,
                 onTextChange = onDescriptionChange,
+                label = { Text(stringResource(id = R.string.receive__edit__desc_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
