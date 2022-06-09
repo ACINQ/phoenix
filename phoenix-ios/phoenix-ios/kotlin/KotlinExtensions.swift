@@ -176,14 +176,14 @@ extension Lightning_kmpOutgoingPayment.Part {
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+extension Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 	
 	var completedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.PartStatusFailed {
+extension Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 	
 	var completedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))

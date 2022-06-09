@@ -105,7 +105,7 @@ fun PaymentLine(
                         is OutgoingPayment -> if (payment.details is OutgoingPayment.Details.ChannelClosing) {
                             payment.recipientAmount
                         } else {
-                            payment.parts.map { it.amount }.sum()
+                            payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().map { it.amount }.sum()
                         }
                         is IncomingPayment -> payment.received?.amount ?: 0.msat
                     }
