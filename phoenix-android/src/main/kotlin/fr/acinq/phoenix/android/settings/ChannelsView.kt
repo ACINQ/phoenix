@@ -48,9 +48,7 @@ import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.android.components.mvi.MVIView
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.*
-import fr.acinq.phoenix.android.utils.datastore.UserPrefs
 import fr.acinq.phoenix.controllers.config.ChannelsConfiguration
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChannelsView() {
@@ -65,8 +63,8 @@ fun ChannelsView() {
         )
     }
 
-    ColumnScreen(isScrollable = false) {
-        RowHeader(
+    DefaultScreenLayout(isScrollable = false) {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.listallchannels_title),
         )

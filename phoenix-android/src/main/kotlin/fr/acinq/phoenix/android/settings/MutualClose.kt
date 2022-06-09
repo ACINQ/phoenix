@@ -41,8 +41,8 @@ import fr.acinq.phoenix.controllers.config.CloseChannelsConfiguration
 fun MutualCloseView() {
     val log = logger("MutualCloseView")
     val nc = navController
-    ColumnScreen {
-        RowHeader(
+    DefaultScreenLayout {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.closechannels_mutual_title),
             subtitle = stringResource(id = R.string.closechannels_mutual_subtitle),

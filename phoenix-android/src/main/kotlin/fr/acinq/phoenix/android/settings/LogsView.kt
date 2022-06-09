@@ -25,8 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.ColumnScreen
-import fr.acinq.phoenix.android.components.RowHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.components.SettingButton
 import fr.acinq.phoenix.android.navController
 import fr.acinq.phoenix.android.utils.Logging
@@ -38,8 +38,8 @@ fun LogsView() {
     val nc = navController
     val context = LocalContext.current
 
-    ColumnScreen {
-        RowHeader(
+    DefaultScreenLayout {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.logs_title),
             subtitle = stringResource(id = R.string.logs_subtitle)

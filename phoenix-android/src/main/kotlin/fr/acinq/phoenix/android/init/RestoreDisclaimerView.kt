@@ -31,17 +31,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.components.BorderButton
-import fr.acinq.phoenix.android.components.ColumnScreen
-import fr.acinq.phoenix.android.components.RowHeader
+import fr.acinq.phoenix.android.components.DefaultScreenLayout
+import fr.acinq.phoenix.android.components.DefaultScreenHeader
 import fr.acinq.phoenix.android.navController
 
 @Composable
 fun RestoreDisclaimerView(
     onClickNext: () -> Unit
 ) {
-    ColumnScreen(backgroundColor = Color.Unspecified) {
+    DefaultScreenLayout(backgroundColor = Color.Unspecified) {
         val nc = navController
-        RowHeader(
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
             backgroundColor = Color.Unspecified

@@ -111,6 +111,9 @@
     <!-- //////////////// receive //////////////// -->
 
     <string name="receive__generating">Generating invoice…</string>
+    <string name="receive__qr_about">QR Code of the invoice</string>
+    <string name="receive__qr_amount_label">Amount:</string>
+    <string name="receive__qr_desc_label">Description:</string>
     <string name="receive__error_message">There was an error when generating the invoice (%1$s).\n\nPlease try again.</string>
     <string name="receive__min_amount_pay_to_open"><![CDATA[Your wallet is empty. First payment you receive must be at least <b>%1$s</b>.]]></string>
     <string name="receive__edit_button">Edit</string>
@@ -123,9 +126,11 @@
     <string name="receive__share__button">Share…</string>
 
     <string name="receive__edit__title">Edit my invoice</string>
-    <string name="receive__edit__subtitle">You can change the requested amount and the description of the invoice.</string>
+    <string name="receive__edit__subtitle">The amount and the description of an invoice are optional and can be edited.</string>
     <string name="receive__edit__amount_label">Amount (optional)</string>
+    <string name="receive__edit__amount_placeholder">Any amount</string>
     <string name="receive__edit__desc_label">Description (optional):</string>
+    <string name="receive__edit__desc_placeholder">This invoice will have no description</string>
     <string name="receive__edit__generate_button">Create invoice</string>
 
     <string name="receive__swapin__error_message">Could not retrieve a Bitcoin address from the swap service.\n\nTry again later.</string>
@@ -221,6 +226,14 @@
     <string name="utils_date_just_now">just now</string>
     <string name="utils_unknown">N/A</string>
     <string name="utils_copied">Copied to clipboard!</string>
+
+    <string name="accessibility_link">Open a link in a browser</string>
+    <string name="validation_empty">This field cannot be blank</string>
+    <string name="validation_invalid_number">Please enter a valid number</string>
+    <string name="validation_no_decimal">This field must be an integer</string>
+    <string name="validation_below_min">Must be at least %1$s</string>
+    <string name="validation_above_max">Must be no more than %1$s</string>
+
     <string name="btn_back">Go back</string>
     <string name="btn_next">Next</string>
     <string name="btn_copy">Copy</string>
@@ -384,6 +397,7 @@
 
     <!-- //////////////// payment details //////////////// -->
 
+    <string name="paymentdetails_title">Payment details</string>
     <string name="paymentdetails_loading">Loading payment details…</string>
     <string name="paymentdetails_error">There was an error when retrieving the details for this payment:\n\nCause:%1$s</string>
 
@@ -403,16 +417,14 @@
     <string name="paymentdetails_pay_to_open_label">Fees</string>
     <string name="paymentdetails_pay_to_open_desc">This fee covers the cost of opening a new payment channel.</string>
     <string name="paymentdetails_error_label">Error</string>
-    <string name="paymentdetails_closing_desc">Payment for closing channel %1$s…</string>
-    <string name="paymentdetails_swap_out_desc">Payment to on-chain address</string>
     <string name="paymentdetails_no_description">No description</string>
     <string name="paymentdetails_address_label">Address</string>
     <string name="paymentdetails_address_open_explorer">Show in explorer</string>
     <string name="paymentdetails_info_uniclose"><![CDATA[
-    This payment happened following a conflict in a channel. Funds will be sent to your on-chain address: %1$s.
-    <br /><br />
-    To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
-  ]]></string>
+      This payment happened following a conflict in a channel. Funds will be sent to your on-chain address: %1$s.
+      <br /><br />
+      To recover your funds, follow <a href="https://phoenix.acinq.co/faq#my-channels-got-force-closed-how-do-i-recover-my-money">the FAQ instructions</a>.
+    ]]></string>
 
     <string name="paymentdetails_edit_dialog_title">Add a custom description to this payment</string>
     <string name="paymentdetails_edit_button">Edit</string>
@@ -425,21 +437,54 @@
 
     <!-- //////////////// payment details: technicals data //////////////// -->
 
-    <string name="paymentdetails_technicals_title">Payment data</string>
-    <string name="paymentdetails_swap_out_feerate_label">Swap fee rate</string>
+    <string name="paymentdetails_payment_type_label">Type of payment</string>
+    <string name="paymentdetails_normal_outgoing">Standard outgoing Lightning payment</string>
+    <string name="paymentdetails_normal_incoming">Standard incoming Lightning payment</string>
+    <string name="paymentdetails_swapin">Swap-in Bitcoin deposit</string>
+    <string name="paymentdetails_swapout">Swap-out to Bitcoin address</string>
+    <string name="paymentdetails_closing">Closing channel</string>
+    <string name="paymentdetails_keysend">Keysend (spontaneous payment)</string>
+    <string name="paymentdetails_swapin_address_label">Deposit address</string>
+    <string name="paymentdetails_swapout_address_label">Bitcoin address</string>
+
+    <string name="paymentdetails_closing_channel_label">Id of the channel</string>
+    <string name="paymentdetails_closing_address_label">Closing address</string>
     <string name="paymentdetails_closing_type_label">Closing type</string>
     <string name="paymentdetails_closing_type_mutual">Mutual closing</string>
     <string name="paymentdetails_closing_type_local">Local</string>
     <string name="paymentdetails_closing_type_remote">Remote</string>
     <string name="paymentdetails_closing_type_other">Other</string>
-    <string name="paymentdetails_closing_channel_label">Closed channel</string>
-    <string name="paymentdetails_closing_spending_txs_label">Closing transactions</string>
+
     <string name="paymentdetails_pubkey_label">Target public key</string>
+    <string name="paymentdetails_payment_request_description_label">Invoice description</string>
     <string name="paymentdetails_payment_hash_label">Payment Hash</string>
-    <string name="paymentdetails_payment_request_label">Payment Request</string>
+    <string name="paymentdetails_payment_request_label">Invoice</string>
     <string name="paymentdetails_preimage_label">Preimage</string>
+
+    <string name="paymentdetails_status_label">Payment status</string>
+    <string name="paymentdetails_status_success">Successful</string>
+    <string name="paymentdetails_status_pending">Pending</string>
+    <string name="paymentdetails_status_failed">Failed</string>
+
+    <string name="paymentdetails_parts_label">Payment parts</string>
+    <string name="paymentdetails_part_label">Part</string>
+    <string name="paymentdetails_part_hops_label">Hops</string>
+
+    <string name="paymentdetails_received_with_label">Received via</string>
+    <string name="paymentdetails_received_with_channel">New channel (automatically created)</string>
+    <string name="paymentdetails_received_with_lightning">Lightning payment</string>
+    <string name="paymentdetails_channel_id_label">Channel id</string>
+
     <string name="paymentdetails_created_at_label">Created at</string>
     <string name="paymentdetails_completed_at_label">Completed at</string>
+    <string name="paymentdetails_elapsed_label">Elapsed</string>
+    <string name="paymentdetails_elapsed">%1$s ms</string>
+
+    <string name="paymentdetails_invoice_requested_label">Amount requested</string>
+    <string name="paymentdetails_amount_sent_label">Amount sent</string>
+    <string name="paymentdetails_amount_received_label">Amount received</string>
+    <string name="paymentdetails_amount_rate_now">≈ %1$s (now)</string>
+    <string name="paymentdetails_amount_rate_then">≈ %1$s (then)</string>
 
     <!-- //////////////// channel state state //////////////// -->
 
@@ -602,11 +647,20 @@
     <string name="paymentsettings_title">Payment settings</string>
     <string name="paymentsettings_subtitle">Set various options regarding payments you send or receive.</string>
 
-    <string name="paymentsettings_defaultdesc_title">Default payment description</string>
+    <string name="paymentsettings_defaultdesc_title">Incoming payment description</string>
     <string name="paymentsettings_defaultdesc_none">No description set…</string>
     <string name="paymentsettings_defaultdesc_dialog_title">Default description</string>
     <string name="paymentsettings_defaultdesc_dialog_description">Payment requests that you create will use this description. You can override it on a case-by-case basis.</string>
     <string name="paymentsettings_defaultdesc_dialog_hint">Enter a description</string>
+
+    <string name="paymentsettings_expiry_title">Incoming payment expiry</string>
+    <string name="paymentsettings_expiry_dialog_title">Payment expiry</string>
+    <string name="paymentsettings_expiry_dialog_description">Payment requests generated by your wallet are stale after this delay. Default value is 1 week.</string>
+
+    <string name="paymentsettings_expiry_one_week">1 week</string>
+    <string name="paymentsettings_expiry_two_weeks">2 weeks</string>
+    <string name="paymentsettings_expiry_three_weeks">3 weeks</string>
+    <string name="paymentsettings_expiry_value">%1$s seconds</string>
 
     <string name="paymentsettings_paytoopen_auto_title">Automatically accept channel opening</string>
     <string name="paymentsettings_paytoopen_auto_desc">It is sometimes necessary to create a new Lightning payment channel in order to receive an incoming payment.\n\nIn this case a fee of %1$s%% is deducted from the amount received, to cover the cost of creating the channel.</string>
@@ -620,6 +674,17 @@
     <string name="paymentsettings_trampoline_fees_dialog_base_fee_hint">Enter a base fee in satoshi</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_label">Proportional fee (%)</string>
     <string name="paymentsettings_trampoline_fees_dialog_proportional_fee_hint">Enter a proportional fee in %</string>
+    <string name="paymentsettings_trampoline_fees_dialog_invalid">Enter a valid maximum fee setting</string>
+    <string name="paymentsettings_trampoline_fees_dialog_base_below_min">Base fee must be at least %1$s.</string>
+    <string name="paymentsettings_trampoline_fees_dialog_base_above_max">Base fee cannot exceed %1$s.</string>
+    <string name="paymentsettings_trampoline_fees_dialog_proportional_below_min">Proportional fee must be at least %1$s%%.</string>
+    <string name="paymentsettings_trampoline_fees_dialog_proportional_above_max">Proportional fee cannot exceed %1$s%%.</string>
+
+    <string name="paymentsettings_paytoopen_fees_title">Fee for on-the-fly channel creation</string>
+    <string name="paymentsettings_paytoopen_fees_desc">%1$s%% (%2$s sat minimum)</string>
+    <string name="paymentsettings_paytoopen_fees_dialog_title">On-the-fly channels</string>
+    <string name="paymentsettings_paytoopen_fees_dialog_message">This fee applies when you receive a payment over Lightning and a new channel needs to be created.</string>
+    <string name="paymentsettings_paytoopen_fees_dialog_message_clickable">See the FAQ for more information</string>
 
     <!-- ////////////// migration result dialog //////////////// -->
 

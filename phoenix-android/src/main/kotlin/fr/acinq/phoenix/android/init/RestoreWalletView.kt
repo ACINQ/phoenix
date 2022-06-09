@@ -58,10 +58,10 @@ sealed class RestoreWalletViewState {
 fun RestoreWalletView(
     onSeedWritten: () -> Unit
 ) {
-    ColumnScreen(backgroundColor = Color.Unspecified) {
+    DefaultScreenLayout(backgroundColor = Color.Unspecified) {
 
         val nc = navController
-        RowHeader(
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.restore_title),
             subtitle = stringResource(id = R.string.restore_instructions),
@@ -146,11 +146,9 @@ private fun RestoreView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 24.dp),
-                isOutlined = true
             )
 
             when (model) {
-
                 is RestoreWallet.Model.Ready -> {}
                 is RestoreWallet.Model.InvalidMnemonics -> {
                     Text(stringResource(R.string.restore_error))
@@ -158,7 +156,6 @@ private fun RestoreView(
                 is RestoreWallet.Model.FilteredWordlist -> {
                     filteredWords = model.words
                 }
-
                 is RestoreWallet.Model.ValidMnemonics -> {
                     val writingState = vm.writingState
                     if (writingState is WritingSeedState.Error) {

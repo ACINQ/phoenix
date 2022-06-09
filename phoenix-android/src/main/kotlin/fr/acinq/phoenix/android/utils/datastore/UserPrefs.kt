@@ -23,9 +23,11 @@ import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
 import fr.acinq.lightning.utils.ServerAddress
+import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
+import fr.acinq.phoenix.legacy.TrampolineFeeSetting
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -103,15 +105,20 @@ object UserPrefs {
     private val TRAMPOLINE_MAX_BASE_FEE = longPreferencesKey("TRAMPOLINE_MAX_BASE_FEE")
     private val TRAMPOLINE_MAX_PROPORTIONAL_FEE = longPreferencesKey("TRAMPOLINE_MAX_PROPORTIONAL_FEE")
     fun getTrampolineMaxFee(context: Context): Flow<TrampolineFees?> = prefs(context).map {
-        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE]?.let { Satoshi(it) }
+        val feeBase = it[TRAMPOLINE_MAX_BASE_FEE]?.sat
         val feeProportional = it[TRAMPOLINE_MAX_PROPORTIONAL_FEE]
         if (feeBase != null && feeProportional != null) {
-            TrampolineFees(feeBase = feeBase, feeProportional = feeProportional, cltvExpiryDelta = CltvExpiryDelta(144))
+            TrampolineFees(feeBase, feeProportional, CltvExpiryDelta(144))
         } else null
     }
-    suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees) = context.userPrefs.edit {
-        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.sat
-        it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeProportional
+    suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees?) = context.userPrefs.edit {
+        if (fee == null) {
+            it.remove(TRAMPOLINE_MAX_BASE_FEE)
+            it.remove(TRAMPOLINE_MAX_PROPORTIONAL_FEE)
+        } else {
+            it[TRAMPOLINE_MAX_BASE_FEE] = fee.feeBase.toLong()
+            it[TRAMPOLINE_MAX_PROPORTIONAL_FEE] = fee.feeProportional
+        }
     }
 
     private val AUTO_PAY_TO_OPEN = booleanPreferencesKey("AUTO_PAY_TO_OPEN")

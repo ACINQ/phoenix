@@ -87,13 +87,15 @@ fun Dialog(
         ) {
             // optional title
             title?.run {
-                Text(text = title, modifier = Modifier.padding(24.dp), style = MaterialTheme.typography.subtitle2.copy(fontSize = 20.sp))
+                Text(text = title, modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 12.dp), style = MaterialTheme.typography.h4)
             }
             // content, must set the padding etc...
             content()
+            Spacer(Modifier.height(24.dp))
             // buttons
             Row(
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
             ) {
                 if (buttons != null) {
                     buttons()
@@ -105,9 +107,9 @@ fun Dialog(
     }
 }
 
-
+/** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
 @Composable
-fun ColumnScreen(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable () -> Unit) {
+fun DefaultScreenLayout(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -119,8 +121,9 @@ fun ColumnScreen(isScrollable: Boolean = true, backgroundColor: Color = Material
     }
 }
 
+/** The default header of a screen contains a back button, an optional title and an optional subtitle (which uses a muted typo style). */
 @Composable
-fun RowHeader(
+fun DefaultScreenHeader(
     title: String? = null,
     subtitle: String? = null,
     onBackClick: () -> Unit,
@@ -134,7 +137,7 @@ fun RowHeader(
     ) {
         BackButton(onClick = onBackClick)
         Column(
-            modifier = Modifier.padding(horizontal = 0.dp, vertical = 14.dp),
+            modifier = Modifier.padding(start = 0.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.Center
         ) {
             title?.run { Text(text = this) }
@@ -188,13 +191,15 @@ fun Card(
     modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
             .clip(shape)
             .background(MaterialTheme.colors.surface)
-            .padding(internalPadding)
+            .padding(internalPadding),
+        verticalArrangement = verticalArrangement
     ) {
         content()
     }

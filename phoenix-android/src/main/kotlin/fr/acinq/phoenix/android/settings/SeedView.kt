@@ -60,8 +60,8 @@ fun SeedView() {
     val scope = rememberCoroutineScope()
     var state by remember { mutableStateOf<SeedViewState>(SeedViewState.Init) }
 
-    ColumnScreen {
-        RowHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
+    DefaultScreenLayout {
+        DefaultScreenHeader(onBackClick = { nc.popBackStack() }, title = stringResource(id = R.string.displayseed_title))
         Card(internalPadding = PaddingValues(16.dp)) {
             Text(text = annotatedStringResource(id = R.string.displayseed_instructions))
         }

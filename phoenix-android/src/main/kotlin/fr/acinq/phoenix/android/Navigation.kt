@@ -44,6 +44,7 @@ sealed class Screen(val route: String) {
     object Preferences : Screen("settings/preferences")
     object About : Screen("settings/about")
     object AppLock : Screen("settings/applock")
+    object PaymentSettings : Screen("settings/paymentsettings")
     object Logs : Screen("settings/logs")
 }
 
