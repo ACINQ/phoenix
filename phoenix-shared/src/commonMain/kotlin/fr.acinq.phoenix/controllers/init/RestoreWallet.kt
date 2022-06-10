@@ -16,7 +16,7 @@ object RestoreWallet {
         }
 
         object InvalidMnemonics : Model()
-        data class ValidMnemonics(val seed: ByteArray) : Model() {
+        data class ValidMnemonics(val mnemonics: List<String>, val seed: ByteArray) : Model() {
 
             // Kotlin recommends equals & hashCode for data classes with array props
             override fun equals(other: Any?): Boolean {

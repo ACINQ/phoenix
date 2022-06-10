@@ -231,7 +231,8 @@ private fun DefaultDescriptionInvoiceDialog(
                 text = paymentDescription,
                 label = { Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
                 onTextChange = { paymentDescription = it },
-                enabled = true
+                maxLines = 3,
+                maxChars = 180,
             )
         }
     }

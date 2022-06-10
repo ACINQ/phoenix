@@ -151,10 +151,11 @@ fun DefaultScreenHeader(
 
 @Composable
 fun HSeparator(
+    modifier: Modifier = Modifier,
     width: Dp? = null,
 ) {
     Box(
-        (width?.run { Modifier.width(width) } ?: Modifier.fillMaxWidth())
+        (width?.run { modifier.width(width) } ?: modifier.fillMaxWidth())
             .height(1.dp)
             .background(color = borderColor())
     )
@@ -188,17 +189,22 @@ fun PrimarySeparator(
 
 @Composable
 fun Card(
-    modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    modifier: Modifier = Modifier,
+    externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
+            .padding(externalPadding)
+            .widthIn(max = 500.dp)
             .clip(shape)
             .background(MaterialTheme.colors.surface)
             .padding(internalPadding),
+        horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement
     ) {
         content()

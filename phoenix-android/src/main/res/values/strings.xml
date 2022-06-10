@@ -34,14 +34,15 @@
     <!-- //////////////// init wallet / automated wallet creation //////////////// -->
 
     <string name="restore_title">Restore my wallet</string>
-    <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nAlso, make sure that you don\'t have another Phoenix wallet running with the same seed.</string>
+    <string name="restore_disclaimer_message">Do not import a seed that was NOT created by this application.\n\nAlso, make sure you are not already running another Phoenix wallet with the same seed.</string>
     <string name="restore_disclaimer_checkbox">I understand.</string>
     <string name="restore_disclaimer_next">Next</string>
-    <string name="restore_instructions">Your wallet\'s seed is a list of 12 english words.</string>
-    <string name="restore_mnemonics_label">Use the keyboard below to enter the seed:</string>
+    <string name="restore_instructions">Your wallet\'s seed is a list of 12 English words</string>
+    <string name="restore_input_label">Enter keywords from your seed.</string>
+    <string name="restore_input_invalid">This is not a valid word.</string>
+    <string name="restore_seed_invalid">This seed is not valid.\nMake sure you entered the words\nin the correct order.</string>
     <string name="restore_in_progress">Restoring your wallet…</string>
     <string name="restore_import_button">Import</string>
-    <string name="restore_error">This seed is invalid and cannot be imported.\n\nPlease try again</string>
 
     <!-- //////////////// Auth prompt (v2) //////////////////// -->
 
