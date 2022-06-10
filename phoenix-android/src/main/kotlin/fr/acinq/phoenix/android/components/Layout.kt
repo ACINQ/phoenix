@@ -107,12 +107,55 @@ fun Dialog(
     }
 }
 
+/** The default screen is a full-height, full-width column with the material theme's background color. It is scrollable by default. */
+@Composable
+fun DefaultScreenLayout(isScrollable: Boolean = true, backgroundColor: Color = MaterialTheme.colors.background, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(backgroundColor)
+            .then(if (isScrollable) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+    ) {
+        content()
+    }
+}
+
+/** The default header of a screen contains a back button, an optional title and an optional subtitle (which uses a muted typo style). */
+@Composable
+fun DefaultScreenHeader(
+    title: String? = null,
+    subtitle: String? = null,
+    onBackClick: () -> Unit,
+    backgroundColor: Color = MaterialTheme.colors.background,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .padding(horizontal = 0.dp, vertical = 6.dp),
+    ) {
+        BackButton(onClick = onBackClick)
+        Column(
+            modifier = Modifier.padding(start = 0.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            title?.run { Text(text = this) }
+            subtitle?.run {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = this, style = TextStyle(color = mutedTextColor(), fontSize = 14.sp))
+            }
+        }
+    }
+}
+
 @Composable
 fun HSeparator(
+    modifier: Modifier = Modifier,
     width: Dp? = null,
 ) {
     Box(
-        (width?.run { Modifier.width(width) } ?: Modifier.fillMaxWidth())
+        (width?.run { modifier.width(width) } ?: modifier.fillMaxWidth())
             .height(1.dp)
             .background(color = borderColor())
     )
@@ -146,17 +189,22 @@ fun PrimarySeparator(
 
 @Composable
 fun Card(
-    modifier: Modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+    modifier: Modifier = Modifier,
+    externalPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     internalPadding: PaddingValues = PaddingValues(0.dp),
     shape: Shape = RoundedCornerShape(16.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
+            .padding(externalPadding)
+            .widthIn(max = 500.dp)
             .clip(shape)
             .background(MaterialTheme.colors.surface)
             .padding(internalPadding),
+        horizontalAlignment = horizontalAlignment,
         verticalArrangement = verticalArrangement
     ) {
         content()

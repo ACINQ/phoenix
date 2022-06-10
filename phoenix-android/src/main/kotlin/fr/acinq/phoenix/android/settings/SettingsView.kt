@@ -32,8 +32,8 @@ import fr.acinq.phoenix.android.navigate
 @Composable
 fun SettingsView() {
     val nc = navController
-    SettingScreen {
-        SettingHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
+    DefaultScreenLayout {
+        DefaultScreenHeader(title = stringResource(id = R.string.menu_settings), onBackClick = { nc.popBackStack() })
         // -- general
         SettingCategory(R.string.settings_general_title)
         Card {

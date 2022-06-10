@@ -16,7 +16,6 @@
 
 package fr.acinq.phoenix.android.components
 
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,8 +27,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import fr.acinq.phoenix.android.isDarkTheme
 import fr.acinq.phoenix.android.utils.gray300
 import fr.acinq.phoenix.android.utils.gray600
@@ -39,12 +38,13 @@ fun Checkbox(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(vertical = 16.dp, horizontal = 0.dp)
 ) {
     var internalChecked by rememberSaveable { mutableStateOf(checked) }
     val interactionSource = remember { MutableInteractionSource() }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .clickable(interactionSource = interactionSource, indication = null, role = Role.Checkbox) {
                 internalChecked = !internalChecked
                 onCheckedChange(internalChecked)

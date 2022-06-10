@@ -45,7 +45,7 @@ class AppRestoreWalletController(
                 try {
                     MnemonicCode.validate(intent.mnemonics)
                     val seed = MnemonicCode.toSeed(intent.mnemonics, passphrase = "")
-                    launch { model(RestoreWallet.Model.ValidMnemonics(seed)) }
+                    launch { model(RestoreWallet.Model.ValidMnemonics(intent.mnemonics, seed)) }
                 } catch (e: IllegalArgumentException) {
                     launch { model(RestoreWallet.Model.InvalidMnemonics) }
                 }

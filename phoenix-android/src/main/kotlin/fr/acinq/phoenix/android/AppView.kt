@@ -35,9 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.phoenix.android.home.*
-import fr.acinq.phoenix.android.init.CreateWalletView
-import fr.acinq.phoenix.android.init.InitWallet
-import fr.acinq.phoenix.android.init.RestoreWalletView
+import fr.acinq.phoenix.android.init.*
 import fr.acinq.phoenix.android.payments.PaymentDetailsView
 import fr.acinq.phoenix.android.payments.ReceiveView
 import fr.acinq.phoenix.android.payments.SendView

@@ -29,9 +29,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.acinq.phoenix.android.R
 import fr.acinq.phoenix.android.business
-import fr.acinq.phoenix.android.components.Card
-import fr.acinq.phoenix.android.components.SettingHeader
-import fr.acinq.phoenix.android.components.SettingScreen
+import fr.acinq.phoenix.android.components.*
 import fr.acinq.phoenix.data.WalletPaymentFetchOptions
 import fr.acinq.phoenix.data.WalletPaymentId
 import fr.acinq.phoenix.data.WalletPaymentInfo
@@ -87,8 +85,8 @@ fun PaymentDetailsView(
         vm.getPayment(paymentId)
     }
     val state = vm.state
-    SettingScreen() {
-        SettingHeader(
+    DefaultScreenLayout() {
+        DefaultScreenHeader(
             onBackClick = {
                 if (state is PaymentDetailsState.Success.TechnicalDetails) {
                     vm.state = PaymentDetailsState.Success.Splash(state.payment)

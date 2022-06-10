@@ -209,8 +209,11 @@ fun Button(
 fun Clickable(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.button,
     backgroundColor: Color = Color.Unspecified, // transparent by default!
+    clickDescription: String = "",
+    internalPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable () -> Unit,
 ) {
     val colors = ButtonDefaults.buttonColors(
@@ -225,8 +228,11 @@ fun Clickable(
         modifier = modifier
             .clickable(
                 onClick = onClick,
+                enabled = enabled,
                 role = Role.Button,
+                onClickLabel = clickDescription,
             )
+            .padding(internalPadding)
     ) {
         CompositionLocalProvider(LocalContentAlpha provides contentColor.alpha) {
             ProvideTextStyle(value = textStyle) {

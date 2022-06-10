@@ -84,6 +84,32 @@ internal class InitViewModel(controller: InitializationController) : MVIControll
     var writingState by mutableStateOf<WritingSeedState>(WritingSeedState.Init)
         private set
 
+    /** State of the view */
+    var restoreWalletState by mutableStateOf<RestoreWalletViewState>(RestoreWalletViewState.Disclaimer)
+
+    var mnemonics by mutableStateOf(arrayOfNulls<String>(12))
+        private set
+
+    fun appendWordToMnemonic(word: String) {
+        val index = mnemonics.indexOfFirst { it == null }
+        if (index in 0..11) {
+            mnemonics = mnemonics.copyOf().also { it[index] = word }
+        }
+    }
+
+    fun removeWordsFromMnemonic(from: Int) {
+        if (from in 0..11) {
+            mnemonics = mnemonics.copyOf().also { it.fill(null, from) }
+        }
+    }
+
+    /**
+     * Attempts to write a seed on disk and updates the view model state. If a seed already
+     * exists on disk, this method will not fail but it will not overwrite the existing file.
+     *
+     * @param isNewWallet when false, we will need to start the legacy app because this seed
+     *          may be attached to a legacy wallet.
+     */
     suspend fun writeSeed(
         context: Context,
         mnemonics: List<String>,

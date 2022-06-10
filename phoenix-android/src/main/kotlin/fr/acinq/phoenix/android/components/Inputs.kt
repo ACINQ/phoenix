@@ -46,6 +46,7 @@ fun TextInput(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 1,
+    singleLine: Boolean = false,
     maxChars: Int? = null,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -63,6 +64,7 @@ fun TextInput(
                 }
             },
             maxLines = maxLines,
+            singleLine = singleLine,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Text
@@ -73,7 +75,7 @@ fun TextInput(
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             colors = outlinedTextFieldColors(),
             shape = RoundedCornerShape(8.dp),
-            modifier = modifier
+            modifier = modifier.enableOrFade(enabled)
         )
         if (maxChars != null) {
             Spacer(Modifier.height(4.dp))

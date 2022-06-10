@@ -67,7 +67,7 @@ val gray600 = Color(0xFF5F6A8A)
 val gray500 = Color(0xFF73899E)
 val gray400 = Color(0xFF8B99AD)
 val gray300 = Color(0xff99a2b6)
-val gray200 = Color(0xffb5bccc)
+val gray200 = Color(0xFFB5BBC9)
 val gray100 = Color(0xffd1d7e3)
 val gray70 = Color(0xffe1eBeD)
 val gray50 = Color(0xFFE9F1F3)
@@ -238,7 +238,7 @@ fun negativeColor(): Color = if (isDarkTheme) red500 else red300
 fun positiveColor(): Color = if (isDarkTheme) green else applegreen
 
 @Composable
-fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray400
+fun mutedTextColor(): Color = if (isDarkTheme) gray600 else gray200
 
 @Composable
 fun mutedBgColor(): Color = if (isDarkTheme) gray950 else gray30

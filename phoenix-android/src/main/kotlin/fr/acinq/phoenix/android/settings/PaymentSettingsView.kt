@@ -70,8 +70,8 @@ fun PaymentSettingsView() {
     val prefsTrampolineMaxFee by UserPrefs.getTrampolineMaxFee(LocalContext.current).collectAsState(null)
     val trampolineFees = prefsTrampolineMaxFee ?: walletContext?.trampoline?.v2?.attempts?.last()?.export()
 
-    SettingScreen {
-        SettingHeader(
+    DefaultScreenLayout {
+        DefaultScreenHeader(
             onBackClick = { nc.popBackStack() },
             title = stringResource(id = R.string.paymentsettings_title),
             subtitle = stringResource(id = R.string.paymentsettings_subtitle)
@@ -231,7 +231,8 @@ private fun DefaultDescriptionInvoiceDialog(
                 text = paymentDescription,
                 label = { Text(stringResource(id = R.string.paymentsettings_defaultdesc_dialog_hint)) },
                 onTextChange = { paymentDescription = it },
-                enabled = true
+                maxLines = 3,
+                maxChars = 180,
             )
         }
     }
