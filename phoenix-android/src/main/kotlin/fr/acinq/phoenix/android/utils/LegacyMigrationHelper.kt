@@ -169,27 +169,28 @@ object LegacyMigrationHelper {
             OutgoingPayment.Details.KeySend(preimage = Lightning.randomBytes32().sha256())
         }
 
-        val parts = payments.map { part ->
+        // lightning parts
+        val lightningParts = payments.map { part ->
             val (fees, status) = when (val partStatus = part.status()) {
                 is OutgoingPaymentStatus.Succeeded -> {
-                    partStatus.feesPaid().toLong().msat to OutgoingPayment.Part.Status.Succeeded(
+                    partStatus.feesPaid().toLong().msat to OutgoingPayment.LightningPart.Status.Succeeded(
                         preimage = partStatus.paymentPreimage().bytes().toArray().byteVector32(),
                         completedAt = partStatus.completedAt()
                     )
                 }
                 is OutgoingPaymentStatus.Failed -> {
                     val lastFailure = JavaConverters.asJavaCollectionConverter(partStatus.failures()).asJavaCollection().toList().lastOrNull()
-                    0.msat to OutgoingPayment.Part.Status.Failed(
+                    0.msat to OutgoingPayment.LightningPart.Status.Failed(
                         remoteFailureCode = null,
                         details = lastFailure?.failureMessage() ?: "error details unavailable",
                         completedAt = partStatus.completedAt()
                     )
                 }
                 else -> {
-                    0.msat to OutgoingPayment.Part.Status.Pending
+                    0.msat to OutgoingPayment.LightningPart.Status.Pending
                 }
             }
-            OutgoingPayment.Part(
+            OutgoingPayment.LightningPart(
                 id = UUID.fromString(part.id().toString()),
                 amount = part.amount().toLong().msat + fees, // must include the fee!!!
                 route = listOf(),
@@ -198,62 +199,49 @@ object LegacyMigrationHelper {
             )
         }
 
+        val closingTxs = paymentMeta?.getSpendingTxs()?.map { ByteVector32.fromValidHex(it) } ?: emptyList()
+        val closingTxsParts = if (head.paymentType() == "ClosingChannel") {
+            closingTxs.map { tx ->
+                OutgoingPayment.ClosingTxPart(
+                    id = UUID.randomUUID(),
+                    claimed = 0.sat,
+                    txId = tx,
+                    closingType = when (paymentMeta?.closing_type) {
+                        ClosingType.Mutual.code -> ChannelClosingType.Mutual
+                        ClosingType.Local.code -> ChannelClosingType.Local
+                        ClosingType.Remote.code -> ChannelClosingType.Remote
+                        else -> ChannelClosingType.Other
+                    },
+                    createdAt = head.createdAt()
+                )
+            }
+        } else {
+            emptyList()
+        }
+
         // save status
         val status: OutgoingPayment.Status = when {
-
             payments.any { p -> p.status() is OutgoingPaymentStatus.`Pending$` } -> {
                 // pending is the default status of the payment
                 OutgoingPayment.Status.Pending
             }
-
             payments.any { p -> p.status() is OutgoingPaymentStatus.Succeeded } -> {
                 val statuses = payments.map { it.status() }.filterIsInstance<OutgoingPaymentStatus.Succeeded>()
                 if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
-                    // successful swap-out
-                    OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                        txids = paymentMeta.swap_out_tx?.encodeToByteArray()?.byteVector32()?.let { listOf(it) } ?: emptyList(),
-                        claimed = 0.sat,
-                        closingType = ChannelClosingType.Mutual,
-                        completedAt = statuses.first().completedAt()
-                    )
+                    OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
+                    // TODO: save legacy swap-out data
+                    // val totalSent = parts.map { p -> p.amount().toLong().msat + (p.status() as OutgoingPaymentStatus.Succeeded).feesPaid().toLong().msat }
+                    // val totalFees = totalSent - payments.first().recipientAmount().toLong().msat
+                    // val completedAt = parts.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.maxOf { s -> s.completedAt() }
+                    // val feeSwapOut = Satoshi(paymentMeta.swap_out_fee_sat)
                 } else if (head.paymentType() == "ClosingChannel") {
-                    // successful channel closing
-                    OutgoingPayment.Status.Completed.Succeeded.OnChain(
-                        txids = paymentMeta?.getSpendingTxs()?.map { ByteVector32.fromValidHex(it) } ?: emptyList(),
-                        claimed = 0.sat,
-                        closingType = when (paymentMeta?.closing_type) {
-                            ClosingType.Mutual.code -> ChannelClosingType.Mutual
-                            ClosingType.Local.code -> ChannelClosingType.Local
-                            ClosingType.Remote.code -> ChannelClosingType.Remote
-                            else -> ChannelClosingType.Other
-                        },
-                        completedAt = statuses.first().completedAt()
-                    )
+                    OutgoingPayment.Status.Completed.Succeeded.OnChain(completedAt = statuses.first().completedAt())
                 } else {
-                    // successful lightning payment
                     OutgoingPayment.Status.Completed.Succeeded.OffChain(
                         preimage = statuses.first().paymentPreimage().bytes().toArray().byteVector32(),
                         completedAt = statuses.first().completedAt()
                     )
                 }
-
-//                    val totalSent = parts.map { p -> p.amount().toLong().msat + (p.status() as OutgoingPaymentStatus.Succeeded).feesPaid().toLong().msat }
-//                    val totalFees = totalSent - payments.first().recipientAmount().toLong().msat
-//                    val completedAt = parts.map { p -> p.status() as OutgoingPaymentStatus.Succeeded }.maxOf { s -> s.completedAt() }
-//                    val head = it.first()
-//                    if (paymentMeta?.swap_out_address != null && paymentMeta.swap_out_fee_sat != null && paymentMeta.swap_out_feerate_per_byte != null) {
-//                        val feeSwapOut = Satoshi(paymentMeta.swap_out_fee_sat)
-//
-//                        state.postValue(
-//                            PaymentDetailsState.Outgoing.Sent.SwapOut(head.paymentType(), it, descSwapOut, amountToRecipient.`$minus`(feeSwapOut), Converter.any2Msat(feeSwapOut), completedAt,
-//                                paymentMeta.swap_out_feerate_per_byte))
-//                    } else if (head.paymentType() == "ClosingChannel" || (head.paymentRequest().isEmpty && head.externalId().isDefined && head.externalId().get().startsWith("closing-"))) {
-//                        val descClosing = appContext.getString(R.string.paymentdetails_closing_desc, paymentMeta?.closing_channel_id?.take(10) ?: "")
-//                        state.postValue(PaymentDetailsState.Outgoing.Sent.Closing(head.paymentType(), it, descClosing, amountToRecipient, fees, completedAt))
-//                    } else {
-//                        state.postValue(PaymentDetailsState.Outgoing.Sent.Normal(head.paymentType(), it, description, amountToRecipient, fees, completedAt))
-//                    }
-//                }
             }
 
             payments.any { p -> p.status() is OutgoingPaymentStatus.Failed } -> {
@@ -283,7 +271,7 @@ object LegacyMigrationHelper {
                 recipientAmount = head.recipientAmount().toLong().msat,
                 recipient = PublicKey.fromHex(head.recipientNodeId().toUncompressedBin().toHex()),
                 details = details,
-                parts = parts,
+                parts = lightningParts,
                 status = status,
                 createdAt = head.createdAt()
             )

@@ -17,9 +17,12 @@
 package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
+import com.google.common.net.HostAndPort
 import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
+import fr.acinq.lightning.io.TcpSocket
+import fr.acinq.lightning.utils.ServerAddress
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
@@ -68,7 +71,11 @@ object LegacyPrefsMigration {
 
         // -- electrum
 
-        UserPrefs.saveElectrumServer(context, Prefs.getElectrumServer(context))
+        UserPrefs.saveElectrumServer(context, Prefs.getElectrumServer(context).takeIf { it.isNotBlank() }?.let {
+            val hostPort = HostAndPort.fromString(it).withDefaultPort(50002)
+            // TODO: handle onion addresses and TOR
+            ServerAddress(hostPort.host, hostPort.port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        })
 
         // -- payment settings
 
