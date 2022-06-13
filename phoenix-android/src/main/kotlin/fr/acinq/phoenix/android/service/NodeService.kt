@@ -100,7 +100,7 @@ class NodeService : Service() {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             } else {
                 stopForeground(STOP_FOREGROUND_DETACH)
-                notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, notificationBuilder.setAutoCancel(true).build())
+                notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline).setAutoCancel(true).build())
             }
             shutdown()
         }
@@ -264,6 +264,7 @@ class NodeService : Service() {
             notificationBuilder.setContentText(message)
             notificationBuilder.setStyle(NotificationCompat.BigTextStyle().bigText(message))
         }
+        notificationBuilder.setSmallIcon(R.drawable.ic_phoenix_outline)
         return notificationBuilder.build().apply {
             notificationManager.notify(Notifications.HEADLESS_NOTIF_ID, this)
         }

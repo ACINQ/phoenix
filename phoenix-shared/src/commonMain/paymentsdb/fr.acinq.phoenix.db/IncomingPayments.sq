@@ -26,10 +26,6 @@ CREATE INDEX IF NOT EXISTS received_amount_msat_idx ON incoming_payments(receive
 
 -- queries
 
-hasIncomingPayment:
-SELECT COUNT(*) FROM incoming_payments
-WHERE payment_hash = ?;
-
 insert:
 INSERT INTO incoming_payments (
             payment_hash,

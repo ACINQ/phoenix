@@ -176,14 +176,14 @@ extension Lightning_kmpOutgoingPayment.Part {
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+extension Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 	
 	var completedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
 	}
 }
 
-extension Lightning_kmpOutgoingPayment.PartStatusFailed {
+extension Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 	
 	var completedAtDate: Date {
 		return Date(timeIntervalSince1970: (Double(completedAt) / Double(1_000)))
@@ -208,10 +208,10 @@ extension Lightning_kmpConnection {
 	
 	func localizedText() -> String {
 		switch self {
-		case .closed       : return NSLocalizedString("Offline", comment: "Connection state")
-		case .establishing : return NSLocalizedString("Connecting...", comment: "Connection state")
-		case .established  : return NSLocalizedString("Connected", comment: "Connection state")
-		default            : return NSLocalizedString("Unknown", comment: "Connection state")
+		case is CLOSED       : return NSLocalizedString("Offline", comment: "Connection state")
+		case is ESTABLISHING : return NSLocalizedString("Connecting...", comment: "Connection state")
+		case is ESTABLISHED  : return NSLocalizedString("Connected", comment: "Connection state")
+		default              : return NSLocalizedString("Unknown", comment: "Connection state")
 		}
 	}
 }

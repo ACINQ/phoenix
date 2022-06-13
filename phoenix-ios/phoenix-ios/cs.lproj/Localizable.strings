@@ -832,10 +832,7 @@
 "The bitcoin mempool is congested and fees are very high. The on-chain swap service has been temporarily disabled." = "Bitcoinový mempool je přetížený a poplatky jsou velmi vysoké. Služba swapu na on-chainu byla dočasně deaktivována.";
 
 /* label text */
-"The closing transaction is in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "Uzavírací transakce je ve vašem seznamu transakcí na __hlavní__ obrazovce. A stav svých kanálů můžete zobrazit na obrazovce __list kanálů__.";
-
-/* label text */
-"The closing transactions are in your transactions list on the __main__ screen. And you can view the status of your channels in the __channels list__ screen." = "Uzavírací transakce jsou ve vašem seznamu transakcí na __hlavní__ obrazovce. A stav svých kanálů můžete zobrazit na obrazovce __list kanálů__.";
+"The closing transaction is in your transactions list." = "Uzavírací transakce je ve vašem seznamu transakcí.";
 
 /* No comment provided by engineer. */
 "The data stored in the cloud is encrypted, and can only be decrypted with your seed." = "Data uložená v cloudu jsou šifrována a lze je dešifrovat pouze pomocí jejich seedu.";

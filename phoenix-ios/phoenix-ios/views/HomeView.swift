@@ -40,6 +40,8 @@ struct HomeView : MVIView {
 	@State var selectedItem: WalletPaymentInfo? = nil
 	@State var isMempoolFull = false
 	
+	@StateObject var customElectrumServerObserver = CustomElectrumServerObserver()
+	
 	@EnvironmentObject var currencyPrefs: CurrencyPrefs
 	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
@@ -276,28 +278,8 @@ struct HomeView : MVIView {
 			)
 			.padding(.bottom, 25)
 
-			// === Beta Version Disclaimer ===
-			generalNotice
-			
-			// === Mempool Full Warning ====
-			if isMempoolFull {
-				NoticeBox {
-					HStack(alignment: VerticalAlignment.top, spacing: 0) {
-						Image(systemName: "exclamationmark.triangle")
-							.imageScale(.large)
-							.padding(.trailing, 10)
-						VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
-							Text("Bitcoin mempool is full and fees are high.")
-							Button {
-								mempoolFullInfo()
-							} label: {
-								Text("See how Phoenix is affected".uppercased())
-							}
-						}
-					}
-					.font(.caption)
-				}
-			}
+			// === Notices & Warnings ===
+			notices
 			
 			// === Payments List ====
 			ScrollView {
@@ -346,8 +328,9 @@ struct HomeView : MVIView {
 	}
 	
 	@ViewBuilder
-	var generalNotice: some View {
+	var notices: some View {
 		
+		// === Welcome / Backup Seed ====
 		if mvi.model.balance.msat == 0 && Prefs.shared.isNewWallet {
 
 			// Reserved for potential "welcome" message.
@@ -380,6 +363,56 @@ struct HomeView : MVIView {
 				.font(.caption)
 			} // </NoticeBox>
 			
+		}
+		
+		// === Custom Electrum Server Problems ====
+		if customElectrumServerObserver.problem == .badCertificate {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "exclamationmark.shield")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+				}
+				.font(.caption)
+				Button {
+					navigationToElecrumServer()
+				} label: {
+					Group {
+						Text("Custom electrum server: bad certificate ! ")
+							.foregroundColor(.primary)
+						+
+						Text("Check it ")
+							.foregroundColor(.appAccent)
+						+
+						Text(Image(systemName: "arrowtriangle.forward"))
+							.foregroundColor(.appAccent)
+					}
+					.multilineTextAlignment(.leading)
+					.allowsTightening(true)
+				}
+			} // </NoticeBox>
+		}
+		
+		// === Mempool Full Warning ====
+		if isMempoolFull {
+			
+			NoticeBox {
+				HStack(alignment: VerticalAlignment.top, spacing: 0) {
+					Image(systemName: "tray.full")
+						.imageScale(.large)
+						.padding(.trailing, 10)
+					VStack(alignment: HorizontalAlignment.leading, spacing: 5) {
+						Text("Bitcoin mempool is full and fees are high.")
+						Button {
+							mempoolFullInfo()
+						} label: {
+							Text("See how Phoenix is affected".uppercased())
+						}
+					}
+				}
+				.font(.caption)
+			}
 		}
 	}
 
@@ -452,7 +485,7 @@ struct HomeView : MVIView {
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged()")
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil {
 			// If we pushed the SendView, triggered by an external lightning url,
@@ -779,14 +812,24 @@ struct HomeView : MVIView {
 		deepLinkManager.broadcast(DeepLink.backup)
 	}
 	
-	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged()")
+	func navigationToElecrumServer() {
+		log.trace("navigateToElectrumServer()")
 		
-		switch value {
-		case .backup:
-			self.navLinkTag = .ConfigurationView
-		default:
-			break
+		deepLinkManager.broadcast(DeepLink.electrum)
+	}
+	
+	func deepLinkChanged(_ value: DeepLink?) {
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
+		
+		if let value = value {
+			switch value {
+			case .backup:
+				self.navLinkTag = .ConfigurationView
+			case .drainWallet:
+				self.navLinkTag = .ConfigurationView
+			case .electrum:
+				self.navLinkTag = .ConfigurationView
+			}
 		}
 	}
 }
@@ -1026,7 +1069,7 @@ fileprivate struct AppStatusButton: View, ViewName {
 	var buttonContent: some View {
 		
 		let connectionStatus = connectionsManager.connections.global
-		if connectionStatus == .closed {
+		if connectionStatus is Lightning_kmpConnection.CLOSED {
 			HStack(alignment: .firstTextBaseline, spacing: 3) {
 				Image(systemName: "bolt.slash.fill")
 					.imageScale(.large)
@@ -1035,7 +1078,7 @@ fileprivate struct AppStatusButton: View, ViewName {
 			}
 			.font(.caption2)
 		}
-		else if connectionStatus == .establishing {
+		else if connectionStatus is Lightning_kmpConnection.ESTABLISHING {
 			HStack(alignment: .firstTextBaseline, spacing: 3) {
 				Image(systemName: "bolt.slash")
 					.imageScale(.large)
@@ -1366,9 +1409,9 @@ fileprivate struct BottomBar: View, ViewName {
 class HomeView_Previews: PreviewProvider {
 	
 	static let connections = Connections(
-		internet : .established,
-		peer     : .established,
-		electrum : .closed
+		internet : Lightning_kmpConnection.ESTABLISHED(),
+		peer     : Lightning_kmpConnection.ESTABLISHED(),
+		electrum : Lightning_kmpConnection.CLOSED(reason: nil)
 	)
 
 	static var previews: some View {

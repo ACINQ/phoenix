@@ -140,9 +140,7 @@ class CloudKitDb(
                 val metadataPlaceholder = WalletPaymentMetadata()
                 val emptyOptions = WalletPaymentFetchOptions.None
 
-                uniquePaymentIds.filterIsInstance<
-                    WalletPaymentId.IncomingPaymentId
-                >().forEach { paymentId ->
+                uniquePaymentIds.filterIsInstance<WalletPaymentId.IncomingPaymentId>().forEach { paymentId ->
                     inQueries.getIncomingPayment(
                         paymentHash = paymentId.paymentHash
                     )?.let { payment ->
@@ -154,10 +152,8 @@ class CloudKitDb(
                     }
                 } // </incoming_payments>
 
-                uniquePaymentIds.filterIsInstance<
-                    WalletPaymentId.OutgoingPaymentId
-                >().forEach { paymentId ->
-                    outQueries.getOutgoingPayment(
+                uniquePaymentIds.filterIsInstance<WalletPaymentId.OutgoingPaymentId>().forEach { paymentId ->
+                    outQueries.getPayment(
                         id = paymentId.id
                     )?.let { payment ->
                         rowMap[paymentId] = WalletPaymentInfo(
@@ -184,7 +180,6 @@ class CloudKitDb(
                 // Fetch the corresponding `cloudkit_payments_metadata.ckrecord_info`
 
                 uniquePaymentIds.forEach { paymentId ->
-
                     ckQueries.fetchMetadata(
                         type = paymentId.dbType.value,
                         id = paymentId.dbId
@@ -376,14 +371,14 @@ class CloudKitDb(
 
                 for (outgoingPayment in outgoingList) {
 
-                    val existing = outQueries.getOutgoingPaymentWithoutParts(
+                    val existing = outQueries.getPaymentWithoutParts(
                         id = outgoingPayment.id.toString(),
                         mapper = OutgoingQueries.Companion::mapOutgoingPaymentWithoutParts
                     ).executeAsOneOrNull()
 
                     if (existing == null) {
                         val (detailsTypeVersion, detailsData) = outgoingPayment.details.mapToDb()
-                        database.outgoingPaymentsQueries.addOutgoingPayment(
+                        database.outgoingPaymentsQueries.insertPayment(
                             id = outgoingPayment.id.toString(),
                             recipient_amount_msat = outgoingPayment.recipientAmount.msat,
                             recipient_node_id = outgoingPayment.recipient.toString(),
@@ -395,34 +390,41 @@ class CloudKitDb(
                     }
 
                     for (part in outgoingPayment.parts) {
-
-                        val partRowExists = outQueries.hasOutgoingPart(
-                            part_id = part.id.toString()
-                        ).executeAsOne() > 0
-                        if (!partRowExists) {
-                            outQueries.addOutgoingPart(
-                                part_id = part.id.toString(),
-                                part_parent_id = outgoingPayment.id.toString(),
-                                part_amount_msat = part.amount.msat,
-                                part_route = part.route,
-                                part_created_at = part.createdAt
-                            )
-
-                            val statusInfo = when (val status = part.status) {
-                                is OutgoingPayment.Part.Status.Failed ->
-                                    status.completedAt to status.mapToDb()
-                                is OutgoingPayment.Part.Status.Succeeded ->
-                                    status.completedAt to status.mapToDb()
-                                else -> null
-                            }
-                            if (statusInfo != null) {
-                                val completedAt = statusInfo.first
-                                val (type, blob) = statusInfo.second
-                                outQueries.updateOutgoingPart(
+                        when {
+                            part is OutgoingPayment.LightningPart && outQueries.countLightningPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
+                                outQueries.insertLightningPart(
                                     part_id = part.id.toString(),
-                                    part_status_type = type,
-                                    part_status_blob = blob,
-                                    part_completed_at = completedAt
+                                    part_parent_id = outgoingPayment.id.toString(),
+                                    part_amount_msat = part.amount.msat,
+                                    part_route = part.route,
+                                    part_created_at = part.createdAt
+                                )
+                                val statusInfo = when (val status = part.status) {
+                                    is OutgoingPayment.LightningPart.Status.Failed -> status.completedAt to status.mapToDb()
+                                    is OutgoingPayment.LightningPart.Status.Succeeded -> status.completedAt to status.mapToDb()
+                                    else -> null
+                                }
+                                if (statusInfo != null) {
+                                    val completedAt = statusInfo.first
+                                    val (type, blob) = statusInfo.second
+                                    outQueries.updateLightningPart(
+                                        part_id = part.id.toString(),
+                                        part_status_type = type,
+                                        part_status_blob = blob,
+                                        part_completed_at = completedAt
+                                    )
+                                }
+                            }
+                            part is OutgoingPayment.ClosingTxPart && outQueries.countClosingTxPart(part_id = part.id.toString()).executeAsOne() == 0L -> {
+                                val (closingInfoType, closingInfoBlob) = part.mapClosingTypeToDb()
+                                outQueries.insertClosingTxPart(
+                                    id = part.id.toString(),
+                                    parent_id = outgoingPayment.id.toString(),
+                                    tx_id = part.txId.toByteArray(),
+                                    amount_msat = part.claimed.sat,
+                                    closing_info_type = closingInfoType,
+                                    closing_info_blob = closingInfoBlob,
+                                    created_at = part.createdAt
                                 )
                             }
                         }
@@ -433,7 +435,7 @@ class CloudKitDb(
 
                     if (oldCompleted == null && completed != null) {
                         val (statusType, statusBlob) = completed.mapToDb()
-                        outQueries.updateOutgoingPayment(
+                        outQueries.updatePayment(
                             id = outgoingPayment.id.toString(),
                             completed_at = completed.completedAt,
                             status_type = statusType,

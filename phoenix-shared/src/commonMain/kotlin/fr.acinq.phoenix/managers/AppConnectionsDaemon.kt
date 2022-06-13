@@ -232,8 +232,7 @@ class AppConnectionsDaemon(
                     is ElectrumConfig.Custom -> {
                         when (newElectrumConfig) {
                             is ElectrumConfig.Custom -> { // custom -> custom
-                                newElectrumConfig.server.host != oldElectrumConfig.server.host ||
-                                newElectrumConfig.server.port != oldElectrumConfig.server.port
+                                newElectrumConfig != oldElectrumConfig
                             }
                             is ElectrumConfig.Random -> true // custom -> random
                             else -> true // custom -> null
@@ -254,7 +253,7 @@ class AppConnectionsDaemon(
                     }
                 }
                 if (changed) {
-                    logger.info { "electrum server config changed to=$newElectrumConfig, reconnecting..." }
+                    logger.info { "electrum config changed: reconnecting..." }
                     electrumControlChanges.send { incrementDisconnectCount() }
                     if (previousElectrumConfig != null) {
                         // The electrumConfig is only null on app launch.
@@ -265,6 +264,8 @@ class AppConnectionsDaemon(
                     // We need to delay the next connection vote because the collector WILL skip fast updates (see documentation)
                     // and ignore the change since the TrafficControl object would not have changed.
                     electrumControlChanges.send { decrementDisconnectCount() }
+                } else {
+                    logger.info { "electrum config: no changes" }
                 }
                 previousElectrumConfig = newElectrumConfig
             }

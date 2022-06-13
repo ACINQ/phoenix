@@ -18,7 +18,6 @@ package fr.acinq.phoenix.android.utils.datastore
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
-import fr.acinq.bitcoin.Satoshi
 import fr.acinq.lightning.CltvExpiryDelta
 import fr.acinq.lightning.TrampolineFees
 import fr.acinq.lightning.io.TcpSocket
@@ -27,7 +26,6 @@ import fr.acinq.lightning.utils.sat
 import fr.acinq.phoenix.android.utils.UserTheme
 import fr.acinq.phoenix.data.BitcoinUnit
 import fr.acinq.phoenix.data.FiatCurrency
-import fr.acinq.phoenix.legacy.TrampolineFeeSetting
 import fr.acinq.phoenix.legacy.userPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -73,18 +71,30 @@ object UserPrefs {
 
     // -- electrum
 
-    val PREFS_ELECTRUM_ADDRESS = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS")
+    val PREFS_ELECTRUM_ADDRESS_HOST = stringPreferencesKey("PREFS_ELECTRUM_ADDRESS_HOST")
+    val PREFS_ELECTRUM_ADDRESS_PORT = intPreferencesKey("PREFS_ELECTRUM_ADDRESS_PORT")
+    const val PREFS_ELECTRUM_FORCE_SSL = "PREFS_ELECTRUM_FORCE_SSL"
+
     fun getElectrumServer(context: Context): Flow<ServerAddress?> = prefs(context).map {
-        it[PREFS_ELECTRUM_ADDRESS]?.takeIf { it.isNotBlank() }?.let { address ->
-            log.info("retrieved preferred electrum=$address from datastore")
-            if (address.contains(":")) {
-                val (host, port) = address.split(":")
-                ServerAddress(host, port.toInt(), TcpSocket.TLS.TRUSTED_CERTIFICATES)
-            } else ServerAddress(address, 50002, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        val host = it[PREFS_ELECTRUM_ADDRESS_HOST]?.takeIf { it.isNotBlank() }
+        val port = it[PREFS_ELECTRUM_ADDRESS_PORT]
+        log.info("retrieved preferred electrum host=$host port=$port from datastore")
+        if (host != null && port != null) {
+            ServerAddress(host, port, TcpSocket.TLS.TRUSTED_CERTIFICATES)
+        } else {
+            null
         }
     }
-    suspend fun saveElectrumServer(context: Context, address: String) = context.userPrefs.edit { it[PREFS_ELECTRUM_ADDRESS] = address }
-    suspend fun saveElectrumServer(context: Context, address: ServerAddress) = saveElectrumServer(context, "${address.host}:${address.port}")
+
+    suspend fun saveElectrumServer(context: Context, address: ServerAddress?) = context.userPrefs.edit {
+        if (address == null) {
+            it.remove(PREFS_ELECTRUM_ADDRESS_HOST)
+            it.remove(PREFS_ELECTRUM_ADDRESS_PORT)
+        } else {
+            it[PREFS_ELECTRUM_ADDRESS_HOST] = address.host
+            it[PREFS_ELECTRUM_ADDRESS_PORT] = address.port
+        }
+    }
 
     // -- security
 
@@ -111,6 +121,7 @@ object UserPrefs {
             TrampolineFees(feeBase, feeProportional, CltvExpiryDelta(144))
         } else null
     }
+
     suspend fun saveTrampolineMaxFee(context: Context, fee: TrampolineFees?) = context.userPrefs.edit {
         if (fee == null) {
             it.remove(TRAMPOLINE_MAX_BASE_FEE)

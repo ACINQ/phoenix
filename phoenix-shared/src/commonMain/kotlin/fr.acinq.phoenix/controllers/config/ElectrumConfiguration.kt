@@ -21,7 +21,6 @@ object ElectrumConfiguration {
     }
 
     sealed class Intent : MVI.Intent() {
-        data class UpdateElectrumServer(val address: String?) : Intent()
+        data class UpdateElectrumServer(val server: ServerAddress?) : Intent()
     }
-
 }

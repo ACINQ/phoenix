@@ -22,6 +22,7 @@ import fr.acinq.lightning.payment.PaymentRequest
 import fr.acinq.lightning.serialization.v1.ByteVector32KSerializer
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -62,6 +63,7 @@ sealed class OutgoingDetailsData {
     }
 
     companion object {
+        @OptIn(ExperimentalSerializationApi::class)
         fun deserialize(typeVersion: OutgoingDetailsTypeVersion, blob: ByteArray): OutgoingPayment.Details = DbTypesHelper.decodeBlob(blob) { json, format ->
             when (typeVersion) {
                 OutgoingDetailsTypeVersion.NORMAL_V0 -> format.decodeFromString<Normal.V0>(json).let { OutgoingPayment.Details.Normal(PaymentRequest.read(it.paymentRequest)) }
@@ -73,6 +75,7 @@ sealed class OutgoingDetailsData {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 fun OutgoingPayment.Details.mapToDb(): Pair<OutgoingDetailsTypeVersion, ByteArray> = when (this) {
     is OutgoingPayment.Details.Normal -> OutgoingDetailsTypeVersion.NORMAL_V0 to
             Json.encodeToString(OutgoingDetailsData.Normal.V0(paymentRequest.write())).toByteArray(Charsets.UTF_8)

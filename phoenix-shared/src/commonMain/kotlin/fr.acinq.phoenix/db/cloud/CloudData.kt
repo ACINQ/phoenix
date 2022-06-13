@@ -87,11 +87,12 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
         padding = ByteArray(size = 0)
     )
 
-    // This function exists because the Kotlin-generated
-    // copy function doesn't translate to iOS very well.
-    //
+    /**
+     * This function exists because the Kotlin-generated
+     * copy function doesn't translate to iOS very well.
+     */
     fun copyWithPadding(padding: ByteArray): CloudData {
-       return this.copy(padding = padding)
+        return this.copy(padding = padding)
     }
 
     fun unwrap(): WalletPayment? = when {
@@ -99,6 +100,8 @@ data class CloudData @OptIn(ExperimentalSerializationApi::class) constructor(
         outgoing != null -> outgoing.unwrap()
         else -> null
     }
+
+    companion object
 }
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -111,7 +114,8 @@ fun CloudData.Companion.cborDeserialize(blob: ByteArray): CloudData? {
     var result: CloudData? = null
     try {
         result = Cbor.decodeFromByteArray(blob)
-    } catch (e: Throwable) {}
+    } catch (e: Throwable) {
+    }
 
     return result
 }

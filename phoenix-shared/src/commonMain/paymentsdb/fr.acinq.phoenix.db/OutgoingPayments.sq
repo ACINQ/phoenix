@@ -1,7 +1,8 @@
 import fr.acinq.lightning.db.HopDesc;
 import fr.acinq.phoenix.db.payments.OutgoingDetailsTypeVersion;
-import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingPartClosingInfoTypeVersion;
 import fr.acinq.phoenix.db.payments.OutgoingPartStatusTypeVersion;
+import fr.acinq.phoenix.db.payments.OutgoingStatusTypeVersion;
 import kotlin.collections.List;
 
 PRAGMA foreign_keys = 1;
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS outgoing_payments (
 -- And that query is used constantly by the app.
 CREATE INDEX IF NOT EXISTS outgoing_payments_created_at_idx ON outgoing_payments(created_at);
 
+-- Stores the lightning parts that make up a lightning payment
 CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
     part_id TEXT NOT NULL PRIMARY KEY,
     part_parent_id TEXT NOT NULL,
@@ -41,6 +43,19 @@ CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
     FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
 );
 
+-- Stores the transactions that close a channel
+CREATE TABLE IF NOT EXISTS outgoing_payment_closing_tx_parts (
+    part_id TEXT NOT NULL PRIMARY KEY,
+    part_parent_id TEXT NOT NULL,
+    part_tx_id BLOB NOT NULL,
+    part_amount_sat INTEGER NOT NULL,
+    part_closing_info_type TEXT AS OutgoingPartClosingInfoTypeVersion NOT NULL,
+    part_closing_info_blob BLOB NOT NULL,
+    part_created_at INTEGER NOT NULL,
+
+    FOREIGN KEY(part_parent_id) REFERENCES outgoing_payments(id)
+);
+
 -- A FOREIGN KEY does NOT create an implicit index.
 -- One would expect it to, but it doesn't.
 -- As per the docs (https://sqlite.org/foreignkeys.html):
@@ -48,14 +63,15 @@ CREATE TABLE IF NOT EXISTS outgoing_payment_parts (
 -- > [...] So, in most real systems, an index should be created on the child key columns
 -- > of each foreign key constraint.
 CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_parts(part_parent_id);
+CREATE INDEX IF NOT EXISTS parent_id_idx ON outgoing_payment_closing_tx_parts(part_parent_id);
 
--- queries
+-- queries for outgoing payments
 
-hasOutgoingPayment:
+hasPayment:
 SELECT COUNT(*) FROM outgoing_payments
 WHERE id = ?;
 
-addOutgoingPayment:
+insertPayment:
 INSERT INTO outgoing_payments (
             id,
             recipient_amount_msat,
@@ -66,14 +82,23 @@ INSERT INTO outgoing_payments (
             details_blob)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
-updateOutgoingPayment:
+updatePayment:
 UPDATE outgoing_payments SET completed_at=?, status_type=?, status_blob=? WHERE id=?;
 
-hasOutgoingPart:
-SELECT COUNT(*) FROM outgoing_payment_parts
-WHERE part_id = ?;
+scanCompleted:
+SELECT id, completed_at
+FROM   outgoing_payments
+WHERE  completed_at IS NOT NULL;
 
-addOutgoingPart:
+deletePayment:
+DELETE FROM outgoing_payments WHERE id = ?;
+
+-- queries for lightning parts
+
+countLightningPart:
+SELECT COUNT(*) FROM outgoing_payment_parts WHERE part_id = ?;
+
+insertLightningPart:
 INSERT INTO outgoing_payment_parts (
             part_id,
             part_parent_id,
@@ -82,20 +107,38 @@ INSERT INTO outgoing_payment_parts (
             part_created_at)
 VALUES (?, ?, ?, ?, ?);
 
-updateOutgoingPart:
+updateLightningPart:
 UPDATE outgoing_payment_parts
 SET    part_status_type=?,
        part_status_blob=?,
        part_completed_at=?
 WHERE  part_id=?;
 
-getOutgoingPart:
+getLightningPart:
 SELECT * FROM outgoing_payment_parts WHERE part_id=?;
 
-deleteOutgoingPart:
-DELETE FROM outgoing_payment_parts WHERE part_id=?;
+deleteLightningPartsForParentId:
+DELETE FROM outgoing_payment_parts WHERE part_parent_id = ?;
 
-getOutgoingPaymentWithoutParts:
+-- queries for closing tx parts
+
+countClosingTxPart:
+SELECT COUNT(*) FROM outgoing_payment_closing_tx_parts WHERE part_id = ?;
+
+insertClosingTxPart:
+INSERT INTO outgoing_payment_closing_tx_parts (
+            part_id,
+            part_parent_id,
+            part_tx_id,
+            part_amount_sat,
+            part_closing_info_type,
+            part_closing_info_blob,
+            part_created_at
+) VALUES (:id, :parent_id, :tx_id, :amount_msat, :closing_info_type, :closing_info_blob, :created_at);
+
+-- queries mixing outgoing payments and parts
+
+getPaymentWithoutParts:
 SELECT id,
        recipient_amount_msat,
        recipient_node_id,
@@ -109,7 +152,7 @@ SELECT id,
 FROM outgoing_payments
 WHERE id=?;
 
-getOutgoingPayment:
+getPayment:
 SELECT parent.id,
        parent.recipient_amount_msat,
        parent.recipient_node_id,
@@ -120,19 +163,27 @@ SELECT parent.id,
        parent.completed_at,
        parent.status_type,
        parent.status_blob,
-       -- parts
-       parts.part_id,
-       parts.part_amount_msat,
-       parts.part_route,
-       parts.part_created_at,
-       parts.part_completed_at,
-       parts.part_status_type,
-       parts.part_status_blob
+       -- lightning parts
+       lightning_parts.part_id AS lightning_part_id,
+       lightning_parts.part_amount_msat AS lightning_part_amount_msat,
+       lightning_parts.part_route AS lightning_part_route,
+       lightning_parts.part_created_at AS lightning_part_created_at,
+       lightning_parts.part_completed_at AS lightning_part_completed_at,
+       lightning_parts.part_status_type AS lightning_part_status_type,
+       lightning_parts.part_status_blob AS lightning_part_status_blob,
+       -- closing tx parts
+       closing_parts.part_id AS closingtx_part_id,
+       closing_parts.part_tx_id AS closingtx_tx_id,
+       closing_parts.part_amount_sat AS closingtx_amount_sat,
+       closing_parts.part_closing_info_type AS closingtx_info_type,
+       closing_parts.part_closing_info_blob AS closingtx_info_blob,
+       closing_parts.part_created_at AS closingtx_created_at
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS lightning_parts ON lightning_parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_closing_tx_parts AS closing_parts ON closing_parts.part_parent_id = parent.id
 WHERE parent.id=?;
 
-listOutgoingForPaymentHash:
+listPaymentsForPaymentHash:
 SELECT parent.id,
        parent.recipient_amount_msat,
        parent.recipient_node_id,
@@ -143,19 +194,27 @@ SELECT parent.id,
        parent.completed_at,
        parent.status_type,
        parent.status_blob,
-       -- parts
-       parts.part_id,
-       parts.part_amount_msat,
-       parts.part_route,
-       parts.part_created_at,
-       parts.part_completed_at,
-       parts.part_status_type,
-       parts.part_status_blob
+       -- lightning parts
+       lightning_parts.part_id AS lightning_part_id,
+       lightning_parts.part_amount_msat AS lightning_part_amount_msat,
+       lightning_parts.part_route AS lightning_part_route,
+       lightning_parts.part_created_at AS lightning_part_created_at,
+       lightning_parts.part_completed_at AS lightning_part_completed_at,
+       lightning_parts.part_status_type AS lightning_part_status_type,
+       lightning_parts.part_status_blob AS lightning_part_status_blob,
+       -- closing tx parts
+       closing_parts.part_id AS closingtx_part_id,
+       closing_parts.part_tx_id AS closingtx_tx_id,
+       closing_parts.part_amount_sat AS closingtx_amount_sat,
+       closing_parts.part_closing_info_type AS closingtx_info_type,
+       closing_parts.part_closing_info_blob AS closingtx_info_blob,
+       closing_parts.part_created_at AS closingtx_created_at
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS lightning_parts ON lightning_parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_closing_tx_parts AS closing_parts ON closing_parts.part_parent_id = parent.id
 WHERE payment_hash=?;
 
-listOutgoingInOffset:
+listPaymentsInOffset:
 SELECT parent.id,
        parent.recipient_amount_msat,
        parent.recipient_node_id,
@@ -166,29 +225,26 @@ SELECT parent.id,
        parent.completed_at,
        parent.status_type,
        parent.status_blob,
-       -- parts
-       parts.part_id,
-       parts.part_amount_msat,
-       parts.part_route,
-       parts.part_created_at,
-       parts.part_completed_at,
-       parts.part_status_type,
-       parts.part_status_blob
+       -- lightning parts
+       lightning_parts.part_id AS lightning_part_id,
+       lightning_parts.part_amount_msat AS lightning_part_amount_msat,
+       lightning_parts.part_route AS lightning_part_route,
+       lightning_parts.part_created_at AS lightning_part_created_at,
+       lightning_parts.part_completed_at AS lightning_part_completed_at,
+       lightning_parts.part_status_type AS lightning_part_status_type,
+       lightning_parts.part_status_blob AS lightning_part_status_blob,
+       -- closing tx parts
+       closing_parts.part_id AS closingtx_part_id,
+       closing_parts.part_tx_id AS closingtx_tx_id,
+       closing_parts.part_amount_sat AS closingtx_amount_sat,
+       closing_parts.part_closing_info_type AS closingtx_info_type,
+       closing_parts.part_closing_info_blob AS closingtx_info_blob,
+       closing_parts.part_created_at AS closingtx_created_at
 FROM outgoing_payments AS parent
-LEFT OUTER JOIN outgoing_payment_parts AS parts ON parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_parts AS lightning_parts ON lightning_parts.part_parent_id = parent.id
+LEFT OUTER JOIN outgoing_payment_closing_tx_parts AS closing_parts ON closing_parts.part_parent_id = parent.id
 ORDER BY parent.completed_at DESC, parent.id DESC
 LIMIT :limit OFFSET :offset;
-
-scanCompleted:
-SELECT id, completed_at
-FROM   outgoing_payments
-WHERE  completed_at IS NOT NULL;
-
-deletePayment:
-DELETE FROM outgoing_payments WHERE id = ?;
-
-deletePaymentParts:
-DELETE FROM outgoing_payment_parts WHERE part_parent_id = ?;
 
 -- use this in a `transaction` block to know how many rows were changed after an UPDATE
 changes:

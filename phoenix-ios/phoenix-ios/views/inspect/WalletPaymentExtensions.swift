@@ -126,16 +126,14 @@ extension Lightning_kmpWalletPayment {
 				// no fees for failed payments
 				return nil
 				
-			} else if let onChain = outgoingPayment.status.asOnChain() {
+			} else if let _ = outgoingPayment.status.asOnChain() {
 				
 				// for on-chain payments, the fees are extracted from the mined transaction(s)
 				
-				let channelDrain: Lightning_kmpMilliSatoshi = outgoingPayment.recipientAmount
-				let claimed = Lightning_kmpMilliSatoshi(sat: onChain.claimed)
-				let fees = channelDrain.minus(other: claimed)
+				let fees = outgoingPayment.fees
 				let formattedAmt = Utils.format(currencyPrefs, msat: fees, policy: .showMsatsIfNonZero)
 				
-				let txCount = onChain.component1().count
+				let txCount = outgoingPayment.closingTxParts().count
 				let exp: String
 				if txCount == 1 {
 					exp = NSLocalizedString(
@@ -159,9 +157,10 @@ extension Lightning_kmpWalletPayment {
 				var parts = 0
 				var hops = 0
 				for part in outgoingPayment.parts {
-					
-					parts += 1
-					hops = part.route.count
+					if (part is Lightning_kmpOutgoingPayment.LightningPart) {
+						parts += 1
+						hops = (part as! Lightning_kmpOutgoingPayment.LightningPart).route.count
+					}
 				}
 				
 				let exp: String
@@ -230,5 +229,30 @@ extension Lightning_kmpWalletPayment {
 		}
 		
 		return nil
+	}
+}
+
+extension Lightning_kmpOutgoingPayment {
+	
+	func closingTxParts() -> [Lightning_kmpOutgoingPayment.ClosingTxPart] {
+		
+		var closingTxParts = [Lightning_kmpOutgoingPayment.ClosingTxPart]()
+		for part in self.parts {
+			if let closingTxPart = part as? Lightning_kmpOutgoingPayment.ClosingTxPart {
+				closingTxParts.append(closingTxPart)
+			}
+		}
+		
+		return closingTxParts
+	}
+	
+	func claimedOnChain() -> Bitcoin_kmpSatoshi {
+		
+		var sat: Int64 = 0
+		for part in closingTxParts() {
+			sat += part.claimed.sat
+		}
+		
+		return Bitcoin_kmpSatoshi(sat: sat)
 	}
 }

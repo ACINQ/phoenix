@@ -28,7 +28,7 @@ class LNUrlBaseTest {
 
     private fun encode(source: String) = Bech32.encode(
         hrp = "lnurl",
-        int5s = Bech32.eight2five(source.encodeToByteArray()).toByteArray(),
+        int5s = Bech32.eight2five(source.encodeToByteArray()),
         encoding = Bech32.Encoding.Bech32
     )
 

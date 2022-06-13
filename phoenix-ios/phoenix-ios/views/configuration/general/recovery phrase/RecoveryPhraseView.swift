@@ -49,6 +49,8 @@ struct RecoveryPhraseList: View {
 	@Namespace var sectionID_button
 	@Namespace var sectionID_legal
 	@Namespace var sectionID_cloudBackup
+
+	@EnvironmentObject var deepLinkManager: DeepLinkManager
 	
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 	
@@ -298,6 +300,12 @@ struct RecoveryPhraseList: View {
 		
 		if !didAppear {
 			didAppear = true
+			
+			if deepLinkManager.deepLink == .backup {
+				// Reached our destination
+				deepLinkManager.broadcast(nil)
+			}
+			
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				withAnimation(Animation.linear(duration: 1.0).repeatForever(autoreverses: true)) {
 					animatingLegalToggleColor = true

@@ -18,13 +18,13 @@ fileprivate enum NavLinkTag: String {
 	case DisplayConfigurationView
 	case PaymentOptionsView
 	case RecoveryPhraseView
+	case CloseChannelsView
 	// Security
 	case AppAccessView
 	// Advanced
 	case PrivacyView
 	case LogsConfigurationView
 	case ChannelsConfigurationView
-	case CloseChannelsView
 	case ForceCloseChannelsView
 }
 
@@ -127,6 +127,16 @@ struct ConfigurationView: View {
 							Image(systemName: "squareshape.split.3x3")
 						}
 					}
+					
+					NavigationLink(
+						destination: CloseChannelsView(),
+						tag: NavLinkTag.CloseChannelsView,
+						selection: $navLinkTag
+					) {
+						Label { Text("Drain wallet") } icon: {
+							Image(systemName: "xmark.circle")
+						}
+					}
 				
 				} // </if: hasWallet>
 				
@@ -161,16 +171,6 @@ struct ConfigurationView: View {
 					}
 				}
 
-				NavigationLink(
-					destination: LogsConfigurationView(),
-					tag: NavLinkTag.LogsConfigurationView,
-					selection: $navLinkTag
-				) {
-					Label { Text("Logs") } icon: {
-						Image(systemName: "doc.text")
-					}
-				}
-
 				if hasWallet {
 
 					NavigationLink(
@@ -183,27 +183,28 @@ struct ConfigurationView: View {
 						}
 					}
 
-					NavigationLink(
-						destination: CloseChannelsView(),
-						tag: NavLinkTag.CloseChannelsView,
-						selection: $navLinkTag
-					) {
-						Label { Text("Close all channels") } icon: {
-							Image(systemName: "xmark.circle")
-						}
-					}
-
-					NavigationLink(
-						destination: ForceCloseChannelsView(),
-						tag: NavLinkTag.ForceCloseChannelsView,
-						selection: $navLinkTag
-					) {
-						Label { Text("Danger zone") } icon: {
-							Image(systemName: "exclamationmark.triangle")
-						}
-					}.foregroundColor(.appNegative)
+//					NavigationLink(
+//						destination: ForceCloseChannelsView(),
+//						tag: NavLinkTag.ForceCloseChannelsView,
+//						selection: $navLinkTag
+//					) {
+//						Label { Text("Danger zone") } icon: {
+//							Image(systemName: "exclamationmark.triangle")
+//						}
+//					}.foregroundColor(.appNegative)
 
 				} // </if: hasWallet>
+				
+				NavigationLink(
+					destination: LogsConfigurationView(),
+					tag: NavLinkTag.LogsConfigurationView,
+					selection: $navLinkTag
+				) {
+					Label { Text("Logs") } icon: {
+						Image(systemName: "doc.text")
+					}
+				}
+				
 			} // </Section: Advanced>
 		} // </List>
 		.listStyle(.insetGrouped)
@@ -293,7 +294,7 @@ struct ConfigurationView: View {
 	}
 	
 	func deepLinkChanged(_ value: DeepLink?) {
-		log.trace("deepLinkChanged()")
+		log.trace("deepLinkChanged() => \(value?.rawValue ?? "nil")")
 		
 		// This is a hack, courtesy of bugs in Apple's NavigationLink:
 		// https://developer.apple.com/forums/thread/677333
@@ -306,40 +307,50 @@ struct ConfigurationView: View {
 		// The only clean solution I've found is to listen for SwiftUI's bad behaviour,
 		// and forcibly undo it.
 		
-		DispatchQueue.main.async {
+		if let value = value {
+			
+			// Navigate towards deep link (if needed)
 			var newNavLinkTag: NavLinkTag? = nil
 			switch value {
-			case .backup:
-				newNavLinkTag = NavLinkTag.RecoveryPhraseView
-			default:
-				break
+				case .backup      : newNavLinkTag = NavLinkTag.RecoveryPhraseView
+				case .drainWallet : newNavLinkTag = NavLinkTag.CloseChannelsView
+				case .electrum    : newNavLinkTag = NavLinkTag.PrivacyView
 			}
 			
 			if let newNavLinkTag = newNavLinkTag {
 				
 				self.swiftUiBugWorkaround = newNavLinkTag
 				self.swiftUiBugWorkaroundIdx += 1
+				clearSwiftUiBugWorkaround(delay: 5.0)
 				
-				let idx = self.swiftUiBugWorkaroundIdx
 				self.navLinkTag = newNavLinkTag // Trigger/push the view
-				
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-					
-					if self.swiftUiBugWorkaroundIdx == idx {
-						self.swiftUiBugWorkaround = nil
-					}
-				}
 			}
+			
+		} else {
+			// We reached the final destination of the deep link
+			clearSwiftUiBugWorkaround(delay: 1.0)
 		}
 	}
 	
 	fileprivate func navLinkTagChanged(_ tag: NavLinkTag?) {
-		log.trace("navLinkTagChanged()")
+		log.trace("navLinkTagChanged() => \(tag?.rawValue ?? "nil")")
 		
 		if tag == nil, let forcedNavLinkTag = swiftUiBugWorkaround {
 				
 			log.trace("Blocking SwiftUI's attempt to reset our navLinkTag")
 			self.navLinkTag = forcedNavLinkTag
+		}
+	}
+	
+	func clearSwiftUiBugWorkaround(delay: TimeInterval) {
+		
+		let idx = self.swiftUiBugWorkaroundIdx
+		
+		DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+			
+			if self.swiftUiBugWorkaroundIdx == idx {
+				self.swiftUiBugWorkaround = nil
+			}
 		}
 	}
 	

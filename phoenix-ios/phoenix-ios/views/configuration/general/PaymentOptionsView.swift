@@ -59,7 +59,7 @@ struct PaymentOptionsView: View {
 					.padding(.all, 8)
 					.overlay(
 						RoundedRectangle(cornerRadius: 4)
-							.stroke(Color(UIColor.separator), lineWidth: 1)
+							.stroke(Color.textFieldBorder, lineWidth: 1)
 					)
 				} // </VStack>
 				.padding([.top, .bottom], 8)
@@ -356,7 +356,7 @@ struct MaxFeeConfiguration: View, ViewName {
 			}
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color(UIColor.separator), lineWidth: 1)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			.padding(.bottom)
 			
@@ -387,7 +387,7 @@ struct MaxFeeConfiguration: View, ViewName {
 			}
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color(UIColor.separator), lineWidth: 1)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			.padding(.bottom)
 			

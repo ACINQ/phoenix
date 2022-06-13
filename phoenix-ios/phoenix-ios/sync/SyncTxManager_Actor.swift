@@ -61,7 +61,7 @@ actor SyncTxManager_Actor {
 	}
 	
 	func networkStatusChanged(hasInternet: Bool) -> SyncTxManager_State? {
-		log.trace("networkStatusChanged(hasInternet: \(hasInternet)")
+		log.trace("networkStatusChanged(hasInternet: \(hasInternet))")
 		
 		if hasInternet {
 			waitingForInternet = false

@@ -148,8 +148,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			header(NSLocalizedString("Channel Closing", comment: "Title in DetailsView_IncomingPayment"))
 			
 			channelClosing_channelId(channelClosing)
-			if let onChain = outgoingPayment.status.asOnChain() {
-				onChain_type(onChain) // this makes more sense in this section
+			if !outgoingPayment.closingTxParts().isEmpty { // otherwise type is unknown
+				channelClosing_type(outgoingPayment)
 			}
 			channelClosing_btcAddress(channelClosing)
 			channelClosing_addrType(channelClosing)
@@ -171,8 +171,8 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			header(NSLocalizedString("Closing Status", comment: "Title in DetailsView_IncomingPayment"))
 			
 			onChain_completedAt(onChain)
-			onChain_claimed(onChain)
-			onChain_btcTxids(onChain)
+			onChain_claimed(outgoingPayment)
+			onChain_btcTxids(outgoingPayment)
 			
 		} else if let failed = outgoingPayment.status.asFailed() {
 			
@@ -187,7 +187,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			header(NSLocalizedString("Payment Parts", comment: "Title in DetailsView_IncomingPayment"))
 			
 			ForEach(outgoingPayment.parts.indices, id: \.self) { index in
-				part_row(outgoingPayment.parts[index])
+				let part = outgoingPayment.parts[index]
+				if (part is Lightning_kmpOutgoingPayment.LightningPart) {
+					lightningPart_row(part as! Lightning_kmpOutgoingPayment.LightningPart)
+				}
 			}
 		}
 	}
@@ -521,6 +524,32 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
+	func channelClosing_type(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
+		let identifier: String = #function
+		
+		InfoGridRowWrapper(
+			identifier: identifier,
+			hSpacing: horizontalSpacingBetweenColumns,
+			keyColumnWidth: keyColumnWidth(identifier: identifier)
+		) {
+			
+			keyColumn(NSLocalizedString("type", comment: "Label in DetailsView_IncomingPayment"))
+			
+		} valueColumn: {
+			
+			let closingTxPart = outgoingPayment.closingTxParts().first
+			switch closingTxPart?.closingType {
+				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
+				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
+				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
+				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
+				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
+				default                                      : Text(verbatim: "?")
+			}
+		}
+	}
+	
+	@ViewBuilder
 	func channelClosing_btcAddress(_ channelClosing: Lightning_kmpOutgoingPayment.DetailsChannelClosing) -> some View {
 		let identifier: String = #function
 		
@@ -736,31 +765,6 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_type(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
-		let identifier: String = #function
-		
-		InfoGridRowWrapper(
-			identifier: identifier,
-			hSpacing: horizontalSpacingBetweenColumns,
-			keyColumnWidth: keyColumnWidth(identifier: identifier)
-		) {
-			
-			keyColumn(NSLocalizedString("type", comment: "Label in DetailsView_IncomingPayment"))
-			
-		} valueColumn: {
-			
-			switch onChain.closingType {
-				case Lightning_kmpChannelClosingType.local   : Text(verbatim: "Local")
-				case Lightning_kmpChannelClosingType.mutual  : Text(verbatim: "Mutual")
-				case Lightning_kmpChannelClosingType.remote  : Text(verbatim: "Remote")
-				case Lightning_kmpChannelClosingType.revoked : Text(verbatim: "Revoked")
-				case Lightning_kmpChannelClosingType.other   : Text(verbatim: "Other")
-				default                                      : Text(verbatim: "?")
-			}
-		}
-	}
-	
-	@ViewBuilder
 	func onChain_completedAt(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
 		let identifier: String = #function
 		
@@ -779,7 +783,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func onChain_claimed(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+	func onChain_claimed(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
 		
 		InfoGridRowWrapper(
@@ -793,15 +797,16 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			commonValue_amounts(displayAmounts: displayAmounts(
-				sat: onChain.claimed,
+				sat: outgoingPayment.claimedOnChain(),
 				originalFiat: paymentInfo.metadata.originalFiat
 			))
 		}
 	}
 	
 	@ViewBuilder
-	func onChain_btcTxids(_ onChain: Lightning_kmpOutgoingPayment.StatusCompletedSucceededOnChain) -> some View {
+	func onChain_btcTxids(_ outgoingPayment: Lightning_kmpOutgoingPayment) -> some View {
 		let identifier: String = #function
+		let closingTxParts = outgoingPayment.closingTxParts()
 		
 		InfoGridRowWrapper(
 			identifier: identifier,
@@ -814,10 +819,9 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 		} valueColumn: {
 			
 			VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
-				
-				ForEach(onChain.txids.indices, id: \.self) { index in
-					
-					let txid = onChain.txids[index].toHex()
+				ForEach(closingTxParts.indices, id: \.self) { index in
+
+					let txid = closingTxParts[index].txId.toHex()
 					Text(txid)
 						.contextMenu {
 							Button(action: {
@@ -868,7 +872,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 	}
 	
 	@ViewBuilder
-	func part_row(_ part: Lightning_kmpOutgoingPayment.Part) -> some View {
+	func lightningPart_row(_ part: Lightning_kmpOutgoingPayment.LightningPart) -> some View {
 		let identifier: String = #function
 		let imgSize: CGFloat = 20
 		
@@ -878,10 +882,10 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			keyColumnWidth: keyColumnWidth(identifier: identifier)
 		) {
 			
-			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+			if let part_succeeded = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 				keyColumn(shortDisplayTime(date: part_succeeded.completedAtDate))
 				
-			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 				keyColumn(shortDisplayTime(date: part_failed.completedAtDate))
 				
 			} else {
@@ -890,7 +894,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 			
 		} valueColumn: {
 		
-			if let _ = part.status as? Lightning_kmpOutgoingPayment.PartStatusSucceeded {
+			if let _ = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusSucceeded {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {
@@ -920,7 +924,7 @@ fileprivate struct DetailsInfoGrid: InfoGridView {
 					}
 				}
 				
-			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.PartStatusFailed {
+			} else if let part_failed = part.status as? Lightning_kmpOutgoingPayment.LightningPartStatusFailed {
 				
 				VStack(alignment: HorizontalAlignment.leading, spacing: 4) {
 					HStack(alignment: VerticalAlignment.center, spacing: 4) {

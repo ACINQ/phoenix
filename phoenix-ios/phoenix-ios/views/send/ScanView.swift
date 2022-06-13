@@ -445,7 +445,7 @@ struct ScanView: View {
 					colorScheme: colorScheme.opposite,
 					style: .chrome,
 					duration: 10.0,
-					location: .middle,
+					alignment: .middle,
 					showCloseButton: true
 				)
 			}
@@ -494,7 +494,7 @@ struct ManualInput: View, ViewName {
 			.padding(.all, 8)
 			.overlay(
 				RoundedRectangle(cornerRadius: 8)
-					.stroke(Color(UIColor.separator), lineWidth: 1)
+					.stroke(Color.textFieldBorder, lineWidth: 1)
 			)
 			.padding(.bottom)
 			.padding(.bottom)

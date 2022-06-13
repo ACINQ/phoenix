@@ -20,6 +20,7 @@ import android.content.Intent
 import fr.acinq.phoenix.PhoenixBusiness
 import fr.acinq.phoenix.android.utils.LegacyMigrationHelper
 import fr.acinq.phoenix.android.utils.Logging
+import fr.acinq.phoenix.android.utils.Notifications
 import fr.acinq.phoenix.legacy.AppContext
 import fr.acinq.phoenix.utils.PlatformContext
 import kotlinx.coroutines.*
@@ -30,6 +31,7 @@ class PhoenixApplication : AppContext() {
     override fun onCreate() {
         super.onCreate()
         Logging.setupLogger(applicationContext)
+        Notifications.registerNotificationChannels(applicationContext)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

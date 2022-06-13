@@ -189,7 +189,7 @@ struct ValidateView: View {
 	@ViewBuilder
 	var content: some View {
 	
-		let isDisconnected = connectionsManager.connections.global != .established
+		let isDisconnected = !(connectionsManager.connections.global is Lightning_kmpConnection.ESTABLISHED)
 		VStack {
 	
 			if let host = paymentHost() {
@@ -566,13 +566,13 @@ struct ValidateView: View {
 	
 	func disconnectedText() -> String {
 		
-		if connectionsManager.connections.internet != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.internet is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("waiting for internet", comment: "button text")
 		}
-		if connectionsManager.connections.peer != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.peer is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to peer", comment: "button text")
 		}
-		if connectionsManager.connections.electrum != Lightning_kmpConnection.established {
+		if !(connectionsManager.connections.electrum is Lightning_kmpConnection.ESTABLISHED) {
 			return NSLocalizedString("connecting to electrum", comment: "button text")
 		}
 		return ""
@@ -1175,11 +1175,11 @@ struct ValidateView: View {
 		// The TextFieldCurrencyStyler doesn't seem to fire when we manually set the text value.
 		// So we need to do it manually here, to ensure the `parsedAmount` is properly updated.
 		
-		let amt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit)
-		let result = TextFieldCurrencyStyler.format(input: amt.digits, currency: currency, hideMsats: false)
+		let amtDbl = Utils.convertBitcoin(msat: msat, to: preferredBitcoinUnit)
+		let amtFrmt = Utils.formatBitcoin(msat: msat, bitcoinUnit: preferredBitcoinUnit, policy: .showMsatsIfNonZero)
 		
-		parsedAmount = result.1
-		amount = result.0
+		parsedAmount = Result.success(amtDbl)
+		amount = amtFrmt.digits
 	}
 	
 	func commentButtonTapped() {
