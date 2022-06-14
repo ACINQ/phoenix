@@ -45,20 +45,27 @@ object Converter {
 
     private val DECIMAL_SEPARATOR = DecimalFormat().decimalFormatSymbols.decimalSeparator.toString()
     private var SAT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.###")
-    private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0")
-    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.##")
-    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.#####")
-    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.###########")
+    private var SAT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0").apply { roundingMode = RoundingMode.DOWN }
+    private var BIT_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.#####")
+    private var BIT_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.##").apply { roundingMode = RoundingMode.DOWN }
+    private var MBTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.########")
+    private var MBTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.#####").apply { roundingMode = RoundingMode.DOWN }
+    private var BTC_FORMAT_WITH_MILLIS: NumberFormat = DecimalFormat("###,###,###,##0.##############")
+    private var BTC_FORMAT: NumberFormat = DecimalFormat("###,###,###,##0.###########").apply { roundingMode = RoundingMode.DOWN }
     private var FIAT_FORMAT: NumberFormat = NumberFormat.getInstance().apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
         roundingMode = RoundingMode.CEILING // prevent converting very small bitcoin amounts to 0 in fiat
     }
 
-    fun getCoinFormat(unit: BitcoinUnit) = when (unit) {
-        BitcoinUnit.Sat -> SAT_FORMAT
-        BitcoinUnit.Bit -> BIT_FORMAT
-        BitcoinUnit.MBtc -> MBTC_FORMAT
+    private fun getCoinFormat(unit: BitcoinUnit, withMillis: Boolean) = when {
+        unit == BitcoinUnit.Sat && withMillis-> SAT_FORMAT_WITH_MILLIS
+        unit == BitcoinUnit.Sat -> SAT_FORMAT
+        unit == BitcoinUnit.Bit && withMillis-> BIT_FORMAT_WITH_MILLIS
+        unit == BitcoinUnit.Bit -> BIT_FORMAT
+        unit == BitcoinUnit.MBtc && withMillis -> MBTC_FORMAT_WITH_MILLIS
+        unit == BitcoinUnit.MBtc -> MBTC_FORMAT
+        unit == BitcoinUnit.Btc && withMillis -> BTC_FORMAT_WITH_MILLIS
         else -> BTC_FORMAT
     }
 
@@ -75,10 +82,7 @@ object Converter {
             unit == BitcoinUnit.Sat && amount < 1.0 && mSatDisplayPolicy == MSatDisplayPolicy.SHOW_IF_ZERO_SATS -> {
                 SAT_FORMAT_WITH_MILLIS.format(amount)
             }
-            unit == BitcoinUnit.Sat && mSatDisplayPolicy == MSatDisplayPolicy.SHOW -> {
-                SAT_FORMAT_WITH_MILLIS.format(amount)
-            }
-            unit is BitcoinUnit -> getCoinFormat(unit).format(amount)
+            unit is BitcoinUnit -> getCoinFormat(unit, withMillis = mSatDisplayPolicy == MSatDisplayPolicy.SHOW).format(amount)
             unit is FiatCurrency -> FIAT_FORMAT.format(amount)
             else -> "?!"
         }

@@ -99,21 +99,20 @@ fun PaymentDetailsTechnicalView(
                 DetailsForOutgoingPayment(payment)
             }
 
-            // show successful LN parts
+            // show successful LN parts and closing txs
             val lightningParts = payment.parts.filterIsInstance<OutgoingPayment.LightningPart>().filter { it.status is OutgoingPayment.LightningPart.Status.Succeeded }
-            if (!lightningParts.isNullOrEmpty()) {
+            val closingTxsParts = payment.parts.filterIsInstance<OutgoingPayment.ClosingTxPart>()
+            if (lightningParts.isNotEmpty() || closingTxsParts.isNotEmpty()) {
                 Text(text = stringResource(id = R.string.paymentdetails_parts_label), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, style = MaterialTheme.typography.subtitle1)
-                lightningParts.forEachIndexed { index, part ->
-                    TechnicalCard {
-                        LightningPart(index, part, rateThen)
-                    }
+            }
+            lightningParts.forEachIndexed { index, part ->
+                TechnicalCard {
+                    LightningPart(index, part, rateThen)
                 }
             }
-            // show closing transactions
-            val closingTxsParts = payment.parts.filterIsInstance<OutgoingPayment.ClosingTxPart>()
             closingTxsParts.forEachIndexed { index, part ->
                 TechnicalCard {
-                    ClosingTxPart(index = index, part = part, rateThen = rateThen)
+                    ClosingTxPart(index, part, rateThen)
                 }
             }
         }
@@ -200,15 +199,18 @@ private fun AmountSection(
     payment: WalletPayment,
     rateThen: ExchangeRate.BitcoinPriceRate?
 ) {
+    val hideMsat = payment is OutgoingPayment && payment.details is OutgoingPayment.Details.ChannelClosing
     TechnicalRowAmount(
         label = stringResource(id = if (payment is OutgoingPayment) R.string.paymentdetails_amount_sent_label else R.string.paymentdetails_amount_received_label),
         amount = payment.amount,
-        rateThen = rateThen
+        rateThen = rateThen,
+        mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
     )
     TechnicalRowAmount(
         label = stringResource(id = R.string.paymentdetails_fees_label),
         amount = payment.fees,
-        rateThen = rateThen
+        rateThen = rateThen,
+        mSatDisplayPolicy = if (hideMsat) MSatDisplayPolicy.HIDE else MSatDisplayPolicy.SHOW
     )
 }
 
@@ -331,10 +333,8 @@ private fun ClosingTxPart(
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_label)) {
         Text("#$index")
     }
-    TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_transaction_label)) {
-        Text(part.txId.toHex())
-    }
-    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_part_claimed_label), amount = part.claimed.toMilliSatoshi(), rateThen = rateThen)
+    TechnicalRowSelectable(label = stringResource(id = R.string.paymentdetails_part_transaction_label), value = part.txId.toHex())
+    TechnicalRowAmount(label = stringResource(id = R.string.paymentdetails_part_claimed_label), amount = part.claimed.toMilliSatoshi(), rateThen = rateThen, mSatDisplayPolicy = MSatDisplayPolicy.HIDE)
     TechnicalRow(label = stringResource(id = R.string.paymentdetails_part_closing_type_label)) {
         Text(
             when (part.closingType) {
@@ -423,14 +423,15 @@ private fun TechnicalRowSelectable(
 private fun TechnicalRowAmount(
     label: String,
     amount: MilliSatoshi,
-    rateThen: ExchangeRate.BitcoinPriceRate?
+    rateThen: ExchangeRate.BitcoinPriceRate?,
+    mSatDisplayPolicy: MSatDisplayPolicy = MSatDisplayPolicy.SHOW,
 ) {
     val rate = fiatRate
     val prefFiat = LocalFiatCurrency.current
     val prefBtcUnit = LocalBitcoinUnit.current
 
     TechnicalRow(label = label) {
-        AmountView(amount = amount, showUnit = true, forceUnit = prefBtcUnit, mSatDisplayPolicy = MSatDisplayPolicy.SHOW)
+        AmountView(amount = amount, showUnit = true, forceUnit = prefBtcUnit, mSatDisplayPolicy = mSatDisplayPolicy)
 
         if (rate != null && amount > 0.msat) {
             val fiatAmount = amount.toFiat(rate.price).toPrettyString(prefFiat, withUnit = true)
