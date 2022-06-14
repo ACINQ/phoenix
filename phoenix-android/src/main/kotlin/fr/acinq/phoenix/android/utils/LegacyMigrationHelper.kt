@@ -54,6 +54,7 @@ object LegacyMigrationHelper {
         context: Context,
         business: PhoenixBusiness
     ) {
+        // 1 - create a copy of the eclair database file we can safely work on
         val eclairDbFile = Wallet.getEclairDBFile(context)
         eclairDbFile.copyTo(File(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite"), overwrite = true)
         log.info("legacy database file has been copied")
@@ -63,8 +64,10 @@ object LegacyMigrationHelper {
         val legacyPaymentsDb = SqlitePaymentsDb(SqliteUtils.openSqliteFile(Wallet.getChainDatadir(context), "eclairdb-migration.sqlite", true, "wal", "normal"))
         log.info("opened legacy payments db")
 
+        // 2 - get the new payments database
         val newPaymentsDb = business.databaseManager.paymentsDb()
 
+        // 3 - extract all outgoing payments from the legacy database, and save them to the new database
         val outgoing = JavaConversions.asJavaCollection(legacyPaymentsDb.listAllOutgoingPayments()).toList().groupBy { it.parentId() }
         log.info("migrating ${outgoing.size} outgoing payments")
         outgoing.forEach {
@@ -75,6 +78,7 @@ object LegacyMigrationHelper {
             }
         }
 
+        // 4 - extract all incoming payments from the legacy database, and save them to the new database
         val incoming = JavaConversions.asJavaCollection(legacyPaymentsDb.listAllIncomingPayments()).toList()
         log.info("migrating ${incoming.size} incoming payments")
         incoming.forEach {
@@ -271,7 +275,7 @@ object LegacyMigrationHelper {
                 recipientAmount = head.recipientAmount().toLong().msat,
                 recipient = PublicKey.fromHex(head.recipientNodeId().toUncompressedBin().toHex()),
                 details = details,
-                parts = lightningParts,
+                parts = lightningParts + closingTxsParts,
                 status = status,
                 createdAt = head.createdAt()
             )
@@ -285,34 +289,5 @@ object LegacyMigrationHelper {
                 userNotes = null
             )
         }
-
-
-//        when (val oldStatus = head.status()) {
-//            is OutgoingPaymentStatus.Failed -> {
-//                newPaymentsDb.completeOutgoingPayment(
-//                    id = id,
-//                    completed = OutgoingPayment.Status.Completed.Failed(reason = FinalFailure.UnknownError, completedAt = oldStatus.completedAt())
-//                )
-//            }
-//            is OutgoingPaymentStatus.Succeeded -> {
-//                newPaymentsDb.completeOutgoingPayment(
-//                    id = id,
-//                    completed = if (paymentMeta?.swap_out_address != null) {
-//                        // FIXME: we need a specific type for successful swap-outs
-//                        OutgoingPayment.Status.Completed.Succeeded.OnChain(
-//                            txids = emptyList(),
-//                            claimed = 0.sat,
-//                            closingType = ChannelClosingType.Mutual,
-//                            completedAt = oldStatus.completedAt()
-//                        )
-//                    } else {
-//                        OutgoingPayment.Status.Completed.Succeeded.OffChain(
-//                            preimage = ByteVector32.fromValidHex(oldStatus.paymentPreimage().bytes().toHex()),
-//                            completedAt = oldStatus.completedAt()
-//                        )
-//                    }
-//                )
-//            }
-//        }
     }
 }
